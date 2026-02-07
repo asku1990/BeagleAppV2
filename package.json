@@ -2,25 +2,41 @@
   "name": "beagle-app-v2",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.4.1",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "next": "16.1.6",
-    "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "test:unit": "turbo test:unit",
+    "test:e2e": "turbo test:e2e",
+    "db:generate": "pnpm --filter @beagle/db exec prisma generate",
+    "db:studio": "pnpm --filter @beagle/db exec prisma studio",
+    "db:migrate": "echo 'Use pnpm db:migrate:dev (with -- --name <migration>) or pnpm db:push for no migration files.' && exit 1",
+    "db:migrate:dev": "pnpm --filter @beagle/db exec prisma migrate dev",
+    "db:deploy": "pnpm --filter @beagle/db exec prisma migrate deploy",
+    "db:push": "pnpm --filter @beagle/db exec prisma db push",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.1.6",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^20.19.10",
+    "eslint": "^9.35.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
+    "turbo": "^2.5.6",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "esbuild",
+      "prisma",
+      "sharp",
+      "unrs-resolver"
+    ]
   }
 }

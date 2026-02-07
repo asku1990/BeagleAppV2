@@ -1,0 +1,24 @@
+{
+  "extends": "../../packages/config-typescript/base.json",
+  "compilerOptions": {
+    "plugins": [{ "name": "next" }],
+    "jsx": "preserve",
+    "incremental": true,
+    "paths": {
+      "@/*": ["./*"],
+      "@beagle/auth": ["../../packages/auth/index.ts"],
+      "@beagle/db": ["../../packages/db/index.ts"],
+      "@beagle/domain": ["../../packages/domain/index.ts"],
+      "@beagle/ui": ["../../packages/ui/index.ts"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  "exclude": ["node_modules"]
+}

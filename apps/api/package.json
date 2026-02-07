@@ -1,0 +1,26 @@
+{
+  "name": "@beagle/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -H 127.0.0.1 -p 3001",
+    "build": "next build --webpack",
+    "start": "next start -H 127.0.0.1 -p 3001",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "echo 'No API tests yet'",
+    "test:unit": "echo 'No API unit tests yet'"
+  },
+  "dependencies": {
+    "@beagle/auth": "workspace:*",
+    "@beagle/db": "workspace:*",
+    "@beagle/domain": "workspace:*",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9"
+  }
+}
