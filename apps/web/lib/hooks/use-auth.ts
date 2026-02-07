@@ -28,6 +28,7 @@ export function useCurrentUser() {
   return useQuery({
     queryKey: currentUserQueryKey,
     queryFn: fetchCurrentUser,
+    staleTime: 60_000,
   });
 }
 
@@ -72,6 +73,7 @@ export function useLogout() {
       return result.data;
     },
     onSuccess: async () => {
+      queryClient.setQueryData(currentUserQueryKey, null);
       await queryClient.invalidateQueries({ queryKey: currentUserQueryKey });
     },
   });

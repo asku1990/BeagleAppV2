@@ -23,6 +23,10 @@ export async function verifyPassword(hash: string, password: string) {
   if (scheme !== "scrypt" || !salt || !expectedHex) {
     return false;
   }
+  const isHex = /^[0-9a-f]+$/i.test(expectedHex);
+  if (!isHex || expectedHex.length % 2 !== 0) {
+    return false;
+  }
 
   const expected = Buffer.from(expectedHex, "hex");
   const candidate = (await scrypt(password, salt, expected.length)) as Buffer;

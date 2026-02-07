@@ -32,14 +32,20 @@ export function createApiClient(options: ClientOptions = {}) {
     path: string,
     init: RequestInit = {},
   ): Promise<ApiResult<T>> {
+    const headers = new Headers(options.headers ?? {});
+    if (init.headers) {
+      new Headers(init.headers).forEach((value, key) =>
+        headers.set(key, value),
+      );
+    }
+    if (init.body != null && !headers.has("Content-Type")) {
+      headers.set("Content-Type", "application/json");
+    }
+
     const response = await fetch(`${baseUrl}${path}`, {
       ...init,
       credentials,
-      headers: {
-        "Content-Type": "application/json",
-        ...(options.headers ?? {}),
-        ...(init.headers ?? {}),
-      },
+      headers,
     });
 
     return parseJson<T>(response);

@@ -11,4 +11,10 @@ describe("password hashing", () => {
     const hash = await hashPassword("p@ssword123");
     await expect(verifyPassword(hash, "wrong-password")).resolves.toBe(false);
   });
+
+  it("rejects malformed hex hash payloads", async () => {
+    await expect(
+      verifyPassword("scrypt$salt$zz", "any-password"),
+    ).resolves.toBe(false);
+  });
 });

@@ -65,7 +65,7 @@ export async function findUserBySessionToken(sessionToken: string) {
 
   if (!session) return null;
   if (session.expires < new Date()) {
-    await prisma.session.delete({ where: { sessionToken } });
+    await prisma.session.deleteMany({ where: { sessionToken } });
     return null;
   }
 
