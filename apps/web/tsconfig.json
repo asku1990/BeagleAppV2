@@ -6,17 +6,11 @@
     "incremental": true,
     "paths": {
       "@/*": ["./*"],
-      "@beagle/domain": ["../../packages/domain/index.ts"],
+      "@beagle/api-client": ["../../packages/api-client/index.ts"],
+      "@beagle/contracts": ["../../packages/contracts/index.ts"],
       "@beagle/ui": ["../../packages/ui/index.ts"]
     }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.mts"],
   "exclude": ["node_modules"]
 }

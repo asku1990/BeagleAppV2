@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ActionResult } from "@beagle/domain";
+import type { ActionResult } from "@beagle/contracts";
 
 describe("action contracts", () => {
   it("matches ActionResult type shape", () => {

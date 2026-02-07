@@ -6,9 +6,8 @@
     "incremental": true,
     "paths": {
       "@/*": ["./*"],
-      "@beagle/auth": ["../../packages/auth/index.ts"],
-      "@beagle/db": ["../../packages/db/index.ts"],
-      "@beagle/domain": ["../../packages/domain/index.ts"],
+      "@beagle/contracts": ["../../packages/contracts/index.ts"],
+      "@beagle/server": ["../../packages/server/index.ts"],
       "@beagle/ui": ["../../packages/ui/index.ts"]
     }
   },

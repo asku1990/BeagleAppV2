@@ -2,38 +2,31 @@
 
 import { useState } from "react";
 import { Button } from "@beagle/ui";
-
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+import { useRegister } from "@/lib/hooks/use-auth";
 
 export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const register = useRegister();
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
-    setIsSubmitting(true);
 
     const formData = new FormData(event.currentTarget);
     const email = String(formData.get("email") ?? "").trim();
     const username = String(formData.get("username") ?? "").trim();
     const password = String(formData.get("password") ?? "");
 
-    const response = await fetch(`${apiBaseUrl}/api/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    try {
+      await register.mutateAsync({
         email,
         username: username || undefined,
         password,
-      }),
-    });
-
-    const payload = (await response.json()) as { ok?: boolean; error?: string };
-
-    if (!response.ok || !payload.ok) {
-      setError(payload.error ?? "Registration failed.");
-      setIsSubmitting(false);
+      });
+    } catch (cause) {
+      const message =
+        cause instanceof Error ? cause.message : "Registration failed.";
+      setError(message);
       return;
     }
 
@@ -64,8 +57,8 @@ export default function RegisterPage() {
           required
           className="rounded border p-2"
         />
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Creating..." : "Register"}
+        <Button type="submit" disabled={register.isPending}>
+          {register.isPending ? "Creating..." : "Register"}
         </Button>
       </form>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}

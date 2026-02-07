@@ -1,5 +1,5 @@
-import { verifyPassword } from "@beagle/auth";
-import { createSession, findUserByEmail } from "@beagle/db";
+import { authService } from "@beagle/server";
+import type { LoginRequest } from "@beagle/contracts";
 import { jsonResponse, optionsResponse } from "@/lib/cors";
 
 export async function OPTIONS() {
@@ -7,48 +7,19 @@ export async function OPTIONS() {
 }
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as { email?: string; password?: string };
-  const email = body.email?.trim().toLowerCase();
+  const body = (await request.json()) as Partial<LoginRequest>;
+  const result = await authService.login(body);
 
-  if (!email || !body.password) {
-    return jsonResponse(
-      { ok: false, error: "Email and password are required." },
-      { status: 400 },
-    );
+  if (!result.body.ok || !result.session) {
+    return jsonResponse(result.body, { status: result.status });
   }
 
-  const user = await findUserByEmail(email);
-  if (!user) {
-    return jsonResponse(
-      { ok: false, error: "Invalid credentials." },
-      { status: 401 },
-    );
-  }
-
-  const validPassword = await verifyPassword(user.passwordHash, body.password);
-  if (!validPassword) {
-    return jsonResponse(
-      { ok: false, error: "Invalid credentials." },
-      { status: 401 },
-    );
-  }
-
-  const session = await createSession(user.id);
-  const response = jsonResponse({
-    ok: true,
-    data: {
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      role: user.role,
-    },
-  });
-
-  response.cookies.set("beagle_session", session.sessionToken, {
+  const response = jsonResponse(result.body, { status: result.status });
+  response.cookies.set("beagle_session", result.session.sessionToken, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
-    expires: session.expires,
+    expires: result.session.expires,
     path: "/",
   });
 

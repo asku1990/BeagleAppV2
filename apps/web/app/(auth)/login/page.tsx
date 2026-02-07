@@ -2,34 +2,25 @@
 
 import { useState } from "react";
 import { Button } from "@beagle/ui";
-
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+import { useLogin } from "@/lib/hooks/use-auth";
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const login = useLogin();
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
-    setIsSubmitting(true);
 
     const formData = new FormData(event.currentTarget);
     const email = String(formData.get("email") ?? "").trim();
     const password = String(formData.get("password") ?? "");
 
-    const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const payload = (await response.json()) as { ok?: boolean; error?: string };
-
-    if (!response.ok || !payload.ok) {
-      setError(payload.error ?? "Login failed.");
-      setIsSubmitting(false);
+    try {
+      await login.mutateAsync({ email, password });
+    } catch (cause) {
+      const message = cause instanceof Error ? cause.message : "Login failed.";
+      setError(message);
       return;
     }
 
@@ -54,8 +45,8 @@ export default function LoginPage() {
           required
           className="rounded border p-2"
         />
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Signing in..." : "Sign in"}
+        <Button type="submit" disabled={login.isPending}>
+          {login.isPending ? "Signing in..." : "Sign in"}
         </Button>
       </form>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}

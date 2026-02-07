@@ -37,15 +37,12 @@ importers:
 
   apps/api:
     dependencies:
-      "@beagle/auth":
+      "@beagle/contracts":
         specifier: workspace:*
-        version: link:../../packages/auth
-      "@beagle/db":
+        version: link:../../packages/contracts
+      "@beagle/server":
         specifier: workspace:*
-        version: link:../../packages/db
-      "@beagle/domain":
-        specifier: workspace:*
-        version: link:../../packages/domain
+        version: link:../../packages/server
       next:
         specifier: 16.1.6
         version: 16.1.6(@playwright/test@1.58.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -65,9 +62,12 @@ importers:
 
   apps/web:
     dependencies:
-      "@beagle/domain":
+      "@beagle/api-client":
         specifier: workspace:*
-        version: link:../../packages/domain
+        version: link:../../packages/api-client
+      "@beagle/contracts":
+        specifier: workspace:*
+        version: link:../../packages/contracts
       "@beagle/ui":
         specifier: workspace:*
         version: link:../../packages/ui
@@ -97,6 +97,12 @@ importers:
         specifier: ^4.1.13
         version: 4.1.18
 
+  packages/api-client:
+    dependencies:
+      "@beagle/contracts":
+        specifier: workspace:*
+        version: link:../contracts
+
   packages/auth:
     dependencies:
       "@beagle/db":
@@ -110,6 +116,8 @@ importers:
         version: 16.1.6(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
 
   packages/config-typescript: {}
+
+  packages/contracts: {}
 
   packages/db:
     dependencies:
@@ -130,8 +138,14 @@ importers:
         specifier: ^7.3.0
         version: 7.3.0(@types/react@19.2.13)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3)
 
-  packages/domain:
+  packages/server:
     dependencies:
+      "@beagle/auth":
+        specifier: workspace:*
+        version: link:../auth
+      "@beagle/contracts":
+        specifier: workspace:*
+        version: link:../contracts
       "@beagle/db":
         specifier: workspace:*
         version: link:../db

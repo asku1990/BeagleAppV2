@@ -1,15 +1,16 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { createApiClient } from "@beagle/api-client";
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+const apiClient = createApiClient();
 
 async function fetchStatus() {
-  const response = await fetch(`${apiBaseUrl}/api/import/example`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch import status");
+  const result = await apiClient.getImportStatus();
+  if (!result.ok) {
+    throw new Error(result.error);
   }
-  return response.json() as Promise<{ ok: boolean; data: { info: string } }>;
+  return result.data;
 }
 
 export function ImportStatus() {
@@ -20,5 +21,5 @@ export function ImportStatus() {
   if (query.isError)
     return <p className="text-sm text-red-600">Import status unavailable.</p>;
 
-  return <p className="text-sm text-zinc-700">{query.data?.data.info}</p>;
+  return <p className="text-sm text-zinc-700">{query.data?.info}</p>;
 }

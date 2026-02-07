@@ -1,5 +1,5 @@
 {
-  "name": "@beagle/domain",
+  "name": "@beagle/server",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -9,10 +9,12 @@
     "build": "tsc -p tsconfig.json",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run --passWithNoTests",
-    "test:unit": "vitest run --passWithNoTests"
+    "test": "vitest run",
+    "test:unit": "vitest run"
   },
   "dependencies": {
+    "@beagle/auth": "workspace:*",
+    "@beagle/contracts": "workspace:*",
     "@beagle/db": "workspace:*"
   }
 }
