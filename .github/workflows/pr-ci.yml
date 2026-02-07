@@ -18,6 +18,8 @@ jobs:
           cache: pnpm
       - name: Install
         run: pnpm install --frozen-lockfile
+      - name: Generate Prisma client
+        run: pnpm db:generate
       - name: Lint
         run: pnpm lint
       - name: Typecheck
@@ -39,6 +41,8 @@ jobs:
           cache: pnpm
       - name: Install
         run: pnpm install --frozen-lockfile
+      - name: Generate Prisma client
+        run: pnpm db:generate
       - name: Install Playwright Browsers
         run: pnpm --filter @beagle/web exec playwright install --with-deps
       - name: E2E tests
