@@ -16,6 +16,7 @@
     "db:studio": "pnpm --filter @beagle/db exec prisma studio",
     "db:migrate": "echo 'Use pnpm db:migrate:dev (with -- --name <migration>) or pnpm db:push for no migration files.' && exit 1",
     "db:migrate:dev": "pnpm --filter @beagle/db exec prisma migrate dev",
+    "db:migrate:reset": "pnpm --filter @beagle/db exec prisma migrate reset",
     "db:deploy": "pnpm --filter @beagle/db exec prisma migrate deploy",
     "db:push": "pnpm --filter @beagle/db exec prisma db push",
     "prepare": "husky"
