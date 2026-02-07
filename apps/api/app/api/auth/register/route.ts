@@ -7,7 +7,18 @@ export async function OPTIONS() {
 }
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as Partial<RegisterRequest>;
+  let body: Partial<RegisterRequest>;
+  try {
+    body = (await request.json()) as Partial<RegisterRequest>;
+  } catch {
+    return jsonResponse(
+      { ok: false, error: "Invalid JSON body." },
+      { status: 400, methods: "POST,OPTIONS" },
+    );
+  }
   const result = await authService.register(body);
-  return jsonResponse(result.body, { status: result.status });
+  return jsonResponse(result.body, {
+    status: result.status,
+    methods: "POST,OPTIONS",
+  });
 }

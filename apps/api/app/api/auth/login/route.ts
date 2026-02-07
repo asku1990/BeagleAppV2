@@ -7,14 +7,28 @@ export async function OPTIONS() {
 }
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as Partial<LoginRequest>;
+  let body: Partial<LoginRequest>;
+  try {
+    body = (await request.json()) as Partial<LoginRequest>;
+  } catch {
+    return jsonResponse(
+      { ok: false, error: "Invalid JSON body." },
+      { status: 400, methods: "POST,OPTIONS" },
+    );
+  }
   const result = await authService.login(body);
 
   if (!result.body.ok || !result.session) {
-    return jsonResponse(result.body, { status: result.status });
+    return jsonResponse(result.body, {
+      status: result.status,
+      methods: "POST,OPTIONS",
+    });
   }
 
-  const response = jsonResponse(result.body, { status: result.status });
+  const response = jsonResponse(result.body, {
+    status: result.status,
+    methods: "POST,OPTIONS",
+  });
   response.cookies.set("beagle_session", result.session.sessionToken, {
     httpOnly: true,
     sameSite: "lax",
