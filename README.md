@@ -133,3 +133,10 @@ pnpm --filter @beagle/server test:unit
 - Add shared payload types in `packages/contracts`.
 - Add client calls in `packages/api-client`.
 - Consume from UI using React Query hooks in `apps/web/lib/hooks`.
+
+## Architecture docs
+
+- `ARCHITECTURE.md`: monorepo boundaries, dependency rules, and scaling path.
+- `docs/api-versioning.md`: API path versioning policy (`/api/v1/...`).
+- `docs/roles-and-permissions.md`: baseline role and authorization rules.
+- `docs/migration-plan-v1-to-v2.md`: staged migration approach from legacy app.
