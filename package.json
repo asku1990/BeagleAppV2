@@ -7,6 +7,7 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
+    "format": "prettier . --write",
     "typecheck": "turbo typecheck",
     "test": "turbo test",
     "test:unit": "turbo test:unit",
@@ -25,6 +26,7 @@
     "eslint": "^9.35.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
+    "prettier": "^3.6.2",
     "turbo": "^2.5.6",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"

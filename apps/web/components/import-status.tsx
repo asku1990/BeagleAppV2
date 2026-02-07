@@ -15,8 +15,10 @@ async function fetchStatus() {
 export function ImportStatus() {
   const query = useQuery({ queryKey: ["import-status"], queryFn: fetchStatus });
 
-  if (query.isLoading) return <p className="text-sm text-zinc-500">Loading import status...</p>;
-  if (query.isError) return <p className="text-sm text-red-600">Import status unavailable.</p>;
+  if (query.isLoading)
+    return <p className="text-sm text-zinc-500">Loading import status...</p>;
+  if (query.isError)
+    return <p className="text-sm text-red-600">Import status unavailable.</p>;
 
   return <p className="text-sm text-zinc-700">{query.data?.data.info}</p>;
 }

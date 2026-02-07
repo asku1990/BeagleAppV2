@@ -22,7 +22,11 @@ export default function RegisterPage() {
     const response = await fetch(`${apiBaseUrl}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, username: username || undefined, password })
+      body: JSON.stringify({
+        email,
+        username: username || undefined,
+        password,
+      }),
     });
 
     const payload = (await response.json()) as { ok?: boolean; error?: string };
@@ -40,10 +44,29 @@ export default function RegisterPage() {
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-4 p-6">
       <h1 className="text-2xl font-semibold">Create account</h1>
       <form onSubmit={onSubmit} className="flex flex-col gap-3">
-        <input name="email" type="email" placeholder="Email" required className="rounded border p-2" />
-        <input name="username" type="text" placeholder="Username (optional)" className="rounded border p-2" />
-        <input name="password" type="password" placeholder="Password" required className="rounded border p-2" />
-        <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Creating..." : "Register"}</Button>
+        <input
+          name="email"
+          type="email"
+          placeholder="Email"
+          required
+          className="rounded border p-2"
+        />
+        <input
+          name="username"
+          type="text"
+          placeholder="Username (optional)"
+          className="rounded border p-2"
+        />
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          required
+          className="rounded border p-2"
+        />
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Creating..." : "Register"}
+        </Button>
       </form>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
     </main>

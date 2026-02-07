@@ -1,5 +1,9 @@
 import type { Role } from "@beagle/db";
-import { randomBytes, scrypt as nodeScrypt, timingSafeEqual } from "node:crypto";
+import {
+  randomBytes,
+  scrypt as nodeScrypt,
+  timingSafeEqual,
+} from "node:crypto";
 import { promisify } from "node:util";
 
 export type AuthzResult =
@@ -25,7 +29,10 @@ export async function verifyPassword(hash: string, password: string) {
   return timingSafeEqual(expected, candidate);
 }
 
-export function authorizeRole(user: { id: string; role: Role } | null, required: Role): AuthzResult {
+export function authorizeRole(
+  user: { id: string; role: Role } | null,
+  required: Role,
+): AuthzResult {
   if (!user) return { ok: false, reason: "UNAUTHENTICATED" };
   if (user.role !== required) return { ok: false, reason: "FORBIDDEN" };
   return { ok: true, userId: user.id, role: user.role };

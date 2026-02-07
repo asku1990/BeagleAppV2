@@ -11,17 +11,26 @@ export async function POST(request: Request) {
   const email = body.email?.trim().toLowerCase();
 
   if (!email || !body.password) {
-    return jsonResponse({ ok: false, error: "Email and password are required." }, { status: 400 });
+    return jsonResponse(
+      { ok: false, error: "Email and password are required." },
+      { status: 400 },
+    );
   }
 
   const user = await findUserByEmail(email);
   if (!user) {
-    return jsonResponse({ ok: false, error: "Invalid credentials." }, { status: 401 });
+    return jsonResponse(
+      { ok: false, error: "Invalid credentials." },
+      { status: 401 },
+    );
   }
 
   const validPassword = await verifyPassword(user.passwordHash, body.password);
   if (!validPassword) {
-    return jsonResponse({ ok: false, error: "Invalid credentials." }, { status: 401 });
+    return jsonResponse(
+      { ok: false, error: "Invalid credentials." },
+      { status: 401 },
+    );
   }
 
   const session = await createSession(user.id);
@@ -31,8 +40,8 @@ export async function POST(request: Request) {
       id: user.id,
       email: user.email,
       username: user.username,
-      role: user.role
-    }
+      role: user.role,
+    },
   });
 
   response.cookies.set("beagle_session", session.sessionToken, {
@@ -40,7 +49,7 @@ export async function POST(request: Request) {
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     expires: session.expires,
-    path: "/"
+    path: "/",
   });
 
   return response;

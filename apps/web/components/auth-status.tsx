@@ -15,7 +15,7 @@ type CurrentUser = {
 
 async function fetchCurrentUser() {
   const response = await fetch(`${apiBaseUrl}/api/auth/me`, {
-    credentials: "include"
+    credentials: "include",
   });
 
   if (response.status === 401) {
@@ -26,18 +26,24 @@ async function fetchCurrentUser() {
     throw new Error("Failed to load auth state.");
   }
 
-  const payload = (await response.json()) as { ok?: boolean; data?: CurrentUser };
-  return payload.ok ? payload.data ?? null : null;
+  const payload = (await response.json()) as {
+    ok?: boolean;
+    data?: CurrentUser;
+  };
+  return payload.ok ? (payload.data ?? null) : null;
 }
 
 export function AuthStatus() {
   const queryClient = useQueryClient();
-  const query = useQuery({ queryKey: ["current-user"], queryFn: fetchCurrentUser });
+  const query = useQuery({
+    queryKey: ["current-user"],
+    queryFn: fetchCurrentUser,
+  });
 
   async function onLogout() {
     await fetch(`${apiBaseUrl}/api/auth/logout`, {
       method: "POST",
-      credentials: "include"
+      credentials: "include",
     });
     await queryClient.invalidateQueries({ queryKey: ["current-user"] });
   }
@@ -53,7 +59,10 @@ export function AuthStatus() {
   if (!query.data) {
     return (
       <p className="text-sm text-zinc-700">
-        Not logged in. <Link className="underline" href="/login">Sign in</Link>
+        Not logged in.{" "}
+        <Link className="underline" href="/login">
+          Sign in
+        </Link>
       </p>
     );
   }
@@ -61,9 +70,12 @@ export function AuthStatus() {
   return (
     <div className="flex items-center gap-3">
       <p className="text-sm text-zinc-700">
-        Logged in as <span className="font-medium">{query.data.email}</span> ({query.data.role})
+        Logged in as <span className="font-medium">{query.data.email}</span> (
+        {query.data.role})
       </p>
-      <Button variant="secondary" onClick={onLogout}>Logout</Button>
+      <Button variant="secondary" onClick={onLogout}>
+        Logout
+      </Button>
     </div>
   );
 }

@@ -9,7 +9,9 @@ const thisDir = path.dirname(fileURLToPath(import.meta.url));
 loadEnv({ path: path.resolve(thisDir, "../../.env") });
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
-const databaseUrl = process.env.DATABASE_URL ?? "mysql://root:password@127.0.0.1:3306/beagle_db_v2";
+const databaseUrl =
+  process.env.DATABASE_URL ??
+  "mysql://root:password@127.0.0.1:3306/beagle_db_v2";
 const adapter = new PrismaMariaDb(databaseUrl);
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
@@ -31,8 +33,8 @@ export async function createUser(input: {
       email: input.email,
       username: input.username,
       passwordHash: input.passwordHash,
-      role: input.role ?? Role.USER
-    }
+      role: input.role ?? Role.USER,
+    },
   });
 }
 
@@ -48,8 +50,8 @@ export async function createSession(userId: string, ttlDays = 30) {
     data: {
       sessionToken,
       userId,
-      expires
-    }
+      expires,
+    },
   });
 
   return { sessionToken, expires };
@@ -58,7 +60,7 @@ export async function createSession(userId: string, ttlDays = 30) {
 export async function findUserBySessionToken(sessionToken: string) {
   const session = await prisma.session.findUnique({
     where: { sessionToken },
-    include: { user: true }
+    include: { user: true },
   });
 
   if (!session) return null;

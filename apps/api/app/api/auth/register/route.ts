@@ -7,16 +7,26 @@ export async function OPTIONS() {
 }
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as { email?: string; password?: string; username?: string };
+  const body = (await request.json()) as {
+    email?: string;
+    password?: string;
+    username?: string;
+  };
   const email = body.email?.trim().toLowerCase();
 
   if (!email || !body.password) {
-    return jsonResponse({ ok: false, error: "Email and password are required." }, { status: 400 });
+    return jsonResponse(
+      { ok: false, error: "Email and password are required." },
+      { status: 400 },
+    );
   }
 
   const existing = await findUserByEmail(email);
   if (existing) {
-    return jsonResponse({ ok: false, error: "Email already exists." }, { status: 409 });
+    return jsonResponse(
+      { ok: false, error: "Email already exists." },
+      { status: 409 },
+    );
   }
 
   const passwordHash = await hashPassword(body.password);
@@ -24,8 +34,11 @@ export async function POST(request: Request) {
     email,
     username: body.username?.trim() || undefined,
     passwordHash,
-    role: Role.USER
+    role: Role.USER,
   });
 
-  return jsonResponse({ ok: true, data: { id: user.id, email: user.email, role: user.role } }, { status: 201 });
+  return jsonResponse(
+    { ok: true, data: { id: user.id, email: user.email, role: user.role } },
+    { status: 201 },
+  );
 }

@@ -5,6 +5,6 @@ export async function importDog(payload: { name: string; breed?: string }) {
   await prisma.$executeRaw`SELECT 1`;
   return {
     imported: 1,
-    payload
+    payload,
   };
 }

@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     expires: new Date(0),
-    path: "/"
+    path: "/",
   });
 
   return response;

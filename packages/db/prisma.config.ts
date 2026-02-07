@@ -9,6 +9,8 @@ loadEnv({ path: path.resolve(thisDir, "../../.env") });
 export default defineConfig({
   schema: "prisma/schema.prisma",
   datasource: {
-    url: process.env.DATABASE_URL ?? "mysql://root:password@127.0.0.1:3306/beagle_db_v2"
-  }
+    url:
+      process.env.DATABASE_URL ??
+      "mysql://root:password@127.0.0.1:3306/beagle_db_v2",
+  },
 });

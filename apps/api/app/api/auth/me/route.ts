@@ -10,12 +10,18 @@ export async function GET(request: NextRequest) {
   const sessionToken = request.cookies.get("beagle_session")?.value;
 
   if (!sessionToken) {
-    return jsonResponse({ ok: false, error: "Not authenticated." }, { status: 401, methods: "GET,OPTIONS" });
+    return jsonResponse(
+      { ok: false, error: "Not authenticated." },
+      { status: 401, methods: "GET,OPTIONS" },
+    );
   }
 
   const user = await findUserBySessionToken(sessionToken);
   if (!user) {
-    return jsonResponse({ ok: false, error: "Not authenticated." }, { status: 401, methods: "GET,OPTIONS" });
+    return jsonResponse(
+      { ok: false, error: "Not authenticated." },
+      { status: 401, methods: "GET,OPTIONS" },
+    );
   }
 
   return jsonResponse(
@@ -25,9 +31,9 @@ export async function GET(request: NextRequest) {
         id: user.id,
         email: user.email,
         username: user.username,
-        role: user.role
-      }
+        role: user.role,
+      },
     },
-    { methods: "GET,OPTIONS" }
+    { methods: "GET,OPTIONS" },
   );
 }
