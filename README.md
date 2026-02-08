@@ -38,6 +38,7 @@ cp .env.example .env
 - `AUTH_SECRET`: strong random secret.
 - `NEXT_PUBLIC_API_URL`: API base URL for web app, default `http://localhost:3001`.
 - `CORS_ORIGIN`: web origin allowed by API, default `http://localhost:3000`.
+- `LEGACY_DATABASE_URL`: MariaDB connection string to legacy Beagle DB for phase-1 imports.
 
 Example values are already in `.env.example`.
 
@@ -122,9 +123,73 @@ pnpm --filter @beagle/server test:unit
   - `POST /api/auth/login`
   - `GET /api/auth/me`
   - `POST /api/auth/logout`
-- Import status endpoint:
+- Import placeholder endpoint (temporary):
   - `GET /api/import/example` returns status text
   - `POST /api/import/example` returns `501 Not Implemented`
+- New v1 admin import endpoints:
+  - `GET /api/v1/imports/:id`
+
+## Test migration and import with curl
+
+1. Run migration:
+
+```bash
+pnpm db:generate
+pnpm db:migrate:dev -- --name add_phase1_dog_search_stats_schema
+```
+
+2. Start apps:
+
+```bash
+pnpm dev
+```
+
+3. Run phase-1 import script:
+
+```bash
+pnpm import:phase1
+```
+
+Optional: provide a user id to record who triggered the import run:
+
+```bash
+pnpm import:phase1 -- <USER_ID>
+```
+
+4. Inspect warning/error details from script output:
+
+- During run, script now prints grouped issue stats and samples automatically.
+- For full issue listing by run id:
+
+```bash
+pnpm import:issues -- <RUN_ID>
+```
+
+Optional filters:
+
+```bash
+pnpm import:issues -- <RUN_ID> --stage owners
+pnpm import:issues -- <RUN_ID> --code OWNER_DOG_NOT_FOUND
+pnpm import:issues -- <RUN_ID> --limit 500
+```
+
+5. Check import run status over API (admin auth required):
+
+```bash
+curl -i -c /tmp/beagle.cookies -X POST http://localhost:3001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"your-password"}'
+
+curl -i -b /tmp/beagle.cookies \
+  http://localhost:3001/api/v1/imports/<RUN_ID>
+```
+
+Optional deep inspection via API:
+
+```bash
+curl -i -b /tmp/beagle.cookies \
+  "http://localhost:3001/api/v1/imports/<RUN_ID>/issues?limit=200"
+```
 
 ## Where to add new features
 

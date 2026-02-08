@@ -19,6 +19,8 @@
     "db:migrate:reset": "pnpm --filter @beagle/db exec prisma migrate reset",
     "db:deploy": "pnpm --filter @beagle/db exec prisma migrate deploy",
     "db:push": "pnpm --filter @beagle/db exec prisma db push",
+    "import:phase1": "pnpm --filter @beagle/server import:phase1",
+    "import:issues": "pnpm --filter @beagle/server import:issues",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -28,6 +30,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
     "prettier": "^3.6.2",
+    "tsx": "^4.20.6",
     "turbo": "^2.5.6",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
