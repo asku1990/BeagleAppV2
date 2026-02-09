@@ -23,8 +23,8 @@ export async function upsertOwner(row: LegacyOwnerRow): Promise<string | null> {
   const ownerName = normalizeNullable(row.ownerName);
   if (!ownerName) return null;
 
-  const postalCode = normalizeNullable(row.postalCode);
-  const city = normalizeNullable(row.city);
+  const postalCode = normalizeNullable(row.postalCode) ?? "";
+  const city = normalizeNullable(row.city) ?? "";
 
   const existing = await prisma.owner.findFirst({
     where: { name: ownerName, postalCode, city },

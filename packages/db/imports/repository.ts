@@ -255,7 +255,12 @@ export async function listImportRunIssues(
     cursor?: string;
   },
 ): Promise<{ items: ImportRunIssueRow[]; nextCursor: string | null }> {
-  const limit = Math.min(Math.max(options?.limit ?? 100, 1), 500);
+  const rawLimit = options?.limit;
+  const normalizedLimit =
+    typeof rawLimit === "number" && Number.isFinite(rawLimit)
+      ? Math.trunc(rawLimit)
+      : 100;
+  const limit = Math.min(Math.max(normalizedLimit, 1), 500);
   const items = await getImportRunIssueDelegate().findMany({
     where: {
       importRunId,

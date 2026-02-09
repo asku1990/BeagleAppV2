@@ -108,8 +108,8 @@ model Breeder {
 model Owner {
   id          String         @id @default(cuid())
   name        String
-  postalCode  String?
-  city        String?
+  postalCode  String         @default("")
+  city        String         @default("")
   ownerships  DogOwnership[]
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
@@ -195,7 +195,7 @@ model ImportRunIssue {
   registrationNo String?
   sourceRowId    Int?
   sourceTable    String?
-  payloadJson    String?
+  payloadJson    String?             @db.LongText
   importRun      ImportRun           @relation(fields: [importRunId], references: [id], onDelete: Cascade)
   createdAt      DateTime            @default(now())
 
