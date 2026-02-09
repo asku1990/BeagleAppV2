@@ -43,7 +43,6 @@ Legacy fetch is performed in `packages/db/legacy/source.ts`.
   - `REKNO -> registrationNo`
   - `EKNO -> ekNo`
 - Owners (`beaom`)
-  - `OMID -> sourceRowId`
   - `REKNO -> registrationNo`
   - `OMIST -> ownerName`
   - `OMPOSNO -> postalCode`
@@ -171,7 +170,7 @@ Rows with invalid registration format are skipped and logged with:
     - Owner/ownership insert skipped.
 - Valid rows:
   - Owner upsert behavior uses unique key `(name, postalCode, city)`.
-  - Ownership is deduplicated by `(dogId, ownerId, ownershipDate, sourceRowId)`.
+  - Ownership is deduplicated by `(dogId, ownerId, ownershipDate)`.
 
 ### Trials and shows stages
 

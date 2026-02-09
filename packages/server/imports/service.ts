@@ -145,7 +145,6 @@ export function createImportsService() {
         code: string;
         message: string;
         registrationNo?: string | null;
-        sourceRowId?: number | null;
         sourceTable?: string | null;
         payloadJson?: string | null;
       }> = [];
@@ -161,7 +160,6 @@ export function createImportsService() {
         code: string;
         message: string;
         registrationNo?: string | null;
-        sourceRowId?: number | null;
         sourceTable?: string | null;
         payloadJson?: string | null;
       }) => {
@@ -717,11 +715,9 @@ export function createImportsService() {
               code: "REGISTRATION_INVALID_FORMAT",
               message: "Owner row has invalid registration format.",
               registrationNo: registration.registrationNo,
-              sourceRowId: row.sourceRowId,
               sourceTable: "beaom",
               payloadJson: JSON.stringify({
                 registrationNo: row.registrationNo,
-                sourceRowId: row.sourceRowId,
               }),
             });
             if (ownersProcessed % 1000 === 0) {
@@ -740,11 +736,9 @@ export function createImportsService() {
               code: "OWNER_DOG_NOT_FOUND",
               message: "Owner row references a dog that was not found.",
               registrationNo: registration.registrationNo,
-              sourceRowId: row.sourceRowId,
               sourceTable: "beaom",
               payloadJson: JSON.stringify({
                 registrationNo: row.registrationNo,
-                sourceRowId: row.sourceRowId,
               }),
             });
             if (ownersProcessed % 1000 === 0) {
@@ -761,7 +755,6 @@ export function createImportsService() {
               code: "OWNER_MISSING_REQUIRED_FIELDS",
               message: "Owner row missing required owner identity fields.",
               registrationNo: registration.registrationNo,
-              sourceRowId: row.sourceRowId,
               sourceTable: "beaom",
               payloadJson: JSON.stringify({
                 ownerName: row.ownerName,
@@ -783,7 +776,6 @@ export function createImportsService() {
               dogId,
               ownerId,
               ownershipDate,
-              sourceRowId: row.sourceRowId,
             },
             select: { id: true },
           });
@@ -793,7 +785,6 @@ export function createImportsService() {
                 dogId,
                 ownerId,
                 ownershipDate,
-                sourceRowId: row.sourceRowId,
               },
             });
             ownershipsUpserted += 1;

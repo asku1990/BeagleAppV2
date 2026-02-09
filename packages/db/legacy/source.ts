@@ -16,7 +16,6 @@ export type LegacyEkRow = {
 };
 
 export type LegacyOwnerRow = {
-  sourceRowId: number | null;
   registrationNo: string;
   ownerName: string | null;
   postalCode: string | null;
@@ -92,8 +91,7 @@ export async function fetchLegacyPhase1Rows(options?: {
 
     const ownersStartedAt = Date.now();
     const owners = (await connection.query(
-      `SELECT OMID as sourceRowId,
-              REKNO as registrationNo,
+      `SELECT REKNO as registrationNo,
               OMIST as ownerName,
               OMPOSNO as postalCode,
               OMPOSPA as city,

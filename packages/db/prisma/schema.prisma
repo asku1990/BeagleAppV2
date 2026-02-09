@@ -123,13 +123,12 @@ model DogOwnership {
   dogId         String
   ownerId       String
   ownershipDate DateTime?
-  sourceRowId   Int?
   dog           Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
   owner         Owner    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  @@unique([dogId, ownerId, ownershipDate, sourceRowId])
+  @@unique([dogId, ownerId, ownershipDate])
   @@index([dogId])
   @@index([ownerId])
   @@index([ownershipDate])
