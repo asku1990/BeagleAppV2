@@ -39,10 +39,10 @@ model User {
   username     String?   @unique
   passwordHash String
   role         Role      @default(USER)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
   sessions     Session[]
   importRuns   ImportRun[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model Session {
@@ -50,10 +50,10 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Dog {
@@ -66,8 +66,6 @@ model Dog {
   damId                String?
   breederId            String?
   ekNo                 Int?           @unique
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @updatedAt
   sire                 Dog?           @relation("SireRelation", fields: [sireId], references: [id])
   siredPuppies         Dog[]          @relation("SireRelation")
   dam                  Dog?           @relation("DamRelation", fields: [damId], references: [id])
@@ -76,6 +74,8 @@ model Dog {
   ownerships           DogOwnership[]
   trialResults         TrialResult[]
   showResults          ShowResult[]
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
 
   @@index([name])
   @@index([birthDate])
@@ -87,9 +87,9 @@ model Dog {
 model Breeder {
   id        String   @id @default(cuid())
   name      String   @unique
+  dogs      Dog[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  dogs      Dog[]
 }
 
 model Owner {
@@ -97,9 +97,9 @@ model Owner {
   name        String
   postalCode  String?
   city        String?
+  ownerships  DogOwnership[]
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
-  ownerships  DogOwnership[]
 
   @@unique([name, postalCode, city])
   @@index([name])
@@ -111,10 +111,10 @@ model DogOwnership {
   ownerId       String
   ownershipDate DateTime?
   sourceRowId   Int?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
   dog           Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
   owner         Owner    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@unique([dogId, ownerId, ownershipDate, sourceRowId])
   @@index([dogId])
@@ -128,9 +128,9 @@ model TrialResult {
   eventDate DateTime
   eventName String
   sourceKey String   @unique
+  dog       Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  dog       Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
 
   @@index([eventDate])
   @@index([dogId, eventDate])
@@ -142,9 +142,9 @@ model ShowResult {
   eventDate DateTime
   eventName String
   sourceKey String   @unique
+  dog       Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  dog       Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
 
   @@index([eventDate])
   @@index([dogId, eventDate])
@@ -164,10 +164,10 @@ model ImportRun {
   finishedAt          DateTime?
   errorSummary        String?
   createdByUserId     String?
-  createdAt           DateTime     @default(now())
-  updatedAt           DateTime     @updatedAt
   createdByUser       User?        @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
   issues              ImportRunIssue[]
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
 
   @@index([kind, status])
   @@index([createdByUserId])
@@ -184,8 +184,8 @@ model ImportRunIssue {
   sourceRowId    Int?
   sourceTable    String?
   payloadJson    String?
-  createdAt      DateTime            @default(now())
   importRun      ImportRun           @relation(fields: [importRunId], references: [id], onDelete: Cascade)
+  createdAt      DateTime            @default(now())
 
   @@index([importRunId])
   @@index([importRunId, stage])

@@ -12,6 +12,7 @@
   - Prisma schema/models for dogs, breeders, owners, ownerships, trial/show events, and import runs
   - Legacy phase-1 import service with admin-only v1 API routes
   - Keep UI/read APIs unchanged for now (import-first groundwork only)
+- Standardize Prisma model field ordering (id, business, relations, audit metadata last) with no schema semantic changes.
 
 Files:
 
@@ -52,3 +53,5 @@ Files:
 - `apps/api/app/api/v1/imports/[id]/route.ts`
 - `packages/server/scripts/run-legacy-phase1.ts`
 - `README.md`
+- `packages/db/prisma/schema.prisma`
+- `CHANGELOG.md`
