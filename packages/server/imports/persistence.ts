@@ -132,7 +132,8 @@ export async function upsertEventRows(
       continue;
     }
 
-    const sourceKey = `${registrationNo}|${row.eventDateRaw}|${eventName}`;
+    const normalizedEventDate = eventDate.toISOString().slice(0, 10);
+    const sourceKey = `${registrationNo}|${normalizedEventDate}|${eventName}`;
 
     if (type === "trial") {
       await prisma.trialResult.upsert({

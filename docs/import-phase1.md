@@ -177,7 +177,7 @@ Rows with invalid registration format are skipped and logged with:
     - Owner/ownership insert skipped.
 - Valid rows:
   - Owner upsert behavior uses unique key `(name, postalCode, city)`.
-  - Ownership is deduplicated by `(dogId, ownerId, ownershipDate)`.
+  - Ownership is deduplicated by `(dogId, ownerId, ownershipDateKey)`, where `ownershipDateKey` is `YYYY-MM-DD` or `__NULL__` for missing dates.
 
 ### Trials and shows stages
 

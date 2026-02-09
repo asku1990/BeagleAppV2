@@ -72,6 +72,11 @@ function parseRegistrationNo(value: string | null | undefined): {
   };
 }
 
+// Internal dedupe key: MariaDB/MySQL unique indexes allow multiple NULL values.
+function toOwnershipDateKey(value: Date | null): string {
+  return value ? value.toISOString().slice(0, 10) : "__NULL__";
+}
+
 async function loadDogIdByRegistration(): Promise<Map<string, string>> {
   const registrations = await prisma.dogRegistration.findMany({
     select: { registrationNo: true, dogId: true },
@@ -771,24 +776,19 @@ export function createImportsService() {
           ownersUpserted += 1;
 
           const ownershipDate = parseLegacyDate(row.ownershipDateRaw);
-          const existingOwnership = await prisma.dogOwnership.findFirst({
-            where: {
-              dogId,
-              ownerId,
-              ownershipDate,
-            },
-            select: { id: true },
-          });
-          if (!existingOwnership) {
-            await prisma.dogOwnership.create({
-              data: {
+          const ownershipDateKey = toOwnershipDateKey(ownershipDate);
+          const ownershipCreateResult = await prisma.dogOwnership.createMany({
+            data: [
+              {
                 dogId,
                 ownerId,
                 ownershipDate,
+                ownershipDateKey,
               },
-            });
-            ownershipsUpserted += 1;
-          }
+            ],
+            skipDuplicates: true,
+          });
+          ownershipsUpserted += ownershipCreateResult.count;
 
           if (ownersProcessed % 1000 === 0) {
             logProgress("owners", ownersProcessed, totalOwners);
