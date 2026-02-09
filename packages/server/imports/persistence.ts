@@ -26,6 +26,12 @@ export async function upsertOwner(row: LegacyOwnerRow): Promise<string | null> {
   const postalCode = normalizeNullable(row.postalCode);
   const city = normalizeNullable(row.city);
 
+  const existing = await prisma.owner.findFirst({
+    where: { name: ownerName, postalCode, city },
+    select: { id: true },
+  });
+  if (existing) return existing.id;
+
   try {
     const created = await prisma.owner.create({
       data: { name: ownerName, postalCode, city },
@@ -38,14 +44,14 @@ export async function upsertOwner(row: LegacyOwnerRow): Promise<string | null> {
       throw error;
     }
 
-    const existing = await prisma.owner.findFirst({
+    const createdByRacingRun = await prisma.owner.findFirst({
       where: { name: ownerName, postalCode, city },
       select: { id: true },
     });
-    if (!existing) {
+    if (!createdByRacingRun) {
       throw error;
     }
-    return existing.id;
+    return createdByRacingRun.id;
   }
 }
 
