@@ -9,34 +9,82 @@ type IssueRow = {
   sourceTable: string | null;
 };
 
+const USAGE =
+  "Usage: pnpm import:issues <RUN_ID> [--stage <stage>] [--code <code>] [--limit <n>]";
+
 function parseArgs(argv: string[]) {
   const raw = argv.slice(2).filter((arg) => arg !== "--");
-  const runId = raw[0];
+  const wantsHelp = raw.includes("--help") || raw.includes("-h");
+  let runId: string | undefined;
   let stage: string | undefined;
   let code: string | undefined;
   let limit = 200;
+  let error: string | undefined;
 
-  for (let i = 1; i < raw.length; i += 1) {
-    const arg = raw[i];
-    if (arg === "--stage") stage = raw[i + 1];
-    if (arg === "--code") code = raw[i + 1];
-    if (arg === "--limit") {
-      const next = Number(raw[i + 1]);
-      if (Number.isFinite(next) && next > 0) {
-        limit = Math.min(next, 1000);
-      }
-    }
+  let i = 0;
+  if (raw[0] && !raw[0].startsWith("--")) {
+    runId = raw[0];
+    i = 1;
   }
 
-  return { runId, stage, code, limit };
+  for (; i < raw.length; i += 1) {
+    const arg = raw[i];
+    const value = raw[i + 1];
+
+    if (arg === "--stage" || arg === "--code" || arg === "--limit") {
+      if (!value || value.startsWith("--")) {
+        error = `Missing value for ${arg}.`;
+        break;
+      }
+    }
+
+    if (arg === "--stage") {
+      stage = value;
+      i += 1;
+      continue;
+    }
+    if (arg === "--code") {
+      code = value;
+      i += 1;
+      continue;
+    }
+    if (arg === "--limit") {
+      const next = Number(value);
+      if (!Number.isFinite(next) || next <= 0) {
+        error = "--limit must be a positive number.";
+        break;
+      }
+      limit = Math.min(Math.trunc(next), 1000);
+      i += 1;
+      continue;
+    }
+    if (!arg.startsWith("--")) {
+      error = `Unexpected positional argument: ${arg}.`;
+      break;
+    }
+    error = `Unknown option: ${arg}.`;
+    break;
+  }
+
+  return { runId, stage, code, limit, wantsHelp, error };
 }
 
 async function main() {
-  const { runId, stage, code, limit } = parseArgs(process.argv);
+  const { runId, stage, code, limit, wantsHelp, error } = parseArgs(
+    process.argv,
+  );
+  if (wantsHelp) {
+    console.log(USAGE);
+    return;
+  }
+  if (error) {
+    console.error(error);
+    console.error(USAGE);
+    process.exitCode = 1;
+    return;
+  }
   if (!runId) {
-    console.error(
-      "Usage: pnpm import:issues -- <RUN_ID> [--stage <stage>] [--code <code>] [--limit <n>]",
-    );
+    console.error(USAGE);
     process.exitCode = 1;
     return;
   }

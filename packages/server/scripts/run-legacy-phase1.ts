@@ -30,6 +30,15 @@ async function main() {
   );
   console.log(JSON.stringify(output, null, 2));
 
+  const runIdFromError =
+    !output.ok &&
+    typeof output.body === "object" &&
+    output.body != null &&
+    "error" in output.body &&
+    typeof output.body.error === "string"
+      ? (output.body.error.match(/runId=([A-Za-z0-9_-]+)/)?.[1] ?? null)
+      : null;
+
   const runId =
     output.ok &&
     typeof output.body === "object" &&
@@ -40,7 +49,7 @@ async function main() {
     "id" in output.body.data &&
     typeof output.body.data.id === "string"
       ? output.body.data.id
-      : null;
+      : runIdFromError;
 
   if (runId) {
     const grouped = new Map<string, number>();
@@ -94,14 +103,15 @@ async function main() {
   }
 
   if (
-    output.ok &&
-    typeof output.body === "object" &&
-    output.body != null &&
-    "data" in output.body &&
-    typeof output.body.data === "object" &&
-    output.body.data != null &&
-    "status" in output.body.data &&
-    output.body.data.status === "FAILED"
+    !output.ok ||
+    (output.ok &&
+      typeof output.body === "object" &&
+      output.body != null &&
+      "data" in output.body &&
+      typeof output.body.data === "object" &&
+      output.body.data != null &&
+      "status" in output.body.data &&
+      output.body.data.status === "FAILED")
   ) {
     process.exitCode = 1;
   }

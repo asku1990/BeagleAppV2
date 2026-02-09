@@ -20,9 +20,9 @@
     "db:deploy": "pnpm --filter @beagle/db exec prisma migrate deploy",
     "db:seed": "pnpm --filter @beagle/db seed:basic-user",
     "db:push": "pnpm --filter @beagle/db exec prisma db push",
-    "import:phase1": "pnpm --filter @beagle/server import:phase1",
-    "import:issues": "pnpm --filter @beagle/server import:issues",
-    "import:issues:csv": "pnpm --filter @beagle/server import:issues:csv",
+    "import:phase1": "pnpm --filter @beagle/server import:phase1 --",
+    "import:issues": "pnpm --filter @beagle/server import:issues --",
+    "import:issues:csv": "pnpm --filter @beagle/server import:issues:csv --",
     "prepare": "husky"
   },
   "devDependencies": {

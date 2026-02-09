@@ -894,8 +894,12 @@ export function createImportsService() {
         });
 
         return {
-          status: 200,
-          body: { ok: true, data: toImportRunResponse(finished) },
+          status: 500,
+          body: {
+            ok: false,
+            code: "IMPORT_FAILED",
+            error: `Import run failed (runId=${finished.id}): ${message}`,
+          },
         };
       } finally {
         log("Import run finished");

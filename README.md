@@ -147,7 +147,7 @@ pnpm import:phase1
 Optional: provide a user id to record who triggered the import run:
 
 ```bash
-pnpm import:phase1 -- <USER_ID>
+pnpm import:phase1 <USER_ID>
 ```
 
 3. Inspect warning/error details from script output:
@@ -156,15 +156,15 @@ pnpm import:phase1 -- <USER_ID>
 - For full issue listing by run id:
 
 ```bash
-pnpm import:issues -- <RUN_ID>
+pnpm import:issues <RUN_ID>
 ```
 
 Optional filters:
 
 ```bash
-pnpm import:issues -- <RUN_ID> --stage owners
-pnpm import:issues -- <RUN_ID> --code OWNER_DOG_NOT_FOUND
-pnpm import:issues -- <RUN_ID> --limit 500
+pnpm import:issues <RUN_ID> --stage owners
+pnpm import:issues <RUN_ID> --code OWNER_DOG_NOT_FOUND
+pnpm import:issues <RUN_ID> --limit 500
 ```
 
 4. Check import run status over API (admin auth required):
