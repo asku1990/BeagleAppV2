@@ -129,7 +129,7 @@ pnpm --filter @beagle/server test:unit
 - New v1 admin import endpoints:
   - `GET /api/v1/imports/:id`
 
-## Test migration and import with curl
+## Import basics
 
 1. Run migration:
 
@@ -138,13 +138,7 @@ pnpm db:generate
 pnpm db:migrate:dev -- --name add_phase1_dog_search_stats_schema
 ```
 
-2. Start apps:
-
-```bash
-pnpm dev
-```
-
-3. Run phase-1 import script:
+2. Run phase-1 import script:
 
 ```bash
 pnpm import:phase1
@@ -156,9 +150,9 @@ Optional: provide a user id to record who triggered the import run:
 pnpm import:phase1 -- <USER_ID>
 ```
 
-4. Inspect warning/error details from script output:
+3. Inspect warning/error details from script output:
 
-- During run, script now prints grouped issue stats and samples automatically.
+- During run, script prints grouped issue stats and samples.
 - For full issue listing by run id:
 
 ```bash
@@ -173,7 +167,7 @@ pnpm import:issues -- <RUN_ID> --code OWNER_DOG_NOT_FOUND
 pnpm import:issues -- <RUN_ID> --limit 500
 ```
 
-5. Check import run status over API (admin auth required):
+4. Check import run status over API (admin auth required):
 
 ```bash
 curl -i -c /tmp/beagle.cookies -X POST http://localhost:3001/api/auth/login \
@@ -191,6 +185,8 @@ curl -i -b /tmp/beagle.cookies \
   "http://localhost:3001/api/v1/imports/<RUN_ID>/issues?limit=200"
 ```
 
+For full import behavior (source tables, stage handling, required fields, issue codes, and logging), see `docs/import-phase1.md`.
+
 ## Where to add new features
 
 - Add new backend business logic in `packages/server`.
@@ -205,3 +201,4 @@ curl -i -b /tmp/beagle.cookies \
 - `docs/api-versioning.md`: API path versioning policy (`/api/v1/...`).
 - `docs/roles-and-permissions.md`: baseline role and authorization rules.
 - `docs/migration-plan-v1-to-v2.md`: staged migration approach from legacy app.
+- `docs/import-phase1.md`: phase-1 import flow, data handling, and issue logging behavior.

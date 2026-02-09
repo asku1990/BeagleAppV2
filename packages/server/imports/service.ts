@@ -52,6 +52,10 @@ function formatImportError(error: unknown): string {
   return lines[lines.length - 1] ?? "Import failed.";
 }
 
+function isPlaceholderRegistration(value: string | null): boolean {
+  return value != null && /^U0+$/i.test(value);
+}
+
 export function createImportsService() {
   return {
     async runLegacyPhase1(
@@ -256,6 +260,8 @@ export function createImportsService() {
         let relationsSkippedDogNotFound = 0;
         let missingSireRefs = 0;
         let missingDamRefs = 0;
+        let skippedPlaceholderSireRefs = 0;
+        let skippedPlaceholderDamRefs = 0;
         for (const row of legacy.dogs) {
           relationsProcessed += 1;
           const registrationNo = normalizeNullable(row.registrationNo);
@@ -277,14 +283,30 @@ export function createImportsService() {
 
           const sireRegistrationNo = normalizeNullable(row.sireRegistrationNo);
           const damRegistrationNo = normalizeNullable(row.damRegistrationNo);
-          const sireId = sireRegistrationNo
-            ? dogIdByRegistration.get(sireRegistrationNo)
+          const sireRegistrationForLookup = isPlaceholderRegistration(
+            sireRegistrationNo,
+          )
+            ? null
+            : sireRegistrationNo;
+          const damRegistrationForLookup = isPlaceholderRegistration(
+            damRegistrationNo,
+          )
+            ? null
+            : damRegistrationNo;
+          if (sireRegistrationNo && !sireRegistrationForLookup) {
+            skippedPlaceholderSireRefs += 1;
+          }
+          if (damRegistrationNo && !damRegistrationForLookup) {
+            skippedPlaceholderDamRefs += 1;
+          }
+          const sireId = sireRegistrationForLookup
+            ? dogIdByRegistration.get(sireRegistrationForLookup)
             : undefined;
-          const damId = damRegistrationNo
-            ? dogIdByRegistration.get(damRegistrationNo)
+          const damId = damRegistrationForLookup
+            ? dogIdByRegistration.get(damRegistrationForLookup)
             : undefined;
-          if (sireRegistrationNo && !sireId) missingSireRefs += 1;
-          if (sireRegistrationNo && !sireId) {
+          if (sireRegistrationForLookup && !sireId) missingSireRefs += 1;
+          if (sireRegistrationForLookup && !sireId) {
             errorsCount += 1;
             await recordIssue({
               stage: "relations",
@@ -295,12 +317,12 @@ export function createImportsService() {
               sourceTable: "bearek_id",
               payloadJson: JSON.stringify({
                 registrationNo,
-                sireRegistrationNo,
+                sireRegistrationNo: sireRegistrationForLookup,
               }),
             });
           }
-          if (damRegistrationNo && !damId) missingDamRefs += 1;
-          if (damRegistrationNo && !damId) {
+          if (damRegistrationForLookup && !damId) missingDamRefs += 1;
+          if (damRegistrationForLookup && !damId) {
             errorsCount += 1;
             await recordIssue({
               stage: "relations",
@@ -311,7 +333,7 @@ export function createImportsService() {
               sourceTable: "bearek_id",
               payloadJson: JSON.stringify({
                 registrationNo,
-                damRegistrationNo,
+                damRegistrationNo: damRegistrationForLookup,
               }),
             });
           }
@@ -331,7 +353,7 @@ export function createImportsService() {
         logProgress("relations", relationsProcessed, totalRelations);
         finishStage(
           "relations",
-          `updated=${relationsUpdated}, skippedNoRegistration=${relationsSkippedNoRegistration}, skippedDogNotFound=${relationsSkippedDogNotFound}, missingSireRefs=${missingSireRefs}, missingDamRefs=${missingDamRefs}`,
+          `updated=${relationsUpdated}, skippedNoRegistration=${relationsSkippedNoRegistration}, skippedDogNotFound=${relationsSkippedDogNotFound}, missingSireRefs=${missingSireRefs}, missingDamRefs=${missingDamRefs}, skippedPlaceholderSireRefs=${skippedPlaceholderSireRefs}, skippedPlaceholderDamRefs=${skippedPlaceholderDamRefs}`,
         );
 
         startStage("owners");
