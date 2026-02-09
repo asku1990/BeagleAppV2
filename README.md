@@ -39,6 +39,10 @@ cp .env.example .env
 - `NEXT_PUBLIC_API_URL`: API base URL for web app, default `http://localhost:3001`.
 - `CORS_ORIGIN`: web origin allowed by API, default `http://localhost:3000`.
 - `LEGACY_DATABASE_URL`: MariaDB connection string to legacy Beagle DB for phase-1 imports.
+- `SEED_TEST_USER_EMAIL`: required when running `pnpm db:seed`.
+- `SEED_TEST_USER_PASSWORD`: required when running `pnpm db:seed`.
+- `SEED_TEST_USER_ROLE`: required when running `pnpm db:seed` (`USER` or `ADMIN`).
+- `SEED_TEST_USER_USERNAME`: optional username for `pnpm db:seed`.
 
 Example values are already in `.env.example`.
 
@@ -172,7 +176,7 @@ pnpm import:issues <RUN_ID> --limit 500
 ```bash
 curl -i -c /tmp/beagle.cookies -X POST http://localhost:3001/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@example.com","password":"your-password"}'
+  -d '{"email":"<SEED_TEST_USER_EMAIL>","password":"<SEED_TEST_USER_PASSWORD>"}'
 
 curl -i -b /tmp/beagle.cookies \
   http://localhost:3001/api/v1/imports/<RUN_ID>

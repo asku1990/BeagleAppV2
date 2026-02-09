@@ -4,6 +4,22 @@ import { Role, prisma } from "../index";
 
 const scrypt = promisify(nodeScrypt);
 
+function getRequiredEnv(name: string): string {
+  const value = process.env[name]?.trim();
+  if (!value) {
+    throw new Error(`${name} is required.`);
+  }
+  return value;
+}
+
+function parseRole(value: string): Role {
+  const normalized = value.trim().toUpperCase();
+  if (normalized === "USER" || normalized === "ADMIN") {
+    return normalized as Role;
+  }
+  throw new Error('SEED_TEST_USER_ROLE must be either "USER" or "ADMIN".');
+}
+
 async function hashPassword(password: string): Promise<string> {
   const salt = randomBytes(16).toString("hex");
   const derivedKey = (await scrypt(password, salt, 64)) as Buffer;
@@ -11,12 +27,10 @@ async function hashPassword(password: string): Promise<string> {
 }
 
 async function main() {
-  const email = process.env.SEED_TEST_USER_EMAIL ?? "admin@example.com";
-  const password = process.env.SEED_TEST_USER_PASSWORD ?? "test1234";
-  const role = (
-    process.env.SEED_TEST_USER_ROLE?.toUpperCase() === "USER" ? "USER" : "ADMIN"
-  ) as Role;
-  const username = process.env.SEED_TEST_USER_USERNAME ?? "admin";
+  const email = getRequiredEnv("SEED_TEST_USER_EMAIL").toLowerCase();
+  const password = getRequiredEnv("SEED_TEST_USER_PASSWORD");
+  const role = parseRole(getRequiredEnv("SEED_TEST_USER_ROLE"));
+  const username = process.env.SEED_TEST_USER_USERNAME?.trim() || undefined;
 
   const passwordHash = await hashPassword(password);
   const user = await prisma.user.upsert({

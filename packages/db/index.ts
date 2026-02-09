@@ -21,6 +21,8 @@ export {
   createImportRunIssuesBulk,
   createImportRun,
   getImportRunById,
+  InvalidImportRunIssuesCursorError,
+  isInvalidImportRunIssuesCursorError,
   listImportRunIssues,
   markImportRunFinished,
   markImportRunRunning,

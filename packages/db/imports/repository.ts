@@ -8,6 +8,32 @@ function normalizeErrorSummary(value?: string | null): string | null {
   return value.slice(0, IMPORT_ERROR_SUMMARY_MAX_LEN);
 }
 
+type PrismaKnownError = {
+  code?: string;
+};
+
+function isPrismaKnownError(error: unknown): error is PrismaKnownError {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    typeof (error as { code?: unknown }).code === "string"
+  );
+}
+
+export class InvalidImportRunIssuesCursorError extends Error {
+  constructor() {
+    super("Invalid cursor.");
+    this.name = "InvalidImportRunIssuesCursorError";
+  }
+}
+
+export function isInvalidImportRunIssuesCursorError(
+  error: unknown,
+): error is InvalidImportRunIssuesCursorError {
+  return error instanceof InvalidImportRunIssuesCursorError;
+}
+
 export type ImportRunSummary = {
   id: string;
   kind: ImportKind;
@@ -261,21 +287,33 @@ export async function listImportRunIssues(
       ? Math.trunc(rawLimit)
       : 100;
   const limit = Math.min(Math.max(normalizedLimit, 1), 500);
-  const items = await getImportRunIssueDelegate().findMany({
-    where: {
-      importRunId,
-      stage: options?.stage,
-      code: options?.code,
-    },
-    orderBy: [{ createdAt: "asc" }, { id: "asc" }],
-    take: limit + 1,
-    ...(options?.cursor
-      ? {
-          cursor: { id: options.cursor },
-          skip: 1,
-        }
-      : {}),
-  });
+  let items: ImportRunIssueRow[];
+  try {
+    items = await getImportRunIssueDelegate().findMany({
+      where: {
+        importRunId,
+        stage: options?.stage,
+        code: options?.code,
+      },
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      take: limit + 1,
+      ...(options?.cursor
+        ? {
+            cursor: { id: options.cursor },
+            skip: 1,
+          }
+        : {}),
+    });
+  } catch (error) {
+    if (
+      options?.cursor &&
+      isPrismaKnownError(error) &&
+      error.code === "P2025"
+    ) {
+      throw new InvalidImportRunIssuesCursorError();
+    }
+    throw error;
+  }
 
   const hasMore = items.length > limit;
   const page = hasMore ? items.slice(0, limit) : items;

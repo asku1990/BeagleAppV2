@@ -1,5 +1,6 @@
 import {
   ImportKind,
+  isInvalidImportRunIssuesCursorError,
   createImportRunIssue,
   createImportRunIssuesBulk,
   createImportRun,
@@ -129,14 +130,7 @@ export function createImportsService() {
             : 100;
         log(`[stage:${name}] progress ${processed}/${total} (${percent}%)`);
       };
-
-      const run = await createImportRun({
-        kind: ImportKind.LEGACY_PHASE1,
-        createdByUserId,
-      });
-      log(`Created import run ${run.id}`);
-      await markImportRunRunning(run.id);
-      log("Marked run as RUNNING");
+      let runId: string | null = null;
 
       let dogsUpserted = 0;
       let ownersUpserted = 0;
@@ -155,9 +149,9 @@ export function createImportsService() {
       }> = [];
       const ISSUE_BUFFER_SIZE = 250;
       const flushIssueBuffer = async () => {
-        if (issueBuffer.length === 0) return;
+        if (!runId || issueBuffer.length === 0) return;
         const next = issueBuffer.splice(0, issueBuffer.length);
-        await createImportRunIssuesBulk(run.id, next);
+        await createImportRunIssuesBulk(runId, next);
       };
       const recordIssue = async (issue: {
         stage: string;
@@ -175,6 +169,15 @@ export function createImportsService() {
       };
 
       try {
+        const run = await createImportRun({
+          kind: ImportKind.LEGACY_PHASE1,
+          createdByUserId,
+        });
+        runId = run.id;
+        log(`Created import run ${run.id}`);
+        await markImportRunRunning(run.id);
+        log("Marked run as RUNNING");
+
         startStage("load");
         const legacy = await fetchLegacyPhase1Rows({
           log: (message) => log(`[stage:load] ${message}`),
@@ -875,14 +878,25 @@ export function createImportsService() {
       } catch (error) {
         const message = formatImportError(error);
         log(`Import failed: ${message}`);
-        await createImportRunIssue(run.id, {
+        if (!runId) {
+          return {
+            status: 500,
+            body: {
+              ok: false,
+              code: "IMPORT_FAILED",
+              error: `Import run failed before initialization: ${message}`,
+            },
+          };
+        }
+
+        await createImportRunIssue(runId, {
           stage: "run",
           severity: "ERROR",
           code: "UNEXPECTED_EXCEPTION",
           message,
         });
         await flushIssueBuffer();
-        const finished = await markImportRunFinished(run.id, {
+        const finished = await markImportRunFinished(runId, {
           status: "FAILED",
           dogsUpserted,
           ownersUpserted,
@@ -938,17 +952,27 @@ export function createImportsService() {
         };
       }
 
-      const result = await listImportRunIssues(id, options);
-      return {
-        status: 200,
-        body: {
-          ok: true,
-          data: {
-            items: result.items.map(toImportRunIssueResponse),
-            nextCursor: result.nextCursor,
+      try {
+        const result = await listImportRunIssues(id, options);
+        return {
+          status: 200,
+          body: {
+            ok: true,
+            data: {
+              items: result.items.map(toImportRunIssueResponse),
+              nextCursor: result.nextCursor,
+            },
           },
-        },
-      };
+        };
+      } catch (error) {
+        if (isInvalidImportRunIssuesCursorError(error)) {
+          return {
+            status: 400,
+            body: { ok: false, error: "Invalid cursor." },
+          };
+        }
+        throw error;
+      }
     },
   };
 }
