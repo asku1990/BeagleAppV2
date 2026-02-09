@@ -1,5 +1,10 @@
 import { prisma, type LegacyEventRow, type LegacyOwnerRow } from "@beagle/db";
-import { normalizeNullable, parseLegacyDate } from "./transform";
+import {
+  isValidRegistrationNo,
+  normalizeNullable,
+  normalizeRegistrationNo,
+  parseLegacyDate,
+} from "./transform";
 
 type PrismaUniqueError = {
   code?: string;
@@ -77,15 +82,13 @@ export async function upsertEventRows(
 
   for (const row of rows) {
     processed += 1;
-    const dogId = dogIdByRegistration.get(row.registrationNo);
-    const eventDate = parseLegacyDate(row.eventDateRaw);
-    const eventName = normalizeNullable(row.eventName);
-    if (!dogId || !eventDate || !eventName) {
+    const registrationNo = normalizeRegistrationNo(row.registrationNo);
+    if (registrationNo && !isValidRegistrationNo(registrationNo)) {
       errors += 1;
       issues.push({
-        code: "EVENT_MISSING_REQUIRED_FIELDS",
-        message: "Event row missing dog, event date, or event name.",
-        registrationNo: row.registrationNo ?? null,
+        code: "REGISTRATION_INVALID_FORMAT",
+        message: "Event row has invalid registration format.",
+        registrationNo,
         sourceTable,
         payloadJson: JSON.stringify({
           registrationNo: row.registrationNo,
@@ -99,7 +102,31 @@ export async function upsertEventRows(
       continue;
     }
 
-    const sourceKey = `${row.registrationNo}|${row.eventDateRaw}|${eventName}`;
+    const dogId = registrationNo
+      ? dogIdByRegistration.get(registrationNo)
+      : undefined;
+    const eventDate = parseLegacyDate(row.eventDateRaw);
+    const eventName = normalizeNullable(row.eventName);
+    if (!dogId || !eventDate || !eventName) {
+      errors += 1;
+      issues.push({
+        code: "EVENT_MISSING_REQUIRED_FIELDS",
+        message: "Event row missing dog, event date, or event name.",
+        registrationNo,
+        sourceTable,
+        payloadJson: JSON.stringify({
+          registrationNo: row.registrationNo,
+          eventName: row.eventName,
+          eventDateRaw: row.eventDateRaw,
+        }),
+      });
+      if (processed % 1000 === 0) {
+        options?.onProgress?.(processed, total);
+      }
+      continue;
+    }
+
+    const sourceKey = `${registrationNo}|${row.eventDateRaw}|${eventName}`;
 
     if (type === "trial") {
       await prisma.trialResult.upsert({

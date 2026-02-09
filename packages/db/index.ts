@@ -36,5 +36,6 @@ export {
   type LegacyEkRow,
   type LegacyEventRow,
   type LegacyOwnerRow,
+  type LegacySamakoiraRow,
   type LegacyPhase1Rows,
 } from "./legacy/source";

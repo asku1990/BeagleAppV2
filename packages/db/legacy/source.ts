@@ -30,12 +30,21 @@ export type LegacyEventRow = {
   eventDateRaw: string | null;
 };
 
+export type LegacySamakoiraRow = {
+  rek1: string | null;
+  rek2: string | null;
+  rek3: string | null;
+  rekMuu: string | null;
+  vara: string | null;
+};
+
 export type LegacyPhase1Rows = {
   dogs: LegacyDogRow[];
   eks: LegacyEkRow[];
   owners: LegacyOwnerRow[];
   trialResults: LegacyEventRow[];
   showResults: LegacyEventRow[];
+  samakoira: LegacySamakoiraRow[];
 };
 
 function getLegacyDatabaseUrl(): string {
@@ -117,11 +126,24 @@ export async function fetchLegacyPhase1Rows(options?: {
       `Fetched show rows: count=${showResults.length}, elapsed=${Math.round((Date.now() - showResultsStartedAt) / 1000)}s`,
     );
 
+    const samakoiraStartedAt = Date.now();
+    const samakoira = (await connection.query(
+      `SELECT REK_1 as rek1,
+              REK_2 as rek2,
+              REK_3 as rek3,
+              REK_MUU as rekMuu,
+              VARA as vara
+       FROM samakoira`,
+    )) as LegacySamakoiraRow[];
+    log(
+      `Fetched samakoira rows: count=${samakoira.length}, elapsed=${Math.round((Date.now() - samakoiraStartedAt) / 1000)}s`,
+    );
+
     log(
       `Legacy source fetch completed in ${Math.round((Date.now() - startedAt) / 1000)}s`,
     );
 
-    return { dogs, eks, owners, trialResults, showResults };
+    return { dogs, eks, owners, trialResults, showResults, samakoira };
   } finally {
     log("Closing legacy database connection...");
     await connection.end();

@@ -39,6 +39,19 @@ export function normalizeNullable(
   return next ? next : null;
 }
 
+const REGISTRATION_NO_PATTERN = /^[\p{L}\p{N}/.-]+$/u;
+
+export function normalizeRegistrationNo(
+  value: string | null | undefined,
+): string | null {
+  const normalized = normalizeNullable(value);
+  return normalized ? normalized.toUpperCase() : null;
+}
+
+export function isValidRegistrationNo(value: string): boolean {
+  return REGISTRATION_NO_PATTERN.test(value);
+}
+
 export function toImportRunResponse(run: ImportRunSummary): ImportRunResponse {
   return {
     id: run.id,

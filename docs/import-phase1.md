@@ -1,6 +1,6 @@
 # Phase-1 Import Behavior
 
-This document describes how phase-1 legacy import currently works in detail: source tables, stage logic, required fields, and issue logging.
+This document describes how phase-1 legacy import works in detail: source tables, stage logic, required fields, registration normalization, and issue logging.
 
 ## Entry points
 
@@ -17,6 +17,15 @@ Implementation references:
 - `packages/server/imports/persistence.ts`
 - `packages/db/legacy/source.ts`
 - `packages/server/scripts/list-import-issues.ts`
+
+## Data model
+
+Registration identity is stored only in `DogRegistration`.
+
+- Canonical registration rows are stored with `source="CANONICAL"`.
+- Legacy aliases from `samakoira.REK_2` and `samakoira.REK_3` are stored with `source="LEGACY_SAMAKOIRA"`.
+- `DogRegistration.registrationNo` is globally unique, so one registration maps to exactly one dog.
+- `samakoira.VARA` is preserved on `Dog.note`.
 
 ## Source tables and field mapping
 
@@ -48,6 +57,12 @@ Legacy fetch is performed in `packages/db/legacy/source.ts`.
   - `REKNO -> registrationNo`
   - `TAPPA -> eventName`
   - `TAPPV -> eventDateRaw`
+- Alias rows (`samakoira`)
+  - `REK_1 -> rek1` (canonical registration)
+  - `REK_2 -> rek2` (alias registration)
+  - `REK_3 -> rek3` (alias registration)
+  - `REK_MUU -> rekMuu` (ignored in phase 1)
+  - `VARA -> vara` (merged into `Dog.note`)
 
 ## Stage order
 
@@ -56,13 +71,29 @@ The import pipeline runs in this order:
 1. `load`
 2. `dogs`
 3. `ek`
-4. `index`
-5. `relations`
-6. `owners`
-7. `trials`
-8. `shows`
+4. `samakoira`
+5. `index`
+6. `relations`
+7. `owners`
+8. `trials`
+9. `shows`
 
 Import issues are buffered and bulk inserted during the run.
+
+## Registration normalization and validation
+
+Registration numbers are normalized before lookups and writes:
+
+- `trim`
+- `uppercase`
+
+Allowed format after normalization:
+
+- Unicode letters, numbers, `/`, `-`, `.`
+
+Rows with invalid registration format are skipped and logged with:
+
+- `REGISTRATION_INVALID_FORMAT`
 
 ## Required fields and skip behavior
 
@@ -72,21 +103,48 @@ Import issues are buffered and bulk inserted during the run.
 - Missing required data:
   - Issue code: `DOG_MISSING_REQUIRED_FIELDS`
   - Dog row is skipped.
-- Valid rows are upserted into `Dog`.
+- Invalid registration format:
+  - Issue code: `REGISTRATION_INVALID_FORMAT`
+  - Dog row is skipped.
+- Valid rows:
+  - Upsert dog by looking up `DogRegistration.registrationNo`.
+  - If registration does not exist, create dog and canonical `DogRegistration` row.
 
 ### EK stage
 
 - If `registrationNo` missing:
   - Issue code: `EK_MISSING_REGISTRATION`
   - Row skipped.
+- If `registrationNo` format invalid:
+  - Issue code: `REGISTRATION_INVALID_FORMAT`
+  - Row skipped.
 - If `ekNo` is null:
   - Row skipped without issue.
-- Otherwise updates `Dog.ekNo` by registration number.
+- Otherwise updates `Dog.ekNo` through registration lookup in `DogRegistration`.
+
+### Samakoira stage
+
+- Canonical `REK_1` must resolve to an imported dog registration.
+  - If missing or not found:
+    - Issue code: `SAMAKOIRA_CANONICAL_NOT_FOUND`
+- Alias `REK_2`/`REK_3` rows are normalized and attached as `DogRegistration` rows.
+- Alias collision behavior:
+  - If alias already belongs to another dog:
+    - Issue code: `REGISTRATION_ALIAS_CONFLICT`
+  - Alias is not reassigned.
+- `REK_MUU` is ignored in phase 1.
+- `VARA` merge behavior (`Dog.note`):
+  - If note is null: set to `VARA`.
+  - If note differs: append ` | <VARA>`.
+  - If already present: no change.
 
 ### Relations stage (sire/dam)
 
-- Dog row must be found by its own `registrationNo`; if not, relation update is skipped.
-- Parent links are resolved by registration against imported dogs index.
+- Dog row must resolve by normalized registration via `DogRegistration`; if not, relation update is skipped.
+- Parent links are resolved by normalized registration against registration index.
+- If sire/dam registration format is invalid:
+  - Issue code: `REGISTRATION_INVALID_FORMAT`
+  - That parent link is treated as missing.
 - If sire/dam reference exists but is not found:
   - Issue codes:
     - `RELATION_SIRE_NOT_FOUND`
@@ -99,10 +157,13 @@ Import issues are buffered and bulk inserted during the run.
 
 ### Owners stage
 
-- Owner row must match an imported dog by `registrationNo`.
+- Owner row must match an imported dog through registration lookup.
   - If not found:
     - Issue code: `OWNER_DOG_NOT_FOUND`
-    - Owner/ownership insert skipped for that row.
+    - Owner/ownership insert skipped.
+- If registration format is invalid:
+  - Issue code: `REGISTRATION_INVALID_FORMAT`
+  - Owner/ownership insert skipped.
 - Owner identity requirement:
   - `ownerName` must be non-empty.
   - If missing:
@@ -118,22 +179,29 @@ Common event upsert logic in `packages/server/imports/persistence.ts`.
 
 Required for each event row:
 
-- Dog exists by `registrationNo`
+- Valid registration format
+- Dog exists by normalized registration lookup
 - Valid event date from `eventDateRaw` (`YYYYMMDD`)
 - Non-empty `eventName`
 
-If any required value is missing:
+If registration format is invalid:
+
+- Issue code: `REGISTRATION_INVALID_FORMAT`
+- Event row skipped.
+
+If dog/date/name is missing:
 
 - Issue code: `EVENT_MISSING_REQUIRED_FIELDS`
 - Event row skipped.
 
 Valid rows are upserted by source key:
 
-- `sourceKey = registrationNo|eventDateRaw|eventName`
+- `sourceKey = normalizedRegistrationNo|eventDateRaw|eventName`
 
 ## Date and value normalization
 
 - `normalizeNullable` trims strings and converts empty string to `null`.
+- `normalizeRegistrationNo` trims and uppercases registration values.
 - `parseLegacyDate` accepts only `YYYYMMDD` and validates actual calendar date.
 
 Implementation:

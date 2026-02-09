@@ -57,31 +57,44 @@ model Session {
 }
 
 model Dog {
-  id                   String         @id @default(cuid())
-  registrationNo       String         @unique
-  name                 String
-  sex                  DogSex         @default(UNKNOWN)
-  birthDate            DateTime?
-  sireId               String?
-  damId                String?
-  breederId            String?
-  ekNo                 Int?           @unique
-  sire                 Dog?           @relation("SireRelation", fields: [sireId], references: [id])
-  siredPuppies         Dog[]          @relation("SireRelation")
-  dam                  Dog?           @relation("DamRelation", fields: [damId], references: [id])
-  whelpedPuppies       Dog[]          @relation("DamRelation")
-  breeder              Breeder?       @relation(fields: [breederId], references: [id])
-  ownerships           DogOwnership[]
-  trialResults         TrialResult[]
-  showResults          ShowResult[]
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @updatedAt
+  id              String            @id @default(cuid())
+  name            String
+  sex             DogSex            @default(UNKNOWN)
+  birthDate       DateTime?
+  sireId          String?
+  damId           String?
+  breederId       String?
+  ekNo            Int?              @unique
+  note            String?
+  sire            Dog?              @relation("SireRelation", fields: [sireId], references: [id])
+  siredPuppies    Dog[]             @relation("SireRelation")
+  dam             Dog?              @relation("DamRelation", fields: [damId], references: [id])
+  whelpedPuppies  Dog[]             @relation("DamRelation")
+  breeder         Breeder?          @relation(fields: [breederId], references: [id])
+  registrations   DogRegistration[]
+  ownerships      DogOwnership[]
+  trialResults    TrialResult[]
+  showResults     ShowResult[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 
   @@index([name])
   @@index([birthDate])
   @@index([sireId])
   @@index([damId])
   @@index([breederId])
+}
+
+model DogRegistration {
+  id             String   @id @default(cuid())
+  dogId          String
+  registrationNo String   @unique
+  source         String
+  dog            Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([dogId])
 }
 
 model Breeder {

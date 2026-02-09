@@ -18,8 +18,10 @@ import type {
 import type { ServiceResult } from "../shared/result";
 import { upsertEventRows, upsertOwner } from "./persistence";
 import {
+  isValidRegistrationNo,
   mapSex,
   normalizeNullable,
+  normalizeRegistrationNo,
   parseLegacyDate,
   toImportRunIssueResponse,
   toImportRunResponse,
@@ -54,6 +56,46 @@ function formatImportError(error: unknown): string {
 
 function isPlaceholderRegistration(value: string | null): boolean {
   return value != null && /^U0+$/i.test(value);
+}
+
+function parseRegistrationNo(value: string | null | undefined): {
+  registrationNo: string | null;
+  isInvalid: boolean;
+} {
+  const registrationNo = normalizeRegistrationNo(value);
+  if (!registrationNo) {
+    return { registrationNo: null, isInvalid: false };
+  }
+  return {
+    registrationNo,
+    isInvalid: !isValidRegistrationNo(registrationNo),
+  };
+}
+
+async function loadDogIdByRegistration(): Promise<Map<string, string>> {
+  const registrations = await prisma.dogRegistration.findMany({
+    select: { registrationNo: true, dogId: true },
+  });
+  return new Map(
+    registrations.map((registration) => [
+      registration.registrationNo,
+      registration.dogId,
+    ]),
+  );
+}
+
+function mergeNoteValue(existing: string | null, incoming: string): string {
+  if (!existing) return incoming;
+
+  const existingParts = existing
+    .split(" | ")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (existingParts.includes(incoming)) {
+    return existing;
+  }
+
+  return `${existing} | ${incoming}`;
 }
 
 export function createImportsService() {
@@ -135,7 +177,7 @@ export function createImportsService() {
           log: (message) => log(`[stage:load] ${message}`),
         });
         log(
-          `Loaded legacy rows: dogs=${legacy.dogs.length}, eks=${legacy.eks.length}, owners=${legacy.owners.length}, trialResults=${legacy.trialResults.length}, showResults=${legacy.showResults.length}`,
+          `Loaded legacy rows: dogs=${legacy.dogs.length}, eks=${legacy.eks.length}, owners=${legacy.owners.length}, trialResults=${legacy.trialResults.length}, showResults=${legacy.showResults.length}, samakoira=${legacy.samakoira.length}`,
         );
         finishStage("load");
 
@@ -144,8 +186,11 @@ export function createImportsService() {
         let dogsProcessed = 0;
         for (const row of legacy.dogs) {
           dogsProcessed += 1;
-          const registrationNo = normalizeNullable(row.registrationNo);
+          const { registrationNo, isInvalid } = parseRegistrationNo(
+            row.registrationNo,
+          );
           const name = normalizeNullable(row.name);
+
           if (!registrationNo || !name) {
             errorsCount += 1;
             await recordIssue({
@@ -157,6 +202,24 @@ export function createImportsService() {
               payloadJson: JSON.stringify({
                 registrationNo: row.registrationNo,
                 name: row.name,
+              }),
+            });
+            if (dogsProcessed % 1000 === 0) {
+              logProgress("dogs", dogsProcessed, totalDogs);
+            }
+            continue;
+          }
+
+          if (isInvalid) {
+            errorsCount += 1;
+            await recordIssue({
+              stage: "dogs",
+              code: "REGISTRATION_INVALID_FORMAT",
+              message: "Dog row has invalid registration format.",
+              registrationNo,
+              sourceTable: "bearek_id",
+              payloadJson: JSON.stringify({
+                registrationNo: row.registrationNo,
               }),
             });
             if (dogsProcessed % 1000 === 0) {
@@ -177,22 +240,44 @@ export function createImportsService() {
             breederId = breeder.id;
           }
 
-          await prisma.dog.upsert({
+          const existingRegistration = await prisma.dogRegistration.findUnique({
             where: { registrationNo },
-            create: {
-              registrationNo,
-              name,
-              sex: mapSex(row.sex),
-              birthDate: parseLegacyDate(row.birthDateRaw),
-              breederId,
-            },
-            update: {
-              name,
-              sex: mapSex(row.sex),
-              birthDate: parseLegacyDate(row.birthDateRaw),
-              breederId,
-            },
+            select: { id: true, dogId: true, source: true },
           });
+
+          if (existingRegistration) {
+            await prisma.dog.update({
+              where: { id: existingRegistration.dogId },
+              data: {
+                name,
+                sex: mapSex(row.sex),
+                birthDate: parseLegacyDate(row.birthDateRaw),
+                breederId,
+              },
+            });
+
+            if (existingRegistration.source !== "CANONICAL") {
+              await prisma.dogRegistration.update({
+                where: { id: existingRegistration.id },
+                data: { source: "CANONICAL" },
+              });
+            }
+          } else {
+            await prisma.dog.create({
+              data: {
+                name,
+                sex: mapSex(row.sex),
+                birthDate: parseLegacyDate(row.birthDateRaw),
+                breederId,
+                registrations: {
+                  create: {
+                    registrationNo,
+                    source: "CANONICAL",
+                  },
+                },
+              },
+            });
+          }
 
           dogsUpserted += 1;
           if (dogsProcessed % 1000 === 0) {
@@ -209,7 +294,10 @@ export function createImportsService() {
         let eksSkipped = 0;
         for (const row of legacy.eks) {
           eksProcessed += 1;
-          const registrationNo = normalizeNullable(row.registrationNo);
+          const { registrationNo, isInvalid } = parseRegistrationNo(
+            row.registrationNo,
+          );
+
           if (!registrationNo || row.ekNo == null) {
             eksSkipped += 1;
             if (!registrationNo) {
@@ -230,11 +318,43 @@ export function createImportsService() {
             }
             continue;
           }
-          const result = await prisma.dog.updateMany({
+
+          if (isInvalid) {
+            errorsCount += 1;
+            await recordIssue({
+              stage: "ek",
+              code: "REGISTRATION_INVALID_FORMAT",
+              message: "EK row has invalid registration format.",
+              registrationNo,
+              sourceTable: "bea_apu",
+              payloadJson: JSON.stringify({
+                registrationNo: row.registrationNo,
+                ekNo: row.ekNo,
+              }),
+            });
+            if (eksProcessed % 1000 === 0) {
+              logProgress("ek", eksProcessed, totalEks);
+            }
+            continue;
+          }
+
+          const registration = await prisma.dogRegistration.findUnique({
             where: { registrationNo },
+            select: { dogId: true },
+          });
+          if (!registration) {
+            if (eksProcessed % 1000 === 0) {
+              logProgress("ek", eksProcessed, totalEks);
+            }
+            continue;
+          }
+
+          await prisma.dog.update({
+            where: { id: registration.dogId },
             data: { ekNo: Number(row.ekNo) },
           });
-          eksApplied += result.count;
+          eksApplied += 1;
+
           if (eksProcessed % 1000 === 0) {
             logProgress("ek", eksProcessed, totalEks);
           }
@@ -242,13 +362,181 @@ export function createImportsService() {
         logProgress("ek", eksProcessed, totalEks);
         finishStage("ek", `applied=${eksApplied}, skipped=${eksSkipped}`);
 
-        startStage("index");
-        const dogRows = await prisma.dog.findMany({
-          select: { id: true, registrationNo: true },
-        });
-        const dogIdByRegistration = new Map(
-          dogRows.map((row) => [row.registrationNo, row.id]),
+        startStage("samakoira");
+        const totalSamakoira = legacy.samakoira.length;
+        let samakoiraProcessed = 0;
+        let aliasesCreated = 0;
+        let aliasConflicts = 0;
+        let notesUpdated = 0;
+        const dogIdByRegistrationForSamakoira = await loadDogIdByRegistration();
+        const noteByDogId = new Map<string, string | null>();
+        const getDogNote = async (dogId: string): Promise<string | null> => {
+          if (noteByDogId.has(dogId)) {
+            return noteByDogId.get(dogId) ?? null;
+          }
+
+          const dog = await prisma.dog.findUnique({
+            where: { id: dogId },
+            select: { note: true },
+          });
+          const note = dog?.note ?? null;
+          noteByDogId.set(dogId, note);
+          return note;
+        };
+
+        for (const row of legacy.samakoira) {
+          samakoiraProcessed += 1;
+          const canonical = parseRegistrationNo(row.rek1);
+          if (!canonical.registrationNo || canonical.isInvalid) {
+            errorsCount += 1;
+            await recordIssue({
+              stage: "samakoira",
+              code: canonical.isInvalid
+                ? "REGISTRATION_INVALID_FORMAT"
+                : "SAMAKOIRA_CANONICAL_NOT_FOUND",
+              message: canonical.isInvalid
+                ? "Samakoira canonical registration has invalid format."
+                : "Samakoira row is missing canonical REK_1 registration.",
+              registrationNo: canonical.registrationNo,
+              sourceTable: "samakoira",
+              payloadJson: JSON.stringify(row),
+            });
+            if (samakoiraProcessed % 1000 === 0) {
+              logProgress("samakoira", samakoiraProcessed, totalSamakoira);
+            }
+            continue;
+          }
+
+          const canonicalDogId = dogIdByRegistrationForSamakoira.get(
+            canonical.registrationNo,
+          );
+          if (!canonicalDogId) {
+            errorsCount += 1;
+            await recordIssue({
+              stage: "samakoira",
+              code: "SAMAKOIRA_CANONICAL_NOT_FOUND",
+              message:
+                "Samakoira canonical registration was not found among imported dogs.",
+              registrationNo: canonical.registrationNo,
+              sourceTable: "samakoira",
+              payloadJson: JSON.stringify(row),
+            });
+            if (samakoiraProcessed % 1000 === 0) {
+              logProgress("samakoira", samakoiraProcessed, totalSamakoira);
+            }
+            continue;
+          }
+
+          const aliases = [
+            { key: "REK_2", value: row.rek2 },
+            { key: "REK_3", value: row.rek3 },
+          ];
+          for (const alias of aliases) {
+            const parsedAlias = parseRegistrationNo(alias.value);
+            if (!parsedAlias.registrationNo) {
+              continue;
+            }
+            if (parsedAlias.isInvalid) {
+              errorsCount += 1;
+              await recordIssue({
+                stage: "samakoira",
+                code: "REGISTRATION_INVALID_FORMAT",
+                message: `Samakoira alias ${alias.key} has invalid registration format.`,
+                registrationNo: parsedAlias.registrationNo,
+                sourceTable: "samakoira",
+                payloadJson: JSON.stringify({
+                  rek1: row.rek1,
+                  [alias.key]: alias.value,
+                }),
+              });
+              continue;
+            }
+            if (parsedAlias.registrationNo === canonical.registrationNo) {
+              continue;
+            }
+
+            const existingAlias = await prisma.dogRegistration.findUnique({
+              where: { registrationNo: parsedAlias.registrationNo },
+              select: { dogId: true },
+            });
+            if (!existingAlias) {
+              await prisma.dogRegistration.create({
+                data: {
+                  dogId: canonicalDogId,
+                  registrationNo: parsedAlias.registrationNo,
+                  source: "LEGACY_SAMAKOIRA",
+                },
+              });
+              dogIdByRegistrationForSamakoira.set(
+                parsedAlias.registrationNo,
+                canonicalDogId,
+              );
+              aliasesCreated += 1;
+              continue;
+            }
+
+            if (existingAlias.dogId !== canonicalDogId) {
+              errorsCount += 1;
+              aliasConflicts += 1;
+              await recordIssue({
+                stage: "samakoira",
+                code: "REGISTRATION_ALIAS_CONFLICT",
+                message:
+                  "Samakoira alias registration belongs to a different dog.",
+                registrationNo: parsedAlias.registrationNo,
+                sourceTable: "samakoira",
+                payloadJson: JSON.stringify({
+                  rek1: canonical.registrationNo,
+                  alias: parsedAlias.registrationNo,
+                  targetDogId: canonicalDogId,
+                  existingDogId: existingAlias.dogId,
+                }),
+              });
+            }
+          }
+
+          const rekMuu = parseRegistrationNo(row.rekMuu);
+          if (rekMuu.registrationNo && rekMuu.isInvalid) {
+            errorsCount += 1;
+            await recordIssue({
+              stage: "samakoira",
+              code: "REGISTRATION_INVALID_FORMAT",
+              message: "Samakoira REK_MUU has invalid registration format.",
+              registrationNo: rekMuu.registrationNo,
+              sourceTable: "samakoira",
+              payloadJson: JSON.stringify({
+                rek1: canonical.registrationNo,
+                rekMuu: row.rekMuu,
+              }),
+            });
+          }
+
+          const vara = normalizeNullable(row.vara);
+          if (vara) {
+            const existingNote = await getDogNote(canonicalDogId);
+            const mergedNote = mergeNoteValue(existingNote, vara);
+            if (mergedNote !== existingNote) {
+              await prisma.dog.update({
+                where: { id: canonicalDogId },
+                data: { note: mergedNote },
+              });
+              noteByDogId.set(canonicalDogId, mergedNote);
+              notesUpdated += 1;
+            }
+          }
+
+          if (samakoiraProcessed % 1000 === 0) {
+            logProgress("samakoira", samakoiraProcessed, totalSamakoira);
+          }
+        }
+        logProgress("samakoira", samakoiraProcessed, totalSamakoira);
+        finishStage(
+          "samakoira",
+          `aliasesCreated=${aliasesCreated}, aliasConflicts=${aliasConflicts}, notesUpdated=${notesUpdated}`,
         );
+
+        startStage("index");
+        const dogIdByRegistration = await loadDogIdByRegistration();
         log(`Indexed dogs by registration: ${dogIdByRegistration.size}`);
         finishStage("index");
 
@@ -264,15 +552,34 @@ export function createImportsService() {
         let skippedPlaceholderDamRefs = 0;
         for (const row of legacy.dogs) {
           relationsProcessed += 1;
-          const registrationNo = normalizeNullable(row.registrationNo);
-          if (!registrationNo) {
+          const registration = parseRegistrationNo(row.registrationNo);
+          if (!registration.registrationNo) {
             relationsSkippedNoRegistration += 1;
             if (relationsProcessed % 1000 === 0) {
               logProgress("relations", relationsProcessed, totalRelations);
             }
             continue;
           }
-          const dogId = dogIdByRegistration.get(registrationNo);
+
+          if (registration.isInvalid) {
+            errorsCount += 1;
+            await recordIssue({
+              stage: "relations",
+              code: "REGISTRATION_INVALID_FORMAT",
+              message: "Dog row has invalid registration format.",
+              registrationNo: registration.registrationNo,
+              sourceTable: "bearek_id",
+              payloadJson: JSON.stringify({
+                registrationNo: row.registrationNo,
+              }),
+            });
+            if (relationsProcessed % 1000 === 0) {
+              logProgress("relations", relationsProcessed, totalRelations);
+            }
+            continue;
+          }
+
+          const dogId = dogIdByRegistration.get(registration.registrationNo);
           if (!dogId) {
             relationsSkippedDogNotFound += 1;
             if (relationsProcessed % 1000 === 0) {
@@ -281,58 +588,98 @@ export function createImportsService() {
             continue;
           }
 
-          const sireRegistrationNo = normalizeNullable(row.sireRegistrationNo);
-          const damRegistrationNo = normalizeNullable(row.damRegistrationNo);
-          const sireRegistrationForLookup = isPlaceholderRegistration(
-            sireRegistrationNo,
-          )
-            ? null
-            : sireRegistrationNo;
-          const damRegistrationForLookup = isPlaceholderRegistration(
-            damRegistrationNo,
-          )
-            ? null
-            : damRegistrationNo;
-          if (sireRegistrationNo && !sireRegistrationForLookup) {
+          const sireRegistration = parseRegistrationNo(row.sireRegistrationNo);
+          const damRegistration = parseRegistrationNo(row.damRegistrationNo);
+
+          const sireIsPlaceholder = isPlaceholderRegistration(
+            sireRegistration.registrationNo,
+          );
+          const damIsPlaceholder = isPlaceholderRegistration(
+            damRegistration.registrationNo,
+          );
+
+          if (sireRegistration.registrationNo && sireIsPlaceholder) {
             skippedPlaceholderSireRefs += 1;
           }
-          if (damRegistrationNo && !damRegistrationForLookup) {
+          if (damRegistration.registrationNo && damIsPlaceholder) {
             skippedPlaceholderDamRefs += 1;
           }
+
+          let sireRegistrationForLookup = sireIsPlaceholder
+            ? null
+            : sireRegistration.registrationNo;
+          let damRegistrationForLookup = damIsPlaceholder
+            ? null
+            : damRegistration.registrationNo;
+
+          if (sireRegistrationForLookup && sireRegistration.isInvalid) {
+            errorsCount += 1;
+            await recordIssue({
+              stage: "relations",
+              code: "REGISTRATION_INVALID_FORMAT",
+              message: "Sire registration has invalid format.",
+              registrationNo: sireRegistrationForLookup,
+              sourceTable: "bearek_id",
+              payloadJson: JSON.stringify({
+                registrationNo: registration.registrationNo,
+                sireRegistrationNo: row.sireRegistrationNo,
+              }),
+            });
+            sireRegistrationForLookup = null;
+          }
+
+          if (damRegistrationForLookup && damRegistration.isInvalid) {
+            errorsCount += 1;
+            await recordIssue({
+              stage: "relations",
+              code: "REGISTRATION_INVALID_FORMAT",
+              message: "Dam registration has invalid format.",
+              registrationNo: damRegistrationForLookup,
+              sourceTable: "bearek_id",
+              payloadJson: JSON.stringify({
+                registrationNo: registration.registrationNo,
+                damRegistrationNo: row.damRegistrationNo,
+              }),
+            });
+            damRegistrationForLookup = null;
+          }
+
           const sireId = sireRegistrationForLookup
             ? dogIdByRegistration.get(sireRegistrationForLookup)
             : undefined;
           const damId = damRegistrationForLookup
             ? dogIdByRegistration.get(damRegistrationForLookup)
             : undefined;
-          if (sireRegistrationForLookup && !sireId) missingSireRefs += 1;
+
           if (sireRegistrationForLookup && !sireId) {
+            missingSireRefs += 1;
             errorsCount += 1;
             await recordIssue({
               stage: "relations",
               code: "RELATION_SIRE_NOT_FOUND",
               message:
                 "Referenced sire registration was not found among imported dogs.",
-              registrationNo,
+              registrationNo: registration.registrationNo,
               sourceTable: "bearek_id",
               payloadJson: JSON.stringify({
-                registrationNo,
+                registrationNo: registration.registrationNo,
                 sireRegistrationNo: sireRegistrationForLookup,
               }),
             });
           }
-          if (damRegistrationForLookup && !damId) missingDamRefs += 1;
+
           if (damRegistrationForLookup && !damId) {
+            missingDamRefs += 1;
             errorsCount += 1;
             await recordIssue({
               stage: "relations",
               code: "RELATION_DAM_NOT_FOUND",
               message:
                 "Referenced dam registration was not found among imported dogs.",
-              registrationNo,
+              registrationNo: registration.registrationNo,
               sourceTable: "bearek_id",
               payloadJson: JSON.stringify({
-                registrationNo,
+                registrationNo: registration.registrationNo,
                 damRegistrationNo: damRegistrationForLookup,
               }),
             });
@@ -346,6 +693,7 @@ export function createImportsService() {
             },
           });
           relationsUpdated += 1;
+
           if (relationsProcessed % 1000 === 0) {
             logProgress("relations", relationsProcessed, totalRelations);
           }
@@ -361,14 +709,37 @@ export function createImportsService() {
         let ownersProcessed = 0;
         for (const row of legacy.owners) {
           ownersProcessed += 1;
-          const dogId = dogIdByRegistration.get(row.registrationNo);
+          const registration = parseRegistrationNo(row.registrationNo);
+          if (registration.isInvalid) {
+            errorsCount += 1;
+            await recordIssue({
+              stage: "owners",
+              code: "REGISTRATION_INVALID_FORMAT",
+              message: "Owner row has invalid registration format.",
+              registrationNo: registration.registrationNo,
+              sourceRowId: row.sourceRowId,
+              sourceTable: "beaom",
+              payloadJson: JSON.stringify({
+                registrationNo: row.registrationNo,
+                sourceRowId: row.sourceRowId,
+              }),
+            });
+            if (ownersProcessed % 1000 === 0) {
+              logProgress("owners", ownersProcessed, totalOwners);
+            }
+            continue;
+          }
+
+          const dogId = registration.registrationNo
+            ? dogIdByRegistration.get(registration.registrationNo)
+            : undefined;
           if (!dogId) {
             errorsCount += 1;
             await recordIssue({
               stage: "owners",
               code: "OWNER_DOG_NOT_FOUND",
               message: "Owner row references a dog that was not found.",
-              registrationNo: row.registrationNo,
+              registrationNo: registration.registrationNo,
               sourceRowId: row.sourceRowId,
               sourceTable: "beaom",
               payloadJson: JSON.stringify({
@@ -389,7 +760,7 @@ export function createImportsService() {
               stage: "owners",
               code: "OWNER_MISSING_REQUIRED_FIELDS",
               message: "Owner row missing required owner identity fields.",
-              registrationNo: row.registrationNo,
+              registrationNo: registration.registrationNo,
               sourceRowId: row.sourceRowId,
               sourceTable: "beaom",
               payloadJson: JSON.stringify({
@@ -427,6 +798,7 @@ export function createImportsService() {
             });
             ownershipsUpserted += 1;
           }
+
           if (ownersProcessed % 1000 === 0) {
             logProgress("owners", ownersProcessed, totalOwners);
           }
