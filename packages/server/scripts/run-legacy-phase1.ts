@@ -8,7 +8,9 @@ type RunResult = {
 };
 
 async function main() {
-  const createdByUserId = process.argv[2];
+  const args = process.argv.slice(2).filter((arg) => arg !== "--");
+  const createdByUserId =
+    args[0] && !args[0].startsWith("--") ? args[0] : undefined;
   const start = Date.now();
   console.log("[import:phase1] Starting import...");
   if (createdByUserId) {
