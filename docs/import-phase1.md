@@ -10,6 +10,13 @@ This document describes how phase-1 legacy import works in detail: source tables
 - Inspect issues:
   - `pnpm import:issues -- <RUN_ID>`
   - Optional filters: `--stage`, `--code`, `--limit`
+- Export issues to CSV files grouped by error code:
+  - `pnpm import:issues:csv -- <RUN_ID>`
+  - (equivalent) `pnpm --filter @beagle/server import:issues:csv -- <RUN_ID>`
+  - Optional filters: `--stage`, `--code`, `--limit`, `--out`
+  - Example (single code): `pnpm import:issues:csv -- <RUN_ID> --code REGISTRATION_INVALID_FORMAT`
+  - Default output directory: `/tmp/import-issues/<RUN_ID>`
+  - Output files: `index.csv` and one `<CODE>.csv` per issue code
 
 Implementation references:
 
