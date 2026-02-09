@@ -10,7 +10,10 @@
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "test:unit": "vitest run"
+    "test:unit": "vitest run",
+    "import:phase1": "node --import tsx/esm scripts/run-legacy-phase1.ts",
+    "import:issues": "node --import tsx/esm scripts/list-import-issues.ts",
+    "import:issues:csv": "node --import tsx/esm scripts/export-import-issues-csv.ts"
   },
   "dependencies": {
     "@beagle/auth": "workspace:*",

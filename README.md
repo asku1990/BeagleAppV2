@@ -38,6 +38,11 @@ cp .env.example .env
 - `AUTH_SECRET`: strong random secret.
 - `NEXT_PUBLIC_API_URL`: API base URL for web app, default `http://localhost:3001`.
 - `CORS_ORIGIN`: web origin allowed by API, default `http://localhost:3000`.
+- `LEGACY_DATABASE_URL`: MariaDB connection string to legacy Beagle DB for phase-1 imports.
+- `SEED_TEST_USER_EMAIL`: required when running `pnpm db:seed`.
+- `SEED_TEST_USER_PASSWORD`: required when running `pnpm db:seed`.
+- `SEED_TEST_USER_ROLE`: required when running `pnpm db:seed` (`USER` or `ADMIN`).
+- `SEED_TEST_USER_USERNAME`: optional username for `pnpm db:seed`.
 
 Example values are already in `.env.example`.
 
@@ -122,9 +127,69 @@ pnpm --filter @beagle/server test:unit
   - `POST /api/auth/login`
   - `GET /api/auth/me`
   - `POST /api/auth/logout`
-- Import status endpoint:
+- Import placeholder endpoint (temporary):
   - `GET /api/import/example` returns status text
   - `POST /api/import/example` returns `501 Not Implemented`
+- New v1 admin import endpoints:
+  - `GET /api/v1/imports/:id`
+
+## Import basics
+
+1. Run migration:
+
+```bash
+pnpm db:generate
+pnpm db:migrate:dev -- --name add_phase1_dog_search_stats_schema
+```
+
+2. Run phase-1 import script:
+
+```bash
+pnpm import:phase1
+```
+
+Optional: provide a user id to record who triggered the import run:
+
+```bash
+pnpm import:phase1 <USER_ID>
+```
+
+3. Inspect warning/error details from script output:
+
+- During run, script prints grouped issue stats and samples.
+- For full issue listing by run id:
+
+```bash
+pnpm import:issues <RUN_ID>
+```
+
+Optional filters:
+
+```bash
+pnpm import:issues <RUN_ID> --stage owners
+pnpm import:issues <RUN_ID> --code OWNER_DOG_NOT_FOUND
+pnpm import:issues <RUN_ID> --limit 500
+```
+
+4. Check import run status over API (admin auth required):
+
+```bash
+curl -i -c /tmp/beagle.cookies -X POST http://localhost:3001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"<SEED_TEST_USER_EMAIL>","password":"<SEED_TEST_USER_PASSWORD>"}'
+
+curl -i -b /tmp/beagle.cookies \
+  http://localhost:3001/api/v1/imports/<RUN_ID>
+```
+
+Optional deep inspection via API:
+
+```bash
+curl -i -b /tmp/beagle.cookies \
+  "http://localhost:3001/api/v1/imports/<RUN_ID>/issues?limit=200"
+```
+
+For full import behavior (source tables, stage handling, required fields, issue codes, and logging), see `docs/import-phase1.md`.
 
 ## Where to add new features
 
@@ -140,3 +205,4 @@ pnpm --filter @beagle/server test:unit
 - `docs/api-versioning.md`: API path versioning policy (`/api/v1/...`).
 - `docs/roles-and-permissions.md`: baseline role and authorization rules.
 - `docs/migration-plan-v1-to-v2.md`: staged migration approach from legacy app.
+- `docs/import-phase1.md`: phase-1 import flow, data handling, and issue logging behavior.

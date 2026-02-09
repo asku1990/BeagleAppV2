@@ -13,7 +13,8 @@
     "test:unit": "vitest run --passWithNoTests",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:deploy": "prisma migrate deploy"
+    "prisma:deploy": "prisma migrate deploy",
+    "seed:basic-user": "node --import tsx/esm scripts/seed-basic-user.ts"
   },
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.3.0",

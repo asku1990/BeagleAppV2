@@ -1,6 +1,8 @@
 import type {
   ApiResult,
   CurrentUserDto,
+  ImportRunIssuesResponse,
+  ImportRunResponse,
   ImportStatusResponse,
   LoginRequest,
   LogoutResponse,
@@ -79,6 +81,35 @@ export function createApiClient(options: ClientOptions = {}) {
 
     getImportStatus() {
       return request<ImportStatusResponse>("/api/import/example", {
+        method: "GET",
+      });
+    },
+
+    getImportRun(id: string) {
+      return request<ImportRunResponse>(`/api/v1/imports/${id}`, {
+        method: "GET",
+      });
+    },
+
+    getImportRunIssues(
+      id: string,
+      options?: {
+        stage?: string;
+        code?: string;
+        cursor?: string;
+        limit?: number;
+      },
+    ) {
+      const params = new URLSearchParams();
+      if (options?.stage) params.set("stage", options.stage);
+      if (options?.code) params.set("code", options.code);
+      if (options?.cursor) params.set("cursor", options.cursor);
+      if (typeof options?.limit === "number") {
+        params.set("limit", String(options.limit));
+      }
+      const query = params.toString();
+      const path = `/api/v1/imports/${id}/issues${query ? `?${query}` : ""}`;
+      return request<ImportRunIssuesResponse>(path, {
         method: "GET",
       });
     },

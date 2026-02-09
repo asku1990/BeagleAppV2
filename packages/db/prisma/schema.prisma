@@ -11,15 +11,38 @@ enum Role {
   ADMIN
 }
 
+enum DogSex {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+enum ImportKind {
+  LEGACY_PHASE1
+}
+
+enum ImportStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+enum ImportIssueSeverity {
+  WARNING
+  ERROR
+}
+
 model User {
   id           String    @id @default(cuid())
   email        String    @unique
   username     String?   @unique
   passwordHash String
   role         Role      @default(USER)
+  sessions     Session[]
+  importRuns   ImportRun[]
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-  sessions     Session[]
 }
 
 model Session {
@@ -29,4 +52,155 @@ model Session {
   expires      DateTime
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Dog {
+  id              String            @id @default(cuid())
+  name            String
+  sex             DogSex            @default(UNKNOWN)
+  birthDate       DateTime?
+  sireId          String?
+  damId           String?
+  breederId       String?
+  ekNo            Int?              @unique
+  note            String?
+  sire            Dog?              @relation("SireRelation", fields: [sireId], references: [id])
+  siredPuppies    Dog[]             @relation("SireRelation")
+  dam             Dog?              @relation("DamRelation", fields: [damId], references: [id])
+  whelpedPuppies  Dog[]             @relation("DamRelation")
+  breeder         Breeder?          @relation(fields: [breederId], references: [id])
+  registrations   DogRegistration[]
+  ownerships      DogOwnership[]
+  trialResults    TrialResult[]
+  showResults     ShowResult[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([name])
+  @@index([birthDate])
+  @@index([sireId])
+  @@index([damId])
+  @@index([breederId])
+}
+
+model DogRegistration {
+  id             String   @id @default(cuid())
+  dogId          String
+  registrationNo String   @unique
+  source         String
+  dog            Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([dogId])
+}
+
+model Breeder {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  dogs      Dog[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Owner {
+  id          String         @id @default(cuid())
+  name        String
+  postalCode  String         @default("")
+  city        String         @default("")
+  ownerships  DogOwnership[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@unique([name, postalCode, city])
+  @@index([name])
+}
+
+model DogOwnership {
+  id            String   @id @default(cuid())
+  dogId         String
+  ownerId       String
+  ownershipDate DateTime?
+  ownershipDateKey String
+  dog           Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
+  owner         Owner    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([dogId, ownerId, ownershipDateKey])
+  @@index([dogId])
+  @@index([ownerId])
+  @@index([ownershipDate])
+}
+
+model TrialResult {
+  id        String   @id @default(cuid())
+  dogId     String
+  eventDate DateTime
+  eventName String
+  sourceKey String   @unique
+  dog       Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([eventDate])
+  @@index([dogId, eventDate])
+}
+
+model ShowResult {
+  id        String   @id @default(cuid())
+  dogId     String
+  eventDate DateTime
+  eventName String
+  sourceKey String   @unique
+  dog       Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([eventDate])
+  @@index([dogId, eventDate])
+}
+
+model ImportRun {
+  id                  String       @id @default(cuid())
+  kind                ImportKind
+  status              ImportStatus @default(PENDING)
+  dogsUpserted        Int          @default(0)
+  ownersUpserted      Int          @default(0)
+  ownershipsUpserted  Int          @default(0)
+  trialResultsUpserted Int         @default(0)
+  showResultsUpserted Int          @default(0)
+  errorsCount         Int          @default(0)
+  startedAt           DateTime?
+  finishedAt          DateTime?
+  errorSummary        String?
+  createdByUserId     String?
+  createdByUser       User?        @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  issues              ImportRunIssue[]
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  @@index([kind, status])
+  @@index([createdByUserId])
+}
+
+model ImportRunIssue {
+  id             String              @id @default(cuid())
+  importRunId    String
+  stage          String
+  severity       ImportIssueSeverity @default(WARNING)
+  code           String
+  message        String
+  registrationNo String?
+  sourceRowId    Int?
+  sourceTable    String?
+  payloadJson    String?             @db.LongText
+  importRun      ImportRun           @relation(fields: [importRunId], references: [id], onDelete: Cascade)
+  createdAt      DateTime            @default(now())
+
+  @@index([importRunId])
+  @@index([importRunId, stage])
+  @@index([importRunId, code])
 }
