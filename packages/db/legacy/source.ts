@@ -10,6 +10,15 @@ export type LegacyDogRow = {
   breederName: string | null;
 };
 
+export type LegacyBreederRow = {
+  name: string | null;
+  shortCode: string | null;
+  grantedAtRaw: string | null;
+  ownerName: string | null;
+  city: string | null;
+  legacyFlag: string | null;
+};
+
 export type LegacyEkRow = {
   registrationNo: string;
   ekNo: number | null;
@@ -23,10 +32,38 @@ export type LegacyOwnerRow = {
   ownershipDateRaw: string | null;
 };
 
-export type LegacyEventRow = {
+type LegacyScore = string | number | null;
+
+export type LegacyTrialResultRow = {
   registrationNo: string;
-  eventName: string | null;
+  eventPlace: string | null;
   eventDateRaw: string | null;
+  kennelDistrict: string | null;
+  kennelDistrictNo: string | null;
+  ke: string | null;
+  lk: string | null;
+  pa: string | null;
+  piste: LegacyScore;
+  sija: string | null;
+  haku: LegacyScore;
+  hauk: LegacyScore;
+  yva: LegacyScore;
+  hlo: LegacyScore;
+  alo: LegacyScore;
+  tja: LegacyScore;
+  pin: LegacyScore;
+  judge: string | null;
+  legacyFlag: string | null;
+};
+
+export type LegacyShowResultRow = {
+  registrationNo: string;
+  eventDateRaw: string | null;
+  eventPlace: string | null;
+  resultText: string | null;
+  heightText: string | null;
+  judge: string | null;
+  legacyFlag: string | null;
 };
 
 export type LegacySamakoiraRow = {
@@ -39,10 +76,11 @@ export type LegacySamakoiraRow = {
 
 export type LegacyPhase1Rows = {
   dogs: LegacyDogRow[];
+  breeders: LegacyBreederRow[];
   eks: LegacyEkRow[];
   owners: LegacyOwnerRow[];
-  trialResults: LegacyEventRow[];
-  showResults: LegacyEventRow[];
+  trialResults: LegacyTrialResultRow[];
+  showResults: LegacyShowResultRow[];
   samakoira: LegacySamakoiraRow[];
 };
 
@@ -79,6 +117,20 @@ export async function fetchLegacyPhase1Rows(options?: {
       `Fetched dogs rows: count=${dogs.length}, elapsed=${Math.round((Date.now() - dogsStartedAt) / 1000)}s`,
     );
 
+    const breedersStartedAt = Date.now();
+    const breeders = (await connection.query(
+      `SELECT KENNEL as name,
+              KELYHE as shortCode,
+              MYONNETTY as grantedAtRaw,
+              KEOMIS as ownerName,
+              POSPAI as city,
+              VARA as legacyFlag
+       FROM kennel`,
+    )) as LegacyBreederRow[];
+    log(
+      `Fetched breeder rows: count=${breeders.length}, elapsed=${Math.round((Date.now() - breedersStartedAt) / 1000)}s`,
+    );
+
     const eksStartedAt = Date.now();
     const eks = (await connection.query(
       `SELECT REKNO as registrationNo,
@@ -105,10 +157,26 @@ export async function fetchLegacyPhase1Rows(options?: {
     const trialResultsStartedAt = Date.now();
     const trialResults = (await connection.query(
       `SELECT REKNO as registrationNo,
-              TAPPA as eventName,
-              TAPPV as eventDateRaw
+              TAPPA as eventPlace,
+              TAPPV as eventDateRaw,
+              KENNELPIIRI as kennelDistrict,
+              KENNELPIIRINRO as kennelDistrictNo,
+              KE as ke,
+              LK as lk,
+              PA as pa,
+              PISTE as piste,
+              SIJA as sija,
+              HAKU as haku,
+              HAUK as hauk,
+              YVA as yva,
+              HLO as hlo,
+              ALO as alo,
+              TJA as tja,
+              PIN as pin,
+              TUOM1 as judge,
+              VARA as legacyFlag
        FROM akoeall`,
-    )) as LegacyEventRow[];
+    )) as LegacyTrialResultRow[];
     log(
       `Fetched trial rows: count=${trialResults.length}, elapsed=${Math.round((Date.now() - trialResultsStartedAt) / 1000)}s`,
     );
@@ -116,10 +184,14 @@ export async function fetchLegacyPhase1Rows(options?: {
     const showResultsStartedAt = Date.now();
     const showResults = (await connection.query(
       `SELECT REKNO as registrationNo,
-              TAPPA as eventName,
-              TAPPV as eventDateRaw
+              TAPPV as eventDateRaw,
+              TAPPA as eventPlace,
+              TULNI as resultText,
+              KORK as heightText,
+              TUOM1 as judge,
+              VARA as legacyFlag
        FROM nay9599`,
-    )) as LegacyEventRow[];
+    )) as LegacyShowResultRow[];
     log(
       `Fetched show rows: count=${showResults.length}, elapsed=${Math.round((Date.now() - showResultsStartedAt) / 1000)}s`,
     );
@@ -141,7 +213,15 @@ export async function fetchLegacyPhase1Rows(options?: {
       `Legacy source fetch completed in ${Math.round((Date.now() - startedAt) / 1000)}s`,
     );
 
-    return { dogs, eks, owners, trialResults, showResults, samakoira };
+    return {
+      dogs,
+      breeders,
+      eks,
+      owners,
+      trialResults,
+      showResults,
+      samakoira,
+    };
   } finally {
     log("Closing legacy database connection...");
     await connection.end();

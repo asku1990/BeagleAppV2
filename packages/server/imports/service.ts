@@ -17,8 +17,9 @@ import type {
   ImportRunResponse,
 } from "@beagle/contracts";
 import type { ServiceResult } from "../shared/result";
-import { upsertEventRows, upsertOwner } from "./persistence";
+import { upsertOwner, upsertShowRows, upsertTrialRows } from "./persistence";
 import {
+  normalizeBreederKey,
   isValidRegistrationNo,
   mapSex,
   normalizeNullable,
@@ -104,6 +105,43 @@ function mergeNoteValue(existing: string | null, incoming: string): string {
   return `${existing} | ${incoming}`;
 }
 
+type BreederDetailsInput = {
+  name: string | null;
+  shortCode: string | null;
+  grantedAtRaw: string | null;
+  ownerName: string | null;
+  city: string | null;
+  legacyFlag: string | null;
+  source: "kennel";
+};
+
+type BreederDetails = {
+  name: string;
+  shortCode: string | null;
+  grantedAtRaw: string | null;
+  ownerName: string | null;
+  city: string | null;
+  legacyFlag: string | null;
+  source: "kennel";
+};
+
+function normalizeBreederDetails(
+  input: BreederDetailsInput,
+): BreederDetails | null {
+  const name = normalizeNullable(input.name);
+  if (!name) return null;
+
+  return {
+    name,
+    shortCode: normalizeNullable(input.shortCode),
+    grantedAtRaw: normalizeNullable(input.grantedAtRaw),
+    ownerName: normalizeNullable(input.ownerName),
+    city: normalizeNullable(input.city),
+    legacyFlag: normalizeNullable(input.legacyFlag),
+    source: input.source,
+  };
+}
+
 export function createImportsService() {
   return {
     async runLegacyPhase1(
@@ -112,6 +150,43 @@ export function createImportsService() {
     ): Promise<ServiceResult<ImportRunResponse>> {
       const log = options?.log ?? (() => {});
       const stageStartedAt = new Map<string, number>();
+      const stageReasonCounts = new Map<string, Map<string, number>>();
+      const addStageReason = (
+        stage: string,
+        severity: ImportIssueSeverity,
+        code: string,
+      ) => {
+        const stageCounts = stageReasonCounts.get(stage) ?? new Map();
+        const key = `${severity}|${code}`;
+        stageCounts.set(key, (stageCounts.get(key) ?? 0) + 1);
+        stageReasonCounts.set(stage, stageCounts);
+      };
+      const formatStageReasons = (stage: string): string | null => {
+        const stageCounts = stageReasonCounts.get(stage);
+        if (!stageCounts || stageCounts.size === 0) {
+          return null;
+        }
+
+        const entries = [...stageCounts.entries()].map(([key, count]) => {
+          const [severity, code] = key.split("|");
+          return {
+            severity,
+            code,
+            count,
+          };
+        });
+        entries.sort((a, b) => {
+          if (b.count !== a.count) return b.count - a.count;
+          if (a.severity !== b.severity) {
+            return a.severity.localeCompare(b.severity);
+          }
+          return a.code.localeCompare(b.code);
+        });
+
+        return entries
+          .map((entry) => `${entry.code}(${entry.severity}):${entry.count}`)
+          .join(", ");
+      };
       const startStage = (name: string) => {
         stageStartedAt.set(name, Date.now());
         log(`[stage:${name}] start`);
@@ -119,8 +194,15 @@ export function createImportsService() {
       const finishStage = (name: string, summary?: string) => {
         const startedAt = stageStartedAt.get(name) ?? Date.now();
         const elapsedSeconds = Math.round((Date.now() - startedAt) / 1000);
+        const reasonSummary = formatStageReasons(name);
+        const details = [
+          summary,
+          reasonSummary ? `reasons=${reasonSummary}` : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
         log(
-          `[stage:${name}] done in ${elapsedSeconds}s${summary ? ` ${summary}` : ""}`,
+          `[stage:${name}] done in ${elapsedSeconds}s${details ? ` ${details}` : ""}`,
         );
       };
       const logProgress = (name: string, processed: number, total: number) => {
@@ -162,7 +244,9 @@ export function createImportsService() {
         sourceTable?: string | null;
         payloadJson?: string | null;
       }) => {
-        issueBuffer.push(issue);
+        const severity = issue.severity ?? "WARNING";
+        addStageReason(issue.stage, severity, issue.code);
+        issueBuffer.push({ ...issue, severity });
         if (issueBuffer.length >= ISSUE_BUFFER_SIZE) {
           await flushIssueBuffer();
         }
@@ -183,13 +267,142 @@ export function createImportsService() {
           log: (message) => log(`[stage:load] ${message}`),
         });
         log(
-          `Loaded legacy rows: dogs=${legacy.dogs.length}, eks=${legacy.eks.length}, owners=${legacy.owners.length}, trialResults=${legacy.trialResults.length}, showResults=${legacy.showResults.length}, samakoira=${legacy.samakoira.length}`,
+          `Loaded legacy rows: dogs=${legacy.dogs.length}, breeders=${legacy.breeders.length}, eks=${legacy.eks.length}, owners=${legacy.owners.length}, trialResults=${legacy.trialResults.length}, showResults=${legacy.showResults.length}, samakoira=${legacy.samakoira.length}`,
         );
         finishStage("load");
+
+        startStage("breeders");
+        let breederRowsProcessed = 0;
+        let breederRowsUpserted = 0;
+        const breederRowsUpdated = 0;
+        let breederRowsSkipped = 0;
+        const totalBreederRows = legacy.breeders.length;
+
+        for (const row of legacy.breeders) {
+          breederRowsProcessed += 1;
+          const breeder = normalizeBreederDetails({
+            name: row.name,
+            shortCode: row.shortCode,
+            grantedAtRaw: row.grantedAtRaw,
+            ownerName: row.ownerName,
+            city: row.city,
+            legacyFlag: row.legacyFlag,
+            source: "kennel",
+          });
+
+          if (!breeder) {
+            breederRowsSkipped += 1;
+            errorsCount += 1;
+            await recordIssue({
+              stage: "breeders",
+              code: "BREEDER_MISSING_NAME",
+              message: "Breeder row is missing kennel name.",
+              sourceTable: "kennel",
+              payloadJson: JSON.stringify(row),
+            });
+            if (breederRowsProcessed % 1000 === 0) {
+              logProgress("breeders", breederRowsProcessed, totalBreederRows);
+            }
+            continue;
+          }
+
+          const result = await prisma.breeder.upsert({
+            where: { name: breeder.name },
+            create: {
+              name: breeder.name,
+              shortCode: breeder.shortCode,
+              grantedAtRaw: breeder.grantedAtRaw,
+              ownerName: breeder.ownerName,
+              city: breeder.city,
+              legacyFlag: breeder.legacyFlag,
+              detailsSource: breeder.source,
+            },
+            update: {
+              shortCode: breeder.shortCode,
+              grantedAtRaw: breeder.grantedAtRaw,
+              ownerName: breeder.ownerName,
+              city: breeder.city,
+              legacyFlag: breeder.legacyFlag,
+              detailsSource: breeder.source,
+            },
+            select: { id: true },
+          });
+          if (result.id) {
+            breederRowsUpserted += 1;
+          }
+
+          if (breederRowsProcessed % 1000 === 0) {
+            logProgress("breeders", breederRowsProcessed, totalBreederRows);
+          }
+        }
+        logProgress("breeders", breederRowsProcessed, totalBreederRows);
+        finishStage(
+          "breeders",
+          `upserted=${breederRowsUpserted}, updated=${breederRowsUpdated}, skipped=${breederRowsSkipped}`,
+        );
+
+        const breederIdByNameKey = new Map<string, string>();
+        const breederNameKeyCounts = new Map<string, number>();
+        const breederNameKeyNames = new Map<string, Set<string>>();
+        const firstBreederIdByNameKey = new Map<string, string>();
+        const ambiguousBreederNameKeys = new Set<string>();
+        let duplicateBreederNameKeys = 0;
+        const kennelBreeders = await prisma.breeder.findMany({
+          where: { detailsSource: "kennel" },
+          select: { id: true, name: true },
+        });
+        for (const breeder of kennelBreeders) {
+          const nameKey = normalizeBreederKey(breeder.name);
+          if (!nameKey) continue;
+          breederNameKeyCounts.set(
+            nameKey,
+            (breederNameKeyCounts.get(nameKey) ?? 0) + 1,
+          );
+          if (!firstBreederIdByNameKey.has(nameKey)) {
+            firstBreederIdByNameKey.set(nameKey, breeder.id);
+          }
+          const names = breederNameKeyNames.get(nameKey) ?? new Set<string>();
+          names.add(breeder.name);
+          breederNameKeyNames.set(nameKey, names);
+        }
+        for (const [nameKey, count] of breederNameKeyCounts.entries()) {
+          if (count === 1) {
+            const breederId = firstBreederIdByNameKey.get(nameKey);
+            if (breederId) {
+              breederIdByNameKey.set(nameKey, breederId);
+            }
+            continue;
+          }
+
+          duplicateBreederNameKeys += count - 1;
+          ambiguousBreederNameKeys.add(nameKey);
+
+          errorsCount += 1;
+          await recordIssue({
+            stage: "breeders",
+            code: "BREEDER_NAME_KEY_AMBIGUOUS",
+            message:
+              "Breeder name key is ambiguous after normalization; dogs with this breeder text will not be linked.",
+            sourceTable: "kennel",
+            payloadJson: JSON.stringify({
+              breederNameKey: nameKey,
+              count,
+              names: [
+                ...(breederNameKeyNames.get(nameKey) ?? new Set<string>()),
+              ],
+            }),
+          });
+        }
+        log(
+          `[stage:breeders] index breederNameKeys=${breederIdByNameKey.size}, duplicateKeys=${duplicateBreederNameKeys}, ambiguousKeys=${ambiguousBreederNameKeys.size}`,
+        );
 
         startStage("dogs");
         const totalDogs = legacy.dogs.length;
         let dogsProcessed = 0;
+        let dogsWithBreederText = 0;
+        let dogsLinkedToBreeder = 0;
+        let dogsWithUnlinkedBreederText = 0;
         for (const row of legacy.dogs) {
           dogsProcessed += 1;
           const { registrationNo, isInvalid } = parseRegistrationNo(
@@ -234,16 +447,38 @@ export function createImportsService() {
             continue;
           }
 
-          const breederName = normalizeNullable(row.breederName);
-          let breederId: string | undefined;
-          if (breederName) {
-            const breeder = await prisma.breeder.upsert({
-              where: { name: breederName },
-              create: { name: breederName },
-              update: {},
-              select: { id: true },
-            });
-            breederId = breeder.id;
+          const breederNameText = normalizeNullable(row.breederName);
+          if (breederNameText) {
+            dogsWithBreederText += 1;
+          }
+          const breederNameKey = normalizeBreederKey(breederNameText);
+          const breederId = breederNameKey
+            ? (breederIdByNameKey.get(breederNameKey) ?? null)
+            : null;
+          if (breederNameText && breederId) {
+            dogsLinkedToBreeder += 1;
+          } else if (breederNameText) {
+            dogsWithUnlinkedBreederText += 1;
+
+            if (
+              breederNameKey &&
+              ambiguousBreederNameKeys.has(breederNameKey)
+            ) {
+              errorsCount += 1;
+              await recordIssue({
+                stage: "dogs",
+                code: "DOG_BREEDER_LINK_AMBIGUOUS",
+                message:
+                  "Dog breeder text matches an ambiguous breeder name key; breeder link skipped.",
+                registrationNo,
+                sourceTable: "bearek_id",
+                payloadJson: JSON.stringify({
+                  registrationNo: row.registrationNo,
+                  breederNameText,
+                  breederNameKey,
+                }),
+              });
+            }
           }
 
           const existingRegistration = await prisma.dogRegistration.findUnique({
@@ -258,6 +493,7 @@ export function createImportsService() {
                 name,
                 sex: mapSex(row.sex),
                 birthDate: parseLegacyDate(row.birthDateRaw),
+                breederNameText,
                 breederId,
               },
             });
@@ -274,6 +510,7 @@ export function createImportsService() {
                 name,
                 sex: mapSex(row.sex),
                 birthDate: parseLegacyDate(row.birthDateRaw),
+                breederNameText,
                 breederId,
                 registrations: {
                   create: {
@@ -291,7 +528,10 @@ export function createImportsService() {
           }
         }
         logProgress("dogs", dogsProcessed, totalDogs);
-        finishStage("dogs", `dogsUpserted=${dogsUpserted}`);
+        finishStage(
+          "dogs",
+          `dogsUpserted=${dogsUpserted}, breederTextSet=${dogsWithBreederText}, breederLinked=${dogsLinkedToBreeder}, breederUnlinkedText=${dogsWithUnlinkedBreederText}`,
+        );
 
         startStage("ek");
         const totalEks = legacy.eks.length;
@@ -304,21 +544,39 @@ export function createImportsService() {
             row.registrationNo,
           );
 
-          if (!registrationNo || row.ekNo == null) {
+          if (!registrationNo) {
             eksSkipped += 1;
-            if (!registrationNo) {
-              errorsCount += 1;
-              await recordIssue({
-                stage: "ek",
-                code: "EK_MISSING_REGISTRATION",
-                message: "EK row missing registration number.",
-                sourceTable: "bea_apu",
-                payloadJson: JSON.stringify({
-                  registrationNo: row.registrationNo,
-                  ekNo: row.ekNo,
-                }),
-              });
+            errorsCount += 1;
+            await recordIssue({
+              stage: "ek",
+              code: "EK_MISSING_REGISTRATION",
+              message: "EK row missing registration number.",
+              sourceTable: "bea_apu",
+              payloadJson: JSON.stringify({
+                registrationNo: row.registrationNo,
+                ekNo: row.ekNo,
+              }),
+            });
+            if (eksProcessed % 1000 === 0) {
+              logProgress("ek", eksProcessed, totalEks);
             }
+            continue;
+          }
+
+          if (row.ekNo == null) {
+            eksSkipped += 1;
+            await recordIssue({
+              stage: "ek",
+              severity: "INFO",
+              code: "EK_MISSING_EKNO",
+              message: "EK row missing EK number.",
+              registrationNo,
+              sourceTable: "bea_apu",
+              payloadJson: JSON.stringify({
+                registrationNo: row.registrationNo,
+                ekNo: row.ekNo,
+              }),
+            });
             if (eksProcessed % 1000 === 0) {
               logProgress("ek", eksProcessed, totalEks);
             }
@@ -326,6 +584,7 @@ export function createImportsService() {
           }
 
           if (isInvalid) {
+            eksSkipped += 1;
             errorsCount += 1;
             await recordIssue({
               stage: "ek",
@@ -349,6 +608,19 @@ export function createImportsService() {
             select: { dogId: true },
           });
           if (!registration) {
+            eksSkipped += 1;
+            errorsCount += 1;
+            await recordIssue({
+              stage: "ek",
+              code: "EK_DOG_NOT_FOUND",
+              message: "EK row references a dog that was not found.",
+              registrationNo,
+              sourceTable: "bea_apu",
+              payloadJson: JSON.stringify({
+                registrationNo: row.registrationNo,
+                ekNo: row.ekNo,
+              }),
+            });
             if (eksProcessed % 1000 === 0) {
               logProgress("ek", eksProcessed, totalEks);
             }
@@ -440,6 +712,18 @@ export function createImportsService() {
           for (const alias of aliases) {
             const parsedAlias = parseRegistrationNo(alias.value);
             if (!parsedAlias.registrationNo) {
+              await recordIssue({
+                stage: "samakoira",
+                severity: "INFO",
+                code: "SAMAKOIRA_ALIAS_EMPTY",
+                message: `Samakoira alias ${alias.key} is empty.`,
+                registrationNo: canonical.registrationNo,
+                sourceTable: "samakoira",
+                payloadJson: JSON.stringify({
+                  rek1: canonical.registrationNo,
+                  [alias.key]: alias.value,
+                }),
+              });
               continue;
             }
             if (parsedAlias.isInvalid) {
@@ -458,6 +742,18 @@ export function createImportsService() {
               continue;
             }
             if (parsedAlias.registrationNo === canonical.registrationNo) {
+              await recordIssue({
+                stage: "samakoira",
+                severity: "INFO",
+                code: "SAMAKOIRA_ALIAS_EQUALS_CANONICAL",
+                message: `Samakoira alias ${alias.key} matches canonical registration.`,
+                registrationNo: canonical.registrationNo,
+                sourceTable: "samakoira",
+                payloadJson: JSON.stringify({
+                  rek1: canonical.registrationNo,
+                  [alias.key]: alias.value,
+                }),
+              });
               continue;
             }
 
@@ -561,6 +857,18 @@ export function createImportsService() {
           const registration = parseRegistrationNo(row.registrationNo);
           if (!registration.registrationNo) {
             relationsSkippedNoRegistration += 1;
+            await recordIssue({
+              stage: "relations",
+              severity: "INFO",
+              code: "RELATION_ROW_MISSING_REGISTRATION",
+              message: "Relations row missing canonical registration number.",
+              sourceTable: "bearek_id",
+              payloadJson: JSON.stringify({
+                registrationNo: row.registrationNo,
+                sireRegistrationNo: row.sireRegistrationNo,
+                damRegistrationNo: row.damRegistrationNo,
+              }),
+            });
             if (relationsProcessed % 1000 === 0) {
               logProgress("relations", relationsProcessed, totalRelations);
             }
@@ -588,6 +896,20 @@ export function createImportsService() {
           const dogId = dogIdByRegistration.get(registration.registrationNo);
           if (!dogId) {
             relationsSkippedDogNotFound += 1;
+            errorsCount += 1;
+            await recordIssue({
+              stage: "relations",
+              code: "RELATION_DOG_NOT_FOUND",
+              message:
+                "Relations row references a dog that was not found among imported dogs.",
+              registrationNo: registration.registrationNo,
+              sourceTable: "bearek_id",
+              payloadJson: JSON.stringify({
+                registrationNo: row.registrationNo,
+                sireRegistrationNo: row.sireRegistrationNo,
+                damRegistrationNo: row.damRegistrationNo,
+              }),
+            });
             if (relationsProcessed % 1000 === 0) {
               logProgress("relations", relationsProcessed, totalRelations);
             }
@@ -606,9 +928,35 @@ export function createImportsService() {
 
           if (sireRegistration.registrationNo && sireIsPlaceholder) {
             skippedPlaceholderSireRefs += 1;
+            await recordIssue({
+              stage: "relations",
+              severity: "INFO",
+              code: "RELATION_SIRE_PLACEHOLDER",
+              message:
+                "Sire registration is a placeholder and was treated as unknown.",
+              registrationNo: registration.registrationNo,
+              sourceTable: "bearek_id",
+              payloadJson: JSON.stringify({
+                registrationNo: registration.registrationNo,
+                sireRegistrationNo: row.sireRegistrationNo,
+              }),
+            });
           }
           if (damRegistration.registrationNo && damIsPlaceholder) {
             skippedPlaceholderDamRefs += 1;
+            await recordIssue({
+              stage: "relations",
+              severity: "INFO",
+              code: "RELATION_DAM_PLACEHOLDER",
+              message:
+                "Dam registration is a placeholder and was treated as unknown.",
+              registrationNo: registration.registrationNo,
+              sourceTable: "bearek_id",
+              payloadJson: JSON.stringify({
+                registrationNo: registration.registrationNo,
+                damRegistrationNo: row.damRegistrationNo,
+              }),
+            });
           }
 
           let sireRegistrationForLookup = sireIsPlaceholder
@@ -804,9 +1152,8 @@ export function createImportsService() {
         finishStage("owners");
 
         startStage("trials");
-        const trialResult = await upsertEventRows(
+        const trialResult = await upsertTrialRows(
           legacy.trialResults,
-          "trial",
           dogIdByRegistration,
           {
             onProgress: (processed, total) =>
@@ -831,9 +1178,8 @@ export function createImportsService() {
         finishStage("trials");
 
         startStage("shows");
-        const showResult = await upsertEventRows(
+        const showResult = await upsertShowRows(
           legacy.showResults,
-          "show",
           dogIdByRegistration,
           {
             onProgress: (processed, total) =>
@@ -940,6 +1286,7 @@ export function createImportsService() {
       options?: {
         stage?: string;
         code?: string;
+        severity?: ImportIssueSeverity;
         limit?: number;
         cursor?: string;
       },

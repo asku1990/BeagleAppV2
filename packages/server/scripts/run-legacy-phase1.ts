@@ -57,6 +57,7 @@ async function main() {
     const grouped = new Map<string, number>();
     const samples: Array<{
       stage: string;
+      severity: string;
       code: string;
       message: string;
       registrationNo: string | null;
@@ -72,11 +73,12 @@ async function main() {
       });
       for (const issue of page.items) {
         total += 1;
-        const key = `${issue.stage}:${issue.code}`;
+        const key = `${issue.stage}:${issue.severity}:${issue.code}`;
         grouped.set(key, (grouped.get(key) ?? 0) + 1);
         if (samples.length < 10) {
           samples.push({
             stage: issue.stage,
+            severity: issue.severity,
             code: issue.code,
             message: issue.message,
             registrationNo: issue.registrationNo,
@@ -98,7 +100,7 @@ async function main() {
       console.log("[import:phase1] Issue samples:");
       for (const sample of samples) {
         console.log(
-          `[import:phase1]   [${sample.stage}/${sample.code}] reg=${sample.registrationNo ?? "-"} table=${sample.sourceTable ?? "-"} msg=${sample.message}`,
+          `[import:phase1]   [${sample.stage}/${sample.severity}/${sample.code}] reg=${sample.registrationNo ?? "-"} table=${sample.sourceTable ?? "-"} msg=${sample.message}`,
         );
       }
     }

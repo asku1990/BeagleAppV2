@@ -39,10 +39,10 @@ cp .env.example .env
 - `NEXT_PUBLIC_API_URL`: API base URL for web app, default `http://localhost:3001`.
 - `CORS_ORIGIN`: web origin allowed by API, default `http://localhost:3000`.
 - `LEGACY_DATABASE_URL`: MariaDB connection string to legacy Beagle DB for phase-1 imports.
-- `SEED_TEST_USER_EMAIL`: required when running `pnpm db:seed`.
-- `SEED_TEST_USER_PASSWORD`: required when running `pnpm db:seed`.
-- `SEED_TEST_USER_ROLE`: required when running `pnpm db:seed` (`USER` or `ADMIN`).
-- `SEED_TEST_USER_USERNAME`: optional username for `pnpm db:seed`.
+- `SEED_TEST_USER_EMAIL`: required when running `pnpm db:seed:basic-user`.
+- `SEED_TEST_USER_PASSWORD`: required when running `pnpm db:seed:basic-user`.
+- `SEED_TEST_USER_ROLE`: required when running `pnpm db:seed:basic-user` (`USER` or `ADMIN`).
+- `SEED_TEST_USER_USERNAME`: optional username for `pnpm db:seed:basic-user`.
 
 Example values are already in `.env.example`.
 
@@ -168,6 +168,7 @@ Optional filters:
 ```bash
 pnpm import:issues <RUN_ID> --stage owners
 pnpm import:issues <RUN_ID> --code OWNER_DOG_NOT_FOUND
+pnpm import:issues <RUN_ID> --severity WARNING
 pnpm import:issues <RUN_ID> --limit 500
 ```
 
@@ -187,6 +188,9 @@ Optional deep inspection via API:
 ```bash
 curl -i -b /tmp/beagle.cookies \
   "http://localhost:3001/api/v1/imports/<RUN_ID>/issues?limit=200"
+
+curl -i -b /tmp/beagle.cookies \
+  "http://localhost:3001/api/v1/imports/<RUN_ID>/issues?severity=WARNING&limit=200"
 ```
 
 For full import behavior (source tables, stage handling, required fields, issue codes, and logging), see `docs/import-phase1.md`.

@@ -29,6 +29,7 @@ enum ImportStatus {
 }
 
 enum ImportIssueSeverity {
+  INFO
   WARNING
   ERROR
 }
@@ -61,6 +62,7 @@ model Dog {
   name            String
   sex             DogSex            @default(UNKNOWN)
   birthDate       DateTime?
+  breederNameText String?
   sireId          String?
   damId           String?
   breederId       String?
@@ -98,11 +100,18 @@ model DogRegistration {
 }
 
 model Breeder {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  dogs      Dog[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(cuid())
+  name           String   @unique
+  shortCode      String?
+  grantedAtRaw   String?
+  modifiedAtRaw  String?
+  ownerName      String?
+  city           String?
+  legacyFlag     String?
+  detailsSource  String?
+  dogs           Dog[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model Owner {
@@ -136,28 +145,50 @@ model DogOwnership {
 }
 
 model TrialResult {
-  id        String   @id @default(cuid())
-  dogId     String
-  eventDate DateTime
-  eventName String
-  sourceKey String   @unique
-  dog       Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String    @id @default(cuid())
+  dogId            String
+  eventDate        DateTime
+  eventName        String?
+  eventPlace       String
+  kennelDistrict   String?
+  kennelDistrictNo String?
+  ke               String?
+  lk               String?
+  pa               String?
+  piste            Decimal?  @db.Decimal(6, 2)
+  sija             String?
+  haku             Decimal?  @db.Decimal(6, 2)
+  hauk             Decimal?  @db.Decimal(6, 2)
+  yva              Decimal?  @db.Decimal(6, 2)
+  hlo              Decimal?  @db.Decimal(6, 2)
+  alo              Decimal?  @db.Decimal(6, 2)
+  tja              Decimal?  @db.Decimal(6, 2)
+  pin              Decimal?  @db.Decimal(6, 2)
+  judge            String?
+  legacyFlag       String?
+  sourceKey        String    @unique
+  dog              Dog       @relation(fields: [dogId], references: [id], onDelete: Cascade)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@index([eventDate])
   @@index([dogId, eventDate])
 }
 
 model ShowResult {
-  id        String   @id @default(cuid())
-  dogId     String
-  eventDate DateTime
-  eventName String
-  sourceKey String   @unique
-  dog       Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  dogId      String
+  eventDate  DateTime
+  eventName  String?
+  eventPlace String
+  resultText String?
+  heightText String?
+  judge      String?
+  legacyFlag String?
+  sourceKey  String   @unique
+  dog        Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@index([eventDate])
   @@index([dogId, eventDate])
@@ -202,5 +233,6 @@ model ImportRunIssue {
 
   @@index([importRunId])
   @@index([importRunId, stage])
+  @@index([importRunId, severity])
   @@index([importRunId, code])
 }

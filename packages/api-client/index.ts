@@ -1,6 +1,7 @@
 import type {
   ApiResult,
   CurrentUserDto,
+  ImportIssueSeverity,
   ImportRunIssuesResponse,
   ImportRunResponse,
   ImportStatusResponse,
@@ -96,6 +97,7 @@ export function createApiClient(options: ClientOptions = {}) {
       options?: {
         stage?: string;
         code?: string;
+        severity?: ImportIssueSeverity;
         cursor?: string;
         limit?: number;
       },
@@ -103,6 +105,7 @@ export function createApiClient(options: ClientOptions = {}) {
       const params = new URLSearchParams();
       if (options?.stage) params.set("stage", options.stage);
       if (options?.code) params.set("code", options.code);
+      if (options?.severity) params.set("severity", options.severity);
       if (options?.cursor) params.set("cursor", options.cursor);
       if (typeof options?.limit === "number") {
         params.set("limit", String(options.limit));
