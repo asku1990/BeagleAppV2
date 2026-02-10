@@ -118,7 +118,7 @@ export async function upsertTrialRows(
         sourceTable,
         payloadJson: JSON.stringify({
           registrationNo: row.registrationNo,
-          eventName: row.eventName,
+          eventPlace: row.eventPlace,
           eventDateRaw: row.eventDateRaw,
           pa: row.pa,
           piste: row.piste,
@@ -134,17 +134,17 @@ export async function upsertTrialRows(
       ? dogIdByRegistration.get(registrationNo)
       : undefined;
     const eventDate = parseLegacyDate(row.eventDateRaw);
-    const eventName = normalizeNullable(row.eventName);
-    if (!dogId || !eventDate || !eventName) {
+    const eventPlace = normalizeNullable(row.eventPlace);
+    if (!dogId || !eventDate || !eventPlace) {
       errors += 1;
       issues.push({
         code: "EVENT_MISSING_REQUIRED_FIELDS",
-        message: "Trial row missing dog, event date, or event name.",
+        message: "Trial row missing dog, event date, or event place.",
         registrationNo,
         sourceTable,
         payloadJson: JSON.stringify({
           registrationNo: row.registrationNo,
-          eventName: row.eventName,
+          eventPlace: row.eventPlace,
           eventDateRaw: row.eventDateRaw,
         }),
       });
@@ -155,14 +155,15 @@ export async function upsertTrialRows(
     }
 
     const normalizedEventDate = eventDate.toISOString().slice(0, 10);
-    const sourceKey = `${registrationNo}|${normalizedEventDate}|${eventName}`;
+    const sourceKey = `${registrationNo}|${normalizedEventDate}|${eventPlace}`;
 
     await prisma.trialResult.upsert({
       where: { sourceKey },
       create: {
         dogId,
         eventDate,
-        eventName,
+        eventName: null,
+        eventPlace,
         kennelDistrict: normalizeNullable(row.kennelDistrict),
         kennelDistrictNo: normalizeNullable(row.kennelDistrictNo),
         ke: normalizeNullable(row.ke),
@@ -184,7 +185,8 @@ export async function upsertTrialRows(
       update: {
         dogId,
         eventDate,
-        eventName,
+        eventName: null,
+        eventPlace,
         kennelDistrict: normalizeNullable(row.kennelDistrict),
         kennelDistrictNo: normalizeNullable(row.kennelDistrictNo),
         ke: normalizeNullable(row.ke),
@@ -246,7 +248,7 @@ export async function upsertShowRows(
         sourceTable,
         payloadJson: JSON.stringify({
           registrationNo: row.registrationNo,
-          eventName: row.eventName,
+          eventPlace: row.eventPlace,
           eventDateRaw: row.eventDateRaw,
         }),
       });
@@ -260,17 +262,17 @@ export async function upsertShowRows(
       ? dogIdByRegistration.get(registrationNo)
       : undefined;
     const eventDate = parseLegacyDate(row.eventDateRaw);
-    const eventName = normalizeNullable(row.eventName);
-    if (!dogId || !eventDate || !eventName) {
+    const eventPlace = normalizeNullable(row.eventPlace);
+    if (!dogId || !eventDate || !eventPlace) {
       errors += 1;
       issues.push({
         code: "EVENT_MISSING_REQUIRED_FIELDS",
-        message: "Show row missing dog, event date, or event name.",
+        message: "Show row missing dog, event date, or event place.",
         registrationNo,
         sourceTable,
         payloadJson: JSON.stringify({
           registrationNo: row.registrationNo,
-          eventName: row.eventName,
+          eventPlace: row.eventPlace,
           eventDateRaw: row.eventDateRaw,
         }),
       });
@@ -281,14 +283,15 @@ export async function upsertShowRows(
     }
 
     const normalizedEventDate = eventDate.toISOString().slice(0, 10);
-    const sourceKey = `${registrationNo}|${normalizedEventDate}|${eventName}`;
+    const sourceKey = `${registrationNo}|${normalizedEventDate}|${eventPlace}`;
 
     await prisma.showResult.upsert({
       where: { sourceKey },
       create: {
         dogId,
         eventDate,
-        eventName,
+        eventName: null,
+        eventPlace,
         resultText: normalizeNullable(row.resultText),
         heightText: normalizeNullable(row.heightText),
         judge: normalizeNullable(row.judge),
@@ -298,7 +301,8 @@ export async function upsertShowRows(
       update: {
         dogId,
         eventDate,
-        eventName,
+        eventName: null,
+        eventPlace,
         resultText: normalizeNullable(row.resultText),
         heightText: normalizeNullable(row.heightText),
         judge: normalizeNullable(row.judge),

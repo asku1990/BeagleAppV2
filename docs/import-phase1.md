@@ -66,7 +66,7 @@ Legacy fetch is performed in `packages/db/legacy/source.ts`.
   - `OMIPV -> ownershipDateRaw`
 - Trial events (`akoeall`)
   - `REKNO -> registrationNo`
-  - `TAPPA -> eventName`
+  - `TAPPA -> eventPlace`
   - `TAPPV -> eventDateRaw`
   - `KENNELPIIRI -> kennelDistrict`
   - `KENNELPIIRINRO -> kennelDistrictNo`
@@ -75,7 +75,7 @@ Legacy fetch is performed in `packages/db/legacy/source.ts`.
   - `VARA -> legacyFlag`
 - Show events (`nay9599`)
   - `REKNO -> registrationNo`
-  - `TAPPA -> eventName`
+  - `TAPPA -> eventPlace`
   - `TAPPV -> eventDateRaw`
   - `TULNI -> resultText`
   - `KORK -> heightText`
@@ -218,7 +218,7 @@ Required for each event row:
 - Valid registration format
 - Dog exists by normalized registration lookup
 - Valid event date from `eventDateRaw` (`YYYYMMDD`)
-- Non-empty `eventName`
+- Non-empty `eventPlace`
 
 If registration format is invalid:
 
@@ -232,12 +232,13 @@ If dog/date/name is missing:
 
 Valid rows are upserted by source key:
 
-- `sourceKey = normalizedRegistrationNo|eventDateRaw|eventName`
+- `sourceKey = normalizedRegistrationNo|eventDateRaw|eventPlace`
 
 Imported detail fields:
 
 - Trials: district, class/result codes, all score columns, placement, judge, legacy flag.
 - Shows: result text, height text, judge, legacy flag.
+- `eventName` is intentionally left null for now (reserved for future event title data).
 
 ## Date and value normalization
 

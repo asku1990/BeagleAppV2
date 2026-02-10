@@ -36,7 +36,7 @@ type LegacyScore = string | number | null;
 
 export type LegacyTrialResultRow = {
   registrationNo: string;
-  eventName: string | null;
+  eventPlace: string | null;
   eventDateRaw: string | null;
   kennelDistrict: string | null;
   kennelDistrictNo: string | null;
@@ -59,7 +59,7 @@ export type LegacyTrialResultRow = {
 export type LegacyShowResultRow = {
   registrationNo: string;
   eventDateRaw: string | null;
-  eventName: string | null;
+  eventPlace: string | null;
   resultText: string | null;
   heightText: string | null;
   judge: string | null;
@@ -157,7 +157,7 @@ export async function fetchLegacyPhase1Rows(options?: {
     const trialResultsStartedAt = Date.now();
     const trialResults = (await connection.query(
       `SELECT REKNO as registrationNo,
-              TAPPA as eventName,
+              TAPPA as eventPlace,
               TAPPV as eventDateRaw,
               KENNELPIIRI as kennelDistrict,
               KENNELPIIRINRO as kennelDistrictNo,
@@ -185,7 +185,7 @@ export async function fetchLegacyPhase1Rows(options?: {
     const showResults = (await connection.query(
       `SELECT REKNO as registrationNo,
               TAPPV as eventDateRaw,
-              TAPPA as eventName,
+              TAPPA as eventPlace,
               TULNI as resultText,
               KORK as heightText,
               TUOM1 as judge,

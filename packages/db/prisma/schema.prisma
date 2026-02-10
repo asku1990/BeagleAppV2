@@ -147,7 +147,8 @@ model TrialResult {
   id               String    @id @default(cuid())
   dogId            String
   eventDate        DateTime
-  eventName        String
+  eventName        String?
+  eventPlace       String
   kennelDistrict   String?
   kennelDistrictNo String?
   ke               String?
@@ -177,7 +178,8 @@ model ShowResult {
   id         String   @id @default(cuid())
   dogId      String
   eventDate  DateTime
-  eventName  String
+  eventName  String?
+  eventPlace String
   resultText String?
   heightText String?
   judge      String?
