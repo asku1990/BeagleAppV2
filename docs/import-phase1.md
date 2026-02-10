@@ -33,7 +33,8 @@ Registration identity is stored only in `DogRegistration`.
 - Legacy aliases from `samakoira.REK_2` and `samakoira.REK_3` are stored with `source="LEGACY_SAMAKOIRA"`.
 - `DogRegistration.registrationNo` is globally unique, so one registration maps to exactly one dog.
 - `samakoira.VARA` is preserved on `Dog.note`.
-- Breeder identity is stored in `Breeder.name` and enriched from legacy kennel tables when available.
+- Dog breeder source text from legacy `KASVA` is stored on `Dog.breederNameText`.
+- `Breeder` is a kennel directory (`kennel` + `kennel_ud`) and dogs are linked by optional `Dog.breederId` only on exact normalized name match.
 
 ## Source tables and field mapping
 
@@ -46,7 +47,7 @@ Legacy fetch is performed in `packages/db/legacy/source.ts`.
   - `SYNTY -> birthDateRaw`
   - `ISREK -> sireRegistrationNo`
   - `EMREK -> damRegistrationNo`
-  - `KASVA -> breederName`
+  - `KASVA -> breederNameText` (and optional breeder directory link by exact normalized name match)
 - Breeders (`kennel`)
   - `KENNEL -> name`
   - `KELYHE -> shortCode`
@@ -99,8 +100,8 @@ Legacy fetch is performed in `packages/db/legacy/source.ts`.
 The import pipeline runs in this order:
 
 1. `load`
-2. `dogs`
-3. `breeders`
+2. `breeders`
+3. `dogs`
 4. `ek`
 5. `samakoira`
 6. `index`
@@ -139,6 +140,9 @@ Rows with invalid registration format are skipped and logged with:
   - Dog row is skipped.
 - Valid rows:
   - Upsert dog by looking up `DogRegistration.registrationNo`.
+  - `KASVA` is stored as `Dog.breederNameText`.
+  - `Dog.breederId` is linked only when normalized `KASVA` exactly matches a breeder directory name.
+  - If no match exists, breeder link remains `null` and text is still preserved.
   - If registration does not exist, create dog and canonical `DogRegistration` row.
 
 ### EK stage
@@ -157,6 +161,7 @@ Rows with invalid registration format are skipped and logged with:
 
 - `kennel` rows upsert breeder metadata by `Breeder.name`.
 - `kennel_ud` rows enrich missing breeder metadata and create missing breeders.
+- Directory index for dog linking is built from breeders with `detailsSource in ("kennel", "kennel_ud")`.
 - If kennel name is missing:
   - Issue code: `BREEDER_MISSING_NAME`
   - Row skipped.
@@ -246,6 +251,7 @@ Imported detail fields:
 
 - `normalizeNullable` trims strings and converts empty string to `null`.
 - `normalizeRegistrationNo` trims and uppercases registration values.
+- `normalizeBreederKey` trims, uppercases, and collapses internal whitespace for deterministic breeder name matching.
 - `parseLegacyDate` accepts only `YYYYMMDD` and validates actual calendar date.
 
 Implementation:

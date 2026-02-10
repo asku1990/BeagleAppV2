@@ -19,6 +19,7 @@ import type {
 import type { ServiceResult } from "../shared/result";
 import { upsertOwner, upsertShowRows, upsertTrialRows } from "./persistence";
 import {
+  normalizeBreederKey,
   isValidRegistrationNo,
   mapSex,
   normalizeNullable,
@@ -227,112 +228,6 @@ export function createImportsService() {
         );
         finishStage("load");
 
-        startStage("dogs");
-        const totalDogs = legacy.dogs.length;
-        let dogsProcessed = 0;
-        for (const row of legacy.dogs) {
-          dogsProcessed += 1;
-          const { registrationNo, isInvalid } = parseRegistrationNo(
-            row.registrationNo,
-          );
-          const name = normalizeNullable(row.name);
-
-          if (!registrationNo || !name) {
-            errorsCount += 1;
-            await recordIssue({
-              stage: "dogs",
-              code: "DOG_MISSING_REQUIRED_FIELDS",
-              message: "Dog row missing registration number or name.",
-              registrationNo,
-              sourceTable: "bearek_id",
-              payloadJson: JSON.stringify({
-                registrationNo: row.registrationNo,
-                name: row.name,
-              }),
-            });
-            if (dogsProcessed % 1000 === 0) {
-              logProgress("dogs", dogsProcessed, totalDogs);
-            }
-            continue;
-          }
-
-          if (isInvalid) {
-            errorsCount += 1;
-            await recordIssue({
-              stage: "dogs",
-              code: "REGISTRATION_INVALID_FORMAT",
-              message: "Dog row has invalid registration format.",
-              registrationNo,
-              sourceTable: "bearek_id",
-              payloadJson: JSON.stringify({
-                registrationNo: row.registrationNo,
-              }),
-            });
-            if (dogsProcessed % 1000 === 0) {
-              logProgress("dogs", dogsProcessed, totalDogs);
-            }
-            continue;
-          }
-
-          const breederName = normalizeNullable(row.breederName);
-          let breederId: string | undefined;
-          if (breederName) {
-            const breeder = await prisma.breeder.upsert({
-              where: { name: breederName },
-              create: { name: breederName },
-              update: {},
-              select: { id: true },
-            });
-            breederId = breeder.id;
-          }
-
-          const existingRegistration = await prisma.dogRegistration.findUnique({
-            where: { registrationNo },
-            select: { id: true, dogId: true, source: true },
-          });
-
-          if (existingRegistration) {
-            await prisma.dog.update({
-              where: { id: existingRegistration.dogId },
-              data: {
-                name,
-                sex: mapSex(row.sex),
-                birthDate: parseLegacyDate(row.birthDateRaw),
-                breederId,
-              },
-            });
-
-            if (existingRegistration.source !== "CANONICAL") {
-              await prisma.dogRegistration.update({
-                where: { id: existingRegistration.id },
-                data: { source: "CANONICAL" },
-              });
-            }
-          } else {
-            await prisma.dog.create({
-              data: {
-                name,
-                sex: mapSex(row.sex),
-                birthDate: parseLegacyDate(row.birthDateRaw),
-                breederId,
-                registrations: {
-                  create: {
-                    registrationNo,
-                    source: "CANONICAL",
-                  },
-                },
-              },
-            });
-          }
-
-          dogsUpserted += 1;
-          if (dogsProcessed % 1000 === 0) {
-            logProgress("dogs", dogsProcessed, totalDogs);
-          }
-        }
-        logProgress("dogs", dogsProcessed, totalDogs);
-        finishStage("dogs", `dogsUpserted=${dogsUpserted}`);
-
         startStage("breeders");
         let breederRowsProcessed = 0;
         let breederRowsUpserted = 0;
@@ -517,6 +412,142 @@ export function createImportsService() {
         finishStage(
           "breeders",
           `upserted=${breederRowsUpserted}, updated=${breederRowsUpdated}, skipped=${breederRowsSkipped}`,
+        );
+
+        const breederIdByNameKey = new Map<string, string>();
+        let duplicateBreederNameKeys = 0;
+        const kennelBreeders = await prisma.breeder.findMany({
+          where: { detailsSource: { in: ["kennel", "kennel_ud"] } },
+          select: { id: true, name: true },
+        });
+        for (const breeder of kennelBreeders) {
+          const nameKey = normalizeBreederKey(breeder.name);
+          if (!nameKey) continue;
+          const existing = breederIdByNameKey.get(nameKey);
+          if (existing && existing !== breeder.id) {
+            duplicateBreederNameKeys += 1;
+            continue;
+          }
+          breederIdByNameKey.set(nameKey, breeder.id);
+        }
+        log(
+          `[stage:breeders] index breederNameKeys=${breederIdByNameKey.size}, duplicateKeys=${duplicateBreederNameKeys}`,
+        );
+
+        startStage("dogs");
+        const totalDogs = legacy.dogs.length;
+        let dogsProcessed = 0;
+        let dogsWithBreederText = 0;
+        let dogsLinkedToBreeder = 0;
+        let dogsWithUnlinkedBreederText = 0;
+        for (const row of legacy.dogs) {
+          dogsProcessed += 1;
+          const { registrationNo, isInvalid } = parseRegistrationNo(
+            row.registrationNo,
+          );
+          const name = normalizeNullable(row.name);
+
+          if (!registrationNo || !name) {
+            errorsCount += 1;
+            await recordIssue({
+              stage: "dogs",
+              code: "DOG_MISSING_REQUIRED_FIELDS",
+              message: "Dog row missing registration number or name.",
+              registrationNo,
+              sourceTable: "bearek_id",
+              payloadJson: JSON.stringify({
+                registrationNo: row.registrationNo,
+                name: row.name,
+              }),
+            });
+            if (dogsProcessed % 1000 === 0) {
+              logProgress("dogs", dogsProcessed, totalDogs);
+            }
+            continue;
+          }
+
+          if (isInvalid) {
+            errorsCount += 1;
+            await recordIssue({
+              stage: "dogs",
+              code: "REGISTRATION_INVALID_FORMAT",
+              message: "Dog row has invalid registration format.",
+              registrationNo,
+              sourceTable: "bearek_id",
+              payloadJson: JSON.stringify({
+                registrationNo: row.registrationNo,
+              }),
+            });
+            if (dogsProcessed % 1000 === 0) {
+              logProgress("dogs", dogsProcessed, totalDogs);
+            }
+            continue;
+          }
+
+          const breederNameText = normalizeNullable(row.breederName);
+          if (breederNameText) {
+            dogsWithBreederText += 1;
+          }
+          const breederNameKey = normalizeBreederKey(breederNameText);
+          const breederId = breederNameKey
+            ? (breederIdByNameKey.get(breederNameKey) ?? null)
+            : null;
+          if (breederNameText && breederId) {
+            dogsLinkedToBreeder += 1;
+          } else if (breederNameText) {
+            dogsWithUnlinkedBreederText += 1;
+          }
+
+          const existingRegistration = await prisma.dogRegistration.findUnique({
+            where: { registrationNo },
+            select: { id: true, dogId: true, source: true },
+          });
+
+          if (existingRegistration) {
+            await prisma.dog.update({
+              where: { id: existingRegistration.dogId },
+              data: {
+                name,
+                sex: mapSex(row.sex),
+                birthDate: parseLegacyDate(row.birthDateRaw),
+                breederNameText,
+                breederId,
+              },
+            });
+
+            if (existingRegistration.source !== "CANONICAL") {
+              await prisma.dogRegistration.update({
+                where: { id: existingRegistration.id },
+                data: { source: "CANONICAL" },
+              });
+            }
+          } else {
+            await prisma.dog.create({
+              data: {
+                name,
+                sex: mapSex(row.sex),
+                birthDate: parseLegacyDate(row.birthDateRaw),
+                breederNameText,
+                breederId,
+                registrations: {
+                  create: {
+                    registrationNo,
+                    source: "CANONICAL",
+                  },
+                },
+              },
+            });
+          }
+
+          dogsUpserted += 1;
+          if (dogsProcessed % 1000 === 0) {
+            logProgress("dogs", dogsProcessed, totalDogs);
+          }
+        }
+        logProgress("dogs", dogsProcessed, totalDogs);
+        finishStage(
+          "dogs",
+          `dogsUpserted=${dogsUpserted}, breederTextSet=${dogsWithBreederText}, breederLinked=${dogsLinkedToBreeder}, breederUnlinkedText=${dogsWithUnlinkedBreederText}`,
         );
 
         startStage("ek");

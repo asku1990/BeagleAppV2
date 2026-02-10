@@ -39,6 +39,13 @@ export function normalizeNullable(
   return next ? next : null;
 }
 
+export function normalizeBreederKey(
+  value: string | null | undefined,
+): string | null {
+  const normalized = normalizeNullable(value);
+  return normalized ? normalized.replace(/\s+/g, " ").toUpperCase() : null;
+}
+
 const REGISTRATION_NO_PATTERN = /^[\p{L}\p{N}/.-]+$/u;
 
 export function normalizeRegistrationNo(
