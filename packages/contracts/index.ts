@@ -63,7 +63,7 @@ export type ImportRunResponse = {
   issuesCount: number;
 };
 
-export type ImportIssueSeverity = "WARNING" | "ERROR";
+export type ImportIssueSeverity = "INFO" | "WARNING" | "ERROR";
 
 export type ImportRunIssueResponse = {
   id: string;

@@ -9,14 +9,14 @@ This document describes how phase-1 legacy import works in detail: source tables
   - Optional actor id: `pnpm import:phase1 <USER_ID>`
 - Inspect issues:
   - `pnpm import:issues <RUN_ID>`
-  - Optional filters: `--stage`, `--code`, `--limit`
+  - Optional filters: `--stage`, `--code`, `--severity`, `--limit`
 - Export issues to CSV files grouped by error code:
   - `pnpm import:issues:csv <RUN_ID>`
   - (equivalent) `pnpm --filter @beagle/server import:issues:csv -- <RUN_ID>`
-  - Optional filters: `--stage`, `--code`, `--limit`, `--out`
+  - Optional filters: `--stage`, `--code`, `--severity`, `--limit`, `--out`
   - Example (single code): `pnpm import:issues:csv <RUN_ID> --code REGISTRATION_INVALID_FORMAT`
   - Default output directory: `/tmp/import-issues/<RUN_ID>`
-  - Output files: `index.csv` and one `<CODE>.csv` per issue code
+  - Output files: `index.csv`, `stage-reasons.csv`, and one `<CODE>.csv` per issue code
 
 Implementation references:
 
@@ -105,6 +105,12 @@ The import pipeline runs in this order:
 
 Import issues are buffered and bulk inserted during the run.
 
+Issue severity values:
+
+- `INFO` for expected/non-actionable paths.
+- `WARNING` for data quality problems that do not fail the run.
+- `ERROR` for unexpected run-level failures.
+
 ## Registration normalization and validation
 
 Registration numbers are normalized before lookups and writes:
@@ -143,11 +149,15 @@ Rows with invalid registration format are skipped and logged with:
 - If `registrationNo` missing:
   - Issue code: `EK_MISSING_REGISTRATION`
   - Row skipped.
+- If `ekNo` is null:
+  - Issue code: `EK_MISSING_EKNO` (`INFO`)
+  - Row skipped.
 - If `registrationNo` format invalid:
   - Issue code: `REGISTRATION_INVALID_FORMAT`
   - Row skipped.
-- If `ekNo` is null:
-  - Row skipped without issue.
+- If dog registration is not found:
+  - Issue code: `EK_DOG_NOT_FOUND`
+  - Row skipped.
 - Otherwise updates `Dog.ekNo` through registration lookup in `DogRegistration`.
 
 ### Breeders stage
@@ -164,6 +174,10 @@ Rows with invalid registration format are skipped and logged with:
   - If missing or not found:
     - Issue code: `SAMAKOIRA_CANONICAL_NOT_FOUND`
 - Alias `REK_2`/`REK_3` rows are normalized and attached as `DogRegistration` rows.
+- Alias rows with empty alias values are logged as:
+  - Issue code: `SAMAKOIRA_ALIAS_EMPTY` (`INFO`)
+- Alias rows where alias equals canonical registration are logged as:
+  - Issue code: `SAMAKOIRA_ALIAS_EQUALS_CANONICAL` (`INFO`)
 - Alias collision behavior:
   - If alias already belongs to another dog:
     - Issue code: `REGISTRATION_ALIAS_CONFLICT`
@@ -176,7 +190,12 @@ Rows with invalid registration format are skipped and logged with:
 
 ### Relations stage (sire/dam)
 
-- Dog row must resolve by normalized registration via `DogRegistration`; if not, relation update is skipped.
+- Dog row missing canonical registration:
+  - Issue code: `RELATION_ROW_MISSING_REGISTRATION` (`INFO`)
+  - Relation update skipped.
+- Dog row canonical registration not found among imported dogs:
+  - Issue code: `RELATION_DOG_NOT_FOUND`
+  - Relation update skipped.
 - Parent links are resolved by normalized registration against registration index.
 - If sire/dam registration format is invalid:
   - Issue code: `REGISTRATION_INVALID_FORMAT`
@@ -188,6 +207,9 @@ Rows with invalid registration format are skipped and logged with:
   - Link is stored as `null`.
 - Placeholder handling:
   - Values like `U000000`, `U00000`, `U0000` (`^U0+$`, case-insensitive) are treated as placeholder unknowns.
+  - Placeholder reasons are logged as:
+    - `RELATION_SIRE_PLACEHOLDER` (`INFO`)
+    - `RELATION_DAM_PLACEHOLDER` (`INFO`)
   - They are not looked up and do not create not-found issues.
   - Link remains `null`.
 
@@ -258,6 +280,7 @@ Runtime logging includes:
 - Stage start/end
 - Progress every 1000 records
 - Per-stage summary counters
+- Per-stage reason summaries (`reasons=<CODE>(<SEVERITY>):<count>,...`)
 
 Run lifecycle:
 
@@ -281,4 +304,7 @@ Issues are stored in `ImportRunIssue` with:
 Query paths:
 
 - Script: `pnpm import:issues <RUN_ID>`
+- Script (filtered): `pnpm import:issues <RUN_ID> --severity WARNING`
+- CSV export: `pnpm import:issues:csv <RUN_ID>` (includes `stage-reasons.csv`)
 - API: `GET /api/v1/imports/<RUN_ID>/issues`
+- API (filtered): `GET /api/v1/imports/<RUN_ID>/issues?severity=WARNING`

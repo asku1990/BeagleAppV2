@@ -67,7 +67,7 @@ export type ImportRunIssueRow = {
   createdAt: Date;
 };
 
-export type ImportIssueSeverity = "WARNING" | "ERROR";
+export type ImportIssueSeverity = "INFO" | "WARNING" | "ERROR";
 
 export type CreateImportRunIssueInput = {
   stage: string;
@@ -113,6 +113,7 @@ type ImportRunIssueDelegate = {
       importRunId: string;
       stage?: string;
       code?: string;
+      severity?: ImportIssueSeverity;
     };
     orderBy: Array<{ createdAt: "asc" } | { id: "asc" }>;
     take: number;
@@ -277,6 +278,7 @@ export async function listImportRunIssues(
   options?: {
     stage?: string;
     code?: string;
+    severity?: ImportIssueSeverity;
     limit?: number;
     cursor?: string;
   },
@@ -294,6 +296,7 @@ export async function listImportRunIssues(
         importRunId,
         stage: options?.stage,
         code: options?.code,
+        severity: options?.severity,
       },
       orderBy: [{ createdAt: "asc" }, { id: "asc" }],
       take: limit + 1,

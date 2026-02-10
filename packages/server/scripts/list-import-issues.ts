@@ -1,8 +1,13 @@
-import { listImportRunIssues, prisma } from "@beagle/db";
+import {
+  listImportRunIssues,
+  prisma,
+  type ImportIssueSeverity,
+} from "@beagle/db";
 
 type IssueRow = {
   id: string;
   stage: string;
+  severity: ImportIssueSeverity;
   code: string;
   message: string;
   registrationNo: string | null;
@@ -10,7 +15,16 @@ type IssueRow = {
 };
 
 const USAGE =
-  "Usage: pnpm import:issues <RUN_ID> [--stage <stage>] [--code <code>] [--limit <n>]";
+  "Usage: pnpm import:issues <RUN_ID> [--stage <stage>] [--code <code>] [--severity <INFO|WARNING|ERROR>] [--limit <n>]";
+
+function parseSeverity(
+  value: string | undefined,
+): ImportIssueSeverity | undefined {
+  if (value === "INFO" || value === "WARNING" || value === "ERROR") {
+    return value;
+  }
+  return undefined;
+}
 
 function parseArgs(argv: string[]) {
   const raw = argv.slice(2).filter((arg) => arg !== "--");
@@ -18,6 +32,7 @@ function parseArgs(argv: string[]) {
   let runId: string | undefined;
   let stage: string | undefined;
   let code: string | undefined;
+  let severity: ImportIssueSeverity | undefined;
   let limit = 200;
   let error: string | undefined;
 
@@ -31,7 +46,12 @@ function parseArgs(argv: string[]) {
     const arg = raw[i];
     const value = raw[i + 1];
 
-    if (arg === "--stage" || arg === "--code" || arg === "--limit") {
+    if (
+      arg === "--stage" ||
+      arg === "--code" ||
+      arg === "--severity" ||
+      arg === "--limit"
+    ) {
       if (!value || value.startsWith("--")) {
         error = `Missing value for ${arg}.`;
         break;
@@ -45,6 +65,16 @@ function parseArgs(argv: string[]) {
     }
     if (arg === "--code") {
       code = value;
+      i += 1;
+      continue;
+    }
+    if (arg === "--severity") {
+      const parsed = parseSeverity(value);
+      if (!parsed) {
+        error = "--severity must be one of INFO, WARNING, ERROR.";
+        break;
+      }
+      severity = parsed;
       i += 1;
       continue;
     }
@@ -66,11 +96,11 @@ function parseArgs(argv: string[]) {
     break;
   }
 
-  return { runId, stage, code, limit, wantsHelp, error };
+  return { runId, stage, code, severity, limit, wantsHelp, error };
 }
 
 async function main() {
-  const { runId, stage, code, limit, wantsHelp, error } = parseArgs(
+  const { runId, stage, code, severity, limit, wantsHelp, error } = parseArgs(
     process.argv,
   );
   if (wantsHelp) {
@@ -98,17 +128,19 @@ async function main() {
     const page = await listImportRunIssues(runId, {
       stage,
       code,
+      severity,
       limit,
       cursor,
     });
     for (const item of page.items) {
       total += 1;
-      const key = `${item.stage}:${item.code}`;
+      const key = `${item.stage}:${item.severity}:${item.code}`;
       grouped.set(key, (grouped.get(key) ?? 0) + 1);
       if (sampleRows.length < 20) {
         sampleRows.push({
           id: item.id,
           stage: item.stage,
+          severity: item.severity,
           code: item.code,
           message: item.message,
           registrationNo: item.registrationNo,
@@ -134,7 +166,7 @@ async function main() {
   console.log("[import:issues] samples:");
   for (const row of sampleRows) {
     console.log(
-      `[import:issues]   [${row.stage}/${row.code}] reg=${row.registrationNo ?? "-"} table=${row.sourceTable ?? "-"} id=${row.id} msg=${row.message}`,
+      `[import:issues]   [${row.stage}/${row.severity}/${row.code}] reg=${row.registrationNo ?? "-"} table=${row.sourceTable ?? "-"} id=${row.id} msg=${row.message}`,
     );
   }
 }

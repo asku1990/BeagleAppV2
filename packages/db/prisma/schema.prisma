@@ -29,6 +29,7 @@ enum ImportStatus {
 }
 
 enum ImportIssueSeverity {
+  INFO
   WARNING
   ERROR
 }
@@ -232,5 +233,6 @@ model ImportRunIssue {
 
   @@index([importRunId])
   @@index([importRunId, stage])
+  @@index([importRunId, severity])
   @@index([importRunId, code])
 }

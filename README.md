@@ -168,6 +168,7 @@ Optional filters:
 ```bash
 pnpm import:issues <RUN_ID> --stage owners
 pnpm import:issues <RUN_ID> --code OWNER_DOG_NOT_FOUND
+pnpm import:issues <RUN_ID> --severity WARNING
 pnpm import:issues <RUN_ID> --limit 500
 ```
 
@@ -187,6 +188,9 @@ Optional deep inspection via API:
 ```bash
 curl -i -b /tmp/beagle.cookies \
   "http://localhost:3001/api/v1/imports/<RUN_ID>/issues?limit=200"
+
+curl -i -b /tmp/beagle.cookies \
+  "http://localhost:3001/api/v1/imports/<RUN_ID>/issues?severity=WARNING&limit=200"
 ```
 
 For full import behavior (source tables, stage handling, required fields, issue codes, and logging), see `docs/import-phase1.md`.

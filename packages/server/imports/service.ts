@@ -150,6 +150,43 @@ export function createImportsService() {
     ): Promise<ServiceResult<ImportRunResponse>> {
       const log = options?.log ?? (() => {});
       const stageStartedAt = new Map<string, number>();
+      const stageReasonCounts = new Map<string, Map<string, number>>();
+      const addStageReason = (
+        stage: string,
+        severity: ImportIssueSeverity,
+        code: string,
+      ) => {
+        const stageCounts = stageReasonCounts.get(stage) ?? new Map();
+        const key = `${severity}|${code}`;
+        stageCounts.set(key, (stageCounts.get(key) ?? 0) + 1);
+        stageReasonCounts.set(stage, stageCounts);
+      };
+      const formatStageReasons = (stage: string): string | null => {
+        const stageCounts = stageReasonCounts.get(stage);
+        if (!stageCounts || stageCounts.size === 0) {
+          return null;
+        }
+
+        const entries = [...stageCounts.entries()].map(([key, count]) => {
+          const [severity, code] = key.split("|");
+          return {
+            severity,
+            code,
+            count,
+          };
+        });
+        entries.sort((a, b) => {
+          if (b.count !== a.count) return b.count - a.count;
+          if (a.severity !== b.severity) {
+            return a.severity.localeCompare(b.severity);
+          }
+          return a.code.localeCompare(b.code);
+        });
+
+        return entries
+          .map((entry) => `${entry.code}(${entry.severity}):${entry.count}`)
+          .join(", ");
+      };
       const startStage = (name: string) => {
         stageStartedAt.set(name, Date.now());
         log(`[stage:${name}] start`);
@@ -157,8 +194,15 @@ export function createImportsService() {
       const finishStage = (name: string, summary?: string) => {
         const startedAt = stageStartedAt.get(name) ?? Date.now();
         const elapsedSeconds = Math.round((Date.now() - startedAt) / 1000);
+        const reasonSummary = formatStageReasons(name);
+        const details = [
+          summary,
+          reasonSummary ? `reasons=${reasonSummary}` : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
         log(
-          `[stage:${name}] done in ${elapsedSeconds}s${summary ? ` ${summary}` : ""}`,
+          `[stage:${name}] done in ${elapsedSeconds}s${details ? ` ${details}` : ""}`,
         );
       };
       const logProgress = (name: string, processed: number, total: number) => {
@@ -200,7 +244,9 @@ export function createImportsService() {
         sourceTable?: string | null;
         payloadJson?: string | null;
       }) => {
-        issueBuffer.push(issue);
+        const severity = issue.severity ?? "WARNING";
+        addStageReason(issue.stage, severity, issue.code);
+        issueBuffer.push({ ...issue, severity });
         if (issueBuffer.length >= ISSUE_BUFFER_SIZE) {
           await flushIssueBuffer();
         }
@@ -498,21 +544,39 @@ export function createImportsService() {
             row.registrationNo,
           );
 
-          if (!registrationNo || row.ekNo == null) {
+          if (!registrationNo) {
             eksSkipped += 1;
-            if (!registrationNo) {
-              errorsCount += 1;
-              await recordIssue({
-                stage: "ek",
-                code: "EK_MISSING_REGISTRATION",
-                message: "EK row missing registration number.",
-                sourceTable: "bea_apu",
-                payloadJson: JSON.stringify({
-                  registrationNo: row.registrationNo,
-                  ekNo: row.ekNo,
-                }),
-              });
+            errorsCount += 1;
+            await recordIssue({
+              stage: "ek",
+              code: "EK_MISSING_REGISTRATION",
+              message: "EK row missing registration number.",
+              sourceTable: "bea_apu",
+              payloadJson: JSON.stringify({
+                registrationNo: row.registrationNo,
+                ekNo: row.ekNo,
+              }),
+            });
+            if (eksProcessed % 1000 === 0) {
+              logProgress("ek", eksProcessed, totalEks);
             }
+            continue;
+          }
+
+          if (row.ekNo == null) {
+            eksSkipped += 1;
+            await recordIssue({
+              stage: "ek",
+              severity: "INFO",
+              code: "EK_MISSING_EKNO",
+              message: "EK row missing EK number.",
+              registrationNo,
+              sourceTable: "bea_apu",
+              payloadJson: JSON.stringify({
+                registrationNo: row.registrationNo,
+                ekNo: row.ekNo,
+              }),
+            });
             if (eksProcessed % 1000 === 0) {
               logProgress("ek", eksProcessed, totalEks);
             }
@@ -520,6 +584,7 @@ export function createImportsService() {
           }
 
           if (isInvalid) {
+            eksSkipped += 1;
             errorsCount += 1;
             await recordIssue({
               stage: "ek",
@@ -543,6 +608,19 @@ export function createImportsService() {
             select: { dogId: true },
           });
           if (!registration) {
+            eksSkipped += 1;
+            errorsCount += 1;
+            await recordIssue({
+              stage: "ek",
+              code: "EK_DOG_NOT_FOUND",
+              message: "EK row references a dog that was not found.",
+              registrationNo,
+              sourceTable: "bea_apu",
+              payloadJson: JSON.stringify({
+                registrationNo: row.registrationNo,
+                ekNo: row.ekNo,
+              }),
+            });
             if (eksProcessed % 1000 === 0) {
               logProgress("ek", eksProcessed, totalEks);
             }
@@ -634,6 +712,18 @@ export function createImportsService() {
           for (const alias of aliases) {
             const parsedAlias = parseRegistrationNo(alias.value);
             if (!parsedAlias.registrationNo) {
+              await recordIssue({
+                stage: "samakoira",
+                severity: "INFO",
+                code: "SAMAKOIRA_ALIAS_EMPTY",
+                message: `Samakoira alias ${alias.key} is empty.`,
+                registrationNo: canonical.registrationNo,
+                sourceTable: "samakoira",
+                payloadJson: JSON.stringify({
+                  rek1: canonical.registrationNo,
+                  [alias.key]: alias.value,
+                }),
+              });
               continue;
             }
             if (parsedAlias.isInvalid) {
@@ -652,6 +742,18 @@ export function createImportsService() {
               continue;
             }
             if (parsedAlias.registrationNo === canonical.registrationNo) {
+              await recordIssue({
+                stage: "samakoira",
+                severity: "INFO",
+                code: "SAMAKOIRA_ALIAS_EQUALS_CANONICAL",
+                message: `Samakoira alias ${alias.key} matches canonical registration.`,
+                registrationNo: canonical.registrationNo,
+                sourceTable: "samakoira",
+                payloadJson: JSON.stringify({
+                  rek1: canonical.registrationNo,
+                  [alias.key]: alias.value,
+                }),
+              });
               continue;
             }
 
@@ -755,6 +857,18 @@ export function createImportsService() {
           const registration = parseRegistrationNo(row.registrationNo);
           if (!registration.registrationNo) {
             relationsSkippedNoRegistration += 1;
+            await recordIssue({
+              stage: "relations",
+              severity: "INFO",
+              code: "RELATION_ROW_MISSING_REGISTRATION",
+              message: "Relations row missing canonical registration number.",
+              sourceTable: "bearek_id",
+              payloadJson: JSON.stringify({
+                registrationNo: row.registrationNo,
+                sireRegistrationNo: row.sireRegistrationNo,
+                damRegistrationNo: row.damRegistrationNo,
+              }),
+            });
             if (relationsProcessed % 1000 === 0) {
               logProgress("relations", relationsProcessed, totalRelations);
             }
@@ -782,6 +896,20 @@ export function createImportsService() {
           const dogId = dogIdByRegistration.get(registration.registrationNo);
           if (!dogId) {
             relationsSkippedDogNotFound += 1;
+            errorsCount += 1;
+            await recordIssue({
+              stage: "relations",
+              code: "RELATION_DOG_NOT_FOUND",
+              message:
+                "Relations row references a dog that was not found among imported dogs.",
+              registrationNo: registration.registrationNo,
+              sourceTable: "bearek_id",
+              payloadJson: JSON.stringify({
+                registrationNo: row.registrationNo,
+                sireRegistrationNo: row.sireRegistrationNo,
+                damRegistrationNo: row.damRegistrationNo,
+              }),
+            });
             if (relationsProcessed % 1000 === 0) {
               logProgress("relations", relationsProcessed, totalRelations);
             }
@@ -800,9 +928,35 @@ export function createImportsService() {
 
           if (sireRegistration.registrationNo && sireIsPlaceholder) {
             skippedPlaceholderSireRefs += 1;
+            await recordIssue({
+              stage: "relations",
+              severity: "INFO",
+              code: "RELATION_SIRE_PLACEHOLDER",
+              message:
+                "Sire registration is a placeholder and was treated as unknown.",
+              registrationNo: registration.registrationNo,
+              sourceTable: "bearek_id",
+              payloadJson: JSON.stringify({
+                registrationNo: registration.registrationNo,
+                sireRegistrationNo: row.sireRegistrationNo,
+              }),
+            });
           }
           if (damRegistration.registrationNo && damIsPlaceholder) {
             skippedPlaceholderDamRefs += 1;
+            await recordIssue({
+              stage: "relations",
+              severity: "INFO",
+              code: "RELATION_DAM_PLACEHOLDER",
+              message:
+                "Dam registration is a placeholder and was treated as unknown.",
+              registrationNo: registration.registrationNo,
+              sourceTable: "bearek_id",
+              payloadJson: JSON.stringify({
+                registrationNo: registration.registrationNo,
+                damRegistrationNo: row.damRegistrationNo,
+              }),
+            });
           }
 
           let sireRegistrationForLookup = sireIsPlaceholder
@@ -1132,6 +1286,7 @@ export function createImportsService() {
       options?: {
         stage?: string;
         code?: string;
+        severity?: ImportIssueSeverity;
         limit?: number;
         cursor?: string;
       },
