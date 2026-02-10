@@ -35,7 +35,6 @@ export {
 export {
   fetchLegacyPhase1Rows,
   type LegacyBreederRow,
-  type LegacyBreederUpdateRow,
   type LegacyDogRow,
   type LegacyEkRow,
   type LegacyOwnerRow,

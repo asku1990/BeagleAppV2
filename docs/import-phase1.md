@@ -34,7 +34,7 @@ Registration identity is stored only in `DogRegistration`.
 - `DogRegistration.registrationNo` is globally unique, so one registration maps to exactly one dog.
 - `samakoira.VARA` is preserved on `Dog.note`.
 - Dog breeder source text from legacy `KASVA` is stored on `Dog.breederNameText`.
-- `Breeder` is a kennel directory (`kennel` + `kennel_ud`) and dogs are linked by optional `Dog.breederId` only on exact normalized name match.
+- `Breeder` is a kennel directory from legacy `kennel` and dogs are linked by optional `Dog.breederId` only on exact normalized name match.
 
 ## Source tables and field mapping
 
@@ -55,13 +55,6 @@ Legacy fetch is performed in `packages/db/legacy/source.ts`.
   - `KEOMIS -> ownerName`
   - `POSPAI -> city`
   - `VARA -> legacyFlag`
-- Breeder updates (`kennel_ud`)
-  - `KENNEL -> name`
-  - `KELYHE -> shortCode`
-  - `KEOMIS -> ownerName`
-  - `POSPAI -> city`
-  - `VARA -> legacyFlag`
-  - `MUOKATTU -> modifiedAtRaw`
 - EK (`bea_apu`)
   - `REKNO -> registrationNo`
   - `EKNO -> ekNo`
@@ -160,8 +153,7 @@ Rows with invalid registration format are skipped and logged with:
 ### Breeders stage
 
 - `kennel` rows upsert breeder metadata by `Breeder.name`.
-- `kennel_ud` rows enrich missing breeder metadata and create missing breeders.
-- Directory index for dog linking is built from breeders with `detailsSource in ("kennel", "kennel_ud")`.
+- Directory index for dog linking is built from breeders with `detailsSource = "kennel"`.
 - If kennel name is missing:
   - Issue code: `BREEDER_MISSING_NAME`
   - Row skipped.

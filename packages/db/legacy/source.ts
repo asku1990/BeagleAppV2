@@ -19,15 +19,6 @@ export type LegacyBreederRow = {
   legacyFlag: string | null;
 };
 
-export type LegacyBreederUpdateRow = {
-  name: string | null;
-  shortCode: string | null;
-  ownerName: string | null;
-  city: string | null;
-  legacyFlag: string | null;
-  modifiedAtRaw: string | null;
-};
-
 export type LegacyEkRow = {
   registrationNo: string;
   ekNo: number | null;
@@ -86,7 +77,6 @@ export type LegacySamakoiraRow = {
 export type LegacyPhase1Rows = {
   dogs: LegacyDogRow[];
   breeders: LegacyBreederRow[];
-  breederUpdates: LegacyBreederUpdateRow[];
   eks: LegacyEkRow[];
   owners: LegacyOwnerRow[];
   trialResults: LegacyTrialResultRow[];
@@ -139,20 +129,6 @@ export async function fetchLegacyPhase1Rows(options?: {
     )) as LegacyBreederRow[];
     log(
       `Fetched breeder rows: count=${breeders.length}, elapsed=${Math.round((Date.now() - breedersStartedAt) / 1000)}s`,
-    );
-
-    const breederUpdatesStartedAt = Date.now();
-    const breederUpdates = (await connection.query(
-      `SELECT KENNEL as name,
-              KELYHE as shortCode,
-              KEOMIS as ownerName,
-              POSPAI as city,
-              VARA as legacyFlag,
-              MUOKATTU as modifiedAtRaw
-       FROM kennel_ud`,
-    )) as LegacyBreederUpdateRow[];
-    log(
-      `Fetched breeder update rows: count=${breederUpdates.length}, elapsed=${Math.round((Date.now() - breederUpdatesStartedAt) / 1000)}s`,
     );
 
     const eksStartedAt = Date.now();
@@ -240,7 +216,6 @@ export async function fetchLegacyPhase1Rows(options?: {
     return {
       dogs,
       breeders,
-      breederUpdates,
       eks,
       owners,
       trialResults,

@@ -109,22 +109,20 @@ type BreederDetailsInput = {
   name: string | null;
   shortCode: string | null;
   grantedAtRaw: string | null;
-  modifiedAtRaw: string | null;
   ownerName: string | null;
   city: string | null;
   legacyFlag: string | null;
-  source: "kennel" | "kennel_ud";
+  source: "kennel";
 };
 
 type BreederDetails = {
   name: string;
   shortCode: string | null;
   grantedAtRaw: string | null;
-  modifiedAtRaw: string | null;
   ownerName: string | null;
   city: string | null;
   legacyFlag: string | null;
-  source: "kennel" | "kennel_ud";
+  source: "kennel";
 };
 
 function normalizeBreederDetails(
@@ -137,7 +135,6 @@ function normalizeBreederDetails(
     name,
     shortCode: normalizeNullable(input.shortCode),
     grantedAtRaw: normalizeNullable(input.grantedAtRaw),
-    modifiedAtRaw: normalizeNullable(input.modifiedAtRaw),
     ownerName: normalizeNullable(input.ownerName),
     city: normalizeNullable(input.city),
     legacyFlag: normalizeNullable(input.legacyFlag),
@@ -224,17 +221,16 @@ export function createImportsService() {
           log: (message) => log(`[stage:load] ${message}`),
         });
         log(
-          `Loaded legacy rows: dogs=${legacy.dogs.length}, breeders=${legacy.breeders.length}, breederUpdates=${legacy.breederUpdates.length}, eks=${legacy.eks.length}, owners=${legacy.owners.length}, trialResults=${legacy.trialResults.length}, showResults=${legacy.showResults.length}, samakoira=${legacy.samakoira.length}`,
+          `Loaded legacy rows: dogs=${legacy.dogs.length}, breeders=${legacy.breeders.length}, eks=${legacy.eks.length}, owners=${legacy.owners.length}, trialResults=${legacy.trialResults.length}, showResults=${legacy.showResults.length}, samakoira=${legacy.samakoira.length}`,
         );
         finishStage("load");
 
         startStage("breeders");
         let breederRowsProcessed = 0;
         let breederRowsUpserted = 0;
-        let breederRowsUpdated = 0;
+        const breederRowsUpdated = 0;
         let breederRowsSkipped = 0;
-        const totalBreederRows =
-          legacy.breeders.length + legacy.breederUpdates.length;
+        const totalBreederRows = legacy.breeders.length;
 
         for (const row of legacy.breeders) {
           breederRowsProcessed += 1;
@@ -242,7 +238,6 @@ export function createImportsService() {
             name: row.name,
             shortCode: row.shortCode,
             grantedAtRaw: row.grantedAtRaw,
-            modifiedAtRaw: null,
             ownerName: row.ownerName,
             city: row.city,
             legacyFlag: row.legacyFlag,
@@ -294,120 +289,6 @@ export function createImportsService() {
             logProgress("breeders", breederRowsProcessed, totalBreederRows);
           }
         }
-
-        for (const row of legacy.breederUpdates) {
-          breederRowsProcessed += 1;
-          const breeder = normalizeBreederDetails({
-            name: row.name,
-            shortCode: row.shortCode,
-            grantedAtRaw: null,
-            modifiedAtRaw: row.modifiedAtRaw,
-            ownerName: row.ownerName,
-            city: row.city,
-            legacyFlag: row.legacyFlag,
-            source: "kennel_ud",
-          });
-
-          if (!breeder) {
-            breederRowsSkipped += 1;
-            errorsCount += 1;
-            await recordIssue({
-              stage: "breeders",
-              code: "BREEDER_MISSING_NAME",
-              message: "Breeder update row is missing kennel name.",
-              sourceTable: "kennel_ud",
-              payloadJson: JSON.stringify(row),
-            });
-            if (breederRowsProcessed % 1000 === 0) {
-              logProgress("breeders", breederRowsProcessed, totalBreederRows);
-            }
-            continue;
-          }
-
-          const existing = await prisma.breeder.findUnique({
-            where: { name: breeder.name },
-            select: {
-              id: true,
-              shortCode: true,
-              grantedAtRaw: true,
-              modifiedAtRaw: true,
-              ownerName: true,
-              city: true,
-              legacyFlag: true,
-              detailsSource: true,
-            },
-          });
-
-          if (!existing) {
-            await prisma.breeder.create({
-              data: {
-                name: breeder.name,
-                shortCode: breeder.shortCode,
-                grantedAtRaw: breeder.grantedAtRaw,
-                modifiedAtRaw: breeder.modifiedAtRaw,
-                ownerName: breeder.ownerName,
-                city: breeder.city,
-                legacyFlag: breeder.legacyFlag,
-                detailsSource: breeder.source,
-              },
-            });
-            breederRowsUpserted += 1;
-          } else if (existing.detailsSource === "kennel") {
-            const updateData: {
-              shortCode?: string | null;
-              grantedAtRaw?: string | null;
-              modifiedAtRaw?: string | null;
-              ownerName?: string | null;
-              city?: string | null;
-              legacyFlag?: string | null;
-            } = {};
-
-            if (!existing.shortCode && breeder.shortCode) {
-              updateData.shortCode = breeder.shortCode;
-            }
-            if (!existing.grantedAtRaw && breeder.grantedAtRaw) {
-              updateData.grantedAtRaw = breeder.grantedAtRaw;
-            }
-            if (breeder.modifiedAtRaw) {
-              updateData.modifiedAtRaw = breeder.modifiedAtRaw;
-            }
-            if (!existing.ownerName && breeder.ownerName) {
-              updateData.ownerName = breeder.ownerName;
-            }
-            if (!existing.city && breeder.city) {
-              updateData.city = breeder.city;
-            }
-            if (!existing.legacyFlag && breeder.legacyFlag) {
-              updateData.legacyFlag = breeder.legacyFlag;
-            }
-
-            if (Object.keys(updateData).length > 0) {
-              await prisma.breeder.update({
-                where: { id: existing.id },
-                data: updateData,
-              });
-              breederRowsUpdated += 1;
-            }
-          } else {
-            await prisma.breeder.update({
-              where: { id: existing.id },
-              data: {
-                shortCode: breeder.shortCode,
-                grantedAtRaw: breeder.grantedAtRaw ?? existing.grantedAtRaw,
-                modifiedAtRaw: breeder.modifiedAtRaw,
-                ownerName: breeder.ownerName,
-                city: breeder.city,
-                legacyFlag: breeder.legacyFlag,
-                detailsSource: breeder.source,
-              },
-            });
-            breederRowsUpdated += 1;
-          }
-
-          if (breederRowsProcessed % 1000 === 0) {
-            logProgress("breeders", breederRowsProcessed, totalBreederRows);
-          }
-        }
         logProgress("breeders", breederRowsProcessed, totalBreederRows);
         finishStage(
           "breeders",
@@ -421,7 +302,7 @@ export function createImportsService() {
         const ambiguousBreederNameKeys = new Set<string>();
         let duplicateBreederNameKeys = 0;
         const kennelBreeders = await prisma.breeder.findMany({
-          where: { detailsSource: { in: ["kennel", "kennel_ud"] } },
+          where: { detailsSource: "kennel" },
           select: { id: true, name: true },
         });
         for (const breeder of kennelBreeders) {
