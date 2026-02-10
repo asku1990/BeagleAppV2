@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@beagle/ui";
+import { Button } from "@/components/ui/button";
 import { useLogin } from "@/lib/hooks/use-auth";
 
 export default function LoginPage() {

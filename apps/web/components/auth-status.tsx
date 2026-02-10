@@ -1,6 +1,7 @@
 "use client";
 
-import { Button } from "@beagle/ui";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { useCurrentUser, useLogout } from "@/lib/hooks/use-auth";
 
@@ -11,7 +12,12 @@ export function AuthStatus() {
     logout.error instanceof Error ? logout.error.message : null;
 
   if (query.isLoading) {
-    return <p className="text-sm text-zinc-500">Checking auth...</p>;
+    return (
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-40" />
+        <Skeleton className="h-9 w-28" />
+      </div>
+    );
   }
 
   if (query.isError) {
