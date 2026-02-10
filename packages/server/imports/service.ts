@@ -415,6 +415,10 @@ export function createImportsService() {
         );
 
         const breederIdByNameKey = new Map<string, string>();
+        const breederNameKeyCounts = new Map<string, number>();
+        const breederNameKeyNames = new Map<string, Set<string>>();
+        const firstBreederIdByNameKey = new Map<string, string>();
+        const ambiguousBreederNameKeys = new Set<string>();
         let duplicateBreederNameKeys = 0;
         const kennelBreeders = await prisma.breeder.findMany({
           where: { detailsSource: { in: ["kennel", "kennel_ud"] } },
@@ -423,15 +427,47 @@ export function createImportsService() {
         for (const breeder of kennelBreeders) {
           const nameKey = normalizeBreederKey(breeder.name);
           if (!nameKey) continue;
-          const existing = breederIdByNameKey.get(nameKey);
-          if (existing && existing !== breeder.id) {
-            duplicateBreederNameKeys += 1;
+          breederNameKeyCounts.set(
+            nameKey,
+            (breederNameKeyCounts.get(nameKey) ?? 0) + 1,
+          );
+          if (!firstBreederIdByNameKey.has(nameKey)) {
+            firstBreederIdByNameKey.set(nameKey, breeder.id);
+          }
+          const names = breederNameKeyNames.get(nameKey) ?? new Set<string>();
+          names.add(breeder.name);
+          breederNameKeyNames.set(nameKey, names);
+        }
+        for (const [nameKey, count] of breederNameKeyCounts.entries()) {
+          if (count === 1) {
+            const breederId = firstBreederIdByNameKey.get(nameKey);
+            if (breederId) {
+              breederIdByNameKey.set(nameKey, breederId);
+            }
             continue;
           }
-          breederIdByNameKey.set(nameKey, breeder.id);
+
+          duplicateBreederNameKeys += count - 1;
+          ambiguousBreederNameKeys.add(nameKey);
+
+          errorsCount += 1;
+          await recordIssue({
+            stage: "breeders",
+            code: "BREEDER_NAME_KEY_AMBIGUOUS",
+            message:
+              "Breeder name key is ambiguous after normalization; dogs with this breeder text will not be linked.",
+            sourceTable: "kennel",
+            payloadJson: JSON.stringify({
+              breederNameKey: nameKey,
+              count,
+              names: [
+                ...(breederNameKeyNames.get(nameKey) ?? new Set<string>()),
+              ],
+            }),
+          });
         }
         log(
-          `[stage:breeders] index breederNameKeys=${breederIdByNameKey.size}, duplicateKeys=${duplicateBreederNameKeys}`,
+          `[stage:breeders] index breederNameKeys=${breederIdByNameKey.size}, duplicateKeys=${duplicateBreederNameKeys}, ambiguousKeys=${ambiguousBreederNameKeys.size}`,
         );
 
         startStage("dogs");
@@ -496,6 +532,26 @@ export function createImportsService() {
             dogsLinkedToBreeder += 1;
           } else if (breederNameText) {
             dogsWithUnlinkedBreederText += 1;
+
+            if (
+              breederNameKey &&
+              ambiguousBreederNameKeys.has(breederNameKey)
+            ) {
+              errorsCount += 1;
+              await recordIssue({
+                stage: "dogs",
+                code: "DOG_BREEDER_LINK_AMBIGUOUS",
+                message:
+                  "Dog breeder text matches an ambiguous breeder name key; breeder link skipped.",
+                registrationNo,
+                sourceTable: "bearek_id",
+                payloadJson: JSON.stringify({
+                  registrationNo: row.registrationNo,
+                  breederNameText,
+                  breederNameKey,
+                }),
+              });
+            }
           }
 
           const existingRegistration = await prisma.dogRegistration.findUnique({
