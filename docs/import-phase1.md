@@ -33,6 +33,7 @@ Registration identity is stored only in `DogRegistration`.
 - Legacy aliases from `samakoira.REK_2` and `samakoira.REK_3` are stored with `source="LEGACY_SAMAKOIRA"`.
 - `DogRegistration.registrationNo` is globally unique, so one registration maps to exactly one dog.
 - `samakoira.VARA` is preserved on `Dog.note`.
+- Breeder identity is stored in `Breeder.name` and enriched from legacy kennel tables when available.
 
 ## Source tables and field mapping
 
@@ -46,6 +47,20 @@ Legacy fetch is performed in `packages/db/legacy/source.ts`.
   - `ISREK -> sireRegistrationNo`
   - `EMREK -> damRegistrationNo`
   - `KASVA -> breederName`
+- Breeders (`kennel`)
+  - `KENNEL -> name`
+  - `KELYHE -> shortCode`
+  - `MYONNETTY -> grantedAtRaw`
+  - `KEOMIS -> ownerName`
+  - `POSPAI -> city`
+  - `VARA -> legacyFlag`
+- Breeder updates (`kennel_ud`)
+  - `KENNEL -> name`
+  - `KELYHE -> shortCode`
+  - `KEOMIS -> ownerName`
+  - `POSPAI -> city`
+  - `VARA -> legacyFlag`
+  - `MUOKATTU -> modifiedAtRaw`
 - EK (`bea_apu`)
   - `REKNO -> registrationNo`
   - `EKNO -> ekNo`
@@ -59,10 +74,19 @@ Legacy fetch is performed in `packages/db/legacy/source.ts`.
   - `REKNO -> registrationNo`
   - `TAPPA -> eventName`
   - `TAPPV -> eventDateRaw`
+  - `KENNELPIIRI -> kennelDistrict`
+  - `KENNELPIIRINRO -> kennelDistrictNo`
+  - `KE, LK, PA, PISTE, SIJA, HAKU, HAUK, YVA, HLO, ALO, TJA, PIN`
+  - `TUOM1 -> judge`
+  - `VARA -> legacyFlag`
 - Show events (`nay9599`)
   - `REKNO -> registrationNo`
   - `TAPPA -> eventName`
   - `TAPPV -> eventDateRaw`
+  - `TULNI -> resultText`
+  - `KORK -> heightText`
+  - `TUOM1 -> judge`
+  - `VARA -> legacyFlag`
 - Alias rows (`samakoira`)
   - `REK_1 -> rek1` (canonical registration)
   - `REK_2 -> rek2` (alias registration)
@@ -76,13 +100,14 @@ The import pipeline runs in this order:
 
 1. `load`
 2. `dogs`
-3. `ek`
-4. `samakoira`
-5. `index`
-6. `relations`
-7. `owners`
-8. `trials`
-9. `shows`
+3. `breeders`
+4. `ek`
+5. `samakoira`
+6. `index`
+7. `relations`
+8. `owners`
+9. `trials`
+10. `shows`
 
 Import issues are buffered and bulk inserted during the run.
 
@@ -127,6 +152,14 @@ Rows with invalid registration format are skipped and logged with:
 - If `ekNo` is null:
   - Row skipped without issue.
 - Otherwise updates `Dog.ekNo` through registration lookup in `DogRegistration`.
+
+### Breeders stage
+
+- `kennel` rows upsert breeder metadata by `Breeder.name`.
+- `kennel_ud` rows enrich missing breeder metadata and create missing breeders.
+- If kennel name is missing:
+  - Issue code: `BREEDER_MISSING_NAME`
+  - Row skipped.
 
 ### Samakoira stage
 
@@ -181,7 +214,7 @@ Rows with invalid registration format are skipped and logged with:
 
 ### Trials and shows stages
 
-Common event upsert logic in `packages/server/imports/persistence.ts`.
+Event upsert logic lives in `packages/server/imports/persistence.ts`.
 
 Required for each event row:
 
@@ -203,6 +236,11 @@ If dog/date/name is missing:
 Valid rows are upserted by source key:
 
 - `sourceKey = normalizedRegistrationNo|eventDateRaw|eventName`
+
+Imported detail fields:
+
+- Trials: district, class/result codes, all score columns, placement, judge, legacy flag.
+- Shows: result text, height text, judge, legacy flag.
 
 ## Date and value normalization
 

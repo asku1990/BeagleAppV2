@@ -34,10 +34,13 @@ export {
 
 export {
   fetchLegacyPhase1Rows,
+  type LegacyBreederRow,
+  type LegacyBreederUpdateRow,
   type LegacyDogRow,
   type LegacyEkRow,
-  type LegacyEventRow,
   type LegacyOwnerRow,
+  type LegacyTrialResultRow,
+  type LegacyShowResultRow,
   type LegacySamakoiraRow,
   type LegacyPhase1Rows,
 } from "./legacy/source";

@@ -1,4 +1,9 @@
-import { prisma, type LegacyEventRow, type LegacyOwnerRow } from "@beagle/db";
+import {
+  prisma,
+  type LegacyOwnerRow,
+  type LegacyShowResultRow,
+  type LegacyTrialResultRow,
+} from "@beagle/db";
 import {
   isValidRegistrationNo,
   normalizeNullable,
@@ -55,14 +60,21 @@ export async function upsertOwner(row: LegacyOwnerRow): Promise<string | null> {
   }
 }
 
-export async function upsertEventRows(
-  rows: LegacyEventRow[],
-  type: "trial" | "show",
-  dogIdByRegistration: Map<string, string>,
-  options?: {
-    onProgress?: (processed: number, total: number) => void;
-  },
-): Promise<{
+function parseLegacyScore(
+  value: string | number | null | undefined,
+): number | null {
+  if (value == null) return null;
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const parsed = Number.parseFloat(trimmed);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+type EventUpsertResult = {
   upserted: number;
   errors: number;
   issues: Array<{
@@ -72,12 +84,20 @@ export async function upsertEventRows(
     sourceTable: "akoeall" | "nay9599";
     payloadJson: string;
   }>;
-}> {
+};
+
+export async function upsertTrialRows(
+  rows: LegacyTrialResultRow[],
+  dogIdByRegistration: Map<string, string>,
+  options?: {
+    onProgress?: (processed: number, total: number) => void;
+  },
+): Promise<EventUpsertResult> {
   const total = rows.length;
   let upserted = 0;
   let errors = 0;
   let processed = 0;
-  const sourceTable = type === "trial" ? "akoeall" : "nay9599";
+  const sourceTable = "akoeall";
   const issues: Array<{
     code: string;
     message: string;
@@ -94,6 +114,134 @@ export async function upsertEventRows(
       issues.push({
         code: "REGISTRATION_INVALID_FORMAT",
         message: "Event row has invalid registration format.",
+        registrationNo,
+        sourceTable,
+        payloadJson: JSON.stringify({
+          registrationNo: row.registrationNo,
+          eventName: row.eventName,
+          eventDateRaw: row.eventDateRaw,
+          pa: row.pa,
+          piste: row.piste,
+        }),
+      });
+      if (processed % 1000 === 0) {
+        options?.onProgress?.(processed, total);
+      }
+      continue;
+    }
+
+    const dogId = registrationNo
+      ? dogIdByRegistration.get(registrationNo)
+      : undefined;
+    const eventDate = parseLegacyDate(row.eventDateRaw);
+    const eventName = normalizeNullable(row.eventName);
+    if (!dogId || !eventDate || !eventName) {
+      errors += 1;
+      issues.push({
+        code: "EVENT_MISSING_REQUIRED_FIELDS",
+        message: "Trial row missing dog, event date, or event name.",
+        registrationNo,
+        sourceTable,
+        payloadJson: JSON.stringify({
+          registrationNo: row.registrationNo,
+          eventName: row.eventName,
+          eventDateRaw: row.eventDateRaw,
+        }),
+      });
+      if (processed % 1000 === 0) {
+        options?.onProgress?.(processed, total);
+      }
+      continue;
+    }
+
+    const normalizedEventDate = eventDate.toISOString().slice(0, 10);
+    const sourceKey = `${registrationNo}|${normalizedEventDate}|${eventName}`;
+
+    await prisma.trialResult.upsert({
+      where: { sourceKey },
+      create: {
+        dogId,
+        eventDate,
+        eventName,
+        kennelDistrict: normalizeNullable(row.kennelDistrict),
+        kennelDistrictNo: normalizeNullable(row.kennelDistrictNo),
+        ke: normalizeNullable(row.ke),
+        lk: normalizeNullable(row.lk),
+        pa: normalizeNullable(row.pa),
+        piste: parseLegacyScore(row.piste),
+        sija: normalizeNullable(row.sija),
+        haku: parseLegacyScore(row.haku),
+        hauk: parseLegacyScore(row.hauk),
+        yva: parseLegacyScore(row.yva),
+        hlo: parseLegacyScore(row.hlo),
+        alo: parseLegacyScore(row.alo),
+        tja: parseLegacyScore(row.tja),
+        pin: parseLegacyScore(row.pin),
+        judge: normalizeNullable(row.judge),
+        legacyFlag: normalizeNullable(row.legacyFlag),
+        sourceKey,
+      },
+      update: {
+        dogId,
+        eventDate,
+        eventName,
+        kennelDistrict: normalizeNullable(row.kennelDistrict),
+        kennelDistrictNo: normalizeNullable(row.kennelDistrictNo),
+        ke: normalizeNullable(row.ke),
+        lk: normalizeNullable(row.lk),
+        pa: normalizeNullable(row.pa),
+        piste: parseLegacyScore(row.piste),
+        sija: normalizeNullable(row.sija),
+        haku: parseLegacyScore(row.haku),
+        hauk: parseLegacyScore(row.hauk),
+        yva: parseLegacyScore(row.yva),
+        hlo: parseLegacyScore(row.hlo),
+        alo: parseLegacyScore(row.alo),
+        tja: parseLegacyScore(row.tja),
+        pin: parseLegacyScore(row.pin),
+        judge: normalizeNullable(row.judge),
+        legacyFlag: normalizeNullable(row.legacyFlag),
+      },
+    });
+
+    upserted += 1;
+    if (processed % 1000 === 0) {
+      options?.onProgress?.(processed, total);
+    }
+  }
+
+  options?.onProgress?.(processed, total);
+  return { upserted, errors, issues };
+}
+
+export async function upsertShowRows(
+  rows: LegacyShowResultRow[],
+  dogIdByRegistration: Map<string, string>,
+  options?: {
+    onProgress?: (processed: number, total: number) => void;
+  },
+): Promise<EventUpsertResult> {
+  const total = rows.length;
+  let upserted = 0;
+  let errors = 0;
+  let processed = 0;
+  const sourceTable = "nay9599";
+  const issues: Array<{
+    code: string;
+    message: string;
+    registrationNo: string | null;
+    sourceTable: "akoeall" | "nay9599";
+    payloadJson: string;
+  }> = [];
+
+  for (const row of rows) {
+    processed += 1;
+    const registrationNo = normalizeRegistrationNo(row.registrationNo);
+    if (registrationNo && !isValidRegistrationNo(registrationNo)) {
+      errors += 1;
+      issues.push({
+        code: "REGISTRATION_INVALID_FORMAT",
+        message: "Show row has invalid registration format.",
         registrationNo,
         sourceTable,
         payloadJson: JSON.stringify({
@@ -117,7 +265,7 @@ export async function upsertEventRows(
       errors += 1;
       issues.push({
         code: "EVENT_MISSING_REQUIRED_FIELDS",
-        message: "Event row missing dog, event date, or event name.",
+        message: "Show row missing dog, event date, or event name.",
         registrationNo,
         sourceTable,
         payloadJson: JSON.stringify({
@@ -135,19 +283,28 @@ export async function upsertEventRows(
     const normalizedEventDate = eventDate.toISOString().slice(0, 10);
     const sourceKey = `${registrationNo}|${normalizedEventDate}|${eventName}`;
 
-    if (type === "trial") {
-      await prisma.trialResult.upsert({
-        where: { sourceKey },
-        create: { dogId, eventDate, eventName, sourceKey },
-        update: { dogId, eventDate, eventName },
-      });
-    } else {
-      await prisma.showResult.upsert({
-        where: { sourceKey },
-        create: { dogId, eventDate, eventName, sourceKey },
-        update: { dogId, eventDate, eventName },
-      });
-    }
+    await prisma.showResult.upsert({
+      where: { sourceKey },
+      create: {
+        dogId,
+        eventDate,
+        eventName,
+        resultText: normalizeNullable(row.resultText),
+        heightText: normalizeNullable(row.heightText),
+        judge: normalizeNullable(row.judge),
+        legacyFlag: normalizeNullable(row.legacyFlag),
+        sourceKey,
+      },
+      update: {
+        dogId,
+        eventDate,
+        eventName,
+        resultText: normalizeNullable(row.resultText),
+        heightText: normalizeNullable(row.heightText),
+        judge: normalizeNullable(row.judge),
+        legacyFlag: normalizeNullable(row.legacyFlag),
+      },
+    });
 
     upserted += 1;
     if (processed % 1000 === 0) {
