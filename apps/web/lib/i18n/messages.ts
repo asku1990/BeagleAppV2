@@ -18,9 +18,9 @@ const fi = {
   "sidebar.nav.bestDriver": "Paras ajuri -kilpailu",
   "sidebar.signIn": "Kirjaudu",
   "common.notImplementedYet": "ei vielä toteutettu",
-  "home.hero.title": "Suomen Beaglejärjestö",
+  "home.hero.title": "Suomen Beaglejärjestö ry",
   "home.hero.description":
-    "Pääsivun rakenne on valmis. Seuraavaksi yhdistämme ominaisuussivut.",
+    "Tietokannassa on Suomessa rekisteröidyt Beaglet sekä koe ja näyttelytuloksia.",
   "home.hero.logoAlt": "Suomen Beaglejärjestön logo",
   "home.stats.title": "Beagle-tietokannan tilastot",
   "home.stats.group.registrations": "Rekisteröinnit",
@@ -57,9 +57,9 @@ const sv: Messages = {
   "sidebar.nav.bestDriver": "Paras ajuri-tävling",
   "sidebar.signIn": "Logga in",
   "common.notImplementedYet": "inte implementerad ännu",
-  "home.hero.title": "Finlands Beagleförbund",
+  "home.hero.title": "Finska Beagleklubben ry",
   "home.hero.description":
-    "Huvudsidans struktur är klar. Nästa steg är att koppla funktionssidorna.",
+    "Databasen innehåller beaglar registrerade i Finland samt prov- och utställningsresultat.",
   "home.hero.logoAlt": "Finlands Beagleförbunds logotyp",
   "home.stats.title": "Beagledatabasens statistik",
   "home.stats.group.registrations": "Registreringar",
@@ -95,7 +95,7 @@ const en: Messages = {
   "common.notImplementedYet": "not implemented yet",
   "home.hero.title": "Finnish Beagle Association",
   "home.hero.description":
-    "The main page structure is ready. Next we will connect feature pages.",
+    "The database contains Beagles registered in Finland and trial and show results.",
   "home.hero.logoAlt": "Finnish Beagle Association logo",
   "home.stats.title": "Beagle Database Statistics",
   "home.stats.group.registrations": "Registrations",
