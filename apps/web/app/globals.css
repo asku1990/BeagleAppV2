@@ -93,6 +93,12 @@ body {
   font-family: "Avenir Next", "Segoe UI", sans-serif;
 }
 
+@keyframes beagle-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 .beagle-shell {
   background:
     radial-gradient(circle at 0% 0%, #d8e8f8 0%, transparent 45%),
