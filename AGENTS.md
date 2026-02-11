@@ -17,7 +17,7 @@ Agent instructions for working in this repository.
 
 ## Monorepo Boundaries
 
-- `apps/web` can depend on: `packages/api-client`, `packages/contracts`, `packages/ui`.
+- `apps/web` can depend on: `packages/api-client`, `packages/contracts`.
 - `apps/api` can depend on: `packages/server`, `packages/contracts`.
 - `packages/server` can depend on: `packages/domain`, `packages/db`, `packages/auth`, `packages/contracts`.
 - Do not put business logic in API route handlers.
@@ -40,3 +40,9 @@ Agent instructions for working in this repository.
 
 - Run targeted checks for touched code when possible.
 - If tests/checks are not run, explicitly say so in the final response.
+
+## Test Conventions
+
+- Place unit and integration tests in `__tests__/` folders next to the relevant feature/module.
+- Place global Playwright e2e tests in root `tests/e2e/`.
+- Keep test refactors structure-only unless behavior changes are explicitly requested.

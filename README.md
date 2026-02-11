@@ -10,7 +10,6 @@ Monorepo for a public Beagle database app with auth, admin-ready routing, and a 
 - `packages/db`: Prisma + MariaDB access.
 - `packages/contracts`: shared API request/response types.
 - `packages/api-client`: typed HTTP client used by frontend hooks.
-- `packages/ui`: shared UI components.
 
 Current access model:
 
@@ -112,7 +111,14 @@ Useful targeted checks:
 ```bash
 pnpm --filter @beagle/web test:unit
 pnpm --filter @beagle/server test:unit
+pnpm --filter @beagle/web test:e2e
 ```
+
+## Test layout conventions
+
+- Co-locate package/app unit or integration tests in `__tests__/` near the feature/module.
+- Keep global Playwright e2e specs in the repo root `tests/e2e/`.
+- Web Playwright config is in `apps/web/playwright.config.ts` and points to root `tests/e2e`.
 
 ## Auth and admin notes
 
@@ -201,7 +207,7 @@ For full import behavior (source tables, stage handling, required fields, issue 
 - Keep `apps/api` routes thin (request/response mapping only).
 - Add shared payload types in `packages/contracts`.
 - Add client calls in `packages/api-client`.
-- Consume from UI using React Query hooks in `apps/web/lib/hooks`.
+- Consume from UI using React Query hooks in `apps/web/queries`.
 
 ## Architecture docs
 

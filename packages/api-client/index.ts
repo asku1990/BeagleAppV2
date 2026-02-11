@@ -1,95 +1,44 @@
 import type {
-  ApiResult,
-  CurrentUserDto,
   ImportIssueSeverity,
-  ImportRunIssuesResponse,
-  ImportRunResponse,
-  ImportStatusResponse,
   LoginRequest,
-  LogoutResponse,
   RegisterRequest,
 } from "@beagle/contracts";
-
-type ClientOptions = {
-  baseUrl?: string;
-  credentials?: RequestCredentials;
-  headers?: HeadersInit;
-};
-
-async function parseJson<T>(response: Response): Promise<ApiResult<T>> {
-  const payload = (await response.json()) as ApiResult<T>;
-  if (!response.ok && payload.ok) {
-    return { ok: false, error: "Unexpected response payload." };
-  }
-  return payload;
-}
+import { login } from "./auth/login";
+import { logout } from "./auth/logout";
+import { me } from "./auth/me";
+import { register } from "./auth/register";
+import type { ClientOptions } from "./core/client-options";
+import { createRequest } from "./core/request";
+import { getImportRun } from "./imports/get-import-run";
+import { getImportRunIssues } from "./imports/get-import-run-issues";
+import { getImportStatus } from "./imports/get-import-status";
 
 export function createApiClient(options: ClientOptions = {}) {
-  const baseUrl =
-    options.baseUrl ??
-    process.env.NEXT_PUBLIC_API_URL ??
-    "http://localhost:3001";
-  const credentials = options.credentials ?? "include";
-
-  async function request<T>(
-    path: string,
-    init: RequestInit = {},
-  ): Promise<ApiResult<T>> {
-    const headers = new Headers(options.headers ?? {});
-    if (init.headers) {
-      new Headers(init.headers).forEach((value, key) =>
-        headers.set(key, value),
-      );
-    }
-    if (init.body != null && !headers.has("Content-Type")) {
-      headers.set("Content-Type", "application/json");
-    }
-
-    const response = await fetch(`${baseUrl}${path}`, {
-      ...init,
-      credentials,
-      headers,
-    });
-
-    return parseJson<T>(response);
-  }
+  const request = createRequest(options);
 
   return {
     login(input: LoginRequest) {
-      return request<CurrentUserDto>("/api/auth/login", {
-        method: "POST",
-        body: JSON.stringify(input),
-      });
+      return login(request, input);
     },
 
     register(input: RegisterRequest) {
-      return request<{ id: string; email: string; role: string }>(
-        "/api/auth/register",
-        {
-          method: "POST",
-          body: JSON.stringify(input),
-        },
-      );
+      return register(request, input);
     },
 
     me() {
-      return request<CurrentUserDto>("/api/auth/me", { method: "GET" });
+      return me(request);
     },
 
     logout() {
-      return request<LogoutResponse>("/api/auth/logout", { method: "POST" });
+      return logout(request);
     },
 
     getImportStatus() {
-      return request<ImportStatusResponse>("/api/import/example", {
-        method: "GET",
-      });
+      return getImportStatus(request);
     },
 
     getImportRun(id: string) {
-      return request<ImportRunResponse>(`/api/v1/imports/${id}`, {
-        method: "GET",
-      });
+      return getImportRun(request, id);
     },
 
     getImportRunIssues(
@@ -102,19 +51,7 @@ export function createApiClient(options: ClientOptions = {}) {
         limit?: number;
       },
     ) {
-      const params = new URLSearchParams();
-      if (options?.stage) params.set("stage", options.stage);
-      if (options?.code) params.set("code", options.code);
-      if (options?.severity) params.set("severity", options.severity);
-      if (options?.cursor) params.set("cursor", options.cursor);
-      if (typeof options?.limit === "number") {
-        params.set("limit", String(options.limit));
-      }
-      const query = params.toString();
-      const path = `/api/v1/imports/${id}/issues${query ? `?${query}` : ""}`;
-      return request<ImportRunIssuesResponse>(path, {
-        method: "GET",
-      });
+      return getImportRunIssues(request, id, options);
     },
   };
 }

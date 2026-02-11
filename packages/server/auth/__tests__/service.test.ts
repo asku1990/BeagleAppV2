@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createAuthService } from "./service";
+import { createAuthService } from "../service";
 
 describe("auth service", () => {
   it("returns 400 for missing login fields", async () => {
