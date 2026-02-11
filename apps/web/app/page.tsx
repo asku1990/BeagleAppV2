@@ -13,10 +13,7 @@ export default function Home() {
           <AppHeader />
           <main className="flex-1 overflow-auto px-3 py-4 sm:px-4 md:px-6 md:py-6 lg:px-8 lg:py-8">
             <section className="mx-auto w-full max-w-7xl space-y-5 lg:space-y-6">
-              <MainHeader
-                title="Suomen Beaglejärjestö"
-                description="Feature pages will be connected next."
-              />
+              <MainHeader />
               <StatisticsSection />
             </section>
           </main>

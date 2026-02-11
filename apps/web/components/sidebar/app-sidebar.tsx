@@ -26,27 +26,30 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useI18n, type MessageKey } from "@/lib/i18n";
 
 type NavItem = {
-  label: string;
+  labelKey: MessageKey;
   icon: React.ComponentType<{ className?: string }>;
 };
 
 const publicNavItems: NavItem[] = [
-  { label: "Beagle Search", icon: Search },
-  { label: "Owner Search", icon: Users },
-  { label: "Trial Results", icon: FileSearch },
-  { label: "Field Trials", icon: Flag },
-  { label: "Shows", icon: Award },
-  { label: "EK Dogs", icon: Dog },
-  { label: "Kennel Names", icon: PawPrint },
-  { label: "Virtual Pairing", icon: Activity },
-  { label: "Best Driver", icon: Shield },
+  { labelKey: "sidebar.nav.beagleSearch", icon: Search },
+  { labelKey: "sidebar.nav.ownerSearch", icon: Users },
+  { labelKey: "sidebar.nav.trialResults", icon: FileSearch },
+  { labelKey: "sidebar.nav.fieldTrials", icon: Flag },
+  { labelKey: "sidebar.nav.shows", icon: Award },
+  { labelKey: "sidebar.nav.ekDogs", icon: Dog },
+  { labelKey: "sidebar.nav.kennelNames", icon: PawPrint },
+  { labelKey: "sidebar.nav.virtualPairing", icon: Activity },
+  { labelKey: "sidebar.nav.bestDriver", icon: Shield },
 ];
 
 export function AppSidebar() {
+  const { t } = useI18n();
+
   const handleComingSoon = (item: string) => {
-    toast(`${item}: not implemented yet`);
+    toast(`${item}: ${t("common.notImplementedYet")}`);
   };
 
   return (
@@ -54,28 +57,28 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-[var(--beagle-border)]">
         <div className="flex min-h-12 items-center px-2">
           <div className="group-data-[collapsible=icon]:hidden">
-            <p className="beagle-title text-lg">SBJ Database</p>
+            <p className="beagle-title text-lg">{t("sidebar.title")}</p>
           </div>
           <p className="hidden text-sm font-semibold text-[var(--beagle-ink)] group-data-[collapsible=icon]:block">
-            SB
+            {t("sidebar.shortTitle")}
           </p>
         </div>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("sidebar.navigation")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {publicNavItems.map((item) => (
-                <SidebarMenuItem key={item.label}>
+                <SidebarMenuItem key={item.labelKey}>
                   <SidebarMenuButton
-                    tooltip={item.label}
-                    onClick={() => handleComingSoon(item.label)}
+                    tooltip={t(item.labelKey)}
+                    onClick={() => handleComingSoon(t(item.labelKey))}
                     className="text-[var(--beagle-ink)]"
                   >
                     <item.icon className="size-4" />
-                    <span>{item.label}</span>
+                    <span>{t(item.labelKey)}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -88,10 +91,12 @@ export function AppSidebar() {
         <Button
           variant="ghost"
           className="justify-start gap-2 text-[var(--beagle-ink)] group-data-[collapsible=icon]:justify-center"
-          onClick={() => handleComingSoon("Sign in")}
+          onClick={() => handleComingSoon(t("sidebar.signIn"))}
         >
           <LogIn className="size-4" />
-          <span className="group-data-[collapsible=icon]:hidden">Sign in</span>
+          <span className="group-data-[collapsible=icon]:hidden">
+            {t("sidebar.signIn")}
+          </span>
         </Button>
       </SidebarFooter>
     </Sidebar>

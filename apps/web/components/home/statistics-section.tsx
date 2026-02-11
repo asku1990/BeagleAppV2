@@ -1,47 +1,76 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useI18n, type MessageKey } from "@/lib/i18n";
 
 type StatRow = {
-  label: string;
-  value: string;
+  labelKey: MessageKey;
+  valueKey: MessageKey;
 };
 
 type StatGroup = {
-  title: string;
+  titleKey: MessageKey;
   rows: StatRow[];
 };
 
 const statGroups: StatGroup[] = [
   {
-    title: "Registrations",
+    titleKey: "home.stats.group.registrations",
     rows: [
-      { label: "Registered dogs", value: "Data pending" },
-      { label: "Youngest registered", value: "Data pending" },
+      {
+        labelKey: "home.stats.row.registeredDogs",
+        valueKey: "common.dataPending",
+      },
+      {
+        labelKey: "home.stats.row.youngestRegistered",
+        valueKey: "common.dataPending",
+      },
     ],
   },
   {
-    title: "Trials",
+    titleKey: "home.stats.group.trials",
     rows: [
-      { label: "Results period", value: "Data pending" },
-      { label: "Total trial entries", value: "Data pending" },
-      { label: "Performed by dogs", value: "Data pending" },
+      {
+        labelKey: "home.stats.row.resultsPeriod",
+        valueKey: "common.dataPending",
+      },
+      {
+        labelKey: "home.stats.row.totalTrialEntries",
+        valueKey: "common.dataPending",
+      },
+      {
+        labelKey: "home.stats.row.performedByDogs",
+        valueKey: "common.dataPending",
+      },
     ],
   },
   {
-    title: "Shows",
+    titleKey: "home.stats.group.shows",
     rows: [
-      { label: "Results period", value: "Data pending" },
-      { label: "Total show entries", value: "Data pending" },
-      { label: "Performed by dogs", value: "Data pending" },
+      {
+        labelKey: "home.stats.row.resultsPeriod",
+        valueKey: "common.dataPending",
+      },
+      {
+        labelKey: "home.stats.row.totalShowEntries",
+        valueKey: "common.dataPending",
+      },
+      {
+        labelKey: "home.stats.row.performedByDogs",
+        valueKey: "common.dataPending",
+      },
     ],
   },
 ];
 
 export function StatisticsSection() {
+  const { t } = useI18n();
+
   return (
     <Card className="beagle-panel gap-0 overflow-hidden py-0">
       <CardHeader className="px-5 pt-5 pb-4 md:px-6 md:pt-6 md:pb-4">
         <CardTitle className="text-xl text-[var(--beagle-ink)]">
-          Beagle Database Statistics
+          {t("home.stats.title")}
         </CardTitle>
       </CardHeader>
 
@@ -49,24 +78,24 @@ export function StatisticsSection() {
         <div className="grid gap-3 md:grid-cols-2 lg:gap-4 xl:grid-cols-3">
           {statGroups.map((group) => (
             <section
-              key={group.title}
+              key={group.titleKey}
               className="rounded-xl border border-[var(--beagle-border)] bg-white px-4 py-3.5 shadow-sm"
-              aria-label={group.title}
+              aria-label={t(group.titleKey)}
             >
               <h3 className="text-base font-semibold text-[var(--beagle-ink)]">
-                {group.title}
+                {t(group.titleKey)}
               </h3>
               <ul className="mt-2.5 space-y-2.5">
                 {group.rows.map((row) => (
                   <li
-                    key={row.label}
+                    key={row.labelKey}
                     className="grid grid-cols-[1fr_auto] items-center gap-3 border-b border-[var(--beagle-border)] pb-2 last:border-b-0 last:pb-0"
                   >
                     <span className="text-sm leading-5 text-[var(--beagle-muted)]">
-                      {row.label}
+                      {t(row.labelKey)}
                     </span>
                     <span className="rounded-md bg-[var(--beagle-accent-soft)] px-2 py-0.5 text-xs font-semibold text-[var(--beagle-ink)]">
-                      {row.value}
+                      {t(row.valueKey)}
                     </span>
                   </li>
                 ))}
