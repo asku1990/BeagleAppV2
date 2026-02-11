@@ -33,6 +33,7 @@ const fi = {
   "home.stats.row.performedByDogs": "Suorittaneita koiria",
   "home.stats.row.totalShowEntries": "Näyttelystartteja yhteensä",
   "common.dataPending": "Tieto tulossa",
+  "common.dataUnavailable": "Tieto ei saatavilla",
 } as const;
 
 export type MessageKey = keyof typeof fi;
@@ -71,6 +72,7 @@ const sv: Messages = {
   "home.stats.row.performedByDogs": "Utförda av hundar",
   "home.stats.row.totalShowEntries": "Totalt antal utställningsstarter",
   "common.dataPending": "Data kommer",
+  "common.dataUnavailable": "Data ej tillgänglig",
 };
 
 const en: Messages = {
@@ -106,6 +108,7 @@ const en: Messages = {
   "home.stats.row.performedByDogs": "Performed by dogs",
   "home.stats.row.totalShowEntries": "Total show entries",
   "common.dataPending": "Data pending",
+  "common.dataUnavailable": "Data unavailable",
 };
 
 export const messages: Record<Locale, Messages> = {

@@ -23,3 +23,6 @@ test-results
 .DS_Store
 
 *.tsbuildinfo
+
+# Next.js generated environment typings (per app)
+apps/*/next-env.d.ts
