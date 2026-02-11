@@ -2,10 +2,19 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useI18n, type MessageKey } from "@/lib/i18n";
+import { useHomeStatisticsQuery } from "@/queries/home/use-home-statistics-query";
 
 type StatRow = {
   labelKey: MessageKey;
-  valueKey: MessageKey;
+  valueId:
+    | "registeredDogs"
+    | "youngestRegistered"
+    | "trialResultsPeriod"
+    | "totalTrialEntries"
+    | "trialPerformedByDogs"
+    | "showResultsPeriod"
+    | "totalShowEntries"
+    | "showPerformedByDogs";
 };
 
 type StatGroup = {
@@ -19,11 +28,11 @@ const statGroups: StatGroup[] = [
     rows: [
       {
         labelKey: "home.stats.row.registeredDogs",
-        valueKey: "common.dataPending",
+        valueId: "registeredDogs",
       },
       {
         labelKey: "home.stats.row.youngestRegistered",
-        valueKey: "common.dataPending",
+        valueId: "youngestRegistered",
       },
     ],
   },
@@ -32,15 +41,15 @@ const statGroups: StatGroup[] = [
     rows: [
       {
         labelKey: "home.stats.row.resultsPeriod",
-        valueKey: "common.dataPending",
+        valueId: "trialResultsPeriod",
       },
       {
         labelKey: "home.stats.row.totalTrialEntries",
-        valueKey: "common.dataPending",
+        valueId: "totalTrialEntries",
       },
       {
         labelKey: "home.stats.row.performedByDogs",
-        valueKey: "common.dataPending",
+        valueId: "trialPerformedByDogs",
       },
     ],
   },
@@ -49,22 +58,79 @@ const statGroups: StatGroup[] = [
     rows: [
       {
         labelKey: "home.stats.row.resultsPeriod",
-        valueKey: "common.dataPending",
+        valueId: "showResultsPeriod",
       },
       {
         labelKey: "home.stats.row.totalShowEntries",
-        valueKey: "common.dataPending",
+        valueId: "totalShowEntries",
       },
       {
         labelKey: "home.stats.row.performedByDogs",
-        valueKey: "common.dataPending",
+        valueId: "showPerformedByDogs",
       },
     ],
   },
 ];
 
 export function StatisticsSection() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const { data, isLoading, isError } = useHomeStatisticsQuery();
+
+  const localeTag =
+    locale === "fi" ? "fi-FI" : locale === "sv" ? "sv-SE" : "en-US";
+  const numberFormat = new Intl.NumberFormat(localeTag);
+  const dateFormat = new Intl.DateTimeFormat(localeTag);
+  const fallbackText = isError
+    ? t("common.dataUnavailable")
+    : t("common.dataPending");
+
+  const formatNumber = (value: number | null): string =>
+    value == null ? fallbackText : numberFormat.format(value);
+
+  const formatDate = (value: string | null): string => {
+    if (!value) return fallbackText;
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return fallbackText;
+    return dateFormat.format(parsed);
+  };
+
+  const formatPeriod = (start: string | null, end: string | null): string => {
+    if (!start || !end) return fallbackText;
+    return `${formatDate(start)} - ${formatDate(end)}`;
+  };
+
+  const valueMap: Record<StatRow["valueId"], string> = {
+    registeredDogs: isLoading
+      ? t("common.dataPending")
+      : formatNumber(data?.registrations.registeredDogs ?? null),
+    youngestRegistered: isLoading
+      ? t("common.dataPending")
+      : formatDate(data?.registrations.youngestRegisteredBirthDate ?? null),
+    trialResultsPeriod: isLoading
+      ? t("common.dataPending")
+      : formatPeriod(
+          data?.trials.resultsPeriodStart ?? null,
+          data?.trials.resultsPeriodEnd ?? null,
+        ),
+    totalTrialEntries: isLoading
+      ? t("common.dataPending")
+      : formatNumber(data?.trials.totalEntries ?? null),
+    trialPerformedByDogs: isLoading
+      ? t("common.dataPending")
+      : formatNumber(data?.trials.performedByDogs ?? null),
+    showResultsPeriod: isLoading
+      ? t("common.dataPending")
+      : formatPeriod(
+          data?.shows.resultsPeriodStart ?? null,
+          data?.shows.resultsPeriodEnd ?? null,
+        ),
+    totalShowEntries: isLoading
+      ? t("common.dataPending")
+      : formatNumber(data?.shows.totalEntries ?? null),
+    showPerformedByDogs: isLoading
+      ? t("common.dataPending")
+      : formatNumber(data?.shows.performedByDogs ?? null),
+  };
 
   return (
     <Card className="beagle-panel gap-0 overflow-hidden py-0">
@@ -95,7 +161,7 @@ export function StatisticsSection() {
                       {t(row.labelKey)}
                     </span>
                     <span className="rounded-md bg-[var(--beagle-accent-soft)] px-2 py-0.5 text-xs font-semibold text-[var(--beagle-ink)]">
-                      {t(row.valueKey)}
+                      {valueMap[row.valueId]}
                     </span>
                   </li>
                 ))}

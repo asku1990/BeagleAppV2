@@ -43,3 +43,8 @@ export {
   type LegacySamakoiraRow,
   type LegacyPhase1Rows,
 } from "./legacy/source";
+
+export {
+  getHomeStatisticsSnapshot,
+  type HomeStatisticsSnapshot,
+} from "./stats";
