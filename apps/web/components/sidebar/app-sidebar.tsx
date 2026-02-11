@@ -1,15 +1,15 @@
 "use client";
 
 import {
-  Activity,
   Award,
   Dog,
   FileSearch,
   Flag,
+  Link2,
   LogIn,
   PawPrint,
   Search,
-  Shield,
+  Trophy,
   Users,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -41,8 +41,8 @@ const publicNavItems: NavItem[] = [
   { labelKey: "sidebar.nav.shows", icon: Award },
   { labelKey: "sidebar.nav.ekDogs", icon: Dog },
   { labelKey: "sidebar.nav.kennelNames", icon: PawPrint },
-  { labelKey: "sidebar.nav.virtualPairing", icon: Activity },
-  { labelKey: "sidebar.nav.bestDriver", icon: Shield },
+  { labelKey: "sidebar.nav.virtualPairing", icon: Link2 },
+  { labelKey: "sidebar.nav.bestDriver", icon: Trophy },
 ];
 
 export function AppSidebar() {
@@ -55,7 +55,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" variant="sidebar">
       <SidebarHeader className="border-b border-[var(--beagle-border)]">
-        <div className="flex min-h-12 items-center px-2">
+        <div className="flex min-h-12 items-center px-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
           <div className="group-data-[collapsible=icon]:hidden">
             <p className="beagle-title text-lg">{t("sidebar.title")}</p>
           </div>
@@ -87,10 +87,10 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="mt-auto border-t border-[var(--beagle-border)]">
+      <SidebarFooter className="mt-auto border-t border-[var(--beagle-border)] group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0">
         <Button
           variant="ghost"
-          className="justify-start gap-2 text-[var(--beagle-ink)] group-data-[collapsible=icon]:justify-center"
+          className="justify-start gap-2 text-[var(--beagle-ink)] group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
           onClick={() => handleComingSoon(t("sidebar.signIn"))}
         >
           <LogIn className="size-4" />

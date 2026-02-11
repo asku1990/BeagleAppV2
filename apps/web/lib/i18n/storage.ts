@@ -1,6 +1,11 @@
-import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n/types";
+import {
+  DEFAULT_LOCALE,
+  isLocale,
+  LOCALE_COOKIE_NAME,
+  type Locale,
+} from "@/lib/i18n/types";
 
-const STORAGE_KEY = "beagle.locale";
+const STORAGE_KEY = LOCALE_COOKIE_NAME;
 
 export function readStoredLocale(): Locale {
   if (typeof window === "undefined") {
@@ -21,4 +26,5 @@ export function writeStoredLocale(locale: Locale): void {
   }
 
   window.localStorage.setItem(STORAGE_KEY, locale);
+  document.cookie = `${LOCALE_COOKIE_NAME}=${locale}; path=/; max-age=31536000; samesite=lax`;
 }

@@ -4,6 +4,7 @@ import {
   createContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -19,10 +20,40 @@ type I18nContextValue = {
 
 export const I18nContext = createContext<I18nContextValue | null>(null);
 
-export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useState<Locale>(() => readStoredLocale());
+export function I18nProvider({
+  children,
+  initialLocale,
+}: {
+  children: ReactNode;
+  initialLocale?: Locale;
+}) {
+  const [locale, setLocale] = useState<Locale>(initialLocale ?? DEFAULT_LOCALE);
+  const isLocaleResolved = useRef(Boolean(initialLocale));
 
   useEffect(() => {
+    if (initialLocale) {
+      return;
+    }
+
+    const storedLocale = readStoredLocale();
+    if (storedLocale === DEFAULT_LOCALE) {
+      isLocaleResolved.current = true;
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      isLocaleResolved.current = true;
+      setLocale(storedLocale);
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [initialLocale]);
+
+  useEffect(() => {
+    if (!isLocaleResolved.current) {
+      return;
+    }
+
     writeStoredLocale(locale);
     document.documentElement.lang = locale;
   }, [locale]);
