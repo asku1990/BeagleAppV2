@@ -12,7 +12,6 @@ Agent behavior/instructions should live in `AGENTS.md`; that file can reference 
 - `packages/db`: Prisma/MariaDB persistence and DB adapters.
 - `packages/contracts`: request/response DTOs and shared API result types.
 - `packages/api-client`: typed frontend API client.
-- `packages/ui`: shared presentational components.
 
 ## Domain boundaries
 
@@ -31,7 +30,7 @@ When adding features, place shared domain concepts in `packages/domain`, busines
 
 Allowed direction:
 
-1. `apps/web` -> `packages/api-client`, `packages/contracts`, `packages/ui`
+1. `apps/web` -> `packages/api-client`, `packages/contracts`
 2. `apps/api` -> `packages/server`, `packages/contracts`
 3. `packages/server` -> `packages/domain`, `packages/db`, `packages/auth`, `packages/contracts`
 4. `packages/db` -> Prisma + DB adapters only (no server/business logic)
@@ -51,6 +50,12 @@ Not allowed:
 - Keep related folder-level `index.ts` files that re-export the public surface.
 - Import from module `index.ts` entrypoints when crossing package/module boundaries.
 - Keep internals private: do not re-export helper files that are only for local use inside a module.
+
+## Test organization rules
+
+- Co-locate unit/integration tests in `__tests__/` folders near the module/feature they verify.
+- Keep global end-to-end tests in root `tests/e2e/`.
+- For `apps/web`, keep Playwright configuration in `apps/web/playwright.config.ts` with `testDir` targeting root `tests/e2e`.
 
 ## Authorization rule
 
