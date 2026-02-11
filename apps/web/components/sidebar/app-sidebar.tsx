@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
   Activity,
   Award,
@@ -11,7 +10,6 @@ import {
   PawPrint,
   Search,
   Shield,
-  UserCircle2,
   Users,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -47,9 +45,6 @@ const publicNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
-  const isAdmin = false;
-  const isAuthed = false;
-
   const handleComingSoon = (item: string) => {
     toast(`${item}: not implemented yet`);
   };
@@ -59,8 +54,7 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-[var(--beagle-border)]">
         <div className="flex min-h-12 items-center px-2">
           <div className="group-data-[collapsible=icon]:hidden">
-            <p className="beagle-title text-lg">Main Menu</p>
-            <p className="beagle-subtitle">Beagle Database</p>
+            <p className="beagle-title text-lg">SBJ Database</p>
           </div>
           <p className="hidden text-sm font-semibold text-[var(--beagle-ink)] group-data-[collapsible=icon]:block">
             SB
@@ -88,49 +82,17 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        {isAdmin ? (
-          <SidebarGroup>
-            <SidebarGroupLabel>Admin</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton tooltip="Admin Panel">
-                    <Shield className="size-4" />
-                    <span>Admin Panel</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ) : null}
       </SidebarContent>
 
       <SidebarFooter className="mt-auto border-t border-[var(--beagle-border)]">
-        {isAuthed ? (
-          <div className="flex items-center gap-2 px-2 py-1">
-            <UserCircle2 className="size-5 text-[var(--beagle-ink)]" />
-            <div className="group-data-[collapsible=icon]:hidden">
-              <p className="text-sm font-medium text-[var(--beagle-ink)]">
-                User
-              </p>
-              <p className="text-xs text-[var(--beagle-muted)]">Account</p>
-            </div>
-          </div>
-        ) : (
-          <Button
-            asChild
-            variant="ghost"
-            className="justify-start gap-2 text-[var(--beagle-ink)] group-data-[collapsible=icon]:justify-center"
-          >
-            <Link href="/login">
-              <LogIn className="size-4" />
-              <span className="group-data-[collapsible=icon]:hidden">
-                Sign in
-              </span>
-            </Link>
-          </Button>
-        )}
+        <Button
+          variant="ghost"
+          className="justify-start gap-2 text-[var(--beagle-ink)] group-data-[collapsible=icon]:justify-center"
+          onClick={() => handleComingSoon("Sign in")}
+        >
+          <LogIn className="size-4" />
+          <span className="group-data-[collapsible=icon]:hidden">Sign in</span>
+        </Button>
       </SidebarFooter>
     </Sidebar>
   );
