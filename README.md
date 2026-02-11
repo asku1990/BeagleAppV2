@@ -1,36 +1,218 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Beagle App v2
 
-## Getting Started
+Monorepo for a public Beagle database app with auth, admin-ready routing, and a separated backend transport layer.
 
-First, run the development server:
+## Architecture
+
+- `apps/web`: main Next.js frontend (public pages, auth pages, admin route group).
+- `apps/api`: Next.js backend HTTP layer (routes, cookies, CORS).
+- `packages/server`: backend use-case services (auth + authorization helpers).
+- `packages/db`: Prisma + MariaDB access.
+- `packages/contracts`: shared API request/response types.
+- `packages/api-client`: typed HTTP client used by frontend hooks.
+
+Current access model:
+
+- Public reads are allowed.
+- Admin area is guarded in `apps/web/app/(admin)`.
+- Import write flow is not implemented yet.
+
+## Requirements
+
+- Node.js 20+
+- pnpm 10+
+- MariaDB (local or remote)
+
+## Environment setup
+
+1. Copy env file:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Update `.env` values:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `DATABASE_URL`: MariaDB connection string.
+- `AUTH_SECRET`: strong random secret.
+- `NEXT_PUBLIC_API_URL`: API base URL for web app, default `http://localhost:3001`.
+- `CORS_ORIGIN`: web origin allowed by API, default `http://localhost:3000`.
+- `LEGACY_DATABASE_URL`: MariaDB connection string to legacy Beagle DB for phase-1 imports.
+- `SEED_TEST_USER_EMAIL`: required when running `pnpm db:seed:basic-user`.
+- `SEED_TEST_USER_PASSWORD`: required when running `pnpm db:seed:basic-user`.
+- `SEED_TEST_USER_ROLE`: required when running `pnpm db:seed:basic-user` (`USER` or `ADMIN`).
+- `SEED_TEST_USER_USERNAME`: optional username for `pnpm db:seed:basic-user`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Example values are already in `.env.example`.
 
-## Learn More
+## Install dependencies
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Database setup
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Generate Prisma client:
 
-## Deploy on Vercel
+```bash
+pnpm db:generate
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Initialize schema (dev):
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm db:push
+```
+
+Or create migrations in dev:
+
+```bash
+pnpm db:migrate:dev -- --name init
+```
+
+Open Prisma Studio:
+
+```bash
+pnpm db:studio
+```
+
+## Run the app
+
+Run all workspace dev processes:
+
+```bash
+pnpm dev
+```
+
+Default ports:
+
+- Web: `http://localhost:3000`
+- API: `http://localhost:3001`
+
+Run apps separately:
+
+```bash
+pnpm --filter @beagle/api dev
+pnpm --filter @beagle/web dev
+```
+
+## Quality checks
+
+```bash
+pnpm typecheck
+pnpm lint
+pnpm test
+pnpm build
+```
+
+Useful targeted checks:
+
+```bash
+pnpm --filter @beagle/web test:unit
+pnpm --filter @beagle/server test:unit
+pnpm --filter @beagle/web test:e2e
+```
+
+## Test layout conventions
+
+- Co-locate package/app unit or integration tests in `__tests__/` near the feature/module.
+- Keep global Playwright e2e specs in the repo root `tests/e2e/`.
+- Web Playwright config is in `apps/web/playwright.config.ts` and points to root `tests/e2e`.
+
+## Auth and admin notes
+
+- Register endpoint creates users with `USER` role by default.
+- Admin pages require `ADMIN` role.
+- To test admin pages locally now, promote a user role to `ADMIN` in the database.
+
+## Current API status
+
+- Auth endpoints implemented:
+  - `POST /api/auth/register`
+  - `POST /api/auth/login`
+  - `GET /api/auth/me`
+  - `POST /api/auth/logout`
+- Import placeholder endpoint (temporary):
+  - `GET /api/import/example` returns status text
+  - `POST /api/import/example` returns `501 Not Implemented`
+- New v1 admin import endpoints:
+  - `GET /api/v1/imports/:id`
+
+## Import basics
+
+1. Run migration:
+
+```bash
+pnpm db:generate
+pnpm db:migrate:dev -- --name add_phase1_dog_search_stats_schema
+```
+
+2. Run phase-1 import script:
+
+```bash
+pnpm import:phase1
+```
+
+Optional: provide a user id to record who triggered the import run:
+
+```bash
+pnpm import:phase1 <USER_ID>
+```
+
+3. Inspect warning/error details from script output:
+
+- During run, script prints grouped issue stats and samples.
+- For full issue listing by run id:
+
+```bash
+pnpm import:issues <RUN_ID>
+```
+
+Optional filters:
+
+```bash
+pnpm import:issues <RUN_ID> --stage owners
+pnpm import:issues <RUN_ID> --code OWNER_DOG_NOT_FOUND
+pnpm import:issues <RUN_ID> --severity WARNING
+pnpm import:issues <RUN_ID> --limit 500
+```
+
+4. Check import run status over API (admin auth required):
+
+```bash
+curl -i -c /tmp/beagle.cookies -X POST http://localhost:3001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"<SEED_TEST_USER_EMAIL>","password":"<SEED_TEST_USER_PASSWORD>"}'
+
+curl -i -b /tmp/beagle.cookies \
+  http://localhost:3001/api/v1/imports/<RUN_ID>
+```
+
+Optional deep inspection via API:
+
+```bash
+curl -i -b /tmp/beagle.cookies \
+  "http://localhost:3001/api/v1/imports/<RUN_ID>/issues?limit=200"
+
+curl -i -b /tmp/beagle.cookies \
+  "http://localhost:3001/api/v1/imports/<RUN_ID>/issues?severity=WARNING&limit=200"
+```
+
+For full import behavior (source tables, stage handling, required fields, issue codes, and logging), see `docs/import-phase1.md`.
+
+## Where to add new features
+
+- Add new backend business logic in `packages/server`.
+- Keep `apps/api` routes thin (request/response mapping only).
+- Add shared payload types in `packages/contracts`.
+- Add client calls in `packages/api-client`.
+- Consume from UI using React Query hooks in `apps/web/queries`.
+
+## Architecture docs
+
+- `ARCHITECTURE.md`: monorepo boundaries, dependency rules, and scaling path.
+- `docs/api-versioning.md`: API path versioning policy (`/api/v1/...`).
+- `docs/roles-and-permissions.md`: baseline role and authorization rules.
+- `docs/migration-plan-v1-to-v2.md`: staged migration approach from legacy app.
+- `docs/import-phase1.md`: phase-1 import flow, data handling, and issue logging behavior.

@@ -1,0 +1,15 @@
+{
+  "extends": "../../packages/config-typescript/base.json",
+  "compilerOptions": {
+    "plugins": [{ "name": "next" }],
+    "jsx": "preserve",
+    "incremental": true,
+    "paths": {
+      "@/*": ["./*"],
+      "@beagle/api-client": ["../../packages/api-client/index.ts"],
+      "@beagle/contracts": ["../../packages/contracts/index.ts"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.mts"],
+  "exclude": ["node_modules"]
+}
