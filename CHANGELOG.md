@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- Redesign web main page shell with legacy-inspired menu layout, top-right login action, and disabled "coming soon" menu items.
+- Add legacy Beagle logo accent and subtle logo watermark background to the new homepage shell.
+
 - Refactor architecture toward layered backend and shared contracts/client.
 - Add `@beagle/server`, `@beagle/contracts`, and `@beagle/api-client` packages.
 - Move auth route orchestration to `@beagle/server` services.

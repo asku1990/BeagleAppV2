@@ -1,2 +1,4 @@
 #!/usr/bin/env sh
+pnpm exec node scripts/normalize-next-env-routes.mjs
+git add apps/web/next-env.d.ts apps/api/next-env.d.ts
 pnpm lint-staged
