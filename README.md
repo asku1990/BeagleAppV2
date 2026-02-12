@@ -125,6 +125,8 @@ pnpm --filter @beagle/web test:e2e
 - Register endpoint creates users with `USER` role by default.
 - Admin pages require `ADMIN` role.
 - To test admin pages locally now, promote a user role to `ADMIN` in the database.
+- Login sets `beagle_session` as an `HttpOnly` cookie (`SameSite=Lax`, `Path=/`, `Secure` in production).
+- Logout always clears `beagle_session`; `me` and `logout` return `401` when session is missing/invalid.
 
 ## Current API status
 
@@ -133,11 +135,11 @@ pnpm --filter @beagle/web test:e2e
   - `POST /api/auth/login`
   - `GET /api/auth/me`
   - `POST /api/auth/logout`
-- Import placeholder endpoint (temporary):
-  - `GET /api/import/example` returns status text
-  - `POST /api/import/example` returns `501 Not Implemented`
-- New v1 admin import endpoints:
+- v1 import endpoints implemented:
   - `GET /api/v1/imports/:id`
+  - `GET /api/v1/imports/:id/issues`
+- v1 public endpoint implemented:
+  - `GET /api/v1/home/statistics`
 
 ## Import basics
 
