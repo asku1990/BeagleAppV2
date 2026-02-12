@@ -71,7 +71,8 @@ describe("useHomeStatisticsQuery", () => {
     });
 
     useQueryMock.mockImplementation((options) => options);
-    const options = useHomeStatisticsQuery() as {
+    useHomeStatisticsQuery();
+    const options = useQueryMock.mock.calls[0]?.[0] as {
       queryFn: () => Promise<unknown>;
     };
 
@@ -86,7 +87,8 @@ describe("useHomeStatisticsQuery", () => {
     });
 
     useQueryMock.mockImplementation((options) => options);
-    const options = useHomeStatisticsQuery() as {
+    useHomeStatisticsQuery();
+    const options = useQueryMock.mock.calls[0]?.[0] as {
       queryFn: () => Promise<unknown>;
     };
 
