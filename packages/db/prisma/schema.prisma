@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
 }
 
 enum Role {
@@ -227,7 +227,7 @@ model ImportRunIssue {
   registrationNo String?
   sourceRowId    Int?
   sourceTable    String?
-  payloadJson    String?             @db.LongText
+  payloadJson    String?             @db.Text
   importRun      ImportRun           @relation(fields: [importRunId], references: [id], onDelete: Cascade)
   createdAt      DateTime            @default(now())
 
