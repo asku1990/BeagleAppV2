@@ -1,6 +1,6 @@
 import { authService } from "@beagle/server";
 import type { LoginRequest } from "@beagle/contracts";
-import { jsonResponse, optionsResponse } from "@/lib/cors";
+import { jsonResponse, optionsResponse } from "@/lib/server/cors";
 
 // Access policy: public route.
 export async function OPTIONS(request: Request) {

@@ -75,15 +75,13 @@ const statGroups: StatGroup[] = [
 
 export function StatisticsSection() {
   const { t, locale } = useI18n();
-  const { data, isLoading, isError } = useHomeStatisticsQuery();
+  const { data, isLoading } = useHomeStatisticsQuery();
   const isInitialLoading = isLoading && !data;
 
   const localeTag = locale === "fi" ? "fi-FI" : "sv-SE";
   const numberFormat = new Intl.NumberFormat(localeTag);
   const dateFormat = new Intl.DateTimeFormat(localeTag);
-  const fallbackText = isError
-    ? t("common.dataUnavailable")
-    : t("common.dataPending");
+  const fallbackText = t("common.noData");
 
   const formatNumber = (value: number | null): string =>
     value == null ? fallbackText : numberFormat.format(value);
@@ -119,16 +117,44 @@ export function StatisticsSection() {
     showPerformedByDogs: formatNumber(data?.shows.performedByDogs ?? null),
   };
 
-  const skeletonWidthMap: Record<StatRow["valueId"], string> = {
-    registeredDogs: "w-12",
-    youngestRegistered: "w-20",
-    trialResultsPeriod: "w-32",
-    totalTrialEntries: "w-12",
-    trialPerformedByDogs: "w-12",
-    showResultsPeriod: "w-32",
-    totalShowEntries: "w-12",
-    showPerformedByDogs: "w-12",
-  };
+  if (isInitialLoading) {
+    return (
+      <Card
+        className="beagle-panel gap-0 overflow-hidden py-0"
+        aria-busy="true"
+      >
+        <CardHeader className="px-5 pt-5 pb-4 md:px-6 md:pt-6 md:pb-4">
+          <Skeleton className="h-7 w-48" aria-hidden="true" />
+        </CardHeader>
+        <CardContent className="px-5 pb-5 md:px-6 md:pb-6">
+          <div className="grid gap-3 md:grid-cols-2 lg:gap-4 xl:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, cardIndex) => (
+              <section
+                key={cardIndex}
+                className="rounded-xl border border-[var(--beagle-border)] bg-white px-4 py-3.5 shadow-sm"
+                aria-hidden="true"
+              >
+                <Skeleton className="h-5 w-28" />
+                <div className="mt-2.5 space-y-2.5">
+                  {Array.from({ length: cardIndex === 0 ? 2 : 3 }).map(
+                    (_, rowIndex) => (
+                      <div
+                        key={rowIndex}
+                        className="grid grid-cols-[1fr_auto] items-center gap-3 border-b border-[var(--beagle-border)] pb-2 last:border-b-0 last:pb-0"
+                      >
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-5 w-16 rounded-md" />
+                      </div>
+                    ),
+                  )}
+                </div>
+              </section>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="beagle-panel gap-0 overflow-hidden py-0">
@@ -141,7 +167,7 @@ export function StatisticsSection() {
       <CardContent className="px-5 pb-5 md:px-6 md:pb-6">
         <div
           className="grid gap-3 md:grid-cols-2 lg:gap-4 xl:grid-cols-3"
-          aria-busy={isInitialLoading}
+          aria-busy={false}
         >
           {statGroups.map((group) => (
             <section
@@ -162,14 +188,7 @@ export function StatisticsSection() {
                       {t(row.labelKey)}
                     </span>
                     <span className="rounded-md bg-[var(--beagle-accent-soft)] px-2 py-0.5 text-xs font-semibold text-[var(--beagle-ink)]">
-                      {isInitialLoading ? (
-                        <Skeleton
-                          className={`h-3.5 ${skeletonWidthMap[row.valueId]}`}
-                          aria-hidden="true"
-                        />
-                      ) : (
-                        valueMap[row.valueId]
-                      )}
+                      {valueMap[row.valueId]}
                     </span>
                   </li>
                 ))}

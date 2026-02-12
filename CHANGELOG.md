@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+- Consolidate runtime to one Next.js server:
+  - Move API transport routes from `apps/api/app/api/*` to `apps/web/app/api/*`.
+  - Move API transport helpers to `apps/web/lib/server/*`.
+  - Remove standalone `apps/api` package.
+  - Keep route paths and auth cookie behavior unchanged.
+  - Update root dev workflow to run only `@beagle/web`.
+- Shift home statistics to web Server Action + query hook:
+  - Remove `GET /api/v1/home/statistics` route.
+  - Add `apps/web/app/actions/home/get-home-statistics.ts`.
+  - Keep auth and import status endpoints in `app/api/*`.
+
 - Redesign web main page shell with legacy-inspired menu layout, top-right login action, and disabled "coming soon" menu items.
 - Add legacy Beagle logo accent and subtle logo watermark background to the new homepage shell.
 

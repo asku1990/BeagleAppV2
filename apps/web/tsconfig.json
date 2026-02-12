@@ -7,7 +7,8 @@
     "paths": {
       "@/*": ["./*"],
       "@beagle/api-client": ["../../packages/api-client/index.ts"],
-      "@beagle/contracts": ["../../packages/contracts/index.ts"]
+      "@beagle/contracts": ["../../packages/contracts/index.ts"],
+      "@beagle/server": ["../../packages/server/index.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.mts"],

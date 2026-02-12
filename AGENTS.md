@@ -17,11 +17,11 @@ Agent instructions for working in this repository.
 
 ## Monorepo Boundaries
 
-- `apps/web` can depend on: `packages/api-client`, `packages/contracts`.
-- `apps/api` can depend on: `packages/server`, `packages/contracts`.
+- `apps/web` UI/client code can depend on: `packages/api-client`, `packages/contracts`.
+- `apps/web` API transport code (`app/api/**`, `lib/server/**`) can depend on: `packages/server`, `packages/contracts`.
 - `packages/server` can depend on: `packages/domain`, `packages/db`, `packages/auth`, `packages/contracts`.
 - Do not put business logic in API route handlers.
-- Do not import `packages/server` or `packages/db` into `apps/web`.
+- Do not import `packages/server` or `packages/db` into `apps/web` UI/client code.
 
 ## Utility Code (`lib`)
 

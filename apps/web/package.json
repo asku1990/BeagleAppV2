@@ -17,6 +17,7 @@
   "dependencies": {
     "@beagle/api-client": "workspace:*",
     "@beagle/contracts": "workspace:*",
+    "@beagle/server": "workspace:*",
     "@tanstack/react-query": "^5.85.9",
     "@tanstack/react-query-devtools": "^5.91.3",
     "class-variance-authority": "^0.7.1",

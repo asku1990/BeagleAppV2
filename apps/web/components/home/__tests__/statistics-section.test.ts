@@ -7,20 +7,13 @@ import { StatisticsSection } from "../statistics-section";
 type Locale = "fi" | "sv";
 
 const translations: Record<string, string> = {
-  "common.dataPending": "Data pending",
-  "common.dataUnavailable": "Data unavailable",
+  "common.noData": "No data",
 };
 
 let mockedLocale: Locale = "fi";
-let mockedQueryResult: {
-  data?: HomeStatisticsResponse;
-  isLoading: boolean;
-  isError: boolean;
-} = {
-  data: undefined,
-  isLoading: false,
-  isError: false,
-};
+let mockedQueryData: HomeStatisticsResponse | null = null;
+let mockedQueryIsError = false;
+let mockedQueryIsLoading = false;
 
 vi.mock("@/lib/i18n", () => ({
   useI18n: () => ({
@@ -30,7 +23,11 @@ vi.mock("@/lib/i18n", () => ({
 }));
 
 vi.mock("@/queries/home/use-home-statistics-query", () => ({
-  useHomeStatisticsQuery: () => mockedQueryResult,
+  useHomeStatisticsQuery: () => ({
+    data: mockedQueryData,
+    isError: mockedQueryIsError,
+    isLoading: mockedQueryIsLoading,
+  }),
 }));
 
 function renderSection() {
@@ -60,19 +57,14 @@ const baseData: HomeStatisticsResponse = {
 describe("StatisticsSection", () => {
   beforeEach(() => {
     mockedLocale = "fi";
-    mockedQueryResult = {
-      data: undefined,
-      isLoading: false,
-      isError: false,
-    };
+    mockedQueryData = null;
+    mockedQueryIsError = false;
+    mockedQueryIsLoading = false;
   });
 
-  it("renders loading skeletons during initial loading", () => {
-    mockedQueryResult = {
-      data: undefined,
-      isLoading: true,
-      isError: false,
-    };
+  it("renders full-card skeleton while initial query is loading", () => {
+    mockedQueryData = null;
+    mockedQueryIsLoading = true;
 
     const html = renderSection();
 
@@ -82,12 +74,7 @@ describe("StatisticsSection", () => {
 
   it("renders formatted values for successful fi locale data", () => {
     mockedLocale = "fi";
-    mockedQueryResult = {
-      data: baseData,
-      isLoading: false,
-      isError: false,
-    };
-
+    mockedQueryData = baseData;
     const html = renderSection();
     const fiNumber = new Intl.NumberFormat("fi-FI").format(
       baseData.registrations.registeredDogs,
@@ -98,17 +85,12 @@ describe("StatisticsSection", () => {
 
     expect(html).toContain(fiNumber);
     expect(html).toContain(fiDate);
-    expect(html).not.toContain("Data unavailable");
+    expect(html).not.toContain("No data");
   });
 
   it("renders formatted values for successful sv locale data", () => {
     mockedLocale = "sv";
-    mockedQueryResult = {
-      data: baseData,
-      isLoading: false,
-      isError: false,
-    };
-
+    mockedQueryData = baseData;
     const html = renderSection();
     const svNumber = new Intl.NumberFormat("sv-SE").format(
       baseData.trials.totalEntries,
@@ -121,33 +103,24 @@ describe("StatisticsSection", () => {
     expect(html).toContain(svDate);
   });
 
-  it("renders unavailable fallback when query errors", () => {
-    mockedQueryResult = {
-      data: undefined,
-      isLoading: false,
-      isError: true,
-    };
-
+  it("renders no-data fallback when statistics load fails", () => {
+    mockedQueryData = null;
+    mockedQueryIsError = true;
     const html = renderSection();
 
-    expect(html).toContain("Data unavailable");
+    expect(html).toContain("No data");
   });
 
-  it("renders pending fallback when response fields are missing", () => {
-    mockedQueryResult = {
-      data: {
-        ...baseData,
-        registrations: {
-          ...baseData.registrations,
-          youngestRegisteredBirthDate: null,
-        },
+  it("renders no-data fallback when response fields are missing", () => {
+    mockedQueryData = {
+      ...baseData,
+      registrations: {
+        ...baseData.registrations,
+        youngestRegisteredBirthDate: null,
       },
-      isLoading: false,
-      isError: false,
     };
-
     const html = renderSection();
 
-    expect(html).toContain("Data pending");
+    expect(html).toContain("No data");
   });
 });

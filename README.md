@@ -1,13 +1,12 @@
 # Beagle App v2
 
-Monorepo for a public Beagle database app with auth, admin-ready routing, and a separated backend transport layer.
+Monorepo for a public Beagle database app with auth, admin-ready routing, and a single Next.js server runtime.
 
 ## Architecture
 
-- `apps/web`: main Next.js frontend (public pages, auth pages, admin route group).
-- `apps/api`: Next.js backend HTTP layer (routes, cookies, CORS).
+- `apps/web`: main Next.js app (public pages, auth pages, admin route group, API routes under `app/api/*`, and Server Actions under `app/actions/*`).
 - `packages/server`: backend use-case services (auth + authorization helpers).
-- `packages/db`: Prisma + MariaDB access.
+- `packages/db`: Prisma + PostgreSQL access (legacy import source uses MariaDB).
 - `packages/contracts`: shared API request/response types.
 - `packages/api-client`: typed HTTP client used by frontend hooks.
 
@@ -21,7 +20,8 @@ Current access model:
 
 - Node.js 20+
 - pnpm 10+
-- MariaDB (local or remote)
+- PostgreSQL (local or remote) for app data
+- MariaDB (local or remote) only for phase-1 legacy imports
 
 ## Environment setup
 
@@ -33,10 +33,10 @@ cp .env.example .env
 
 2. Update `.env` values:
 
-- `DATABASE_URL`: MariaDB connection string.
+- `DATABASE_URL`: PostgreSQL connection string.
 - `AUTH_SECRET`: strong random secret.
-- `NEXT_PUBLIC_API_URL`: API base URL for web app, default `http://localhost:3001`.
-- `CORS_ORIGINS`: comma-separated web origins allowed by API, default `http://localhost:3000`.
+- `NEXT_PUBLIC_API_URL`: optional API base URL override for web app clients. Default is same-origin.
+- `CORS_ORIGINS`: optional comma-separated cross-origin allowlist for API responses.
 - `LEGACY_DATABASE_URL`: MariaDB connection string to legacy Beagle DB for phase-1 imports.
 - `SEED_TEST_USER_EMAIL`: required when running `pnpm db:seed:basic-user`.
 - `SEED_TEST_USER_PASSWORD`: required when running `pnpm db:seed:basic-user`.
@@ -79,7 +79,7 @@ pnpm db:studio
 
 ## Run the app
 
-Run all workspace dev processes:
+Run the app:
 
 ```bash
 pnpm dev
@@ -87,13 +87,11 @@ pnpm dev
 
 Default ports:
 
-- Web: `http://localhost:3000`
-- API: `http://localhost:3001`
+- App + API routes: `http://localhost:3000`
 
-Run apps separately:
+Run app directly:
 
 ```bash
-pnpm --filter @beagle/api dev
 pnpm --filter @beagle/web dev
 ```
 
@@ -138,8 +136,7 @@ pnpm --filter @beagle/web test:e2e
 - v1 import endpoints implemented:
   - `GET /api/v1/imports/:id`
   - `GET /api/v1/imports/:id/issues`
-- v1 public endpoint implemented:
-  - `GET /api/v1/home/statistics`
+- Home statistics are now loaded via Server Action + React Query hook in web UI (`app/actions/home/get-home-statistics.ts` + `queries/home/use-home-statistics-query.ts`).
 
 ## Import basics
 
@@ -183,22 +180,22 @@ pnpm import:issues <RUN_ID> --limit 500
 4. Check import run status over API (admin auth required):
 
 ```bash
-curl -i -c /tmp/beagle.cookies -X POST http://localhost:3001/api/auth/login \
+curl -i -c /tmp/beagle.cookies -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"<SEED_TEST_USER_EMAIL>","password":"<SEED_TEST_USER_PASSWORD>"}'
 
 curl -i -b /tmp/beagle.cookies \
-  http://localhost:3001/api/v1/imports/<RUN_ID>
+  http://localhost:3000/api/v1/imports/<RUN_ID>
 ```
 
 Optional deep inspection via API:
 
 ```bash
 curl -i -b /tmp/beagle.cookies \
-  "http://localhost:3001/api/v1/imports/<RUN_ID>/issues?limit=200"
+  "http://localhost:3000/api/v1/imports/<RUN_ID>/issues?limit=200"
 
 curl -i -b /tmp/beagle.cookies \
-  "http://localhost:3001/api/v1/imports/<RUN_ID>/issues?severity=WARNING&limit=200"
+  "http://localhost:3000/api/v1/imports/<RUN_ID>/issues?severity=WARNING&limit=200"
 ```
 
 For full import behavior (source tables, stage handling, required fields, issue codes, and logging), see `docs/import-phase1.md`.
@@ -206,7 +203,8 @@ For full import behavior (source tables, stage handling, required fields, issue 
 ## Where to add new features
 
 - Add new backend business logic in `packages/server`.
-- Keep `apps/api` routes thin (request/response mapping only).
+- Keep `apps/web/app/api` routes thin (request/response mapping only).
+- Use `apps/web/app/actions` for web-only reads/writes that do not need public HTTP transport.
 - Add shared payload types in `packages/contracts`.
 - Add client calls in `packages/api-client`.
 - Consume from UI using React Query hooks in `apps/web/queries`.

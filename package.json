@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "pnpm@10.4.1",
   "scripts": {
-    "dev": "turbo dev",
+    "dev": "pnpm --filter @beagle/web dev",
     "build": "turbo build",
     "lint": "turbo lint",
     "format": "prettier . --write",

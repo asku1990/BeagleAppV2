@@ -9,7 +9,6 @@ import { me } from "./auth/me";
 import { register } from "./auth/register";
 import type { ClientOptions } from "./core/client-options";
 import { createRequest } from "./core/request";
-import { getHomeStatistics } from "./home/get-home-statistics";
 import { getImportRun } from "./imports/get-import-run";
 import { getImportRunIssues } from "./imports/get-import-run-issues";
 
@@ -31,10 +30,6 @@ export function createApiClient(options: ClientOptions = {}) {
 
     logout() {
       return logout(request);
-    },
-
-    getHomeStatistics() {
-      return getHomeStatistics(request);
     },
 
     getImportRun(id: string) {

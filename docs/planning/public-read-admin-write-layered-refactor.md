@@ -1,5 +1,7 @@
 # Public Read + Admin Write Layered Refactor
 
+> Superseded: This plan assumed a separate `apps/api` transport layer. The active architecture now uses a single Next.js runtime with transport routes in `apps/web/app/api/*`.
+
 ## Intent
 
 Refactor backend/frontend boundaries so the app stays public, admin writes are protected, and a second frontend can be added later without rewriting backend logic.
@@ -7,7 +9,7 @@ Refactor backend/frontend boundaries so the app stays public, admin writes are p
 ## Implemented decisions
 
 - Keep one frontend app (`apps/web`) now.
-- Use `apps/api` as transport layer.
+- Use `apps/web/app/api/*` as transport layer.
 - Use shared backend logic in `packages/server`.
 - Use shared API contracts in `packages/contracts`.
 - Use shared typed web client in `packages/api-client`.
@@ -25,4 +27,3 @@ Refactor backend/frontend boundaries so the app stays public, admin writes are p
 - `pnpm --filter @beagle/contracts typecheck`
 - `pnpm --filter @beagle/api-client typecheck`
 - `pnpm --filter @beagle/web typecheck`
-- `pnpm --filter @beagle/api typecheck`

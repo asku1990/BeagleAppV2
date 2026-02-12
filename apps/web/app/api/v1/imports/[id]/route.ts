@@ -1,7 +1,7 @@
 import { importsService } from "@beagle/server";
 import { NextRequest } from "next/server";
-import { requireAdminAccess } from "@/lib/admin-guard";
-import { jsonResponse, optionsResponse } from "@/lib/cors";
+import { requireAdminAccess } from "@/lib/server/admin-guard";
+import { jsonResponse, optionsResponse } from "@/lib/server/cors";
 
 // Access policy: admin-only route.
 export async function OPTIONS(request: NextRequest) {
