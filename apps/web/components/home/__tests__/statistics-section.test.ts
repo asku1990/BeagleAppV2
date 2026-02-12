@@ -54,6 +54,7 @@ const baseData: HomeStatisticsResponse = {
     totalEntries: 980,
     performedByDogs: 250,
   },
+  generatedAt: "2026-02-12T00:00:00.000Z",
 };
 
 describe("StatisticsSection", () => {

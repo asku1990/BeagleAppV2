@@ -12,7 +12,6 @@ import { createRequest } from "./core/request";
 import { getHomeStatistics } from "./home/get-home-statistics";
 import { getImportRun } from "./imports/get-import-run";
 import { getImportRunIssues } from "./imports/get-import-run-issues";
-import { getImportStatus } from "./imports/get-import-status";
 
 export function createApiClient(options: ClientOptions = {}) {
   const request = createRequest(options);
@@ -32,10 +31,6 @@ export function createApiClient(options: ClientOptions = {}) {
 
     logout() {
       return logout(request);
-    },
-
-    getImportStatus() {
-      return getImportStatus(request);
     },
 
     getHomeStatistics() {
