@@ -41,7 +41,10 @@ describe("GET /api/v1/home/statistics", () => {
     });
 
     const { GET } = await import("../route");
-    const response = await GET();
+    const request = new Request("http://localhost/api/v1/home/statistics", {
+      headers: { origin: "http://localhost:3000" },
+    });
+    const response = await GET(request);
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
@@ -69,6 +72,9 @@ describe("GET /api/v1/home/statistics", () => {
     expect(response.headers.get("access-control-allow-methods")).toBe(
       "GET,OPTIONS",
     );
+    expect(response.headers.get("access-control-allow-origin")).toBe(
+      "http://localhost:3000",
+    );
   });
 
   it("passes through service failure responses", async () => {
@@ -81,7 +87,10 @@ describe("GET /api/v1/home/statistics", () => {
     });
 
     const { GET } = await import("../route");
-    const response = await GET();
+    const request = new Request("http://localhost/api/v1/home/statistics", {
+      headers: { origin: "http://localhost:3000" },
+    });
+    const response = await GET(request);
 
     expect(response.status).toBe(500);
     await expect(response.json()).resolves.toEqual({
@@ -92,7 +101,11 @@ describe("GET /api/v1/home/statistics", () => {
 
   it("returns preflight options response", async () => {
     const { OPTIONS } = await import("../route");
-    const response = await OPTIONS();
+    const request = new Request("http://localhost/api/v1/home/statistics", {
+      method: "OPTIONS",
+      headers: { origin: "http://localhost:3000" },
+    });
+    const response = await OPTIONS(request);
 
     expect(response.status).toBe(204);
     expect(response.headers.get("access-control-allow-methods")).toBe(

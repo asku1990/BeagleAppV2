@@ -36,7 +36,7 @@ cp .env.example .env
 - `DATABASE_URL`: MariaDB connection string.
 - `AUTH_SECRET`: strong random secret.
 - `NEXT_PUBLIC_API_URL`: API base URL for web app, default `http://localhost:3001`.
-- `CORS_ORIGIN`: web origin allowed by API, default `http://localhost:3000`.
+- `CORS_ORIGINS`: comma-separated web origins allowed by API, default `http://localhost:3000`.
 - `LEGACY_DATABASE_URL`: MariaDB connection string to legacy Beagle DB for phase-1 imports.
 - `SEED_TEST_USER_EMAIL`: required when running `pnpm db:seed:basic-user`.
 - `SEED_TEST_USER_PASSWORD`: required when running `pnpm db:seed:basic-user`.
