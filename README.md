@@ -4,7 +4,7 @@ Monorepo for a public Beagle database app with auth, admin-ready routing, and a 
 
 ## Architecture
 
-- `apps/web`: main Next.js app (public pages, auth pages, admin route group, and API routes under `app/api/*`).
+- `apps/web`: main Next.js app (public pages, auth pages, admin route group, API routes under `app/api/*`, and Server Actions under `app/actions/*`).
 - `packages/server`: backend use-case services (auth + authorization helpers).
 - `packages/db`: Prisma + MariaDB access.
 - `packages/contracts`: shared API request/response types.
@@ -135,8 +135,7 @@ pnpm --filter @beagle/web test:e2e
 - v1 import endpoints implemented:
   - `GET /api/v1/imports/:id`
   - `GET /api/v1/imports/:id/issues`
-- v1 public endpoint implemented:
-  - `GET /api/v1/home/statistics`
+- Home statistics are now loaded via Server Action + React Query hook in web UI (`app/actions/home/get-home-statistics.ts` + `queries/home/use-home-statistics-query.ts`).
 
 ## Import basics
 
@@ -204,6 +203,7 @@ For full import behavior (source tables, stage handling, required fields, issue 
 
 - Add new backend business logic in `packages/server`.
 - Keep `apps/web/app/api` routes thin (request/response mapping only).
+- Use `apps/web/app/actions` for web-only reads/writes that do not need public HTTP transport.
 - Add shared payload types in `packages/contracts`.
 - Add client calls in `packages/api-client`.
 - Consume from UI using React Query hooks in `apps/web/queries`.

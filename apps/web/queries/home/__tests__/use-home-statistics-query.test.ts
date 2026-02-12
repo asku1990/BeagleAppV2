@@ -2,37 +2,32 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { HomeStatisticsResponse } from "@beagle/contracts";
 import { useHomeStatisticsQuery } from "../use-home-statistics-query";
 
-const { useQueryMock, getHomeStatisticsMock } = vi.hoisted(() => ({
+const { useQueryMock, getHomeStatisticsActionMock } = vi.hoisted(() => ({
   useQueryMock: vi.fn(),
-  getHomeStatisticsMock: vi.fn(),
+  getHomeStatisticsActionMock: vi.fn(),
 }));
 
 vi.mock("@tanstack/react-query", () => ({
   useQuery: useQueryMock,
 }));
 
-vi.mock("@/lib/api-client", () => ({
-  apiClient: {
-    getHomeStatistics: getHomeStatisticsMock,
-  },
+vi.mock("@/app/actions/home/get-home-statistics", () => ({
+  getHomeStatisticsAction: getHomeStatisticsActionMock,
 }));
 
 describe("useHomeStatisticsQuery", () => {
   beforeEach(() => {
     useQueryMock.mockReset();
-    getHomeStatisticsMock.mockReset();
+    getHomeStatisticsActionMock.mockReset();
   });
 
-  it("configures react-query with expected cache and refresh options", () => {
+  it("configures react-query with expected options", () => {
     useQueryMock.mockReturnValue({
       data: undefined,
-      isLoading: false,
       isError: false,
     });
-
     useHomeStatisticsQuery();
 
-    expect(useQueryMock).toHaveBeenCalledTimes(1);
     expect(useQueryMock).toHaveBeenCalledWith(
       expect.objectContaining({
         queryKey: ["home-statistics"],
@@ -44,54 +39,51 @@ describe("useHomeStatisticsQuery", () => {
     );
   });
 
-  it("returns API data from queryFn when request succeeds", async () => {
+  it("queryFn returns data when action succeeds", async () => {
     const data: HomeStatisticsResponse = {
       registrations: {
-        registeredDogs: 99,
+        registeredDogs: 10,
         youngestRegisteredBirthDate: null,
       },
       trials: {
         resultsPeriodStart: null,
         resultsPeriodEnd: null,
-        totalEntries: 100,
-        performedByDogs: 90,
+        totalEntries: 20,
+        performedByDogs: 7,
       },
       shows: {
         resultsPeriodStart: null,
         resultsPeriodEnd: null,
-        totalEntries: 80,
-        performedByDogs: 70,
+        totalEntries: 12,
+        performedByDogs: 5,
       },
       generatedAt: "2026-02-12T00:00:00.000Z",
     };
-
-    getHomeStatisticsMock.mockResolvedValue({
-      ok: true,
-      data,
-    });
-
+    getHomeStatisticsActionMock.mockResolvedValue({ data, hasError: false });
     useQueryMock.mockImplementation((options) => options);
+
     useHomeStatisticsQuery();
     const options = useQueryMock.mock.calls[0]?.[0] as {
       queryFn: () => Promise<unknown>;
     };
 
     await expect(options.queryFn()).resolves.toEqual(data);
-    expect(getHomeStatisticsMock).toHaveBeenCalledTimes(1);
   });
 
-  it("throws API error text from queryFn when response is not ok", async () => {
-    getHomeStatisticsMock.mockResolvedValue({
-      ok: false,
-      error: "backend unavailable",
+  it("queryFn throws when action fails", async () => {
+    getHomeStatisticsActionMock.mockResolvedValue({
+      data: null,
+      hasError: true,
     });
-
     useQueryMock.mockImplementation((options) => options);
+
     useHomeStatisticsQuery();
     const options = useQueryMock.mock.calls[0]?.[0] as {
       queryFn: () => Promise<unknown>;
     };
 
-    await expect(options.queryFn()).rejects.toThrow("backend unavailable");
+    await expect(options.queryFn()).rejects.toThrow(
+      "Failed to refresh home statistics.",
+    );
   });
 });

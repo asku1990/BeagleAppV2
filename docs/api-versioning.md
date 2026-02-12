@@ -10,9 +10,10 @@ All new API routes should be created under:
 
 Examples:
 
-- `GET /api/v1/home/statistics`
 - `GET /api/v1/imports/:id`
 - `GET /api/v1/imports/:id/issues`
+
+Web-only interactions may use Server Actions in `apps/web/app/actions/*` instead of API routes.
 
 ## Why
 

@@ -7,7 +7,7 @@ const serverImportRestriction = [
       {
         name: "@beagle/server",
         message:
-          "Use @beagle/server only inside apps/web app/api/** or lib/server/**.",
+          "Use @beagle/server only inside apps/web app/api/**, app/actions/**, or lib/server/**.",
       },
       {
         name: "@beagle/db",
@@ -32,13 +32,20 @@ const dbImportRestriction = [
 const webConfig = [
   ...config,
   {
+    ignores: ["coverage/**"],
+  },
+  {
     files: ["**/*.{ts,tsx,mts}"],
     rules: {
       "no-restricted-imports": serverImportRestriction,
     },
   },
   {
-    files: ["app/api/**/*.{ts,tsx,mts}", "lib/server/**/*.{ts,tsx,mts}"],
+    files: [
+      "app/api/**/*.{ts,tsx,mts}",
+      "app/actions/**/*.{ts,tsx,mts}",
+      "lib/server/**/*.{ts,tsx,mts}",
+    ],
     rules: {
       "no-restricted-imports": dbImportRestriction,
     },

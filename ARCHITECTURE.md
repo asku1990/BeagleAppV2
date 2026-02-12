@@ -5,7 +5,7 @@ Agent behavior/instructions should live in `AGENTS.md`; that file can reference 
 
 ## Monorepo layout
 
-- `apps/web`: Next.js app containing UI route groups and HTTP transport routes under `app/api/*`.
+- `apps/web`: Next.js app containing UI route groups, HTTP transport routes under `app/api/*`, and Server Actions under `app/actions/*`.
 - `packages/server`: backend use cases and authorization rules.
 - `packages/domain`: domain models/value objects that are framework-agnostic.
 - `packages/db`: Prisma/MariaDB persistence and DB adapters.
@@ -23,7 +23,7 @@ Domain modules should remain explicit and isolated as they grow:
 - `admin`
 - `forum`
 
-When adding features, place shared domain concepts in `packages/domain`, business rules in `packages/server`, then expose through `apps/web/app/api/*`, then consume via `packages/api-client` in UIs.
+When adding features, place shared domain concepts in `packages/domain`, business rules in `packages/server`, then expose through `apps/web/app/api/*` for public/compat HTTP needs or `apps/web/app/actions/*` for web-only transport, then consume in UIs.
 
 ## Dependency rules
 
@@ -31,8 +31,9 @@ Allowed direction:
 
 1. `apps/web` UI/client code -> `packages/api-client`, `packages/contracts`
 2. `apps/web` API transport code (`app/api/**`, `lib/server/**`) -> `packages/server`, `packages/contracts`
-3. `packages/server` -> `packages/domain`, `packages/db`, `packages/auth`, `packages/contracts`
-4. `packages/db` -> Prisma + DB adapters only (no server/business logic)
+3. `apps/web` Server Actions (`app/actions/**`) -> `packages/server`, `packages/contracts`
+4. `packages/server` -> `packages/domain`, `packages/db`, `packages/auth`, `packages/contracts`
+5. `packages/db` -> Prisma + DB adapters only (no server/business logic)
 
 Not allowed:
 
