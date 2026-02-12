@@ -78,8 +78,7 @@ export function StatisticsSection() {
   const { data, isLoading, isError } = useHomeStatisticsQuery();
   const isInitialLoading = isLoading && !data;
 
-  const localeTag =
-    locale === "fi" ? "fi-FI" : locale === "sv" ? "sv-SE" : "en-US";
+  const localeTag = locale === "fi" ? "fi-FI" : "sv-SE";
   const numberFormat = new Intl.NumberFormat(localeTag);
   const dateFormat = new Intl.DateTimeFormat(localeTag);
   const fallbackText = isError
