@@ -9,18 +9,10 @@ export default defineConfig({
     video: "retain-on-failure",
     screenshot: "only-on-failure",
   },
-  webServer: [
-    {
-      command: "pnpm --dir ../api dev",
-      url: "http://localhost:3001",
-      reuseExistingServer: !process.env.CI,
-      timeout: 120000,
-    },
-    {
-      command: "pnpm dev",
-      url: "http://localhost:3000",
-      reuseExistingServer: !process.env.CI,
-      timeout: 120000,
-    },
-  ],
+  webServer: {
+    command: "pnpm dev",
+    url: "http://localhost:3000",
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
+  },
 });

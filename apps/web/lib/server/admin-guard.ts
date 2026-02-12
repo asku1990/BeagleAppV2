@@ -1,6 +1,6 @@
 import { authService, requireAdmin } from "@beagle/server";
 import { type NextRequest } from "next/server";
-import { jsonResponse } from "@/lib/cors";
+import { jsonResponse } from "@/lib/server/cors";
 
 type AdminAccessResult = { ok: true } | { ok: false; response: Response };
 

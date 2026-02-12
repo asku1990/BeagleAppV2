@@ -1,11 +1,10 @@
 # Beagle App v2
 
-Monorepo for a public Beagle database app with auth, admin-ready routing, and a separated backend transport layer.
+Monorepo for a public Beagle database app with auth, admin-ready routing, and a single Next.js server runtime.
 
 ## Architecture
 
-- `apps/web`: main Next.js frontend (public pages, auth pages, admin route group).
-- `apps/api`: Next.js backend HTTP layer (routes, cookies, CORS).
+- `apps/web`: main Next.js app (public pages, auth pages, admin route group, and API routes under `app/api/*`).
 - `packages/server`: backend use-case services (auth + authorization helpers).
 - `packages/db`: Prisma + MariaDB access.
 - `packages/contracts`: shared API request/response types.
@@ -35,8 +34,8 @@ cp .env.example .env
 
 - `DATABASE_URL`: MariaDB connection string.
 - `AUTH_SECRET`: strong random secret.
-- `NEXT_PUBLIC_API_URL`: API base URL for web app, default `http://localhost:3001`.
-- `CORS_ORIGINS`: comma-separated web origins allowed by API, default `http://localhost:3000`.
+- `NEXT_PUBLIC_API_URL`: optional API base URL override for web app clients. Default is same-origin.
+- `CORS_ORIGINS`: optional comma-separated cross-origin allowlist for API responses.
 - `LEGACY_DATABASE_URL`: MariaDB connection string to legacy Beagle DB for phase-1 imports.
 - `SEED_TEST_USER_EMAIL`: required when running `pnpm db:seed:basic-user`.
 - `SEED_TEST_USER_PASSWORD`: required when running `pnpm db:seed:basic-user`.
@@ -79,7 +78,7 @@ pnpm db:studio
 
 ## Run the app
 
-Run all workspace dev processes:
+Run the app:
 
 ```bash
 pnpm dev
@@ -87,13 +86,11 @@ pnpm dev
 
 Default ports:
 
-- Web: `http://localhost:3000`
-- API: `http://localhost:3001`
+- App + API routes: `http://localhost:3000`
 
-Run apps separately:
+Run app directly:
 
 ```bash
-pnpm --filter @beagle/api dev
 pnpm --filter @beagle/web dev
 ```
 
@@ -183,22 +180,22 @@ pnpm import:issues <RUN_ID> --limit 500
 4. Check import run status over API (admin auth required):
 
 ```bash
-curl -i -c /tmp/beagle.cookies -X POST http://localhost:3001/api/auth/login \
+curl -i -c /tmp/beagle.cookies -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"<SEED_TEST_USER_EMAIL>","password":"<SEED_TEST_USER_PASSWORD>"}'
 
 curl -i -b /tmp/beagle.cookies \
-  http://localhost:3001/api/v1/imports/<RUN_ID>
+  http://localhost:3000/api/v1/imports/<RUN_ID>
 ```
 
 Optional deep inspection via API:
 
 ```bash
 curl -i -b /tmp/beagle.cookies \
-  "http://localhost:3001/api/v1/imports/<RUN_ID>/issues?limit=200"
+  "http://localhost:3000/api/v1/imports/<RUN_ID>/issues?limit=200"
 
 curl -i -b /tmp/beagle.cookies \
-  "http://localhost:3001/api/v1/imports/<RUN_ID>/issues?severity=WARNING&limit=200"
+  "http://localhost:3000/api/v1/imports/<RUN_ID>/issues?severity=WARNING&limit=200"
 ```
 
 For full import behavior (source tables, stage handling, required fields, issue codes, and logging), see `docs/import-phase1.md`.
@@ -206,7 +203,7 @@ For full import behavior (source tables, stage handling, required fields, issue 
 ## Where to add new features
 
 - Add new backend business logic in `packages/server`.
-- Keep `apps/api` routes thin (request/response mapping only).
+- Keep `apps/web/app/api` routes thin (request/response mapping only).
 - Add shared payload types in `packages/contracts`.
 - Add client calls in `packages/api-client`.
 - Consume from UI using React Query hooks in `apps/web/queries`.

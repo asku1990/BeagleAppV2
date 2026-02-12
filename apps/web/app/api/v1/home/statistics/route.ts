@@ -1,5 +1,5 @@
 import { statsService } from "@beagle/server";
-import { jsonResponse, optionsResponse } from "@/lib/cors";
+import { jsonResponse, optionsResponse } from "@/lib/server/cors";
 
 export const dynamic = "force-dynamic";
 

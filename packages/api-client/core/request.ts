@@ -8,10 +8,7 @@ export type RequestFn = <T>(
 ) => Promise<ApiResult<T>>;
 
 export function createRequest(options: ClientOptions): RequestFn {
-  const baseUrl =
-    options.baseUrl ??
-    process.env.NEXT_PUBLIC_API_URL ??
-    "http://localhost:3001";
+  const baseUrl = options.baseUrl ?? process.env.NEXT_PUBLIC_API_URL ?? "";
   const credentials = options.credentials ?? "include";
 
   return async function request<T>(
