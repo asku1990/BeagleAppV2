@@ -5,5 +5,5 @@ test("home page loads", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Suomen Beaglejärjestö" }),
   ).toBeVisible();
-  await expect(page.getByText("Tietokanta", { exact: true })).toBeVisible();
+  await expect(page.getByTestId("sidebar-title")).toBeVisible();
 });

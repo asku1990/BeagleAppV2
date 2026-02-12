@@ -57,6 +57,7 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" variant="sidebar">
       <SidebarHeader className="gap-0 border-b border-[var(--beagle-border)] p-0">
         <div
+          data-testid="sidebar-title"
           className={
             state === "collapsed"
               ? "flex h-12 items-center justify-center px-0"
