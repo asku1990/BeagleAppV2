@@ -242,9 +242,22 @@ export function createAuthService(
     async logout(
       sessionToken: string | undefined,
     ): Promise<ServiceResult<LogoutResponse>> {
-      if (sessionToken) {
-        await deps.deleteSession(sessionToken);
+      if (!sessionToken) {
+        return {
+          status: 401,
+          body: { ok: false, error: "Not authenticated." },
+        };
       }
+
+      const user = await deps.findUserBySessionToken(sessionToken);
+      if (!user) {
+        return {
+          status: 401,
+          body: { ok: false, error: "Not authenticated." },
+        };
+      }
+
+      await deps.deleteSession(sessionToken);
 
       return {
         status: 200,

@@ -180,4 +180,25 @@ describe("auth routes", () => {
     expect(cookie).toContain("HttpOnly");
     expect(cookie).toContain("Path=/");
   });
+
+  it("logout returns 401 when session is missing", async () => {
+    logoutMock.mockResolvedValue({
+      status: 401,
+      body: { ok: false, error: "Not authenticated." },
+    });
+
+    const { POST } = await import("../logout/route");
+    const request = new NextRequest("http://localhost/api/auth/logout", {
+      method: "POST",
+      headers: { origin: "http://localhost:3000" },
+    });
+    const response = await POST(request);
+
+    expect(logoutMock).toHaveBeenCalledWith(undefined);
+    expect(response.status).toBe(401);
+    await expect(response.json()).resolves.toEqual({
+      ok: false,
+      error: "Not authenticated.",
+    });
+  });
 });

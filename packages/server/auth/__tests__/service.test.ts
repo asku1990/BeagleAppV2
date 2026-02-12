@@ -34,6 +34,74 @@ describe("auth service", () => {
     expect(result.body.ok).toBe(false);
   });
 
+  it("logout returns 401 when session token is missing", async () => {
+    const deleteSessionMock = vi.fn();
+    const service = createAuthService({
+      createSession: vi.fn(),
+      createUser: vi.fn(),
+      deleteSession: deleteSessionMock,
+      findUserByEmail: vi.fn(),
+      findUserBySessionToken: vi.fn(),
+      hashPassword: vi.fn(),
+      verifyPassword: vi.fn(),
+    } as never);
+
+    const result = await service.logout(undefined);
+    expect(result.status).toBe(401);
+    expect(result.body).toEqual({
+      ok: false,
+      error: "Not authenticated.",
+    });
+    expect(deleteSessionMock).not.toHaveBeenCalled();
+  });
+
+  it("logout returns 401 for unknown session token", async () => {
+    const deleteSessionMock = vi.fn();
+    const service = createAuthService({
+      createSession: vi.fn(),
+      createUser: vi.fn(),
+      deleteSession: deleteSessionMock,
+      findUserByEmail: vi.fn(),
+      findUserBySessionToken: vi.fn().mockResolvedValue(null),
+      hashPassword: vi.fn(),
+      verifyPassword: vi.fn(),
+    } as never);
+
+    const result = await service.logout("bad-token");
+    expect(result.status).toBe(401);
+    expect(result.body).toEqual({
+      ok: false,
+      error: "Not authenticated.",
+    });
+    expect(deleteSessionMock).not.toHaveBeenCalled();
+  });
+
+  it("logout deletes session and returns success for known session token", async () => {
+    const deleteSessionMock = vi.fn();
+    const service = createAuthService({
+      createSession: vi.fn(),
+      createUser: vi.fn(),
+      deleteSession: deleteSessionMock,
+      findUserByEmail: vi.fn(),
+      findUserBySessionToken: vi.fn().mockResolvedValue({
+        id: "u1",
+        email: "user@example.com",
+        username: "user",
+        role: "USER",
+      }),
+      hashPassword: vi.fn(),
+      verifyPassword: vi.fn(),
+    } as never);
+
+    const result = await service.logout("valid-token");
+    expect(result.status).toBe(200);
+    expect(result.body).toEqual({
+      ok: true,
+      data: { success: true },
+    });
+    expect(deleteSessionMock).toHaveBeenCalledWith("valid-token");
+  });
+
   it("returns 409 when username already exists", async () => {
     const service = createAuthService({
       createSession: vi.fn(),
