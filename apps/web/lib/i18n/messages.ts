@@ -31,6 +31,7 @@ const fi = {
   "home.stats.row.totalTrialEntries": "Ajokoestartteja yhteensä",
   "home.stats.row.performedByDogs": "Suorittaneita koiria",
   "home.stats.row.totalShowEntries": "Näyttelystartteja yhteensä",
+  "common.noData": "Ei dataa",
   "common.dataPending": "Tieto tulossa",
   "common.dataUnavailable": "Tieto ei saatavilla",
 } as const;
@@ -69,6 +70,7 @@ const sv: Messages = {
   "home.stats.row.totalTrialEntries": "Jaktprovsstarter totalt",
   "home.stats.row.performedByDogs": "Genomförda av hundar",
   "home.stats.row.totalShowEntries": "Utställningsstarter totalt",
+  "common.noData": "Ingen data",
   "common.dataPending": "Data kommer",
   "common.dataUnavailable": "Data ej tillgänglig",
 };

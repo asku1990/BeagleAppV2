@@ -6,7 +6,7 @@ Monorepo for a public Beagle database app with auth, admin-ready routing, and a 
 
 - `apps/web`: main Next.js app (public pages, auth pages, admin route group, API routes under `app/api/*`, and Server Actions under `app/actions/*`).
 - `packages/server`: backend use-case services (auth + authorization helpers).
-- `packages/db`: Prisma + MariaDB access.
+- `packages/db`: Prisma + PostgreSQL access (legacy import source uses MariaDB).
 - `packages/contracts`: shared API request/response types.
 - `packages/api-client`: typed HTTP client used by frontend hooks.
 
@@ -20,7 +20,8 @@ Current access model:
 
 - Node.js 20+
 - pnpm 10+
-- MariaDB (local or remote)
+- PostgreSQL (local or remote) for app data
+- MariaDB (local or remote) only for phase-1 legacy imports
 
 ## Environment setup
 
@@ -32,7 +33,7 @@ cp .env.example .env
 
 2. Update `.env` values:
 
-- `DATABASE_URL`: MariaDB connection string.
+- `DATABASE_URL`: PostgreSQL connection string.
 - `AUTH_SECRET`: strong random secret.
 - `NEXT_PUBLIC_API_URL`: optional API base URL override for web app clients. Default is same-origin.
 - `CORS_ORIGINS`: optional comma-separated cross-origin allowlist for API responses.

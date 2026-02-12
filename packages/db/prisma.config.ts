@@ -11,6 +11,6 @@ export default defineConfig({
   datasource: {
     url:
       process.env.DATABASE_URL ??
-      "mysql://root:password@127.0.0.1:3306/beagle_db_v2",
+      "postgresql://postgres:password@127.0.0.1:5432/beagle_db_v2",
   },
 });

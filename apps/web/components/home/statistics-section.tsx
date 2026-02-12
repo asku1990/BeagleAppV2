@@ -75,15 +75,13 @@ const statGroups: StatGroup[] = [
 
 export function StatisticsSection() {
   const { t, locale } = useI18n();
-  const { data, isError, isLoading } = useHomeStatisticsQuery();
+  const { data, isLoading } = useHomeStatisticsQuery();
   const isInitialLoading = isLoading && !data;
 
   const localeTag = locale === "fi" ? "fi-FI" : "sv-SE";
   const numberFormat = new Intl.NumberFormat(localeTag);
   const dateFormat = new Intl.DateTimeFormat(localeTag);
-  const fallbackText = isError
-    ? t("common.dataUnavailable")
-    : t("common.dataPending");
+  const fallbackText = t("common.noData");
 
   const formatNumber = (value: number | null): string =>
     value == null ? fallbackText : numberFormat.format(value);
