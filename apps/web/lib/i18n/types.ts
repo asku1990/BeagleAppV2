@@ -1,4 +1,4 @@
-export const SUPPORTED_LOCALES = ["fi", "sv", "en"] as const;
+export const SUPPORTED_LOCALES = ["fi", "sv"] as const;
 export const LOCALE_COOKIE_NAME = "beagle.locale";
 
 export type Locale = (typeof SUPPORTED_LOCALES)[number];

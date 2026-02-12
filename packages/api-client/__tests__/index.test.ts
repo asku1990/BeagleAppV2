@@ -15,7 +15,7 @@ describe("api client request headers", () => {
     );
     const client = createApiClient({ baseUrl: "http://example.test" });
 
-    await client.getImportStatus();
+    await client.me();
 
     const init = fetchMock.mock.calls[0]?.[1];
     const headers = new Headers(init?.headers);

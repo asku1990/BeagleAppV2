@@ -7,7 +7,6 @@ import { useI18n } from "@/lib/i18n";
 const localeButtons = [
   { locale: "fi", flag: "🇫🇮", labelKey: "header.language.finnish" },
   { locale: "sv", flag: "🇸🇪", labelKey: "header.language.swedish" },
-  { locale: "en", flag: "🇬🇧", labelKey: "header.language.english" },
 ] as const;
 
 export function AppHeader() {

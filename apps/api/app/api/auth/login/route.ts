@@ -2,18 +2,22 @@ import { authService } from "@beagle/server";
 import type { LoginRequest } from "@beagle/contracts";
 import { jsonResponse, optionsResponse } from "@/lib/cors";
 
-export async function OPTIONS() {
-  return optionsResponse("POST,OPTIONS");
+// Access policy: public route.
+export async function OPTIONS(request: Request) {
+  return optionsResponse("POST,OPTIONS", {
+    origin: request.headers.get("origin"),
+  });
 }
 
 export async function POST(request: Request) {
+  const origin = request.headers.get("origin");
   let body: Partial<LoginRequest>;
   try {
     body = (await request.json()) as Partial<LoginRequest>;
   } catch {
     return jsonResponse(
       { ok: false, error: "Invalid JSON body." },
-      { status: 400, methods: "POST,OPTIONS" },
+      { status: 400, methods: "POST,OPTIONS", origin },
     );
   }
   const result = await authService.login(body);
@@ -22,12 +26,14 @@ export async function POST(request: Request) {
     return jsonResponse(result.body, {
       status: result.status,
       methods: "POST,OPTIONS",
+      origin,
     });
   }
 
   const response = jsonResponse(result.body, {
     status: result.status,
     methods: "POST,OPTIONS",
+    origin,
   });
   response.cookies.set("beagle_session", result.session.sessionToken, {
     httpOnly: true,

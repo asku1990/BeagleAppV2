@@ -20,11 +20,11 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { useI18n, type MessageKey } from "@/lib/i18n";
 
@@ -47,6 +47,7 @@ const publicNavItems: NavItem[] = [
 
 export function AppSidebar() {
   const { t } = useI18n();
+  const { state } = useSidebar();
 
   const handleComingSoon = (item: string) => {
     toast(`${item}: ${t("common.notImplementedYet")}`);
@@ -54,20 +55,29 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" variant="sidebar">
-      <SidebarHeader className="border-b border-[var(--beagle-border)]">
-        <div className="flex min-h-12 items-center px-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
-          <div className="group-data-[collapsible=icon]:hidden">
-            <p className="beagle-title text-lg">{t("sidebar.title")}</p>
-          </div>
-          <p className="hidden text-sm font-semibold text-[var(--beagle-ink)] group-data-[collapsible=icon]:block">
-            {t("sidebar.shortTitle")}
-          </p>
+      <SidebarHeader className="gap-0 border-b border-[var(--beagle-border)] p-0">
+        <div
+          data-testid="sidebar-title"
+          className={
+            state === "collapsed"
+              ? "flex h-12 items-center justify-center px-0"
+              : "flex h-12 items-center px-3"
+          }
+        >
+          {state === "collapsed" ? (
+            <p className="text-xs font-semibold leading-none tracking-wide text-[var(--beagle-ink)] uppercase">
+              {t("sidebar.shortTitle")}
+            </p>
+          ) : (
+            <p className="text-base font-semibold leading-none text-[var(--beagle-ink)]">
+              {t("sidebar.title")}
+            </p>
+          )}
         </div>
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>{t("sidebar.navigation")}</SidebarGroupLabel>
+        <SidebarGroup className="pt-1">
           <SidebarGroupContent>
             <SidebarMenu>
               {publicNavItems.map((item) => (

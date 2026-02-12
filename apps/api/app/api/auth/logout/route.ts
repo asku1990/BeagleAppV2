@@ -2,8 +2,11 @@ import { authService } from "@beagle/server";
 import { NextRequest } from "next/server";
 import { jsonResponse, optionsResponse } from "@/lib/cors";
 
-export async function OPTIONS() {
-  return optionsResponse("POST,OPTIONS");
+// Access policy: authenticated route.
+export async function OPTIONS(request: NextRequest) {
+  return optionsResponse("POST,OPTIONS", {
+    origin: request.headers.get("origin"),
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -13,6 +16,7 @@ export async function POST(request: NextRequest) {
   const response = jsonResponse(result.body, {
     status: result.status,
     methods: "POST,OPTIONS",
+    origin: request.headers.get("origin"),
   });
   response.cookies.set("beagle_session", "", {
     httpOnly: true,

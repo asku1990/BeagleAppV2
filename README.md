@@ -36,7 +36,7 @@ cp .env.example .env
 - `DATABASE_URL`: MariaDB connection string.
 - `AUTH_SECRET`: strong random secret.
 - `NEXT_PUBLIC_API_URL`: API base URL for web app, default `http://localhost:3001`.
-- `CORS_ORIGIN`: web origin allowed by API, default `http://localhost:3000`.
+- `CORS_ORIGINS`: comma-separated web origins allowed by API, default `http://localhost:3000`.
 - `LEGACY_DATABASE_URL`: MariaDB connection string to legacy Beagle DB for phase-1 imports.
 - `SEED_TEST_USER_EMAIL`: required when running `pnpm db:seed:basic-user`.
 - `SEED_TEST_USER_PASSWORD`: required when running `pnpm db:seed:basic-user`.
@@ -125,6 +125,8 @@ pnpm --filter @beagle/web test:e2e
 - Register endpoint creates users with `USER` role by default.
 - Admin pages require `ADMIN` role.
 - To test admin pages locally now, promote a user role to `ADMIN` in the database.
+- Login sets `beagle_session` as an `HttpOnly` cookie (`SameSite=Lax`, `Path=/`, `Secure` in production).
+- Logout always clears `beagle_session`; `me` and `logout` return `401` when session is missing/invalid.
 
 ## Current API status
 
@@ -133,11 +135,11 @@ pnpm --filter @beagle/web test:e2e
   - `POST /api/auth/login`
   - `GET /api/auth/me`
   - `POST /api/auth/logout`
-- Import placeholder endpoint (temporary):
-  - `GET /api/import/example` returns status text
-  - `POST /api/import/example` returns `501 Not Implemented`
-- New v1 admin import endpoints:
+- v1 import endpoints implemented:
   - `GET /api/v1/imports/:id`
+  - `GET /api/v1/imports/:id/issues`
+- v1 public endpoint implemented:
+  - `GET /api/v1/home/statistics`
 
 ## Import basics
 

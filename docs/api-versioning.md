@@ -10,9 +10,9 @@ All new API routes should be created under:
 
 Examples:
 
-- `POST /api/v1/auth/login`
-- `GET /api/v1/dogs/:id`
-- `POST /api/v1/imports/run`
+- `GET /api/v1/home/statistics`
+- `GET /api/v1/imports/:id`
+- `GET /api/v1/imports/:id/issues`
 
 ## Why
 
@@ -22,8 +22,8 @@ Examples:
 
 ## Migration note
 
-Current routes under `/api/auth/*` and `/api/import/*` can remain during bootstrap.
-When adding new features, prefer `v1` paths and phase old unversioned endpoints out.
+Current auth routes under `/api/auth/*` are bootstrap routes and remain valid for now.
+When adding new features, prefer `/api/v1/*` paths and phase old unversioned endpoints out.
 
 ## Compatibility policy
 
