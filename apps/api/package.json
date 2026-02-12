@@ -8,8 +8,9 @@
     "start": "next start -H 127.0.0.1 -p 3001",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "echo 'No API tests yet'",
-    "test:unit": "echo 'No API unit tests yet'"
+    "test": "pnpm test:unit",
+    "test:unit": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@beagle/contracts": "workspace:*",

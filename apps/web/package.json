@@ -10,7 +10,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "pnpm test:unit && pnpm test:e2e",
     "test:unit": "vitest run",
-    "test:e2e": "playwright test"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "pnpm test:playwright",
+    "test:playwright": "playwright test"
   },
   "dependencies": {
     "@beagle/api-client": "workspace:*",
