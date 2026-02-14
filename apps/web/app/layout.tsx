@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/legacy-v1-assets/v1-root-favicon.ico",
     shortcut: "/legacy-v1-assets/v1-root-favicon.ico",
-    apple: "/legacy-v1-assets/v1-root-favicon.ico",
+    apple: "/dog_15997414.png",
   },
 };
 
