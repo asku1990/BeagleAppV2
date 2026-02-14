@@ -1,7 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { beagleTheme } from "@/components/ui/beagle-theme";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 
 const localeButtons = [
@@ -13,10 +15,18 @@ export function AppHeader() {
   const { locale, setLocale, t } = useI18n();
 
   return (
-    <header className="sticky top-0 z-20 border-b border-[var(--beagle-border)] bg-white/95 backdrop-blur">
-      <div className="flex h-12 w-full items-center justify-between gap-3 px-3 sm:px-4 md:px-6">
+    <header
+      className={cn(
+        "sticky top-0 z-20 border-b backdrop-blur",
+        beagleTheme.border,
+        beagleTheme.sidebarSurface,
+      )}
+    >
+      <div className="flex h-12 w-full items-center justify-between gap-3 px-4 md:px-6">
         <div className="flex items-center gap-2.5">
-          <SidebarTrigger className="text-[var(--beagle-ink)]" />
+          <SidebarTrigger
+            className={cn(beagleTheme.inkStrongText, beagleTheme.focusRing)}
+          />
         </div>
         <div className="flex items-center gap-1">
           {localeButtons.map((option) => (
@@ -27,8 +37,17 @@ export function AppHeader() {
               size="icon-xs"
               className={
                 locale === option.locale
-                  ? "text-base border border-[var(--beagle-border)] bg-[var(--beagle-accent-soft)] ring-2 ring-[var(--beagle-border)]"
-                  : "text-base border border-transparent"
+                  ? cn(
+                      "h-11 w-11 text-base border ring-2 ring-[var(--beagle-focus)] md:h-8 md:w-8",
+                      beagleTheme.border,
+                      beagleTheme.softAccent,
+                      beagleTheme.focusRing,
+                    )
+                  : cn(
+                      "h-11 w-11 text-base border border-transparent md:h-8 md:w-8",
+                      beagleTheme.interactive,
+                      beagleTheme.focusRing,
+                    )
               }
               aria-label={t(option.labelKey)}
               aria-pressed={locale === option.locale}

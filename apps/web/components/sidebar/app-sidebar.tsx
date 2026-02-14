@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { beagleTheme } from "@/components/ui/beagle-theme";
 import {
   Sidebar,
   SidebarContent,
@@ -26,6 +27,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 import { useI18n, type MessageKey } from "@/lib/i18n";
 
 type NavItem = {
@@ -55,21 +57,32 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" variant="sidebar">
-      <SidebarHeader className="gap-0 border-b border-[var(--beagle-border)] p-0">
+      <SidebarHeader className={cn("gap-0 border-b p-0", beagleTheme.border)}>
         <div
           data-testid="sidebar-title"
           className={
             state === "collapsed"
               ? "flex h-12 items-center justify-center px-0"
-              : "flex h-12 items-center px-3"
+              : "flex h-12 items-center px-4"
           }
         >
           {state === "collapsed" ? (
-            <p className="text-xs font-semibold leading-none tracking-wide text-[var(--beagle-ink)] uppercase">
+            <p
+              className={cn(
+                "text-xs font-semibold leading-none tracking-wide uppercase",
+                beagleTheme.inkStrongText,
+              )}
+            >
               {t("sidebar.shortTitle")}
             </p>
           ) : (
-            <p className="text-base font-semibold leading-none text-[var(--beagle-ink)]">
+            <p
+              className={cn(
+                "leading-none",
+                beagleTheme.headingSm,
+                beagleTheme.inkStrongText,
+              )}
+            >
               {t("sidebar.title")}
             </p>
           )}
@@ -85,7 +98,13 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     tooltip={t(item.labelKey)}
                     onClick={() => handleComingSoon(t(item.labelKey))}
-                    className="text-[var(--beagle-ink)]"
+                    className={cn(
+                      beagleTheme.inkStrongText,
+                      beagleTheme.interactive,
+                      beagleTheme.focusRing,
+                      "min-h-11 md:min-h-9",
+                      "data-[active=true]:bg-[var(--beagle-accent-soft)]",
+                    )}
                   >
                     <item.icon className="size-4" />
                     <span>{t(item.labelKey)}</span>
@@ -97,10 +116,21 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="mt-auto border-t border-[var(--beagle-border)] group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0">
+      <SidebarFooter
+        className={cn(
+          "mt-auto border-t group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0",
+          beagleTheme.border,
+        )}
+      >
         <Button
           variant="ghost"
-          className="justify-start gap-2 text-[var(--beagle-ink)] group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
+          className={cn(
+            "justify-start gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
+            beagleTheme.inkStrongText,
+            beagleTheme.interactive,
+            beagleTheme.focusRing,
+            "min-h-11 md:min-h-9",
+          )}
           onClick={() => handleComingSoon(t("sidebar.signIn"))}
         >
           <LogIn className="size-4" />
