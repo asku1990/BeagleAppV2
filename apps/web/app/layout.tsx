@@ -5,8 +5,13 @@ import { DEFAULT_LOCALE, LOCALE_COOKIE_NAME, isLocale } from "@/lib/i18n/types";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Beagle v2",
-  description: "Beagle v2 platform",
+  title: "Suomen Beaglejärjestö- Finska Beagleklubben r.y.",
+  description: "Suomen Beaglejärjestö- Finska Beagleklubben r.y. tietokanta",
+  icons: {
+    icon: "/beagle-icon.png",
+    shortcut: "/beagle-icon.png",
+    apple: "/beagle-icon.png",
+  },
 };
 
 export default async function RootLayout({

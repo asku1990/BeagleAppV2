@@ -17,7 +17,7 @@ const fi = {
   "sidebar.nav.bestDriver": "Paras ajuri -kilpailu",
   "sidebar.signIn": "Kirjaudu",
   "common.notImplementedYet": "ei vielä toteutettu",
-  "home.hero.title": "Suomen Beaglejärjestö ry",
+  "home.hero.title": "Suomen Beaglejärjestö- Finska Beagleklubben r.y.",
   "home.hero.description":
     "Tietokannassa on Suomessa rekisteröidyt Beaglet sekä koe ja näyttelytuloksia.",
   "home.hero.logoAlt": "Suomen Beaglejärjestön logo",
@@ -56,7 +56,7 @@ const sv: Messages = {
   "sidebar.nav.bestDriver": "Paras ajuri-tävling",
   "sidebar.signIn": "Logga in",
   "common.notImplementedYet": "inte implementerad ännu",
-  "home.hero.title": "Finska Beagleklubben ry",
+  "home.hero.title": "Suomen Beaglejärjestö- Finska Beagleklubben r.y.",
   "home.hero.description":
     "I databasen finns beaglar registrerade i Finland samt resultat från jaktprov och utställningar.",
   "home.hero.logoAlt": "Finlands Beagleförbunds logotyp",
