@@ -9,12 +9,10 @@ export function MainHeader() {
   const { t } = useI18n();
 
   return (
-    <header
-      className={cn(beagleTheme.panel, "beagle-hero px-5 py-5 md:px-6 md:py-6")}
-    >
+    <header className={cn(beagleTheme.panel, "px-5 py-5 md:px-6 md:py-6")}>
       <div className="flex items-center gap-3 md:gap-4">
         <Image
-          src="/beagle-legacy-logo.png"
+          src="/legacy-v1-assets/v1-root-belogo.png"
           alt={t("home.hero.logoAlt")}
           width={132}
           height={74}
