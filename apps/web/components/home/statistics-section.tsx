@@ -1,7 +1,9 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { beagleTheme } from "@/components/ui/beagle-theme";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 import { useI18n, type MessageKey } from "@/lib/i18n";
 import { useHomeStatisticsQuery } from "@/queries/home/use-home-statistics-query";
 
@@ -73,6 +75,12 @@ const statGroups: StatGroup[] = [
   },
 ];
 
+const cardClassName = cn(beagleTheme.subpanel, "px-4 py-3.5");
+const rowClassName = cn(
+  "grid grid-cols-[1fr_auto] items-center gap-3 border-b pb-2 last:border-b-0 last:pb-0",
+  beagleTheme.border,
+);
+
 export function StatisticsSection() {
   const { t, locale } = useI18n();
   const { data, isLoading } = useHomeStatisticsQuery();
@@ -120,7 +128,7 @@ export function StatisticsSection() {
   if (isInitialLoading) {
     return (
       <Card
-        className="beagle-panel gap-0 overflow-hidden py-0"
+        className={cn(beagleTheme.panel, "gap-0 overflow-hidden py-0")}
         aria-busy="true"
       >
         <CardHeader className="px-5 pt-5 pb-4 md:px-6 md:pt-6 md:pb-4">
@@ -131,17 +139,14 @@ export function StatisticsSection() {
             {Array.from({ length: 3 }).map((_, cardIndex) => (
               <section
                 key={cardIndex}
-                className="rounded-xl border border-[var(--beagle-border)] bg-white px-4 py-3.5 shadow-sm"
+                className={cardClassName}
                 aria-hidden="true"
               >
                 <Skeleton className="h-5 w-28" />
                 <div className="mt-2.5 space-y-2.5">
                   {Array.from({ length: cardIndex === 0 ? 2 : 3 }).map(
                     (_, rowIndex) => (
-                      <div
-                        key={rowIndex}
-                        className="grid grid-cols-[1fr_auto] items-center gap-3 border-b border-[var(--beagle-border)] pb-2 last:border-b-0 last:pb-0"
-                      >
+                      <div key={rowIndex} className={rowClassName}>
                         <Skeleton className="h-4 w-24" />
                         <Skeleton className="h-5 w-16 rounded-md" />
                       </div>
@@ -157,9 +162,11 @@ export function StatisticsSection() {
   }
 
   return (
-    <Card className="beagle-panel gap-0 overflow-hidden py-0">
+    <Card className={cn(beagleTheme.panel, "gap-0 overflow-hidden py-0")}>
       <CardHeader className="px-5 pt-5 pb-4 md:px-6 md:pt-6 md:pb-4">
-        <CardTitle className="text-xl text-[var(--beagle-ink)]">
+        <CardTitle
+          className={cn(beagleTheme.headingMd, beagleTheme.inkStrongText)}
+        >
           {t("home.stats.title")}
         </CardTitle>
       </CardHeader>
@@ -172,22 +179,29 @@ export function StatisticsSection() {
           {statGroups.map((group) => (
             <section
               key={group.titleKey}
-              className="rounded-xl border border-[var(--beagle-border)] bg-white px-4 py-3.5 shadow-sm"
+              className={cardClassName}
               aria-label={t(group.titleKey)}
             >
-              <h3 className="text-base font-semibold text-[var(--beagle-ink)]">
+              <h3
+                className={cn(beagleTheme.headingSm, beagleTheme.inkStrongText)}
+              >
                 {t(group.titleKey)}
               </h3>
               <ul className="mt-2.5 space-y-2.5">
                 {group.rows.map((row) => (
-                  <li
-                    key={row.labelKey}
-                    className="grid grid-cols-[1fr_auto] items-center gap-3 border-b border-[var(--beagle-border)] pb-2 last:border-b-0 last:pb-0"
-                  >
-                    <span className="text-sm leading-5 text-[var(--beagle-muted)]">
+                  <li key={row.labelKey} className={rowClassName}>
+                    <span
+                      className={cn(beagleTheme.labelSm, beagleTheme.mutedText)}
+                    >
                       {t(row.labelKey)}
                     </span>
-                    <span className="rounded-md bg-[var(--beagle-accent-soft)] px-2 py-0.5 text-xs font-semibold text-[var(--beagle-ink)]">
+                    <span
+                      className={cn(
+                        "rounded-md px-2 py-0.5 text-xs font-semibold",
+                        beagleTheme.softAccent,
+                        beagleTheme.inkStrongText,
+                      )}
+                    >
                       {valueMap[row.valueId]}
                     </span>
                   </li>
