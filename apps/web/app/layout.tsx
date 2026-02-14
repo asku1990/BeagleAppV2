@@ -8,9 +8,9 @@ export const metadata: Metadata = {
   title: "Suomen Beaglejärjestö- Finska Beagleklubben r.y.",
   description: "Suomen Beaglejärjestö- Finska Beagleklubben r.y. tietokanta",
   icons: {
-    icon: "/beagle-icon.png",
-    shortcut: "/beagle-icon.png",
-    apple: "/beagle-icon.png",
+    icon: "/legacy-v1-assets/v1-root-favicon.ico",
+    shortcut: "/legacy-v1-assets/v1-root-favicon.ico",
+    apple: "/dog_15997414.png",
   },
 };
 

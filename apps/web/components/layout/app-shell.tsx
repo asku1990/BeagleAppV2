@@ -15,7 +15,7 @@ export function AppShell({ sidebar, header, children }: AppShellProps) {
         {sidebar}
         <SidebarInset className="min-h-screen">
           {header}
-          <main className="flex-1 overflow-auto px-4 py-5 md:px-6 md:py-6 lg:px-8">
+          <main className="flex-1 overflow-auto bg-[url('/legacy-v1-assets/v1-kuvat-be_leima.jpg')] bg-repeat bg-[length:198px_108px] px-4 py-5 md:px-6 md:py-6 lg:px-8">
             <section className="mx-auto w-full max-w-screen-2xl space-y-6">
               {children}
             </section>
