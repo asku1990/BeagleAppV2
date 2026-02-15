@@ -8,10 +8,7 @@ import {
   useTransition,
 } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type {
-  BeagleSearchQueryState,
-  BeagleSearchSort,
-} from "./mock-beagle-search-data";
+import type { BeagleSearchQueryState, BeagleSearchSort } from "./types";
 
 type SearchParamsLike = {
   get: (key: string) => string | null;

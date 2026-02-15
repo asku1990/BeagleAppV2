@@ -8,9 +8,9 @@ function mapSexLabel(
   sex: BeagleSearchResultRow["sex"],
   t: (key: MessageKey) => string,
 ) {
-  return sex === "U"
-    ? t("search.results.sex.male")
-    : t("search.results.sex.female");
+  if (sex === "U") return t("search.results.sex.male");
+  if (sex === "N") return t("search.results.sex.female");
+  return "-";
 }
 
 export function BeagleSearchResultsCards({

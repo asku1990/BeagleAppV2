@@ -53,13 +53,15 @@ export const fiSearchMessages = {
   "search.pagination.next": "Seuraavat",
   "search.pagination.range": "Näytetään",
   "search.empty.start":
-    "Aloita haku syöttämällä arvo yhteen pääkenttään ja suorittamalla haku.",
+    "Aloita haku syöttämällä arvo vähintään yhteen pääkenttään ja suorittamalla haku.",
   "search.empty.singleField":
     "Legacy-yhteensopiva haku hyväksyy vain yhden pääkentän kerrallaan.",
   "search.empty.noMatches": "Hakuehdoilla ei löytynyt koiria.",
+  "search.empty.fetchFailed":
+    "Hakutulosten lataus epäonnistui. Yritä uudelleen hetken kuluttua.",
   "search.newest.title": "Viimeisimmät lisäykset",
   "search.newest.subtitle":
-    "Lista on järjestetty lisäysajan mukaan; tasatilanteissa rekisterinumeron mukaan.",
+    "Lista on järjestetty lisäysajan mukaan. Siirrossa uuteen järjestelmään monelle vanhalle koiralle tallentui sama lisäysaika, joten niiden keskinäinen järjestys voi vaihdella.",
   "search.newest.registration": "Rekisterinumero",
   "search.newest.birthDate": "Syntymäaika",
 } as const;
@@ -119,13 +121,15 @@ export const svSearchMessages = {
   "search.pagination.next": "Nästa",
   "search.pagination.range": "Visar",
   "search.empty.start":
-    "Starta sökning genom att fylla i ett huvudfält och köra sökningen.",
+    "Starta sökning genom att fylla i minst ett huvudfält och köra sökningen.",
   "search.empty.singleField":
     "Legacy-kompatibel sökning accepterar endast ett huvudfält åt gången.",
   "search.empty.noMatches": "Inga hundar hittades med dessa villkor.",
+  "search.empty.fetchFailed":
+    "Det gick inte att ladda sökresultaten. Försök igen om en stund.",
   "search.newest.title": "Senaste tillagda",
   "search.newest.subtitle":
-    "Listan är sorterad enligt tilläggstid; vid lika tid enligt registreringsnummer.",
+    "Listan är sorterad enligt tilläggstid. Vid överföringen till det nya systemet fick många äldre hundar samma tilläggstid, så den inbördes ordningen kan variera.",
   "search.newest.registration": "Registreringsnummer",
   "search.newest.birthDate": "Födelsedatum",
 } as const;

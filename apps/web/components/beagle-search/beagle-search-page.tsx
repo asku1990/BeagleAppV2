@@ -5,13 +5,13 @@ import { useMemo } from "react";
 import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import {
-  computeBeagleSearchResults,
-  getNewestDogRows,
   resolvePrimarySearchMode,
   useBeagleSearchUiState,
 } from "@/lib/beagle-search";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { useBeagleNewestQuery } from "@/queries/beagle-search/use-beagle-newest-query";
+import { useBeagleSearchQuery } from "@/queries/beagle-search/use-beagle-search-query";
 import { BeagleSearchEmptyState } from "./beagle-search-empty-state";
 import { BeagleSearchForm } from "./beagle-search-form";
 import { BeagleSearchLoadingState } from "./beagle-search-loading-state";
@@ -36,14 +36,31 @@ export function BeagleSearchPage() {
   const localMode = resolvePrimarySearchMode(formState);
   const canSubmit = localMode !== "none";
 
+  const searchQuery = useBeagleSearchQuery(urlState);
+  const newestQuery = useBeagleNewestQuery(5);
+
   const searchResults = useMemo(
-    () => computeBeagleSearchResults(urlState),
-    [urlState],
+    () =>
+      searchQuery.data ?? {
+        mode: "none" as const,
+        total: 0,
+        totalPages: 0,
+        page: 1,
+        items: [],
+      },
+    [searchQuery.data],
   );
 
-  const newestDogRows = useMemo(() => getNewestDogRows(5), []);
+  const isSearchLoading =
+    isPending || (searchQuery.isFetching && !searchQuery.data);
+  const hasSearchError = searchQuery.isError && !searchQuery.data;
+  const hasNewestError = newestQuery.isError && !newestQuery.data;
 
-  const emptyVariant = searchResults.mode === "none" ? "start" : "no-results";
+  const emptyVariant = hasSearchError
+    ? "error"
+    : searchResults.mode === "none"
+      ? "start"
+      : "no-results";
 
   const hasResultItems = searchResults.items.length > 0;
 
@@ -93,13 +110,15 @@ export function BeagleSearchPage() {
       <ListingSectionShell
         title={t("search.results.title")}
         count={
-          searchResults.mode !== "none"
+          !hasSearchError && searchResults.mode !== "none"
             ? `${t("search.results.count")} ${searchResults.total}`
             : undefined
         }
       >
-        {isPending ? (
+        {isSearchLoading ? (
           <BeagleSearchLoadingState />
+        ) : hasSearchError ? (
+          <BeagleSearchEmptyState variant="error" />
         ) : hasResultItems ? (
           <>
             <div className="hidden md:block">
@@ -125,12 +144,20 @@ export function BeagleSearchPage() {
         title={t("search.newest.title")}
         subtitle={t("search.newest.subtitle")}
       >
-        <div className="hidden md:block">
-          <BeagleSearchResultsTable rows={newestDogRows} />
-        </div>
-        <div className="md:hidden">
-          <BeagleSearchResultsCards rows={newestDogRows} />
-        </div>
+        {newestQuery.isLoading && !newestQuery.data ? (
+          <BeagleSearchLoadingState />
+        ) : hasNewestError ? (
+          <BeagleSearchEmptyState variant="error" />
+        ) : (
+          <>
+            <div className="hidden md:block">
+              <BeagleSearchResultsTable rows={newestQuery.data ?? []} />
+            </div>
+            <div className="md:hidden">
+              <BeagleSearchResultsCards rows={newestQuery.data ?? []} />
+            </div>
+          </>
+        )}
       </ListingSectionShell>
     </>
   );
