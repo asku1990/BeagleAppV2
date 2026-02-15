@@ -15,6 +15,7 @@ const modeKeyMap: Record<BeaglePrimarySearchMode, MessageKey> = {
   ek: "search.form.mode.ek",
   reg: "search.form.mode.reg",
   name: "search.form.mode.name",
+  combined: "search.form.mode.combined",
   none: "search.form.mode.none",
   invalid: "search.form.mode.invalid",
 };
@@ -78,6 +79,10 @@ export function BeagleSearchForm({
               <option value="birth-desc">
                 {t("search.form.sort.birthDesc")}
               </option>
+              <option value="created-desc">
+                {t("search.form.sort.createdDesc")}
+              </option>
+              <option value="reg-desc">{t("search.form.sort.regDesc")}</option>
               <option value="name-asc">{t("search.form.sort.nameAsc")}</option>
             </select>
           </label>

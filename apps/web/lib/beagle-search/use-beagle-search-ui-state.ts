@@ -17,7 +17,7 @@ type SearchParamsLike = {
   get: (key: string) => string | null;
 };
 
-const DEFAULT_SORT: BeagleSearchSort = "birth-desc";
+const DEFAULT_SORT: BeagleSearchSort = "name-asc";
 
 const DEFAULT_STATE: BeagleSearchQueryState = {
   ek: "",
@@ -42,7 +42,12 @@ function readPage(value: string | null): number {
 }
 
 function readSort(value: string | null): BeagleSearchSort {
-  if (value === "name-asc" || value === "birth-desc") {
+  if (
+    value === "name-asc" ||
+    value === "birth-desc" ||
+    value === "reg-desc" ||
+    value === "created-desc"
+  ) {
     return value;
   }
 

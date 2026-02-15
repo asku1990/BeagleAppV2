@@ -34,8 +34,7 @@ export function BeagleSearchPage() {
   } = useBeagleSearchUiState();
 
   const localMode = resolvePrimarySearchMode(formState);
-  const canSubmit =
-    localMode === "ek" || localMode === "reg" || localMode === "name";
+  const canSubmit = localMode !== "none";
 
   const searchResults = useMemo(
     () => computeBeagleSearchResults(urlState),
@@ -44,12 +43,7 @@ export function BeagleSearchPage() {
 
   const newestDogRows = useMemo(() => getNewestDogRows(5), []);
 
-  const emptyVariant =
-    searchResults.mode === "none"
-      ? "start"
-      : searchResults.mode === "invalid"
-        ? "invalid"
-        : "no-results";
+  const emptyVariant = searchResults.mode === "none" ? "start" : "no-results";
 
   const hasResultItems = searchResults.items.length > 0;
 
@@ -99,7 +93,7 @@ export function BeagleSearchPage() {
       <ListingSectionShell
         title={t("search.results.title")}
         count={
-          searchResults.mode !== "none" && searchResults.mode !== "invalid"
+          searchResults.mode !== "none"
             ? `${t("search.results.count")} ${searchResults.total}`
             : undefined
         }

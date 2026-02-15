@@ -5,7 +5,11 @@ import {
   type BeaglePrimarySearchMode,
 } from "./legacy-like-match";
 
-export type BeagleSearchSort = "birth-desc" | "name-asc";
+export type BeagleSearchSort =
+  | "birth-desc"
+  | "name-asc"
+  | "reg-desc"
+  | "created-desc";
 
 export type BeagleSearchQueryState = {
   ek: string;
@@ -26,6 +30,7 @@ export type BeagleSearchResultRow = {
   id: string;
   ekNo: number | null;
   registrationNo: string;
+  createdAt: string;
   sex: "U" | "N";
   name: string;
   birthDate: string;
@@ -57,7 +62,7 @@ export const BEAGLE_ROW_ACTIONS: BeagleSearchQuickAction[] = [
   "offspring",
 ];
 
-const MOCK_BEAGLE_ROWS: BeagleSearchResultRow[] = [
+const MOCK_BEAGLE_ROWS_BASE: Omit<BeagleSearchResultRow, "createdAt">[] = [
   {
     id: "dog-001",
     ekNo: 120,
@@ -348,7 +353,17 @@ const MOCK_BEAGLE_ROWS: BeagleSearchResultRow[] = [
   },
 ];
 
-const DEFAULT_SORT: BeagleSearchSort = "birth-desc";
+const MOCK_BEAGLE_ROWS: BeagleSearchResultRow[] = MOCK_BEAGLE_ROWS_BASE.map(
+  (row, index) => ({
+    ...row,
+    // Mock insertion timestamp for "newest additions" ordering.
+    createdAt: new Date(
+      Date.UTC(2026, 0, 1) - index * 24 * 60 * 60 * 1000,
+    ).toISOString(),
+  }),
+);
+
+const DEFAULT_SORT: BeagleSearchSort = "name-asc";
 
 function compareByBirthDesc(
   left: BeagleSearchResultRow,
@@ -376,11 +391,69 @@ function compareByNameAsc(
   return left.registrationNo.localeCompare(right.registrationNo, "fi");
 }
 
+function parseRegistrationOrder(registrationNo: string): {
+  year: number;
+  sequence: number;
+} {
+  const match = registrationNo.match(/^[A-Z]{2}(\d+)\/(\d{2})$/i);
+  if (!match) {
+    return { year: 0, sequence: 0 };
+  }
+
+  return {
+    year: 2000 + Number.parseInt(match[2], 10),
+    sequence: Number.parseInt(match[1], 10),
+  };
+}
+
+function compareByRegistrationDesc(
+  left: BeagleSearchResultRow,
+  right: BeagleSearchResultRow,
+): number {
+  const leftOrder = parseRegistrationOrder(left.registrationNo);
+  const rightOrder = parseRegistrationOrder(right.registrationNo);
+
+  if (rightOrder.year !== leftOrder.year) {
+    return rightOrder.year - leftOrder.year;
+  }
+
+  if (rightOrder.sequence !== leftOrder.sequence) {
+    return rightOrder.sequence - leftOrder.sequence;
+  }
+
+  return left.registrationNo.localeCompare(right.registrationNo, "fi");
+}
+
+function compareByCreatedAtDesc(
+  left: BeagleSearchResultRow,
+  right: BeagleSearchResultRow,
+): number {
+  const dateComparison =
+    new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
+
+  if (dateComparison !== 0) {
+    return dateComparison;
+  }
+
+  const registrationComparison = compareByRegistrationDesc(left, right);
+  if (registrationComparison !== 0) {
+    return registrationComparison;
+  }
+
+  return compareByBirthDesc(left, right);
+}
+
 function sortRows(
   rows: BeagleSearchResultRow[],
   sort: BeagleSearchSort,
 ): BeagleSearchResultRow[] {
   const sortable = [...rows];
+  if (sort === "created-desc") {
+    return sortable.sort(compareByCreatedAtDesc);
+  }
+  if (sort === "reg-desc") {
+    return sortable.sort(compareByRegistrationDesc);
+  }
   if (sort === "name-asc") {
     return sortable.sort(compareByNameAsc);
   }
@@ -401,7 +474,7 @@ export function getNewestDogs(limit = 10): BeagleNewestDogItem[] {
 }
 
 export function getNewestDogRows(limit = 10): BeagleSearchResultRow[] {
-  return sortRows(MOCK_BEAGLE_ROWS, "birth-desc").slice(0, limit);
+  return [...MOCK_BEAGLE_ROWS].sort(compareByCreatedAtDesc).slice(0, limit);
 }
 
 function resolveSearchFieldValue(
@@ -419,6 +492,27 @@ function resolveSearchFieldValue(
   return row.name;
 }
 
+function filterRowsByQuery(
+  rows: BeagleSearchResultRow[],
+  state: BeagleSearchQueryState,
+): BeagleSearchResultRow[] {
+  const activeFields: Array<{
+    field: Exclude<BeaglePrimarySearchMode, "none" | "invalid" | "combined">;
+    pattern: string;
+  }> = (["ek", "reg", "name"] as const)
+    .map((field) => ({
+      field,
+      pattern: buildLegacyPattern(field, state[field]),
+    }))
+    .filter((entry) => entry.pattern.length > 0);
+
+  return rows.filter((row) =>
+    activeFields.every(({ field, pattern }) =>
+      matchesLegacyLike(resolveSearchFieldValue(row, field), pattern),
+    ),
+  );
+}
+
 export function computeBeagleSearchResults(
   state: BeagleSearchQueryState,
 ): BeagleSearchComputation {
@@ -428,7 +522,7 @@ export function computeBeagleSearchResults(
     name: state.name,
   });
 
-  if (mode === "none" || mode === "invalid") {
+  if (mode === "none") {
     return {
       mode,
       total: 0,
@@ -438,13 +532,8 @@ export function computeBeagleSearchResults(
     };
   }
 
-  const rawValue = state[mode].trim();
-  const pattern = buildLegacyPattern(mode, rawValue);
-
   const filteredRows = sortRows(
-    MOCK_BEAGLE_ROWS.filter((row) =>
-      matchesLegacyLike(resolveSearchFieldValue(row, mode), pattern),
-    ),
+    filterRowsByQuery(MOCK_BEAGLE_ROWS, state),
     state.sort || DEFAULT_SORT,
   );
 

@@ -3,6 +3,7 @@ export type BeaglePrimarySearchField = "ek" | "reg" | "name";
 export type BeaglePrimarySearchMode =
   | BeaglePrimarySearchField
   | "none"
+  | "combined"
   | "invalid";
 
 export type BeaglePrimaryInput = {
@@ -33,7 +34,7 @@ export function resolvePrimarySearchMode(
   }
 
   if (filledFields.length > 1) {
-    return "invalid";
+    return "combined";
   }
 
   return filledFields[0];
@@ -53,11 +54,11 @@ export function buildLegacyPattern(
   }
 
   if (field === "name") {
-    return `${value}%`;
+    return `%${value}%`;
   }
 
   if (field === "reg") {
-    return `%${value}`;
+    return `${value}%`;
   }
 
   return value;

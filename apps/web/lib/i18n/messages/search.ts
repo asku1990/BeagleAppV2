@@ -14,7 +14,8 @@ export const fiSearchMessages = {
   "search.form.mode.ek": "Haku kohdistuu EK-numeroon.",
   "search.form.mode.reg": "Haku kohdistuu rekisterinumeroon.",
   "search.form.mode.name": "Haku kohdistuu nimeen.",
-  "search.form.mode.none": "Valitse yksi pääkenttä ja suorita haku.",
+  "search.form.mode.combined": "Haku käyttää kaikkia täytettyjä pääkenttiä.",
+  "search.form.mode.none": "Täytä vähintään yksi pääkenttä ja suorita haku.",
   "search.form.mode.invalid":
     "Legacy-tila: käytä vain yhtä pääkenttää kerrallaan.",
   "search.form.advanced.toggle.open": "Näytä lisäsuodattimet",
@@ -24,6 +25,8 @@ export const fiSearchMessages = {
     "Lisäsuodattimien toiminnallisuus lisätään myöhemmin.",
   "search.form.sort.label": "Lajittelu",
   "search.form.sort.birthDesc": "Syntymäaika (uusin ensin)",
+  "search.form.sort.createdDesc": "Lisäysaika (uusin ensin)",
+  "search.form.sort.regDesc": "Rekisterinumero (uusin ensin)",
   "search.form.sort.nameAsc": "Nimi (A-Ö)",
   "search.advanced.sex": "Sukupuoli",
   "search.advanced.birthYearFrom": "Syntymävuosi alkaen",
@@ -55,7 +58,8 @@ export const fiSearchMessages = {
     "Legacy-yhteensopiva haku hyväksyy vain yhden pääkentän kerrallaan.",
   "search.empty.noMatches": "Hakuehdoilla ei löytynyt koiria.",
   "search.newest.title": "Viimeisimmät lisäykset",
-  "search.newest.subtitle": "Kevyt viitelista viimeksi syntyneistä koirista.",
+  "search.newest.subtitle":
+    "Lista on järjestetty lisäysajan mukaan; tasatilanteissa rekisterinumeron mukaan.",
   "search.newest.registration": "Rekisterinumero",
   "search.newest.birthDate": "Syntymäaika",
 } as const;
@@ -76,7 +80,8 @@ export const svSearchMessages = {
   "search.form.mode.ek": "Sökningen riktas till SSB-nummer.",
   "search.form.mode.reg": "Sökningen riktas till registreringsnummer.",
   "search.form.mode.name": "Sökningen riktas till namn.",
-  "search.form.mode.none": "Välj ett huvudfält och kör sökning.",
+  "search.form.mode.combined": "Sökningen använder alla ifyllda huvudfält.",
+  "search.form.mode.none": "Fyll i minst ett huvudfält och kör sökningen.",
   "search.form.mode.invalid":
     "Legacy-läge: använd endast ett huvudfält åt gången.",
   "search.form.advanced.toggle.open": "Visa avancerade filter",
@@ -86,6 +91,8 @@ export const svSearchMessages = {
     "Funktionalitet för avancerade filter läggs till senare.",
   "search.form.sort.label": "Sortering",
   "search.form.sort.birthDesc": "Födelsedatum (nyast först)",
+  "search.form.sort.createdDesc": "Tilläggstid (nyast först)",
+  "search.form.sort.regDesc": "Registreringsnummer (nyast först)",
   "search.form.sort.nameAsc": "Namn (A-Ö)",
   "search.advanced.sex": "Kön",
   "search.advanced.birthYearFrom": "Födelseår från",
@@ -118,7 +125,7 @@ export const svSearchMessages = {
   "search.empty.noMatches": "Inga hundar hittades med dessa villkor.",
   "search.newest.title": "Senaste tillagda",
   "search.newest.subtitle":
-    "En lätt referenslista över de senast födda hundarna.",
+    "Listan är sorterad enligt tilläggstid; vid lika tid enligt registreringsnummer.",
   "search.newest.registration": "Registreringsnummer",
   "search.newest.birthDate": "Födelsedatum",
 } as const;
