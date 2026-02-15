@@ -49,29 +49,47 @@ export function BeagleSearchResultsDesktopTable({
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => (
-            <tr
-              key={row.id}
-              className={cn("border-b align-top", beagleTheme.border)}
-            >
-              <td className="px-2 py-2">{row.registrationNo}</td>
-              <td className="px-2 py-2">{row.ekNo == null ? "-" : row.ekNo}</td>
-              <td className="px-2 py-2">{mapSexLabel(row.sex, t)}</td>
-              <td className="px-2 py-2">
-                <span
-                  title={`${t("search.results.parents.sire")}: ${row.sire}\n${t("search.results.parents.dam")}: ${row.dam}`}
-                  className={cn("font-medium", beagleTheme.inkStrongText)}
-                >
-                  {row.name}
-                </span>
-              </td>
-              <td className="px-2 py-2">{row.trialCount}</td>
-              <td className="px-2 py-2">{row.showCount}</td>
-              <td className="px-2 py-2">
-                <BeagleSearchRowActions />
-              </td>
-            </tr>
-          ))}
+          {rows.map((row) => {
+            const additionalRegistrationNos = row.registrationNos.filter(
+              (registrationNo) => registrationNo !== row.registrationNo,
+            );
+
+            return (
+              <tr
+                key={row.id}
+                className={cn("border-b align-top", beagleTheme.border)}
+              >
+                <td className="px-2 py-2">
+                  <div className={cn("font-medium", beagleTheme.inkStrongText)}>
+                    {row.registrationNo}
+                  </div>
+                  {additionalRegistrationNos.length > 0 ? (
+                    <div className={cn("mt-1 text-xs", beagleTheme.mutedText)}>
+                      {t("search.results.col.regAll")}:{" "}
+                      {additionalRegistrationNos.join(", ")}
+                    </div>
+                  ) : null}
+                </td>
+                <td className="px-2 py-2">
+                  {row.ekNo == null ? "-" : row.ekNo}
+                </td>
+                <td className="px-2 py-2">{mapSexLabel(row.sex, t)}</td>
+                <td className="px-2 py-2">
+                  <span
+                    title={`${t("search.results.parents.sire")}: ${row.sire}\n${t("search.results.parents.dam")}: ${row.dam}`}
+                    className={cn("font-medium", beagleTheme.inkStrongText)}
+                  >
+                    {row.name}
+                  </span>
+                </td>
+                <td className="px-2 py-2">{row.trialCount}</td>
+                <td className="px-2 py-2">{row.showCount}</td>
+                <td className="px-2 py-2">
+                  <BeagleSearchRowActions />
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

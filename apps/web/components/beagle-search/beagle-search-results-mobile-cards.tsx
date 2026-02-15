@@ -22,75 +22,89 @@ export function BeagleSearchResultsMobileCards({
 
   return (
     <div className="space-y-2">
-      {rows.map((row) => (
-        <article
-          key={row.id}
-          className={cn(
-            "rounded-lg border p-3",
-            beagleTheme.border,
-            beagleTheme.surface,
-          )}
-        >
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <p className="col-span-2">
-              <span className={beagleTheme.mutedText}>
-                {t("search.results.col.reg")}:{" "}
-              </span>
-              <span>{row.registrationNo}</span>
-            </p>
-            <p>
-              <span className={beagleTheme.mutedText}>
-                {t("search.results.col.ek")}:{" "}
-              </span>
-              <span>{row.ekNo == null ? "-" : row.ekNo}</span>
-            </p>
-            <p>
-              <span className={beagleTheme.mutedText}>
-                {t("search.results.col.sex")}:{" "}
-              </span>
-              <span>{mapSexLabel(row.sex, t)}</span>
-            </p>
-            <p className="col-span-2">
-              <span className={beagleTheme.mutedText}>
-                {t("search.results.col.name")}:{" "}
-              </span>
-              <span
-                title={`${t("search.results.parents.sire")}: ${row.sire}\n${t("search.results.parents.dam")}: ${row.dam}`}
-                className={cn("font-medium", beagleTheme.inkStrongText)}
-              >
-                {row.name}
-              </span>
-            </p>
-            <p>
-              <span className={beagleTheme.mutedText}>
-                {t("search.results.col.trials")}:
-              </span>{" "}
-              <span
-                className={cn(
-                  "font-medium tabular-nums",
-                  beagleTheme.inkStrongText,
-                )}
-              >
-                {row.trialCount}
-              </span>
-            </p>
-            <p>
-              <span className={beagleTheme.mutedText}>
-                {t("search.results.col.shows")}:
-              </span>{" "}
-              <span
-                className={cn(
-                  "font-medium tabular-nums",
-                  beagleTheme.inkStrongText,
-                )}
-              >
-                {row.showCount}
-              </span>
-            </p>
-          </div>
-          <BeagleSearchRowActions className="mt-2" />
-        </article>
-      ))}
+      {rows.map((row) => {
+        const additionalRegistrationNos = row.registrationNos.filter(
+          (registrationNo) => registrationNo !== row.registrationNo,
+        );
+
+        return (
+          <article
+            key={row.id}
+            className={cn(
+              "rounded-lg border p-3",
+              beagleTheme.border,
+              beagleTheme.surface,
+            )}
+          >
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <p className="col-span-2">
+                <span className={beagleTheme.mutedText}>
+                  {t("search.results.col.reg")}:{" "}
+                </span>
+                <span>{row.registrationNo}</span>
+              </p>
+              {additionalRegistrationNos.length > 0 ? (
+                <p className="col-span-2">
+                  <span className={beagleTheme.mutedText}>
+                    {t("search.results.col.regAll")}:{" "}
+                  </span>
+                  <span>{additionalRegistrationNos.join(", ")}</span>
+                </p>
+              ) : null}
+              <p>
+                <span className={beagleTheme.mutedText}>
+                  {t("search.results.col.ek")}:{" "}
+                </span>
+                <span>{row.ekNo == null ? "-" : row.ekNo}</span>
+              </p>
+              <p>
+                <span className={beagleTheme.mutedText}>
+                  {t("search.results.col.sex")}:{" "}
+                </span>
+                <span>{mapSexLabel(row.sex, t)}</span>
+              </p>
+              <p className="col-span-2">
+                <span className={beagleTheme.mutedText}>
+                  {t("search.results.col.name")}:{" "}
+                </span>
+                <span
+                  title={`${t("search.results.parents.sire")}: ${row.sire}\n${t("search.results.parents.dam")}: ${row.dam}`}
+                  className={cn("font-medium", beagleTheme.inkStrongText)}
+                >
+                  {row.name}
+                </span>
+              </p>
+              <p>
+                <span className={beagleTheme.mutedText}>
+                  {t("search.results.col.trials")}:
+                </span>{" "}
+                <span
+                  className={cn(
+                    "font-medium tabular-nums",
+                    beagleTheme.inkStrongText,
+                  )}
+                >
+                  {row.trialCount}
+                </span>
+              </p>
+              <p>
+                <span className={beagleTheme.mutedText}>
+                  {t("search.results.col.shows")}:
+                </span>{" "}
+                <span
+                  className={cn(
+                    "font-medium tabular-nums",
+                    beagleTheme.inkStrongText,
+                  )}
+                >
+                  {row.showCount}
+                </span>
+              </p>
+            </div>
+            <BeagleSearchRowActions className="mt-2" />
+          </article>
+        );
+      })}
     </div>
   );
 }

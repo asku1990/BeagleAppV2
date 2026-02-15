@@ -8,7 +8,11 @@ import {
   useTransition,
 } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { BeagleSearchQueryState, BeagleSearchSort } from "./types";
+import type {
+  BeagleSearchAdvancedSex,
+  BeagleSearchQueryState,
+  BeagleSearchSort,
+} from "./types";
 
 type SearchParamsLike = {
   get: (key: string) => string | null;
@@ -20,6 +24,8 @@ const DEFAULT_STATE: BeagleSearchQueryState = {
   ek: "",
   reg: "",
   name: "",
+  sex: "any",
+  multipleRegsOnly: false,
   page: 1,
   sort: DEFAULT_SORT,
   adv: false,
@@ -55,6 +61,13 @@ function trimValue(value: string | null): string {
   return (value ?? "").trim();
 }
 
+function readSex(value: string | null): BeagleSearchAdvancedSex {
+  if (value === "male" || value === "female") {
+    return value;
+  }
+  return "any";
+}
+
 export function readUrlSearchState(
   params: SearchParamsLike,
 ): BeagleSearchQueryState {
@@ -62,6 +75,8 @@ export function readUrlSearchState(
     ek: trimValue(params.get("ek")),
     reg: trimValue(params.get("reg")),
     name: trimValue(params.get("name")),
+    sex: readSex(params.get("sex")),
+    multipleRegsOnly: params.get("multiRegs") === "1",
     page: readPage(params.get("page")),
     sort: readSort(params.get("sort")),
     adv: params.get("adv") === "1",
@@ -79,6 +94,12 @@ function toQueryString(state: BeagleSearchQueryState): string {
   }
   if (state.name) {
     params.set("name", state.name);
+  }
+  if (state.sex !== "any") {
+    params.set("sex", state.sex);
+  }
+  if (state.multipleRegsOnly) {
+    params.set("multiRegs", "1");
   }
   if (state.page > 1) {
     params.set("page", String(state.page));
@@ -108,6 +129,8 @@ export function useBeagleSearchUiState() {
     ek: urlState.ek,
     reg: urlState.reg,
     name: urlState.name,
+    sex: urlState.sex,
+    multipleRegsOnly: urlState.multipleRegsOnly,
   });
 
   useEffect(() => {
@@ -117,8 +140,16 @@ export function useBeagleSearchUiState() {
       ek: urlState.ek,
       reg: urlState.reg,
       name: urlState.name,
+      sex: urlState.sex,
+      multipleRegsOnly: urlState.multipleRegsOnly,
     });
-  }, [urlState.ek, urlState.reg, urlState.name]);
+  }, [
+    urlState.ek,
+    urlState.reg,
+    urlState.name,
+    urlState.sex,
+    urlState.multipleRegsOnly,
+  ]);
 
   const commitState = useCallback(
     (nextState: BeagleSearchQueryState) => {
@@ -145,15 +176,27 @@ export function useBeagleSearchUiState() {
       ek: formState.ek.trim(),
       reg: formState.reg.trim(),
       name: formState.name.trim(),
+      sex: formState.sex,
+      multipleRegsOnly: formState.multipleRegsOnly,
       page: 1,
     });
-  }, [commitState, formState.ek, formState.name, formState.reg, urlState]);
+  }, [
+    commitState,
+    formState.ek,
+    formState.multipleRegsOnly,
+    formState.name,
+    formState.reg,
+    formState.sex,
+    urlState,
+  ]);
 
   const resetSearch = useCallback(() => {
     setFormState({
       ek: "",
       reg: "",
       name: "",
+      sex: "any",
+      multipleRegsOnly: false,
     });
 
     commitState(DEFAULT_STATE);
@@ -177,6 +220,14 @@ export function useBeagleSearchUiState() {
     commitState({ ...urlState, adv: !urlState.adv });
   }, [commitState, urlState]);
 
+  const setMultipleRegsOnly = useCallback((value: boolean) => {
+    setFormState((current) => ({ ...current, multipleRegsOnly: value }));
+  }, []);
+
+  const setSex = useCallback((value: BeagleSearchAdvancedSex) => {
+    setFormState((current) => ({ ...current, sex: value }));
+  }, []);
+
   return {
     formState,
     urlState,
@@ -187,5 +238,7 @@ export function useBeagleSearchUiState() {
     setPage,
     setSort,
     toggleAdvanced,
+    setSex,
+    setMultipleRegsOnly,
   };
 }

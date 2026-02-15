@@ -13,6 +13,8 @@ export type BeagleSearchRequestDb = {
   ek?: string;
   reg?: string;
   name?: string;
+  sex?: "male" | "female";
+  multipleRegsOnly?: boolean;
   page?: number;
   pageSize?: number;
   sort?: BeagleSearchSortDb;
@@ -22,6 +24,7 @@ export type BeagleSearchRowDb = {
   id: string;
   ekNo: number | null;
   registrationNo: string;
+  registrationNos: string[];
   createdAt: Date;
   sex: "U" | "N" | "-";
   name: string;
@@ -72,6 +75,10 @@ type RegistrationRow = {
 type RegistrationOrderKeyRow = {
   id: string;
   primaryRegistrationNo: string;
+};
+
+type DogIdRow = {
+  dogId: string;
 };
 
 function normalizeText(value: string | undefined): string {
@@ -343,10 +350,22 @@ async function loadRegistrationOrderKeys(
   });
 }
 
+async function loadDogIdsWithMultipleRegistrations(): Promise<string[]> {
+  const rows = await prisma.$queryRaw<DogIdRow[]>`
+    SELECT r."dogId"
+    FROM "DogRegistration" r
+    GROUP BY r."dogId"
+    HAVING COUNT(*) > 1
+  `;
+
+  return rows.map((row) => row.dogId);
+}
+
 function buildWhere(input: {
   ek: string;
   reg: string;
   name: string;
+  sex?: "male" | "female";
 }): Prisma.DogWhereInput {
   const and: Prisma.DogWhereInput[] = [];
 
@@ -411,8 +430,21 @@ function buildWhere(input: {
     }
   }
 
+  if (input.sex === "male") {
+    and.push({ sex: DogSex.MALE });
+  } else if (input.sex === "female") {
+    and.push({ sex: DogSex.FEMALE });
+  }
+
   if (and.length === 0) return {};
   return { AND: and };
+}
+
+function normalizeSex(value: unknown): "male" | "female" | undefined {
+  if (value === "male" || value === "female") {
+    return value;
+  }
+  return undefined;
 }
 
 function matchesRow(
@@ -536,6 +568,7 @@ function toSearchRow(row: RawDogRow): BeagleSearchRowDb {
     id: row.id,
     ekNo: row.ekNo,
     registrationNo: row.primaryRegistrationNo,
+    registrationNos: row.registrationNos,
     createdAt: row.createdAt,
     sex: toSexCode(row.sex),
     name: row.name,
@@ -568,11 +601,16 @@ export async function searchBeagleDogsDb(
   const ek = normalizeText(input.ek);
   const reg = normalizeText(input.reg).toUpperCase();
   const name = normalizeText(input.name);
+  const sex = normalizeSex(input.sex);
+  const multipleRegsOnly = input.multipleRegsOnly === true;
 
   const mode = resolveMode({ ek, reg, name });
-  if (mode === "none") {
+  const hasAdvancedFilters = multipleRegsOnly || sex != null;
+  const effectiveMode: BeagleSearchModeDb =
+    mode === "none" && hasAdvancedFilters ? "combined" : mode;
+  if (mode === "none" && !hasAdvancedFilters) {
     return {
-      mode,
+      mode: effectiveMode,
       total: 0,
       totalPages: 0,
       page: 1,
@@ -590,17 +628,46 @@ export async function searchBeagleDogsDb(
     name: buildPattern("name", name),
   };
 
-  const where = buildWhere({
+  const baseWhere = buildWhere({
     ek,
     reg,
     name,
+    sex,
   });
+  const multiRegistrationDogIds = multipleRegsOnly
+    ? await loadDogIdsWithMultipleRegistrations()
+    : null;
+
+  if (multipleRegsOnly && (multiRegistrationDogIds?.length ?? 0) === 0) {
+    return {
+      mode: effectiveMode,
+      total: 0,
+      totalPages: 0,
+      page: 1,
+      items: [],
+    };
+  }
+
+  const where: Prisma.DogWhereInput =
+    multipleRegsOnly && multiRegistrationDogIds
+      ? {
+          AND: [
+            baseWhere,
+            {
+              id: {
+                in: multiRegistrationDogIds,
+              },
+            },
+          ],
+        }
+      : baseWhere;
 
   const needsWildcardFilter =
     hasWildcard(ek) || hasWildcard(reg) || hasWildcard(name);
+  const requiresInMemoryFilter = needsWildcardFilter;
   const dbOrderBy = resolveDbOrderBy(sort);
 
-  if (!needsWildcardFilter && dbOrderBy) {
+  if (!requiresInMemoryFilter && dbOrderBy) {
     const total = await prisma.dog.count({ where });
     const totalPages = Math.ceil(total / pageSize);
     const resolvedPage =
@@ -616,7 +683,7 @@ export async function searchBeagleDogsDb(
     });
 
     return {
-      mode,
+      mode: effectiveMode,
       total,
       totalPages,
       page: resolvedPage,
@@ -624,7 +691,7 @@ export async function searchBeagleDogsDb(
     };
   }
 
-  if (!needsWildcardFilter && sort === "reg-desc") {
+  if (!requiresInMemoryFilter && sort === "reg-desc") {
     const orderKeys = await loadRegistrationOrderKeys(where);
     const sortedOrderKeys = [...orderKeys].sort((left, right) => {
       const registrationComparison = compareByRegistrationDesc(
@@ -648,7 +715,7 @@ export async function searchBeagleDogsDb(
 
     if (pageIds.length === 0) {
       return {
-        mode,
+        mode: effectiveMode,
         total,
         totalPages,
         page: resolvedPage,
@@ -670,7 +737,7 @@ export async function searchBeagleDogsDb(
     );
 
     return {
-      mode,
+      mode: effectiveMode,
       total,
       totalPages,
       page: resolvedPage,
@@ -679,9 +746,15 @@ export async function searchBeagleDogsDb(
   }
 
   const allRows = await loadDogs({ where });
-  const filteredRows = needsWildcardFilter
-    ? allRows.filter((row) => matchesRow(row, patterns))
-    : allRows;
+  const filteredRows = allRows.filter((row) => {
+    if (needsWildcardFilter && !matchesRow(row, patterns)) {
+      return false;
+    }
+    if (multipleRegsOnly && row.registrationNos.length < 2) {
+      return false;
+    }
+    return true;
+  });
   const sortedRows = sortRows(filteredRows, sort);
 
   const total = sortedRows.length;
@@ -692,7 +765,7 @@ export async function searchBeagleDogsDb(
   const paged = sortedRows.slice(start, start + pageSize).map(toSearchRow);
 
   return {
-    mode,
+    mode: effectiveMode,
     total,
     totalPages,
     page: resolvedPage,

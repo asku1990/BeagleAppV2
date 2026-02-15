@@ -3,7 +3,17 @@ import { Input } from "@/components/ui/input";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
-export function BeagleSearchAdvancedPlaceholders() {
+export function BeagleSearchAdvancedFilters({
+  sex,
+  onSexChange,
+  multipleRegsOnly,
+  onMultipleRegsOnlyChange,
+}: {
+  sex: "any" | "male" | "female";
+  onSexChange: (value: "any" | "male" | "female") => void;
+  multipleRegsOnly: boolean;
+  onMultipleRegsOnlyChange: (value: boolean) => void;
+}) {
   const { t } = useI18n();
 
   return (
@@ -17,22 +27,35 @@ export function BeagleSearchAdvancedPlaceholders() {
       <p className={cn("mt-1 text-xs", beagleTheme.mutedText)}>
         {t("search.form.advanced.placeholder")}
       </p>
-      <p className={cn("mt-1 text-xs font-medium text-amber-700")}>
-        {t("common.notImplementedYet")}
-      </p>
+      <label className="mt-3 flex items-center gap-2 text-xs">
+        <input
+          type="checkbox"
+          checked={multipleRegsOnly}
+          onChange={(event) => onMultipleRegsOnlyChange(event.target.checked)}
+          className={cn("size-4 rounded border", beagleTheme.border)}
+        />
+        <span className={beagleTheme.inkStrongText}>
+          {t("search.advanced.multipleRegsOnly")}
+        </span>
+      </label>
       <div className="mt-3 grid gap-3 md:grid-cols-2">
         <label className="space-y-1 text-xs">
           <span className={beagleTheme.mutedText}>
             {t("search.advanced.sex")}
           </span>
           <select
-            disabled
+            value={sex}
+            onChange={(event) =>
+              onSexChange(event.target.value as "any" | "male" | "female")
+            }
             className={cn(
-              "h-9 w-full rounded-md border bg-white px-3 text-sm disabled:cursor-not-allowed disabled:opacity-70",
+              "h-9 w-full rounded-md border bg-white px-3 text-sm",
               beagleTheme.border,
             )}
           >
-            <option>{t("search.advanced.option.any")}</option>
+            <option value="any">{t("search.advanced.option.any")}</option>
+            <option value="male">{t("search.advanced.sex.male")}</option>
+            <option value="female">{t("search.advanced.sex.female")}</option>
           </select>
         </label>
         <label className="space-y-1 text-xs">
