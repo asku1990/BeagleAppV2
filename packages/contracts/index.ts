@@ -91,6 +91,7 @@ export type {
   BeagleSearchRequest,
   BeagleSearchResponse,
   BeagleSearchRow,
+  BeagleSearchSex,
   BeagleSearchSort,
 } from "./dogs";
 

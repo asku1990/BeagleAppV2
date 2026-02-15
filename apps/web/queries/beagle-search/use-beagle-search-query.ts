@@ -12,7 +12,9 @@ export function useBeagleSearchQuery(state: BeagleSearchQueryState) {
   const hasSearchInput =
     state.ek.trim().length > 0 ||
     state.reg.trim().length > 0 ||
-    state.name.trim().length > 0;
+    state.name.trim().length > 0 ||
+    state.sex !== "any" ||
+    state.multipleRegsOnly;
 
   return useQuery<BeagleSearchResponse>({
     queryKey: [
@@ -20,6 +22,8 @@ export function useBeagleSearchQuery(state: BeagleSearchQueryState) {
       state.ek,
       state.reg,
       state.name,
+      state.sex,
+      state.multipleRegsOnly,
       state.page,
       state.sort,
     ],
@@ -29,6 +33,8 @@ export function useBeagleSearchQuery(state: BeagleSearchQueryState) {
         ek: state.ek,
         reg: state.reg,
         name: state.name,
+        sex: state.sex === "any" ? undefined : state.sex,
+        multipleRegsOnly: state.multipleRegsOnly,
         page: state.page,
         pageSize: BEAGLE_PAGE_SIZE,
         sort: state.sort,
