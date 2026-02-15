@@ -61,12 +61,30 @@ export function BeagleSearchResultsMobileCards({
                 {row.name}
               </span>
             </p>
-            <p className="col-span-2">
+            <p>
               <span className={beagleTheme.mutedText}>
-                {t("search.results.col.trialsShows")}:
+                {t("search.results.col.trials")}:
+              </span>{" "}
+              <span
+                className={cn(
+                  "font-medium tabular-nums",
+                  beagleTheme.inkStrongText,
+                )}
+              >
+                {row.trialCount}
               </span>
-              <span>
-                {row.trialCount} / {row.showCount}
+            </p>
+            <p>
+              <span className={beagleTheme.mutedText}>
+                {t("search.results.col.shows")}:
+              </span>{" "}
+              <span
+                className={cn(
+                  "font-medium tabular-nums",
+                  beagleTheme.inkStrongText,
+                )}
+              >
+                {row.showCount}
               </span>
             </p>
           </div>

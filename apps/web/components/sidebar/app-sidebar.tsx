@@ -58,10 +58,17 @@ const publicNavItems: NavItem[] = [
 
 export function AppSidebar() {
   const { t } = useI18n();
-  const { state } = useSidebar();
+  const { state, isMobile, setOpenMobile } = useSidebar();
   const pathname = usePathname();
 
+  const closeSidebarOnMobile = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
   const handleComingSoon = (item: string) => {
+    closeSidebarOnMobile();
     toast(`${item}: ${t("common.notImplementedYet")}`);
   };
 
@@ -79,6 +86,7 @@ export function AppSidebar() {
           {state === "collapsed" ? (
             <Link
               href="/"
+              onClick={closeSidebarOnMobile}
               className={cn(
                 "text-xs font-semibold leading-none tracking-wide uppercase",
                 beagleTheme.inkStrongText,
@@ -90,6 +98,7 @@ export function AppSidebar() {
           ) : (
             <Link
               href="/"
+              onClick={closeSidebarOnMobile}
               className={cn(
                 "leading-none",
                 beagleTheme.headingSm,
@@ -126,7 +135,7 @@ export function AppSidebar() {
                         "data-[active=true]:bg-[var(--beagle-accent-soft)]",
                       )}
                     >
-                      <Link href={item.href}>
+                      <Link href={item.href} onClick={closeSidebarOnMobile}>
                         <item.icon className="size-4" />
                         <span>{t(item.labelKey)}</span>
                       </Link>
