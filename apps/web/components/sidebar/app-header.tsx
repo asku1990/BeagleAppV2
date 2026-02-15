@@ -1,5 +1,8 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -13,6 +16,8 @@ const localeButtons = [
 
 export function AppHeader() {
   const { locale, setLocale, t } = useI18n();
+  const pathname = usePathname();
+  const showBackHome = pathname !== "/";
 
   return (
     <header
@@ -27,6 +32,20 @@ export function AppHeader() {
           <SidebarTrigger
             className={cn(beagleTheme.inkStrongText, beagleTheme.focusRing)}
           />
+          {showBackHome ? (
+            <Button
+              asChild
+              type="button"
+              variant="ghost"
+              size="sm"
+              className={cn(beagleTheme.inkStrongText, beagleTheme.focusRing)}
+            >
+              <Link href="/">
+                <ChevronLeft className="size-4" />
+                <span>{t("header.backHome")}</span>
+              </Link>
+            </Button>
+          ) : null}
         </div>
         <div className="flex items-center gap-1">
           {localeButtons.map((option) => (

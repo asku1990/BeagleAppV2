@@ -84,4 +84,14 @@ export type ImportRunIssuesResponse = {
   nextCursor: string | null;
 };
 
+export type {
+  BeagleNewestRequest,
+  BeagleNewestResponse,
+  BeagleSearchMode,
+  BeagleSearchRequest,
+  BeagleSearchResponse,
+  BeagleSearchRow,
+  BeagleSearchSort,
+} from "./dogs";
+
 export type { HomeStatisticsResponse } from "./home";
