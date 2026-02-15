@@ -13,6 +13,7 @@ export type BeagleSearchRequestDb = {
   ek?: string;
   reg?: string;
   name?: string;
+  sex?: "male" | "female";
   multipleRegsOnly?: boolean;
   page?: number;
   pageSize?: number;
@@ -364,6 +365,7 @@ function buildWhere(input: {
   ek: string;
   reg: string;
   name: string;
+  sex?: "male" | "female";
 }): Prisma.DogWhereInput {
   const and: Prisma.DogWhereInput[] = [];
 
@@ -428,8 +430,21 @@ function buildWhere(input: {
     }
   }
 
+  if (input.sex === "male") {
+    and.push({ sex: DogSex.MALE });
+  } else if (input.sex === "female") {
+    and.push({ sex: DogSex.FEMALE });
+  }
+
   if (and.length === 0) return {};
   return { AND: and };
+}
+
+function normalizeSex(value: unknown): "male" | "female" | undefined {
+  if (value === "male" || value === "female") {
+    return value;
+  }
+  return undefined;
 }
 
 function matchesRow(
@@ -586,12 +601,14 @@ export async function searchBeagleDogsDb(
   const ek = normalizeText(input.ek);
   const reg = normalizeText(input.reg).toUpperCase();
   const name = normalizeText(input.name);
+  const sex = normalizeSex(input.sex);
   const multipleRegsOnly = input.multipleRegsOnly === true;
 
   const mode = resolveMode({ ek, reg, name });
+  const hasAdvancedFilters = multipleRegsOnly || sex != null;
   const effectiveMode: BeagleSearchModeDb =
-    mode === "none" && multipleRegsOnly ? "combined" : mode;
-  if (mode === "none" && !multipleRegsOnly) {
+    mode === "none" && hasAdvancedFilters ? "combined" : mode;
+  if (mode === "none" && !hasAdvancedFilters) {
     return {
       mode: effectiveMode,
       total: 0,
@@ -615,6 +632,7 @@ export async function searchBeagleDogsDb(
     ek,
     reg,
     name,
+    sex,
   });
   const multiRegistrationDogIds = multipleRegsOnly
     ? await loadDogIdsWithMultipleRegistrations()

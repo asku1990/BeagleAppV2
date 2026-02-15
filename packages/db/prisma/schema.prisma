@@ -81,6 +81,7 @@ model Dog {
   updatedAt       DateTime          @updatedAt
 
   @@index([name])
+  @@index([sex])
   @@index([birthDate])
   @@index([sireId])
   @@index([damId])

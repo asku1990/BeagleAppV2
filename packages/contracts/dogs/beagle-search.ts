@@ -5,11 +5,13 @@ export type BeagleSearchSort =
   | "created-desc";
 
 export type BeagleSearchMode = "none" | "ek" | "reg" | "name" | "combined";
+export type BeagleSearchSex = "male" | "female";
 
 export type BeagleSearchRequest = {
   ek?: string;
   reg?: string;
   name?: string;
+  sex?: BeagleSearchSex;
   multipleRegsOnly?: boolean;
   page?: number;
   pageSize?: number;

@@ -4,9 +4,13 @@ import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export function BeagleSearchAdvancedFilters({
+  sex,
+  onSexChange,
   multipleRegsOnly,
   onMultipleRegsOnlyChange,
 }: {
+  sex: "any" | "male" | "female";
+  onSexChange: (value: "any" | "male" | "female") => void;
   multipleRegsOnly: boolean;
   onMultipleRegsOnlyChange: (value: boolean) => void;
 }) {
@@ -40,13 +44,18 @@ export function BeagleSearchAdvancedFilters({
             {t("search.advanced.sex")}
           </span>
           <select
-            disabled
+            value={sex}
+            onChange={(event) =>
+              onSexChange(event.target.value as "any" | "male" | "female")
+            }
             className={cn(
-              "h-9 w-full rounded-md border bg-white px-3 text-sm disabled:cursor-not-allowed disabled:opacity-70",
+              "h-9 w-full rounded-md border bg-white px-3 text-sm",
               beagleTheme.border,
             )}
           >
-            <option>{t("search.advanced.option.any")}</option>
+            <option value="any">{t("search.advanced.option.any")}</option>
+            <option value="male">{t("search.advanced.sex.male")}</option>
+            <option value="female">{t("search.advanced.sex.female")}</option>
           </select>
         </label>
         <label className="space-y-1 text-xs">

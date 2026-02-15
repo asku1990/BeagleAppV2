@@ -32,11 +32,12 @@ export function BeagleSearchForm({
   onReset,
   onToggleAdvanced,
   onSortChange,
+  onSexChange,
   onMultipleRegsOnlyChange,
 }: {
   values: Pick<
     BeagleSearchQueryState,
-    "ek" | "reg" | "name" | "multipleRegsOnly"
+    "ek" | "reg" | "name" | "sex" | "multipleRegsOnly"
   >;
   mode: BeaglePrimarySearchMode;
   sort: BeagleSearchSort;
@@ -48,6 +49,7 @@ export function BeagleSearchForm({
   onReset: () => void;
   onToggleAdvanced: () => void;
   onSortChange: (sort: BeagleSearchSort) => void;
+  onSexChange: (value: "any" | "male" | "female") => void;
   onMultipleRegsOnlyChange: (value: boolean) => void;
 }) {
   const { t } = useI18n();
@@ -167,6 +169,8 @@ export function BeagleSearchForm({
 
         {advancedOpen ? (
           <BeagleSearchAdvancedFilters
+            sex={values.sex}
+            onSexChange={onSexChange}
             multipleRegsOnly={values.multipleRegsOnly}
             onMultipleRegsOnlyChange={onMultipleRegsOnlyChange}
           />

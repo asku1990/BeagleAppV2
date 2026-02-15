@@ -30,14 +30,17 @@ export function BeagleSearchPage() {
     resetSearch,
     setPage,
     setSort,
+    setSex,
     setMultipleRegsOnly,
     toggleAdvanced,
   } = useBeagleSearchUiState();
 
   const localMode = resolvePrimarySearchMode(formState);
+  const hasAdvancedFilters =
+    formState.multipleRegsOnly || formState.sex !== "any";
   const effectiveFormMode =
-    localMode === "none" && formState.multipleRegsOnly ? "combined" : localMode;
-  const canSubmit = localMode !== "none" || formState.multipleRegsOnly;
+    localMode === "none" && hasAdvancedFilters ? "combined" : localMode;
+  const canSubmit = localMode !== "none" || hasAdvancedFilters;
 
   const searchQuery = useBeagleSearchQuery(urlState);
   const newestQuery = useBeagleNewestQuery(5);
@@ -108,6 +111,7 @@ export function BeagleSearchPage() {
         onReset={resetSearch}
         onToggleAdvanced={toggleAdvanced}
         onSortChange={setSort}
+        onSexChange={setSex}
         onMultipleRegsOnlyChange={setMultipleRegsOnly}
       />
 

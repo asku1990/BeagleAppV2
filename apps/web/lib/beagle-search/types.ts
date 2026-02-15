@@ -2,16 +2,19 @@ import type {
   BeagleSearchMode,
   BeagleSearchResponse,
   BeagleSearchRow,
+  BeagleSearchSex,
   BeagleSearchSort,
 } from "@beagle/contracts";
 
 export type { BeagleSearchMode, BeagleSearchSort };
+export type BeagleSearchAdvancedSex = "any" | BeagleSearchSex;
 export type BeagleSearchResultRow = BeagleSearchRow;
 
 export type BeagleSearchQueryState = {
   ek: string;
   reg: string;
   name: string;
+  sex: BeagleSearchAdvancedSex;
   multipleRegsOnly: boolean;
   page: number;
   sort: BeagleSearchSort;
