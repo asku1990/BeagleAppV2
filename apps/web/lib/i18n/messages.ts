@@ -1,78 +1,30 @@
 import type { Locale } from "@/lib/i18n/types";
+import { fiCommonMessages, svCommonMessages } from "@/lib/i18n/messages/common";
+import { fiHeaderMessages, svHeaderMessages } from "@/lib/i18n/messages/header";
+import { fiHomeMessages, svHomeMessages } from "@/lib/i18n/messages/home";
+import { fiSearchMessages, svSearchMessages } from "@/lib/i18n/messages/search";
+import {
+  fiSidebarMessages,
+  svSidebarMessages,
+} from "@/lib/i18n/messages/sidebar";
 
 const fi = {
-  "header.language.finnish": "Vaihda kieleksi suomi",
-  "header.language.swedish": "Vaihda kieleksi ruotsi",
-  "sidebar.title": "SBJ-tietokanta",
-  "sidebar.shortTitle": "SBJ",
-  "sidebar.navigation": "Tietokanta",
-  "sidebar.nav.beagleSearch": "Beaglehaku",
-  "sidebar.nav.ownerSearch": "Omistajahaku",
-  "sidebar.nav.trialResults": "Koetulosten haku",
-  "sidebar.nav.fieldTrials": "Ajokokeet",
-  "sidebar.nav.shows": "Näyttelyt",
-  "sidebar.nav.ekDogs": "EK-koirat",
-  "sidebar.nav.kennelNames": "Kennelnimet ja lyhenteet",
-  "sidebar.nav.virtualPairing": "Virtuaaliparitus",
-  "sidebar.nav.bestDriver": "Paras ajuri -kilpailu",
-  "sidebar.signIn": "Kirjaudu",
-  "common.notImplementedYet": "ei vielä toteutettu",
-  "home.hero.title": "Suomen Beaglejärjestö- Finska Beagleklubben r.y.",
-  "home.hero.description":
-    "Tietokannassa on Suomessa rekisteröidyt Beaglet sekä koe ja näyttelytuloksia.",
-  "home.hero.logoAlt": "Suomen Beaglejärjestön logo",
-  "home.stats.title": "Beagle-tietokannan tilastot",
-  "home.stats.group.registrations": "Rekisteröinnit",
-  "home.stats.group.trials": "Ajokokeet",
-  "home.stats.group.shows": "Näyttelyt",
-  "home.stats.row.registeredDogs": "Rekisteröityjä koiria",
-  "home.stats.row.youngestRegistered": "Nuorin rekisteröity",
-  "home.stats.row.resultsPeriod": "Tulosten ajanjakso",
-  "home.stats.row.totalTrialEntries": "Ajokoestartteja yhteensä",
-  "home.stats.row.performedByDogs": "Suorittaneita koiria",
-  "home.stats.row.totalShowEntries": "Näyttelystartteja yhteensä",
-  "common.noData": "Ei dataa",
-  "common.dataPending": "Tieto tulossa",
-  "common.dataUnavailable": "Tieto ei saatavilla",
+  ...fiHeaderMessages,
+  ...fiSidebarMessages,
+  ...fiCommonMessages,
+  ...fiHomeMessages,
+  ...fiSearchMessages,
 } as const;
 
 export type MessageKey = keyof typeof fi;
 type Messages = Record<MessageKey, string>;
 
 const sv: Messages = {
-  "header.language.finnish": "Byt språk till finska",
-  "header.language.swedish": "Byt språk till svenska",
-  "sidebar.title": "Beagledatabas",
-  "sidebar.shortTitle": "SBJ",
-  "sidebar.navigation": "Databas",
-  "sidebar.nav.beagleSearch": "Beaglesökning",
-  "sidebar.nav.ownerSearch": "Ägarsökning",
-  "sidebar.nav.trialResults": "Provresultatsökning",
-  "sidebar.nav.fieldTrials": "Jaktprov",
-  "sidebar.nav.shows": "Utställningar",
-  "sidebar.nav.ekDogs": "Specialstambokshundar",
-  "sidebar.nav.kennelNames": "Kennelnamn och förkortningar",
-  "sidebar.nav.virtualPairing": "Virtuell parning",
-  "sidebar.nav.bestDriver": "Paras ajuri-tävling",
-  "sidebar.signIn": "Logga in",
-  "common.notImplementedYet": "inte implementerad ännu",
-  "home.hero.title": "Suomen Beaglejärjestö- Finska Beagleklubben r.y.",
-  "home.hero.description":
-    "I databasen finns beaglar registrerade i Finland samt resultat från jaktprov och utställningar.",
-  "home.hero.logoAlt": "Finlands Beagleförbunds logotyp",
-  "home.stats.title": "Beagledatabasens statistik",
-  "home.stats.group.registrations": "Registreringar",
-  "home.stats.group.trials": "Jaktprov",
-  "home.stats.group.shows": "Utställningar",
-  "home.stats.row.registeredDogs": "Registrerade hundar",
-  "home.stats.row.youngestRegistered": "Yngst registrerad",
-  "home.stats.row.resultsPeriod": "Resultat från perioden",
-  "home.stats.row.totalTrialEntries": "Jaktprovsstarter totalt",
-  "home.stats.row.performedByDogs": "Genomförda av hundar",
-  "home.stats.row.totalShowEntries": "Utställningsstarter totalt",
-  "common.noData": "Ingen data",
-  "common.dataPending": "Data kommer",
-  "common.dataUnavailable": "Data ej tillgänglig",
+  ...svHeaderMessages,
+  ...svSidebarMessages,
+  ...svCommonMessages,
+  ...svHomeMessages,
+  ...svSearchMessages,
 };
 
 export const messages: Record<Locale, Messages> = {

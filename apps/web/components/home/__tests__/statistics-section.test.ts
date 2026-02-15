@@ -92,10 +92,10 @@ describe("StatisticsSection", () => {
     mockedLocale = "sv";
     mockedQueryData = baseData;
     const html = renderSection();
-    const svNumber = new Intl.NumberFormat("sv-SE").format(
+    const svNumber = new Intl.NumberFormat("sv-FI").format(
       baseData.trials.totalEntries,
     );
-    const svDate = new Intl.DateTimeFormat("sv-SE").format(
+    const svDate = new Intl.DateTimeFormat("sv-FI").format(
       new Date(baseData.shows.resultsPeriodStart!),
     );
 

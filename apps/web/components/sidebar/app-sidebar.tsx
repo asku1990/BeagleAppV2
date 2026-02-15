@@ -1,10 +1,13 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Award,
   Dog,
   FileSearch,
   Flag,
+  House,
   Link2,
   LogIn,
   PawPrint,
@@ -33,10 +36,16 @@ import { useI18n, type MessageKey } from "@/lib/i18n";
 type NavItem = {
   labelKey: MessageKey;
   icon: React.ComponentType<{ className?: string }>;
+  href?: string;
 };
 
 const publicNavItems: NavItem[] = [
-  { labelKey: "sidebar.nav.beagleSearch", icon: Search },
+  { labelKey: "sidebar.nav.home", icon: House, href: "/" },
+  {
+    labelKey: "sidebar.nav.beagleSearch",
+    icon: Search,
+    href: "/beagle/search",
+  },
   { labelKey: "sidebar.nav.ownerSearch", icon: Users },
   { labelKey: "sidebar.nav.trialResults", icon: FileSearch },
   { labelKey: "sidebar.nav.fieldTrials", icon: Flag },
@@ -50,6 +59,7 @@ const publicNavItems: NavItem[] = [
 export function AppSidebar() {
   const { t } = useI18n();
   const { state } = useSidebar();
+  const pathname = usePathname();
 
   const handleComingSoon = (item: string) => {
     toast(`${item}: ${t("common.notImplementedYet")}`);
@@ -67,24 +77,28 @@ export function AppSidebar() {
           }
         >
           {state === "collapsed" ? (
-            <p
+            <Link
+              href="/"
               className={cn(
                 "text-xs font-semibold leading-none tracking-wide uppercase",
                 beagleTheme.inkStrongText,
+                beagleTheme.focusRing,
               )}
             >
               {t("sidebar.shortTitle")}
-            </p>
+            </Link>
           ) : (
-            <p
+            <Link
+              href="/"
               className={cn(
                 "leading-none",
                 beagleTheme.headingSm,
                 beagleTheme.inkStrongText,
+                beagleTheme.focusRing,
               )}
             >
               {t("sidebar.title")}
-            </p>
+            </Link>
           )}
         </div>
       </SidebarHeader>
@@ -95,20 +109,44 @@ export function AppSidebar() {
             <SidebarMenu>
               {publicNavItems.map((item) => (
                 <SidebarMenuItem key={item.labelKey}>
-                  <SidebarMenuButton
-                    tooltip={t(item.labelKey)}
-                    onClick={() => handleComingSoon(t(item.labelKey))}
-                    className={cn(
-                      beagleTheme.inkStrongText,
-                      beagleTheme.interactive,
-                      beagleTheme.focusRing,
-                      "min-h-11 md:min-h-9",
-                      "data-[active=true]:bg-[var(--beagle-accent-soft)]",
-                    )}
-                  >
-                    <item.icon className="size-4" />
-                    <span>{t(item.labelKey)}</span>
-                  </SidebarMenuButton>
+                  {item.href ? (
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={t(item.labelKey)}
+                      isActive={
+                        item.href === "/"
+                          ? pathname === "/"
+                          : pathname.startsWith(item.href)
+                      }
+                      className={cn(
+                        beagleTheme.inkStrongText,
+                        beagleTheme.interactive,
+                        beagleTheme.focusRing,
+                        "min-h-11 md:min-h-9",
+                        "data-[active=true]:bg-[var(--beagle-accent-soft)]",
+                      )}
+                    >
+                      <Link href={item.href}>
+                        <item.icon className="size-4" />
+                        <span>{t(item.labelKey)}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  ) : (
+                    <SidebarMenuButton
+                      tooltip={t(item.labelKey)}
+                      onClick={() => handleComingSoon(t(item.labelKey))}
+                      className={cn(
+                        beagleTheme.inkStrongText,
+                        beagleTheme.interactive,
+                        beagleTheme.focusRing,
+                        "min-h-11 md:min-h-9",
+                        "data-[active=true]:bg-[var(--beagle-accent-soft)]",
+                      )}
+                    >
+                      <item.icon className="size-4" />
+                      <span>{t(item.labelKey)}</span>
+                    </SidebarMenuButton>
+                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
