@@ -38,7 +38,10 @@ export function BeagleSearchResultsDesktopTable({
               {t("search.results.col.name")}
             </th>
             <th className="px-2 py-2 font-semibold">
-              {t("search.results.col.trialsShows")}
+              {t("search.results.col.trials")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
+              {t("search.results.col.shows")}
             </th>
             <th className="px-2 py-2 font-semibold">
               {t("search.results.col.actions")}
@@ -62,9 +65,8 @@ export function BeagleSearchResultsDesktopTable({
                   {row.name}
                 </span>
               </td>
-              <td className="px-2 py-2">
-                {row.trialCount} / {row.showCount}
-              </td>
+              <td className="px-2 py-2">{row.trialCount}</td>
+              <td className="px-2 py-2">{row.showCount}</td>
               <td className="px-2 py-2">
                 <BeagleSearchRowActions />
               </td>
