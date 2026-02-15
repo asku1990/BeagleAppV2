@@ -1,5 +1,6 @@
 export const fiSearchMessages = {
   "search.page.title": "Beaglehaku",
+  "search.page.logoAlt": "Suomen Beaglejärjestön logo",
   "search.page.description":
     "Hae beagleja EK-numerolla, rekisterinumerolla tai nimellä. Legacy-yhteensopiva haku käyttää yhtä pääkenttää kerrallaan.",
   "search.form.title": "Hae beagleja",
@@ -53,14 +54,15 @@ export const fiSearchMessages = {
   "search.empty.singleField":
     "Legacy-yhteensopiva haku hyväksyy vain yhden pääkentän kerrallaan.",
   "search.empty.noMatches": "Hakuehdoilla ei löytynyt koiria.",
-  "search.newest.title": "10 uusinta koiraa",
-  "search.newest.subtitle": "Listaus uusimmista syntymäajoista.",
+  "search.newest.title": "Viimeisimmät lisäykset",
+  "search.newest.subtitle": "Kevyt viitelista viimeksi syntyneistä koirista.",
   "search.newest.registration": "Rekisterinumero",
   "search.newest.birthDate": "Syntymäaika",
 } as const;
 
 export const svSearchMessages = {
   "search.page.title": "Beaglesökning",
+  "search.page.logoAlt": "Finlands Beagleförbunds logotyp",
   "search.page.description":
     "Sök beaglar med SSB-nummer, registreringsnummer eller namn. Legacy-kompatibelt läge använder ett huvudfält åt gången.",
   "search.form.title": "Sök beaglar",
@@ -114,8 +116,9 @@ export const svSearchMessages = {
   "search.empty.singleField":
     "Legacy-kompatibel sökning accepterar endast ett huvudfält åt gången.",
   "search.empty.noMatches": "Inga hundar hittades med dessa villkor.",
-  "search.newest.title": "10 nyaste hundarna",
-  "search.newest.subtitle": "Lista med de senaste födelsedatumen.",
+  "search.newest.title": "Senaste tillagda",
+  "search.newest.subtitle":
+    "En lätt referenslista över de senast födda hundarna.",
   "search.newest.registration": "Registreringsnummer",
   "search.newest.birthDate": "Födelsedatum",
 } as const;

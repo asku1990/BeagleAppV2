@@ -1,17 +1,17 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import {
   computeBeagleSearchResults,
-  getNewestDogs,
+  getNewestDogRows,
   resolvePrimarySearchMode,
   useBeagleSearchUiState,
 } from "@/lib/beagle-search";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-import { BeagleNewestDogsPanel } from "./beagle-newest-dogs-panel";
 import { BeagleSearchEmptyState } from "./beagle-search-empty-state";
 import { BeagleSearchForm } from "./beagle-search-form";
 import { BeagleSearchLoadingState } from "./beagle-search-loading-state";
@@ -20,7 +20,7 @@ import { BeagleSearchResultsCards } from "./beagle-search-results-cards";
 import { BeagleSearchResultsTable } from "./beagle-search-results-table";
 
 export function BeagleSearchPage() {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const {
     formState,
     urlState,
@@ -42,7 +42,7 @@ export function BeagleSearchPage() {
     [urlState],
   );
 
-  const newestDogs = useMemo(() => getNewestDogs(10), []);
+  const newestDogRows = useMemo(() => getNewestDogRows(5), []);
 
   const emptyVariant =
     searchResults.mode === "none"
@@ -56,12 +56,25 @@ export function BeagleSearchPage() {
   return (
     <>
       <header className={cn(beagleTheme.panel, "px-5 py-5 md:px-6 md:py-6")}>
-        <h1 className={cn(beagleTheme.headingLg, beagleTheme.inkStrongText)}>
-          {t("search.page.title")}
-        </h1>
+        <div className="flex items-center gap-3 md:gap-4">
+          <Image
+            src="/legacy-v1-assets/v1-root-belogo.png"
+            alt={t("search.page.logoAlt")}
+            width={132}
+            height={74}
+            className={cn(
+              "h-auto w-[110px] rounded-sm border p-1 md:w-[132px]",
+              beagleTheme.border,
+              beagleTheme.surface,
+            )}
+          />
+          <h1 className={cn(beagleTheme.headingLg, beagleTheme.inkStrongText)}>
+            {t("search.page.title")}
+          </h1>
+        </div>
         <p
           className={cn(
-            "mt-2 max-w-3xl text-sm md:text-base",
+            "mt-3 max-w-3xl text-sm md:text-base",
             beagleTheme.mutedText,
           )}
         >
@@ -69,61 +82,62 @@ export function BeagleSearchPage() {
         </p>
       </header>
 
-      <section className="grid gap-4 lg:grid-cols-[2fr_1fr]">
-        <BeagleSearchForm
-          values={formState}
-          mode={localMode}
-          sort={urlState.sort}
-          advancedOpen={urlState.adv}
-          isPending={isPending}
-          canSubmit={canSubmit}
-          onFieldChange={setFormField}
-          onSubmit={submitSearch}
-          onReset={resetSearch}
-          onToggleAdvanced={toggleAdvanced}
-          onSortChange={setSort}
-        />
-        <BeagleNewestDogsPanel items={newestDogs} locale={locale} />
-      </section>
+      <BeagleSearchForm
+        values={formState}
+        mode={localMode}
+        sort={urlState.sort}
+        advancedOpen={urlState.adv}
+        isPending={isPending}
+        canSubmit={canSubmit}
+        onFieldChange={setFormField}
+        onSubmit={submitSearch}
+        onReset={resetSearch}
+        onToggleAdvanced={toggleAdvanced}
+        onSortChange={setSort}
+      />
 
-      <Card className={cn(beagleTheme.panel, "gap-0 py-0")}>
-        <CardHeader className="px-5 pt-5 pb-3 md:px-6 md:pt-6 md:pb-4">
-          <CardTitle
-            className={cn(beagleTheme.headingMd, beagleTheme.inkStrongText)}
-          >
-            {t("search.results.title")}
-          </CardTitle>
-          {searchResults.mode !== "none" && searchResults.mode !== "invalid" ? (
-            <p className={cn("text-sm", beagleTheme.mutedText)}>
-              {t("search.results.count")} {searchResults.total}
-            </p>
-          ) : null}
-        </CardHeader>
+      <ListingSectionShell
+        title={t("search.results.title")}
+        count={
+          searchResults.mode !== "none" && searchResults.mode !== "invalid"
+            ? `${t("search.results.count")} ${searchResults.total}`
+            : undefined
+        }
+      >
+        {isPending ? (
+          <BeagleSearchLoadingState />
+        ) : hasResultItems ? (
+          <>
+            <div className="hidden md:block">
+              <BeagleSearchResultsTable rows={searchResults.items} />
+            </div>
+            <div className="md:hidden">
+              <BeagleSearchResultsCards rows={searchResults.items} />
+            </div>
+            <BeagleSearchPagination
+              page={searchResults.page}
+              total={searchResults.total}
+              totalPages={Math.max(1, searchResults.totalPages)}
+              onPrevious={() => setPage(searchResults.page - 1)}
+              onNext={() => setPage(searchResults.page + 1)}
+            />
+          </>
+        ) : (
+          <BeagleSearchEmptyState variant={emptyVariant} />
+        )}
+      </ListingSectionShell>
 
-        <CardContent className="px-5 pb-5 md:px-6 md:pb-6">
-          {isPending ? (
-            <BeagleSearchLoadingState />
-          ) : hasResultItems ? (
-            <>
-              <div className="hidden md:block">
-                <BeagleSearchResultsTable rows={searchResults.items} />
-              </div>
-              <div className="md:hidden">
-                <BeagleSearchResultsCards rows={searchResults.items} />
-              </div>
-              <BeagleSearchPagination
-                page={searchResults.page}
-                total={searchResults.total}
-                totalPages={Math.max(1, searchResults.totalPages)}
-                onPrevious={() => setPage(searchResults.page - 1)}
-                onNext={() => setPage(searchResults.page + 1)}
-              />
-            </>
-          ) : (
-            <BeagleSearchEmptyState variant={emptyVariant} />
-          )}
-        </CardContent>
-      </Card>
+      <ListingSectionShell
+        title={t("search.newest.title")}
+        subtitle={t("search.newest.subtitle")}
+      >
+        <div className="hidden md:block">
+          <BeagleSearchResultsTable rows={newestDogRows} />
+        </div>
+        <div className="md:hidden">
+          <BeagleSearchResultsCards rows={newestDogRows} />
+        </div>
+      </ListingSectionShell>
     </>
   );
 }

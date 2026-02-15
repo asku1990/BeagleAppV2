@@ -17,6 +17,9 @@ export function BeagleSearchAdvancedPlaceholders() {
       <p className={cn("mt-1 text-xs", beagleTheme.mutedText)}>
         {t("search.form.advanced.placeholder")}
       </p>
+      <p className={cn("mt-1 text-xs font-medium text-amber-700")}>
+        {t("common.notImplementedYet")}
+      </p>
       <div className="mt-3 grid gap-3 md:grid-cols-2">
         <label className="space-y-1 text-xs">
           <span className={beagleTheme.mutedText}>

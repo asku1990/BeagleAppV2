@@ -400,6 +400,10 @@ export function getNewestDogs(limit = 10): BeagleNewestDogItem[] {
     }));
 }
 
+export function getNewestDogRows(limit = 10): BeagleSearchResultRow[] {
+  return sortRows(MOCK_BEAGLE_ROWS, "birth-desc").slice(0, limit);
+}
+
 function resolveSearchFieldValue(
   row: BeagleSearchResultRow,
   mode: Exclude<BeaglePrimarySearchMode, "none" | "invalid">,

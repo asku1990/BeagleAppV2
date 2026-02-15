@@ -32,6 +32,12 @@ export function BeagleSearchResultsCards({
           )}
         >
           <div className="grid grid-cols-2 gap-2 text-xs">
+            <p className="col-span-2">
+              <span className={beagleTheme.mutedText}>
+                {t("search.results.col.reg")}:{" "}
+              </span>
+              <span>{row.registrationNo}</span>
+            </p>
             <p>
               <span className={beagleTheme.mutedText}>
                 {t("search.results.col.ek")}:{" "}
@@ -43,12 +49,6 @@ export function BeagleSearchResultsCards({
                 {t("search.results.col.sex")}:{" "}
               </span>
               <span>{mapSexLabel(row.sex, t)}</span>
-            </p>
-            <p className="col-span-2">
-              <span className={beagleTheme.mutedText}>
-                {t("search.results.col.reg")}:{" "}
-              </span>
-              <span>{row.registrationNo}</span>
             </p>
             <p className="col-span-2">
               <span className={beagleTheme.mutedText}>

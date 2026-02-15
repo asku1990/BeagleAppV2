@@ -26,10 +26,10 @@ export function BeagleSearchResultsTable({
         <thead>
           <tr className={cn("border-b text-left", beagleTheme.border)}>
             <th className="px-2 py-2 font-semibold">
-              {t("search.results.col.ek")}
+              {t("search.results.col.reg")}
             </th>
             <th className="px-2 py-2 font-semibold">
-              {t("search.results.col.reg")}
+              {t("search.results.col.ek")}
             </th>
             <th className="px-2 py-2 font-semibold">
               {t("search.results.col.sex")}
@@ -51,8 +51,8 @@ export function BeagleSearchResultsTable({
               key={row.id}
               className={cn("border-b align-top", beagleTheme.border)}
             >
-              <td className="px-2 py-2">{row.ekNo == null ? "-" : row.ekNo}</td>
               <td className="px-2 py-2">{row.registrationNo}</td>
+              <td className="px-2 py-2">{row.ekNo == null ? "-" : row.ekNo}</td>
               <td className="px-2 py-2">{mapSexLabel(row.sex, t)}</td>
               <td className="px-2 py-2">
                 <span
