@@ -77,10 +77,6 @@ type RegistrationOrderKeyRow = {
   primaryRegistrationNo: string;
 };
 
-type DogIdRow = {
-  dogId: string;
-};
-
 function normalizeText(value: string | undefined): string {
   return (value ?? "").trim();
 }
@@ -350,15 +346,20 @@ async function loadRegistrationOrderKeys(
   });
 }
 
-async function loadDogIdsWithMultipleRegistrations(): Promise<string[]> {
-  const rows = await prisma.$queryRaw<DogIdRow[]>`
-    SELECT r."dogId"
-    FROM "DogRegistration" r
-    GROUP BY r."dogId"
-    HAVING COUNT(*) > 1
-  `;
+async function loadDogIdsWithMultipleRegistrations(
+  where: Prisma.DogWhereInput,
+): Promise<string[]> {
+  const rows = await prisma.dogRegistration.groupBy({
+    by: ["dogId"],
+    where: {
+      dog: where,
+    },
+    _count: {
+      _all: true,
+    },
+  });
 
-  return rows.map((row) => row.dogId);
+  return rows.filter((row) => row._count._all > 1).map((row) => row.dogId);
 }
 
 function buildWhere(input: {
@@ -635,7 +636,7 @@ export async function searchBeagleDogsDb(
     sex,
   });
   const multiRegistrationDogIds = multipleRegsOnly
-    ? await loadDogIdsWithMultipleRegistrations()
+    ? await loadDogIdsWithMultipleRegistrations(baseWhere)
     : null;
 
   if (multipleRegsOnly && (multiRegistrationDogIds?.length ?? 0) === 0) {
