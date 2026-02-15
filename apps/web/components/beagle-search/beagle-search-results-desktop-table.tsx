@@ -13,7 +13,7 @@ function mapSexLabel(
   return "-";
 }
 
-export function BeagleSearchResultsTable({
+export function BeagleSearchResultsDesktopTable({
   rows,
 }: {
   rows: BeagleSearchResultRow[];

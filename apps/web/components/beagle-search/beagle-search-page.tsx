@@ -14,10 +14,10 @@ import { useBeagleNewestQuery } from "@/queries/beagle-search/use-beagle-newest-
 import { useBeagleSearchQuery } from "@/queries/beagle-search/use-beagle-search-query";
 import { BeagleSearchEmptyState } from "./beagle-search-empty-state";
 import { BeagleSearchForm } from "./beagle-search-form";
+import { BeagleSearchResultsDesktopTable } from "./beagle-search-results-desktop-table";
 import { BeagleSearchLoadingState } from "./beagle-search-loading-state";
+import { BeagleSearchResultsMobileCards } from "./beagle-search-results-mobile-cards";
 import { BeagleSearchPagination } from "./beagle-search-pagination";
-import { BeagleSearchResultsCards } from "./beagle-search-results-cards";
-import { BeagleSearchResultsTable } from "./beagle-search-results-table";
 
 export function BeagleSearchPage() {
   const { t } = useI18n();
@@ -121,11 +121,12 @@ export function BeagleSearchPage() {
           <BeagleSearchEmptyState variant="error" />
         ) : hasResultItems ? (
           <>
+            {/* Desktop uses table, mobile uses cards; both render same row contract. */}
             <div className="hidden md:block">
-              <BeagleSearchResultsTable rows={searchResults.items} />
+              <BeagleSearchResultsDesktopTable rows={searchResults.items} />
             </div>
             <div className="md:hidden">
-              <BeagleSearchResultsCards rows={searchResults.items} />
+              <BeagleSearchResultsMobileCards rows={searchResults.items} />
             </div>
             <BeagleSearchPagination
               page={searchResults.page}
@@ -151,10 +152,10 @@ export function BeagleSearchPage() {
         ) : (
           <>
             <div className="hidden md:block">
-              <BeagleSearchResultsTable rows={newestQuery.data ?? []} />
+              <BeagleSearchResultsDesktopTable rows={newestQuery.data ?? []} />
             </div>
             <div className="md:hidden">
-              <BeagleSearchResultsCards rows={newestQuery.data ?? []} />
+              <BeagleSearchResultsMobileCards rows={newestQuery.data ?? []} />
             </div>
           </>
         )}

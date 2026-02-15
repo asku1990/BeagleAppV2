@@ -13,7 +13,7 @@ function mapSexLabel(
   return "-";
 }
 
-export function BeagleSearchResultsCards({
+export function BeagleSearchResultsMobileCards({
   rows,
 }: {
   rows: BeagleSearchResultRow[];
@@ -54,7 +54,10 @@ export function BeagleSearchResultsCards({
               <span className={beagleTheme.mutedText}>
                 {t("search.results.col.name")}:{" "}
               </span>
-              <span className={cn("font-medium", beagleTheme.inkStrongText)}>
+              <span
+                title={`${t("search.results.parents.sire")}: ${row.sire}\n${t("search.results.parents.dam")}: ${row.dam}`}
+                className={cn("font-medium", beagleTheme.inkStrongText)}
+              >
                 {row.name}
               </span>
             </p>
@@ -67,11 +70,6 @@ export function BeagleSearchResultsCards({
               </span>
             </p>
           </div>
-          <p className={cn("mt-2 text-xs", beagleTheme.mutedText)}>
-            {t("search.results.parents.sire")}: {row.sire}
-            <br />
-            {t("search.results.parents.dam")}: {row.dam}
-          </p>
           <BeagleSearchRowActions className="mt-2" />
         </article>
       ))}
