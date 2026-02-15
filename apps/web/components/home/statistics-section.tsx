@@ -86,7 +86,7 @@ export function StatisticsSection() {
   const { data, isLoading } = useHomeStatisticsQuery();
   const isInitialLoading = isLoading && !data;
 
-  const localeTag = locale === "fi" ? "fi-FI" : "sv-SE";
+  const localeTag = locale === "fi" ? "fi-FI" : "sv-FI";
   const numberFormat = new Intl.NumberFormat(localeTag);
   const dateFormat = new Intl.DateTimeFormat(localeTag);
   const fallbackText = t("common.noData");

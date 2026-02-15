@@ -1,0 +1,33 @@
+export const fiSidebarMessages = {
+  "sidebar.title": "SBJ-tietokanta",
+  "sidebar.shortTitle": "SBJ",
+  "sidebar.navigation": "Tietokanta",
+  "sidebar.nav.home": "Etusivu",
+  "sidebar.nav.beagleSearch": "Beaglehaku",
+  "sidebar.nav.ownerSearch": "Omistajahaku",
+  "sidebar.nav.trialResults": "Koetulosten haku",
+  "sidebar.nav.fieldTrials": "Ajokokeet",
+  "sidebar.nav.shows": "Näyttelyt",
+  "sidebar.nav.ekDogs": "EK-koirat",
+  "sidebar.nav.kennelNames": "Kennelnimet ja lyhenteet",
+  "sidebar.nav.virtualPairing": "Virtuaaliparitus",
+  "sidebar.nav.bestDriver": "Paras ajuri -kilpailu",
+  "sidebar.signIn": "Kirjaudu",
+} as const;
+
+export const svSidebarMessages = {
+  "sidebar.title": "Beagledatabas",
+  "sidebar.shortTitle": "SBJ",
+  "sidebar.navigation": "Databas",
+  "sidebar.nav.home": "Hem",
+  "sidebar.nav.beagleSearch": "Beaglesökning",
+  "sidebar.nav.ownerSearch": "Ägarsökning",
+  "sidebar.nav.trialResults": "Provresultatsökning",
+  "sidebar.nav.fieldTrials": "Jaktprov",
+  "sidebar.nav.shows": "Utställningar",
+  "sidebar.nav.ekDogs": "Specialstambokshundar",
+  "sidebar.nav.kennelNames": "Kennelnamn och förkortningar",
+  "sidebar.nav.virtualPairing": "Virtuell parning",
+  "sidebar.nav.bestDriver": "Paras ajuri-tävling",
+  "sidebar.signIn": "Logga in",
+} as const;

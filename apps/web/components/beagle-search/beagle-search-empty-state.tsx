@@ -1,0 +1,27 @@
+import { beagleTheme } from "@/components/ui/beagle-theme";
+import { useI18n, type MessageKey } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
+
+type EmptyVariant = "start" | "invalid" | "no-results";
+
+const messageKeyByVariant: Record<EmptyVariant, MessageKey> = {
+  start: "search.empty.start",
+  invalid: "search.empty.singleField",
+  "no-results": "search.empty.noMatches",
+};
+
+export function BeagleSearchEmptyState({ variant }: { variant: EmptyVariant }) {
+  const { t } = useI18n();
+
+  return (
+    <div
+      className={cn(
+        "rounded-lg border px-4 py-8 text-center text-sm",
+        beagleTheme.border,
+        beagleTheme.mutedText,
+      )}
+    >
+      {t(messageKeyByVariant[variant])}
+    </div>
+  );
+}
