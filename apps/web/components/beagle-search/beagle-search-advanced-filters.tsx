@@ -3,7 +3,13 @@ import { Input } from "@/components/ui/input";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
-export function BeagleSearchAdvancedPlaceholders() {
+export function BeagleSearchAdvancedFilters({
+  multipleRegsOnly,
+  onMultipleRegsOnlyChange,
+}: {
+  multipleRegsOnly: boolean;
+  onMultipleRegsOnlyChange: (value: boolean) => void;
+}) {
   const { t } = useI18n();
 
   return (
@@ -17,9 +23,17 @@ export function BeagleSearchAdvancedPlaceholders() {
       <p className={cn("mt-1 text-xs", beagleTheme.mutedText)}>
         {t("search.form.advanced.placeholder")}
       </p>
-      <p className={cn("mt-1 text-xs font-medium text-amber-700")}>
-        {t("common.notImplementedYet")}
-      </p>
+      <label className="mt-3 flex items-center gap-2 text-xs">
+        <input
+          type="checkbox"
+          checked={multipleRegsOnly}
+          onChange={(event) => onMultipleRegsOnlyChange(event.target.checked)}
+          className={cn("size-4 rounded border", beagleTheme.border)}
+        />
+        <span className={beagleTheme.inkStrongText}>
+          {t("search.advanced.multipleRegsOnly")}
+        </span>
+      </label>
       <div className="mt-3 grid gap-3 md:grid-cols-2">
         <label className="space-y-1 text-xs">
           <span className={beagleTheme.mutedText}>

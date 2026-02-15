@@ -12,6 +12,7 @@ export type BeagleSearchQueryState = {
   ek: string;
   reg: string;
   name: string;
+  multipleRegsOnly: boolean;
   page: number;
   sort: BeagleSearchSort;
   adv: boolean;

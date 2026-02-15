@@ -10,6 +10,7 @@ export type BeagleSearchRequest = {
   ek?: string;
   reg?: string;
   name?: string;
+  multipleRegsOnly?: boolean;
   page?: number;
   pageSize?: number;
   sort?: BeagleSearchSort;
@@ -19,6 +20,7 @@ export type BeagleSearchRow = {
   id: string;
   ekNo: number | null;
   registrationNo: string;
+  registrationNos: string[];
   createdAt: string;
   sex: "U" | "N" | "-";
   name: string;

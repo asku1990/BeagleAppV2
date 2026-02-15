@@ -20,6 +20,7 @@ const DEFAULT_STATE: BeagleSearchQueryState = {
   ek: "",
   reg: "",
   name: "",
+  multipleRegsOnly: false,
   page: 1,
   sort: DEFAULT_SORT,
   adv: false,
@@ -62,6 +63,7 @@ export function readUrlSearchState(
     ek: trimValue(params.get("ek")),
     reg: trimValue(params.get("reg")),
     name: trimValue(params.get("name")),
+    multipleRegsOnly: params.get("multiRegs") === "1",
     page: readPage(params.get("page")),
     sort: readSort(params.get("sort")),
     adv: params.get("adv") === "1",
@@ -79,6 +81,9 @@ function toQueryString(state: BeagleSearchQueryState): string {
   }
   if (state.name) {
     params.set("name", state.name);
+  }
+  if (state.multipleRegsOnly) {
+    params.set("multiRegs", "1");
   }
   if (state.page > 1) {
     params.set("page", String(state.page));
@@ -108,6 +113,7 @@ export function useBeagleSearchUiState() {
     ek: urlState.ek,
     reg: urlState.reg,
     name: urlState.name,
+    multipleRegsOnly: urlState.multipleRegsOnly,
   });
 
   useEffect(() => {
@@ -117,8 +123,9 @@ export function useBeagleSearchUiState() {
       ek: urlState.ek,
       reg: urlState.reg,
       name: urlState.name,
+      multipleRegsOnly: urlState.multipleRegsOnly,
     });
-  }, [urlState.ek, urlState.reg, urlState.name]);
+  }, [urlState.ek, urlState.reg, urlState.name, urlState.multipleRegsOnly]);
 
   const commitState = useCallback(
     (nextState: BeagleSearchQueryState) => {
@@ -145,15 +152,24 @@ export function useBeagleSearchUiState() {
       ek: formState.ek.trim(),
       reg: formState.reg.trim(),
       name: formState.name.trim(),
+      multipleRegsOnly: formState.multipleRegsOnly,
       page: 1,
     });
-  }, [commitState, formState.ek, formState.name, formState.reg, urlState]);
+  }, [
+    commitState,
+    formState.ek,
+    formState.multipleRegsOnly,
+    formState.name,
+    formState.reg,
+    urlState,
+  ]);
 
   const resetSearch = useCallback(() => {
     setFormState({
       ek: "",
       reg: "",
       name: "",
+      multipleRegsOnly: false,
     });
 
     commitState(DEFAULT_STATE);
@@ -177,6 +193,10 @@ export function useBeagleSearchUiState() {
     commitState({ ...urlState, adv: !urlState.adv });
   }, [commitState, urlState]);
 
+  const setMultipleRegsOnly = useCallback((value: boolean) => {
+    setFormState((current) => ({ ...current, multipleRegsOnly: value }));
+  }, []);
+
   return {
     formState,
     urlState,
@@ -187,5 +207,6 @@ export function useBeagleSearchUiState() {
     setPage,
     setSort,
     toggleAdvanced,
+    setMultipleRegsOnly,
   };
 }

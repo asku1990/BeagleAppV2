@@ -9,7 +9,7 @@ import type {
   BeagleSearchQueryState,
   BeagleSearchSort,
 } from "@/lib/beagle-search";
-import { BeagleSearchAdvancedPlaceholders } from "./beagle-search-advanced-placeholders";
+import { BeagleSearchAdvancedFilters } from "./beagle-search-advanced-filters";
 
 const modeKeyMap: Record<BeaglePrimarySearchMode, MessageKey> = {
   ek: "search.form.mode.ek",
@@ -32,8 +32,12 @@ export function BeagleSearchForm({
   onReset,
   onToggleAdvanced,
   onSortChange,
+  onMultipleRegsOnlyChange,
 }: {
-  values: Pick<BeagleSearchQueryState, "ek" | "reg" | "name">;
+  values: Pick<
+    BeagleSearchQueryState,
+    "ek" | "reg" | "name" | "multipleRegsOnly"
+  >;
   mode: BeaglePrimarySearchMode;
   sort: BeagleSearchSort;
   advancedOpen: boolean;
@@ -44,6 +48,7 @@ export function BeagleSearchForm({
   onReset: () => void;
   onToggleAdvanced: () => void;
   onSortChange: (sort: BeagleSearchSort) => void;
+  onMultipleRegsOnlyChange: (value: boolean) => void;
 }) {
   const { t } = useI18n();
 
@@ -160,7 +165,12 @@ export function BeagleSearchForm({
           </div>
         </form>
 
-        {advancedOpen ? <BeagleSearchAdvancedPlaceholders /> : null}
+        {advancedOpen ? (
+          <BeagleSearchAdvancedFilters
+            multipleRegsOnly={values.multipleRegsOnly}
+            onMultipleRegsOnlyChange={onMultipleRegsOnlyChange}
+          />
+        ) : null}
       </CardContent>
     </Card>
   );
