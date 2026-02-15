@@ -62,7 +62,7 @@ export function BeagleSearchForm({
             </p>
           </div>
           <label className="space-y-1 text-xs">
-            <span className={beagleTheme.mutedText}>
+            <span className={cn(beagleTheme.mutedText, "mb-2 block")}>
               {t("search.form.sort.label")}
             </span>
             <select
