@@ -36,9 +36,6 @@ export function BeagleSearchAdvancedFilters({
       <p className={cn("text-sm font-medium", beagleTheme.inkStrongText)}>
         {t("search.form.advanced.title")}
       </p>
-      <p className={cn("mt-1 text-xs", beagleTheme.mutedText)}>
-        {t("search.form.advanced.placeholder")}
-      </p>
       <label className="mt-3 flex items-center gap-2 text-xs">
         <input
           type="checkbox"

@@ -21,8 +21,6 @@ export const fiSearchMessages = {
   "search.form.advanced.toggle.open": "Näytä lisäsuodattimet",
   "search.form.advanced.toggle.close": "Piilota lisäsuodattimet",
   "search.form.advanced.title": "Lisäsuodattimet",
-  "search.form.advanced.placeholder":
-    "Osa lisäsuodattimista on käytettävissä. Lisää suodattimia lisätään myöhemmin.",
   "search.form.sort.label": "Lajittelu",
   "search.form.sort.birthDesc": "Syntymäaika (uusin ensin)",
   "search.form.sort.createdDesc": "Lisäysaika (uusin ensin)",
@@ -96,8 +94,6 @@ export const svSearchMessages = {
   "search.form.advanced.toggle.open": "Visa avancerade filter",
   "search.form.advanced.toggle.close": "Dölj avancerade filter",
   "search.form.advanced.title": "Avancerade filter",
-  "search.form.advanced.placeholder":
-    "En del avancerade filter är tillgängliga. Fler filter läggs till senare.",
   "search.form.sort.label": "Sortering",
   "search.form.sort.birthDesc": "Födelsedatum (nyast först)",
   "search.form.sort.createdDesc": "Tilläggstid (nyast först)",
