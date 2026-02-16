@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import {
+  normalizeBirthYearInput,
   resolvePrimarySearchMode,
   useBeagleSearchUiState,
 } from "@/lib/beagle-search";
@@ -31,13 +32,18 @@ export function BeagleSearchPage() {
     setPage,
     setSort,
     setSex,
+    setBirthYearFrom,
+    setBirthYearTo,
     setMultipleRegsOnly,
     toggleAdvanced,
   } = useBeagleSearchUiState();
 
   const localMode = resolvePrimarySearchMode(formState);
   const hasAdvancedFilters =
-    formState.multipleRegsOnly || formState.sex !== "any";
+    formState.multipleRegsOnly ||
+    formState.sex !== "any" ||
+    normalizeBirthYearInput(formState.birthYearFrom).length > 0 ||
+    normalizeBirthYearInput(formState.birthYearTo).length > 0;
   const effectiveFormMode =
     localMode === "none" && hasAdvancedFilters ? "combined" : localMode;
   const canSubmit = localMode !== "none" || hasAdvancedFilters;
@@ -112,6 +118,8 @@ export function BeagleSearchPage() {
         onToggleAdvanced={toggleAdvanced}
         onSortChange={setSort}
         onSexChange={setSex}
+        onBirthYearFromChange={setBirthYearFrom}
+        onBirthYearToChange={setBirthYearTo}
         onMultipleRegsOnlyChange={setMultipleRegsOnly}
       />
 

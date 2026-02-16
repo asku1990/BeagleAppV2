@@ -6,11 +6,19 @@ import { cn } from "@/lib/utils";
 export function BeagleSearchAdvancedFilters({
   sex,
   onSexChange,
+  birthYearFrom,
+  birthYearTo,
+  onBirthYearFromChange,
+  onBirthYearToChange,
   multipleRegsOnly,
   onMultipleRegsOnlyChange,
 }: {
   sex: "any" | "male" | "female";
   onSexChange: (value: "any" | "male" | "female") => void;
+  birthYearFrom: string;
+  birthYearTo: string;
+  onBirthYearFromChange: (value: string) => void;
+  onBirthYearToChange: (value: string) => void;
   multipleRegsOnly: boolean;
   onMultipleRegsOnlyChange: (value: boolean) => void;
 }) {
@@ -62,13 +70,27 @@ export function BeagleSearchAdvancedFilters({
           <span className={beagleTheme.mutedText}>
             {t("search.advanced.birthYearFrom")}
           </span>
-          <Input disabled placeholder="2000" />
+          <Input
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={4}
+            value={birthYearFrom}
+            onChange={(event) => onBirthYearFromChange(event.target.value)}
+            placeholder="2000"
+          />
         </label>
         <label className="space-y-1 text-xs">
           <span className={beagleTheme.mutedText}>
             {t("search.advanced.birthYearTo")}
           </span>
-          <Input disabled placeholder="2026" />
+          <Input
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={4}
+            value={birthYearTo}
+            onChange={(event) => onBirthYearToChange(event.target.value)}
+            placeholder="2026"
+          />
         </label>
         <label className="space-y-1 text-xs">
           <span className={beagleTheme.mutedText}>

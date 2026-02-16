@@ -15,6 +15,8 @@ export type BeagleSearchQueryState = {
   reg: string;
   name: string;
   sex: BeagleSearchAdvancedSex;
+  birthYearFrom: string;
+  birthYearTo: string;
   multipleRegsOnly: boolean;
   page: number;
   sort: BeagleSearchSort;

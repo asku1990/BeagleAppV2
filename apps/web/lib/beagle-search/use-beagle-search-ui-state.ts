@@ -8,6 +8,7 @@ import {
   useTransition,
 } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { normalizeBirthYearInput } from "./birth-year";
 import type {
   BeagleSearchAdvancedSex,
   BeagleSearchQueryState,
@@ -25,6 +26,8 @@ const DEFAULT_STATE: BeagleSearchQueryState = {
   reg: "",
   name: "",
   sex: "any",
+  birthYearFrom: "",
+  birthYearTo: "",
   multipleRegsOnly: false,
   page: 1,
   sort: DEFAULT_SORT,
@@ -76,6 +79,8 @@ export function readUrlSearchState(
     reg: trimValue(params.get("reg")),
     name: trimValue(params.get("name")),
     sex: readSex(params.get("sex")),
+    birthYearFrom: normalizeBirthYearInput(params.get("birthYearFrom")),
+    birthYearTo: normalizeBirthYearInput(params.get("birthYearTo")),
     multipleRegsOnly: params.get("multiRegs") === "1",
     page: readPage(params.get("page")),
     sort: readSort(params.get("sort")),
@@ -97,6 +102,12 @@ function toQueryString(state: BeagleSearchQueryState): string {
   }
   if (state.sex !== "any") {
     params.set("sex", state.sex);
+  }
+  if (state.birthYearFrom) {
+    params.set("birthYearFrom", state.birthYearFrom);
+  }
+  if (state.birthYearTo) {
+    params.set("birthYearTo", state.birthYearTo);
   }
   if (state.multipleRegsOnly) {
     params.set("multiRegs", "1");
@@ -130,6 +141,8 @@ export function useBeagleSearchUiState() {
     reg: urlState.reg,
     name: urlState.name,
     sex: urlState.sex,
+    birthYearFrom: urlState.birthYearFrom,
+    birthYearTo: urlState.birthYearTo,
     multipleRegsOnly: urlState.multipleRegsOnly,
   });
 
@@ -141,6 +154,8 @@ export function useBeagleSearchUiState() {
       reg: urlState.reg,
       name: urlState.name,
       sex: urlState.sex,
+      birthYearFrom: urlState.birthYearFrom,
+      birthYearTo: urlState.birthYearTo,
       multipleRegsOnly: urlState.multipleRegsOnly,
     });
   }, [
@@ -148,6 +163,8 @@ export function useBeagleSearchUiState() {
     urlState.reg,
     urlState.name,
     urlState.sex,
+    urlState.birthYearFrom,
+    urlState.birthYearTo,
     urlState.multipleRegsOnly,
   ]);
 
@@ -177,12 +194,16 @@ export function useBeagleSearchUiState() {
       reg: formState.reg.trim(),
       name: formState.name.trim(),
       sex: formState.sex,
+      birthYearFrom: normalizeBirthYearInput(formState.birthYearFrom),
+      birthYearTo: normalizeBirthYearInput(formState.birthYearTo),
       multipleRegsOnly: formState.multipleRegsOnly,
       page: 1,
     });
   }, [
     commitState,
     formState.ek,
+    formState.birthYearFrom,
+    formState.birthYearTo,
     formState.multipleRegsOnly,
     formState.name,
     formState.reg,
@@ -196,6 +217,8 @@ export function useBeagleSearchUiState() {
       reg: "",
       name: "",
       sex: "any",
+      birthYearFrom: "",
+      birthYearTo: "",
       multipleRegsOnly: false,
     });
 
@@ -228,6 +251,14 @@ export function useBeagleSearchUiState() {
     setFormState((current) => ({ ...current, sex: value }));
   }, []);
 
+  const setBirthYearFrom = useCallback((value: string) => {
+    setFormState((current) => ({ ...current, birthYearFrom: value }));
+  }, []);
+
+  const setBirthYearTo = useCallback((value: string) => {
+    setFormState((current) => ({ ...current, birthYearTo: value }));
+  }, []);
+
   return {
     formState,
     urlState,
@@ -239,6 +270,8 @@ export function useBeagleSearchUiState() {
     setSort,
     toggleAdvanced,
     setSex,
+    setBirthYearFrom,
+    setBirthYearTo,
     setMultipleRegsOnly,
   };
 }
