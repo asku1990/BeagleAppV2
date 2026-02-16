@@ -18,6 +18,7 @@ export function useBeagleSearchQuery(state: BeagleSearchQueryState) {
     state.name.trim().length > 0 ||
     birthYearFrom != null ||
     birthYearTo != null ||
+    state.ekOnly ||
     state.sex !== "any" ||
     state.multipleRegsOnly;
 
@@ -30,6 +31,7 @@ export function useBeagleSearchQuery(state: BeagleSearchQueryState) {
       state.sex,
       state.birthYearFrom,
       state.birthYearTo,
+      state.ekOnly,
       state.multipleRegsOnly,
       state.page,
       state.sort,
@@ -43,6 +45,7 @@ export function useBeagleSearchQuery(state: BeagleSearchQueryState) {
         sex: state.sex === "any" ? undefined : state.sex,
         birthYearFrom,
         birthYearTo,
+        ekOnly: state.ekOnly,
         multipleRegsOnly: state.multipleRegsOnly,
         page: state.page,
         pageSize: BEAGLE_PAGE_SIZE,

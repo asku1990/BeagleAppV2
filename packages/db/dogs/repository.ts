@@ -16,6 +16,7 @@ export type BeagleSearchRequestDb = {
   sex?: "male" | "female";
   birthYearFrom?: number;
   birthYearTo?: number;
+  ekOnly?: boolean;
   multipleRegsOnly?: boolean;
   page?: number;
   pageSize?: number;
@@ -392,6 +393,7 @@ function buildWhere(input: {
   sex?: "male" | "female";
   birthYearFrom?: number;
   birthYearTo?: number;
+  ekOnly?: boolean;
 }): Prisma.DogWhereInput {
   const and: Prisma.DogWhereInput[] = [];
 
@@ -474,6 +476,14 @@ function buildWhere(input: {
     and.push({
       birthDate: {
         lte: toYearEndDateUtc(input.birthYearTo),
+      },
+    });
+  }
+
+  if (input.ekOnly === true) {
+    and.push({
+      ekNo: {
+        not: null,
       },
     });
   }
@@ -646,11 +656,13 @@ export async function searchBeagleDogsDb(
   const sex = normalizeSex(input.sex);
   const birthYearFrom = normalizeBirthYear(input.birthYearFrom);
   const birthYearTo = normalizeBirthYear(input.birthYearTo);
+  const ekOnly = input.ekOnly === true;
   const multipleRegsOnly = input.multipleRegsOnly === true;
 
   const mode = resolveMode({ ek, reg, name });
   const hasAdvancedFilters =
     multipleRegsOnly ||
+    ekOnly ||
     sex != null ||
     birthYearFrom != null ||
     birthYearTo != null;
@@ -683,6 +695,7 @@ export async function searchBeagleDogsDb(
     sex,
     birthYearFrom,
     birthYearTo,
+    ekOnly,
   });
   const multiRegistrationDogIds = multipleRegsOnly
     ? await loadDogIdsWithMultipleRegistrations(baseWhere)

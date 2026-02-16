@@ -44,11 +44,9 @@ Agent instructions for working in this repository.
 ## Release & Changelog Rules
 
 - Source of truth for release communication is root `CHANGELOG.md`.
-- Add user-visible changes under `## [Unreleased]` during feature work.
-- For release/version-bump prep, move those bullets to a dated version block:
+- Add user-visible changes directly to a dated version block:
   - `## [x.y.z] - YYYY-MM-DD`
   - Keep sections: `Added`, `Changed`, `Fixed`, `Removed`.
-- Reset `Unreleased` back to placeholder skeleton after moving entries.
 - Important: web "Mitä uutta" reads only versioned blocks, not `Unreleased`.
   - Parsing code: `apps/web/lib/release-notes/latest.ts`
   - UI page: `apps/web/app/(public)/whats-new/page.tsx`

@@ -4,38 +4,20 @@ This project uses a user-facing changelog format.
 
 ## How to write entries
 
-- Add one user-visible bullet under `Unreleased`.
 - Keep language plain first; add technical detail only when useful.
 - Internal-only changes are optional in the changelog.
 - Use sections: `Added`, `Changed`, `Fixed`, `Removed`.
-
-## [Unreleased]
-
-### Added
-
-- No user-facing additions yet.
-
-### Changed
-
-- No user-facing changes yet.
-
-### Fixed
-
-- No user-facing fixes yet.
-
-### Removed
-
-- No user-facing removals yet.
 
 ## [0.1.1] - 2026-02-16
 
 ### Added
 
-- Beaglehakuun lisättiin syntymävuosiväli-suodattimet (`alkaen` ja `asti`) lisäsuodattimiin.
+- Beaglehaun lisäsuodattimiin lisättiin syntymävuosiväli (`alkaen` ja `asti`).
+- Beaglehaun lisäsuodattimiin lisättiin asetus "vain EK-koirat".
 
 ### Changed
 
-- Ei käyttäjälle näkyviä muutoksia tässä julkaisussa.
+- Uudet lisäsuodattimet tallentuvat URL-osoitteeseen ja palautuvat sivun uudelleenlatauksessa.
 
 ### Fixed
 

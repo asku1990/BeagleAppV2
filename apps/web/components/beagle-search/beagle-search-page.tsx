@@ -34,6 +34,7 @@ export function BeagleSearchPage() {
     setSex,
     setBirthYearFrom,
     setBirthYearTo,
+    setEkOnly,
     setMultipleRegsOnly,
     toggleAdvanced,
   } = useBeagleSearchUiState();
@@ -41,6 +42,7 @@ export function BeagleSearchPage() {
   const localMode = resolvePrimarySearchMode(formState);
   const hasAdvancedFilters =
     formState.multipleRegsOnly ||
+    formState.ekOnly ||
     formState.sex !== "any" ||
     normalizeBirthYearInput(formState.birthYearFrom).length > 0 ||
     normalizeBirthYearInput(formState.birthYearTo).length > 0;
@@ -120,6 +122,7 @@ export function BeagleSearchPage() {
         onSexChange={setSex}
         onBirthYearFromChange={setBirthYearFrom}
         onBirthYearToChange={setBirthYearTo}
+        onEkOnlyChange={setEkOnly}
         onMultipleRegsOnlyChange={setMultipleRegsOnly}
       />
 

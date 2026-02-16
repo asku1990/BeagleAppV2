@@ -69,6 +69,7 @@ export function createDogsService() {
           sex: input.sex,
           birthYearFrom: input.birthYearFrom,
           birthYearTo: input.birthYearTo,
+          ekOnly: input.ekOnly,
           multipleRegsOnly: input.multipleRegsOnly,
           page: parsePage(input.page),
           pageSize: parsePageSize(input.pageSize),
