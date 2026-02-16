@@ -27,6 +27,24 @@ This project uses a user-facing changelog format.
 
 - No user-facing removals yet.
 
+## [0.1.1] - 2026-02-16
+
+### Added
+
+- Beaglehakuun lisättiin syntymävuosiväli-suodattimet (`alkaen` ja `asti`) lisäsuodattimiin.
+
+### Changed
+
+- Ei käyttäjälle näkyviä muutoksia tässä julkaisussa.
+
+### Fixed
+
+- Ei käyttäjälle näkyviä korjauksia tässä julkaisussa.
+
+### Removed
+
+- Ei poistettu käyttäjälle näkyviä toimintoja tässä julkaisussa.
+
 ## [0.1.0] - 2026-02-16
 
 ### Added
