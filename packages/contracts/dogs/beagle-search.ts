@@ -12,6 +12,9 @@ export type BeagleSearchRequest = {
   reg?: string;
   name?: string;
   sex?: BeagleSearchSex;
+  birthYearFrom?: number;
+  birthYearTo?: number;
+  ekOnly?: boolean;
   multipleRegsOnly?: boolean;
   page?: number;
   pageSize?: number;

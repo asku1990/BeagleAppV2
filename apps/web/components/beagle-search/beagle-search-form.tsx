@@ -33,11 +33,21 @@ export function BeagleSearchForm({
   onToggleAdvanced,
   onSortChange,
   onSexChange,
+  onBirthYearFromChange,
+  onBirthYearToChange,
+  onEkOnlyChange,
   onMultipleRegsOnlyChange,
 }: {
   values: Pick<
     BeagleSearchQueryState,
-    "ek" | "reg" | "name" | "sex" | "multipleRegsOnly"
+    | "ek"
+    | "reg"
+    | "name"
+    | "sex"
+    | "birthYearFrom"
+    | "birthYearTo"
+    | "ekOnly"
+    | "multipleRegsOnly"
   >;
   mode: BeaglePrimarySearchMode;
   sort: BeagleSearchSort;
@@ -50,6 +60,9 @@ export function BeagleSearchForm({
   onToggleAdvanced: () => void;
   onSortChange: (sort: BeagleSearchSort) => void;
   onSexChange: (value: "any" | "male" | "female") => void;
+  onBirthYearFromChange: (value: string) => void;
+  onBirthYearToChange: (value: string) => void;
+  onEkOnlyChange: (value: boolean) => void;
   onMultipleRegsOnlyChange: (value: boolean) => void;
 }) {
   const { t } = useI18n();
@@ -171,6 +184,12 @@ export function BeagleSearchForm({
           <BeagleSearchAdvancedFilters
             sex={values.sex}
             onSexChange={onSexChange}
+            birthYearFrom={values.birthYearFrom}
+            birthYearTo={values.birthYearTo}
+            onBirthYearFromChange={onBirthYearFromChange}
+            onBirthYearToChange={onBirthYearToChange}
+            ekOnly={values.ekOnly}
+            onEkOnlyChange={onEkOnlyChange}
             multipleRegsOnly={values.multipleRegsOnly}
             onMultipleRegsOnlyChange={onMultipleRegsOnlyChange}
           />

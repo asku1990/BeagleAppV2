@@ -41,6 +41,30 @@ Agent instructions for working in this repository.
 - Run targeted checks for touched code when possible.
 - If tests/checks are not run, explicitly say so in the final response.
 
+## Release & Changelog Rules
+
+- Source of truth for release communication is root `CHANGELOG.md`.
+- Add user-visible changes directly to a dated version block:
+  - `## [x.y.z] - YYYY-MM-DD`
+  - Keep sections: `Added`, `Changed`, `Fixed`, `Removed`.
+- Important: web "Mitä uutta" reads only versioned blocks, not `Unreleased`.
+  - Parsing code: `apps/web/lib/release-notes/latest.ts`
+  - UI page: `apps/web/app/(public)/whats-new/page.tsx`
+
+### Version Alignment
+
+- Keep all workspace package versions aligned to the same version:
+  - `package.json`
+  - `apps/web/package.json`
+  - `packages/api-client/package.json`
+  - `packages/auth/package.json`
+  - `packages/config-eslint/package.json`
+  - `packages/config-typescript/package.json`
+  - `packages/contracts/package.json`
+  - `packages/db/package.json`
+  - `packages/server/package.json`
+- Do not edit generated `apps/web/.next/**/package.json` files.
+
 ## Test Conventions
 
 - Place unit and integration tests in `__tests__/` folders next to the relevant feature/module.

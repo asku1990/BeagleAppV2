@@ -14,6 +14,9 @@ export type BeagleSearchRequestDb = {
   reg?: string;
   name?: string;
   sex?: "male" | "female";
+  birthYearFrom?: number;
+  birthYearTo?: number;
+  ekOnly?: boolean;
   multipleRegsOnly?: boolean;
   page?: number;
   pageSize?: number;
@@ -170,6 +173,27 @@ function parseNewestLimit(input: number | undefined): number {
   if (!Number.isFinite(input)) return DEFAULT_NEWEST_LIMIT;
   const parsed = Math.floor(input ?? DEFAULT_NEWEST_LIMIT);
   return Math.min(MAX_NEWEST_LIMIT, Math.max(1, parsed));
+}
+
+function normalizeBirthYear(value: unknown): number | undefined {
+  if (!Number.isFinite(value)) {
+    return undefined;
+  }
+
+  const year = Math.floor(value as number);
+  if (year < 1000 || year > 9999) {
+    return undefined;
+  }
+
+  return year;
+}
+
+function toYearStartDateUtc(year: number): Date {
+  return new Date(Date.UTC(year, 0, 1, 0, 0, 0, 0));
+}
+
+function toYearEndDateUtc(year: number): Date {
+  return new Date(Date.UTC(year, 11, 31, 23, 59, 59, 999));
 }
 
 function parseRegistrationOrder(registrationNo: string): {
@@ -367,6 +391,9 @@ function buildWhere(input: {
   reg: string;
   name: string;
   sex?: "male" | "female";
+  birthYearFrom?: number;
+  birthYearTo?: number;
+  ekOnly?: boolean;
 }): Prisma.DogWhereInput {
   const and: Prisma.DogWhereInput[] = [];
 
@@ -435,6 +462,30 @@ function buildWhere(input: {
     and.push({ sex: DogSex.MALE });
   } else if (input.sex === "female") {
     and.push({ sex: DogSex.FEMALE });
+  }
+
+  if (input.birthYearFrom != null) {
+    and.push({
+      birthDate: {
+        gte: toYearStartDateUtc(input.birthYearFrom),
+      },
+    });
+  }
+
+  if (input.birthYearTo != null) {
+    and.push({
+      birthDate: {
+        lte: toYearEndDateUtc(input.birthYearTo),
+      },
+    });
+  }
+
+  if (input.ekOnly === true) {
+    and.push({
+      ekNo: {
+        not: null,
+      },
+    });
   }
 
   if (and.length === 0) return {};
@@ -603,10 +654,18 @@ export async function searchBeagleDogsDb(
   const reg = normalizeText(input.reg).toUpperCase();
   const name = normalizeText(input.name);
   const sex = normalizeSex(input.sex);
+  const birthYearFrom = normalizeBirthYear(input.birthYearFrom);
+  const birthYearTo = normalizeBirthYear(input.birthYearTo);
+  const ekOnly = input.ekOnly === true;
   const multipleRegsOnly = input.multipleRegsOnly === true;
 
   const mode = resolveMode({ ek, reg, name });
-  const hasAdvancedFilters = multipleRegsOnly || sex != null;
+  const hasAdvancedFilters =
+    multipleRegsOnly ||
+    ekOnly ||
+    sex != null ||
+    birthYearFrom != null ||
+    birthYearTo != null;
   const effectiveMode: BeagleSearchModeDb =
     mode === "none" && hasAdvancedFilters ? "combined" : mode;
   if (mode === "none" && !hasAdvancedFilters) {
@@ -634,6 +693,9 @@ export async function searchBeagleDogsDb(
     reg,
     name,
     sex,
+    birthYearFrom,
+    birthYearTo,
+    ekOnly,
   });
   const multiRegistrationDogIds = multipleRegsOnly
     ? await loadDogIdsWithMultipleRegistrations(baseWhere)

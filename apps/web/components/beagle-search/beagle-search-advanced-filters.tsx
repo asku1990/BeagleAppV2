@@ -6,11 +6,23 @@ import { cn } from "@/lib/utils";
 export function BeagleSearchAdvancedFilters({
   sex,
   onSexChange,
+  birthYearFrom,
+  birthYearTo,
+  onBirthYearFromChange,
+  onBirthYearToChange,
+  ekOnly,
+  onEkOnlyChange,
   multipleRegsOnly,
   onMultipleRegsOnlyChange,
 }: {
   sex: "any" | "male" | "female";
   onSexChange: (value: "any" | "male" | "female") => void;
+  birthYearFrom: string;
+  birthYearTo: string;
+  onBirthYearFromChange: (value: string) => void;
+  onBirthYearToChange: (value: string) => void;
+  ekOnly: boolean;
+  onEkOnlyChange: (value: boolean) => void;
   multipleRegsOnly: boolean;
   onMultipleRegsOnlyChange: (value: boolean) => void;
 }) {
@@ -23,9 +35,6 @@ export function BeagleSearchAdvancedFilters({
     >
       <p className={cn("text-sm font-medium", beagleTheme.inkStrongText)}>
         {t("search.form.advanced.title")}
-      </p>
-      <p className={cn("mt-1 text-xs", beagleTheme.mutedText)}>
-        {t("search.form.advanced.placeholder")}
       </p>
       <label className="mt-3 flex items-center gap-2 text-xs">
         <input
@@ -62,28 +71,44 @@ export function BeagleSearchAdvancedFilters({
           <span className={beagleTheme.mutedText}>
             {t("search.advanced.birthYearFrom")}
           </span>
-          <Input disabled placeholder="2000" />
+          <Input
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={4}
+            value={birthYearFrom}
+            onChange={(event) => onBirthYearFromChange(event.target.value)}
+            placeholder="2000"
+          />
         </label>
         <label className="space-y-1 text-xs">
           <span className={beagleTheme.mutedText}>
             {t("search.advanced.birthYearTo")}
           </span>
-          <Input disabled placeholder="2026" />
+          <Input
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={4}
+            value={birthYearTo}
+            onChange={(event) => onBirthYearToChange(event.target.value)}
+            placeholder="2026"
+          />
         </label>
-        <label className="space-y-1 text-xs">
+        <div className="space-y-1 text-xs">
           <span className={beagleTheme.mutedText}>
             {t("search.advanced.ekOnly")}
           </span>
-          <select
-            disabled
-            className={cn(
-              "h-9 w-full rounded-md border bg-white px-3 text-sm disabled:cursor-not-allowed disabled:opacity-70",
-              beagleTheme.border,
-            )}
-          >
-            <option>{t("search.advanced.option.any")}</option>
-          </select>
-        </label>
+          <label className="flex h-9 items-center gap-2 rounded-md border px-3 text-sm">
+            <input
+              type="checkbox"
+              checked={ekOnly}
+              onChange={(event) => onEkOnlyChange(event.target.checked)}
+              className={cn("size-4 rounded border", beagleTheme.border)}
+            />
+            <span className={beagleTheme.inkStrongText}>
+              {t("search.advanced.ekOnly")}
+            </span>
+          </label>
+        </div>
       </div>
     </section>
   );
