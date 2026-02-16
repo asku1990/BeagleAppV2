@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -48,6 +48,18 @@ export function AppHeader() {
           ) : null}
         </div>
         <div className="flex items-center gap-1">
+          <Button
+            asChild
+            type="button"
+            variant="ghost"
+            size="sm"
+            className={cn(beagleTheme.inkStrongText, beagleTheme.focusRing)}
+          >
+            <Link href="/whats-new" aria-label={t("header.whatsNewAria")}>
+              <Info className="size-4" />
+              <span>{t("header.whatsNew")}</span>
+            </Link>
+          </Button>
           {localeButtons.map((option) => (
             <Button
               key={option.locale}
