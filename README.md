@@ -216,3 +216,43 @@ For full import behavior (source tables, stage handling, required fields, issue 
 - `docs/roles-and-permissions.md`: baseline role and authorization rules.
 - `docs/migration-plan-v1-to-v2.md`: staged migration approach from legacy app.
 - `docs/import-phase1.md`: phase-1 import flow, data handling, and issue logging behavior.
+
+## How we communicate changes
+
+- User-facing changes are tracked in root `CHANGELOG.md`.
+- Changelog source format:
+  - `## [Unreleased]`
+  - `## [x.y.z] - YYYY-MM-DD`
+  - Sections: `Added`, `Changed`, `Fixed`, `Removed`
+- When a PR includes user-visible behavior, add one line under `Unreleased`.
+- For internal-only changes (`refactor`, `test`, `chore`), changelog updates are optional.
+- User-facing release-note surfaces:
+  - Header entry point: `Mitä uutta` in the app shell.
+  - Public app page: `/whats-new` (latest Finnish summary + full notes).
+  - Matching GitHub Release notes per tagged version.
+
+## Release procedure (manual)
+
+1. Confirm `CHANGELOG.md` `Unreleased` entries are complete and user-facing.
+2. Move `Unreleased` bullets into a new version block `## [x.y.z] - YYYY-MM-DD`.
+3. Keep entries grouped under `Added`, `Changed`, `Fixed`, `Removed`.
+4. Commit the changelog update.
+5. Tag the release (example: `git tag v0.4.0` and `git push origin v0.4.0`).
+6. Create a GitHub Release for that tag and paste the same changelog block as release notes.
+7. Reset `Unreleased` to an empty section skeleton for the next cycle.
+
+Dry-run example:
+
+```md
+## [Unreleased]
+
+### Added
+
+- No user-facing additions yet.
+
+## [0.4.0] - 2026-02-16
+
+### Added
+
+- Added Beagle search filters for owner and registration number.
+```
