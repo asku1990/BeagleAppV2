@@ -137,4 +137,78 @@ describe("dogs service", () => {
       },
     });
   });
+
+  it("maps newest dogs result and clamps limit", async () => {
+    const createdAt = new Date("2026-02-02T10:00:00.000Z");
+    const birthDate = new Date("2021-01-01T00:00:00.000Z");
+    getNewestBeagleDogsDbMock.mockResolvedValue([
+      {
+        id: "n1",
+        ekNo: 10,
+        registrationNo: "FI-10/24",
+        registrationNos: ["FI-10/24"],
+        createdAt,
+        sex: "N",
+        name: "Newest",
+        birthDate,
+        sire: "SIRE",
+        dam: "DAM",
+        trialCount: 4,
+        showCount: 5,
+      },
+    ]);
+
+    const service = createDogsService();
+    const result = await service.getNewestBeagleDogs({ limit: 999 });
+
+    expect(getNewestBeagleDogsDbMock).toHaveBeenCalledWith(20);
+    expect(result).toEqual({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          items: [
+            {
+              id: "n1",
+              ekNo: 10,
+              registrationNo: "FI-10/24",
+              registrationNos: ["FI-10/24"],
+              createdAt: "2026-02-02T10:00:00.000Z",
+              sex: "N",
+              name: "Newest",
+              birthDate: "2021-01-01T00:00:00.000Z",
+              sire: "SIRE",
+              dam: "DAM",
+              trialCount: 4,
+              showCount: 5,
+            },
+          ],
+        },
+      },
+    });
+  });
+
+  it("uses default newest limit when missing", async () => {
+    getNewestBeagleDogsDbMock.mockResolvedValue([]);
+    const service = createDogsService();
+
+    await service.getNewestBeagleDogs();
+
+    expect(getNewestBeagleDogsDbMock).toHaveBeenCalledWith(5);
+  });
+
+  it("returns 500 when newest DB call throws", async () => {
+    getNewestBeagleDogsDbMock.mockRejectedValue(new Error("db fail"));
+    const service = createDogsService();
+
+    const result = await service.getNewestBeagleDogs({ limit: 1 });
+
+    expect(result).toEqual({
+      status: 500,
+      body: {
+        ok: false,
+        error: "Failed to load newest beagles.",
+      },
+    });
+  });
 });
