@@ -22,7 +22,7 @@ This project uses a user-facing changelog format.
 
 ### Fixed
 
-- Ei käyttäjälle näkyviä korjauksia tässä julkaisussa.
+- Yläpalkin painikkeita tiivistettiin, jotta kielivalinta (🇸🇪/🇫🇮) mahtuu myös pienille näytöille ilman vaakasuuntaista ylivuotoa.
 
 ### Removed
 

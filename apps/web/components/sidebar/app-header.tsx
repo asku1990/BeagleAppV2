@@ -27,8 +27,8 @@ export function AppHeader() {
         beagleTheme.sidebarSurface,
       )}
     >
-      <div className="flex h-12 w-full items-center justify-between gap-3 px-4 md:px-6">
-        <div className="flex items-center gap-2.5">
+      <div className="flex h-12 w-full items-center justify-between gap-2 px-3 md:px-4">
+        <div className="flex min-w-0 items-center gap-1.5">
           <SidebarTrigger
             className={cn(beagleTheme.inkStrongText, beagleTheme.focusRing)}
           />
@@ -37,27 +37,39 @@ export function AppHeader() {
               asChild
               type="button"
               variant="ghost"
-              size="sm"
-              className={cn(beagleTheme.inkStrongText, beagleTheme.focusRing)}
+              size="icon-sm"
+              className={cn(
+                "shrink-0",
+                beagleTheme.inkStrongText,
+                beagleTheme.focusRing,
+              )}
             >
-              <Link href="/">
+              <Link
+                href="/"
+                aria-label={t("header.backHome")}
+                title={t("header.backHome")}
+              >
                 <ChevronLeft className="size-4" />
-                <span>{t("header.backHome")}</span>
+                <span className="sr-only">{t("header.backHome")}</span>
               </Link>
             </Button>
           ) : null}
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex shrink-0 items-center gap-0.5">
           <Button
             asChild
             type="button"
             variant="ghost"
-            size="sm"
+            size="icon-sm"
             className={cn(beagleTheme.inkStrongText, beagleTheme.focusRing)}
           >
-            <Link href="/whats-new" aria-label={t("header.whatsNewAria")}>
+            <Link
+              href="/whats-new"
+              aria-label={t("header.whatsNewAria")}
+              title={t("header.whatsNew")}
+            >
               <Info className="size-4" />
-              <span>{t("header.whatsNew")}</span>
+              <span className="sr-only">{t("header.whatsNew")}</span>
             </Link>
           </Button>
           {localeButtons.map((option) => (
@@ -69,13 +81,13 @@ export function AppHeader() {
               className={
                 locale === option.locale
                   ? cn(
-                      "h-11 w-11 text-base border ring-2 ring-[var(--beagle-focus)] md:h-8 md:w-8",
+                      "h-9 w-9 text-base border ring-2 ring-[var(--beagle-focus)]",
                       beagleTheme.border,
                       beagleTheme.softAccent,
                       beagleTheme.focusRing,
                     )
                   : cn(
-                      "h-11 w-11 text-base border border-transparent md:h-8 md:w-8",
+                      "h-9 w-9 text-base border border-transparent",
                       beagleTheme.interactive,
                       beagleTheme.focusRing,
                     )
