@@ -91,7 +91,7 @@ export function readUrlSearchState(
   };
 }
 
-function toQueryString(state: BeagleSearchQueryState): string {
+export function toSearchQueryString(state: BeagleSearchQueryState): string {
   const params = new URLSearchParams();
 
   if (state.ek) {
@@ -179,7 +179,7 @@ export function useBeagleSearchUiState() {
 
   const commitState = useCallback(
     (nextState: BeagleSearchQueryState) => {
-      const query = toQueryString(nextState);
+      const query = toSearchQueryString(nextState);
       const href = query ? `${pathname}?${query}` : pathname;
 
       startTransition(() => {
