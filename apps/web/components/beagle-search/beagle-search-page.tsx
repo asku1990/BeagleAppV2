@@ -5,10 +5,11 @@ import { useMemo } from "react";
 import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import {
+  normalizeBirthYearInput,
   resolvePrimarySearchMode,
-  useBeagleSearchUiState,
 } from "@/lib/beagle-search";
-import { useI18n } from "@/lib/i18n";
+import { useBeagleSearchUiState } from "@/hooks/beagle-search";
+import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
 import { useBeagleNewestQuery } from "@/queries/beagle-search/use-beagle-newest-query";
 import { useBeagleSearchQuery } from "@/queries/beagle-search/use-beagle-search-query";
@@ -31,13 +32,20 @@ export function BeagleSearchPage() {
     setPage,
     setSort,
     setSex,
+    setBirthYearFrom,
+    setBirthYearTo,
+    setEkOnly,
     setMultipleRegsOnly,
     toggleAdvanced,
   } = useBeagleSearchUiState();
 
   const localMode = resolvePrimarySearchMode(formState);
   const hasAdvancedFilters =
-    formState.multipleRegsOnly || formState.sex !== "any";
+    formState.multipleRegsOnly ||
+    formState.ekOnly ||
+    formState.sex !== "any" ||
+    normalizeBirthYearInput(formState.birthYearFrom).length > 0 ||
+    normalizeBirthYearInput(formState.birthYearTo).length > 0;
   const effectiveFormMode =
     localMode === "none" && hasAdvancedFilters ? "combined" : localMode;
   const canSubmit = localMode !== "none" || hasAdvancedFilters;
@@ -112,6 +120,9 @@ export function BeagleSearchPage() {
         onToggleAdvanced={toggleAdvanced}
         onSortChange={setSort}
         onSexChange={setSex}
+        onBirthYearFromChange={setBirthYearFrom}
+        onBirthYearToChange={setBirthYearTo}
+        onEkOnlyChange={setEkOnly}
         onMultipleRegsOnlyChange={setMultipleRegsOnly}
       />
 

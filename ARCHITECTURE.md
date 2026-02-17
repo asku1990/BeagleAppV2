@@ -49,6 +49,8 @@ Not allowed:
 - Keep related folder-level `index.ts` files that re-export the public surface.
 - Import from module `index.ts` entrypoints when crossing package/module boundaries.
 - Keep internals private: do not re-export helper files that are only for local use inside a module.
+- For `apps/web`: place custom React hooks under `apps/web/hooks/**` (prefer feature-scoped folders).
+- For `apps/web`: keep `apps/web/lib/**` for non-hook utilities/support code (helpers, types, constants, providers, etc.).
 
 ## Test organization rules
 

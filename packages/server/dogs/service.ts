@@ -16,6 +16,7 @@ const ALLOWED_SORTS: ReadonlySet<BeagleSearchSortDb> = new Set([
   "birth-desc",
   "reg-desc",
   "created-desc",
+  "ek-asc",
 ]);
 
 function parseSort(
@@ -67,6 +68,9 @@ export function createDogsService() {
           reg: input.reg,
           name: input.name,
           sex: input.sex,
+          birthYearFrom: input.birthYearFrom,
+          birthYearTo: input.birthYearTo,
+          ekOnly: input.ekOnly,
           multipleRegsOnly: input.multipleRegsOnly,
           page: parsePage(input.page),
           pageSize: parsePageSize(input.pageSize),

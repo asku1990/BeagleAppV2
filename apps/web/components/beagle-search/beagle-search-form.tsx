@@ -2,7 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { beagleTheme } from "@/components/ui/beagle-theme";
-import { useI18n, type MessageKey } from "@/lib/i18n";
+import type { MessageKey } from "@/lib/i18n";
+import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
 import type {
   BeaglePrimarySearchMode,
@@ -33,11 +34,21 @@ export function BeagleSearchForm({
   onToggleAdvanced,
   onSortChange,
   onSexChange,
+  onBirthYearFromChange,
+  onBirthYearToChange,
+  onEkOnlyChange,
   onMultipleRegsOnlyChange,
 }: {
   values: Pick<
     BeagleSearchQueryState,
-    "ek" | "reg" | "name" | "sex" | "multipleRegsOnly"
+    | "ek"
+    | "reg"
+    | "name"
+    | "sex"
+    | "birthYearFrom"
+    | "birthYearTo"
+    | "ekOnly"
+    | "multipleRegsOnly"
   >;
   mode: BeaglePrimarySearchMode;
   sort: BeagleSearchSort;
@@ -50,6 +61,9 @@ export function BeagleSearchForm({
   onToggleAdvanced: () => void;
   onSortChange: (sort: BeagleSearchSort) => void;
   onSexChange: (value: "any" | "male" | "female") => void;
+  onBirthYearFromChange: (value: string) => void;
+  onBirthYearToChange: (value: string) => void;
+  onEkOnlyChange: (value: boolean) => void;
   onMultipleRegsOnlyChange: (value: boolean) => void;
 }) {
   const { t } = useI18n();
@@ -90,6 +104,7 @@ export function BeagleSearchForm({
                 {t("search.form.sort.createdDesc")}
               </option>
               <option value="reg-desc">{t("search.form.sort.regDesc")}</option>
+              <option value="ek-asc">{t("search.form.sort.ekAsc")}</option>
               <option value="name-asc">{t("search.form.sort.nameAsc")}</option>
             </select>
           </label>
@@ -171,6 +186,12 @@ export function BeagleSearchForm({
           <BeagleSearchAdvancedFilters
             sex={values.sex}
             onSexChange={onSexChange}
+            birthYearFrom={values.birthYearFrom}
+            birthYearTo={values.birthYearTo}
+            onBirthYearFromChange={onBirthYearFromChange}
+            onBirthYearToChange={onBirthYearToChange}
+            ekOnly={values.ekOnly}
+            onEkOnlyChange={onEkOnlyChange}
             multipleRegsOnly={values.multipleRegsOnly}
             onMultipleRegsOnlyChange={onMultipleRegsOnlyChange}
           />

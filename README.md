@@ -138,6 +138,34 @@ pnpm --filter @beagle/web test:e2e
   - `GET /api/v1/imports/:id/issues`
 - Home statistics are now loaded via Server Action + React Query hook in web UI (`app/actions/home/get-home-statistics.ts` + `queries/home/use-home-statistics-query.ts`).
 
+## Beagle search
+
+Supported filters:
+
+- Primary filters: `ek`, `reg`, `name`
+- Advanced filters: `sex`, `birthYearFrom`, `birthYearTo`, `ekOnly`, `multipleRegsOnly`
+
+URL query params used by search page:
+
+- Primary: `ek`, `reg`, `name`
+- Advanced: `sex`, `birthYearFrom`, `birthYearTo`, `ekOnly=1`, `multiRegs=1`, `adv=1`
+- Paging and sort: `page`, `sort`
+
+Search mode behavior:
+
+- Primary-only input resolves to one of: `ek`, `reg`, `name`
+- Multiple filled primary fields resolve to `combined`
+- No primary input resolves to `none`
+- Advanced-only submissions resolve to `combined` (so search can run without primary fields)
+
+Sort values:
+
+- `name-asc`
+- `birth-desc`
+- `reg-desc`
+- `created-desc`
+- `ek-asc`
+
 ## Import basics
 
 1. Run migration:

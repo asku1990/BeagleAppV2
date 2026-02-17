@@ -29,6 +29,14 @@ Agent instructions for working in this repository.
 - Keep utilities close to the feature/package that uses them.
 - Create shared utilities only when reused in multiple places.
 - Avoid generic catch-all files like `utils.ts` with unrelated helpers.
+- Do not place custom React hooks under `apps/web/lib/**`.
+
+## Hooks (`apps/web/hooks`)
+
+- Place custom React hooks for `apps/web` under `apps/web/hooks/**` (feature-scoped subfolders are preferred).
+- Import hooks from `@/hooks/**`.
+- Keep non-hook helpers, types, and constants in `apps/web/lib/**`.
+- Query hooks in `apps/web/queries/**` are allowed to stay there unless explicitly refactored.
 
 ## Implementation Preferences
 
@@ -40,6 +48,30 @@ Agent instructions for working in this repository.
 
 - Run targeted checks for touched code when possible.
 - If tests/checks are not run, explicitly say so in the final response.
+
+## Release & Changelog Rules
+
+- Source of truth for release communication is root `CHANGELOG.md`.
+- Add user-visible changes directly to a dated version block:
+  - `## [x.y.z] - YYYY-MM-DD`
+  - Keep sections: `Added`, `Changed`, `Fixed`, `Removed`.
+- Important: web "Mitä uutta" reads only versioned blocks, not `Unreleased`.
+  - Parsing code: `apps/web/lib/release-notes/latest.ts`
+  - UI page: `apps/web/app/(public)/whats-new/page.tsx`
+
+### Version Alignment
+
+- Keep all workspace package versions aligned to the same version:
+  - `package.json`
+  - `apps/web/package.json`
+  - `packages/api-client/package.json`
+  - `packages/auth/package.json`
+  - `packages/config-eslint/package.json`
+  - `packages/config-typescript/package.json`
+  - `packages/contracts/package.json`
+  - `packages/db/package.json`
+  - `packages/server/package.json`
+- Do not edit generated `apps/web/.next/**/package.json` files.
 
 ## Test Conventions
 
