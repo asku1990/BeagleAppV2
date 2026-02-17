@@ -4,7 +4,7 @@ import {
   LabeledInput,
   LabeledSelect,
 } from "@/components/ui/form-fields";
-import { useI18n } from "@/lib/i18n";
+import { useI18n } from "@/hooks/i18n";
 
 export function BeagleSearchAdvancedFilters({
   sex,

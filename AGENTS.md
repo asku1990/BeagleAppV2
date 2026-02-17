@@ -29,6 +29,14 @@ Agent instructions for working in this repository.
 - Keep utilities close to the feature/package that uses them.
 - Create shared utilities only when reused in multiple places.
 - Avoid generic catch-all files like `utils.ts` with unrelated helpers.
+- Do not place custom React hooks under `apps/web/lib/**`.
+
+## Hooks (`apps/web/hooks`)
+
+- Place custom React hooks for `apps/web` under `apps/web/hooks/**` (feature-scoped subfolders are preferred).
+- Import hooks from `@/hooks/**`.
+- Keep non-hook helpers, types, and constants in `apps/web/lib/**`.
+- Query hooks in `apps/web/queries/**` are allowed to stay there unless explicitly refactored.
 
 ## Implementation Preferences
 

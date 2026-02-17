@@ -15,7 +15,7 @@ let mockedQueryData: HomeStatisticsResponse | null = null;
 let mockedQueryIsError = false;
 let mockedQueryIsLoading = false;
 
-vi.mock("@/lib/i18n", () => ({
+vi.mock("@/hooks/i18n", () => ({
   useI18n: () => ({
     locale: mockedLocale,
     t: (key: string) => translations[key] ?? key,

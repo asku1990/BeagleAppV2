@@ -7,9 +7,9 @@ import { beagleTheme } from "@/components/ui/beagle-theme";
 import {
   normalizeBirthYearInput,
   resolvePrimarySearchMode,
-  useBeagleSearchUiState,
 } from "@/lib/beagle-search";
-import { useI18n } from "@/lib/i18n";
+import { useBeagleSearchUiState } from "@/hooks/beagle-search";
+import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
 import { useBeagleNewestQuery } from "@/queries/beagle-search/use-beagle-newest-query";
 import { useBeagleSearchQuery } from "@/queries/beagle-search/use-beagle-search-query";

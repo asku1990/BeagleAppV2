@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { cn } from "@/lib/utils";
-import { useI18n } from "@/lib/i18n";
+import { useI18n } from "@/hooks/i18n";
 
 export function MainHeader() {
   const { t } = useI18n();
