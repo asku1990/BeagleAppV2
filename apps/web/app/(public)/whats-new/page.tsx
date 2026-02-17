@@ -42,7 +42,7 @@ export default async function WhatsNewPage() {
             beagleTheme.inkText,
           )}
         >
-          {releaseNotesData.latestUpdatesFi.slice(0, 5).map((item) => (
+          {releaseNotesData.latestUpdatesFi.map((item) => (
             <li key={item}>{item}</li>
           ))}
         </ul>

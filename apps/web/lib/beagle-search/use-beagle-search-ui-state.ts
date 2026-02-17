@@ -53,7 +53,8 @@ function readSort(value: string | null): BeagleSearchSort {
     value === "name-asc" ||
     value === "birth-desc" ||
     value === "reg-desc" ||
-    value === "created-desc"
+    value === "created-desc" ||
+    value === "ek-asc"
   ) {
     return value;
   }

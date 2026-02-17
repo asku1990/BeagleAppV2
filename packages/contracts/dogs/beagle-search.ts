@@ -2,7 +2,8 @@ export type BeagleSearchSort =
   | "name-asc"
   | "birth-desc"
   | "reg-desc"
-  | "created-desc";
+  | "created-desc"
+  | "ek-asc";
 
 export type BeagleSearchMode = "none" | "ek" | "reg" | "name" | "combined";
 export type BeagleSearchSex = "male" | "female";

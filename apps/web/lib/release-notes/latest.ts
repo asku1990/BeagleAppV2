@@ -138,7 +138,7 @@ export async function getReleaseNotesData(): Promise<ReleaseNotesData> {
         latest.blocks.flatMap((block) =>
           block.items.filter((item) => !isNonUserVisiblePlaceholder(item)),
         ),
-      ).slice(0, 5)
+      ).slice(0, 10)
     : [];
 
   return {
