@@ -8,7 +8,7 @@ This project uses a user-facing changelog format.
 - Internal-only changes are optional in the changelog.
 - Use sections: `Added`, `Changed`, `Fixed`, `Removed`.
 
-## [0.1.1] - 2026-02-16
+## [0.1.1] - 2026-02-17
 
 ### Added
 
