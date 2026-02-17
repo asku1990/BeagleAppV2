@@ -16,6 +16,7 @@ const ALLOWED_SORTS: ReadonlySet<BeagleSearchSortDb> = new Set([
   "birth-desc",
   "reg-desc",
   "created-desc",
+  "ek-asc",
 ]);
 
 function parseSort(

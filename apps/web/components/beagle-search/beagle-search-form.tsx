@@ -103,6 +103,7 @@ export function BeagleSearchForm({
                 {t("search.form.sort.createdDesc")}
               </option>
               <option value="reg-desc">{t("search.form.sort.regDesc")}</option>
+              <option value="ek-asc">{t("search.form.sort.ekAsc")}</option>
               <option value="name-asc">{t("search.form.sort.nameAsc")}</option>
             </select>
           </label>

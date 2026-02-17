@@ -5,7 +5,8 @@ export type BeagleSearchSortDb =
   | "name-asc"
   | "birth-desc"
   | "reg-desc"
-  | "created-desc";
+  | "created-desc"
+  | "ek-asc";
 
 export type BeagleSearchModeDb = "none" | "ek" | "reg" | "name" | "combined";
 
@@ -151,7 +152,8 @@ function parseSort(input: string | undefined): BeagleSearchSortDb {
     input === "name-asc" ||
     input === "birth-desc" ||
     input === "reg-desc" ||
-    input === "created-desc"
+    input === "created-desc" ||
+    input === "ek-asc"
   ) {
     return input;
   }
@@ -290,6 +292,19 @@ function compareRowsByNameAsc(left: RawDogRow, right: RawDogRow): number {
   );
 }
 
+function compareRowsByEkAsc(left: RawDogRow, right: RawDogRow): number {
+  if (left.ekNo != null && right.ekNo != null) {
+    const ekComparison = left.ekNo - right.ekNo;
+    if (ekComparison !== 0) return ekComparison;
+  } else if (left.ekNo != null && right.ekNo == null) {
+    return -1;
+  } else if (left.ekNo == null && right.ekNo != null) {
+    return 1;
+  }
+
+  return left.id.localeCompare(right.id, "fi", { sensitivity: "base" });
+}
+
 function compareRegistrationRowsDesc(
   left: RegistrationRow,
   right: RegistrationRow,
@@ -318,6 +333,9 @@ function sortRows(rows: RawDogRow[], sort: BeagleSearchSortDb): RawDogRow[] {
   }
   if (sort === "birth-desc") {
     return sortable.sort(compareRowsByBirthDesc);
+  }
+  if (sort === "ek-asc") {
+    return sortable.sort(compareRowsByEkAsc);
   }
   return sortable.sort(compareRowsByNameAsc);
 }
@@ -643,6 +661,9 @@ function resolveDbOrderBy(
   }
   if (sort === "created-desc") {
     return [{ createdAt: "desc" }, { id: "desc" }];
+  }
+  if (sort === "ek-asc") {
+    return [{ ekNo: { sort: "asc", nulls: "last" } }, { id: "asc" }];
   }
   return null;
 }
