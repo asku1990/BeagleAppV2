@@ -6,7 +6,8 @@ import {
   BEAGLE_ROW_ACTIONS,
   type BeagleSearchQuickAction,
 } from "@/lib/beagle-search";
-import { useI18n, type MessageKey } from "@/lib/i18n";
+import type { MessageKey } from "@/lib/i18n";
+import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
 
 const actionLabelMap: Record<BeagleSearchQuickAction, MessageKey> = {

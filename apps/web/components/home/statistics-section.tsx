@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { useI18n, type MessageKey } from "@/lib/i18n";
+import type { MessageKey } from "@/lib/i18n";
+import { useI18n } from "@/hooks/i18n";
 import { useHomeStatisticsQuery } from "@/queries/home/use-home-statistics-query";
 
 type StatRow = {

@@ -1,6 +1,7 @@
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import type { BeagleSearchResultRow } from "@/lib/beagle-search";
-import { useI18n, type MessageKey } from "@/lib/i18n";
+import type { MessageKey } from "@/lib/i18n";
+import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
 import { BeagleSearchRowActions } from "./beagle-search-row-actions";
 

@@ -8,12 +8,12 @@ import {
   useTransition,
 } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { normalizeBirthYearInput } from "./birth-year";
+import { normalizeBirthYearInput } from "@/lib/beagle-search/birth-year";
 import type {
   BeagleSearchAdvancedSex,
   BeagleSearchQueryState,
   BeagleSearchSort,
-} from "./types";
+} from "@/lib/beagle-search/types";
 
 type SearchParamsLike = {
   get: (key: string) => string | null;

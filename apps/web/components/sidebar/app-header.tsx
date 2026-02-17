@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { useI18n } from "@/lib/i18n";
+import { useI18n } from "@/hooks/i18n";
 
 const localeButtons = [
   { locale: "fi", flag: "🇫🇮", labelKey: "header.language.finnish" },

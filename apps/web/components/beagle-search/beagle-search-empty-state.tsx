@@ -1,5 +1,6 @@
 import { beagleTheme } from "@/components/ui/beagle-theme";
-import { useI18n, type MessageKey } from "@/lib/i18n";
+import type { MessageKey } from "@/lib/i18n";
+import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
 
 type EmptyVariant = "start" | "invalid" | "no-results" | "error";
