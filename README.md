@@ -38,6 +38,9 @@ cp .env.example .env
 - `BETTER_AUTH_URL`: canonical app URL used by Better Auth (for local dev: `http://localhost:3000`).
 - `BETTER_AUTH_SESSION_EXPIRES_IN`: session lifetime in seconds (default `1209600` = 14 days).
 - `BETTER_AUTH_SESSION_UPDATE_AGE`: sliding refresh interval in seconds for active sessions (default `86400` = 1 day).
+- `BOOTSTRAP_ADMIN_EMAIL`: first admin email for one-time bootstrap script.
+- `BOOTSTRAP_ADMIN_PASSWORD`: first admin password for one-time bootstrap script (12-128 chars).
+- `BOOTSTRAP_ADMIN_NAME`: optional first admin display name (falls back to email local-part).
 - `NEXT_PUBLIC_API_URL`: optional API base URL override for web app clients. Default is same-origin.
 - `CORS_ORIGINS`: optional comma-separated cross-origin allowlist for API responses.
 - `LEGACY_DATABASE_URL`: MariaDB connection string to legacy Beagle DB for phase-1 imports.
@@ -140,6 +143,20 @@ Better Auth config lives at `packages/server/auth/better-auth.ts`, so pass `--co
 pnpm auth:generate
 pnpm auth:migrate
 ```
+
+## First admin bootstrap
+
+For a fresh environment with public sign-up disabled, create the first `ADMIN` user with:
+
+```bash
+pnpm auth:bootstrap-admin
+```
+
+The script is idempotent:
+
+- creates the admin user if missing
+- promotes an existing matching user to `ADMIN`
+- ensures credential account exists for email/password sign-in
 
 ## Beagle search
 
