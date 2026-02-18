@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useMemo } from "react";
-import { toast } from "sonner";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { toast } from "@/components/ui/sonner";
 import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import {
@@ -72,6 +72,32 @@ export function BeagleSearchPage() {
     isPending || (searchQuery.isFetching && !searchQuery.data);
   const hasSearchError = searchQuery.isError && !searchQuery.data;
   const hasNewestError = newestQuery.isError && !newestQuery.data;
+  const hasNotifiedSearchError = useRef(false);
+  const hasNotifiedNewestError = useRef(false);
+
+  useEffect(() => {
+    if (hasSearchError && !hasNotifiedSearchError.current) {
+      toast.error(t("search.empty.fetchFailed"));
+      hasNotifiedSearchError.current = true;
+      return;
+    }
+
+    if (!hasSearchError) {
+      hasNotifiedSearchError.current = false;
+    }
+  }, [hasSearchError, t]);
+
+  useEffect(() => {
+    if (hasNewestError && !hasNotifiedNewestError.current) {
+      toast.error(t("search.newest.fetchFailed"));
+      hasNotifiedNewestError.current = true;
+      return;
+    }
+
+    if (!hasNewestError) {
+      hasNotifiedNewestError.current = false;
+    }
+  }, [hasNewestError, t]);
 
   const emptyVariant = hasSearchError
     ? "error"

@@ -13,6 +13,8 @@ export const fiHomeMessages = {
   "home.stats.row.totalTrialEntries": "Ajokoestartteja yhteensä",
   "home.stats.row.performedByDogs": "Suorittaneita koiria",
   "home.stats.row.totalShowEntries": "Näyttelystartteja yhteensä",
+  "home.stats.fetchFailed":
+    "Tilastojen lataus epäonnistui. Yritä uudelleen hetken kuluttua.",
 } as const;
 
 export const svHomeMessages = {
@@ -30,4 +32,6 @@ export const svHomeMessages = {
   "home.stats.row.totalTrialEntries": "Jaktprovsstarter totalt",
   "home.stats.row.performedByDogs": "Genomförda av hundar",
   "home.stats.row.totalShowEntries": "Utställningsstarter totalt",
+  "home.stats.fetchFailed":
+    "Det gick inte att ladda statistiken. Försök igen om en stund.",
 } as const;
