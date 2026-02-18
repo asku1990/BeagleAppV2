@@ -157,9 +157,6 @@ importers:
 
   packages/server:
     dependencies:
-      "@beagle/auth":
-        specifier: workspace:*
-        version: link:../auth
       "@beagle/contracts":
         specifier: workspace:*
         version: link:../contracts

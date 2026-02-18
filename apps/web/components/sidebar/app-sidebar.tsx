@@ -13,6 +13,7 @@ import {
   LogOut,
   PawPrint,
   Search,
+  Shield,
   Trophy,
   Users,
 } from "lucide-react";
@@ -42,6 +43,10 @@ type NavItem = {
   href?: string;
 };
 
+type SessionUserWithOptionalRole = {
+  role?: string | null;
+};
+
 const publicNavItems: NavItem[] = [
   { labelKey: "sidebar.nav.home", icon: House, href: "/" },
   {
@@ -58,6 +63,12 @@ const publicNavItems: NavItem[] = [
   { labelKey: "sidebar.nav.virtualPairing", icon: Link2 },
   { labelKey: "sidebar.nav.bestDriver", icon: Trophy },
 ];
+
+const adminNavItem: NavItem = {
+  labelKey: "sidebar.nav.admin",
+  icon: Shield,
+  href: "/admin",
+};
 
 export function AppSidebar() {
   const { t } = useI18n();
@@ -92,6 +103,9 @@ export function AppSidebar() {
   };
 
   const isSignedIn = Boolean(session?.user);
+  const userRole = (session?.user as SessionUserWithOptionalRole | undefined)
+    ?.role;
+  const isAdmin = userRole === "ADMIN";
 
   return (
     <Sidebar collapsible="icon" variant="sidebar">
@@ -179,6 +193,32 @@ export function AppSidebar() {
                   )}
                 </SidebarMenuItem>
               ))}
+              {isAdmin ? (
+                <SidebarMenuItem key={adminNavItem.labelKey}>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={t(adminNavItem.labelKey)}
+                    isActive={pathname.startsWith(
+                      adminNavItem.href ?? "/admin",
+                    )}
+                    className={cn(
+                      beagleTheme.inkStrongText,
+                      beagleTheme.interactive,
+                      beagleTheme.focusRing,
+                      "min-h-11 md:min-h-9",
+                      "data-[active=true]:bg-[var(--beagle-accent-soft)]",
+                    )}
+                  >
+                    <Link
+                      href={adminNavItem.href ?? "/admin"}
+                      onClick={closeSidebarOnMobile}
+                    >
+                      <adminNavItem.icon className="size-4" />
+                      <span>{t(adminNavItem.labelKey)}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ) : null}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
