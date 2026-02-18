@@ -34,16 +34,13 @@ cp .env.example .env
 2. Update `.env` values:
 
 - `DATABASE_URL`: PostgreSQL connection string.
-- `AUTH_SECRET`: strong random secret.
-- `BETTER_AUTH_SECRET`: Better Auth secret (use at least 32 chars, for example `openssl rand -base64 32`) (phase-1 foundation; route cutover comes later).
+- `BETTER_AUTH_SECRET`: Better Auth secret (minimum 32 chars, for example `openssl rand -base64 32`).
 - `BETTER_AUTH_URL`: canonical app URL used by Better Auth (for local dev: `http://localhost:3000`).
+- `BETTER_AUTH_SESSION_EXPIRES_IN`: session lifetime in seconds (default `1209600` = 14 days).
+- `BETTER_AUTH_SESSION_UPDATE_AGE`: sliding refresh interval in seconds for active sessions (default `86400` = 1 day).
 - `NEXT_PUBLIC_API_URL`: optional API base URL override for web app clients. Default is same-origin.
 - `CORS_ORIGINS`: optional comma-separated cross-origin allowlist for API responses.
 - `LEGACY_DATABASE_URL`: MariaDB connection string to legacy Beagle DB for phase-1 imports.
-- `SEED_TEST_USER_EMAIL`: required when running `pnpm db:seed:basic-user`.
-- `SEED_TEST_USER_PASSWORD`: required when running `pnpm db:seed:basic-user`.
-- `SEED_TEST_USER_ROLE`: required when running `pnpm db:seed:basic-user` (`USER` or `ADMIN`).
-- `SEED_TEST_USER_USERNAME`: optional username for `pnpm db:seed:basic-user`.
 
 Example values are already in `.env.example`.
 
@@ -122,24 +119,27 @@ pnpm --filter @beagle/web test:e2e
 
 ## Auth and admin notes
 
-- Register endpoint creates users with `USER` role by default.
+- Better Auth is mounted at `/api/auth/*` via Next catch-all route.
+- Email/password auth is enabled, but public sign-up is disabled (`disableSignUp: true`).
 - Admin pages require `ADMIN` role.
-- To test admin pages locally now, promote a user role to `ADMIN` in the database.
-- Login sets `beagle_session` as an `HttpOnly` cookie (`SameSite=Lax`, `Path=/`, `Secure` in production).
-- Logout always clears `beagle_session`; `me` and `logout` return `401` when session is missing/invalid.
-- Better Auth foundation config and Prisma models exist, but auth runtime still uses the existing `/api/auth/*` routes until a later cutover phase.
+- To test admin pages locally, create a user and set role to `ADMIN` in `BetterAuthUser`.
 
 ## Current API status
 
-- Auth endpoints implemented:
-  - `POST /api/auth/register`
-  - `POST /api/auth/login`
-  - `GET /api/auth/me`
-  - `POST /api/auth/logout`
+- Auth endpoints are provided by Better Auth under `/api/auth/*`.
 - v1 import endpoints implemented:
   - `GET /api/v1/imports/:id`
   - `GET /api/v1/imports/:id/issues`
 - Home statistics are now loaded via Server Action + React Query hook in web UI (`app/actions/home/get-home-statistics.ts` + `queries/home/use-home-statistics-query.ts`).
+
+## Better Auth CLI
+
+Better Auth config lives at `packages/server/auth/better-auth.ts`, so pass `--config` when running CLI commands.
+
+```bash
+pnpm auth:generate
+pnpm auth:migrate
+```
 
 ## Beagle search
 
@@ -211,9 +211,9 @@ pnpm import:issues <RUN_ID> --limit 500
 4. Check import run status over API (admin auth required):
 
 ```bash
-curl -i -c /tmp/beagle.cookies -X POST http://localhost:3000/api/auth/login \
+curl -i -c /tmp/beagle.cookies -X POST http://localhost:3000/api/auth/sign-in/email \
   -H "Content-Type: application/json" \
-  -d '{"email":"<SEED_TEST_USER_EMAIL>","password":"<SEED_TEST_USER_PASSWORD>"}'
+  -d '{"email":"<ADMIN_EMAIL>","password":"<ADMIN_PASSWORD>"}'
 
 curl -i -b /tmp/beagle.cookies \
   http://localhost:3000/api/v1/imports/<RUN_ID>

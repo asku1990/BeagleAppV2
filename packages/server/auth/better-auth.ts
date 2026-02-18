@@ -14,9 +14,31 @@ const trustedOrigins = (process.env.CORS_ORIGINS ?? "")
   .split(",")
   .map((origin) => origin.trim())
   .filter((origin) => origin.length > 0);
+const sessionExpiresIn = Number(
+  process.env.BETTER_AUTH_SESSION_EXPIRES_IN ?? 60 * 60 * 24 * 14,
+);
+const sessionUpdateAge = Number(
+  process.env.BETTER_AUTH_SESSION_UPDATE_AGE ?? 60 * 60 * 24,
+);
 
-if (isProduction && !betterAuthSecret) {
-  throw new Error("BETTER_AUTH_SECRET is required in production.");
+if (!betterAuthSecret) {
+  throw new Error("BETTER_AUTH_SECRET is required.");
+}
+
+if (betterAuthSecret.length < 32) {
+  throw new Error("BETTER_AUTH_SECRET must be at least 32 characters.");
+}
+
+if (!Number.isFinite(sessionExpiresIn) || sessionExpiresIn <= 0) {
+  throw new Error(
+    "BETTER_AUTH_SESSION_EXPIRES_IN must be a positive number of seconds.",
+  );
+}
+
+if (!Number.isFinite(sessionUpdateAge) || sessionUpdateAge <= 0) {
+  throw new Error(
+    "BETTER_AUTH_SESSION_UPDATE_AGE must be a positive number of seconds.",
+  );
 }
 
 if (isProduction && !betterAuthUrl) {
@@ -24,9 +46,7 @@ if (isProduction && !betterAuthUrl) {
 }
 
 export const betterAuth = createBetterAuth({
-  ...(betterAuthSecret
-    ? { secret: betterAuthSecret }
-    : { secret: "replace-in-development" }),
+  secret: betterAuthSecret,
   ...(baseURL ? { baseURL } : {}),
   database: prismaAdapter(prisma, {
     provider: "postgresql",
@@ -39,12 +59,14 @@ export const betterAuth = createBetterAuth({
     resetPasswordTokenExpiresIn: 60 * 30,
     revokeSessionsOnPasswordReset: true,
   },
+  session: {
+    modelName: "betterAuthSession",
+    expiresIn: sessionExpiresIn,
+    updateAge: sessionUpdateAge,
+  },
   trustedOrigins,
   user: {
     modelName: "betterAuthUser",
-  },
-  session: {
-    modelName: "betterAuthSession",
   },
   account: {
     modelName: "betterAuthAccount",

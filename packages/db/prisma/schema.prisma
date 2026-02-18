@@ -34,29 +34,6 @@ enum ImportIssueSeverity {
   ERROR
 }
 
-model User {
-  id           String    @id @default(cuid())
-  email        String    @unique
-  username     String?   @unique
-  passwordHash String
-  role         Role      @default(USER)
-  sessions     Session[]
-  importRuns   ImportRun[]
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model BetterAuthUser {
   id            String              @id
   email         String              @unique
@@ -71,6 +48,7 @@ model BetterAuthUser {
   updatedAt     DateTime            @updatedAt
   sessions      BetterAuthSession[]
   accounts      BetterAuthAccount[]
+  importRuns    ImportRun[]
 
   @@index([role])
 }
@@ -273,7 +251,7 @@ model ImportRun {
   finishedAt          DateTime?
   errorSummary        String?
   createdByUserId     String?
-  createdByUser       User?        @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdByUser       BetterAuthUser? @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
   issues              ImportRunIssue[]
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt

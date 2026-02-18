@@ -15,7 +15,6 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
-    "seed:basic-user": "node --import tsx/esm scripts/seed-basic-user.ts",
     "seed:initial-test-data": "node --import tsx/esm scripts/seed-initial-test-data.ts"
   },
   "dependencies": {
