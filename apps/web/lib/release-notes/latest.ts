@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-export type ReleaseNotesSection = "Added" | "Changed" | "Fixed" | "Removed";
+export type ReleaseNotesSection = string;
 
 export type ReleaseNotesBlock = {
   section: ReleaseNotesSection;
@@ -15,16 +15,8 @@ export type ReleaseHistoryEntry = {
 };
 
 export type ReleaseNotesData = {
-  latestUpdatesFi: string[];
   history: ReleaseHistoryEntry[];
 };
-
-const SECTION_ORDER: ReleaseNotesSection[] = [
-  "Added",
-  "Changed",
-  "Fixed",
-  "Removed",
-];
 
 function uniqueItems(items: string[]): string[] {
   const seen = new Set<string>();
@@ -87,32 +79,37 @@ function parseVersionBlocks(changelogText: string): ReleaseHistoryEntry[] {
       continue;
     }
 
-    const sectionItems: Record<ReleaseNotesSection, string[]> = {
-      Added: [],
-      Changed: [],
-      Fixed: [],
-      Removed: [],
-    };
+    const sectionItems = new Map<ReleaseNotesSection, string[]>();
 
     let currentSection: ReleaseNotesSection | null = null;
     for (let j = start + 1; j < end; j += 1) {
       const line = lines[j];
-      const sectionMatch = line.match(/^### (Added|Changed|Fixed|Removed)$/);
+      const sectionMatch = line.match(/^###\s+(.+)$/);
       if (sectionMatch) {
-        currentSection = sectionMatch[1] as ReleaseNotesSection;
+        currentSection = sectionMatch[1].trim();
+        if (!sectionItems.has(currentSection)) {
+          sectionItems.set(currentSection, []);
+        }
         continue;
       }
 
       const bulletMatch = line.match(/^- (.+)$/);
       if (bulletMatch && currentSection) {
-        sectionItems[currentSection].push(bulletMatch[1].trim());
+        const items = sectionItems.get(currentSection);
+        if (items) {
+          items.push(bulletMatch[1].trim());
+        }
       }
     }
 
-    const blocks: ReleaseNotesBlock[] = SECTION_ORDER.map((section) => ({
-      section,
-      items: uniqueItems(sectionItems[section]),
-    })).filter((block) => block.items.length > 0);
+    const sectionOrder = Array.from(sectionItems.keys());
+
+    const blocks: ReleaseNotesBlock[] = sectionOrder
+      .map((section) => ({
+        section,
+        items: uniqueItems(sectionItems.get(section) ?? []),
+      }))
+      .filter((block) => block.items.length > 0);
 
     releases.push({ version, date, blocks });
   }
@@ -120,29 +117,11 @@ function parseVersionBlocks(changelogText: string): ReleaseHistoryEntry[] {
   return releases;
 }
 
-function isNonUserVisiblePlaceholder(item: string): boolean {
-  const trimmed = item.trim();
-  return (
-    /^No user-visible /i.test(trimmed) ||
-    /^Ei käyttäjälle näkyviä /i.test(trimmed) ||
-    /^Ei poistettu käyttäjälle näkyviä /i.test(trimmed)
-  );
-}
-
 export async function getReleaseNotesData(): Promise<ReleaseNotesData> {
   const changelogText = await readChangelogFile();
   const history = parseVersionBlocks(changelogText);
-  const latest = history[0];
-  const latestItems = latest
-    ? uniqueItems(
-        latest.blocks.flatMap((block) =>
-          block.items.filter((item) => !isNonUserVisiblePlaceholder(item)),
-        ),
-      ).slice(0, 10)
-    : [];
 
   return {
-    latestUpdatesFi: latestItems,
     history,
   };
 }

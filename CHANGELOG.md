@@ -8,6 +8,32 @@ This project uses a user-facing changelog format.
 - Internal-only changes are optional in the changelog.
 - Use sections: `Added`, `Changed`, `Fixed`, `Removed`.
 
+## [0.2.0] - 2026-02-18
+
+### Tärkeintä tässä julkaisussa
+
+- Tämä julkaisu painottuu taustalla tehtyihin autentikoinnin uudistuksiin. Käyttäjälle näkyvät muutokset ovat vähäisiä, mutta tekninen pohja on aiempaa vakaampi.
+
+### Added
+
+- Sovellukseen lisättiin Better Authiin perustuva auth-reitti (`/api/auth/[...all]`).
+- Ylläpidon alkuasennusta varten lisättiin `auth:bootstrap-admin`-komento, jolla ensimmäinen ADMIN-käyttäjä voidaan luoda tai olemassa oleva käyttäjä nostaa adminiksi.
+
+### Changed
+
+- Sovelluksen aiempi auth-palvelukerros ja auth-route-wrapperit korvattiin Better Auth -integraatiolla.
+- Ylläpidon käyttöoikeustarkistus (`requireAdmin`) käyttää nyt Better Authin sessiota.
+- Auth-asetusten validointeja tarkennettiin (esim. salaisuuden vähimmäispituus ja session kestoasetukset), jotta virheelliset asetukset havaitaan jo käynnistyksessä.
+
+### Fixed
+
+- Auth-päätepisteiden CORS-otsakkeet ja OPTIONS-preflight-vastaukset yhdenmukaistettiin, jotta selain ei estä kirjautumispyyntöjä eri alkuperien välillä.
+- Auth-reittien testit päivitettiin kattamaan CORS- ja preflight-käytös sekä estämään testien välinen ympäristömuuttujien vuoto.
+
+### Removed
+
+- Vanhat API-clientin auth-wrapperit (`login`, `logout`, `me`, `register`) ja aiempi auth-service poistettiin käytöstä.
+
 ## [0.1.2] - 2026-02-18
 
 ### Added
