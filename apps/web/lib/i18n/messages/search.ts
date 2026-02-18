@@ -77,6 +77,8 @@ export const fiSearchMessages = {
     "Lista on järjestetty lisäysajan mukaan. Siirrossa uuteen järjestelmään monelle vanhalle koiralle tallentui sama lisäysaika, joten niiden keskinäinen järjestys voi vaihdella.",
   "search.newest.registration": "Rekisterinumero",
   "search.newest.birthDate": "Syntymäaika",
+  "search.newest.fetchFailed":
+    "Viimeisimpien lisäysten lataus epäonnistui. Yritä uudelleen hetken kuluttua.",
 } as const;
 
 export const svSearchMessages = {
@@ -158,4 +160,6 @@ export const svSearchMessages = {
     "Listan är sorterad enligt tilläggstid. Vid överföringen till det nya systemet fick många äldre hundar samma tilläggstid, så den inbördes ordningen kan variera.",
   "search.newest.registration": "Registreringsnummer",
   "search.newest.birthDate": "Födelsedatum",
+  "search.newest.fetchFailed":
+    "Det gick inte att ladda de senaste tilläggen. Försök igen om en stund.",
 } as const;
