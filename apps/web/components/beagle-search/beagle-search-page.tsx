@@ -87,7 +87,7 @@ export function BeagleSearchPage() {
 
     const clipboard = globalThis.navigator?.clipboard;
     if (!clipboard?.writeText) {
-      toast(t("search.results.copy.unsupported"));
+      toast.warning(t("search.results.copy.unsupported"));
       return;
     }
 
@@ -108,9 +108,9 @@ export function BeagleSearchPage() {
 
     try {
       await clipboard.writeText(output);
-      toast(t("search.results.copy.success"));
+      toast.success(t("search.results.copy.success"));
     } catch {
-      toast(t("search.results.copy.error"));
+      toast.error(t("search.results.copy.error"));
     }
   }, [searchResults.items, t]);
 
