@@ -1,5 +1,6 @@
 import { betterAuth, requireAdmin } from "@beagle/server";
 import type { CurrentUserDto } from "@beagle/contracts";
+import { headers } from "next/headers";
 import { type NextRequest } from "next/server";
 import { jsonResponse } from "@/lib/server/cors";
 
@@ -23,15 +24,19 @@ function toCurrentUser(user: {
   };
 }
 
+async function getAdminCheck(requestHeaders: Headers) {
+  const session = await betterAuth.api.getSession({
+    headers: requestHeaders,
+  });
+  const currentUser = session?.user ? toCurrentUser(session.user) : null;
+  return requireAdmin(currentUser);
+}
+
 export async function requireAdminAccess(
   request: NextRequest,
   methods: string,
 ): Promise<AdminAccessResult> {
-  const session = await betterAuth.api.getSession({
-    headers: request.headers,
-  });
-  const currentUser = session?.user ? toCurrentUser(session.user) : null;
-  const adminCheck = requireAdmin(currentUser);
+  const adminCheck = await getAdminCheck(request.headers);
 
   if (!adminCheck.body.ok) {
     return {
@@ -42,6 +47,18 @@ export async function requireAdminAccess(
         origin: request.headers.get("origin"),
       }),
     };
+  }
+
+  return { ok: true };
+}
+
+export async function requireAdminLayoutAccess(): Promise<
+  { ok: true } | { ok: false; status: number }
+> {
+  const adminCheck = await getAdminCheck(await headers());
+
+  if (!adminCheck.body.ok) {
+    return { ok: false, status: adminCheck.status };
   }
 
   return { ok: true };

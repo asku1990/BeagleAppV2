@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Award,
   Dog,
@@ -10,8 +10,10 @@ import {
   House,
   Link2,
   LogIn,
+  LogOut,
   PawPrint,
   Search,
+  Shield,
   Trophy,
   Users,
 } from "lucide-react";
@@ -33,11 +35,16 @@ import {
 import { cn } from "@/lib/utils";
 import type { MessageKey } from "@/lib/i18n";
 import { useI18n } from "@/hooks/i18n";
+import { authClient } from "@/lib/auth/auth-client";
 
 type NavItem = {
   labelKey: MessageKey;
   icon: React.ComponentType<{ className?: string }>;
   href?: string;
+};
+
+type SessionUserWithOptionalRole = {
+  role?: string | null;
 };
 
 const publicNavItems: NavItem[] = [
@@ -57,10 +64,19 @@ const publicNavItems: NavItem[] = [
   { labelKey: "sidebar.nav.bestDriver", icon: Trophy },
 ];
 
+const adminNavItem: NavItem = {
+  labelKey: "sidebar.nav.admin",
+  icon: Shield,
+  href: "/admin",
+};
+
 export function AppSidebar() {
   const { t } = useI18n();
+  const router = useRouter();
   const { state, isMobile, setOpenMobile } = useSidebar();
   const pathname = usePathname();
+  const { data: session, isPending: isSessionPending } =
+    authClient.useSession();
 
   const closeSidebarOnMobile = () => {
     if (isMobile) {
@@ -72,6 +88,24 @@ export function AppSidebar() {
     closeSidebarOnMobile();
     toast.info(`${item}: ${t("common.notImplementedYet")}`);
   };
+
+  const handleSignOut = async () => {
+    closeSidebarOnMobile();
+    const { error } = await authClient.signOut();
+    if (error) {
+      toast.error(error.message ?? t("auth.signOut.error"));
+      return;
+    }
+
+    toast.success(t("auth.signOut.success"));
+    router.push("/");
+    router.refresh();
+  };
+
+  const isSignedIn = Boolean(session?.user);
+  const userRole = (session?.user as SessionUserWithOptionalRole | undefined)
+    ?.role;
+  const isAdmin = userRole === "ADMIN";
 
   return (
     <Sidebar collapsible="icon" variant="sidebar">
@@ -159,6 +193,32 @@ export function AppSidebar() {
                   )}
                 </SidebarMenuItem>
               ))}
+              {isAdmin ? (
+                <SidebarMenuItem key={adminNavItem.labelKey}>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={t(adminNavItem.labelKey)}
+                    isActive={pathname.startsWith(
+                      adminNavItem.href ?? "/admin",
+                    )}
+                    className={cn(
+                      beagleTheme.inkStrongText,
+                      beagleTheme.interactive,
+                      beagleTheme.focusRing,
+                      "min-h-11 md:min-h-9",
+                      "data-[active=true]:bg-[var(--beagle-accent-soft)]",
+                    )}
+                  >
+                    <Link
+                      href={adminNavItem.href ?? "/admin"}
+                      onClick={closeSidebarOnMobile}
+                    >
+                      <adminNavItem.icon className="size-4" />
+                      <span>{t(adminNavItem.labelKey)}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ) : null}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -170,22 +230,44 @@ export function AppSidebar() {
           beagleTheme.border,
         )}
       >
-        <Button
-          variant="ghost"
-          className={cn(
-            "justify-start gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
-            beagleTheme.inkStrongText,
-            beagleTheme.interactive,
-            beagleTheme.focusRing,
-            "min-h-11 md:min-h-9",
-          )}
-          onClick={() => handleComingSoon(t("sidebar.signIn"))}
-        >
-          <LogIn className="size-4" />
-          <span className="group-data-[collapsible=icon]:hidden">
-            {t("sidebar.signIn")}
-          </span>
-        </Button>
+        {isSignedIn ? (
+          <Button
+            variant="ghost"
+            className={cn(
+              "justify-start gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
+              beagleTheme.inkStrongText,
+              beagleTheme.interactive,
+              beagleTheme.focusRing,
+              "min-h-11 md:min-h-9",
+            )}
+            onClick={handleSignOut}
+            disabled={isSessionPending}
+          >
+            <LogOut className="size-4" />
+            <span className="group-data-[collapsible=icon]:hidden">
+              {t("sidebar.signOut")}
+            </span>
+          </Button>
+        ) : (
+          <Button
+            asChild
+            variant="ghost"
+            className={cn(
+              "justify-start gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
+              beagleTheme.inkStrongText,
+              beagleTheme.interactive,
+              beagleTheme.focusRing,
+              "min-h-11 md:min-h-9",
+            )}
+          >
+            <Link href="/sign-in" onClick={closeSidebarOnMobile}>
+              <LogIn className="size-4" />
+              <span className="group-data-[collapsible=icon]:hidden">
+                {t("sidebar.signIn")}
+              </span>
+            </Link>
+          </Button>
+        )}
       </SidebarFooter>
     </Sidebar>
   );

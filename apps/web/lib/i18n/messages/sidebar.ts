@@ -12,7 +12,9 @@ export const fiSidebarMessages = {
   "sidebar.nav.kennelNames": "Kennelnimet ja lyhenteet",
   "sidebar.nav.virtualPairing": "Virtuaaliparitus",
   "sidebar.nav.bestDriver": "Paras ajuri -kilpailu",
+  "sidebar.nav.admin": "Ylläpito",
   "sidebar.signIn": "Kirjaudu",
+  "sidebar.signOut": "Kirjaudu ulos",
 } as const;
 
 export const svSidebarMessages = {
@@ -29,5 +31,7 @@ export const svSidebarMessages = {
   "sidebar.nav.kennelNames": "Kennelnamn och förkortningar",
   "sidebar.nav.virtualPairing": "Virtuell parning",
   "sidebar.nav.bestDriver": "Paras ajuri-tävling",
+  "sidebar.nav.admin": "Admin",
   "sidebar.signIn": "Logga in",
+  "sidebar.signOut": "Logga ut",
 } as const;

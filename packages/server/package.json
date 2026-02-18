@@ -17,7 +17,6 @@
     "import:issues:csv": "node --import tsx/esm scripts/export-import-issues-csv.ts"
   },
   "dependencies": {
-    "@beagle/auth": "workspace:*",
     "@beagle/contracts": "workspace:*",
     "@beagle/db": "workspace:*",
     "better-auth": "^1.4.18"

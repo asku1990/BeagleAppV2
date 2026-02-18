@@ -26,6 +26,7 @@
     "auth:generate": "pnpm dlx @better-auth/cli@latest generate --config packages/server/auth/better-auth.ts",
     "auth:migrate": "pnpm dlx @better-auth/cli@latest migrate --config packages/server/auth/better-auth.ts",
     "auth:bootstrap-admin": "pnpm --filter @beagle/server exec tsx scripts/bootstrap-admin.ts",
+    "auth:set-password": "pnpm --filter @beagle/server exec tsx scripts/set-user-password.ts",
     "db:push": "pnpm --filter @beagle/db exec prisma db push",
     "import:phase1": "pnpm --filter @beagle/server import:phase1 --",
     "import:issues": "pnpm --filter @beagle/server import:issues --",
