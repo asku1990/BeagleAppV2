@@ -18,6 +18,7 @@ This project uses a user-facing changelog format.
 
 - Hakutulosten sivutus uudistettiin: käytössä on nyt numeropohjainen sivunavigaatio (`1 ... 14 15 16 ... N`) aiemman pelkän edellinen/seuraava-rakenteen sijaan.
 - Sivutusnäkymä näyttää nyt myös selkeän "tuloksia / sivu" -valinnan sekä mobiilissa että desktopissa.
+- Hakutulosten sarake- ja otsikot täsmennettiin suomeksi ja ruotsiksi (esim. EK-numero, sukupuoli, kokeet/näyttelyt ja sukupuoliarvot) luettavuuden parantamiseksi.
 
 ### Fixed
 
