@@ -58,6 +58,8 @@ export const fiSearchMessages = {
   "search.pagination.previous": "Edelliset",
   "search.pagination.next": "Seuraavat",
   "search.pagination.range": "Näytetään",
+  "search.pagination.pageSize": "Tuloksia / sivu",
+  "search.pagination.page": "Sivu",
   "search.empty.start":
     "Aloita haku syöttämällä arvo vähintään yhteen pääkenttään ja suorittamalla haku.",
   "search.empty.singleField":
@@ -132,6 +134,8 @@ export const svSearchMessages = {
   "search.pagination.previous": "Föregående",
   "search.pagination.next": "Nästa",
   "search.pagination.range": "Visar",
+  "search.pagination.pageSize": "Resultat / sida",
+  "search.pagination.page": "Sida",
   "search.empty.start":
     "Starta sökning genom att fylla i minst ett huvudfält och köra sökningen.",
   "search.empty.singleField":

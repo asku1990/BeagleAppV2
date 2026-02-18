@@ -30,6 +30,7 @@ export function BeagleSearchPage() {
     submitSearch,
     resetSearch,
     setPage,
+    setPageSize,
     setSort,
     setSex,
     setBirthYearFrom,
@@ -149,10 +150,11 @@ export function BeagleSearchPage() {
             </div>
             <BeagleSearchPagination
               page={searchResults.page}
+              pageSize={urlState.pageSize}
               total={searchResults.total}
               totalPages={Math.max(1, searchResults.totalPages)}
-              onPrevious={() => setPage(searchResults.page - 1)}
-              onNext={() => setPage(searchResults.page + 1)}
+              onPageSelect={setPage}
+              onPageSizeChange={setPageSize}
             />
           </>
         ) : (

@@ -4,7 +4,6 @@ import type { BeagleSearchResponse } from "@beagle/contracts";
 import { useQuery } from "@tanstack/react-query";
 import { searchDogsAction } from "@/app/actions/beagle-search/search-dogs";
 import {
-  BEAGLE_PAGE_SIZE,
   parseBirthYearInput,
   type BeagleSearchQueryState,
 } from "@/lib/beagle-search";
@@ -34,6 +33,7 @@ export function useBeagleSearchQuery(state: BeagleSearchQueryState) {
       state.ekOnly,
       state.multipleRegsOnly,
       state.page,
+      state.pageSize,
       state.sort,
     ],
     enabled: hasSearchInput,
@@ -48,7 +48,7 @@ export function useBeagleSearchQuery(state: BeagleSearchQueryState) {
         ekOnly: state.ekOnly,
         multipleRegsOnly: state.multipleRegsOnly,
         page: state.page,
-        pageSize: BEAGLE_PAGE_SIZE,
+        pageSize: state.pageSize,
         sort: state.sort,
       });
 
