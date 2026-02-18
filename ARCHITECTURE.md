@@ -52,6 +52,13 @@ Not allowed:
 - For `apps/web`: place custom React hooks under `apps/web/hooks/**` (prefer feature-scoped folders).
 - For `apps/web`: keep `apps/web/lib/**` for non-hook utilities/support code (helpers, types, constants, providers, etc.).
 
+## UI feedback consistency rules
+
+- Use Sonner toasts as the default user feedback mechanism for new user-visible actions and async operation outcomes in `apps/web`.
+- Use semantic toast variants (`toast.success`, `toast.error`, `toast.warning`, `toast.info`) instead of plain `toast(...)` so styling and meaning stay consistent.
+- Keep existing inline error/empty states when they provide page context, but pair them with a toast for failed operations when user feedback is expected.
+- Refactor legacy non-toast feedback paths to this toast convention whenever touched by feature work or bug fixes.
+
 ## Test organization rules
 
 - Co-locate unit/integration tests in `__tests__/` folders near the module/feature they verify.

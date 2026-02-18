@@ -21,6 +21,7 @@ describe("useBeagleSearchUiState helpers", () => {
     expect(state.reg).toBe("REG-1");
     expect(state.name).toBe("Fido");
     expect(state.page).toBe(1);
+    expect(state.pageSize).toBe(10);
     expect(state.sort).toBe("name-asc");
   });
 
@@ -50,6 +51,7 @@ describe("useBeagleSearchUiState helpers", () => {
       ekOnly: true,
       multipleRegsOnly: true,
       page: 2,
+      pageSize: 25,
       sort: "reg-desc",
       adv: true,
     };
@@ -66,6 +68,7 @@ describe("useBeagleSearchUiState helpers", () => {
     expect(params.get("ekOnly")).toBe("1");
     expect(params.get("multiRegs")).toBe("1");
     expect(params.get("page")).toBe("2");
+    expect(params.get("pageSize")).toBe("25");
     expect(params.get("sort")).toBe("reg-desc");
     expect(params.get("adv")).toBe("1");
   });
@@ -81,6 +84,7 @@ describe("useBeagleSearchUiState helpers", () => {
       ekOnly: false,
       multipleRegsOnly: false,
       page: 1,
+      pageSize: 10,
       sort: "name-asc",
       adv: false,
     };
@@ -99,6 +103,7 @@ describe("useBeagleSearchUiState helpers", () => {
       ekOnly: true,
       multipleRegsOnly: true,
       page: 3,
+      pageSize: 50,
       sort: "ek-asc",
       adv: true,
     };
@@ -122,5 +127,11 @@ describe("useBeagleSearchUiState helpers", () => {
     expect(state.adv).toBe(true);
     expect(state.birthYearFrom).toBe("2020");
     expect(state.page).toBe(1);
+    expect(state.pageSize).toBe(10);
+  });
+
+  it("falls back to default pageSize when query value is invalid", () => {
+    const state = readUrlSearchState(readParams("name=alpha&pageSize=200"));
+    expect(state.pageSize).toBe(10);
   });
 });

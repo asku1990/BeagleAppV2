@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+import { toast } from "@/components/ui/sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -84,8 +86,21 @@ const rowClassName = cn(
 
 export function StatisticsSection() {
   const { t, locale } = useI18n();
-  const { data, isLoading } = useHomeStatisticsQuery();
+  const { data, isError, isLoading } = useHomeStatisticsQuery();
+  const hasNotifiedLoadError = useRef(false);
   const isInitialLoading = isLoading && !data;
+
+  useEffect(() => {
+    if (isError && !hasNotifiedLoadError.current) {
+      toast.error(t("home.stats.fetchFailed"));
+      hasNotifiedLoadError.current = true;
+      return;
+    }
+
+    if (!isError) {
+      hasNotifiedLoadError.current = false;
+    }
+  }, [isError, t]);
 
   const localeTag = locale === "fi" ? "fi-FI" : "sv-FI";
   const numberFormat = new Intl.NumberFormat(localeTag);

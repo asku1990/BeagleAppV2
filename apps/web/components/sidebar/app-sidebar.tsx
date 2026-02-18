@@ -15,7 +15,7 @@ import {
   Trophy,
   Users,
 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import {
@@ -70,7 +70,7 @@ export function AppSidebar() {
 
   const handleComingSoon = (item: string) => {
     closeSidebarOnMobile();
-    toast(`${item}: ${t("common.notImplementedYet")}`);
+    toast.info(`${item}: ${t("common.notImplementedYet")}`);
   };
 
   return (

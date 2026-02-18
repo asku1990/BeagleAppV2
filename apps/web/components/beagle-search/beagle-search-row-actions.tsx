@@ -1,6 +1,6 @@
 "use client";
 
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import {
   BEAGLE_ROW_ACTIONS,
@@ -30,7 +30,9 @@ export function BeagleSearchRowActions({ className }: { className?: string }) {
             type="button"
             variant="outline"
             size="xs"
-            onClick={() => toast(`${label}: ${t("common.notImplementedYet")}`)}
+            onClick={() =>
+              toast.info(`${label}: ${t("common.notImplementedYet")}`)
+            }
           >
             {label}
           </Button>

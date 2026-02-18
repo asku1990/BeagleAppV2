@@ -7,12 +7,13 @@ import {
   OctagonXIcon,
   TriangleAlertIcon,
 } from "lucide-react";
-import { Toaster as Sonner, type ToasterProps } from "sonner";
+import { Toaster as Sonner, toast, type ToasterProps } from "sonner";
 
-const Toaster = ({ ...props }: ToasterProps) => {
+const Toaster = ({ richColors, ...props }: ToasterProps) => {
   return (
     <Sonner
       theme="light"
+      richColors={richColors ?? true}
       className="toaster group"
       icons={{
         success: <CircleCheckIcon className="size-4" />,
@@ -34,4 +35,4 @@ const Toaster = ({ ...props }: ToasterProps) => {
   );
 };
 
-export { Toaster };
+export { Toaster, toast };
