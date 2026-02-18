@@ -3,6 +3,7 @@ import { fiCommonMessages, svCommonMessages } from "@/lib/i18n/messages/common";
 import { fiHeaderMessages, svHeaderMessages } from "@/lib/i18n/messages/header";
 import { fiHomeMessages, svHomeMessages } from "@/lib/i18n/messages/home";
 import { fiSearchMessages, svSearchMessages } from "@/lib/i18n/messages/search";
+import { fiAuthMessages, svAuthMessages } from "@/lib/i18n/messages/auth";
 import {
   fiSidebarMessages,
   svSidebarMessages,
@@ -11,6 +12,7 @@ import {
 const fi = {
   ...fiHeaderMessages,
   ...fiSidebarMessages,
+  ...fiAuthMessages,
   ...fiCommonMessages,
   ...fiHomeMessages,
   ...fiSearchMessages,
@@ -22,6 +24,7 @@ type Messages = Record<MessageKey, string>;
 const sv: Messages = {
   ...svHeaderMessages,
   ...svSidebarMessages,
+  ...svAuthMessages,
   ...svCommonMessages,
   ...svHomeMessages,
   ...svSearchMessages,

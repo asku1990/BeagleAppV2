@@ -13,6 +13,7 @@ export const fiSidebarMessages = {
   "sidebar.nav.virtualPairing": "Virtuaaliparitus",
   "sidebar.nav.bestDriver": "Paras ajuri -kilpailu",
   "sidebar.signIn": "Kirjaudu",
+  "sidebar.signOut": "Kirjaudu ulos",
 } as const;
 
 export const svSidebarMessages = {
@@ -30,4 +31,5 @@ export const svSidebarMessages = {
   "sidebar.nav.virtualPairing": "Virtuell parning",
   "sidebar.nav.bestDriver": "Paras ajuri-tävling",
   "sidebar.signIn": "Logga in",
+  "sidebar.signOut": "Logga ut",
 } as const;
