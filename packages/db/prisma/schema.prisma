@@ -57,6 +57,70 @@ model Session {
   updatedAt DateTime @updatedAt
 }
 
+model BetterAuthUser {
+  id            String              @id
+  email         String              @unique
+  emailVerified Boolean             @default(false)
+  name          String?
+  image         String?
+  role          String              @default("USER")
+  banned        Boolean             @default(false)
+  banReason     String?
+  banExpires    DateTime?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  sessions      BetterAuthSession[]
+  accounts      BetterAuthAccount[]
+
+  @@index([role])
+}
+
+model BetterAuthSession {
+  id             String         @id
+  token          String         @unique
+  expiresAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  impersonatedBy String?
+  user           BetterAuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([userId])
+}
+
+model BetterAuthAccount {
+  id                    String         @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  user                  BetterAuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model BetterAuthVerification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, value])
+}
+
 model Dog {
   id              String            @id @default(cuid())
   name            String

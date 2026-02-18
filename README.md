@@ -35,6 +35,8 @@ cp .env.example .env
 
 - `DATABASE_URL`: PostgreSQL connection string.
 - `AUTH_SECRET`: strong random secret.
+- `BETTER_AUTH_SECRET`: Better Auth secret (use at least 32 chars, for example `openssl rand -base64 32`) (phase-1 foundation; route cutover comes later).
+- `BETTER_AUTH_URL`: canonical app URL used by Better Auth (for local dev: `http://localhost:3000`).
 - `NEXT_PUBLIC_API_URL`: optional API base URL override for web app clients. Default is same-origin.
 - `CORS_ORIGINS`: optional comma-separated cross-origin allowlist for API responses.
 - `LEGACY_DATABASE_URL`: MariaDB connection string to legacy Beagle DB for phase-1 imports.
@@ -125,6 +127,7 @@ pnpm --filter @beagle/web test:e2e
 - To test admin pages locally now, promote a user role to `ADMIN` in the database.
 - Login sets `beagle_session` as an `HttpOnly` cookie (`SameSite=Lax`, `Path=/`, `Secure` in production).
 - Logout always clears `beagle_session`; `me` and `logout` return `401` when session is missing/invalid.
+- Better Auth foundation config and Prisma models exist, but auth runtime still uses the existing `/api/auth/*` routes until a later cutover phase.
 
 ## Current API status
 
