@@ -114,6 +114,12 @@ pnpm --filter @beagle/server test:unit
 pnpm --filter @beagle/web test:e2e
 ```
 
+CI note:
+
+- This repo runs `turbo test:e2e`, and `test:e2e` depends on `build`.
+- `@beagle/web` build validates Better Auth env at build time.
+- Keep `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` available in CI job env and forwarded through Turbo `globalEnv` (see `turbo.json`).
+
 ## Test layout conventions
 
 - Co-locate package/app unit or integration tests in `__tests__/` near the feature/module.
