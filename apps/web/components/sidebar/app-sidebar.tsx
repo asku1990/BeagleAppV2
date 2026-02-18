@@ -70,7 +70,7 @@ export function AppSidebar() {
 
   const handleComingSoon = (item: string) => {
     closeSidebarOnMobile();
-    toast(`${item}: ${t("common.notImplementedYet")}`);
+    toast.info(`${item}: ${t("common.notImplementedYet")}`);
   };
 
   return (

@@ -1,10 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { toast } from "sonner";
 import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import {
+  formatBeagleRowsForClipboard,
   normalizeBirthYearInput,
   resolvePrimarySearchMode,
 } from "@/lib/beagle-search";
@@ -30,6 +32,7 @@ export function BeagleSearchPage() {
     submitSearch,
     resetSearch,
     setPage,
+    setPageSize,
     setSort,
     setSex,
     setBirthYearFrom,
@@ -77,6 +80,39 @@ export function BeagleSearchPage() {
       : "no-results";
 
   const hasResultItems = searchResults.items.length > 0;
+  const handleCopyResults = useCallback(async () => {
+    if (searchResults.items.length === 0) {
+      return;
+    }
+
+    const clipboard = globalThis.navigator?.clipboard;
+    if (!clipboard?.writeText) {
+      toast.warning(t("search.results.copy.unsupported"));
+      return;
+    }
+
+    const output = formatBeagleRowsForClipboard(searchResults.items, {
+      ek: t("search.results.col.ek"),
+      registration: t("search.results.col.reg"),
+      registrationAll: t("search.results.col.regAll"),
+      name: t("search.results.col.name"),
+      sex: t("search.results.col.sex"),
+      birthDate: t("search.newest.birthDate"),
+      sire: t("search.results.parents.sire"),
+      dam: t("search.results.parents.dam"),
+      trials: t("search.results.col.trials"),
+      shows: t("search.results.col.shows"),
+      sexMale: t("search.results.sex.male"),
+      sexFemale: t("search.results.sex.female"),
+    });
+
+    try {
+      await clipboard.writeText(output);
+      toast.success(t("search.results.copy.success"));
+    } catch {
+      toast.error(t("search.results.copy.error"));
+    }
+  }, [searchResults.items, t]);
 
   return (
     <>
@@ -129,9 +165,27 @@ export function BeagleSearchPage() {
       <ListingSectionShell
         title={t("search.results.title")}
         count={
-          !hasSearchError && searchResults.mode !== "none"
-            ? `${t("search.results.count")} ${searchResults.total}`
-            : undefined
+          !hasSearchError && searchResults.mode !== "none" ? (
+            <span className="flex flex-wrap items-center gap-2">
+              <span>
+                {t("search.results.count")} {searchResults.total}
+              </span>
+              {hasResultItems ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    void handleCopyResults();
+                  }}
+                  className={cn(
+                    "cursor-pointer text-xs underline underline-offset-2",
+                    beagleTheme.inkStrongText,
+                  )}
+                >
+                  {t("search.results.copy.button")}
+                </button>
+              ) : null}
+            </span>
+          ) : undefined
         }
       >
         {isSearchLoading ? (
@@ -149,10 +203,11 @@ export function BeagleSearchPage() {
             </div>
             <BeagleSearchPagination
               page={searchResults.page}
+              pageSize={urlState.pageSize}
               total={searchResults.total}
               totalPages={Math.max(1, searchResults.totalPages)}
-              onPrevious={() => setPage(searchResults.page - 1)}
-              onNext={() => setPage(searchResults.page + 1)}
+              onPageSelect={setPage}
+              onPageSizeChange={setPageSize}
             />
           </>
         ) : (

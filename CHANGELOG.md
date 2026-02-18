@@ -8,7 +8,28 @@ This project uses a user-facing changelog format.
 - Internal-only changes are optional in the changelog.
 - Use sections: `Added`, `Changed`, `Fixed`, `Removed`.
 
-## [0.1.1] - 2026-02-17
+## [0.1.2] - 2026-02-18
+
+### Added
+
+- Beaglehaun sivutukseen lisättiin valittava tulosmäärä per sivu (10, 25, 50, 100) sekä URL-osoitteeseen tallentuva `pageSize`-parametri.
+
+### Changed
+
+- Hakutulosten sivutus uudistettiin: käytössä on nyt numeropohjainen sivunavigaatio (`1 ... 14 15 16 ... N`) aiemman pelkän edellinen/seuraava-rakenteen sijaan.
+- Sivutusnäkymä näyttää nyt myös selkeän "tuloksia / sivu" -valinnan sekä mobiilissa että desktopissa.
+- Hakutulosten sarake- ja otsikot täsmennettiin suomeksi ja ruotsiksi (esim. EK-numero, sukupuoli, kokeet/näyttelyt ja sukupuoliarvot) luettavuuden parantamiseksi.
+
+### Fixed
+
+- Hakutuloksiin lisättiin uusi "Kopioi sivun tulokset" -painike, jonka toiminto kopioi näkyvän tulossivun koirarivit leikepöydälle taulukkomuodossa.
+- Varmistettiin, että hakutulosten kopiointi toimii käytännössä: koirarivejä voi maalata hausta ja liittää onnistuneesti esimerkiksi Google Docsiin.
+
+### Removed
+
+- Ei poistettu käyttäjälle näkyviä toimintoja tässä julkaisussa.
+
+## [0.1.1] - 2026-02-16
 
 ### Added
 

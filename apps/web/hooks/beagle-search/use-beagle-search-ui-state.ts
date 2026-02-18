@@ -9,10 +9,12 @@ import {
 } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { normalizeBirthYearInput } from "@/lib/beagle-search/birth-year";
-import type {
-  BeagleSearchAdvancedSex,
-  BeagleSearchQueryState,
-  BeagleSearchSort,
+import {
+  BEAGLE_DEFAULT_PAGE_SIZE,
+  BEAGLE_PAGE_SIZE_OPTIONS,
+  type BeagleSearchAdvancedSex,
+  type BeagleSearchQueryState,
+  type BeagleSearchSort,
 } from "@/lib/beagle-search/types";
 
 type SearchParamsLike = {
@@ -31,6 +33,7 @@ const DEFAULT_STATE: BeagleSearchQueryState = {
   ekOnly: false,
   multipleRegsOnly: false,
   page: 1,
+  pageSize: BEAGLE_DEFAULT_PAGE_SIZE,
   sort: DEFAULT_SORT,
   adv: false,
 };
@@ -62,6 +65,27 @@ function readSort(value: string | null): BeagleSearchSort {
   return DEFAULT_SORT;
 }
 
+function readPageSize(value: string | null): number {
+  if (!value) {
+    return BEAGLE_DEFAULT_PAGE_SIZE;
+  }
+
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed)) {
+    return BEAGLE_DEFAULT_PAGE_SIZE;
+  }
+
+  if (
+    !BEAGLE_PAGE_SIZE_OPTIONS.includes(
+      parsed as (typeof BEAGLE_PAGE_SIZE_OPTIONS)[number],
+    )
+  ) {
+    return BEAGLE_DEFAULT_PAGE_SIZE;
+  }
+
+  return parsed;
+}
+
 function trimValue(value: string | null): string {
   return (value ?? "").trim();
 }
@@ -86,6 +110,7 @@ export function readUrlSearchState(
     ekOnly: params.get("ekOnly") === "1",
     multipleRegsOnly: params.get("multiRegs") === "1",
     page: readPage(params.get("page")),
+    pageSize: readPageSize(params.get("pageSize")),
     sort: readSort(params.get("sort")),
     adv: params.get("adv") === "1",
   };
@@ -120,6 +145,9 @@ export function toSearchQueryString(state: BeagleSearchQueryState): string {
   }
   if (state.page > 1) {
     params.set("page", String(state.page));
+  }
+  if (state.pageSize !== BEAGLE_DEFAULT_PAGE_SIZE) {
+    params.set("pageSize", String(state.pageSize));
   }
   if (state.sort !== DEFAULT_SORT) {
     params.set("sort", state.sort);
@@ -244,6 +272,18 @@ export function useBeagleSearchUiState() {
     [commitState, urlState],
   );
 
+  const setPageSize = useCallback(
+    (pageSize: number) => {
+      const normalizedPageSize = BEAGLE_PAGE_SIZE_OPTIONS.includes(
+        pageSize as (typeof BEAGLE_PAGE_SIZE_OPTIONS)[number],
+      )
+        ? pageSize
+        : BEAGLE_DEFAULT_PAGE_SIZE;
+      commitState({ ...urlState, page: 1, pageSize: normalizedPageSize });
+    },
+    [commitState, urlState],
+  );
+
   const setSort = useCallback(
     (sort: BeagleSearchSort) => {
       commitState({ ...urlState, sort, page: 1 });
@@ -283,6 +323,7 @@ export function useBeagleSearchUiState() {
     submitSearch,
     resetSearch,
     setPage,
+    setPageSize,
     setSort,
     toggleAdvanced,
     setSex,

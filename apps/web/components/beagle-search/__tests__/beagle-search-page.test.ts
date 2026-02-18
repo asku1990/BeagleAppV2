@@ -58,6 +58,7 @@ function baseUiState() {
       ekOnly: false,
       multipleRegsOnly: false,
       page: 1,
+      pageSize: 10,
       sort: "name-asc" as const,
       adv: false,
     },
@@ -66,6 +67,7 @@ function baseUiState() {
     submitSearch: vi.fn(),
     resetSearch: vi.fn(),
     setPage: vi.fn(),
+    setPageSize: vi.fn(),
     setSort: vi.fn(),
     setSex: vi.fn(),
     setBirthYearFrom: vi.fn(),
@@ -166,5 +168,6 @@ describe("BeagleSearchPage", () => {
     expect(html).toContain("FI-1/24");
     expect(html).toContain("search.pagination.range");
     expect(html).toContain("search.results.count 1");
+    expect(html).toContain("search.results.copy.button");
   });
 });

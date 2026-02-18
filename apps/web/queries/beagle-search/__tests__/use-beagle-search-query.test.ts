@@ -25,6 +25,7 @@ const baseState: BeagleSearchQueryState = {
   ekOnly: false,
   multipleRegsOnly: false,
   page: 1,
+  pageSize: 10,
   sort: "name-asc",
   adv: false,
 };
@@ -69,6 +70,7 @@ describe("useBeagleSearchQuery", () => {
       ...baseState,
       ek: "100",
       page: 3,
+      pageSize: 25,
       sort: "ek-asc",
       multipleRegsOnly: true,
     });
@@ -85,6 +87,7 @@ describe("useBeagleSearchQuery", () => {
       false,
       true,
       3,
+      25,
       "ek-asc",
     ]);
   });

@@ -30,7 +30,9 @@ export function BeagleSearchRowActions({ className }: { className?: string }) {
             type="button"
             variant="outline"
             size="xs"
-            onClick={() => toast(`${label}: ${t("common.notImplementedYet")}`)}
+            onClick={() =>
+              toast.info(`${label}: ${t("common.notImplementedYet")}`)
+            }
           >
             {label}
           </Button>

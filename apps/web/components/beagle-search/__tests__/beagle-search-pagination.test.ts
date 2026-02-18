@@ -14,10 +14,11 @@ describe("BeagleSearchPagination", () => {
     const html = renderToStaticMarkup(
       React.createElement(BeagleSearchPagination, {
         page: 1,
+        pageSize: 10,
         total: 0,
         totalPages: 0,
-        onPrevious: vi.fn(),
-        onNext: vi.fn(),
+        onPageSelect: vi.fn(),
+        onPageSizeChange: vi.fn(),
       }),
     );
 
@@ -28,10 +29,11 @@ describe("BeagleSearchPagination", () => {
     const html = renderToStaticMarkup(
       React.createElement(BeagleSearchPagination, {
         page: 2,
+        pageSize: 10,
         total: 25,
         totalPages: 3,
-        onPrevious: vi.fn(),
-        onNext: vi.fn(),
+        onPageSelect: vi.fn(),
+        onPageSizeChange: vi.fn(),
       }),
     );
 
@@ -39,5 +41,27 @@ describe("BeagleSearchPagination", () => {
     expect(html).toContain("search.pagination.next");
     expect(html).toContain("search.pagination.range");
     expect(html).toContain("11-20 / 25");
+    expect(html).toContain("search.pagination.pageSize");
+  });
+
+  it("renders compact pagination with ellipsis for large page counts", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(BeagleSearchPagination, {
+        page: 15,
+        pageSize: 100,
+        total: 34000,
+        totalPages: 340,
+        onPageSelect: vi.fn(),
+        onPageSizeChange: vi.fn(),
+      }),
+    );
+
+    expect(html).toContain('aria-current="page"');
+    expect(html).toContain(">1<");
+    expect(html).toContain(">14<");
+    expect(html).toContain(">15<");
+    expect(html).toContain(">16<");
+    expect(html).toContain(">340<");
+    expect(html).toContain("...");
   });
 });
