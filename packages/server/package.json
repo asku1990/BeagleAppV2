@@ -1,6 +1,6 @@
 {
   "name": "@beagle/server",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "main": "./index.ts",
@@ -19,6 +19,7 @@
   "dependencies": {
     "@beagle/auth": "workspace:*",
     "@beagle/contracts": "workspace:*",
-    "@beagle/db": "workspace:*"
+    "@beagle/db": "workspace:*",
+    "better-auth": "^1.4.18"
   }
 }

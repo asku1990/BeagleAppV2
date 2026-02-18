@@ -1,6 +1,6 @@
 {
   "name": "beagle-app-v2",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "private": true,
   "packageManager": "pnpm@10.4.1",
   "scripts": {
@@ -22,8 +22,10 @@
     "db:migrate:dev": "pnpm --filter @beagle/db exec prisma migrate dev",
     "db:migrate:reset": "pnpm --filter @beagle/db exec prisma migrate reset",
     "db:deploy": "pnpm --filter @beagle/db exec prisma migrate deploy",
-    "db:seed:basic-user": "pnpm --filter @beagle/db seed:basic-user",
     "db:seed:initial-test-data": "pnpm --filter @beagle/db seed:initial-test-data",
+    "auth:generate": "pnpm dlx @better-auth/cli@latest generate --config packages/server/auth/better-auth.ts",
+    "auth:migrate": "pnpm dlx @better-auth/cli@latest migrate --config packages/server/auth/better-auth.ts",
+    "auth:bootstrap-admin": "pnpm --filter @beagle/server exec tsx scripts/bootstrap-admin.ts",
     "db:push": "pnpm --filter @beagle/db exec prisma db push",
     "import:phase1": "pnpm --filter @beagle/server import:phase1 --",
     "import:issues": "pnpm --filter @beagle/server import:issues --",

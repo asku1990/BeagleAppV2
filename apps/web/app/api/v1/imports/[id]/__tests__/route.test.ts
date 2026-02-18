@@ -4,18 +4,20 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const {
   getImportRunIssuesMock,
   getImportRunMock,
-  getUserFromSessionTokenMock,
+  getSessionMock,
   requireAdminMock,
 } = vi.hoisted(() => ({
   getImportRunMock: vi.fn(),
   getImportRunIssuesMock: vi.fn(),
-  getUserFromSessionTokenMock: vi.fn(),
+  getSessionMock: vi.fn(),
   requireAdminMock: vi.fn(),
 }));
 
 vi.mock("@beagle/server", () => ({
-  authService: {
-    getUserFromSessionToken: getUserFromSessionTokenMock,
+  betterAuth: {
+    api: {
+      getSession: getSessionMock,
+    },
   },
   importsService: {
     getImportRun: getImportRunMock,
@@ -28,12 +30,12 @@ describe("import admin routes", () => {
   beforeEach(() => {
     getImportRunMock.mockReset();
     getImportRunIssuesMock.mockReset();
-    getUserFromSessionTokenMock.mockReset();
+    getSessionMock.mockReset();
     requireAdminMock.mockReset();
   });
 
   it("returns 401 for import run endpoint when session is missing", async () => {
-    getUserFromSessionTokenMock.mockResolvedValue(null);
+    getSessionMock.mockResolvedValue(null);
     requireAdminMock.mockReturnValue({
       status: 401,
       body: {
@@ -51,16 +53,18 @@ describe("import admin routes", () => {
       params: Promise.resolve({ id: "run-1" }),
     });
 
-    expect(getUserFromSessionTokenMock).toHaveBeenCalledWith(undefined);
+    expect(getSessionMock).toHaveBeenCalled();
     expect(response.status).toBe(401);
   });
 
   it("returns 403 for import run endpoint when user is not admin", async () => {
-    getUserFromSessionTokenMock.mockResolvedValue({
-      id: "u1",
-      role: "USER",
-      email: "user@example.com",
-      username: "user",
+    getSessionMock.mockResolvedValue({
+      user: {
+        id: "u1",
+        role: "USER",
+        email: "user@example.com",
+        name: "user",
+      },
     });
     requireAdminMock.mockReturnValue({
       status: 403,
@@ -86,11 +90,13 @@ describe("import admin routes", () => {
   });
 
   it("returns 200 for import run endpoint when user is admin", async () => {
-    getUserFromSessionTokenMock.mockResolvedValue({
-      id: "a1",
-      role: "ADMIN",
-      email: "admin@example.com",
-      username: "admin",
+    getSessionMock.mockResolvedValue({
+      user: {
+        id: "a1",
+        role: "ADMIN",
+        email: "admin@example.com",
+        name: "admin",
+      },
     });
     requireAdminMock.mockReturnValue({
       status: 200,
@@ -117,7 +123,7 @@ describe("import admin routes", () => {
   });
 
   it("returns 401 for import issues endpoint when session is missing", async () => {
-    getUserFromSessionTokenMock.mockResolvedValue(null);
+    getSessionMock.mockResolvedValue(null);
     requireAdminMock.mockReturnValue({
       status: 401,
       body: {
@@ -142,11 +148,13 @@ describe("import admin routes", () => {
   });
 
   it("returns 403 for import issues endpoint when user is not admin", async () => {
-    getUserFromSessionTokenMock.mockResolvedValue({
-      id: "u1",
-      role: "USER",
-      email: "user@example.com",
-      username: "user",
+    getSessionMock.mockResolvedValue({
+      user: {
+        id: "u1",
+        role: "USER",
+        email: "user@example.com",
+        name: "user",
+      },
     });
     requireAdminMock.mockReturnValue({
       status: 403,
@@ -175,11 +183,13 @@ describe("import admin routes", () => {
   });
 
   it("returns 200 for import issues endpoint when user is admin", async () => {
-    getUserFromSessionTokenMock.mockResolvedValue({
-      id: "a1",
-      role: "ADMIN",
-      email: "admin@example.com",
-      username: "admin",
+    getSessionMock.mockResolvedValue({
+      user: {
+        id: "a1",
+        role: "ADMIN",
+        email: "admin@example.com",
+        name: "admin",
+      },
     });
     requireAdminMock.mockReturnValue({
       status: 200,

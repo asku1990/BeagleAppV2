@@ -1,20 +1,6 @@
-export {
-  DogSex,
-  ImportKind,
-  ImportStatus,
-  Role,
-  type User,
-} from "@prisma/client";
+export { DogSex, ImportKind, ImportStatus, Role } from "@prisma/client";
 
 export { prisma } from "./core/prisma";
-
-export {
-  createSession,
-  createUser,
-  deleteSession,
-  findUserByEmail,
-  findUserBySessionToken,
-} from "./auth/repository";
 
 export {
   createImportRunIssue,
