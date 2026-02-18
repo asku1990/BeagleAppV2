@@ -168,5 +168,6 @@ describe("BeagleSearchPage", () => {
     expect(html).toContain("FI-1/24");
     expect(html).toContain("search.pagination.range");
     expect(html).toContain("search.results.count 1");
+    expect(html).toContain("search.results.copy.button");
   });
 });

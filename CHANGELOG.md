@@ -22,7 +22,8 @@ This project uses a user-facing changelog format.
 
 ### Fixed
 
-- Ei käyttäjälle näkyviä korjauksia tässä julkaisussa.
+- Hakutuloksiin lisättiin uusi "Kopioi sivun tulokset" -painike, jonka toiminto kopioi näkyvän tulossivun koirarivit leikepöydälle taulukkomuodossa.
+- Varmistettiin, että hakutulosten kopiointi toimii käytännössä: koirarivejä voi maalata hausta ja liittää onnistuneesti esimerkiksi Google Docsiin.
 
 ### Removed
 

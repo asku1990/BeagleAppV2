@@ -55,6 +55,11 @@ export const fiSearchMessages = {
   "search.results.actions.trials": "Kokeet laaja",
   "search.results.actions.siblings": "Sisarukset",
   "search.results.actions.offspring": "Jälkeläiset",
+  "search.results.copy.button": "Kopioi sivun tulokset",
+  "search.results.copy.success": "Hakutulokset kopioitu leikepöydälle.",
+  "search.results.copy.error": "Hakutulosten kopiointi epäonnistui.",
+  "search.results.copy.unsupported":
+    "Leikepöydälle kopiointi ei ole käytettävissä tässä selaimessa.",
   "search.pagination.previous": "Edelliset",
   "search.pagination.next": "Seuraavat",
   "search.pagination.range": "Näytetään",
@@ -131,6 +136,11 @@ export const svSearchMessages = {
   "search.results.actions.trials": "Jaktprov i detalj",
   "search.results.actions.siblings": "Syskon",
   "search.results.actions.offspring": "Avkommor",
+  "search.results.copy.button": "Kopiera sidans resultat",
+  "search.results.copy.success": "Sökresultaten kopierades till urklipp.",
+  "search.results.copy.error": "Kopiering av sökresultat misslyckades.",
+  "search.results.copy.unsupported":
+    "Kopiering till urklipp stöds inte i den här webbläsaren.",
   "search.pagination.previous": "Föregående",
   "search.pagination.next": "Nästa",
   "search.pagination.range": "Visar",
