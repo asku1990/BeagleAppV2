@@ -134,6 +134,14 @@ pnpm --filter @beagle/server test:unit
 pnpm --filter @beagle/web test:e2e
 ```
 
+Playwright e2e with env-specific app startup:
+
+```bash
+pnpm test:playwright:local
+pnpm test:playwright:staging
+pnpm test:playwright:prod
+```
+
 CI note:
 
 - This repo runs `turbo test:e2e`, and `test:e2e` depends on `build`.
