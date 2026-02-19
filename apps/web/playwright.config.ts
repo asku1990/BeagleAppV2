@@ -15,7 +15,11 @@ function resolveWebServerCommand(): string {
     return "pnpm --dir ../.. dev:prod";
   }
 
-  return "pnpm --dir ../.. dev:local";
+  if (targetEnv === "local") {
+    return "pnpm --dir ../.. dev:local";
+  }
+
+  return "pnpm --dir ../.. dev";
 }
 
 export default defineConfig({

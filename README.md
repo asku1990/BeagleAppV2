@@ -79,10 +79,34 @@ Initialize schema (dev):
 pnpm db:push
 ```
 
+Initialize schema against a specific environment:
+
+```bash
+pnpm db:push:local
+pnpm db:push:staging
+pnpm db:push:prod
+```
+
+If `pnpm db:push:staging -- --accept-data-loss` does not forward the flag correctly, run Prisma directly:
+
+```bash
+pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db exec prisma db push --accept-data-loss
+```
+
+Only use `--accept-data-loss` when you intentionally allow Prisma to apply destructive schema changes.
+
 Or create migrations in dev:
 
 ```bash
 pnpm db:migrate:dev -- --name init
+```
+
+Apply committed migrations to a specific environment:
+
+```bash
+pnpm db:deploy:local
+pnpm db:deploy:staging
+pnpm db:deploy:prod
 ```
 
 Open Prisma Studio:
@@ -184,6 +208,9 @@ For a fresh environment with public sign-up disabled, create the first `ADMIN` u
 
 ```bash
 pnpm auth:bootstrap-admin
+pnpm auth:bootstrap-admin:local
+pnpm auth:bootstrap-admin:staging
+pnpm auth:bootstrap-admin:prod
 ```
 
 The script is idempotent:
@@ -191,6 +218,12 @@ The script is idempotent:
 - creates the admin user if missing
 - promotes an existing matching user to `ADMIN`
 - ensures credential account exists for email/password sign-in
+
+Notes:
+
+- `auth:bootstrap-admin:local` loads `.env.local`.
+- `auth:bootstrap-admin:staging` loads `.env.staging`.
+- `auth:bootstrap-admin:prod` loads `.env.prod`.
 
 ## Update existing user password
 
