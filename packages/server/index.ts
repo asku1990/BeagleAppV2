@@ -3,6 +3,7 @@ export {
   deleteAdminUser,
   listAdminUsers,
   requireAdmin,
+  setAdminUserPassword,
   setAdminUserStatus,
 } from "./admin";
 export { betterAuth } from "./auth";

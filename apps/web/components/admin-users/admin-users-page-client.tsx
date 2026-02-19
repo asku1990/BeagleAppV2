@@ -1,12 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@beagle/contracts";
 import { toast } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { createAdminUserAction } from "@/app/actions/admin/create-admin-user";
 import { deleteAdminUserAction } from "@/app/actions/admin/delete-admin-user";
+import { setAdminUserPasswordAction } from "@/app/actions/admin/set-admin-user-password";
 import { setAdminUserStatusAction } from "@/app/actions/admin/set-admin-user-status";
 import { useI18n } from "@/hooks/i18n";
 import { useAdminUsersQuery } from "@/queries/admin/use-admin-users-query";
@@ -31,8 +33,13 @@ export function AdminUsersPageClient() {
     email: string;
   } | null>(null);
   const [isDeletingUser, setIsDeletingUser] = useState(false);
-  const [resetTargetId, setResetTargetId] = useState<string | null>(null);
-  const [tempPassword, setTempPassword] = useState("");
+  const [resetTarget, setResetTarget] = useState<{
+    id: string;
+    email: string;
+  } | null>(null);
+  const [resetPassword, setResetPassword] = useState("");
+  const [resetPasswordConfirm, setResetPasswordConfirm] = useState("");
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
 
   const filteredUsers = useMemo(() => {
     const trimmed = query.trim().toLowerCase();
@@ -82,6 +89,17 @@ export function AdminUsersPageClient() {
         return t("admin.users.status.errorNotFound");
       default:
         return t("admin.users.status.error");
+    }
+  }
+
+  function getResetPasswordErrorMessage(errorCode?: string): string {
+    switch (errorCode) {
+      case "INVALID_PASSWORD":
+        return t("admin.users.reset.errorInvalidPassword");
+      case "NOT_FOUND":
+        return t("admin.users.reset.errorNotFound");
+      default:
+        return t("admin.users.reset.error");
     }
   }
 
@@ -163,19 +181,36 @@ export function AdminUsersPageClient() {
     }
   }
 
-  function onResetPasswordConfirm() {
-    if (!resetTargetId) {
+  async function onResetPasswordConfirm() {
+    if (!resetTarget) {
       return;
     }
 
-    if (tempPassword.trim().length < 12) {
-      toast.error(t("admin.users.reset.passwordTooShort"));
+    if (resetPassword !== resetPasswordConfirm) {
+      toast.error(t("admin.users.reset.passwordMismatch"));
       return;
     }
 
-    toast.success(t("admin.users.reset.success"));
-    setTempPassword("");
-    setResetTargetId(null);
+    setIsResettingPassword(true);
+    try {
+      const result = await setAdminUserPasswordAction({
+        userId: resetTarget.id,
+        newPassword: resetPassword,
+      });
+      if (result.hasError) {
+        toast.error(getResetPasswordErrorMessage(result.errorCode));
+        return;
+      }
+
+      toast.success(t("admin.users.reset.success"));
+      setResetTarget(null);
+      setResetPassword("");
+      setResetPasswordConfirm("");
+    } catch {
+      toast.error(t("admin.users.reset.error"));
+    } finally {
+      setIsResettingPassword(false);
+    }
   }
 
   return (
@@ -307,8 +342,9 @@ export function AdminUsersPageClient() {
                           variant="outline"
                           size="sm"
                           onClick={() => {
-                            setResetTargetId(user.id);
-                            setTempPassword("");
+                            setResetTarget({ id: user.id, email: user.email });
+                            setResetPassword("");
+                            setResetPasswordConfirm("");
                           }}
                         >
                           {t("admin.users.actions.resetPassword")}
@@ -365,8 +401,9 @@ export function AdminUsersPageClient() {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        setResetTargetId(user.id);
-                        setTempPassword("");
+                        setResetTarget({ id: user.id, email: user.email });
+                        setResetPassword("");
+                        setResetPasswordConfirm("");
                       }}
                     >
                       {t("admin.users.actions.resetPassword")}
@@ -399,35 +436,66 @@ export function AdminUsersPageClient() {
         </CardContent>
       </Card>
 
-      {resetTargetId ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("admin.users.reset.title")}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Input
-              type="password"
-              value={tempPassword}
-              onChange={(event) => setTempPassword(event.target.value)}
-              placeholder={t("admin.users.reset.passwordPlaceholder")}
-            />
-            <div className="flex gap-2">
-              <Button type="button" onClick={onResetPasswordConfirm}>
-                {t("admin.users.reset.confirm")}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setResetTargetId(null);
-                  setTempPassword("");
-                }}
-              >
-                {t("admin.users.reset.cancel")}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      {resetTarget ? (
+        <div
+          className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t("admin.users.reset.modalAria")}
+        >
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>{t("admin.users.reset.title")}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                {t("admin.users.reset.descriptionPrefix")}{" "}
+                <strong>{resetTarget.email}</strong>.
+              </p>
+              <Input
+                type="password"
+                value={resetPassword}
+                onChange={(event) => setResetPassword(event.target.value)}
+                placeholder={t("admin.users.reset.passwordPlaceholder")}
+              />
+              <Input
+                type="password"
+                value={resetPasswordConfirm}
+                onChange={(event) =>
+                  setResetPasswordConfirm(event.target.value)
+                }
+                placeholder={t("admin.users.reset.confirmPasswordPlaceholder")}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t("admin.users.reset.passwordHint")} ({PASSWORD_MIN_LENGTH}-
+                {PASSWORD_MAX_LENGTH})
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  onClick={() => void onResetPasswordConfirm()}
+                  disabled={isResettingPassword}
+                >
+                  {isResettingPassword
+                    ? t("admin.users.reset.confirming")
+                    : t("admin.users.reset.confirm")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setResetTarget(null);
+                    setResetPassword("");
+                    setResetPasswordConfirm("");
+                  }}
+                  disabled={isResettingPassword}
+                >
+                  {t("admin.users.reset.cancel")}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       ) : null}
       {deleteTarget ? (
         <div

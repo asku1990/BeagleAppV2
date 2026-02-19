@@ -105,6 +105,8 @@ export type {
   AdminUserStatus,
   SetAdminUserStatusRequest,
   SetAdminUserStatusResponse,
+  SetAdminUserPasswordRequest,
+  SetAdminUserPasswordResponse,
 } from "./admin";
 export type { HomeStatisticsResponse } from "./home";
 export {

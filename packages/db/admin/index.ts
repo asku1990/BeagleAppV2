@@ -10,3 +10,4 @@ export {
   type AdminUserLookupRowDb,
 } from "./delete-user";
 export { setAdminUserStatusDb } from "./set-user-status";
+export { setAdminUserPasswordDb } from "./set-user-password";

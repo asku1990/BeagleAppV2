@@ -33,6 +33,7 @@ This project uses a user-facing changelog format.
 - Ylläpidon Käyttäjät-sivulle lisättiin käyttäjän poistotoiminto vahvistusmodalilla. Kirjautunutta admin-käyttäjää ei voi poistaa.
 - Ylläpidon Käyttäjät-sivun jäädytys/aktivointi toimii nyt oikeasti palvelimen kautta, ja jäädytys katkaisee käyttäjän aktiiviset sessiot.
 - Käyttäjähallinnan roolinvaihto poistettiin toistaiseksi näkyvistä, kunnes roolimuutosten käytännöt on määritelty.
+- Ylläpidon Käyttäjät-sivun salasanan vaihto toteutettiin oikeana toimintona: avautuu vahvistusmodalissa, vaatii salasanan syötön kahdesti ja katkaisee käyttäjän aktiiviset sessiot vaihdon yhteydessä.
 
 ### Fixed
 

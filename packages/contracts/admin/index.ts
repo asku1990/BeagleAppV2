@@ -15,3 +15,7 @@ export type {
   SetAdminUserStatusRequest,
   SetAdminUserStatusResponse,
 } from "./set-admin-user-status";
+export type {
+  SetAdminUserPasswordRequest,
+  SetAdminUserPasswordResponse,
+} from "./set-admin-user-password";
