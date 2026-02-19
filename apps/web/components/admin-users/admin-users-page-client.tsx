@@ -7,9 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { createAdminUserAction } from "@/app/actions/admin/create-admin-user";
 import { deleteAdminUserAction } from "@/app/actions/admin/delete-admin-user";
+import { useI18n } from "@/hooks/i18n";
 import { useAdminUsersQuery } from "@/queries/admin/use-admin-users-query";
 
 export function AdminUsersPageClient() {
+  const { t } = useI18n();
   const [query, setQuery] = useState("");
   const {
     data: users = [],
@@ -46,11 +48,37 @@ export function AdminUsersPageClient() {
   }, [query, users]);
 
   function onToggleRole() {
-    toast.info("Role update action comes in next step");
+    toast.info(t("admin.users.role.pending"));
   }
 
   function onToggleSuspend() {
-    toast.info("Suspend action comes in next step");
+    toast.info(t("admin.users.suspend.pending"));
+  }
+
+  function getCreateUserErrorMessage(errorCode?: string): string {
+    switch (errorCode) {
+      case "EMAIL_EXISTS":
+        return t("admin.users.create.errorEmailExists");
+      case "INVALID_EMAIL":
+        return t("admin.users.create.errorInvalidEmail");
+      case "INVALID_PASSWORD":
+        return t("admin.users.create.errorInvalidPassword");
+      default:
+        return t("admin.users.create.error");
+    }
+  }
+
+  function getDeleteUserErrorMessage(errorCode?: string): string {
+    switch (errorCode) {
+      case "CANNOT_DELETE_SELF":
+        return t("admin.users.delete.errorSelf");
+      case "LAST_ADMIN":
+        return t("admin.users.delete.errorLastAdmin");
+      case "NOT_FOUND":
+        return t("admin.users.delete.errorNotFound");
+      default:
+        return t("admin.users.delete.error");
+    }
   }
 
   async function onConfirmDeleteUser() {
@@ -62,15 +90,15 @@ export function AdminUsersPageClient() {
     try {
       const result = await deleteAdminUserAction({ userId: deleteTarget.id });
       if (result.hasError) {
-        toast.error(result.message ?? "Failed to delete user");
+        toast.error(getDeleteUserErrorMessage(result.errorCode));
         return;
       }
 
-      toast.success("User deleted");
+      toast.success(t("admin.users.delete.success"));
       setDeleteTarget(null);
       await refetch();
     } catch {
-      toast.error("Failed to delete user");
+      toast.error(t("admin.users.delete.error"));
     } finally {
       setIsDeletingUser(false);
     }
@@ -87,18 +115,18 @@ export function AdminUsersPageClient() {
       });
 
       if (result.hasError) {
-        toast.error(result.message ?? "Failed to create user");
+        toast.error(getCreateUserErrorMessage(result.errorCode));
         return;
       }
 
-      toast.success("User created");
+      toast.success(t("admin.users.create.success"));
       setCreateEmail("");
       setCreateName("");
       setCreatePassword("");
       setIsCreateOpen(false);
       await refetch();
     } catch {
-      toast.error("Failed to create user");
+      toast.error(t("admin.users.create.error"));
     } finally {
       setIsCreatingUser(false);
     }
@@ -110,11 +138,11 @@ export function AdminUsersPageClient() {
     }
 
     if (tempPassword.trim().length < 12) {
-      toast.error("Temporary password must be at least 12 characters");
+      toast.error(t("admin.users.reset.passwordTooShort"));
       return;
     }
 
-    toast.success("Mock action: reset password queued");
+    toast.success(t("admin.users.reset.success"));
     setTempPassword("");
     setResetTargetId(null);
   }
@@ -122,34 +150,38 @@ export function AdminUsersPageClient() {
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">Admin Users</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {t("admin.users.title")}
+        </h1>
         <Button type="button" onClick={() => setIsCreateOpen((prev) => !prev)}>
-          {isCreateOpen ? "Close create form" : "Create user"}
+          {isCreateOpen
+            ? t("admin.users.create.toggleClose")
+            : t("admin.users.create.toggleOpen")}
         </Button>
       </div>
 
       {isCreateOpen ? (
         <Card>
           <CardHeader>
-            <CardTitle>Create user</CardTitle>
+            <CardTitle>{t("admin.users.create.title")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <Input
               value={createEmail}
               onChange={(event) => setCreateEmail(event.target.value)}
               type="email"
-              placeholder="Email"
+              placeholder={t("admin.users.create.emailPlaceholder")}
             />
             <Input
               value={createName}
               onChange={(event) => setCreateName(event.target.value)}
-              placeholder="Name (optional)"
+              placeholder={t("admin.users.create.namePlaceholder")}
             />
             <Input
               value={createPassword}
               onChange={(event) => setCreatePassword(event.target.value)}
               type="password"
-              placeholder="Password (12-128 chars)"
+              placeholder={t("admin.users.create.passwordPlaceholder")}
             />
             <div className="flex gap-2">
               <Button
@@ -157,7 +189,9 @@ export function AdminUsersPageClient() {
                 onClick={() => void onCreateUser()}
                 disabled={isCreatingUser}
               >
-                {isCreatingUser ? "Creating..." : "Create"}
+                {isCreatingUser
+                  ? t("admin.users.create.submitting")
+                  : t("admin.users.create.submit")}
               </Button>
               <Button
                 type="button"
@@ -170,7 +204,7 @@ export function AdminUsersPageClient() {
                 }}
                 disabled={isCreatingUser}
               >
-                Cancel
+                {t("admin.users.create.cancel")}
               </Button>
             </div>
           </CardContent>
@@ -179,16 +213,18 @@ export function AdminUsersPageClient() {
 
       <Card>
         <CardHeader>
-          <CardTitle>User management</CardTitle>
+          <CardTitle>{t("admin.users.management.title")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {isLoading ? (
-            <p className="text-sm text-muted-foreground">Loading users...</p>
+            <p className="text-sm text-muted-foreground">
+              {t("admin.users.loading")}
+            </p>
           ) : null}
           {isError ? (
             <div className="flex items-center justify-between gap-3 rounded-md border p-3">
               <p className="text-sm text-muted-foreground">
-                Failed to load users.
+                {t("admin.users.fetchError")}
               </p>
               <Button
                 type="button"
@@ -197,15 +233,15 @@ export function AdminUsersPageClient() {
                 onClick={() => void refetch()}
                 disabled={isFetching}
               >
-                Retry
+                {t("admin.users.retry")}
               </Button>
             </div>
           ) : null}
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search by email or name"
-            aria-label="Search users"
+            placeholder={t("admin.users.searchPlaceholder")}
+            aria-label={t("admin.users.searchAria")}
             disabled={isLoading || isError}
           />
 
@@ -213,11 +249,17 @@ export function AdminUsersPageClient() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b text-left">
-                  <th className="px-2 py-2">Email</th>
-                  <th className="px-2 py-2">Name</th>
-                  <th className="px-2 py-2">Role</th>
-                  <th className="px-2 py-2">Status</th>
-                  <th className="px-2 py-2">Actions</th>
+                  <th className="px-2 py-2">
+                    {t("admin.users.columns.email")}
+                  </th>
+                  <th className="px-2 py-2">{t("admin.users.columns.name")}</th>
+                  <th className="px-2 py-2">{t("admin.users.columns.role")}</th>
+                  <th className="px-2 py-2">
+                    {t("admin.users.columns.status")}
+                  </th>
+                  <th className="px-2 py-2">
+                    {t("admin.users.columns.actions")}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -238,7 +280,7 @@ export function AdminUsersPageClient() {
                             setTempPassword("");
                           }}
                         >
-                          Reset password
+                          {t("admin.users.actions.resetPassword")}
                         </Button>
                         <Button
                           type="button"
@@ -246,7 +288,7 @@ export function AdminUsersPageClient() {
                           size="sm"
                           onClick={onToggleRole}
                         >
-                          Toggle role
+                          {t("admin.users.actions.toggleRole")}
                         </Button>
                         <Button
                           type="button"
@@ -254,7 +296,9 @@ export function AdminUsersPageClient() {
                           size="sm"
                           onClick={onToggleSuspend}
                         >
-                          {user.status === "active" ? "Suspend" : "Unsuspend"}
+                          {user.status === "active"
+                            ? t("admin.users.actions.suspend")
+                            : t("admin.users.actions.unsuspend")}
                         </Button>
                         <Button
                           type="button"
@@ -264,7 +308,7 @@ export function AdminUsersPageClient() {
                             setDeleteTarget({ id: user.id, email: user.email })
                           }
                         >
-                          Delete
+                          {t("admin.users.actions.delete")}
                         </Button>
                       </div>
                     </td>
@@ -285,8 +329,12 @@ export function AdminUsersPageClient() {
                     </p>
                   </div>
                   <div className="text-sm">
-                    <p>Role: {user.role}</p>
-                    <p>Status: {user.status}</p>
+                    <p>
+                      {t("admin.users.mobile.roleLabel")}: {user.role}
+                    </p>
+                    <p>
+                      {t("admin.users.mobile.statusLabel")}: {user.status}
+                    </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <Button
@@ -298,7 +346,7 @@ export function AdminUsersPageClient() {
                         setTempPassword("");
                       }}
                     >
-                      Reset password
+                      {t("admin.users.actions.resetPassword")}
                     </Button>
                     <Button
                       type="button"
@@ -306,7 +354,7 @@ export function AdminUsersPageClient() {
                       size="sm"
                       onClick={onToggleRole}
                     >
-                      Toggle role
+                      {t("admin.users.actions.toggleRole")}
                     </Button>
                     <Button
                       type="button"
@@ -314,7 +362,9 @@ export function AdminUsersPageClient() {
                       size="sm"
                       onClick={onToggleSuspend}
                     >
-                      {user.status === "active" ? "Suspend" : "Unsuspend"}
+                      {user.status === "active"
+                        ? t("admin.users.actions.suspend")
+                        : t("admin.users.actions.unsuspend")}
                     </Button>
                     <Button
                       type="button"
@@ -324,7 +374,7 @@ export function AdminUsersPageClient() {
                         setDeleteTarget({ id: user.id, email: user.email })
                       }
                     >
-                      Delete
+                      {t("admin.users.actions.delete")}
                     </Button>
                   </div>
                 </CardContent>
@@ -337,18 +387,18 @@ export function AdminUsersPageClient() {
       {resetTargetId ? (
         <Card>
           <CardHeader>
-            <CardTitle>Reset password</CardTitle>
+            <CardTitle>{t("admin.users.reset.title")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <Input
               type="password"
               value={tempPassword}
               onChange={(event) => setTempPassword(event.target.value)}
-              placeholder="Temporary password (12+ chars)"
+              placeholder={t("admin.users.reset.passwordPlaceholder")}
             />
             <div className="flex gap-2">
               <Button type="button" onClick={onResetPasswordConfirm}>
-                Confirm reset
+                {t("admin.users.reset.confirm")}
               </Button>
               <Button
                 type="button"
@@ -358,7 +408,7 @@ export function AdminUsersPageClient() {
                   setTempPassword("");
                 }}
               >
-                Cancel
+                {t("admin.users.reset.cancel")}
               </Button>
             </div>
           </CardContent>
@@ -369,15 +419,15 @@ export function AdminUsersPageClient() {
           className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4"
           role="dialog"
           aria-modal="true"
-          aria-label="Confirm user deletion"
+          aria-label={t("admin.users.delete.modalAria")}
         >
           <Card className="w-full max-w-md">
             <CardHeader>
-              <CardTitle>Delete user?</CardTitle>
+              <CardTitle>{t("admin.users.delete.title")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                This will permanently delete{" "}
+                {t("admin.users.delete.descriptionPrefix")}{" "}
                 <strong>{deleteTarget.email}</strong>.
               </p>
               <div className="flex gap-2">
@@ -387,7 +437,9 @@ export function AdminUsersPageClient() {
                   onClick={() => void onConfirmDeleteUser()}
                   disabled={isDeletingUser}
                 >
-                  {isDeletingUser ? "Deleting..." : "Delete user"}
+                  {isDeletingUser
+                    ? t("admin.users.delete.confirming")
+                    : t("admin.users.delete.confirm")}
                 </Button>
                 <Button
                   type="button"
@@ -395,7 +447,7 @@ export function AdminUsersPageClient() {
                   onClick={() => setDeleteTarget(null)}
                   disabled={isDeletingUser}
                 >
-                  Cancel
+                  {t("admin.users.delete.cancel")}
                 </Button>
               </div>
             </CardContent>

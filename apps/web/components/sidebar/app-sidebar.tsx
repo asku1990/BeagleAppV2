@@ -20,7 +20,6 @@ import {
   Users,
 } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
-import { Button } from "@/components/ui/button";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import {
   Sidebar,
@@ -120,9 +119,12 @@ export function AppSidebar() {
   const isAdmin = userRole === "ADMIN";
   const userEmail = session?.user?.email ?? null;
   const userName = session?.user?.name ?? null;
-  const accountPrimary = userName?.trim() || userEmail || "Signed in";
+  const accountPrimary =
+    userName?.trim() || userEmail || t("sidebar.account.signedInFallback");
   const accountSecondary = userName?.trim() ? userEmail : null;
-  const accountRole = isAdmin ? "ADMIN" : "USER";
+  const accountRole = isAdmin
+    ? t("sidebar.account.roleAdmin")
+    : t("sidebar.account.roleUser");
 
   return (
     <Sidebar collapsible="icon" variant="sidebar">
@@ -329,25 +331,26 @@ export function AppSidebar() {
                 </div>
               </div>
               <div className="hidden group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
-                <Link
-                  href="/account/profile"
-                  onClick={closeSidebarOnMobile}
-                  title={`${accountPrimary} (${accountRole})`}
+                <SidebarMenuButton
+                  asChild
+                  tooltip={`${accountPrimary} (${accountRole})`}
                   className={cn(
-                    "inline-flex h-7 w-7 items-center justify-center rounded-full border",
+                    "h-7 w-7 justify-center rounded-full border p-0",
                     beagleTheme.border,
                     beagleTheme.softAccent,
                     beagleTheme.focusRing,
                   )}
                 >
-                  <User className="size-3.5" />
-                </Link>
+                  <Link href="/account/profile" onClick={closeSidebarOnMobile}>
+                    <User className="size-3.5" />
+                    <span className="sr-only">{`${accountPrimary} (${accountRole})`}</span>
+                  </Link>
+                </SidebarMenuButton>
               </div>
             </div>
-            <Button
-              variant="ghost"
+            <SidebarMenuButton
+              tooltip={t("sidebar.signOut")}
               className={cn(
-                "justify-start gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
                 beagleTheme.inkStrongText,
                 beagleTheme.interactive,
                 beagleTheme.focusRing,
@@ -360,19 +363,18 @@ export function AppSidebar() {
               <span className="group-data-[collapsible=icon]:hidden">
                 {t("sidebar.signOut")}
               </span>
-            </Button>
+            </SidebarMenuButton>
           </>
         ) : (
-          <Button
+          <SidebarMenuButton
             asChild
+            tooltip={t("sidebar.signIn")}
             className={cn(
-              "justify-start gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
               beagleTheme.inkStrongText,
               beagleTheme.interactive,
               beagleTheme.focusRing,
               "min-h-11 md:min-h-9",
             )}
-            variant="ghost"
           >
             <Link href="/sign-in" onClick={closeSidebarOnMobile}>
               <LogIn className="size-4" />
@@ -380,7 +382,7 @@ export function AppSidebar() {
                 {t("sidebar.signIn")}
               </span>
             </Link>
-          </Button>
+          </SidebarMenuButton>
         )}
       </SidebarFooter>
     </Sidebar>

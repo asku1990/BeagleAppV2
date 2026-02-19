@@ -18,6 +18,9 @@ export const fiSidebarMessages = {
   "sidebar.nav.adminDogs": "Koirat",
   "sidebar.nav.adminSettings": "Asetukset",
   "sidebar.nav.adminProfile": "Profiili",
+  "sidebar.account.signedInFallback": "Kirjautunut",
+  "sidebar.account.roleAdmin": "ADMIN",
+  "sidebar.account.roleUser": "USER",
   "sidebar.signIn": "Kirjaudu",
   "sidebar.signOut": "Kirjaudu ulos",
 } as const;
@@ -42,6 +45,9 @@ export const svSidebarMessages = {
   "sidebar.nav.adminDogs": "Hundar",
   "sidebar.nav.adminSettings": "Inställningar",
   "sidebar.nav.adminProfile": "Profil",
+  "sidebar.account.signedInFallback": "Inloggad",
+  "sidebar.account.roleAdmin": "ADMIN",
+  "sidebar.account.roleUser": "USER",
   "sidebar.signIn": "Logga in",
   "sidebar.signOut": "Logga ut",
 } as const;
