@@ -32,6 +32,47 @@ async function getAdminCheck(requestHeaders: Headers) {
   return requireAdmin(currentUser);
 }
 
+function parseAdminPathCandidate(candidate: string | null): string | null {
+  if (!candidate) {
+    return null;
+  }
+
+  const trimmed = candidate.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  if (trimmed.startsWith("/admin")) {
+    return trimmed;
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+    const pathWithSearch = `${parsed.pathname}${parsed.search}`;
+    if (pathWithSearch.startsWith("/admin")) {
+      return pathWithSearch;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
+function resolveAdminReturnTo(requestHeaders: Headers): string {
+  const fromNextUrl = parseAdminPathCandidate(requestHeaders.get("next-url"));
+  if (fromNextUrl) {
+    return fromNextUrl;
+  }
+
+  const fromReferer = parseAdminPathCandidate(requestHeaders.get("referer"));
+  if (fromReferer) {
+    return fromReferer;
+  }
+
+  return "/admin";
+}
+
 export async function requireAdminAccess(
   request: NextRequest,
   methods: string,
@@ -53,12 +94,17 @@ export async function requireAdminAccess(
 }
 
 export async function requireAdminLayoutAccess(): Promise<
-  { ok: true } | { ok: false; status: number }
+  { ok: true } | { ok: false; status: number; returnTo: string }
 > {
-  const adminCheck = await getAdminCheck(await headers());
+  const requestHeaders = await headers();
+  const adminCheck = await getAdminCheck(requestHeaders);
 
   if (!adminCheck.body.ok) {
-    return { ok: false, status: adminCheck.status };
+    return {
+      ok: false,
+      status: adminCheck.status,
+      returnTo: resolveAdminReturnTo(requestHeaders),
+    };
   }
 
   return { ok: true };

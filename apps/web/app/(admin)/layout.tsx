@@ -14,7 +14,7 @@ export default async function AdminLayout({
 
   if (!adminCheck.ok) {
     if (adminCheck.status === 401) {
-      redirect("/sign-in?returnTo=/admin");
+      redirect(`/sign-in?returnTo=${encodeURIComponent(adminCheck.returnTo)}`);
     }
 
     redirect("/");
