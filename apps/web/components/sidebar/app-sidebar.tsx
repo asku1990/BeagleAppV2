@@ -13,6 +13,7 @@ import {
   LogOut,
   PawPrint,
   Search,
+  Settings,
   Shield,
   Trophy,
   Users,
@@ -69,6 +70,16 @@ const adminNavItem: NavItem = {
   icon: Shield,
   href: "/admin",
 };
+
+const adminModuleNavItems: NavItem[] = [
+  { labelKey: "sidebar.nav.adminUsers", icon: Users, href: "/admin/users" },
+  { labelKey: "sidebar.nav.adminDogs", icon: Dog, href: "/admin/dogs" },
+  {
+    labelKey: "sidebar.nav.adminSettings",
+    icon: Settings,
+    href: "/admin/settings",
+  },
+];
 
 export function AppSidebar() {
   const { t } = useI18n();
@@ -194,30 +205,64 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               ))}
               {isAdmin ? (
-                <SidebarMenuItem key={adminNavItem.labelKey}>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip={t(adminNavItem.labelKey)}
-                    isActive={pathname.startsWith(
-                      adminNavItem.href ?? "/admin",
-                    )}
-                    className={cn(
-                      beagleTheme.inkStrongText,
-                      beagleTheme.interactive,
-                      beagleTheme.focusRing,
-                      "min-h-11 md:min-h-9",
-                      "data-[active=true]:bg-[var(--beagle-accent-soft)]",
-                    )}
-                  >
-                    <Link
-                      href={adminNavItem.href ?? "/admin"}
-                      onClick={closeSidebarOnMobile}
+                <>
+                  <SidebarMenuItem className="my-1 border-t border-[var(--beagle-border)] pt-1">
+                    <span
+                      className={cn(
+                        "block px-2 py-1 text-xs font-semibold tracking-wide uppercase group-data-[collapsible=icon]:hidden",
+                        beagleTheme.mutedText,
+                      )}
                     >
-                      <adminNavItem.icon className="size-4" />
-                      <span>{t(adminNavItem.labelKey)}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                      {t("sidebar.adminSection")}
+                    </span>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem key={adminNavItem.labelKey}>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={t(adminNavItem.labelKey)}
+                      isActive={pathname === (adminNavItem.href ?? "/admin")}
+                      className={cn(
+                        beagleTheme.inkStrongText,
+                        beagleTheme.interactive,
+                        beagleTheme.focusRing,
+                        "min-h-11 md:min-h-9",
+                        "data-[active=true]:bg-[var(--beagle-accent-soft)]",
+                      )}
+                    >
+                      <Link
+                        href={adminNavItem.href ?? "/admin"}
+                        onClick={closeSidebarOnMobile}
+                      >
+                        <adminNavItem.icon className="size-4" />
+                        <span>{t(adminNavItem.labelKey)}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  {adminModuleNavItems.map((item) => (
+                    <SidebarMenuItem key={item.labelKey}>
+                      <SidebarMenuButton
+                        asChild
+                        tooltip={t(item.labelKey)}
+                        isActive={pathname.startsWith(item.href ?? "/admin")}
+                        className={cn(
+                          beagleTheme.inkStrongText,
+                          beagleTheme.interactive,
+                          beagleTheme.focusRing,
+                          "min-h-11 md:min-h-9",
+                          "data-[active=true]:bg-[var(--beagle-accent-soft)]",
+                        )}
+                      >
+                        <Link
+                          href={item.href ?? "/admin"}
+                          onClick={closeSidebarOnMobile}
+                        >
+                          <item.icon className="size-4" />
+                          <span>{t(item.labelKey)}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </>
               ) : null}
             </SidebarMenu>
           </SidebarGroupContent>

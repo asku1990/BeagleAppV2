@@ -7,6 +7,7 @@ import { prisma } from "@beagle/db";
 const MIN_PASSWORD_LENGTH = 12;
 const MAX_PASSWORD_LENGTH = 128;
 const thisDir = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = path.resolve(thisDir, "../../..");
 
 function stripWrappingQuotes(value: string): string {
   if (
@@ -45,7 +46,26 @@ function loadEnvFromFile(filePath: string): void {
   }
 }
 
-loadEnvFromFile(path.resolve(thisDir, "../../../.env"));
+function resolveEnvFilePath(filePath: string): string {
+  if (path.isAbsolute(filePath)) {
+    return filePath;
+  }
+
+  return path.resolve(repoRoot, filePath);
+}
+
+function loadSupportedEnvFiles(): void {
+  const configuredEnvFile = process.env.ENV_FILE?.trim();
+  if (configuredEnvFile) {
+    loadEnvFromFile(resolveEnvFilePath(configuredEnvFile));
+    return;
+  }
+
+  loadEnvFromFile(path.resolve(repoRoot, ".env.local"));
+  loadEnvFromFile(path.resolve(repoRoot, ".env"));
+}
+
+loadSupportedEnvFiles();
 
 function getRequiredEnv(name: string): string {
   const value = process.env[name]?.trim();

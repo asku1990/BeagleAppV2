@@ -38,8 +38,7 @@ function normalizeReturnTo(returnTo: string | string[] | undefined): string {
 export function SignInForm({ returnTo }: SignInFormProps) {
   const { t } = useI18n();
   const router = useRouter();
-  const { data: session, isPending: isSessionPending } =
-    authClient.useSession();
+  const { data: session } = authClient.useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,19 +72,6 @@ export function SignInForm({ returnTo }: SignInFormProps) {
     } finally {
       setIsSubmitting(false);
     }
-  }
-
-  if (isSessionPending) {
-    return (
-      <div className="mx-auto w-full max-w-md">
-        <Card className={cn(beagleTheme.surface, beagleTheme.border)}>
-          <CardHeader>
-            <CardTitle>{t("auth.signIn.title")}</CardTitle>
-            <CardDescription>{t("auth.signIn.pending")}</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
   }
 
   return (

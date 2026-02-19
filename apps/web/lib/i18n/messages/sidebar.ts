@@ -13,6 +13,10 @@ export const fiSidebarMessages = {
   "sidebar.nav.virtualPairing": "Virtuaaliparitus",
   "sidebar.nav.bestDriver": "Paras ajuri -kilpailu",
   "sidebar.nav.admin": "Ylläpito",
+  "sidebar.adminSection": "Ylläpito",
+  "sidebar.nav.adminUsers": "Käyttäjät",
+  "sidebar.nav.adminDogs": "Koirat",
+  "sidebar.nav.adminSettings": "Asetukset",
   "sidebar.signIn": "Kirjaudu",
   "sidebar.signOut": "Kirjaudu ulos",
 } as const;
@@ -32,6 +36,10 @@ export const svSidebarMessages = {
   "sidebar.nav.virtualPairing": "Virtuell parning",
   "sidebar.nav.bestDriver": "Paras ajuri-tävling",
   "sidebar.nav.admin": "Admin",
+  "sidebar.adminSection": "Admin",
+  "sidebar.nav.adminUsers": "Användare",
+  "sidebar.nav.adminDogs": "Hundar",
+  "sidebar.nav.adminSettings": "Inställningar",
   "sidebar.signIn": "Logga in",
   "sidebar.signOut": "Logga ut",
 } as const;

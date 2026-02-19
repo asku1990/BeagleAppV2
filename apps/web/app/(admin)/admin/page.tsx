@@ -12,11 +12,20 @@ export default function AdminHomePage() {
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">
-            Start with Dogs management. More modules can be added here later.
+            Start with Users and Dogs management. More modules can be added here
+            later.
           </p>
-          <Button asChild>
-            <Link href="/admin/dogs">Open Dogs</Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild>
+              <Link href="/admin/users">Open Users</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/admin/dogs">Open Dogs</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/admin/settings">Open Settings</Link>
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
