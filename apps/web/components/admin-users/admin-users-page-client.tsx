@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { createAdminUserAction } from "@/app/actions/admin/create-admin-user";
+import { deleteAdminUserAction } from "@/app/actions/admin/delete-admin-user";
 import { useAdminUsersQuery } from "@/queries/admin/use-admin-users-query";
 
 export function AdminUsersPageClient() {
@@ -22,6 +23,11 @@ export function AdminUsersPageClient() {
   const [createName, setCreateName] = useState("");
   const [createPassword, setCreatePassword] = useState("");
   const [isCreatingUser, setIsCreatingUser] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string;
+    email: string;
+  } | null>(null);
+  const [isDeletingUser, setIsDeletingUser] = useState(false);
   const [resetTargetId, setResetTargetId] = useState<string | null>(null);
   const [tempPassword, setTempPassword] = useState("");
 
@@ -45,6 +51,29 @@ export function AdminUsersPageClient() {
 
   function onToggleSuspend() {
     toast.info("Suspend action comes in next step");
+  }
+
+  async function onConfirmDeleteUser() {
+    if (!deleteTarget) {
+      return;
+    }
+
+    setIsDeletingUser(true);
+    try {
+      const result = await deleteAdminUserAction({ userId: deleteTarget.id });
+      if (result.hasError) {
+        toast.error(result.message ?? "Failed to delete user");
+        return;
+      }
+
+      toast.success("User deleted");
+      setDeleteTarget(null);
+      await refetch();
+    } catch {
+      toast.error("Failed to delete user");
+    } finally {
+      setIsDeletingUser(false);
+    }
   }
 
   async function onCreateUser() {
@@ -227,6 +256,16 @@ export function AdminUsersPageClient() {
                         >
                           {user.status === "active" ? "Suspend" : "Unsuspend"}
                         </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            setDeleteTarget({ id: user.id, email: user.email })
+                          }
+                        >
+                          Delete
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -277,6 +316,16 @@ export function AdminUsersPageClient() {
                     >
                       {user.status === "active" ? "Suspend" : "Unsuspend"}
                     </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setDeleteTarget({ id: user.id, email: user.email })
+                      }
+                    >
+                      Delete
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -314,6 +363,44 @@ export function AdminUsersPageClient() {
             </div>
           </CardContent>
         </Card>
+      ) : null}
+      {deleteTarget ? (
+        <div
+          className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Confirm user deletion"
+        >
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Delete user?</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                This will permanently delete{" "}
+                <strong>{deleteTarget.email}</strong>.
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => void onConfirmDeleteUser()}
+                  disabled={isDeletingUser}
+                >
+                  {isDeletingUser ? "Deleting..." : "Delete user"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setDeleteTarget(null)}
+                  disabled={isDeletingUser}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       ) : null}
     </div>
   );

@@ -6,3 +6,7 @@ export type {
   CreateAdminUserRequest,
   CreateAdminUserResponse,
 } from "./create-admin-user";
+export type {
+  DeleteAdminUserRequest,
+  DeleteAdminUserResponse,
+} from "./delete-admin-user";

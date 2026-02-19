@@ -100,5 +100,7 @@ export type {
   AdminUsersResponse,
   CreateAdminUserRequest,
   CreateAdminUserResponse,
+  DeleteAdminUserRequest,
+  DeleteAdminUserResponse,
 } from "./admin";
 export type { HomeStatisticsResponse } from "./home";

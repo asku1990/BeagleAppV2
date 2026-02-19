@@ -30,6 +30,7 @@ This project uses a user-facing changelog format.
 - Ylläpidon navigaatiota selkeytettiin: Admin Home, Käyttäjät, Koirat ja Asetukset on ryhmitelty samaan sivupalkkiin.
 - Ylläpidon Käyttäjät-sivu hakee nyt käyttäjät oikeasta palvelindatasta aiemman mock-listan sijaan.
 - Ylläpidon Käyttäjät-sivulle lisättiin toimiva "Luo käyttäjä" -lomake testikäyttäjien nopeaan luontiin.
+- Ylläpidon Käyttäjät-sivulle lisättiin käyttäjän poistotoiminto vahvistusmodalilla. Kirjautunutta admin-käyttäjää ei voi poistaa.
 
 ### Fixed
 

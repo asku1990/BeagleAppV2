@@ -47,7 +47,13 @@ export {
 
 export {
   createAdminUserDb,
+  countAdminUsersDb,
+  deleteAdminUserDb,
+  getAdminUserByIdDb,
+  lockAdminUsersForUpdateDb,
   listAdminUsersDb,
+  runAdminUserWriteTransactionDb,
+  type AdminUserLookupRowDb,
   type AdminUserRowDb,
   type CreatedAdminUserRowDb,
 } from "./admin";

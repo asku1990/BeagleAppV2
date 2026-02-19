@@ -1,4 +1,9 @@
-export { createAdminUser, listAdminUsers, requireAdmin } from "./admin";
+export {
+  createAdminUser,
+  deleteAdminUser,
+  listAdminUsers,
+  requireAdmin,
+} from "./admin";
 export { betterAuth } from "./auth";
 export { createDogsService, dogsService } from "./dogs";
 export { createImportsService, importsService } from "./imports";
