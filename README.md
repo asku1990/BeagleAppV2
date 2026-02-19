@@ -28,10 +28,12 @@ Current access model:
 1. Copy env file:
 
 ```bash
-cp .env.example .env
+cp .env.example .env.local
+cp .env.example .env.staging
+cp .env.example .env.prod
 ```
 
-2. Update `.env` values:
+2. Update env values in the target file:
 
 - `DATABASE_URL`: PostgreSQL connection string.
 - `BETTER_AUTH_SECRET`: Better Auth secret (minimum 32 chars, for example `openssl rand -base64 32`).
@@ -47,7 +49,15 @@ cp .env.example .env
 - `CORS_ORIGINS`: optional comma-separated cross-origin allowlist for API responses.
 - `LEGACY_DATABASE_URL`: MariaDB connection string to legacy Beagle DB for phase-1 imports.
 
-Example values are already in `.env.example`.
+Example plain values and Proton Pass reference blocks are in `.env.example`.
+
+3. If using Proton Pass `pass://` references, run via the env-specific scripts:
+
+```bash
+pnpm dev:local
+pnpm dev:staging
+pnpm dev:prod
+```
 
 ## Install dependencies
 
@@ -83,10 +93,18 @@ pnpm db:studio
 
 ## Run the app
 
-Run the app:
+Run the app (plain envs):
 
 ```bash
 pnpm dev
+```
+
+Run the app with Proton Pass env files:
+
+```bash
+pnpm dev:local
+pnpm dev:staging
+pnpm dev:prod
 ```
 
 Default ports:

@@ -5,6 +5,9 @@
   "packageManager": "pnpm@10.4.1",
   "scripts": {
     "dev": "pnpm --filter @beagle/web dev",
+    "dev:local": "pass-cli run --env-file .env.local -- pnpm --filter @beagle/web dev",
+    "dev:staging": "pass-cli run --env-file .env.staging -- pnpm --filter @beagle/web dev",
+    "dev:prod": "pass-cli run --env-file .env.prod -- pnpm --filter @beagle/web dev",
     "build": "turbo build",
     "vercel:ignored-build": "bash ./scripts/vercel-ignored-build.sh",
     "lint": "turbo lint",
