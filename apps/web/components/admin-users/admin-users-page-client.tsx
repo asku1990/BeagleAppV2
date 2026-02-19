@@ -5,20 +5,8 @@ import { toast } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { createAdminUserAction } from "@/app/actions/admin/create-admin-user";
 import { useAdminUsersQuery } from "@/queries/admin/use-admin-users-query";
-
-function formatDateTime(value: string | null): string {
-  if (!value) {
-    return "Never";
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return date.toLocaleString("fi-FI");
-}
 
 export function AdminUsersPageClient() {
   const [query, setQuery] = useState("");
@@ -29,6 +17,11 @@ export function AdminUsersPageClient() {
     refetch,
     isFetching,
   } = useAdminUsersQuery();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [createEmail, setCreateEmail] = useState("");
+  const [createName, setCreateName] = useState("");
+  const [createPassword, setCreatePassword] = useState("");
+  const [isCreatingUser, setIsCreatingUser] = useState(false);
   const [resetTargetId, setResetTargetId] = useState<string | null>(null);
   const [tempPassword, setTempPassword] = useState("");
 
@@ -54,6 +47,34 @@ export function AdminUsersPageClient() {
     toast.info("Suspend action comes in next step");
   }
 
+  async function onCreateUser() {
+    setIsCreatingUser(true);
+    try {
+      const result = await createAdminUserAction({
+        email: createEmail,
+        name: createName,
+        role: "ADMIN",
+        password: createPassword,
+      });
+
+      if (result.hasError) {
+        toast.error(result.message ?? "Failed to create user");
+        return;
+      }
+
+      toast.success("User created");
+      setCreateEmail("");
+      setCreateName("");
+      setCreatePassword("");
+      setIsCreateOpen(false);
+      await refetch();
+    } catch {
+      toast.error("Failed to create user");
+    } finally {
+      setIsCreatingUser(false);
+    }
+  }
+
   function onResetPasswordConfirm() {
     if (!resetTargetId) {
       return;
@@ -73,13 +94,59 @@ export function AdminUsersPageClient() {
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Admin Users</h1>
-        <Button
-          type="button"
-          onClick={() => toast.info("Create user form comes in next step")}
-        >
-          Create user
+        <Button type="button" onClick={() => setIsCreateOpen((prev) => !prev)}>
+          {isCreateOpen ? "Close create form" : "Create user"}
         </Button>
       </div>
+
+      {isCreateOpen ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Create user</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Input
+              value={createEmail}
+              onChange={(event) => setCreateEmail(event.target.value)}
+              type="email"
+              placeholder="Email"
+            />
+            <Input
+              value={createName}
+              onChange={(event) => setCreateName(event.target.value)}
+              placeholder="Name (optional)"
+            />
+            <Input
+              value={createPassword}
+              onChange={(event) => setCreatePassword(event.target.value)}
+              type="password"
+              placeholder="Password (12-128 chars)"
+            />
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                onClick={() => void onCreateUser()}
+                disabled={isCreatingUser}
+              >
+                {isCreatingUser ? "Creating..." : "Create"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setIsCreateOpen(false);
+                  setCreateEmail("");
+                  setCreateName("");
+                  setCreatePassword("");
+                }}
+                disabled={isCreatingUser}
+              >
+                Cancel
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
 
       <Card>
         <CardHeader>
@@ -121,7 +188,6 @@ export function AdminUsersPageClient() {
                   <th className="px-2 py-2">Name</th>
                   <th className="px-2 py-2">Role</th>
                   <th className="px-2 py-2">Status</th>
-                  <th className="px-2 py-2">Last sign-in</th>
                   <th className="px-2 py-2">Actions</th>
                 </tr>
               </thead>
@@ -132,9 +198,6 @@ export function AdminUsersPageClient() {
                     <td className="px-2 py-2">{user.name ?? "-"}</td>
                     <td className="px-2 py-2">{user.role}</td>
                     <td className="px-2 py-2">{user.status}</td>
-                    <td className="px-2 py-2">
-                      {formatDateTime(user.lastSignInAt)}
-                    </td>
                     <td className="px-2 py-2">
                       <div className="flex flex-wrap gap-2">
                         <Button
@@ -185,7 +248,6 @@ export function AdminUsersPageClient() {
                   <div className="text-sm">
                     <p>Role: {user.role}</p>
                     <p>Status: {user.status}</p>
-                    <p>Last sign-in: {formatDateTime(user.lastSignInAt)}</p>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <Button
