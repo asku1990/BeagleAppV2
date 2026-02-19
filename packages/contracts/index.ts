@@ -95,4 +95,26 @@ export type {
   BeagleSearchSort,
 } from "./dogs";
 
+export type {
+  AdminUserListItem,
+  AdminUsersResponse,
+  CreateAdminUserRequest,
+  CreateAdminUserResponse,
+  DeleteAdminUserRequest,
+  DeleteAdminUserResponse,
+  AdminUserStatus,
+  SetAdminUserStatusRequest,
+  SetAdminUserStatusResponse,
+  SetAdminUserPasswordRequest,
+  SetAdminUserPasswordResponse,
+} from "./admin";
 export type { HomeStatisticsResponse } from "./home";
+export {
+  isValidEmailAddress,
+  normalizeAndValidateEmailAddress,
+  normalizeEmailAddress,
+  isValidPasswordLength,
+  normalizeAndValidatePassword,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+} from "./validation";

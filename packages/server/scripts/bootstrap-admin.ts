@@ -3,10 +3,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { hashPassword } from "better-auth/crypto";
+import {
+  normalizeAndValidateEmailAddress,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+} from "@beagle/contracts";
 import { prisma } from "@beagle/db";
 
-const MIN_PASSWORD_LENGTH = 12;
-const MAX_PASSWORD_LENGTH = 128;
 const thisDir = path.dirname(fileURLToPath(import.meta.url));
 
 function stripWrappingQuotes(value: string): string {
@@ -59,12 +62,12 @@ function getRequiredEnv(name: string): string {
 }
 
 function normalizeEmail(rawEmail: string): string {
-  const email = rawEmail.trim().toLowerCase();
-  if (!email) {
+  const email = normalizeAndValidateEmailAddress(rawEmail);
+  if (!email && !rawEmail.trim()) {
     throw new Error("BOOTSTRAP_ADMIN_EMAIL must not be empty.");
   }
 
-  if (!email.includes("@")) {
+  if (!email) {
     throw new Error("BOOTSTRAP_ADMIN_EMAIL must be a valid email address.");
   }
 
@@ -88,11 +91,11 @@ function resolveName(email: string): string {
 
 function validatePassword(password: string): void {
   if (
-    password.length < MIN_PASSWORD_LENGTH ||
-    password.length > MAX_PASSWORD_LENGTH
+    password.length < PASSWORD_MIN_LENGTH ||
+    password.length > PASSWORD_MAX_LENGTH
   ) {
     throw new Error(
-      `BOOTSTRAP_ADMIN_PASSWORD must be ${MIN_PASSWORD_LENGTH}-${MAX_PASSWORD_LENGTH} characters.`,
+      `BOOTSTRAP_ADMIN_PASSWORD must be ${PASSWORD_MIN_LENGTH}-${PASSWORD_MAX_LENGTH} characters.`,
     );
   }
 }

@@ -189,7 +189,9 @@ The script is idempotent:
 To update an existing credential user password:
 
 ```bash
-pnpm auth:set-password
+pnpm auth:set-password:local
+pnpm auth:set-password:staging
+pnpm auth:set-password:prod
 ```
 
 It uses:
@@ -197,7 +199,12 @@ It uses:
 - `SET_PASSWORD_EMAIL`
 - `SET_PASSWORD_NEW_PASSWORD`
 
-By default the command loads `.env.local` (fallback `.env`). For other files, set `ENV_FILE`, for example `ENV_FILE=.env.staging pnpm auth:set-password`.
+Notes:
+
+- `auth:set-password:local` loads `.env.local`.
+- `auth:set-password:staging` loads `.env.staging`.
+- `auth:set-password:prod` loads `.env.prod`.
+- `auth:set-password` without suffix defaults to `.env.local` (with `.env` fallback).
 
 ## Beagle search
 

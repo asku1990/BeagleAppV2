@@ -44,3 +44,19 @@ export {
   type BeagleSearchRowDb,
   type BeagleSearchSortDb,
 } from "./dogs";
+
+export {
+  createAdminUserDb,
+  countActiveAdminUsersDb,
+  countAdminUsersDb,
+  deleteAdminUserDb,
+  getAdminUserByIdDb,
+  lockAdminUsersForUpdateDb,
+  listAdminUsersDb,
+  runAdminUserWriteTransactionDb,
+  setAdminUserPasswordDb,
+  setAdminUserStatusDb,
+  type AdminUserLookupRowDb,
+  type AdminUserRowDb,
+  type CreatedAdminUserRowDb,
+} from "./admin";

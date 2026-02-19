@@ -28,12 +28,20 @@ This project uses a user-facing changelog format.
 - Yläpalkin takaisin-painike näkyy nyt kaikilla muilla sivuilla paitsi etusivulla, myös julkisilla sivuilla.
 - Takaisin-painike yrittää ensin palata edelliseen näkymään ja käyttää varareittiä, jos selaushistoriaa ei ole (adminissa `/admin`, muilla sivuilla `/`).
 - Ylläpidon navigaatiota selkeytettiin: Admin Home, Käyttäjät, Koirat ja Asetukset on ryhmitelty samaan sivupalkkiin.
+- Ylläpidon Käyttäjät-sivu hakee nyt käyttäjät oikeasta palvelindatasta aiemman mock-listan sijaan.
+- Ylläpidon Käyttäjät-sivulle lisättiin toimiva "Luo käyttäjä" -lomake testikäyttäjien nopeaan luontiin.
+- Ylläpidon Käyttäjät-sivulle lisättiin käyttäjän poistotoiminto vahvistusmodalilla. Kirjautunutta admin-käyttäjää ei voi poistaa.
+- Ylläpidon Käyttäjät-sivun jäädytys/aktivointi toimii nyt oikeasti palvelimen kautta, ja jäädytys katkaisee käyttäjän aktiiviset sessiot.
+- Käyttäjähallinnan roolinvaihto poistettiin toistaiseksi näkyvistä, kunnes roolimuutosten käytännöt on määritelty.
+- Ylläpidon Käyttäjät-sivun salasanan vaihto toteutettiin oikeana toimintona: avautuu vahvistusmodalissa, vaatii salasanan syötön kahdesti ja katkaisee käyttäjän aktiiviset sessiot vaihdon yhteydessä.
 
 ### Fixed
 
 - Auth-päätepisteiden CORS-otsakkeet ja OPTIONS-preflight-vastaukset yhdenmukaistettiin, jotta selain ei estä kirjautumispyyntöjä eri alkuperien välillä.
 - Auth-reittien testit päivitettiin kattamaan CORS- ja preflight-käytös sekä estämään ympäristömuuttujien vuotaminen testien välillä.
 - Korjattiin kirjautumissivun hydration-virhe, joka saattoi näkyä takaisin-navigoinnin jälkeen.
+- Sähköpostin validointi yhtenäistettiin käyttäjän luonnissa ja ylläpitoskripteissä, jotta kirjautuminen ei kaadu myöhemmin epäyhteensopivan osoitteen takia.
+- Salasanan pituusvalidointi yhtenäistettiin auth-asetuksissa, käyttäjän luonnissa ja ylläpitoskripteissä, jotta kaikki käyttävät samaa sääntöä.
 
 ### Removed
 

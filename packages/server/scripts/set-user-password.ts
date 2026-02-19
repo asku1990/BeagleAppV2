@@ -2,10 +2,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { hashPassword } from "better-auth/crypto";
+import {
+  normalizeAndValidateEmailAddress,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+} from "@beagle/contracts";
 import { prisma } from "@beagle/db";
 
-const MIN_PASSWORD_LENGTH = 12;
-const MAX_PASSWORD_LENGTH = 128;
 const thisDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(thisDir, "../../..");
 
@@ -46,26 +49,26 @@ function loadEnvFromFile(filePath: string): void {
   }
 }
 
-function resolveEnvFilePath(filePath: string): string {
-  if (path.isAbsolute(filePath)) {
-    return filePath;
+function toEnvFilePath(projectRoot: string, envFile: string): string {
+  if (path.isAbsolute(envFile)) {
+    return envFile;
   }
-
-  return path.resolve(repoRoot, filePath);
+  return path.join(projectRoot, envFile);
 }
 
-function loadSupportedEnvFiles(): void {
-  const configuredEnvFile = process.env.ENV_FILE?.trim();
-  if (configuredEnvFile) {
-    loadEnvFromFile(resolveEnvFilePath(configuredEnvFile));
-    return;
-  }
+function loadDefaultEnvFiles(): void {
+  const projectRoot = path.resolve(thisDir, "../../../");
+  const explicitEnvFile = process.env.SET_PASSWORD_ENV_FILE?.trim();
+  const envFileCandidates = explicitEnvFile
+    ? [explicitEnvFile]
+    : [".env.local", ".env"];
 
-  loadEnvFromFile(path.resolve(repoRoot, ".env.local"));
-  loadEnvFromFile(path.resolve(repoRoot, ".env"));
+  for (const envFileName of envFileCandidates) {
+    loadEnvFromFile(toEnvFilePath(projectRoot, envFileName));
+  }
 }
 
-loadSupportedEnvFiles();
+loadDefaultEnvFiles();
 
 function getRequiredEnv(name: string): string {
   const value = process.env[name]?.trim();
@@ -76,8 +79,8 @@ function getRequiredEnv(name: string): string {
 }
 
 function normalizeEmail(rawEmail: string): string {
-  const email = rawEmail.trim().toLowerCase();
-  if (!email || !email.includes("@")) {
+  const email = normalizeAndValidateEmailAddress(rawEmail);
+  if (!email) {
     throw new Error("SET_PASSWORD_EMAIL must be a valid email address.");
   }
   return email;
@@ -85,11 +88,11 @@ function normalizeEmail(rawEmail: string): string {
 
 function validatePassword(password: string): void {
   if (
-    password.length < MIN_PASSWORD_LENGTH ||
-    password.length > MAX_PASSWORD_LENGTH
+    password.length < PASSWORD_MIN_LENGTH ||
+    password.length > PASSWORD_MAX_LENGTH
   ) {
     throw new Error(
-      `SET_PASSWORD_NEW_PASSWORD must be ${MIN_PASSWORD_LENGTH}-${MAX_PASSWORD_LENGTH} characters.`,
+      `SET_PASSWORD_NEW_PASSWORD must be ${PASSWORD_MIN_LENGTH}-${PASSWORD_MAX_LENGTH} characters.`,
     );
   }
 }
