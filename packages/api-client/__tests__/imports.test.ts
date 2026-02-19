@@ -19,13 +19,13 @@ describe("imports api helpers", () => {
     await getImportRunIssues(requestMock, "run-1", {
       stage: "PARSE",
       code: "INVALID_VALUE",
-      severity: "error",
+      severity: "ERROR",
       cursor: "next-1",
       limit: 25,
     });
 
     expect(requestMock).toHaveBeenCalledWith(
-      "/api/v1/imports/run-1/issues?stage=PARSE&code=INVALID_VALUE&severity=error&cursor=next-1&limit=25",
+      "/api/v1/imports/run-1/issues?stage=PARSE&code=INVALID_VALUE&severity=ERROR&cursor=next-1&limit=25",
       { method: "GET" },
     );
   });

@@ -38,6 +38,6 @@ describe("useI18n", () => {
     expect(typeof context.setLocale).toBe("function");
     expect(typeof context.t).toBe("function");
     expect(context.t("search.form.title")).toBe("Hae beagleja");
-    expect(() => context.setLocale("en")).not.toThrow();
+    expect(() => context.setLocale("sv")).not.toThrow();
   });
 });

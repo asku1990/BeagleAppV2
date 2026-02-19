@@ -60,7 +60,7 @@ vi.mock("react", async () => {
       if (typeof initial === "object") {
         return [initial, setFormStateMock];
       }
-      return stateTupleMock(initial);
+      return stateTupleMock();
     },
   };
 });

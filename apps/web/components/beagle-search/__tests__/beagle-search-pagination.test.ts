@@ -9,14 +9,23 @@ vi.mock("@/hooks/i18n", () => ({
   }),
 }));
 
-function asElements(node: React.ReactNode): React.ReactElement[] {
+type ElementProps = {
+  children?: React.ReactNode;
+  onClick?: () => void;
+  onChange?: (event: { target: { value: string } }) => void;
+  "aria-current"?: string;
+};
+
+type TestElement = React.ReactElement<ElementProps>;
+
+function asElements(node: React.ReactNode): TestElement[] {
   if (!node) {
     return [];
   }
   if (Array.isArray(node)) {
     return node.flatMap((child) => asElements(child));
   }
-  if (!React.isValidElement(node)) {
+  if (!React.isValidElement<ElementProps>(node)) {
     return [];
   }
   return [node, ...asElements(node.props.children as React.ReactNode)];
@@ -92,27 +101,27 @@ describe("BeagleSearchPagination", () => {
     const elements = asElements(tree);
 
     const pageSizeSelect = elements.find(
-      (element) => React.isValidElement(element) && element.type === "select",
+      (element) => element.type === "select",
     );
-    pageSizeSelect?.props.onChange({ target: { value: "25" } });
+    pageSizeSelect?.props.onChange?.({ target: { value: "25" } });
 
     const buttonElements = elements.filter(
       (element) => typeof element.props.onClick === "function",
     );
-    const getText = (element: React.ReactElement) => {
+    const getText = (element: TestElement) => {
       const children = element.props.children;
       return Array.isArray(children) ? children.join("") : String(children);
     };
 
     buttonElements
       .find((button) => getText(button) === "search.pagination.previous")
-      ?.props.onClick();
+      ?.props.onClick?.();
     buttonElements
       .find((button) => getText(button) === "search.pagination.next")
-      ?.props.onClick();
+      ?.props.onClick?.();
     buttonElements
       .find((button) => button.props["aria-current"] === "page")
-      ?.props.onClick();
+      ?.props.onClick?.();
 
     expect(onPageSizeChange).toHaveBeenCalledWith(25);
     expect(onPageSelect).toHaveBeenCalledWith(2);

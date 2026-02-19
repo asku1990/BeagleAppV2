@@ -31,9 +31,7 @@ jobs:
         run: pnpm lint
       - name: Typecheck
         run: pnpm typecheck
-      - name: Unit tests
-        run: pnpm test:unit
-      - name: Coverage (per-file >=50 in package configs)
+      - name: Unit tests with coverage (per-file >=50 in package configs)
         run: pnpm test:coverage
       - name: Coverage global gate (>=75 per package)
         run: pnpm test:coverage:global-check
@@ -62,9 +60,9 @@ jobs:
           test -n "${BETTER_AUTH_SECRET:-}" || (echo "Missing BETTER_AUTH_SECRET in GitHub Actions secrets" && exit 1)
           test -n "${BETTER_AUTH_URL:-}" || (echo "Missing BETTER_AUTH_URL in GitHub Actions secret/variable" && exit 1)
       - name: Install Playwright Browsers
-        run: pnpm --filter @beagle/web exec playwright install --with-deps
+        run: pnpm --filter @beagle/web exec playwright install --with-deps chromium
       - name: E2E tests
-        run: pnpm test:e2e
+        run: pnpm --filter @beagle/web exec playwright test --project=chromium
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4

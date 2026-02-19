@@ -13,7 +13,7 @@
     "lint": "turbo lint",
     "format": "prettier . --write",
     "typecheck": "turbo typecheck",
-    "test": "pnpm test:unit && pnpm test:coverage && pnpm test:coverage:global-check",
+    "test": "pnpm test:coverage && pnpm test:coverage:global-check",
     "test:unit": "turbo test:unit",
     "test:coverage": "turbo test:coverage --concurrency=1",
     "test:coverage:global-check": "node scripts/check-global-coverage.mjs",

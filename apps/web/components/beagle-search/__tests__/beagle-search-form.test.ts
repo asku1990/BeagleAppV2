@@ -37,14 +37,24 @@ const baseProps = {
   onMultipleRegsOnlyChange: vi.fn(),
 };
 
-function asElements(node: React.ReactNode): React.ReactElement[] {
+type ElementProps = {
+  children?: React.ReactNode;
+  placeholder?: string;
+  onSubmit?: (event: { preventDefault: () => void }) => void;
+  onChange?: (event: { target: { value: string } }) => void;
+  onClick?: () => void;
+};
+
+type TestElement = React.ReactElement<ElementProps>;
+
+function asElements(node: React.ReactNode): TestElement[] {
   if (!node) {
     return [];
   }
   if (Array.isArray(node)) {
     return node.flatMap((child) => asElements(child));
   }
-  if (!React.isValidElement(node)) {
+  if (!React.isValidElement<ElementProps>(node)) {
     return [];
   }
   return [node, ...asElements(node.props.children as React.ReactNode)];
@@ -96,12 +106,12 @@ describe("BeagleSearchForm", () => {
     const elements = asElements(tree);
 
     const form = elements.find((element) => element.type === "form");
-    form?.props.onSubmit({
+    form?.props.onSubmit?.({
       preventDefault: vi.fn(),
     });
 
-    const inputs = elements.filter(
-      (element) => React.isValidElement(element) && element.props.placeholder,
+    const inputs = elements.filter((element) =>
+      Boolean(element.props.placeholder),
     );
     const ekInput = inputs.find(
       (element) => element.props.placeholder === "search.form.field.ek",
@@ -112,14 +122,12 @@ describe("BeagleSearchForm", () => {
     const nameInput = inputs.find(
       (element) => element.props.placeholder === "search.form.field.name",
     );
-    ekInput?.props.onChange({ target: { value: "100" } });
-    regInput?.props.onChange({ target: { value: "ABC" } });
-    nameInput?.props.onChange({ target: { value: "Meri" } });
+    ekInput?.props.onChange?.({ target: { value: "100" } });
+    regInput?.props.onChange?.({ target: { value: "ABC" } });
+    nameInput?.props.onChange?.({ target: { value: "Meri" } });
 
-    const select = elements.find(
-      (element) => React.isValidElement(element) && element.type === "select",
-    );
-    select?.props.onChange({ target: { value: "ek-asc" } });
+    const select = elements.find((element) => element.type === "select");
+    select?.props.onChange?.({ target: { value: "ek-asc" } });
 
     const buttonTexts = elements
       .filter((element) => typeof element.props.onClick === "function")
