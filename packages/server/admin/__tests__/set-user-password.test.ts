@@ -37,6 +37,22 @@ describe("setAdminUserPassword", () => {
     });
   });
 
+  it("returns 400 for empty user id", async () => {
+    await expect(
+      setAdminUserPassword({
+        userId: "   ",
+        newPassword: "validpassword123",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "User id is required.",
+        code: "INVALID_USER_ID",
+      },
+    });
+  });
+
   it("returns 404 when user does not exist", async () => {
     getAdminUserByIdDbMock.mockResolvedValue(null);
 
@@ -82,6 +98,30 @@ describe("setAdminUserPassword", () => {
     expect(setAdminUserPasswordDbMock).toHaveBeenCalledWith({
       userId: "u_1",
       passwordHash: "hashed-password",
+    });
+  });
+
+  it("returns 500 when password hashing fails", async () => {
+    getAdminUserByIdDbMock.mockResolvedValue({
+      id: "u_1",
+      email: "user@example.com",
+      role: "ADMIN",
+      banned: false,
+    });
+    hashPasswordMock.mockRejectedValue(new Error("hash failure"));
+
+    await expect(
+      setAdminUserPassword({
+        userId: "u_1",
+        newPassword: "validpassword123",
+      }),
+    ).resolves.toEqual({
+      status: 500,
+      body: {
+        ok: false,
+        error: "Failed to set user password.",
+        code: "INTERNAL_ERROR",
+      },
     });
   });
 });

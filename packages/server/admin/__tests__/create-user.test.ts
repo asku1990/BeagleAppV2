@@ -24,6 +24,7 @@ describe("createAdminUser", () => {
     await expect(
       createAdminUser({
         email: "invalid",
+        role: "ADMIN",
         password: "password123456",
       }),
     ).resolves.toEqual({
@@ -40,6 +41,7 @@ describe("createAdminUser", () => {
     await expect(
       createAdminUser({
         email: "testi@t.t",
+        role: "ADMIN",
         password: "password123456",
       }),
     ).resolves.toEqual({
@@ -56,6 +58,7 @@ describe("createAdminUser", () => {
     await expect(
       createAdminUser({
         email: "user@example.com",
+        role: "ADMIN",
         password: "short",
       }),
     ).resolves.toEqual({
@@ -135,6 +138,7 @@ describe("createAdminUser", () => {
     await expect(
       createAdminUser({
         email: "user@example.com",
+        role: "ADMIN",
         password: "password123456",
       }),
     ).resolves.toEqual({

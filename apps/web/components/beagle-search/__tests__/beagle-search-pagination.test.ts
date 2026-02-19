@@ -9,6 +9,19 @@ vi.mock("@/hooks/i18n", () => ({
   }),
 }));
 
+function asElements(node: React.ReactNode): React.ReactElement[] {
+  if (!node) {
+    return [];
+  }
+  if (Array.isArray(node)) {
+    return node.flatMap((child) => asElements(child));
+  }
+  if (!React.isValidElement(node)) {
+    return [];
+  }
+  return [node, ...asElements(node.props.children as React.ReactNode)];
+}
+
 describe("BeagleSearchPagination", () => {
   it("renders nothing when total is 0", () => {
     const html = renderToStaticMarkup(
@@ -63,5 +76,47 @@ describe("BeagleSearchPagination", () => {
     expect(html).toContain(">16<");
     expect(html).toContain(">340<");
     expect(html).toContain("...");
+  });
+
+  it("invokes page and page-size callbacks", () => {
+    const onPageSelect = vi.fn();
+    const onPageSizeChange = vi.fn();
+    const tree = BeagleSearchPagination({
+      page: 3,
+      pageSize: 10,
+      total: 100,
+      totalPages: 10,
+      onPageSelect,
+      onPageSizeChange,
+    });
+    const elements = asElements(tree);
+
+    const pageSizeSelect = elements.find(
+      (element) => React.isValidElement(element) && element.type === "select",
+    );
+    pageSizeSelect?.props.onChange({ target: { value: "25" } });
+
+    const buttonElements = elements.filter(
+      (element) => typeof element.props.onClick === "function",
+    );
+    const getText = (element: React.ReactElement) => {
+      const children = element.props.children;
+      return Array.isArray(children) ? children.join("") : String(children);
+    };
+
+    buttonElements
+      .find((button) => getText(button) === "search.pagination.previous")
+      ?.props.onClick();
+    buttonElements
+      .find((button) => getText(button) === "search.pagination.next")
+      ?.props.onClick();
+    buttonElements
+      .find((button) => button.props["aria-current"] === "page")
+      ?.props.onClick();
+
+    expect(onPageSizeChange).toHaveBeenCalledWith(25);
+    expect(onPageSelect).toHaveBeenCalledWith(2);
+    expect(onPageSelect).toHaveBeenCalledWith(4);
+    expect(onPageSelect).toHaveBeenCalledWith(3);
   });
 });

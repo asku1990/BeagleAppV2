@@ -31,6 +31,7 @@ describe("createAdminUserAction", () => {
     await expect(
       createAdminUserAction({
         email: "user@example.com",
+        role: "ADMIN",
         password: "password123456",
       }),
     ).resolves.toEqual({
@@ -55,6 +56,7 @@ describe("createAdminUserAction", () => {
     await expect(
       createAdminUserAction({
         email: "user@example.com",
+        role: "ADMIN",
         password: "password123456",
       }),
     ).resolves.toEqual({
@@ -85,6 +87,7 @@ describe("createAdminUserAction", () => {
     await expect(
       createAdminUserAction({
         email: "user@example.com",
+        role: "ADMIN",
         password: "password123456",
       }),
     ).resolves.toEqual({

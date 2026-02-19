@@ -37,6 +37,19 @@ const baseProps = {
   onMultipleRegsOnlyChange: vi.fn(),
 };
 
+function asElements(node: React.ReactNode): React.ReactElement[] {
+  if (!node) {
+    return [];
+  }
+  if (Array.isArray(node)) {
+    return node.flatMap((child) => asElements(child));
+  }
+  if (!React.isValidElement(node)) {
+    return [];
+  }
+  return [node, ...asElements(node.props.children as React.ReactNode)];
+}
+
 describe("BeagleSearchForm", () => {
   it("renders core fields and sort options including ek-asc", () => {
     const html = renderToStaticMarkup(
@@ -63,5 +76,70 @@ describe("BeagleSearchForm", () => {
     expect(html).toContain("search.form.advanced.title");
     expect(html).toContain("search.advanced.multipleRegsOnly");
     expect(html).toContain("search.form.mode.combined");
+  });
+
+  it("invokes handlers from form controls", () => {
+    const onFieldChange = vi.fn();
+    const onSubmit = vi.fn();
+    const onReset = vi.fn();
+    const onToggleAdvanced = vi.fn();
+    const onSortChange = vi.fn();
+
+    const tree = BeagleSearchForm({
+      ...baseProps,
+      onFieldChange,
+      onSubmit,
+      onReset,
+      onToggleAdvanced,
+      onSortChange,
+    });
+    const elements = asElements(tree);
+
+    const form = elements.find((element) => element.type === "form");
+    form?.props.onSubmit({
+      preventDefault: vi.fn(),
+    });
+
+    const inputs = elements.filter(
+      (element) => React.isValidElement(element) && element.props.placeholder,
+    );
+    const ekInput = inputs.find(
+      (element) => element.props.placeholder === "search.form.field.ek",
+    );
+    const regInput = inputs.find(
+      (element) => element.props.placeholder === "search.form.field.reg",
+    );
+    const nameInput = inputs.find(
+      (element) => element.props.placeholder === "search.form.field.name",
+    );
+    ekInput?.props.onChange({ target: { value: "100" } });
+    regInput?.props.onChange({ target: { value: "ABC" } });
+    nameInput?.props.onChange({ target: { value: "Meri" } });
+
+    const select = elements.find(
+      (element) => React.isValidElement(element) && element.type === "select",
+    );
+    select?.props.onChange({ target: { value: "ek-asc" } });
+
+    const buttonTexts = elements
+      .filter((element) => typeof element.props.onClick === "function")
+      .map((element) => ({
+        onClick: element.props.onClick as (() => void) | undefined,
+        text: String(element.props.children ?? ""),
+      }));
+    buttonTexts
+      .find((button) => button.text === "search.form.reset")
+      ?.onClick?.();
+    buttonTexts
+      .find((button) => button.text.includes("advanced.toggle"))
+      ?.onClick?.();
+
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+    expect(onFieldChange).toHaveBeenNthCalledWith(1, "ek", "100");
+    expect(onFieldChange).toHaveBeenNthCalledWith(2, "reg", "ABC");
+    expect(onFieldChange).toHaveBeenNthCalledWith(3, "name", "Meri");
+    expect(onSortChange).toHaveBeenCalledWith("ek-asc");
+    expect(onReset).toHaveBeenCalledTimes(1);
+    expect(onToggleAdvanced).toHaveBeenCalledTimes(1);
   });
 });

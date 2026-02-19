@@ -33,6 +33,10 @@ jobs:
         run: pnpm typecheck
       - name: Unit tests
         run: pnpm test:unit
+      - name: Coverage (per-file >=50 in package configs)
+        run: pnpm test:coverage
+      - name: Coverage global gate (>=75 per package)
+        run: pnpm test:coverage:global-check
 
   e2e:
     runs-on: ubuntu-latest

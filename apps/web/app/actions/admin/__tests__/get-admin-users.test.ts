@@ -34,6 +34,38 @@ describe("getAdminUsersAction", () => {
     expect(listAdminUsersMock).not.toHaveBeenCalled();
   });
 
+  it("returns unauthenticated when no session exists", async () => {
+    requireAdminLayoutAccessMock.mockResolvedValue({
+      ok: false,
+      status: 401,
+    });
+
+    await expect(getAdminUsersAction()).resolves.toEqual({
+      data: null,
+      hasError: true,
+      errorCode: "UNAUTHENTICATED",
+    });
+    expect(listAdminUsersMock).not.toHaveBeenCalled();
+  });
+
+  it("returns service error code when listing fails", async () => {
+    requireAdminLayoutAccessMock.mockResolvedValue({ ok: true });
+    listAdminUsersMock.mockResolvedValue({
+      status: 500,
+      body: {
+        ok: false,
+        error: "Failed to list users.",
+        code: "INTERNAL_ERROR",
+      },
+    });
+
+    await expect(getAdminUsersAction()).resolves.toEqual({
+      data: null,
+      hasError: true,
+      errorCode: "INTERNAL_ERROR",
+    });
+  });
+
   it("returns users when service succeeds", async () => {
     requireAdminLayoutAccessMock.mockResolvedValue({ ok: true });
     listAdminUsersMock.mockResolvedValue({
