@@ -19,8 +19,14 @@ function normalizeName(name: string | null | undefined): string | null {
   return normalized ? normalized : null;
 }
 
-function normalizeRole(role: string | undefined): "USER" | "ADMIN" {
-  return role === "USER" ? "USER" : "ADMIN";
+function parseRole(role: string | undefined): "USER" | "ADMIN" | null {
+  if (role === undefined || role === "ADMIN") {
+    return "ADMIN";
+  }
+  if (role === "USER") {
+    return "USER";
+  }
+  return null;
 }
 
 function isDuplicateEmailError(error: unknown): boolean {
@@ -59,12 +65,24 @@ export async function createAdminUser(
     };
   }
 
+  const role = parseRole(input.role);
+  if (!role) {
+    return {
+      status: 400,
+      body: {
+        ok: false,
+        error: "Role must be either USER or ADMIN.",
+        code: "INVALID_ROLE",
+      },
+    };
+  }
+
   try {
     const passwordHash = await hashPassword(password);
     const created = await createAdminUserDb({
       email,
       name: normalizeName(input.name),
-      role: normalizeRole(input.role),
+      role,
       passwordHash,
     });
 

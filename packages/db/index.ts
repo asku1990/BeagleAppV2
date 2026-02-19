@@ -47,6 +47,7 @@ export {
 
 export {
   createAdminUserDb,
+  countActiveAdminUsersDb,
   countAdminUsersDb,
   deleteAdminUserDb,
   getAdminUserByIdDb,

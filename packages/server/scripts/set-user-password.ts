@@ -49,26 +49,26 @@ function loadEnvFromFile(filePath: string): void {
   }
 }
 
-function resolveEnvFilePath(filePath: string): string {
-  if (path.isAbsolute(filePath)) {
-    return filePath;
+function toEnvFilePath(projectRoot: string, envFile: string): string {
+  if (path.isAbsolute(envFile)) {
+    return envFile;
   }
-
-  return path.resolve(repoRoot, filePath);
+  return path.join(projectRoot, envFile);
 }
 
-function loadSupportedEnvFiles(): void {
-  const configuredEnvFile = process.env.ENV_FILE?.trim();
-  if (configuredEnvFile) {
-    loadEnvFromFile(resolveEnvFilePath(configuredEnvFile));
-    return;
-  }
+function loadDefaultEnvFiles(): void {
+  const projectRoot = path.resolve(thisDir, "../../../");
+  const explicitEnvFile = process.env.SET_PASSWORD_ENV_FILE?.trim();
+  const envFileCandidates = explicitEnvFile
+    ? [explicitEnvFile]
+    : [".env.local", ".env"];
 
-  loadEnvFromFile(path.resolve(repoRoot, ".env.local"));
-  loadEnvFromFile(path.resolve(repoRoot, ".env"));
+  for (const envFileName of envFileCandidates) {
+    loadEnvFromFile(toEnvFilePath(projectRoot, envFileName));
+  }
 }
 
-loadSupportedEnvFiles();
+loadDefaultEnvFiles();
 
 function getRequiredEnv(name: string): string {
   const value = process.env[name]?.trim();

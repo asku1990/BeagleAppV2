@@ -1,4 +1,10 @@
-import { getAdminUserByIdDb, setAdminUserStatusDb } from "@beagle/db";
+import {
+  countActiveAdminUsersDb,
+  getAdminUserByIdDb,
+  lockAdminUsersForUpdateDb,
+  runAdminUserWriteTransactionDb,
+  setAdminUserStatusDb,
+} from "@beagle/db";
 import type {
   SetAdminUserStatusRequest,
   SetAdminUserStatusResponse,
@@ -52,8 +58,39 @@ export async function setAdminUserStatus(
   }
 
   try {
-    const target = await getAdminUserByIdDb(input.userId);
-    if (!target) {
+    const updateResult = await runAdminUserWriteTransactionDb(async (tx) => {
+      const target = await getAdminUserByIdDb(input.userId, tx);
+      if (!target) {
+        return { kind: "NOT_FOUND" } as const;
+      }
+
+      if (input.status === "suspended" && target.role === "ADMIN") {
+        await lockAdminUsersForUpdateDb(tx);
+        const targetAfterLock = await getAdminUserByIdDb(input.userId, tx);
+        if (!targetAfterLock) {
+          return { kind: "NOT_FOUND" } as const;
+        }
+
+        if (!targetAfterLock.banned) {
+          const activeAdminCount = await countActiveAdminUsersDb(tx);
+          if (activeAdminCount <= 1) {
+            return { kind: "LAST_ACTIVE_ADMIN" } as const;
+          }
+        }
+      }
+
+      await setAdminUserStatusDb(
+        {
+          userId: input.userId,
+          status: input.status,
+        },
+        tx,
+      );
+
+      return { kind: "UPDATED" } as const;
+    });
+
+    if (updateResult.kind === "NOT_FOUND") {
       return {
         status: 404,
         body: {
@@ -64,10 +101,17 @@ export async function setAdminUserStatus(
       };
     }
 
-    await setAdminUserStatusDb({
-      userId: input.userId,
-      status: input.status,
-    });
+    if (updateResult.kind === "LAST_ACTIVE_ADMIN") {
+      return {
+        status: 409,
+        body: {
+          ok: false,
+          error: "Cannot suspend the last active admin user.",
+          code: "LAST_ACTIVE_ADMIN",
+        },
+      };
+    }
+
     return {
       status: 200,
       body: {

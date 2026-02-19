@@ -67,6 +67,8 @@ export const fiAdminUsersMessages = {
   "admin.users.status.error": "Käyttäjän tilan päivitys epäonnistui",
   "admin.users.status.errorSelf":
     "Kirjautunutta admin-käyttäjää ei voi jäädyttää.",
+  "admin.users.status.errorLastActiveAdmin":
+    "Viimeistä aktiivista admin-käyttäjää ei voi jäädyttää.",
   "admin.users.status.errorNotFound": "Käyttäjää ei löytynyt.",
 } as const;
 
@@ -139,5 +141,7 @@ export const svAdminUsersMessages = {
   "admin.users.status.error": "Det gick inte att uppdatera användarstatus",
   "admin.users.status.errorSelf":
     "Den inloggade adminanvändaren kan inte stängas av.",
+  "admin.users.status.errorLastActiveAdmin":
+    "Den sista aktiva adminanvändaren kan inte stängas av.",
   "admin.users.status.errorNotFound": "Användaren hittades inte.",
 } as const;

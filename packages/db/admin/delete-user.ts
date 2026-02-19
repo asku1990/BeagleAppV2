@@ -10,6 +10,7 @@ function resolveDbClient(dbClient?: AdminUserDbClient): AdminUserDbClient {
 export type AdminUserLookupRowDb = {
   id: string;
   role: string;
+  banned: boolean;
 };
 
 export async function getAdminUserByIdDb(
@@ -21,6 +22,7 @@ export async function getAdminUserByIdDb(
     select: {
       id: true,
       role: true,
+      banned: true,
     },
   });
 }
@@ -31,6 +33,17 @@ export async function countAdminUsersDb(
   return resolveDbClient(dbClient).betterAuthUser.count({
     where: {
       role: "ADMIN",
+    },
+  });
+}
+
+export async function countActiveAdminUsersDb(
+  dbClient?: AdminUserDbClient,
+): Promise<number> {
+  return resolveDbClient(dbClient).betterAuthUser.count({
+    where: {
+      role: "ADMIN",
+      banned: false,
     },
   });
 }

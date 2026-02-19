@@ -85,6 +85,8 @@ export function AdminUsersPageClient() {
     switch (errorCode) {
       case "CANNOT_SUSPEND_SELF":
         return t("admin.users.status.errorSelf");
+      case "LAST_ACTIVE_ADMIN":
+        return t("admin.users.status.errorLastActiveAdmin");
       case "NOT_FOUND":
         return t("admin.users.status.errorNotFound");
       default:

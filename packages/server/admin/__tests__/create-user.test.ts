@@ -68,6 +68,25 @@ describe("createAdminUser", () => {
     });
   });
 
+  it("returns 400 for invalid role", async () => {
+    await expect(
+      createAdminUser({
+        email: "user@example.com",
+        role: "SUPERADMIN" as "ADMIN",
+        password: "password123456",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Role must be either USER or ADMIN.",
+        code: "INVALID_ROLE",
+      },
+    });
+    expect(hashPasswordMock).not.toHaveBeenCalled();
+    expect(createAdminUserDbMock).not.toHaveBeenCalled();
+  });
+
   it("creates user and returns 201", async () => {
     hashPasswordMock.mockResolvedValue("hashed");
     createAdminUserDbMock.mockResolvedValue({
