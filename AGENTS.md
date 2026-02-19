@@ -48,6 +48,7 @@ Agent instructions for working in this repository.
 
 - Run targeted checks for touched code when possible.
 - If tests/checks are not run, explicitly say so in the final response.
+- CI note: when a Turbo task chain includes `build` (for example via `test:e2e`), any build-time required environment variables must be provided in CI job env and forwarded through `turbo.json` `globalEnv`.
 
 ## Release & Changelog Rules
 

@@ -1,5 +1,12 @@
-export { requireAdmin } from "./admin";
-export { authService, createAuthService } from "./auth";
+export {
+  createAdminUser,
+  deleteAdminUser,
+  listAdminUsers,
+  requireAdmin,
+  setAdminUserPassword,
+  setAdminUserStatus,
+} from "./admin";
+export { betterAuth } from "./auth";
 export { createDogsService, dogsService } from "./dogs";
 export { createImportsService, importsService } from "./imports";
 export { createStatsService, statsService } from "./stats";

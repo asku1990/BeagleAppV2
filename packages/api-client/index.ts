@@ -1,12 +1,4 @@
-import type {
-  ImportIssueSeverity,
-  LoginRequest,
-  RegisterRequest,
-} from "@beagle/contracts";
-import { login } from "./auth/login";
-import { logout } from "./auth/logout";
-import { me } from "./auth/me";
-import { register } from "./auth/register";
+import type { ImportIssueSeverity } from "@beagle/contracts";
 import type { ClientOptions } from "./core/client-options";
 import { createRequest } from "./core/request";
 import { getImportRun } from "./imports/get-import-run";
@@ -16,22 +8,6 @@ export function createApiClient(options: ClientOptions = {}) {
   const request = createRequest(options);
 
   return {
-    login(input: LoginRequest) {
-      return login(request, input);
-    },
-
-    register(input: RegisterRequest) {
-      return register(request, input);
-    },
-
-    me() {
-      return me(request);
-    },
-
-    logout() {
-      return logout(request);
-    },
-
     getImportRun(id: string) {
       return getImportRun(request, id);
     },

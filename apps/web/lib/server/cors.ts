@@ -56,3 +56,22 @@ export function jsonResponse(
     headers: corsHeaders(methods, init.origin ?? null),
   });
 }
+
+export function withCorsHeaders(
+  response: Response,
+  init: { methods?: string; origin?: string | null } = {},
+) {
+  const methods = init.methods ?? "GET,POST,OPTIONS";
+  const headers = new Headers(response.headers);
+  const additions = corsHeaders(methods, init.origin ?? null);
+
+  for (const [key, value] of Object.entries(additions)) {
+    headers.set(key, value);
+  }
+
+  return new NextResponse(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}

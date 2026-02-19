@@ -7,6 +7,9 @@ on:
 jobs:
   checks:
     runs-on: ubuntu-latest
+    env:
+      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+      BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL || vars.BETTER_AUTH_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -20,16 +23,25 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Generate Prisma client
         run: pnpm db:generate
+      - name: Validate auth env for CI
+        run: |
+          test -n "${BETTER_AUTH_SECRET:-}" || (echo "Missing BETTER_AUTH_SECRET in GitHub Actions secrets" && exit 1)
+          test -n "${BETTER_AUTH_URL:-}" || (echo "Missing BETTER_AUTH_URL in GitHub Actions secret/variable" && exit 1)
       - name: Lint
         run: pnpm lint
       - name: Typecheck
         run: pnpm typecheck
-      - name: Unit tests
-        run: pnpm test:unit
+      - name: Unit tests with coverage (per-file >=50 in package configs)
+        run: pnpm test:coverage
+      - name: Coverage global gate (>=75 per package)
+        run: pnpm test:coverage:global-check
 
   e2e:
     runs-on: ubuntu-latest
     needs: checks
+    env:
+      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+      BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL || vars.BETTER_AUTH_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -43,8 +55,12 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Generate Prisma client
         run: pnpm db:generate
+      - name: Validate auth env for CI
+        run: |
+          test -n "${BETTER_AUTH_SECRET:-}" || (echo "Missing BETTER_AUTH_SECRET in GitHub Actions secrets" && exit 1)
+          test -n "${BETTER_AUTH_URL:-}" || (echo "Missing BETTER_AUTH_URL in GitHub Actions secret/variable" && exit 1)
       - name: Install Playwright Browsers
-        run: pnpm --filter @beagle/web exec playwright install --with-deps
+        run: pnpm --filter @beagle/web exec playwright install --with-deps chromium
       - name: E2E tests
         run: pnpm test:e2e
       - name: Upload Playwright report
@@ -52,7 +68,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: apps/web/playwright-report
+          path: playwright-report
           if-no-files-found: ignore
       - name: Upload Playwright test results
         if: always()

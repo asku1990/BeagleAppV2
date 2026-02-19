@@ -28,22 +28,36 @@ Current access model:
 1. Copy env file:
 
 ```bash
-cp .env.example .env
+cp .env.example .env.local
+cp .env.example .env.staging
+cp .env.example .env.prod
 ```
 
-2. Update `.env` values:
+2. Update env values in the target file:
 
 - `DATABASE_URL`: PostgreSQL connection string.
-- `AUTH_SECRET`: strong random secret.
+- `BETTER_AUTH_SECRET`: Better Auth secret (minimum 32 chars, for example `openssl rand -base64 32`).
+- `BETTER_AUTH_URL`: canonical app URL used by Better Auth (for local dev: `http://localhost:3000`).
+- `BETTER_AUTH_SESSION_EXPIRES_IN`: session lifetime in seconds (default `1209600` = 14 days).
+- `BETTER_AUTH_SESSION_UPDATE_AGE`: sliding refresh interval in seconds for active sessions (default `86400` = 1 day).
+- `BOOTSTRAP_ADMIN_EMAIL`: first admin email for one-time bootstrap script.
+- `BOOTSTRAP_ADMIN_PASSWORD`: first admin password for one-time bootstrap script (12-128 chars).
+- `BOOTSTRAP_ADMIN_NAME`: optional first admin display name (falls back to email local-part).
+- `SET_PASSWORD_EMAIL`: user email for password update helper command.
+- `SET_PASSWORD_NEW_PASSWORD`: new password for password update helper command (12-128 chars).
 - `NEXT_PUBLIC_API_URL`: optional API base URL override for web app clients. Default is same-origin.
 - `CORS_ORIGINS`: optional comma-separated cross-origin allowlist for API responses.
 - `LEGACY_DATABASE_URL`: MariaDB connection string to legacy Beagle DB for phase-1 imports.
-- `SEED_TEST_USER_EMAIL`: required when running `pnpm db:seed:basic-user`.
-- `SEED_TEST_USER_PASSWORD`: required when running `pnpm db:seed:basic-user`.
-- `SEED_TEST_USER_ROLE`: required when running `pnpm db:seed:basic-user` (`USER` or `ADMIN`).
-- `SEED_TEST_USER_USERNAME`: optional username for `pnpm db:seed:basic-user`.
 
-Example values are already in `.env.example`.
+Example plain values and Proton Pass reference blocks are in `.env.example`.
+
+3. If using Proton Pass `pass://` references, run via the env-specific scripts:
+
+```bash
+pnpm dev:local
+pnpm dev:staging
+pnpm dev:prod
+```
 
 ## Install dependencies
 
@@ -65,10 +79,34 @@ Initialize schema (dev):
 pnpm db:push
 ```
 
+Initialize schema against a specific environment:
+
+```bash
+pnpm db:push:local
+pnpm db:push:staging
+pnpm db:push:prod
+```
+
+If `pnpm db:push:staging -- --accept-data-loss` does not forward the flag correctly, run Prisma directly:
+
+```bash
+pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db exec prisma db push --accept-data-loss
+```
+
+Only use `--accept-data-loss` when you intentionally allow Prisma to apply destructive schema changes.
+
 Or create migrations in dev:
 
 ```bash
 pnpm db:migrate:dev -- --name init
+```
+
+Apply committed migrations to a specific environment:
+
+```bash
+pnpm db:deploy:local
+pnpm db:deploy:staging
+pnpm db:deploy:prod
 ```
 
 Open Prisma Studio:
@@ -79,10 +117,18 @@ pnpm db:studio
 
 ## Run the app
 
-Run the app:
+Run the app (plain envs):
 
 ```bash
 pnpm dev
+```
+
+Run the app with Proton Pass env files:
+
+```bash
+pnpm dev:local
+pnpm dev:staging
+pnpm dev:prod
 ```
 
 Default ports:
@@ -112,6 +158,20 @@ pnpm --filter @beagle/server test:unit
 pnpm --filter @beagle/web test:e2e
 ```
 
+Playwright e2e with env-specific app startup:
+
+```bash
+pnpm test:playwright:local
+pnpm test:playwright:staging
+pnpm test:playwright:prod
+```
+
+CI note:
+
+- This repo runs `turbo test:e2e`, and `test:e2e` depends on `build`.
+- `@beagle/web` build validates Better Auth env at build time.
+- Keep `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` available in CI job env and forwarded through Turbo `globalEnv` (see `turbo.json`).
+
 ## Test layout conventions
 
 - Co-locate package/app unit or integration tests in `__tests__/` near the feature/module.
@@ -120,23 +180,72 @@ pnpm --filter @beagle/web test:e2e
 
 ## Auth and admin notes
 
-- Register endpoint creates users with `USER` role by default.
+- Better Auth is mounted at `/api/auth/*` via Next catch-all route.
+- Email/password auth is enabled, but public sign-up is disabled (`disableSignUp: true`).
 - Admin pages require `ADMIN` role.
-- To test admin pages locally now, promote a user role to `ADMIN` in the database.
-- Login sets `beagle_session` as an `HttpOnly` cookie (`SameSite=Lax`, `Path=/`, `Secure` in production).
-- Logout always clears `beagle_session`; `me` and `logout` return `401` when session is missing/invalid.
+- To test admin pages locally, create a user and set role to `ADMIN` in `BetterAuthUser`.
 
 ## Current API status
 
-- Auth endpoints implemented:
-  - `POST /api/auth/register`
-  - `POST /api/auth/login`
-  - `GET /api/auth/me`
-  - `POST /api/auth/logout`
+- Auth endpoints are provided by Better Auth under `/api/auth/*`.
 - v1 import endpoints implemented:
   - `GET /api/v1/imports/:id`
   - `GET /api/v1/imports/:id/issues`
 - Home statistics are now loaded via Server Action + React Query hook in web UI (`app/actions/home/get-home-statistics.ts` + `queries/home/use-home-statistics-query.ts`).
+
+## Better Auth CLI
+
+Better Auth config lives at `packages/server/auth/better-auth.ts`, so pass `--config` when running CLI commands.
+
+```bash
+pnpm auth:generate
+pnpm auth:migrate
+```
+
+## First admin bootstrap
+
+For a fresh environment with public sign-up disabled, create the first `ADMIN` user with:
+
+```bash
+pnpm auth:bootstrap-admin
+pnpm auth:bootstrap-admin:local
+pnpm auth:bootstrap-admin:staging
+pnpm auth:bootstrap-admin:prod
+```
+
+The script is idempotent:
+
+- creates the admin user if missing
+- promotes an existing matching user to `ADMIN`
+- ensures credential account exists for email/password sign-in
+
+Notes:
+
+- `auth:bootstrap-admin:local` loads `.env.local`.
+- `auth:bootstrap-admin:staging` loads `.env.staging`.
+- `auth:bootstrap-admin:prod` loads `.env.prod`.
+
+## Update existing user password
+
+To update an existing credential user password:
+
+```bash
+pnpm auth:set-password:local
+pnpm auth:set-password:staging
+pnpm auth:set-password:prod
+```
+
+It uses:
+
+- `SET_PASSWORD_EMAIL`
+- `SET_PASSWORD_NEW_PASSWORD`
+
+Notes:
+
+- `auth:set-password:local` loads `.env.local`.
+- `auth:set-password:staging` loads `.env.staging`.
+- `auth:set-password:prod` loads `.env.prod`.
+- `auth:set-password` without suffix defaults to `.env.local` (with `.env` fallback).
 
 ## Beagle search
 
@@ -208,9 +317,9 @@ pnpm import:issues <RUN_ID> --limit 500
 4. Check import run status over API (admin auth required):
 
 ```bash
-curl -i -c /tmp/beagle.cookies -X POST http://localhost:3000/api/auth/login \
+curl -i -c /tmp/beagle.cookies -X POST http://localhost:3000/api/auth/sign-in/email \
   -H "Content-Type: application/json" \
-  -d '{"email":"<SEED_TEST_USER_EMAIL>","password":"<SEED_TEST_USER_PASSWORD>"}'
+  -d '{"email":"<ADMIN_EMAIL>","password":"<ADMIN_PASSWORD>"}'
 
 curl -i -b /tmp/beagle.cookies \
   http://localhost:3000/api/v1/imports/<RUN_ID>

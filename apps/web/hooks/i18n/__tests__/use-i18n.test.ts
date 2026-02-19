@@ -30,9 +30,14 @@ describe("useI18n", () => {
     expect(useI18n()).toBe(context);
   });
 
-  it("throws when used without I18nProvider", () => {
+  it("returns fallback context when provider is missing", () => {
     useContextMock.mockReturnValue(null);
 
-    expect(() => useI18n()).toThrow("useI18n must be used within I18nProvider");
+    const context = useI18n();
+    expect(context.locale).toBe("fi");
+    expect(typeof context.setLocale).toBe("function");
+    expect(typeof context.t).toBe("function");
+    expect(context.t("search.form.title")).toBe("Hae beagleja");
+    expect(() => context.setLocale("sv")).not.toThrow();
   });
 });

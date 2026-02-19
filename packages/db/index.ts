@@ -1,20 +1,6 @@
-export {
-  DogSex,
-  ImportKind,
-  ImportStatus,
-  Role,
-  type User,
-} from "@prisma/client";
+export { DogSex, ImportKind, ImportStatus, Role } from "@prisma/client";
 
 export { prisma } from "./core/prisma";
-
-export {
-  createSession,
-  createUser,
-  deleteSession,
-  findUserByEmail,
-  findUserBySessionToken,
-} from "./auth/repository";
 
 export {
   createImportRunIssue,
@@ -58,3 +44,19 @@ export {
   type BeagleSearchRowDb,
   type BeagleSearchSortDb,
 } from "./dogs";
+
+export {
+  createAdminUserDb,
+  countActiveAdminUsersDb,
+  countAdminUsersDb,
+  deleteAdminUserDb,
+  getAdminUserByIdDb,
+  lockAdminUsersForUpdateDb,
+  listAdminUsersDb,
+  runAdminUserWriteTransactionDb,
+  setAdminUserPasswordDb,
+  setAdminUserStatusDb,
+  type AdminUserLookupRowDb,
+  type AdminUserRowDb,
+  type CreatedAdminUserRowDb,
+} from "./admin";

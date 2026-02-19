@@ -31,7 +31,7 @@ vi.mock("../../core/prisma", () => ({
   prisma: prismaMock,
 }));
 
-import { searchBeagleDogsDb } from "../repository";
+import { getNewestBeagleDogsDb, searchBeagleDogsDb } from "../repository";
 
 function makeDogRow(input: {
   id: string;
@@ -159,6 +159,21 @@ describe("searchBeagleDogsDb", () => {
     expect(result.items.map((item) => item.id)).toEqual(["dogB", "dogA"]);
   });
 
+  it("returns empty page from registration ordering path when no dogs match", async () => {
+    dogFindManyMock.mockResolvedValue([]);
+
+    const result = await searchBeagleDogsDb({ reg: "FI-", sort: "reg-desc" });
+
+    expect(result).toEqual({
+      mode: "reg",
+      total: 0,
+      totalPages: 0,
+      page: 1,
+      items: [],
+    });
+    expect(dogFindManyMock).toHaveBeenCalledTimes(1);
+  });
+
   it("clamps page to totalPages and keeps total/totalPages consistency", async () => {
     dogCountMock.mockResolvedValue(25);
     dogFindManyMock.mockResolvedValue([]);
@@ -283,5 +298,76 @@ describe("searchBeagleDogsDb", () => {
 
     expect(result.items.map((item) => item.id)).toEqual(["dog1"]);
     expect(result.mode).toBe("name");
+  });
+
+  it("filters out single-registration dogs in in-memory multipleRegsOnly mode", async () => {
+    dogRegistrationGroupByMock.mockResolvedValue([
+      { dogId: "dog1", _count: { _all: 1 } },
+      { dogId: "dog2", _count: { _all: 2 } },
+    ]);
+    dogFindManyMock.mockResolvedValue([
+      makeDogRow({
+        id: "dog1",
+        name: "Alpha",
+        registrations: [
+          { registrationNo: "FI-100/24", createdAt: new Date("2026-01-01") },
+        ],
+      }),
+      makeDogRow({
+        id: "dog2",
+        name: "Alpha",
+        registrations: [
+          { registrationNo: "FI-200/24", createdAt: new Date("2026-01-02") },
+          { registrationNo: "FI-201/25", createdAt: new Date("2026-01-03") },
+        ],
+      }),
+    ]);
+
+    const result = await searchBeagleDogsDb({
+      name: "%alp%",
+      multipleRegsOnly: true,
+    });
+
+    expect(result.items.map((item) => item.id)).toEqual(["dog2"]);
+  });
+});
+
+describe("getNewestBeagleDogsDb", () => {
+  beforeEach(() => {
+    dogFindManyMock.mockReset();
+  });
+
+  it("uses default limit and maps rows", async () => {
+    dogFindManyMock.mockResolvedValue([
+      makeDogRow({
+        id: "dog1",
+        name: "Alpha",
+        createdAt: new Date("2026-01-03T00:00:00.000Z"),
+        registrations: [
+          { registrationNo: "FI-100/24", createdAt: new Date("2026-01-01") },
+        ],
+      }),
+    ]);
+
+    const result = await getNewestBeagleDogsDb();
+
+    expect(dogFindManyMock).toHaveBeenCalledWith({
+      where: {},
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      take: 5,
+      skip: undefined,
+      select: expect.any(Object),
+    });
+    expect(result[0]?.id).toBe("dog1");
+  });
+
+  it("clamps invalid limit values", async () => {
+    dogFindManyMock.mockResolvedValue([]);
+
+    await getNewestBeagleDogsDb(0);
+    await getNewestBeagleDogsDb(999);
+
+    expect(dogFindManyMock.mock.calls[0]?.[0]?.take).toBe(1);
+    expect(dogFindManyMock.mock.calls[1]?.[0]?.take).toBe(20);
   });
 });

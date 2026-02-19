@@ -34,27 +34,69 @@ enum ImportIssueSeverity {
   ERROR
 }
 
-model User {
-  id           String    @id @default(cuid())
-  email        String    @unique
-  username     String?   @unique
-  passwordHash String
-  role         Role      @default(USER)
-  sessions     Session[]
-  importRuns   ImportRun[]
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+model BetterAuthUser {
+  id            String              @id
+  email         String              @unique
+  emailVerified Boolean             @default(false)
+  name          String?
+  image         String?
+  role          String              @default("USER")
+  banned        Boolean             @default(false)
+  banReason     String?
+  banExpires    DateTime?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  sessions      BetterAuthSession[]
+  accounts      BetterAuthAccount[]
+  importRuns    ImportRun[]
+
+  @@index([role])
 }
 
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
+model BetterAuthSession {
+  id             String         @id
+  token          String         @unique
+  expiresAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  impersonatedBy String?
+  user           BetterAuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@index([userId])
+}
+
+model BetterAuthAccount {
+  id                    String         @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  user                  BetterAuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model BetterAuthVerification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, value])
 }
 
 model Dog {
@@ -209,7 +251,7 @@ model ImportRun {
   finishedAt          DateTime?
   errorSummary        String?
   createdByUserId     String?
-  createdByUser       User?        @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdByUser       BetterAuthUser? @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
   issues              ImportRunIssue[]
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
