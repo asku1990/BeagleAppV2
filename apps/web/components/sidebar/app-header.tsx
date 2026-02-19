@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ChevronLeft, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { beagleTheme } from "@/components/ui/beagle-theme";
@@ -16,8 +16,20 @@ const localeButtons = [
 
 export function AppHeader() {
   const { locale, setLocale, t } = useI18n();
+  const router = useRouter();
   const pathname = usePathname();
-  const showBackHome = pathname !== "/";
+  const showBackButton = pathname !== "/";
+  const backFallbackHref =
+    pathname.startsWith("/admin") && pathname !== "/admin" ? "/admin" : "/";
+
+  const handleBack = () => {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+      return;
+    }
+
+    router.push(backFallbackHref);
+  };
 
   return (
     <header
@@ -32,9 +44,8 @@ export function AppHeader() {
           <SidebarTrigger
             className={cn(beagleTheme.inkStrongText, beagleTheme.focusRing)}
           />
-          {showBackHome ? (
+          {showBackButton ? (
             <Button
-              asChild
               type="button"
               variant="ghost"
               size="icon-sm"
@@ -43,15 +54,12 @@ export function AppHeader() {
                 beagleTheme.inkStrongText,
                 beagleTheme.focusRing,
               )}
+              onClick={handleBack}
+              aria-label={t("header.back")}
+              title={t("header.back")}
             >
-              <Link
-                href="/"
-                aria-label={t("header.backHome")}
-                title={t("header.backHome")}
-              >
-                <ChevronLeft className="size-4" />
-                <span className="sr-only">{t("header.backHome")}</span>
-              </Link>
+              <ChevronLeft className="size-4" />
+              <span className="sr-only">{t("header.back")}</span>
             </Button>
           ) : null}
         </div>

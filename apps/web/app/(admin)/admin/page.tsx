@@ -22,6 +22,9 @@ export default function AdminHomePage() {
             <Button asChild variant="outline">
               <Link href="/admin/dogs">Open Dogs</Link>
             </Button>
+            <Button asChild variant="outline">
+              <Link href="/admin/settings">Open Settings</Link>
+            </Button>
           </div>
         </CardContent>
       </Card>
