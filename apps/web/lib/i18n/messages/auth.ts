@@ -8,6 +8,8 @@ export const fiAuthMessages = {
   "auth.signIn.pending": "Tarkistetaan kirjautumistila...",
   "auth.signIn.success": "Kirjautuminen onnistui.",
   "auth.signIn.errorGeneric": "Kirjautuminen epäonnistui.",
+  "auth.signIn.errorBanned":
+    "Tilisi on estetty tässä sovelluksessa. Ota yhteyttä tukeen, jos kyseessä on virhe.",
   "auth.register.title": "Rekisteröityminen",
   "auth.register.closedDescription":
     "Uusien käyttäjien rekisteröityminen on tällä hetkellä suljettu.",
@@ -28,6 +30,8 @@ export const svAuthMessages = {
   "auth.signIn.pending": "Kontrollerar inloggningsstatus...",
   "auth.signIn.success": "Inloggningen lyckades.",
   "auth.signIn.errorGeneric": "Inloggningen misslyckades.",
+  "auth.signIn.errorBanned":
+    "Ditt konto har blockerats i den här applikationen. Kontakta support om du tror att detta är ett fel.",
   "auth.register.title": "Registrering",
   "auth.register.closedDescription":
     "Registrering av nya användare är för närvarande stängd.",

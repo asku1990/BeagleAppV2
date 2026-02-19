@@ -1,4 +1,5 @@
 import { prisma } from "@beagle/db";
+import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@beagle/contracts";
 import { betterAuth as createBetterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
@@ -54,8 +55,8 @@ export const betterAuth = createBetterAuth({
   emailAndPassword: {
     enabled: true,
     disableSignUp: true,
-    minPasswordLength: 12,
-    maxPasswordLength: 128,
+    minPasswordLength: PASSWORD_MIN_LENGTH,
+    maxPasswordLength: PASSWORD_MAX_LENGTH,
     resetPasswordTokenExpiresIn: 60 * 30,
     revokeSessionsOnPasswordReset: true,
   },

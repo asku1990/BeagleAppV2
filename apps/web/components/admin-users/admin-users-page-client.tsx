@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { createAdminUserAction } from "@/app/actions/admin/create-admin-user";
 import { deleteAdminUserAction } from "@/app/actions/admin/delete-admin-user";
+import { setAdminUserStatusAction } from "@/app/actions/admin/set-admin-user-status";
 import { useI18n } from "@/hooks/i18n";
 import { useAdminUsersQuery } from "@/queries/admin/use-admin-users-query";
 
@@ -47,14 +48,6 @@ export function AdminUsersPageClient() {
     });
   }, [query, users]);
 
-  function onToggleRole() {
-    toast.info(t("admin.users.role.pending"));
-  }
-
-  function onToggleSuspend() {
-    toast.info(t("admin.users.suspend.pending"));
-  }
-
   function getCreateUserErrorMessage(errorCode?: string): string {
     switch (errorCode) {
       case "EMAIL_EXISTS":
@@ -78,6 +71,17 @@ export function AdminUsersPageClient() {
         return t("admin.users.delete.errorNotFound");
       default:
         return t("admin.users.delete.error");
+    }
+  }
+
+  function getStatusUpdateErrorMessage(errorCode?: string): string {
+    switch (errorCode) {
+      case "CANNOT_SUSPEND_SELF":
+        return t("admin.users.status.errorSelf");
+      case "NOT_FOUND":
+        return t("admin.users.status.errorNotFound");
+      default:
+        return t("admin.users.status.error");
     }
   }
 
@@ -129,6 +133,33 @@ export function AdminUsersPageClient() {
       toast.error(t("admin.users.create.error"));
     } finally {
       setIsCreatingUser(false);
+    }
+  }
+
+  async function onToggleSuspend(user: {
+    id: string;
+    status: "active" | "suspended";
+  }) {
+    const nextStatus = user.status === "active" ? "suspended" : "active";
+    const successMessage =
+      nextStatus === "suspended"
+        ? t("admin.users.status.suspendedSuccess")
+        : t("admin.users.status.unsuspendedSuccess");
+
+    try {
+      const result = await setAdminUserStatusAction({
+        userId: user.id,
+        status: nextStatus,
+      });
+      if (result.hasError) {
+        toast.error(getStatusUpdateErrorMessage(result.errorCode));
+        return;
+      }
+
+      toast.success(successMessage);
+      await refetch();
+    } catch {
+      toast.error(t("admin.users.status.error"));
     }
   }
 
@@ -286,15 +317,7 @@ export function AdminUsersPageClient() {
                           type="button"
                           variant="outline"
                           size="sm"
-                          onClick={onToggleRole}
-                        >
-                          {t("admin.users.actions.toggleRole")}
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={onToggleSuspend}
+                          onClick={() => void onToggleSuspend(user)}
                         >
                           {user.status === "active"
                             ? t("admin.users.actions.suspend")
@@ -352,15 +375,7 @@ export function AdminUsersPageClient() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={onToggleRole}
-                    >
-                      {t("admin.users.actions.toggleRole")}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={onToggleSuspend}
+                      onClick={() => void onToggleSuspend(user)}
                     >
                       {user.status === "active"
                         ? t("admin.users.actions.suspend")

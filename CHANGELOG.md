@@ -31,12 +31,16 @@ This project uses a user-facing changelog format.
 - Ylläpidon Käyttäjät-sivu hakee nyt käyttäjät oikeasta palvelindatasta aiemman mock-listan sijaan.
 - Ylläpidon Käyttäjät-sivulle lisättiin toimiva "Luo käyttäjä" -lomake testikäyttäjien nopeaan luontiin.
 - Ylläpidon Käyttäjät-sivulle lisättiin käyttäjän poistotoiminto vahvistusmodalilla. Kirjautunutta admin-käyttäjää ei voi poistaa.
+- Ylläpidon Käyttäjät-sivun jäädytys/aktivointi toimii nyt oikeasti palvelimen kautta, ja jäädytys katkaisee käyttäjän aktiiviset sessiot.
+- Käyttäjähallinnan roolinvaihto poistettiin toistaiseksi näkyvistä, kunnes roolimuutosten käytännöt on määritelty.
 
 ### Fixed
 
 - Auth-päätepisteiden CORS-otsakkeet ja OPTIONS-preflight-vastaukset yhdenmukaistettiin, jotta selain ei estä kirjautumispyyntöjä eri alkuperien välillä.
 - Auth-reittien testit päivitettiin kattamaan CORS- ja preflight-käytös sekä estämään ympäristömuuttujien vuotaminen testien välillä.
 - Korjattiin kirjautumissivun hydration-virhe, joka saattoi näkyä takaisin-navigoinnin jälkeen.
+- Sähköpostin validointi yhtenäistettiin käyttäjän luonnissa ja ylläpitoskripteissä, jotta kirjautuminen ei kaadu myöhemmin epäyhteensopivan osoitteen takia.
+- Salasanan pituusvalidointi yhtenäistettiin auth-asetuksissa, käyttäjän luonnissa ja ylläpitoskripteissä, jotta kaikki käyttävät samaa sääntöä.
 
 ### Removed
 

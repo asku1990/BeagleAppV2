@@ -9,3 +9,4 @@ export {
   runAdminUserWriteTransactionDb,
   type AdminUserLookupRowDb,
 } from "./delete-user";
+export { setAdminUserStatusDb } from "./set-user-status";

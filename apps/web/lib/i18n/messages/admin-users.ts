@@ -28,7 +28,6 @@ export const fiAdminUsersMessages = {
   "admin.users.columns.status": "Tila",
   "admin.users.columns.actions": "Toiminnot",
   "admin.users.actions.resetPassword": "Vaihda salasana",
-  "admin.users.actions.toggleRole": "Vaihda rooli",
   "admin.users.actions.suspend": "Jäädytä",
   "admin.users.actions.unsuspend": "Poista jäädytys",
   "admin.users.actions.delete": "Poista",
@@ -55,9 +54,12 @@ export const fiAdminUsersMessages = {
   "admin.users.delete.errorLastAdmin":
     "Viimeistä admin-käyttäjää ei voi poistaa.",
   "admin.users.delete.errorNotFound": "Käyttäjää ei löytynyt.",
-  "admin.users.role.pending": "Roolin päivitys lisätään seuraavassa vaiheessa",
-  "admin.users.suspend.pending":
-    "Jäädytys- ja palautustoiminto lisätään seuraavassa vaiheessa",
+  "admin.users.status.suspendedSuccess": "Käyttäjä jäädytetty",
+  "admin.users.status.unsuspendedSuccess": "Jäädytys poistettu",
+  "admin.users.status.error": "Käyttäjän tilan päivitys epäonnistui",
+  "admin.users.status.errorSelf":
+    "Kirjautunutta admin-käyttäjää ei voi jäädyttää.",
+  "admin.users.status.errorNotFound": "Käyttäjää ei löytynyt.",
 } as const;
 
 export const svAdminUsersMessages = {
@@ -90,7 +92,6 @@ export const svAdminUsersMessages = {
   "admin.users.columns.status": "Status",
   "admin.users.columns.actions": "Åtgärder",
   "admin.users.actions.resetPassword": "Byt lösenord",
-  "admin.users.actions.toggleRole": "Byt roll",
   "admin.users.actions.suspend": "Stäng av",
   "admin.users.actions.unsuspend": "Återaktivera",
   "admin.users.actions.delete": "Ta bort",
@@ -116,7 +117,10 @@ export const svAdminUsersMessages = {
   "admin.users.delete.errorLastAdmin":
     "Den sista adminanvändaren kan inte tas bort.",
   "admin.users.delete.errorNotFound": "Användaren hittades inte.",
-  "admin.users.role.pending": "Rolluppdatering läggs till i nästa fas",
-  "admin.users.suspend.pending":
-    "Avstängning och återaktivering läggs till i nästa fas",
+  "admin.users.status.suspendedSuccess": "Användaren har stängts av",
+  "admin.users.status.unsuspendedSuccess": "Avstängningen har hävts",
+  "admin.users.status.error": "Det gick inte att uppdatera användarstatus",
+  "admin.users.status.errorSelf":
+    "Den inloggade adminanvändaren kan inte stängas av.",
+  "admin.users.status.errorNotFound": "Användaren hittades inte.",
 } as const;

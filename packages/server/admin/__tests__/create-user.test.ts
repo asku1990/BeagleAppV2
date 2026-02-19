@@ -39,7 +39,7 @@ describe("createAdminUser", () => {
   it("returns 400 for email without domain dot", async () => {
     await expect(
       createAdminUser({
-        email: "amin@rr",
+        email: "testi@t.t",
         password: "password123456",
       }),
     ).resolves.toEqual({

@@ -10,3 +10,8 @@ export type {
   DeleteAdminUserRequest,
   DeleteAdminUserResponse,
 } from "./delete-admin-user";
+export type {
+  AdminUserStatus,
+  SetAdminUserStatusRequest,
+  SetAdminUserStatusResponse,
+} from "./set-admin-user-status";

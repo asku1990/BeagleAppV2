@@ -1,21 +1,17 @@
 import { hashPassword } from "better-auth/crypto";
 import { createAdminUserDb } from "@beagle/db";
-import type {
-  CreateAdminUserRequest,
-  CreateAdminUserResponse,
+import {
+  normalizeAndValidateEmailAddress,
+  normalizeAndValidatePassword,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  type CreateAdminUserRequest,
+  type CreateAdminUserResponse,
 } from "@beagle/contracts";
 import type { ServiceResult } from "../shared/result";
 
-const MIN_PASSWORD_LENGTH = 12;
-const MAX_PASSWORD_LENGTH = 128;
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 function normalizeEmail(email: string): string | null {
-  const normalized = email.trim().toLowerCase();
-  if (!normalized || !EMAIL_PATTERN.test(normalized)) {
-    return null;
-  }
-  return normalized;
+  return normalizeAndValidateEmailAddress(email);
 }
 
 function normalizeName(name: string | null | undefined): string | null {
@@ -51,16 +47,13 @@ export async function createAdminUser(
     };
   }
 
-  const password = input.password.trim();
-  if (
-    password.length < MIN_PASSWORD_LENGTH ||
-    password.length > MAX_PASSWORD_LENGTH
-  ) {
+  const password = normalizeAndValidatePassword(input.password);
+  if (!password) {
     return {
       status: 400,
       body: {
         ok: false,
-        error: `Password must be ${MIN_PASSWORD_LENGTH}-${MAX_PASSWORD_LENGTH} characters.`,
+        error: `Password must be ${PASSWORD_MIN_LENGTH}-${PASSWORD_MAX_LENGTH} characters.`,
         code: "INVALID_PASSWORD",
       },
     };

@@ -3,6 +3,7 @@ export {
   deleteAdminUser,
   listAdminUsers,
   requireAdmin,
+  setAdminUserStatus,
 } from "./admin";
 export { betterAuth } from "./auth";
 export { createDogsService, dogsService } from "./dogs";

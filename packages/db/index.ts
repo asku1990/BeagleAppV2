@@ -53,6 +53,7 @@ export {
   lockAdminUsersForUpdateDb,
   listAdminUsersDb,
   runAdminUserWriteTransactionDb,
+  setAdminUserStatusDb,
   type AdminUserLookupRowDb,
   type AdminUserRowDb,
   type CreatedAdminUserRowDb,

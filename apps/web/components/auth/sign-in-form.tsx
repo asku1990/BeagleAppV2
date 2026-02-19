@@ -21,6 +21,11 @@ type SignInFormProps = {
   returnTo?: string | string[];
 };
 
+type AuthClientError = {
+  code?: string;
+  message?: string;
+};
+
 function normalizeReturnTo(returnTo: string | string[] | undefined): string {
   const value = Array.isArray(returnTo) ? returnTo[0] : returnTo;
 
@@ -33,6 +38,23 @@ function normalizeReturnTo(returnTo: string | string[] | undefined): string {
   }
 
   return "/admin";
+}
+
+function getSignInErrorKey(
+  error: AuthClientError,
+): "auth.signIn.errorBanned" | "auth.signIn.errorGeneric" {
+  const code = error.code?.toUpperCase();
+  const message = error.message?.toLowerCase() ?? "";
+
+  if (
+    code === "USER_BANNED" ||
+    code === "BANNED" ||
+    message.includes("banned from this application")
+  ) {
+    return "auth.signIn.errorBanned";
+  }
+
+  return "auth.signIn.errorGeneric";
 }
 
 export function SignInForm({ returnTo }: SignInFormProps) {
@@ -62,7 +84,7 @@ export function SignInForm({ returnTo }: SignInFormProps) {
       });
 
       if (error) {
-        toast.error(error.message ?? t("auth.signIn.errorGeneric"));
+        toast.error(t(getSignInErrorKey(error)));
         return;
       }
 
