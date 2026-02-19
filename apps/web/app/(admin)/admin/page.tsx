@@ -17,6 +17,9 @@ export default function AdminHomePage() {
           </p>
           <div className="flex flex-wrap gap-2">
             <Button asChild>
+              <Link href="/account/profile">Open Profile</Link>
+            </Button>
+            <Button asChild>
               <Link href="/admin/users">Open Users</Link>
             </Button>
             <Button asChild variant="outline">

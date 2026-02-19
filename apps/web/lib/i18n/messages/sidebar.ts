@@ -17,6 +17,7 @@ export const fiSidebarMessages = {
   "sidebar.nav.adminUsers": "Käyttäjät",
   "sidebar.nav.adminDogs": "Koirat",
   "sidebar.nav.adminSettings": "Asetukset",
+  "sidebar.nav.adminProfile": "Profiili",
   "sidebar.signIn": "Kirjaudu",
   "sidebar.signOut": "Kirjaudu ulos",
 } as const;
@@ -40,6 +41,7 @@ export const svSidebarMessages = {
   "sidebar.nav.adminUsers": "Användare",
   "sidebar.nav.adminDogs": "Hundar",
   "sidebar.nav.adminSettings": "Inställningar",
+  "sidebar.nav.adminProfile": "Profil",
   "sidebar.signIn": "Logga in",
   "sidebar.signOut": "Logga ut",
 } as const;

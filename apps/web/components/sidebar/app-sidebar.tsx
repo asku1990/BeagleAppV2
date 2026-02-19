@@ -16,6 +16,7 @@ import {
   Settings,
   Shield,
   Trophy,
+  User,
   Users,
 } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
@@ -117,6 +118,11 @@ export function AppSidebar() {
   const userRole = (session?.user as SessionUserWithOptionalRole | undefined)
     ?.role;
   const isAdmin = userRole === "ADMIN";
+  const userEmail = session?.user?.email ?? null;
+  const userName = session?.user?.name ?? null;
+  const accountPrimary = userName?.trim() || userEmail || "Signed in";
+  const accountSecondary = userName?.trim() ? userEmail : null;
+  const accountRole = isAdmin ? "ADMIN" : "USER";
 
   return (
     <Sidebar collapsible="icon" variant="sidebar">
@@ -276,27 +282,89 @@ export function AppSidebar() {
         )}
       >
         {isSignedIn ? (
-          <Button
-            variant="ghost"
-            className={cn(
-              "justify-start gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
-              beagleTheme.inkStrongText,
-              beagleTheme.interactive,
-              beagleTheme.focusRing,
-              "min-h-11 md:min-h-9",
-            )}
-            onClick={handleSignOut}
-            disabled={isSessionPending}
-          >
-            <LogOut className="size-4" />
-            <span className="group-data-[collapsible=icon]:hidden">
-              {t("sidebar.signOut")}
-            </span>
-          </Button>
+          <>
+            <div
+              className={cn(
+                "mx-2 mb-1 rounded-md border px-2 py-2 group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:w-full group-data-[collapsible=icon]:border-transparent group-data-[collapsible=icon]:px-0",
+                beagleTheme.border,
+              )}
+            >
+              <div className="flex items-start gap-2 group-data-[collapsible=icon]:hidden">
+                <span
+                  className={cn(
+                    "mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border",
+                    beagleTheme.border,
+                    beagleTheme.softAccent,
+                  )}
+                >
+                  <User className="size-3.5" />
+                </span>
+                <div className="min-w-0">
+                  <Link
+                    href="/account/profile"
+                    onClick={closeSidebarOnMobile}
+                    className={cn(
+                      "block truncate text-sm font-medium underline-offset-2 hover:underline",
+                      beagleTheme.inkStrongText,
+                      beagleTheme.focusRing,
+                    )}
+                  >
+                    {accountPrimary}
+                  </Link>
+                  {accountSecondary ? (
+                    <p
+                      className={cn("truncate text-xs", beagleTheme.mutedText)}
+                    >
+                      {accountSecondary}
+                    </p>
+                  ) : null}
+                  <p
+                    className={cn(
+                      "mt-0.5 text-[11px] font-semibold",
+                      beagleTheme.mutedText,
+                    )}
+                  >
+                    {accountRole}
+                  </p>
+                </div>
+              </div>
+              <div className="hidden group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
+                <Link
+                  href="/account/profile"
+                  onClick={closeSidebarOnMobile}
+                  title={`${accountPrimary} (${accountRole})`}
+                  className={cn(
+                    "inline-flex h-7 w-7 items-center justify-center rounded-full border",
+                    beagleTheme.border,
+                    beagleTheme.softAccent,
+                    beagleTheme.focusRing,
+                  )}
+                >
+                  <User className="size-3.5" />
+                </Link>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              className={cn(
+                "justify-start gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
+                beagleTheme.inkStrongText,
+                beagleTheme.interactive,
+                beagleTheme.focusRing,
+                "min-h-11 md:min-h-9",
+              )}
+              onClick={handleSignOut}
+              disabled={isSessionPending}
+            >
+              <LogOut className="size-4" />
+              <span className="group-data-[collapsible=icon]:hidden">
+                {t("sidebar.signOut")}
+              </span>
+            </Button>
+          </>
         ) : (
           <Button
             asChild
-            variant="ghost"
             className={cn(
               "justify-start gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
               beagleTheme.inkStrongText,
@@ -304,6 +372,7 @@ export function AppSidebar() {
               beagleTheme.focusRing,
               "min-h-11 md:min-h-9",
             )}
+            variant="ghost"
           >
             <Link href="/sign-in" onClick={closeSidebarOnMobile}>
               <LogIn className="size-4" />
