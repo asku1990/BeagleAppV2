@@ -105,4 +105,40 @@ describe("better auth catch-all route", () => {
       "true",
     );
   });
+
+  it("applies CORS headers to all auth HTTP methods", async () => {
+    process.env.CORS_ORIGINS = "http://localhost:3000,http://admin.local";
+    getMock.mockResolvedValue(new Response("ok-get"));
+    patchMock.mockResolvedValue(new Response("ok-patch"));
+    putMock.mockResolvedValue(new Response("ok-put"));
+    deleteMock.mockResolvedValue(new Response("ok-delete"));
+    const route = await import("../route");
+
+    const request = new Request("http://localhost:3000/api/auth/session", {
+      headers: { origin: "http://admin.local" },
+    });
+
+    const getResponse = await route.GET(request);
+    const patchResponse = await route.PATCH(request);
+    const putResponse = await route.PUT(request);
+    const deleteResponse = await route.DELETE(request);
+
+    expect(getMock).toHaveBeenCalledWith(request);
+    expect(patchMock).toHaveBeenCalledWith(request);
+    expect(putMock).toHaveBeenCalledWith(request);
+    expect(deleteMock).toHaveBeenCalledWith(request);
+
+    expect(getResponse.headers.get("access-control-allow-origin")).toBe(
+      "http://admin.local",
+    );
+    expect(patchResponse.headers.get("access-control-allow-origin")).toBe(
+      "http://admin.local",
+    );
+    expect(putResponse.headers.get("access-control-allow-origin")).toBe(
+      "http://admin.local",
+    );
+    expect(deleteResponse.headers.get("access-control-allow-origin")).toBe(
+      "http://admin.local",
+    );
+  });
 });

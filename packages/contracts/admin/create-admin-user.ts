@@ -3,7 +3,7 @@ type Role = "USER" | "ADMIN";
 export type CreateAdminUserRequest = {
   email: string;
   name?: string | null;
-  role?: Role;
+  role: Role;
   password: string;
 };
 

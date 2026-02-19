@@ -19,8 +19,8 @@ function normalizeName(name: string | null | undefined): string | null {
   return normalized ? normalized : null;
 }
 
-function parseRole(role: string | undefined): "USER" | "ADMIN" | null {
-  if (role === undefined || role === "ADMIN") {
+function parseRole(role: string): "USER" | "ADMIN" | null {
+  if (role === "ADMIN") {
     return "ADMIN";
   }
   if (role === "USER") {
