@@ -44,3 +44,5 @@ export {
   type BeagleSearchRowDb,
   type BeagleSearchSortDb,
 } from "./dogs";
+
+export { listAdminUsersDb, type AdminUserRowDb } from "./admin";

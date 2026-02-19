@@ -28,6 +28,7 @@ This project uses a user-facing changelog format.
 - Yläpalkin takaisin-painike näkyy nyt kaikilla muilla sivuilla paitsi etusivulla, myös julkisilla sivuilla.
 - Takaisin-painike yrittää ensin palata edelliseen näkymään ja käyttää varareittiä, jos selaushistoriaa ei ole (adminissa `/admin`, muilla sivuilla `/`).
 - Ylläpidon navigaatiota selkeytettiin: Admin Home, Käyttäjät, Koirat ja Asetukset on ryhmitelty samaan sivupalkkiin.
+- Ylläpidon Käyttäjät-sivu hakee nyt käyttäjät oikeasta palvelindatasta aiemman mock-listan sijaan.
 
 ### Fixed
 

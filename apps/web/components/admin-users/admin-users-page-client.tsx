@@ -5,50 +5,30 @@ import { toast } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useAdminUsersQuery } from "@/queries/admin/use-admin-users-query";
 
-type AdminUser = {
-  id: string;
-  email: string;
-  name: string;
-  role: "ADMIN" | "USER";
-  status: "active" | "suspended";
-  lastSignInAt: string;
-};
+function formatDateTime(value: string | null): string {
+  if (!value) {
+    return "Never";
+  }
 
-const MOCK_USERS: AdminUser[] = [
-  {
-    id: "u_1",
-    email: "admin@beagle.test",
-    name: "Main Admin",
-    role: "ADMIN",
-    status: "active",
-    lastSignInAt: "2026-02-18 15:20",
-  },
-  {
-    id: "u_2",
-    email: "editor@beagle.test",
-    name: "Editor User",
-    role: "USER",
-    status: "active",
-    lastSignInAt: "2026-02-17 10:12",
-  },
-  {
-    id: "u_3",
-    email: "blocked@beagle.test",
-    name: "Blocked User",
-    role: "USER",
-    status: "suspended",
-    lastSignInAt: "2026-02-10 07:45",
-  },
-];
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
 
-function nextRole(current: "ADMIN" | "USER"): "ADMIN" | "USER" {
-  return current === "ADMIN" ? "USER" : "ADMIN";
+  return date.toLocaleString("fi-FI");
 }
 
 export function AdminUsersPageClient() {
   const [query, setQuery] = useState("");
-  const [users, setUsers] = useState<AdminUser[]>(MOCK_USERS);
+  const {
+    data: users = [],
+    isLoading,
+    isError,
+    refetch,
+    isFetching,
+  } = useAdminUsersQuery();
   const [resetTargetId, setResetTargetId] = useState<string | null>(null);
   const [tempPassword, setTempPassword] = useState("");
 
@@ -61,32 +41,17 @@ export function AdminUsersPageClient() {
     return users.filter((user) => {
       return (
         user.email.toLowerCase().includes(trimmed) ||
-        user.name.toLowerCase().includes(trimmed)
+        (user.name ?? "").toLowerCase().includes(trimmed)
       );
     });
   }, [query, users]);
 
-  function onToggleRole(userId: string) {
-    setUsers((previous) =>
-      previous.map((user) =>
-        user.id === userId ? { ...user, role: nextRole(user.role) } : user,
-      ),
-    );
-    toast.success("Mock action: role updated in UI state");
+  function onToggleRole() {
+    toast.info("Role update action comes in next step");
   }
 
-  function onToggleSuspend(userId: string) {
-    setUsers((previous) =>
-      previous.map((user) =>
-        user.id === userId
-          ? {
-              ...user,
-              status: user.status === "active" ? "suspended" : "active",
-            }
-          : user,
-      ),
-    );
-    toast.success("Mock action: user status updated in UI state");
+  function onToggleSuspend() {
+    toast.info("Suspend action comes in next step");
   }
 
   function onResetPasswordConfirm() {
@@ -118,14 +83,34 @@ export function AdminUsersPageClient() {
 
       <Card>
         <CardHeader>
-          <CardTitle>User management (UI draft)</CardTitle>
+          <CardTitle>User management</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground">Loading users...</p>
+          ) : null}
+          {isError ? (
+            <div className="flex items-center justify-between gap-3 rounded-md border p-3">
+              <p className="text-sm text-muted-foreground">
+                Failed to load users.
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => void refetch()}
+                disabled={isFetching}
+              >
+                Retry
+              </Button>
+            </div>
+          ) : null}
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search by email or name"
             aria-label="Search users"
+            disabled={isLoading || isError}
           />
 
           <div className="hidden overflow-x-auto md:block">
@@ -144,10 +129,12 @@ export function AdminUsersPageClient() {
                 {filteredUsers.map((user) => (
                   <tr key={user.id} className="border-b align-top">
                     <td className="px-2 py-2">{user.email}</td>
-                    <td className="px-2 py-2">{user.name}</td>
+                    <td className="px-2 py-2">{user.name ?? "-"}</td>
                     <td className="px-2 py-2">{user.role}</td>
                     <td className="px-2 py-2">{user.status}</td>
-                    <td className="px-2 py-2">{user.lastSignInAt}</td>
+                    <td className="px-2 py-2">
+                      {formatDateTime(user.lastSignInAt)}
+                    </td>
                     <td className="px-2 py-2">
                       <div className="flex flex-wrap gap-2">
                         <Button
@@ -165,7 +152,7 @@ export function AdminUsersPageClient() {
                           type="button"
                           variant="outline"
                           size="sm"
-                          onClick={() => onToggleRole(user.id)}
+                          onClick={onToggleRole}
                         >
                           Toggle role
                         </Button>
@@ -173,7 +160,7 @@ export function AdminUsersPageClient() {
                           type="button"
                           variant="outline"
                           size="sm"
-                          onClick={() => onToggleSuspend(user.id)}
+                          onClick={onToggleSuspend}
                         >
                           {user.status === "active" ? "Suspend" : "Unsuspend"}
                         </Button>
@@ -191,12 +178,14 @@ export function AdminUsersPageClient() {
                 <CardContent className="space-y-3 pt-4">
                   <div>
                     <p className="font-medium">{user.email}</p>
-                    <p className="text-sm text-muted-foreground">{user.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {user.name ?? "-"}
+                    </p>
                   </div>
                   <div className="text-sm">
                     <p>Role: {user.role}</p>
                     <p>Status: {user.status}</p>
-                    <p>Last sign-in: {user.lastSignInAt}</p>
+                    <p>Last sign-in: {formatDateTime(user.lastSignInAt)}</p>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <Button
@@ -214,7 +203,7 @@ export function AdminUsersPageClient() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => onToggleRole(user.id)}
+                      onClick={onToggleRole}
                     >
                       Toggle role
                     </Button>
@@ -222,7 +211,7 @@ export function AdminUsersPageClient() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => onToggleSuspend(user.id)}
+                      onClick={onToggleSuspend}
                     >
                       {user.status === "active" ? "Suspend" : "Unsuspend"}
                     </Button>
@@ -237,7 +226,7 @@ export function AdminUsersPageClient() {
       {resetTargetId ? (
         <Card>
           <CardHeader>
-            <CardTitle>Reset password (UI draft)</CardTitle>
+            <CardTitle>Reset password</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <Input

@@ -95,4 +95,5 @@ export type {
   BeagleSearchSort,
 } from "./dogs";
 
+export type { AdminUserListItem, AdminUsersResponse } from "./admin";
 export type { HomeStatisticsResponse } from "./home";
