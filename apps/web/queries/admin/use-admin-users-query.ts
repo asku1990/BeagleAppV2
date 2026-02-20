@@ -3,10 +3,11 @@
 import type { AdminUserListItem } from "@beagle/contracts";
 import { useQuery } from "@tanstack/react-query";
 import { getAdminUsersAction } from "@/app/actions/admin/get-admin-users";
+import { adminUsersQueryKey } from "./query-keys";
 
 export function useAdminUsersQuery() {
   return useQuery<AdminUserListItem[]>({
-    queryKey: ["admin-users"],
+    queryKey: adminUsersQueryKey,
     queryFn: async () => {
       const result = await getAdminUsersAction();
       if (result.hasError || !result.data) {

@@ -50,7 +50,15 @@ Not allowed:
 - Import from module `index.ts` entrypoints when crossing package/module boundaries.
 - Keep internals private: do not re-export helper files that are only for local use inside a module.
 - For `apps/web`: place custom React hooks under `apps/web/hooks/**` (prefer feature-scoped folders).
+- Query and mutation data-access hooks may live under `apps/web/queries/**` to keep read/write cache logic co-located with feature data APIs.
 - For `apps/web`: keep `apps/web/lib/**` for non-hook utilities/support code (helpers, types, constants, providers, etc.).
+
+## React Query data-access conventions
+
+- UI reads should be wrapped in `useQuery` hooks.
+- UI writes should be wrapped in `useMutation` hooks.
+- Mutation hooks are responsible for cache coherence and should invalidate affected query keys in `onSuccess` by default.
+- Prefer shared query-key constants over inline arrays so query invalidation stays consistent.
 
 ## UI feedback consistency rules
 

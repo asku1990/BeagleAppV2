@@ -6,12 +6,15 @@ import { toast } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { createAdminUserAction } from "@/app/actions/admin/create-admin-user";
-import { deleteAdminUserAction } from "@/app/actions/admin/delete-admin-user";
-import { setAdminUserPasswordAction } from "@/app/actions/admin/set-admin-user-password";
-import { setAdminUserStatusAction } from "@/app/actions/admin/set-admin-user-status";
 import { useI18n } from "@/hooks/i18n";
-import { useAdminUsersQuery } from "@/queries/admin/use-admin-users-query";
+import {
+  AdminMutationError,
+  useAdminUsersQuery,
+  useCreateAdminUserMutation,
+  useDeleteAdminUserMutation,
+  useSetAdminUserPasswordMutation,
+  useSetAdminUserStatusMutation,
+} from "@/queries/admin";
 
 export function AdminUsersPageClient() {
   const { t } = useI18n();
@@ -23,6 +26,11 @@ export function AdminUsersPageClient() {
     refetch,
     isFetching,
   } = useAdminUsersQuery();
+  const { mutateAsync: createAdminUser } = useCreateAdminUserMutation();
+  const { mutateAsync: deleteAdminUser } = useDeleteAdminUserMutation();
+  const { mutateAsync: setAdminUserStatus } = useSetAdminUserStatusMutation();
+  const { mutateAsync: setAdminUserPassword } =
+    useSetAdminUserPasswordMutation();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [createEmail, setCreateEmail] = useState("");
   const [createName, setCreateName] = useState("");
@@ -105,6 +113,13 @@ export function AdminUsersPageClient() {
     }
   }
 
+  function getMutationErrorCode(error: unknown): string | undefined {
+    if (error instanceof AdminMutationError) {
+      return error.errorCode;
+    }
+    return undefined;
+  }
+
   async function onConfirmDeleteUser() {
     if (!deleteTarget) {
       return;
@@ -112,17 +127,11 @@ export function AdminUsersPageClient() {
 
     setIsDeletingUser(true);
     try {
-      const result = await deleteAdminUserAction({ userId: deleteTarget.id });
-      if (result.hasError) {
-        toast.error(getDeleteUserErrorMessage(result.errorCode));
-        return;
-      }
-
+      await deleteAdminUser({ userId: deleteTarget.id });
       toast.success(t("admin.users.delete.success"));
       setDeleteTarget(null);
-      await refetch();
-    } catch {
-      toast.error(t("admin.users.delete.error"));
+    } catch (error) {
+      toast.error(getDeleteUserErrorMessage(getMutationErrorCode(error)));
     } finally {
       setIsDeletingUser(false);
     }
@@ -131,26 +140,20 @@ export function AdminUsersPageClient() {
   async function onCreateUser() {
     setIsCreatingUser(true);
     try {
-      const result = await createAdminUserAction({
+      await createAdminUser({
         email: createEmail,
         name: createName,
         role: "ADMIN",
         password: createPassword,
       });
 
-      if (result.hasError) {
-        toast.error(getCreateUserErrorMessage(result.errorCode));
-        return;
-      }
-
       toast.success(t("admin.users.create.success"));
       setCreateEmail("");
       setCreateName("");
       setCreatePassword("");
       setIsCreateOpen(false);
-      await refetch();
-    } catch {
-      toast.error(t("admin.users.create.error"));
+    } catch (error) {
+      toast.error(getCreateUserErrorMessage(getMutationErrorCode(error)));
     } finally {
       setIsCreatingUser(false);
     }
@@ -167,19 +170,14 @@ export function AdminUsersPageClient() {
         : t("admin.users.status.unsuspendedSuccess");
 
     try {
-      const result = await setAdminUserStatusAction({
+      await setAdminUserStatus({
         userId: user.id,
         status: nextStatus,
       });
-      if (result.hasError) {
-        toast.error(getStatusUpdateErrorMessage(result.errorCode));
-        return;
-      }
 
       toast.success(successMessage);
-      await refetch();
-    } catch {
-      toast.error(t("admin.users.status.error"));
+    } catch (error) {
+      toast.error(getStatusUpdateErrorMessage(getMutationErrorCode(error)));
     }
   }
 
@@ -195,21 +193,17 @@ export function AdminUsersPageClient() {
 
     setIsResettingPassword(true);
     try {
-      const result = await setAdminUserPasswordAction({
+      await setAdminUserPassword({
         userId: resetTarget.id,
         newPassword: resetPassword,
       });
-      if (result.hasError) {
-        toast.error(getResetPasswordErrorMessage(result.errorCode));
-        return;
-      }
 
       toast.success(t("admin.users.reset.success"));
       setResetTarget(null);
       setResetPassword("");
       setResetPasswordConfirm("");
-    } catch {
-      toast.error(t("admin.users.reset.error"));
+    } catch (error) {
+      toast.error(getResetPasswordErrorMessage(getMutationErrorCode(error)));
     } finally {
       setIsResettingPassword(false);
     }

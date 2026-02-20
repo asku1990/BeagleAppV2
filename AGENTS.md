@@ -42,6 +42,8 @@ Agent instructions for working in this repository.
 
 - Keep business rules in `packages/server` (and shared domain concepts in `packages/domain`).
 - Keep UI components presentational when possible; call typed clients for data access.
+- For TanStack Query writes in `apps/web`, use feature mutation hooks and invalidate impacted query keys on success.
+- Prefer shared query key constants (for example `query-keys.ts`) instead of inline query key arrays.
 - Preserve existing naming and folder conventions unless a refactor is explicitly requested.
 
 ## Validation
