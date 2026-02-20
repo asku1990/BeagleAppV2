@@ -12,40 +12,26 @@ This project uses a user-facing changelog format.
 
 ### Tärkeintä tässä julkaisussa
 
-- Julkaisussa uudistettiin kirjautumisen tekninen toteutus ja parannettiin ylläpidon käytettävyyttä. Kokonaisuus on nyt aiempaa vakaampi ja ylläpidon navigointi selkeämpi.
+- Tässä versiossa otettiin käyttöön uusi käyttäjähallinta sekä turvallinen better-auth kirjautuminen. Samalla paranneltiin taustatoimintoja ja testausta, jotta mahdolliset virheet tulevat herkemin ilmi. Ylläpitäjä voi luoda käyttäjätunnuksia, poistaa, jäädyttää ja resetoida salasanat. Toistaiseksi käytössä on vain yksi käyttäjärooli (admin) mutta tietokannassa on valmius peruskäyttäjälle.
 
 ### Added
 
-- Sovellukseen lisättiin Better Authiin perustuva auth-reitti (`/api/auth/[...all]`).
-- Ylläpidon alkuasennukseen lisättiin `auth:bootstrap-admin`-komento, jolla ensimmäinen ADMIN-käyttäjä voidaan luoda tai olemassa oleva käyttäjä nostaa adminiksi.
-- Ylläpidon sivupalkkiin lisättiin oma osio sekä uusi Asetukset-sivu (`/admin/settings`) admin-käyttäjille.
+- Palveluun lisättiin uusi kirjautumis- ja istunnonhallinta.
+- Ylläpidolle lisättiin selkeä Admin-alue, jossa on omat sivut etusivulle, käyttäjille, koirille ja asetuksille.
+- Ylläpitoon lisättiin käyttäjähallinnan perustoiminnot: käyttäjän luonti, poisto, jäädytys/aktivointi ja salasanan vaihto.
+- Käyttäjille lisättiin oma Tiliprofiili-sivu.
+- Ylläpidon ensimmäisen pääkäyttäjän käyttöönottoon lisättiin oma komentotyökalu (ajetaanpaikalliseslta koneelta suoraan tietokantaan).
+- Komentotyökalu salasanan vaihtamiseen.
 
 ### Changed
 
-- Sovelluksen aiempi auth-palvelukerros ja auth-route-wrapperit korvattiin Better Auth -integraatiolla.
-- Ylläpidon käyttöoikeustarkistus (`requireAdmin`) käyttää nyt Better Authin sessiota.
-- Auth-asetusten validointeja tarkennettiin (esimerkiksi salaisuuden vähimmäispituus ja session kesto), jotta virheelliset asetukset havaitaan jo käynnistyksessä.
-- Yläpalkin takaisin-painike näkyy nyt kaikilla muilla sivuilla paitsi etusivulla, myös julkisilla sivuilla.
-- Takaisin-painike yrittää ensin palata edelliseen näkymään ja käyttää varareittiä, jos selaushistoriaa ei ole (adminissa `/admin`, muilla sivuilla `/`).
-- Ylläpidon navigaatiota selkeytettiin: Admin Home, Käyttäjät, Koirat ja Asetukset on ryhmitelty samaan sivupalkkiin.
-- Ylläpidon Käyttäjät-sivu hakee nyt käyttäjät oikeasta palvelindatasta aiemman mock-listan sijaan.
-- Ylläpidon Käyttäjät-sivulle lisättiin toimiva "Luo käyttäjä" -lomake testikäyttäjien nopeaan luontiin.
-- Ylläpidon Käyttäjät-sivulle lisättiin käyttäjän poistotoiminto vahvistusmodalilla. Kirjautunutta admin-käyttäjää ei voi poistaa.
-- Ylläpidon Käyttäjät-sivun jäädytys/aktivointi toimii nyt oikeasti palvelimen kautta, ja jäädytys katkaisee käyttäjän aktiiviset sessiot.
-- Käyttäjähallinnan roolinvaihto poistettiin toistaiseksi näkyvistä, kunnes roolimuutosten käytännöt on määritelty.
-- Ylläpidon Käyttäjät-sivun salasanan vaihto toteutettiin oikeana toimintona: avautuu vahvistusmodalissa, vaatii salasanan syötön kahdesti ja katkaisee käyttäjän aktiiviset sessiot vaihdon yhteydessä.
+- Ylläpidon sivupalkki ja navigaatio järjesteltiin selkeämmäksi.
 
 ### Fixed
 
-- Auth-päätepisteiden CORS-otsakkeet ja OPTIONS-preflight-vastaukset yhdenmukaistettiin, jotta selain ei estä kirjautumispyyntöjä eri alkuperien välillä.
-- Auth-reittien testit päivitettiin kattamaan CORS- ja preflight-käytös sekä estämään ympäristömuuttujien vuotaminen testien välillä.
-- Korjattiin kirjautumissivun hydration-virhe, joka saattoi näkyä takaisin-navigoinnin jälkeen.
-- Sähköpostin validointi yhtenäistettiin käyttäjän luonnissa ja ylläpitoskripteissä, jotta kirjautuminen ei kaadu myöhemmin epäyhteensopivan osoitteen takia.
-- Salasanan pituusvalidointi yhtenäistettiin auth-asetuksissa, käyttäjän luonnissa ja ylläpitoskripteissä, jotta kaikki käyttävät samaa sääntöä.
-
 ### Removed
 
-- Vanhat API-clientin auth-wrapperit (`login`, `logout`, `me`, `register`) sekä aiempi auth-service poistettiin käytöstä.
+- Vanha kirjautumisratkaisu ja siihen liittyneet vanhat välikerrokset poistettiin.
 
 ## [0.1.2] - 2026-02-18
 
