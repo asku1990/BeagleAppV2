@@ -7,7 +7,6 @@ describe("ListLoadingSkeleton", () => {
   it("renders configured loading blocks", () => {
     const html = renderToStaticMarkup(
       React.createElement(ListLoadingSkeleton, {
-        showSearchBar: true,
         desktopRows: 2,
         mobileCards: 1,
       }),
@@ -18,12 +17,16 @@ describe("ListLoadingSkeleton", () => {
     expect(html).toContain("md:hidden");
     expect(
       html.match(/data-slot="skeleton"/g)?.length ?? 0,
-    ).toBeGreaterThanOrEqual(6);
+    ).toBeGreaterThanOrEqual(5);
   });
 
   it("renders simple row list variant", () => {
     const html = renderToStaticMarkup(
-      React.createElement(ListLoadingSkeleton, { rows: 4 }),
+      React.createElement(ListLoadingSkeleton, {
+        rows: 4,
+        desktopRows: 0,
+        mobileCards: 0,
+      }),
     );
 
     expect(html).toContain('aria-busy="true"');
