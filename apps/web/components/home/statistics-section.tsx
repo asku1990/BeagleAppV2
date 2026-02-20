@@ -5,6 +5,7 @@ import { toast } from "@/components/ui/sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StatsGridLoadingSkeleton } from "@/components/ui/stats-grid-loading-skeleton";
 import { cn } from "@/lib/utils";
 import type { MessageKey } from "@/lib/i18n";
 import { useI18n } from "@/hooks/i18n";
@@ -151,27 +152,10 @@ export function StatisticsSection() {
           <Skeleton className="h-7 w-48" aria-hidden="true" />
         </CardHeader>
         <CardContent className="px-5 pb-5 md:px-6 md:pb-6">
-          <div className="grid gap-3 md:grid-cols-2 lg:gap-4 xl:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, cardIndex) => (
-              <section
-                key={cardIndex}
-                className={cardClassName}
-                aria-hidden="true"
-              >
-                <Skeleton className="h-5 w-28" />
-                <div className="mt-2.5 space-y-2.5">
-                  {Array.from({ length: cardIndex === 0 ? 2 : 3 }).map(
-                    (_, rowIndex) => (
-                      <div key={rowIndex} className={rowClassName}>
-                        <Skeleton className="h-4 w-24" />
-                        <Skeleton className="h-5 w-16 rounded-md" />
-                      </div>
-                    ),
-                  )}
-                </div>
-              </section>
-            ))}
-          </div>
+          <StatsGridLoadingSkeleton
+            cardClassName={cardClassName}
+            rowClassName={beagleTheme.border}
+          />
         </CardContent>
       </Card>
     );

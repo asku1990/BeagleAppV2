@@ -346,6 +346,13 @@ For full import behavior (source tables, stage handling, required fields, issue 
 - Add client calls in `packages/api-client`.
 - Consume from UI using React Query hooks in `apps/web/queries`.
 
+## React Query write conventions
+
+- Use `useQuery` hooks for UI reads.
+- Use `useMutation` hooks for UI writes.
+- After successful writes, invalidate affected query keys in `onSuccess` using `queryClient.invalidateQueries(...)` as the default cache policy.
+- Define query keys as shared constants (for example, in feature-level `query-keys.ts`) instead of repeating inline string arrays.
+
 ## Architecture docs
 
 - `ARCHITECTURE.md`: monorepo boundaries, dependency rules, and scaling path.

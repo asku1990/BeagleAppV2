@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { adminUsersQueryKey } from "../query-keys";
 import { useAdminUsersQuery } from "../use-admin-users-query";
 
 const { useQueryMock, getAdminUsersActionMock } = vi.hoisted(() => ({
@@ -31,7 +32,7 @@ describe("useAdminUsersQuery", () => {
       refetchOnWindowFocus: boolean;
     };
 
-    expect(options.queryKey).toEqual(["admin-users"]);
+    expect(options.queryKey).toEqual(adminUsersQueryKey);
     expect(options.staleTime).toBe(60_000);
     expect(options.refetchOnWindowFocus).toBe(true);
   });
