@@ -3,7 +3,10 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { toast } from "@/components/ui/sonner";
-import { ListingSectionShell } from "@/components/listing";
+import {
+  ListingResponsiveResults,
+  ListingSectionShell,
+} from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import {
   formatBeagleRowsForClipboard,
@@ -220,13 +223,14 @@ export function BeagleSearchPage() {
           <BeagleSearchEmptyState variant="error" />
         ) : hasResultItems ? (
           <>
-            {/* Desktop uses table, mobile uses cards; both render same row contract. */}
-            <div className="hidden md:block">
-              <BeagleSearchResultsDesktopTable rows={searchResults.items} />
-            </div>
-            <div className="md:hidden">
-              <BeagleSearchResultsMobileCards rows={searchResults.items} />
-            </div>
+            <ListingResponsiveResults
+              desktop={
+                <BeagleSearchResultsDesktopTable rows={searchResults.items} />
+              }
+              mobile={
+                <BeagleSearchResultsMobileCards rows={searchResults.items} />
+              }
+            />
             <BeagleSearchPagination
               page={searchResults.page}
               pageSize={urlState.pageSize}
@@ -250,14 +254,14 @@ export function BeagleSearchPage() {
         ) : hasNewestError ? (
           <BeagleSearchEmptyState variant="error" />
         ) : (
-          <>
-            <div className="hidden md:block">
+          <ListingResponsiveResults
+            desktop={
               <BeagleSearchResultsDesktopTable rows={newestQuery.data ?? []} />
-            </div>
-            <div className="md:hidden">
+            }
+            mobile={
               <BeagleSearchResultsMobileCards rows={newestQuery.data ?? []} />
-            </div>
-          </>
+            }
+          />
         )}
       </ListingSectionShell>
     </>

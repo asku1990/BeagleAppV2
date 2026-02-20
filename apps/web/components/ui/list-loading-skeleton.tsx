@@ -1,22 +1,18 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
 type ListLoadingSkeletonProps = {
-  showSearchBar?: boolean;
   rows?: number;
   desktopRows?: number;
   mobileCards?: number;
 };
 
 export function ListLoadingSkeleton({
-  showSearchBar = false,
   rows = 0,
   desktopRows = 5,
   mobileCards = 3,
 }: ListLoadingSkeletonProps) {
   return (
     <div className="space-y-3" aria-busy="true">
-      {showSearchBar ? <Skeleton className="h-9 w-full" /> : null}
-
       {rows > 0 ? (
         <div className="space-y-2">
           {Array.from({ length: rows }).map((_, index) => (

@@ -6,6 +6,7 @@ import { toast } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { ListingResponsiveResults } from "@/components/listing";
 import { ListLoadingSkeleton } from "@/components/ui/list-loading-skeleton";
 import { useI18n } from "@/hooks/i18n";
 import {
@@ -16,6 +17,7 @@ import {
   useSetAdminUserPasswordMutation,
   useSetAdminUserStatusMutation,
 } from "@/queries/admin";
+import { AdminUserSearch } from "./admin-user-search";
 
 export function AdminUsersPageClient() {
   const { t } = useI18n();
@@ -280,7 +282,14 @@ export function AdminUsersPageClient() {
           <CardTitle>{t("admin.users.management.title")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {isInitialLoading ? <ListLoadingSkeleton showSearchBar /> : null}
+          <AdminUserSearch
+            value={query}
+            onChange={setQuery}
+            placeholder={t("admin.users.searchPlaceholder")}
+            ariaLabel={t("admin.users.searchAria")}
+            disabled={isInitialLoading || isError}
+          />
+          {isInitialLoading ? <ListLoadingSkeleton /> : null}
           {isError ? (
             <div className="flex items-center justify-between gap-3 rounded-md border p-3">
               <p className="text-sm text-muted-foreground">
@@ -297,95 +306,87 @@ export function AdminUsersPageClient() {
               </Button>
             </div>
           ) : null}
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={t("admin.users.searchPlaceholder")}
-            aria-label={t("admin.users.searchAria")}
-            disabled={isInitialLoading || isError}
-          />
 
           {!isInitialLoading ? (
-            <div className="hidden overflow-x-auto md:block">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b text-left">
-                    <th className="px-2 py-2">
-                      {t("admin.users.columns.email")}
-                    </th>
-                    <th className="px-2 py-2">
-                      {t("admin.users.columns.name")}
-                    </th>
-                    <th className="px-2 py-2">
-                      {t("admin.users.columns.role")}
-                    </th>
-                    <th className="px-2 py-2">
-                      {t("admin.users.columns.status")}
-                    </th>
-                    <th className="px-2 py-2">
-                      {t("admin.users.columns.actions")}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredUsers.map((user) => (
-                    <tr key={user.id} className="border-b align-top">
-                      <td className="px-2 py-2">{user.email}</td>
-                      <td className="px-2 py-2">{user.name ?? "-"}</td>
-                      <td className="px-2 py-2">{user.role}</td>
-                      <td className="px-2 py-2">{user.status}</td>
-                      <td className="px-2 py-2">
-                        <div className="flex flex-wrap gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setResetTarget({
-                                id: user.id,
-                                email: user.email,
-                              });
-                              setResetPassword("");
-                              setResetPasswordConfirm("");
-                            }}
-                          >
-                            {t("admin.users.actions.resetPassword")}
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => void onToggleSuspend(user)}
-                          >
-                            {user.status === "active"
-                              ? t("admin.users.actions.suspend")
-                              : t("admin.users.actions.unsuspend")}
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() =>
-                              setDeleteTarget({
-                                id: user.id,
-                                email: user.email,
-                              })
-                            }
-                          >
-                            {t("admin.users.actions.delete")}
-                          </Button>
-                        </div>
-                      </td>
+            <ListingResponsiveResults
+              desktopClassName="overflow-x-auto"
+              mobileClassName="space-y-3"
+              desktop={
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-left">
+                      <th className="px-2 py-2">
+                        {t("admin.users.columns.email")}
+                      </th>
+                      <th className="px-2 py-2">
+                        {t("admin.users.columns.name")}
+                      </th>
+                      <th className="px-2 py-2">
+                        {t("admin.users.columns.role")}
+                      </th>
+                      <th className="px-2 py-2">
+                        {t("admin.users.columns.status")}
+                      </th>
+                      <th className="px-2 py-2">
+                        {t("admin.users.columns.actions")}
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : null}
-
-          {!isInitialLoading ? (
-            <div className="space-y-3 md:hidden">
-              {filteredUsers.map((user) => (
+                  </thead>
+                  <tbody>
+                    {filteredUsers.map((user) => (
+                      <tr key={user.id} className="border-b align-top">
+                        <td className="px-2 py-2">{user.email}</td>
+                        <td className="px-2 py-2">{user.name ?? "-"}</td>
+                        <td className="px-2 py-2">{user.role}</td>
+                        <td className="px-2 py-2">{user.status}</td>
+                        <td className="px-2 py-2">
+                          <div className="flex flex-wrap gap-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setResetTarget({
+                                  id: user.id,
+                                  email: user.email,
+                                });
+                                setResetPassword("");
+                                setResetPasswordConfirm("");
+                              }}
+                            >
+                              {t("admin.users.actions.resetPassword")}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => void onToggleSuspend(user)}
+                            >
+                              {user.status === "active"
+                                ? t("admin.users.actions.suspend")
+                                : t("admin.users.actions.unsuspend")}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                setDeleteTarget({
+                                  id: user.id,
+                                  email: user.email,
+                                })
+                              }
+                            >
+                              {t("admin.users.actions.delete")}
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              }
+              mobile={filteredUsers.map((user) => (
                 <Card key={user.id}>
                   <CardContent className="space-y-3 pt-4">
                     <div>
@@ -439,7 +440,7 @@ export function AdminUsersPageClient() {
                   </CardContent>
                 </Card>
               ))}
-            </div>
+            />
           ) : null}
         </CardContent>
       </Card>
