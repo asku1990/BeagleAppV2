@@ -1,12 +1,5 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { ListLoadingSkeleton } from "@/components/ui/list-loading-skeleton";
 
 export function BeagleSearchLoadingState() {
-  return (
-    <div className="space-y-2">
-      <Skeleton className="h-10 w-full" />
-      <Skeleton className="h-10 w-full" />
-      <Skeleton className="h-10 w-full" />
-      <Skeleton className="h-10 w-full" />
-    </div>
-  );
+  return <ListLoadingSkeleton rows={5} desktopRows={0} mobileCards={0} />;
 }
