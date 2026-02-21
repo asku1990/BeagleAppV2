@@ -1,4 +1,5 @@
 import {
+  type AuditContextDb,
   ImportKind,
   isInvalidImportRunIssuesCursorError,
   createImportRunIssue,
@@ -146,9 +147,16 @@ export function createImportsService() {
   return {
     async runLegacyPhase1(
       createdByUserId?: string,
-      options?: { log?: (message: string) => void },
+      options?: {
+        log?: (message: string) => void;
+        auditSource?: AuditContextDb["source"];
+      },
     ): Promise<ServiceResult<ImportRunResponse>> {
       const log = options?.log ?? (() => {});
+      const auditContext: AuditContextDb = {
+        actorUserId: createdByUserId ?? null,
+        source: options?.auditSource ?? "SYSTEM",
+      };
       const stageStartedAt = new Map<string, number>();
       const stageReasonCounts = new Map<string, Map<string, number>>();
       const addStageReason = (
@@ -233,7 +241,7 @@ export function createImportsService() {
       const flushIssueBuffer = async () => {
         if (!runId || issueBuffer.length === 0) return;
         const next = issueBuffer.splice(0, issueBuffer.length);
-        await createImportRunIssuesBulk(runId, next);
+        await createImportRunIssuesBulk(runId, next, auditContext);
       };
       const recordIssue = async (issue: {
         stage: string;
@@ -256,10 +264,11 @@ export function createImportsService() {
         const run = await createImportRun({
           kind: ImportKind.LEGACY_PHASE1,
           createdByUserId,
+          auditContext,
         });
         runId = run.id;
         log(`Created import run ${run.id}`);
-        await markImportRunRunning(run.id);
+        await markImportRunRunning(run.id, auditContext);
         log("Marked run as RUNNING");
 
         startStage("load");
@@ -1205,17 +1214,21 @@ export function createImportsService() {
 
         await flushIssueBuffer();
 
-        const finished = await markImportRunFinished(run.id, {
-          status: "SUCCEEDED",
-          dogsUpserted,
-          ownersUpserted,
-          ownershipsUpserted,
-          trialResultsUpserted,
-          showResultsUpserted,
-          errorsCount,
-          errorSummary:
-            errorsCount > 0 ? "Import completed with warnings." : null,
-        });
+        const finished = await markImportRunFinished(
+          run.id,
+          {
+            status: "SUCCEEDED",
+            dogsUpserted,
+            ownersUpserted,
+            ownershipsUpserted,
+            trialResultsUpserted,
+            showResultsUpserted,
+            errorsCount,
+            errorSummary:
+              errorsCount > 0 ? "Import completed with warnings." : null,
+          },
+          auditContext,
+        );
 
         return {
           status: 202,
@@ -1235,23 +1248,31 @@ export function createImportsService() {
           };
         }
 
-        await createImportRunIssue(runId, {
-          stage: "run",
-          severity: "ERROR",
-          code: "UNEXPECTED_EXCEPTION",
-          message,
-        });
+        await createImportRunIssue(
+          runId,
+          {
+            stage: "run",
+            severity: "ERROR",
+            code: "UNEXPECTED_EXCEPTION",
+            message,
+          },
+          auditContext,
+        );
         await flushIssueBuffer();
-        const finished = await markImportRunFinished(runId, {
-          status: "FAILED",
-          dogsUpserted,
-          ownersUpserted,
-          ownershipsUpserted,
-          trialResultsUpserted,
-          showResultsUpserted,
-          errorsCount: errorsCount + 1,
-          errorSummary: message,
-        });
+        const finished = await markImportRunFinished(
+          runId,
+          {
+            status: "FAILED",
+            dogsUpserted,
+            ownersUpserted,
+            ownershipsUpserted,
+            trialResultsUpserted,
+            showResultsUpserted,
+            errorsCount: errorsCount + 1,
+            errorSummary: message,
+          },
+          auditContext,
+        );
 
         return {
           status: 500,

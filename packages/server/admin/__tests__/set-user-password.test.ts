@@ -95,10 +95,13 @@ describe("setAdminUserPassword", () => {
       },
     });
 
-    expect(setAdminUserPasswordDbMock).toHaveBeenCalledWith({
-      userId: "u_1",
-      passwordHash: "hashed-password",
-    });
+    expect(setAdminUserPasswordDbMock).toHaveBeenCalledWith(
+      {
+        userId: "u_1",
+        passwordHash: "hashed-password",
+      },
+      undefined,
+    );
   });
 
   it("returns 500 when password hashing fails", async () => {

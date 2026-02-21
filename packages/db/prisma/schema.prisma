@@ -34,6 +34,18 @@ enum ImportIssueSeverity {
   ERROR
 }
 
+enum AuditAction {
+  INSERT
+  UPDATE
+  DELETE
+}
+
+enum AuditSource {
+  WEB
+  SCRIPT
+  SYSTEM
+}
+
 model BetterAuthUser {
   id            String              @id
   email         String              @unique
@@ -278,4 +290,22 @@ model ImportRunIssue {
   @@index([importRunId, stage])
   @@index([importRunId, severity])
   @@index([importRunId, code])
+}
+
+model AuditEvent {
+  id             String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  happenedAt     DateTime    @default(now())
+  action         AuditAction
+  tableName      String
+  rowId          String?
+  actorUserId    String?
+  actorSessionId String?
+  source         AuditSource @default(SYSTEM)
+  oldData        Json?
+  newData        Json?
+
+  @@index([happenedAt])
+  @@index([tableName, rowId, happenedAt])
+  @@index([actorUserId, happenedAt])
+  @@index([actorSessionId, happenedAt])
 }

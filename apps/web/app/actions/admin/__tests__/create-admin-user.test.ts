@@ -1,15 +1,22 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createAdminUserAction } from "../create-admin-user";
 
-const { requireAdminLayoutAccessMock, createAdminUserMock } = vi.hoisted(
-  () => ({
-    requireAdminLayoutAccessMock: vi.fn(),
-    createAdminUserMock: vi.fn(),
-  }),
-);
+const {
+  requireAdminLayoutAccessMock,
+  getSessionCurrentUserMock,
+  createAdminUserMock,
+} = vi.hoisted(() => ({
+  requireAdminLayoutAccessMock: vi.fn(),
+  getSessionCurrentUserMock: vi.fn(),
+  createAdminUserMock: vi.fn(),
+}));
 
 vi.mock("@/lib/server/admin-guard", () => ({
   requireAdminLayoutAccess: requireAdminLayoutAccessMock,
+}));
+
+vi.mock("@/lib/server/current-user", () => ({
+  getSessionCurrentUser: getSessionCurrentUserMock,
 }));
 
 vi.mock("@beagle/server", () => ({
@@ -19,6 +26,7 @@ vi.mock("@beagle/server", () => ({
 describe("createAdminUserAction", () => {
   beforeEach(() => {
     requireAdminLayoutAccessMock.mockReset();
+    getSessionCurrentUserMock.mockReset();
     createAdminUserMock.mockReset();
   });
 
@@ -44,6 +52,14 @@ describe("createAdminUserAction", () => {
 
   it("returns mapped service error", async () => {
     requireAdminLayoutAccessMock.mockResolvedValue({ ok: true });
+    getSessionCurrentUserMock.mockResolvedValue({
+      id: "u_1",
+      email: "admin@example.com",
+      name: "Admin",
+      role: "ADMIN",
+      createdAt: "2026-02-19T10:00:00.000Z",
+      sessionId: "s_1",
+    });
     createAdminUserMock.mockResolvedValue({
       status: 409,
       body: {
@@ -65,10 +81,30 @@ describe("createAdminUserAction", () => {
       errorCode: "EMAIL_EXISTS",
       message: "User with this email already exists.",
     });
+    expect(createAdminUserMock).toHaveBeenCalledWith(
+      {
+        email: "user@example.com",
+        role: "ADMIN",
+        password: "password123456",
+      },
+      {
+        actorUserId: "u_1",
+        actorSessionId: "s_1",
+        source: "WEB",
+      },
+    );
   });
 
   it("returns data when service succeeds", async () => {
     requireAdminLayoutAccessMock.mockResolvedValue({ ok: true });
+    getSessionCurrentUserMock.mockResolvedValue({
+      id: "u_1",
+      email: "admin@example.com",
+      name: "Admin",
+      role: "ADMIN",
+      createdAt: "2026-02-19T10:00:00.000Z",
+      sessionId: "s_1",
+    });
     createAdminUserMock.mockResolvedValue({
       status: 201,
       body: {

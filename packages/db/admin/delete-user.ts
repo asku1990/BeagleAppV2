@@ -1,4 +1,8 @@
 import { prisma } from "../core/prisma";
+import {
+  runInAuditContextDb,
+  type AuditContextDb,
+} from "../core/audit-context";
 import type { Prisma, PrismaClient } from "@prisma/client";
 
 type AdminUserDbClient = PrismaClient | Prisma.TransactionClient;
@@ -60,7 +64,12 @@ export async function deleteAdminUserDb(
 
 export async function runAdminUserWriteTransactionDb<T>(
   callback: (tx: Prisma.TransactionClient) => Promise<T>,
+  auditContext?: AuditContextDb,
 ): Promise<T> {
+  if (auditContext) {
+    return runInAuditContextDb(auditContext, callback);
+  }
+
   return prisma.$transaction((tx) => callback(tx));
 }
 

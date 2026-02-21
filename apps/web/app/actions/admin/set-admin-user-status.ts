@@ -42,6 +42,11 @@ export async function setAdminUserStatusAction(
     userId: input.userId,
     status: input.status,
     currentUserId: currentUser.id,
+    auditContext: {
+      actorUserId: currentUser.id,
+      actorSessionId: currentUser.sessionId,
+      source: "WEB",
+    },
   });
   if (!result.body.ok) {
     return {

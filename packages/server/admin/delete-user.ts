@@ -1,4 +1,5 @@
 import {
+  type AuditContextDb,
   countAdminUsersDb,
   deleteAdminUserDb,
   getAdminUserByIdDb,
@@ -11,6 +12,7 @@ import type { ServiceResult } from "../shared/result";
 type DeleteAdminUserInput = {
   userId: string;
   currentUserId: string;
+  auditContext?: AuditContextDb;
 };
 
 export async function deleteAdminUser(
@@ -59,7 +61,7 @@ export async function deleteAdminUser(
       }
 
       return { kind: "DELETED" } as const;
-    });
+    }, input.auditContext);
 
     if (deleteResult.kind === "NOT_FOUND") {
       return {

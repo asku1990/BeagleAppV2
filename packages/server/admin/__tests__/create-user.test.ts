@@ -123,12 +123,15 @@ describe("createAdminUser", () => {
       },
     });
 
-    expect(createAdminUserDbMock).toHaveBeenCalledWith({
-      email: "user@example.com",
-      name: "Tester",
-      role: "USER",
-      passwordHash: "hashed",
-    });
+    expect(createAdminUserDbMock).toHaveBeenCalledWith(
+      {
+        email: "user@example.com",
+        name: "Tester",
+        role: "USER",
+        passwordHash: "hashed",
+      },
+      undefined,
+    );
   });
 
   it("returns 409 when email exists", async () => {

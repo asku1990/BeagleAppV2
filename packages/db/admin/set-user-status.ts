@@ -1,4 +1,8 @@
 import { prisma } from "../core/prisma";
+import {
+  runInAuditContextDb,
+  type AuditContextDb,
+} from "../core/audit-context";
 import type { Prisma, PrismaClient } from "@prisma/client";
 
 type SetAdminUserStatusDbInput = {

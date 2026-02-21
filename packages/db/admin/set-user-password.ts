@@ -1,4 +1,9 @@
 import { randomUUID } from "node:crypto";
+import type { Prisma } from "@prisma/client";
+import {
+  runInAuditContextDb,
+  type AuditContextDb,
+} from "../core/audit-context";
 import { prisma } from "../core/prisma";
 
 type SetAdminUserPasswordDbInput = {
@@ -8,8 +13,9 @@ type SetAdminUserPasswordDbInput = {
 
 export async function setAdminUserPasswordDb(
   input: SetAdminUserPasswordDbInput,
+  auditContext?: AuditContextDb,
 ): Promise<void> {
-  await prisma.$transaction(async (tx) => {
+  const runUpdate = async (tx: Prisma.TransactionClient) => {
     const credentialAccount = await tx.betterAuthAccount.findFirst({
       where: {
         userId: input.userId,
@@ -40,5 +46,12 @@ export async function setAdminUserPasswordDb(
     await tx.betterAuthSession.deleteMany({
       where: { userId: input.userId },
     });
-  });
+  };
+
+  if (auditContext) {
+    await runInAuditContextDb(auditContext, runUpdate);
+    return;
+  }
+
+  await prisma.$transaction(runUpdate);
 }

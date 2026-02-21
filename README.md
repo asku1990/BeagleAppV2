@@ -109,6 +109,12 @@ pnpm db:deploy:staging
 pnpm db:deploy:prod
 ```
 
+Prune audit log rows older than 12 months:
+
+```bash
+pnpm audit:prune
+```
+
 Open Prisma Studio:
 
 ```bash

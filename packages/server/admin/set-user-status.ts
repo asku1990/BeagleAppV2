@@ -1,4 +1,5 @@
 import {
+  type AuditContextDb,
   countActiveAdminUsersDb,
   getAdminUserByIdDb,
   lockAdminUsersForUpdateDb,
@@ -13,6 +14,7 @@ import type { ServiceResult } from "../shared/result";
 
 type SetAdminUserStatusInput = SetAdminUserStatusRequest & {
   currentUserId: string;
+  auditContext?: AuditContextDb;
 };
 
 function isValidAdminUserStatus(
@@ -88,7 +90,7 @@ export async function setAdminUserStatus(
       );
 
       return { kind: "UPDATED" } as const;
-    });
+    }, input.auditContext);
 
     if (updateResult.kind === "NOT_FOUND") {
       return {

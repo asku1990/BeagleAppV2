@@ -1,4 +1,9 @@
 import { randomUUID } from "node:crypto";
+import type { Prisma } from "@prisma/client";
+import {
+  runInAuditContextDb,
+  type AuditContextDb,
+} from "../core/audit-context";
 import { prisma } from "../core/prisma";
 
 type CreateAdminUserDbInput = {
@@ -19,8 +24,9 @@ export type CreatedAdminUserRowDb = {
 
 export async function createAdminUserDb(
   input: CreateAdminUserDbInput,
+  auditContext?: AuditContextDb,
 ): Promise<CreatedAdminUserRowDb> {
-  return prisma.$transaction(async (tx) => {
+  const runCreate = async (tx: Prisma.TransactionClient) => {
     const userId = randomUUID();
 
     const user = await tx.betterAuthUser.create({
@@ -53,5 +59,11 @@ export async function createAdminUserDb(
     });
 
     return user;
-  });
+  };
+
+  if (auditContext) {
+    return runInAuditContextDb(auditContext, runCreate);
+  }
+
+  return prisma.$transaction(runCreate);
 }

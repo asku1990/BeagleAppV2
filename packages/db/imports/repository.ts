@@ -1,4 +1,8 @@
 import { ImportKind, ImportStatus } from "@prisma/client";
+import {
+  runInAuditContextDb,
+  type AuditContextDb,
+} from "../core/audit-context";
 import { prisma } from "../core/prisma";
 
 const IMPORT_ERROR_SUMMARY_MAX_LEN = 180;
@@ -168,7 +172,21 @@ function toImportRunSummary(run: {
 export async function createImportRun(input: {
   kind: ImportKind;
   createdByUserId?: string;
+  auditContext?: AuditContextDb;
 }): Promise<ImportRunSummary> {
+  if (input.auditContext) {
+    const run = await runInAuditContextDb(input.auditContext, async (tx) =>
+      tx.importRun.create({
+        data: {
+          kind: input.kind,
+          status: ImportStatus.PENDING,
+          createdByUserId: input.createdByUserId,
+        },
+      }),
+    );
+    return toImportRunSummary(run);
+  }
+
   const run = await prisma.importRun.create({
     data: {
       kind: input.kind,
@@ -179,7 +197,23 @@ export async function createImportRun(input: {
   return toImportRunSummary(run);
 }
 
-export async function markImportRunRunning(id: string) {
+export async function markImportRunRunning(
+  id: string,
+  auditContext?: AuditContextDb,
+) {
+  if (auditContext) {
+    return runInAuditContextDb(auditContext, (tx) =>
+      tx.importRun.update({
+        where: { id },
+        data: {
+          status: ImportStatus.RUNNING,
+          startedAt: new Date(),
+          errorSummary: null,
+        },
+      }),
+    );
+  }
+
   return prisma.importRun.update({
     where: { id },
     data: {
@@ -202,7 +236,31 @@ export async function markImportRunFinished(
     errorsCount: number;
     errorSummary?: string | null;
   },
+  auditContext?: AuditContextDb,
 ) {
+  if (auditContext) {
+    return runInAuditContextDb(auditContext, async (tx) => {
+      const run = await tx.importRun.update({
+        where: { id },
+        data: {
+          status: input.status,
+          dogsUpserted: input.dogsUpserted,
+          ownersUpserted: input.ownersUpserted,
+          ownershipsUpserted: input.ownershipsUpserted,
+          trialResultsUpserted: input.trialResultsUpserted,
+          showResultsUpserted: input.showResultsUpserted,
+          errorsCount: input.errorsCount,
+          finishedAt: new Date(),
+          errorSummary: normalizeErrorSummary(input.errorSummary),
+        },
+      });
+      const issuesCount = await tx.importRunIssue.count({
+        where: { importRunId: id },
+      });
+      return toImportRunSummary({ ...run, _count: { issues: issuesCount } });
+    });
+  }
+
   const run = await prisma.importRun.update({
     where: { id },
     data: {
@@ -237,7 +295,26 @@ export async function getImportRunById(
 export async function createImportRunIssue(
   importRunId: string,
   input: CreateImportRunIssueInput,
+  auditContext?: AuditContextDb,
 ): Promise<ImportRunIssueRow> {
+  if (auditContext) {
+    return runInAuditContextDb(auditContext, (tx) =>
+      tx.importRunIssue.create({
+        data: {
+          importRunId,
+          stage: input.stage,
+          severity: input.severity ?? "WARNING",
+          code: input.code,
+          message: input.message,
+          registrationNo: input.registrationNo ?? null,
+          sourceRowId: input.sourceRowId ?? null,
+          sourceTable: input.sourceTable ?? null,
+          payloadJson: input.payloadJson ?? null,
+        },
+      }),
+    );
+  }
+
   return getImportRunIssueDelegate().create({
     data: {
       importRunId,
@@ -256,8 +333,28 @@ export async function createImportRunIssue(
 export async function createImportRunIssuesBulk(
   importRunId: string,
   issues: CreateImportRunIssueInput[],
+  auditContext?: AuditContextDb,
 ): Promise<void> {
   if (issues.length === 0) return;
+  if (auditContext) {
+    await runInAuditContextDb(auditContext, (tx) =>
+      tx.importRunIssue.createMany({
+        data: issues.map((issue) => ({
+          importRunId,
+          stage: issue.stage,
+          severity: issue.severity ?? "WARNING",
+          code: issue.code,
+          message: issue.message,
+          registrationNo: issue.registrationNo ?? null,
+          sourceRowId: issue.sourceRowId ?? null,
+          sourceTable: issue.sourceTable ?? null,
+          payloadJson: issue.payloadJson ?? null,
+        })),
+      }),
+    );
+    return;
+  }
+
   await getImportRunIssueDelegate().createMany({
     data: issues.map((issue) => ({
       importRunId,

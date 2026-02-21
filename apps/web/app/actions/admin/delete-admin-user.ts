@@ -41,6 +41,11 @@ export async function deleteAdminUserAction(
   const result = await deleteAdminUser({
     userId: input.userId,
     currentUserId: currentUser.id,
+    auditContext: {
+      actorUserId: currentUser.id,
+      actorSessionId: currentUser.sessionId,
+      source: "WEB",
+    },
   });
   if (!result.body.ok) {
     return {

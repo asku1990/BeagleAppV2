@@ -41,6 +41,7 @@ describe("getSessionCurrentUser", () => {
 
   it("maps admin session user to dto", async () => {
     getSessionMock.mockResolvedValue({
+      session: { id: "s_1" },
       user: {
         id: "u_1",
         email: "admin@example.com",
@@ -56,6 +57,7 @@ describe("getSessionCurrentUser", () => {
       name: "Admin",
       role: "ADMIN",
       createdAt: "2026-02-19T10:00:00.000Z",
+      sessionId: "s_1",
     });
   });
 
@@ -76,6 +78,7 @@ describe("getSessionCurrentUser", () => {
       name: null,
       role: "USER",
       createdAt: null,
+      sessionId: null,
     });
   });
 });

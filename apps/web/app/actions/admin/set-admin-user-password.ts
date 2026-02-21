@@ -5,6 +5,7 @@ import type {
   SetAdminUserPasswordResponse,
 } from "@beagle/contracts";
 import { setAdminUserPassword } from "@beagle/server";
+import { getSessionCurrentUser } from "@/lib/server/current-user";
 import { requireAdminLayoutAccess } from "@/lib/server/admin-guard";
 
 export type SetAdminUserPasswordActionResult = {
@@ -27,7 +28,21 @@ export async function setAdminUserPasswordAction(
     };
   }
 
-  const result = await setAdminUserPassword(input);
+  const currentUser = await getSessionCurrentUser();
+  if (!currentUser) {
+    return {
+      data: null,
+      hasError: true,
+      errorCode: "UNAUTHENTICATED",
+      message: "Admin access required.",
+    };
+  }
+
+  const result = await setAdminUserPassword(input, {
+    actorUserId: currentUser.id,
+    actorSessionId: currentUser.sessionId,
+    source: "WEB",
+  });
   if (!result.body.ok) {
     return {
       data: null,

@@ -19,6 +19,7 @@ async function main() {
 
   const result = await importsService.runLegacyPhase1(createdByUserId, {
     log: (message) => console.log(`[import:phase1] ${message}`),
+    auditSource: "SCRIPT",
   });
 
   const output: RunResult = {
