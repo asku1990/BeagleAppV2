@@ -301,6 +301,8 @@ model AuditEvent {
   actorUserId    String?
   actorSessionId String?
   source         AuditSource @default(SYSTEM)
+  intent         String?
+  requestId      String?
   oldData        Json?
   newData        Json?
 
@@ -308,4 +310,5 @@ model AuditEvent {
   @@index([tableName, rowId, happenedAt])
   @@index([actorUserId, happenedAt])
   @@index([actorSessionId, happenedAt])
+  @@index([requestId])
 }

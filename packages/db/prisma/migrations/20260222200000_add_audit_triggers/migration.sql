@@ -9,6 +9,8 @@ DECLARE
   v_actor_user_id text;
   v_actor_session_id text;
   v_source text;
+  v_intent text;
+  v_request_id text;
 BEGIN
   IF TG_OP = 'INSERT' THEN
     v_new := to_jsonb(NEW);
@@ -36,6 +38,8 @@ BEGIN
   v_actor_user_id := nullif(current_setting('app.audit.actor_user_id', true), '');
   v_actor_session_id := nullif(current_setting('app.audit.actor_session_id', true), '');
   v_source := upper(COALESCE(nullif(current_setting('app.audit.source', true), ''), 'SYSTEM'));
+  v_intent := nullif(current_setting('app.audit.intent', true), '');
+  v_request_id := nullif(current_setting('app.audit.request_id', true), '');
 
   INSERT INTO "AuditEvent" (
     "action",
@@ -44,6 +48,8 @@ BEGIN
     "actorUserId",
     "actorSessionId",
     "source",
+    "intent",
+    "requestId",
     "oldData",
     "newData"
   )
@@ -57,6 +63,8 @@ BEGIN
       WHEN v_source IN ('WEB', 'SCRIPT', 'SYSTEM') THEN v_source::"AuditSource"
       ELSE 'SYSTEM'::"AuditSource"
     END,
+    v_intent,
+    v_request_id,
     v_old,
     v_new
   );
@@ -116,3 +124,4 @@ FOR EACH ROW EXECUTE FUNCTION audit_capture_row_change();
 CREATE TRIGGER trg_audit_import_run_issue
 AFTER INSERT OR UPDATE OR DELETE ON "ImportRunIssue"
 FOR EACH ROW EXECUTE FUNCTION audit_capture_row_change();
+

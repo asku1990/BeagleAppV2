@@ -36,6 +36,8 @@ describe("runInAuditContextDb", () => {
         actorUserId: "user-123",
         actorSessionId: "session-456",
         source: "WEB",
+        intent: "TEST_INTENT",
+        requestId: "req-789",
       },
       callback,
     );
@@ -43,7 +45,7 @@ describe("runInAuditContextDb", () => {
     expect(result).toBe("result");
 
     expect(transactionMock).toHaveBeenCalledTimes(1);
-    expect(executeRawMock).toHaveBeenCalledTimes(3);
+    expect(executeRawMock).toHaveBeenCalledTimes(5);
 
     const calls = executeRawMock.mock.calls;
 
@@ -57,6 +59,12 @@ describe("runInAuditContextDb", () => {
     expect(calls[2]?.[0]?.join("")).toContain("app.audit.source");
     expect(calls[2]?.[1]).toBe("WEB");
 
+    expect(calls[3]?.[0]?.join("")).toContain("app.audit.intent");
+    expect(calls[3]?.[1]).toBe("TEST_INTENT");
+
+    expect(calls[4]?.[0]?.join("")).toContain("app.audit.request_id");
+    expect(calls[4]?.[1]).toBe("req-789");
+
     expect(callback).toHaveBeenCalledWith(prismaMock);
   });
 
@@ -65,12 +73,14 @@ describe("runInAuditContextDb", () => {
 
     await runInAuditContextDb({}, callback);
 
-    expect(executeRawMock).toHaveBeenCalledTimes(3);
+    expect(executeRawMock).toHaveBeenCalledTimes(5);
 
     const calls = executeRawMock.mock.calls;
     expect(calls[0]?.[1]).toBe("");
     expect(calls[1]?.[1]).toBe("");
     expect(calls[2]?.[1]).toBe("SYSTEM");
+    expect(calls[3]?.[1]).toBe("");
+    expect(calls[4]?.[1]).toBe("");
   });
 
   it("normalizes unknown source to SYSTEM", async () => {

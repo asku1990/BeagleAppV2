@@ -41,27 +41,30 @@ export async function deleteAdminUser(
   }
 
   try {
-    const deleteResult = await runAdminUserWriteTransactionDb(async (tx) => {
-      const target = await getAdminUserByIdDb(input.userId, tx);
-      if (!target) {
-        return { kind: "NOT_FOUND" } as const;
-      }
-
-      if (target.role === "ADMIN") {
-        await lockAdminUsersForUpdateDb(tx);
-        const adminCount = await countAdminUsersDb(tx);
-        if (adminCount <= 1) {
-          return { kind: "LAST_ADMIN" } as const;
+    const deleteResult = await runAdminUserWriteTransactionDb(
+      async (tx) => {
+        const target = await getAdminUserByIdDb(input.userId, tx);
+        if (!target) {
+          return { kind: "NOT_FOUND" } as const;
         }
-      }
 
-      const deleted = await deleteAdminUserDb(input.userId, tx);
-      if (!deleted) {
-        return { kind: "NOT_FOUND" } as const;
-      }
+        if (target.role === "ADMIN") {
+          await lockAdminUsersForUpdateDb(tx);
+          const adminCount = await countAdminUsersDb(tx);
+          if (adminCount <= 1) {
+            return { kind: "LAST_ADMIN" } as const;
+          }
+        }
 
-      return { kind: "DELETED" } as const;
-    }, input.auditContext);
+        const deleted = await deleteAdminUserDb(input.userId, tx);
+        if (!deleted) {
+          return { kind: "NOT_FOUND" } as const;
+        }
+
+        return { kind: "DELETED" } as const;
+      },
+      { ...input.auditContext, intent: "DELETE_USER" },
+    );
 
     if (deleteResult.kind === "NOT_FOUND") {
       return {

@@ -60,37 +60,43 @@ export async function setAdminUserStatus(
   }
 
   try {
-    const updateResult = await runAdminUserWriteTransactionDb(async (tx) => {
-      const target = await getAdminUserByIdDb(input.userId, tx);
-      if (!target) {
-        return { kind: "NOT_FOUND" } as const;
-      }
-
-      if (input.status === "suspended" && target.role === "ADMIN") {
-        await lockAdminUsersForUpdateDb(tx);
-        const targetAfterLock = await getAdminUserByIdDb(input.userId, tx);
-        if (!targetAfterLock) {
+    const updateResult = await runAdminUserWriteTransactionDb(
+      async (tx) => {
+        const target = await getAdminUserByIdDb(input.userId, tx);
+        if (!target) {
           return { kind: "NOT_FOUND" } as const;
         }
 
-        if (!targetAfterLock.banned) {
-          const activeAdminCount = await countActiveAdminUsersDb(tx);
-          if (activeAdminCount <= 1) {
-            return { kind: "LAST_ACTIVE_ADMIN" } as const;
+        if (input.status === "suspended" && target.role === "ADMIN") {
+          await lockAdminUsersForUpdateDb(tx);
+          const targetAfterLock = await getAdminUserByIdDb(input.userId, tx);
+          if (!targetAfterLock) {
+            return { kind: "NOT_FOUND" } as const;
+          }
+
+          if (!targetAfterLock.banned) {
+            const activeAdminCount = await countActiveAdminUsersDb(tx);
+            if (activeAdminCount <= 1) {
+              return { kind: "LAST_ACTIVE_ADMIN" } as const;
+            }
           }
         }
-      }
 
-      await setAdminUserStatusDb(
-        {
-          userId: input.userId,
-          status: input.status,
-        },
-        tx,
-      );
+        await setAdminUserStatusDb(
+          {
+            userId: input.userId,
+            status: input.status,
+          },
+          tx,
+        );
 
-      return { kind: "UPDATED" } as const;
-    }, input.auditContext);
+        return { kind: "UPDATED" } as const;
+      },
+      {
+        ...input.auditContext,
+        intent: input.status === "suspended" ? "SUSPEND_USER" : "ACTIVATE_USER",
+      },
+    );
 
     if (updateResult.kind === "NOT_FOUND") {
       return {

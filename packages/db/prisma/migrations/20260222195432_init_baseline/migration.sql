@@ -250,6 +250,8 @@ CREATE TABLE "AuditEvent" (
     "actorUserId" TEXT,
     "actorSessionId" TEXT,
     "source" "AuditSource" NOT NULL DEFAULT 'SYSTEM',
+    "intent" TEXT,
+    "requestId" TEXT,
     "oldData" JSONB,
     "newData" JSONB,
 
@@ -372,6 +374,9 @@ CREATE INDEX "AuditEvent_actorUserId_happenedAt_idx" ON "AuditEvent"("actorUserI
 
 -- CreateIndex
 CREATE INDEX "AuditEvent_actorSessionId_happenedAt_idx" ON "AuditEvent"("actorSessionId", "happenedAt");
+
+-- CreateIndex
+CREATE INDEX "AuditEvent_requestId_idx" ON "AuditEvent"("requestId");
 
 -- AddForeignKey
 ALTER TABLE "BetterAuthSession" ADD CONSTRAINT "BetterAuthSession_userId_fkey" FOREIGN KEY ("userId") REFERENCES "BetterAuthUser"("id") ON DELETE CASCADE ON UPDATE CASCADE;

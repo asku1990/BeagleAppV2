@@ -1,5 +1,9 @@
 import { hashPassword } from "better-auth/crypto";
-import { createAdminUserDb, type AuditContextDb } from "@beagle/db";
+import {
+  createAdminUserDb,
+  runAdminUserWriteTransactionDb,
+  type AuditContextDb,
+} from "@beagle/db";
 import {
   normalizeAndValidateEmailAddress,
   normalizeAndValidatePassword,
@@ -79,15 +83,20 @@ export async function createAdminUser(
   }
 
   try {
-    const passwordHash = await hashPassword(password);
-    const created = await createAdminUserDb(
-      {
-        email,
-        name: normalizeName(input.name),
-        role,
-        passwordHash,
+    const created = await runAdminUserWriteTransactionDb(
+      async (tx) => {
+        const passwordHash = await hashPassword(password);
+        return createAdminUserDb(
+          {
+            email,
+            name: normalizeName(input.name),
+            role,
+            passwordHash,
+          },
+          tx,
+        );
       },
-      auditContext,
+      { ...auditContext, intent: "CREATE_USER" },
     );
 
     return {

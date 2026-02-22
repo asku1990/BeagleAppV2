@@ -2,6 +2,7 @@ import { hashPassword } from "better-auth/crypto";
 import {
   getAdminUserByIdDb,
   setAdminUserPasswordDb,
+  runAdminUserWriteTransactionDb,
   type AuditContextDb,
 } from "@beagle/db";
 import {
@@ -51,13 +52,18 @@ export async function setAdminUserPassword(
       };
     }
 
-    const passwordHash = await hashPassword(normalizedPassword);
-    await setAdminUserPasswordDb(
-      {
-        userId: input.userId,
-        passwordHash,
+    await runAdminUserWriteTransactionDb(
+      async (tx) => {
+        const passwordHash = await hashPassword(normalizedPassword);
+        await setAdminUserPasswordDb(
+          {
+            userId: input.userId,
+            passwordHash,
+          },
+          tx,
+        );
       },
-      auditContext,
+      { ...auditContext, intent: "RESET_PASSWORD" },
     );
 
     return {

@@ -23,42 +23,38 @@ export type CreatedAdminUserRowDb = {
 
 export async function createAdminUserDb(
   input: CreateAdminUserDbInput,
-  auditContext?: AuditContextDb,
+  tx: Prisma.TransactionClient,
 ): Promise<CreatedAdminUserRowDb> {
-  const runCreate = async (tx: Prisma.TransactionClient) => {
-    const userId = randomUUID();
+  const userId = randomUUID();
 
-    const user = await tx.betterAuthUser.create({
-      data: {
-        id: userId,
-        email: input.email,
-        emailVerified: true,
-        name: input.name,
-        role: input.role,
-        banned: false,
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        banned: true,
-        createdAt: true,
-      },
-    });
+  const user = await tx.betterAuthUser.create({
+    data: {
+      id: userId,
+      email: input.email,
+      emailVerified: true,
+      name: input.name,
+      role: input.role,
+      banned: false,
+    },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      banned: true,
+      createdAt: true,
+    },
+  });
 
-    await tx.betterAuthAccount.create({
-      data: {
-        id: randomUUID(),
-        accountId: userId,
-        providerId: "credential",
-        userId,
-        password: input.passwordHash,
-      },
-    });
+  await tx.betterAuthAccount.create({
+    data: {
+      id: randomUUID(),
+      accountId: userId,
+      providerId: "credential",
+      userId,
+      password: input.passwordHash,
+    },
+  });
 
-    return user;
-  };
-
-  return runInAuditContextDb(auditContext ?? {}, runCreate);
+  return user;
 }
