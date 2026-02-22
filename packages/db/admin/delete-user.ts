@@ -53,16 +53,14 @@ export async function countActiveAdminUsersDb(
 }
 
 /**
- * Low-level write operation. Audit context (actor, session, source) is the
- * caller's responsibility — use `runAdminUserWriteTransactionDb` to run this
- * inside an audited transaction. If called standalone without a `dbClient`,
- * the audit trigger will fire with empty attribution (SYSTEM fallback).
+ * Low-level write operation. Must be run inside an audited transaction
+ * using `runAdminUserWriteTransactionDb`.
  */
 export async function deleteAdminUserDb(
   userId: string,
-  dbClient?: AdminUserDbClient,
+  tx: Prisma.TransactionClient,
 ): Promise<boolean> {
-  const result = await resolveDbClient(dbClient).betterAuthUser.deleteMany({
+  const result = await tx.betterAuthUser.deleteMany({
     where: { id: userId },
   });
   return result.count > 0;
