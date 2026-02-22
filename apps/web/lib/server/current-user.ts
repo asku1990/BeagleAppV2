@@ -26,12 +26,6 @@ export async function getSessionCurrentUser(): Promise<SessionCurrentUser | null
     name: user.name ?? null,
     role: user.role === "ADMIN" ? "ADMIN" : "USER",
     createdAt: user.createdAt ? new Date(user.createdAt).toISOString() : null,
-    sessionId:
-      session?.session &&
-      typeof session.session === "object" &&
-      "id" in session.session &&
-      typeof session.session.id === "string"
-        ? session.session.id
-        : null,
+    sessionId: session?.session?.id ?? null,
   };
 }

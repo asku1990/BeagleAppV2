@@ -1,8 +1,4 @@
 import { prisma } from "../core/prisma";
-import {
-  runInAuditContextDb,
-  type AuditContextDb,
-} from "../core/audit-context";
 import type { Prisma, PrismaClient } from "@prisma/client";
 
 type SetAdminUserStatusDbInput = {
@@ -16,6 +12,12 @@ function resolveDbClient(dbClient?: AdminUserDbClient): AdminUserDbClient {
   return dbClient ?? prisma;
 }
 
+/**
+ * Low-level write operation. Audit context (actor, session, source) is the
+ * caller's responsibility — use `runAdminUserWriteTransactionDb` to run this
+ * inside an audited transaction. If called standalone without a `dbClient`,
+ * the audit trigger will fire with empty attribution (SYSTEM fallback).
+ */
 export async function setAdminUserStatusDb(
   input: SetAdminUserStatusDbInput,
   dbClient?: AdminUserDbClient,

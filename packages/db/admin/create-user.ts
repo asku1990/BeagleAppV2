@@ -4,7 +4,6 @@ import {
   runInAuditContextDb,
   type AuditContextDb,
 } from "../core/audit-context";
-import { prisma } from "../core/prisma";
 
 type CreateAdminUserDbInput = {
   email: string;
@@ -61,9 +60,5 @@ export async function createAdminUserDb(
     return user;
   };
 
-  if (auditContext) {
-    return runInAuditContextDb(auditContext, runCreate);
-  }
-
-  return prisma.$transaction(runCreate);
+  return runInAuditContextDb(auditContext ?? {}, runCreate);
 }

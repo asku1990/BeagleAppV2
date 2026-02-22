@@ -3,7 +3,6 @@ export { DogSex, ImportKind, ImportStatus, Role } from "@prisma/client";
 export { prisma } from "./core/prisma";
 export {
   runInAuditContextDb,
-  setAuditContextDb,
   type AuditContextDb,
   type AuditSourceDb,
 } from "./core/audit-context";

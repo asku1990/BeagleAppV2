@@ -16,7 +16,7 @@ function normalizeSource(source: AuditContextDb["source"]): AuditSourceDb {
   return "SYSTEM";
 }
 
-export async function setAuditContextDb(
+async function setAuditContextDb(
   tx: Prisma.TransactionClient,
   context: AuditContextDb,
 ): Promise<void> {

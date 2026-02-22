@@ -52,6 +52,12 @@ export async function countActiveAdminUsersDb(
   });
 }
 
+/**
+ * Low-level write operation. Audit context (actor, session, source) is the
+ * caller's responsibility — use `runAdminUserWriteTransactionDb` to run this
+ * inside an audited transaction. If called standalone without a `dbClient`,
+ * the audit trigger will fire with empty attribution (SYSTEM fallback).
+ */
 export async function deleteAdminUserDb(
   userId: string,
   dbClient?: AdminUserDbClient,
@@ -66,11 +72,7 @@ export async function runAdminUserWriteTransactionDb<T>(
   callback: (tx: Prisma.TransactionClient) => Promise<T>,
   auditContext?: AuditContextDb,
 ): Promise<T> {
-  if (auditContext) {
-    return runInAuditContextDb(auditContext, callback);
-  }
-
-  return prisma.$transaction((tx) => callback(tx));
+  return runInAuditContextDb(auditContext ?? {}, callback);
 }
 
 export async function lockAdminUsersForUpdateDb(

@@ -4,7 +4,6 @@ import {
   runInAuditContextDb,
   type AuditContextDb,
 } from "../core/audit-context";
-import { prisma } from "../core/prisma";
 
 type SetAdminUserPasswordDbInput = {
   userId: string;
@@ -48,10 +47,5 @@ export async function setAdminUserPasswordDb(
     });
   };
 
-  if (auditContext) {
-    await runInAuditContextDb(auditContext, runUpdate);
-    return;
-  }
-
-  await prisma.$transaction(runUpdate);
+  await runInAuditContextDb(auditContext ?? {}, runUpdate);
 }

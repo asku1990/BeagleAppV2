@@ -1,12 +1,21 @@
 import { prisma } from "../core/prisma";
 
 async function main() {
-  const deletedCount = await prisma.$executeRaw`
-    DELETE FROM "AuditEvent"
-    WHERE "happenedAt" < NOW() - INTERVAL '12 months'
-  `;
+  let totalDeleted = 0;
+  let deleted: number;
+  do {
+    deleted = await prisma.$executeRaw`
+      DELETE FROM "AuditEvent"
+      WHERE id IN (
+        SELECT id FROM "AuditEvent"
+        WHERE "happenedAt" < NOW() - INTERVAL '12 months'
+        LIMIT 1000
+      )
+    `;
+    totalDeleted += deleted;
+  } while (deleted > 0);
 
-  console.log(`[audit:prune] Deleted ${deletedCount} audit event(s).`);
+  console.log(`[audit:prune] Deleted ${totalDeleted} audit event(s).`);
 }
 
 main()
