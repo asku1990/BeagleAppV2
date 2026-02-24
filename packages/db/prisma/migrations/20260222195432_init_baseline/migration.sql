@@ -19,6 +19,9 @@ CREATE TYPE "AuditAction" AS ENUM ('INSERT', 'UPDATE', 'DELETE');
 -- CreateEnum
 CREATE TYPE "AuditSource" AS ENUM ('WEB', 'SCRIPT', 'SYSTEM');
 
+-- CreateExtension
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- CreateTable
 CREATE TABLE "BetterAuthUser" (
     "id" TEXT NOT NULL,
