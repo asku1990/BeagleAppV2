@@ -116,4 +116,34 @@ describe("getHomeStatistics", () => {
       },
     });
   });
+
+  it("returns mapped statistics data when log context is provided", async () => {
+    getHomeStatisticsSnapshotMock.mockResolvedValue({
+      registrations: {
+        registeredDogs: 25,
+        youngestRegisteredBirthDate: null,
+      },
+      trials: {
+        resultsPeriodStart: null,
+        resultsPeriodEnd: null,
+        totalEntries: 5,
+        performedByDogs: 3,
+      },
+      shows: {
+        resultsPeriodStart: null,
+        resultsPeriodEnd: null,
+        totalEntries: 4,
+        performedByDogs: 2,
+      },
+      generatedAt: new Date("2026-02-01T00:00:00.000Z"),
+    });
+
+    const result = await getHomeStatistics({
+      requestId: "req-123",
+      actorUserId: "user-123",
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.body.ok).toBe(true);
+  });
 });

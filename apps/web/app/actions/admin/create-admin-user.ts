@@ -5,6 +5,7 @@ import type {
   CreateAdminUserResponse,
 } from "@beagle/contracts";
 import { createAdminUser } from "@beagle/server";
+import { getSessionCurrentUser } from "@/lib/server/current-user";
 import { requireAdminLayoutAccess } from "@/lib/server/admin-guard";
 
 export type CreateAdminUserActionResult = {
@@ -27,7 +28,21 @@ export async function createAdminUserAction(
     };
   }
 
-  const result = await createAdminUser(input);
+  const currentUser = await getSessionCurrentUser();
+  if (!currentUser) {
+    return {
+      data: null,
+      hasError: true,
+      errorCode: "UNAUTHENTICATED",
+      message: "Admin access required.",
+    };
+  }
+
+  const result = await createAdminUser(input, {
+    actorUserId: currentUser.id,
+    actorSessionId: currentUser.sessionId,
+    source: "WEB",
+  });
   if (!result.body.ok) {
     return {
       data: null,

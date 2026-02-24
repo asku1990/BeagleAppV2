@@ -7,6 +7,7 @@ export type SessionCurrentUser = {
   name: string | null;
   role: "ADMIN" | "USER";
   createdAt: string | null;
+  sessionId: string | null;
 };
 
 export async function getSessionCurrentUser(): Promise<SessionCurrentUser | null> {
@@ -25,5 +26,6 @@ export async function getSessionCurrentUser(): Promise<SessionCurrentUser | null
     name: user.name ?? null,
     role: user.role === "ADMIN" ? "ADMIN" : "USER",
     createdAt: user.createdAt ? new Date(user.createdAt).toISOString() : null,
+    sessionId: session?.session?.id ?? null,
   };
 }
