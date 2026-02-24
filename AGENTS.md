@@ -10,6 +10,8 @@ Agent instructions for working in this repository.
 ## Working Style
 
 - Make focused changes with minimal blast radius.
+- Prefer opportunistic refactors: when introducing cross-cutting improvements (for example logging), update files you are already modifying and defer untouched areas.
+- Structured server logging standard is `pino`; when touching server actions/use-cases, use the shared logger and replace adjacent legacy `console.*` in the same file.
 - Prefer small files and clear names over large multi-purpose files.
 - Prefer one primary function/use-case per file.
 - Re-export public module APIs via `index.ts`.

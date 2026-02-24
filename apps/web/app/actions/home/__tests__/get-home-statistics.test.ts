@@ -9,6 +9,13 @@ vi.mock("@beagle/server", () => ({
   statsService: {
     getHomeStatistics: getHomeStatisticsMock,
   },
+  withLogContext: () => ({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    child: vi.fn(),
+  }),
+  toErrorLog: (error: unknown) => ({ error }),
 }));
 
 describe("getHomeStatisticsAction", () => {
