@@ -10,6 +10,7 @@ import type {
   BeagleSearchResponse,
 } from "@beagle/contracts";
 import type { ServiceResult } from "../shared/result";
+import { toErrorLog, withLogContext } from "../shared/logger";
 
 const ALLOWED_SORTS: ReadonlySet<BeagleSearchSortDb> = new Set([
   "name-asc",
@@ -46,13 +47,43 @@ function parseNewestLimit(value: number | undefined): number {
   return Math.min(20, Math.max(1, Math.floor(value ?? 5)));
 }
 
+type ServiceLogContext = {
+  requestId?: string;
+  actorUserId?: string;
+};
+
 export function createDogsService() {
   return {
     async searchBeagleDogs(
       input: BeagleSearchRequest,
+      context?: ServiceLogContext,
     ): Promise<ServiceResult<BeagleSearchResponse>> {
+      const startedAt = Date.now();
+      const log = withLogContext({
+        layer: "service",
+        useCase: "dogs.searchBeagleDogs",
+        ...(context?.requestId ? { requestId: context.requestId } : {}),
+        ...(context?.actorUserId ? { actorUserId: context.actorUserId } : {}),
+      });
+      log.info(
+        {
+          event: "start",
+          sort: input.sort ?? "name-asc",
+          page: input.page ?? 1,
+          pageSize: input.pageSize ?? 10,
+        },
+        "dogs search started",
+      );
       const sortResult = parseSort(input.sort);
       if (!sortResult.ok) {
+        log.warn(
+          {
+            event: "invalid_sort",
+            sort: input.sort,
+            durationMs: Date.now() - startedAt,
+          },
+          "dogs search rejected because sort is invalid",
+        );
         return {
           status: 400,
           body: {
@@ -76,6 +107,16 @@ export function createDogsService() {
           pageSize: parsePageSize(input.pageSize),
           sort: sortResult.value,
         });
+        log.info(
+          {
+            event: "success",
+            total: result.total,
+            itemCount: result.items.length,
+            mode: result.mode,
+            durationMs: Date.now() - startedAt,
+          },
+          "dogs search succeeded",
+        );
 
         return {
           status: 200,
@@ -104,7 +145,14 @@ export function createDogsService() {
           },
         };
       } catch (error) {
-        console.error("[dogsService.searchBeagleDogs] failed", error);
+        log.error(
+          {
+            event: "exception",
+            durationMs: Date.now() - startedAt,
+            ...toErrorLog(error),
+          },
+          "dogs search failed",
+        );
         return {
           status: 500,
           body: {
@@ -117,10 +165,33 @@ export function createDogsService() {
 
     async getNewestBeagleDogs(
       input: BeagleNewestRequest = {},
+      context?: ServiceLogContext,
     ): Promise<ServiceResult<BeagleNewestResponse>> {
+      const startedAt = Date.now();
+      const log = withLogContext({
+        layer: "service",
+        useCase: "dogs.getNewestBeagleDogs",
+        ...(context?.requestId ? { requestId: context.requestId } : {}),
+        ...(context?.actorUserId ? { actorUserId: context.actorUserId } : {}),
+      });
+      log.info(
+        {
+          event: "start",
+          limit: input.limit ?? 5,
+        },
+        "newest dogs query started",
+      );
       try {
         const items = await getNewestBeagleDogsDb(
           parseNewestLimit(input.limit),
+        );
+        log.info(
+          {
+            event: "success",
+            itemCount: items.length,
+            durationMs: Date.now() - startedAt,
+          },
+          "newest dogs query succeeded",
         );
         return {
           status: 200,
@@ -145,7 +216,14 @@ export function createDogsService() {
           },
         };
       } catch (error) {
-        console.error("[dogsService.getNewestBeagleDogs] failed", error);
+        log.error(
+          {
+            event: "exception",
+            durationMs: Date.now() - startedAt,
+            ...toErrorLog(error),
+          },
+          "newest dogs query failed",
+        );
         return {
           status: 500,
           body: {
