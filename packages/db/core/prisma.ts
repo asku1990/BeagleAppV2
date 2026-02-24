@@ -1,11 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
-import { config as loadEnv } from "dotenv";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
-const thisDir = path.dirname(fileURLToPath(import.meta.url));
-loadEnv({ path: path.resolve(thisDir, "../../../.env") });
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 const configuredDatabaseUrl =

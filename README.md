@@ -23,7 +23,11 @@ Current access model:
 - PostgreSQL (local or remote) for app data
 - MariaDB (local or remote) only for phase-1 legacy imports
 
+Ops safety commands and checklist are documented in `docs/ops-env-safety.md`.
+
 ## Environment setup
+
+All commands in this README assume current directory is repo root: `beagle-app-v2/`.
 
 1. Copy env file:
 
@@ -51,13 +55,13 @@ cp .env.example .env.prod
 
 Example plain values and Proton Pass reference blocks are in `.env.example`.
 
-3. If using Proton Pass `pass://` references, run via the env-specific scripts:
+3. If using Proton Pass `pass://` references, run with an explicit env file:
 
 ```bash
-pnpm dev:local
-pnpm dev:staging
-pnpm dev:prod
+pass-cli run --env-file .env.local -- pnpm --filter @beagle/web dev
 ```
+
+For staging/prod variants and safety checklist, use `docs/ops-env-safety.md` as source of truth.
 
 ## Install dependencies
 
@@ -79,15 +83,9 @@ Initialize schema (dev):
 pnpm db:push
 ```
 
-Initialize schema against a specific environment:
+For explicit env-file variants (`.env.local/.env.staging/.env.prod`), see `docs/ops-env-safety.md`.
 
-```bash
-pnpm db:push:local
-pnpm db:push:staging
-pnpm db:push:prod
-```
-
-If `pnpm db:push:staging -- --accept-data-loss` does not forward the flag correctly, run Prisma directly:
+If you need to pass `--accept-data-loss`, run Prisma directly:
 
 ```bash
 pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db exec prisma db push --accept-data-loss
@@ -95,19 +93,21 @@ pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db exec prisma db 
 
 Only use `--accept-data-loss` when you intentionally allow Prisma to apply destructive schema changes.
 
-Or create migrations in dev:
+Create migrations in local dev (do not run `migrate dev` against staging/prod):
 
 ```bash
-pnpm db:migrate:dev -- --name init
+pass-cli run --env-file .env.local -- pnpm --filter @beagle/db exec prisma migrate dev --name init
 ```
 
-Apply committed migrations to a specific environment:
+Apply committed migrations:
 
 ```bash
-pnpm db:deploy:local
-pnpm db:deploy:staging
-pnpm db:deploy:prod
+pnpm db:deploy
 ```
+
+For explicit env-file variants, see `docs/ops-env-safety.md`.
+
+For `migrate reset` (destructive, requires env file), see `docs/ops-env-safety.md`.
 
 Prune audit log rows older than 12 months:
 
@@ -121,6 +121,8 @@ Open Prisma Studio:
 pnpm db:studio
 ```
 
+For explicit env-file variants, see `docs/ops-env-safety.md`.
+
 ## Run the app
 
 Run the app (plain envs):
@@ -129,13 +131,12 @@ Run the app (plain envs):
 pnpm dev
 ```
 
-Run the app with Proton Pass env files:
+Notes:
 
-```bash
-pnpm dev:local
-pnpm dev:staging
-pnpm dev:prod
-```
+- `pnpm dev` uses environment variables already present in your shell/process.
+- `pnpm dev` does not load `.env.local/.env.staging/.env.prod` by itself.
+
+For explicit env-file app startup, see `docs/ops-env-safety.md`.
 
 Default ports:
 
@@ -156,6 +157,8 @@ pnpm test
 pnpm build
 ```
 
+For explicit env-file test variants, see `docs/ops-env-safety.md`.
+
 Useful targeted checks:
 
 ```bash
@@ -164,12 +167,10 @@ pnpm --filter @beagle/server test:unit
 pnpm --filter @beagle/web test:e2e
 ```
 
-Playwright e2e with env-specific app startup:
+Playwright e2e:
 
 ```bash
-pnpm test:playwright:local
-pnpm test:playwright:staging
-pnpm test:playwright:prod
+pnpm test:playwright
 ```
 
 CI note:
@@ -214,9 +215,7 @@ For a fresh environment with public sign-up disabled, create the first `ADMIN` u
 
 ```bash
 pnpm auth:bootstrap-admin
-pnpm auth:bootstrap-admin:local
-pnpm auth:bootstrap-admin:staging
-pnpm auth:bootstrap-admin:prod
+pass-cli run --env-file .env.local -- pnpm auth:bootstrap-admin
 ```
 
 The script is idempotent:
@@ -227,18 +226,15 @@ The script is idempotent:
 
 Notes:
 
-- `auth:bootstrap-admin:local` loads `.env.local`.
-- `auth:bootstrap-admin:staging` loads `.env.staging`.
-- `auth:bootstrap-admin:prod` loads `.env.prod`.
+- `auth:bootstrap-admin` uses current process env values.
+- Use `pass-cli run --env-file ...` to make the target env explicit.
 
 ## Update existing user password
 
 To update an existing credential user password:
 
 ```bash
-pnpm auth:set-password:local
-pnpm auth:set-password:staging
-pnpm auth:set-password:prod
+pass-cli run --env-file .env.local -- pnpm auth:set-password
 ```
 
 It uses:
@@ -248,10 +244,9 @@ It uses:
 
 Notes:
 
-- `auth:set-password:local` loads `.env.local`.
-- `auth:set-password:staging` loads `.env.staging`.
-- `auth:set-password:prod` loads `.env.prod`.
-- `auth:set-password` without suffix defaults to `.env.local` (with `.env` fallback).
+- `auth:set-password` uses current process env values.
+- Use `pass-cli run --env-file ...` to make the target env explicit.
+- For staging/prod variants, see `docs/ops-env-safety.md`.
 
 ## Beagle search
 
@@ -287,7 +282,7 @@ Sort values:
 
 ```bash
 pnpm db:generate
-pnpm db:migrate:dev -- --name add_phase1_dog_search_stats_schema
+pass-cli run --env-file .env.local -- pnpm --filter @beagle/db exec prisma migrate dev --name add_phase1_dog_search_stats_schema
 ```
 
 2. Run phase-1 import script:
@@ -308,16 +303,16 @@ pnpm import:phase1 <USER_ID>
 - For full issue listing by run id:
 
 ```bash
-pnpm import:issues <RUN_ID>
+pass-cli run --env-file .env.local -- pnpm import:issues <RUN_ID>
 ```
 
 Optional filters:
 
 ```bash
-pnpm import:issues <RUN_ID> --stage owners
-pnpm import:issues <RUN_ID> --code OWNER_DOG_NOT_FOUND
-pnpm import:issues <RUN_ID> --severity WARNING
-pnpm import:issues <RUN_ID> --limit 500
+pass-cli run --env-file .env.local -- pnpm import:issues <RUN_ID> --stage owners
+pass-cli run --env-file .env.local -- pnpm import:issues <RUN_ID> --code OWNER_DOG_NOT_FOUND
+pass-cli run --env-file .env.local -- pnpm import:issues <RUN_ID> --severity WARNING
+pass-cli run --env-file .env.local -- pnpm import:issues <RUN_ID> --limit 500
 ```
 
 4. Check import run status over API (admin auth required):
