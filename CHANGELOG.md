@@ -8,7 +8,12 @@ This project uses a user-facing changelog format.
 - Internal-only changes are optional in the changelog.
 - Use sections: `Added`, `Changed`, `Fixed`, `Removed`.
 
-## [0.2.0] - 2026-02-19
+## [0.2.1] - 2026-02-24
+
+### Added
+
+- Added `pnpm vercel:build`, which generates Prisma clients, runs the Turbo build, and (when `RUN_DB_MIGRATIONS=true`) applies deployed migrations during Vercel builds so deployments control migration timing.
+- Documented the new script and the `RUN_DB_MIGRATIONS` toggle in the README and `.env.example` so operators know how to opt out.
 
 ### Tärkeintä tässä julkaisussa
 
