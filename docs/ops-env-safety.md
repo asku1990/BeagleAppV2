@@ -68,16 +68,21 @@ CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm --filter @beagle/db e
 
 Prisma `migrate dev` (local only):
 
+Note: this may become interactive (for example drift/reset prompts). If that happens, run it directly in an interactive terminal session.
+
 ```bash
 pass-cli run --env-file .env.local -- pnpm --filter @beagle/db exec prisma migrate dev --name <migration_name>
 ```
 
 Prisma `migrate reset` (destructive):
 
+Note: via Proton Pass (`pass-cli run --env-file ...`), Prisma runs this as non-interactive.
+If Prisma refuses to run in non-interactive mode, add `--force`.
+
 ```bash
-pass-cli run --env-file .env.local -- pnpm --filter @beagle/db exec prisma migrate reset
-pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db exec prisma migrate reset
-CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm --filter @beagle/db exec prisma migrate reset
+pass-cli run --env-file .env.local -- pnpm --filter @beagle/db exec prisma migrate reset [--force]
+pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db exec prisma migrate reset [--force]
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm --filter @beagle/db exec prisma migrate reset [--force]
 ```
 
 Prisma `migrate deploy`:
