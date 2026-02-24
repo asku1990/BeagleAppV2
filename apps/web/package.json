@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
+    "vercel:build": "bash ../../scripts/vercel-build.sh",
     "vercel:ignored-build": "bash ../../scripts/vercel-ignored-build.sh",
     "start": "next start",
     "lint": "eslint .",

@@ -167,6 +167,8 @@ To skip migrations for a specific environment, set:
 RUN_DB_MIGRATIONS=false
 ```
 
+For full Vercel project settings and troubleshooting (including `vercel:build` not found), see `docs/vercel-deployment.md`.
+
 ## Quality checks
 
 ```bash
