@@ -1,4 +1,8 @@
 import { prisma } from "../core/prisma";
+import {
+  runInAuditContextDb,
+  type AuditContextDb,
+} from "../core/audit-context";
 import type { Prisma, PrismaClient } from "@prisma/client";
 
 type AdminUserDbClient = PrismaClient | Prisma.TransactionClient;
@@ -48,11 +52,15 @@ export async function countActiveAdminUsersDb(
   });
 }
 
+/**
+ * Low-level write operation. Must be run inside an audited transaction
+ * using `runAdminUserWriteTransactionDb`.
+ */
 export async function deleteAdminUserDb(
   userId: string,
-  dbClient?: AdminUserDbClient,
+  tx: Prisma.TransactionClient,
 ): Promise<boolean> {
-  const result = await resolveDbClient(dbClient).betterAuthUser.deleteMany({
+  const result = await tx.betterAuthUser.deleteMany({
     where: { id: userId },
   });
   return result.count > 0;
@@ -60,8 +68,9 @@ export async function deleteAdminUserDb(
 
 export async function runAdminUserWriteTransactionDb<T>(
   callback: (tx: Prisma.TransactionClient) => Promise<T>,
+  auditContext?: AuditContextDb,
 ): Promise<T> {
-  return prisma.$transaction((tx) => callback(tx));
+  return runInAuditContextDb(auditContext ?? {}, callback);
 }
 
 export async function lockAdminUsersForUpdateDb(

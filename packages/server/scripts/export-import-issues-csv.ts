@@ -151,9 +151,10 @@ async function main() {
     return;
   }
 
+  const defaultRoot = process.env.INIT_CWD ?? process.cwd();
   const outputDir = outDir
     ? path.resolve(outDir)
-    : path.join("/tmp", "import-issues", runId);
+    : path.join(defaultRoot, "tmp", "import-issues", runId);
 
   let cursor: string | undefined;
   let total = 0;

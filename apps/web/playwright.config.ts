@@ -1,24 +1,6 @@
 import { defineConfig } from "@playwright/test";
 
-const targetEnv = process.env.PLAYWRIGHT_ENV ?? "local";
-
 function resolveWebServerCommand(): string {
-  if (process.env.CI) {
-    return "pnpm --dir ../.. dev";
-  }
-
-  if (targetEnv === "staging") {
-    return "pnpm --dir ../.. dev:staging";
-  }
-
-  if (targetEnv === "prod") {
-    return "pnpm --dir ../.. dev:prod";
-  }
-
-  if (targetEnv === "local") {
-    return "pnpm --dir ../.. dev:local";
-  }
-
   return "pnpm --dir ../.. dev";
 }
 

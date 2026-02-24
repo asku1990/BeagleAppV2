@@ -1,5 +1,10 @@
 import { hashPassword } from "better-auth/crypto";
-import { getAdminUserByIdDb, setAdminUserPasswordDb } from "@beagle/db";
+import {
+  getAdminUserByIdDb,
+  setAdminUserPasswordDb,
+  runAdminUserWriteTransactionDb,
+  type AuditContextDb,
+} from "@beagle/db";
 import {
   normalizeAndValidatePassword,
   type SetAdminUserPasswordRequest,
@@ -9,6 +14,7 @@ import type { ServiceResult } from "../shared/result";
 
 export async function setAdminUserPassword(
   input: SetAdminUserPasswordRequest,
+  auditContext?: AuditContextDb,
 ): Promise<ServiceResult<SetAdminUserPasswordResponse>> {
   if (!input.userId.trim()) {
     return {
@@ -46,11 +52,19 @@ export async function setAdminUserPassword(
       };
     }
 
-    const passwordHash = await hashPassword(normalizedPassword);
-    await setAdminUserPasswordDb({
-      userId: input.userId,
-      passwordHash,
-    });
+    await runAdminUserWriteTransactionDb(
+      async (tx) => {
+        const passwordHash = await hashPassword(normalizedPassword);
+        await setAdminUserPasswordDb(
+          {
+            userId: input.userId,
+            passwordHash,
+          },
+          tx,
+        );
+      },
+      { ...auditContext, intent: "RESET_PASSWORD" },
+    );
 
     return {
       status: 200,

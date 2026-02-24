@@ -1,5 +1,9 @@
 import { hashPassword } from "better-auth/crypto";
-import { createAdminUserDb } from "@beagle/db";
+import {
+  createAdminUserDb,
+  runAdminUserWriteTransactionDb,
+  type AuditContextDb,
+} from "@beagle/db";
 import {
   normalizeAndValidateEmailAddress,
   normalizeAndValidatePassword,
@@ -40,6 +44,7 @@ function isDuplicateEmailError(error: unknown): boolean {
 
 export async function createAdminUser(
   input: CreateAdminUserRequest,
+  auditContext?: AuditContextDb,
 ): Promise<ServiceResult<CreateAdminUserResponse>> {
   const email = normalizeEmail(input.email);
   if (!email) {
@@ -78,13 +83,21 @@ export async function createAdminUser(
   }
 
   try {
-    const passwordHash = await hashPassword(password);
-    const created = await createAdminUserDb({
-      email,
-      name: normalizeName(input.name),
-      role,
-      passwordHash,
-    });
+    const created = await runAdminUserWriteTransactionDb(
+      async (tx) => {
+        const passwordHash = await hashPassword(password);
+        return createAdminUserDb(
+          {
+            email,
+            name: normalizeName(input.name),
+            role,
+            passwordHash,
+          },
+          tx,
+        );
+      },
+      { ...auditContext, intent: "CREATE_USER" },
+    );
 
     return {
       status: 201,
