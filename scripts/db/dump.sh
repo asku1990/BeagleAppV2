@@ -1,32 +1,30 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [ "${1:-}" = "" ]; then
-  echo "Usage: $0 <env-file> [output-file.sql]"
+output_file="${1:-}"
+
+if [ "${1:-}" != "" ] && [ "${2:-}" != "" ]; then
+  echo "Usage: $0 [output-file.sql]"
+  echo "Do not pass env file as an argument."
+  echo "Use: pass-cli run --env-file .env.local -- pnpm db:dump [output-file.sql]"
   exit 1
 fi
 
-env_file="$1"
-output_file="${2:-}"
-
-if [ ! -f "$env_file" ]; then
-  echo "Env file not found: $env_file"
+if [ -n "$output_file" ] && [[ "$(basename "$output_file")" == .env* ]]; then
+  echo "Refusing to use '$output_file' as dump output path."
+  echo "Do not pass env file as an argument."
+  echo "Use: pass-cli run --env-file .env.local -- pnpm db:dump [output-file.sql]"
   exit 1
 fi
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Shared DB target safety checks used by dump + restore.
 source "$script_dir/env-guard.sh"
-ensure_db_operation_allowed "$env_file" "database dump"
+ensure_database_url_set
+ensure_db_operation_allowed "database dump"
+ensure_binary_available "pg_dump"
 
-env_basename="$(basename "$env_file")"
-env_name="${env_basename#*.env.}"
-if [ "$env_name" = "$env_basename" ]; then
-  env_name="${env_basename#.env}"
-fi
-if [ -z "$env_name" ]; then
-  env_name="unknown"
-fi
+env_name="$(infer_db_env_label)"
 
 timestamp="$(date +%Y%m%d-%H%M%S)"
 if [ -z "$output_file" ]; then
@@ -37,6 +35,6 @@ fi
 output_dir="$(dirname "$output_file")"
 mkdir -p "$output_dir"
 
-pass-cli run --env-file "$env_file" -- sh -c 'pg_dump --no-owner --no-privileges --clean --if-exists "$DATABASE_URL" > "$1"' _ "$output_file"
+pg_dump --no-owner --no-privileges --clean --if-exists "$DATABASE_URL" > "$output_file"
 
 echo "Dump created: $output_file"

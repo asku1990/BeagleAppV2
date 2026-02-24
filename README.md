@@ -317,6 +317,14 @@ pass-cli run --env-file .env.local -- pnpm import:issues <RUN_ID> --severity WAR
 pass-cli run --env-file .env.local -- pnpm import:issues <RUN_ID> --limit 500
 ```
 
+To export CSV files (instead of terminal output):
+
+```bash
+pass-cli run --env-file .env.local -- pnpm import:issues:csv <RUN_ID>
+```
+
+Default CSV output directory: `./tmp/import-issues/<RUN_ID>`.
+
 4. Check import run status over API (admin auth required):
 
 ```bash

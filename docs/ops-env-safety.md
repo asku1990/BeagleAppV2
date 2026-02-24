@@ -133,33 +133,57 @@ pass-cli run --env-file .env.staging -- pnpm import:issues <RUN_ID>
 CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:issues <RUN_ID>
 ```
 
+Note: `import:issues` prints to terminal only (no files written).
+To export CSV files to `./tmp/import-issues/<RUN_ID>`:
+
+```bash
+pass-cli run --env-file .env.local -- pnpm import:issues:csv <RUN_ID>
+pass-cli run --env-file .env.staging -- pnpm import:issues:csv <RUN_ID>
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:issues:csv <RUN_ID>
+```
+
+PostgreSQL dump/restore prerequisites:
+
+- `pg_dump` and `psql` must be available in the shell where you run `pnpm`.
+- macOS example: `brew install libpq`
+- Add PostgreSQL client binaries to your shell PATH (zsh example: `echo 'export PATH="/opt/homebrew/opt/libpq/bin:$PATH"' >> ~/.zshrc && source ~/.zshrc`).
+
 PostgreSQL dump (schema + data):
 
 ```bash
 # Default output is nested by env and date:
 # ./tmp/db-dumps/<env>/<YYYY-MM-DD>/beagle-<env>-<timestamp>.sql
-pnpm db:dump .env.local
-pnpm db:dump .env.staging
-CONFIRM_PROD=YES pnpm db:dump .env.prod
+pass-cli run --env-file .env.local -- pnpm db:dump
+CONFIRM_PROD=YES pass-cli run --env-file .env.staging -- pnpm db:dump
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm db:dump
 
 # Optional explicit path:
-pnpm db:dump .env.local ./tmp/db-dumps/local/refresh/local-refresh.sql
+pass-cli run --env-file .env.local -- pnpm db:dump ./tmp/db-dumps/local/refresh/local-refresh.sql
 ```
+
+Note: `db:dump`/`db:restore` are fail-safe and require `CONFIRM_PROD=YES` unless the target looks clearly local/staging/dev/test by host or DB name.
 
 PostgreSQL restore from dump (destructive to target DB contents):
 
 ```bash
-pnpm db:restore .env.staging ./tmp/db-dumps/local/<YYYY-MM-DD>/beagle-local-<timestamp>.sql
-CONFIRM_PROD=YES pnpm db:restore .env.prod ./tmp/db-dumps/local/<YYYY-MM-DD>/beagle-local-<timestamp>.sql
+CONFIRM_PROD=YES pass-cli run --env-file .env.staging -- pnpm db:restore ./tmp/db-dumps/local/<YYYY-MM-DD>/beagle-local-<timestamp>.sql
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm db:restore ./tmp/db-dumps/local/<YYYY-MM-DD>/beagle-local-<timestamp>.sql
 ```
 
 Suggested local -> staging refresh flow:
 
-1. `pnpm db:dump .env.local`
+1. `pass-cli run --env-file .env.local -- pnpm db:dump`
 2. `ls -1t ./tmp/db-dumps/local/*/beagle-local-*.sql | head -n 1`
 3. `pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db exec prisma migrate reset --force`
-4. `pnpm db:restore .env.staging <latest-local-dump-from-step-2>`
+4. `CONFIRM_PROD=YES pass-cli run --env-file .env.staging -- pnpm db:restore <latest-local-dump-from-step-2>`
 5. `pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db exec prisma migrate deploy`
+
+Example (auto-pick latest local dump):
+
+```bash
+latest_dump=$(ls -1t ./tmp/db-dumps/local/*/beagle-local-*.sql 2>/dev/null | head -n 1)
+CONFIRM_PROD=YES pass-cli run --env-file .env.staging -- pnpm db:restore "$latest_dump"
+```
 
 ## Optional explicit host check
 
