@@ -109,6 +109,8 @@ For explicit env-file variants, see `docs/ops-env-safety.md`.
 
 For `migrate reset` (destructive, requires env file), see `docs/ops-env-safety.md`.
 
+For PostgreSQL dump/restore commands (`db:dump`, `db:restore`), see `docs/ops-env-safety.md`.
+
 Prune audit log rows older than 12 months:
 
 ```bash
