@@ -12,6 +12,7 @@ Agent instructions for working in this repository.
 - Make focused changes with minimal blast radius.
 - Prefer opportunistic refactors: when introducing cross-cutting improvements (for example logging), update files you are already modifying and defer untouched areas.
 - Structured server logging standard is `pino`; when touching server actions/use-cases, use the shared logger and replace adjacent legacy `console.*` in the same file.
+- When you add server logging around input parameters (search filters, IDs, etc.), validate those fields (e.g., normalize/parse registration numbers through `parseRegistrationNo`) and log a warning/failure before calling downstream services or the DB.
 - Prefer small files and clear names over large multi-purpose files.
 - Prefer one primary function/use-case per file.
 - Re-export public module APIs via `index.ts`.
