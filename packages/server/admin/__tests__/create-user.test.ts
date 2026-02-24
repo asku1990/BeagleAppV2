@@ -1,13 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createAdminUser } from "../create-user";
 
-const { createAdminUserDbMock, hashPasswordMock } = vi.hoisted(() => ({
+const {
+  createAdminUserDbMock,
+  hashPasswordMock,
+  runAdminUserWriteTransactionDbMock,
+} = vi.hoisted(() => ({
   createAdminUserDbMock: vi.fn(),
   hashPasswordMock: vi.fn(),
+  runAdminUserWriteTransactionDbMock: vi.fn(),
 }));
 
 vi.mock("@beagle/db", () => ({
   createAdminUserDb: createAdminUserDbMock,
+  runAdminUserWriteTransactionDb: runAdminUserWriteTransactionDbMock,
 }));
 
 vi.mock("better-auth/crypto", () => ({
@@ -18,6 +24,10 @@ describe("createAdminUser", () => {
   beforeEach(() => {
     createAdminUserDbMock.mockReset();
     hashPasswordMock.mockReset();
+    runAdminUserWriteTransactionDbMock.mockReset();
+    runAdminUserWriteTransactionDbMock.mockImplementation(async (callback) =>
+      callback({}),
+    );
   });
 
   it("returns 400 for invalid email", async () => {
@@ -130,7 +140,11 @@ describe("createAdminUser", () => {
         role: "USER",
         passwordHash: "hashed",
       },
-      undefined,
+      {},
+    );
+    expect(runAdminUserWriteTransactionDbMock).toHaveBeenCalledWith(
+      expect.any(Function),
+      { intent: "CREATE_USER" },
     );
   });
 

@@ -1,16 +1,22 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { setAdminUserPassword } from "../set-user-password";
 
-const { getAdminUserByIdDbMock, setAdminUserPasswordDbMock, hashPasswordMock } =
-  vi.hoisted(() => ({
-    getAdminUserByIdDbMock: vi.fn(),
-    setAdminUserPasswordDbMock: vi.fn(),
-    hashPasswordMock: vi.fn(),
-  }));
+const {
+  getAdminUserByIdDbMock,
+  setAdminUserPasswordDbMock,
+  hashPasswordMock,
+  runAdminUserWriteTransactionDbMock,
+} = vi.hoisted(() => ({
+  getAdminUserByIdDbMock: vi.fn(),
+  setAdminUserPasswordDbMock: vi.fn(),
+  hashPasswordMock: vi.fn(),
+  runAdminUserWriteTransactionDbMock: vi.fn(),
+}));
 
 vi.mock("@beagle/db", () => ({
   getAdminUserByIdDb: getAdminUserByIdDbMock,
   setAdminUserPasswordDb: setAdminUserPasswordDbMock,
+  runAdminUserWriteTransactionDb: runAdminUserWriteTransactionDbMock,
 }));
 
 vi.mock("better-auth/crypto", () => ({
@@ -22,6 +28,10 @@ describe("setAdminUserPassword", () => {
     getAdminUserByIdDbMock.mockReset();
     setAdminUserPasswordDbMock.mockReset();
     hashPasswordMock.mockReset();
+    runAdminUserWriteTransactionDbMock.mockReset();
+    runAdminUserWriteTransactionDbMock.mockImplementation(async (callback) =>
+      callback({}),
+    );
   });
 
   it("returns 400 for invalid password", async () => {
@@ -100,7 +110,11 @@ describe("setAdminUserPassword", () => {
         userId: "u_1",
         passwordHash: "hashed-password",
       },
-      undefined,
+      {},
+    );
+    expect(runAdminUserWriteTransactionDbMock).toHaveBeenCalledWith(
+      expect.any(Function),
+      { intent: "RESET_PASSWORD" },
     );
   });
 

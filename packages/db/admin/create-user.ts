@@ -1,9 +1,5 @@
 import { randomUUID } from "node:crypto";
 import type { Prisma } from "@prisma/client";
-import {
-  runInAuditContextDb,
-  type AuditContextDb,
-} from "../core/audit-context";
 
 type CreateAdminUserDbInput = {
   email: string;
