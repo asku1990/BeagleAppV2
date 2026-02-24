@@ -42,6 +42,7 @@ cp .env.example .env.prod
 - `DATABASE_URL`: PostgreSQL connection string.
 - `BETTER_AUTH_SECRET`: Better Auth secret (minimum 32 chars, for example `openssl rand -base64 32`).
 - `BETTER_AUTH_URL`: canonical app URL used by Better Auth (for local dev: `http://localhost:3000`).
+- `RUN_DB_MIGRATIONS`: build-time toggle for deploy migrations (used by `pnpm vercel:build`). Default in script is `true` when unset.
 - `BETTER_AUTH_SESSION_EXPIRES_IN`: session lifetime in seconds (default `1209600` = 14 days).
 - `BETTER_AUTH_SESSION_UPDATE_AGE`: sliding refresh interval in seconds for active sessions (default `86400` = 1 day).
 - `BOOTSTRAP_ADMIN_EMAIL`: first admin email for one-time bootstrap script.
@@ -148,6 +149,22 @@ Run app directly:
 
 ```bash
 pnpm --filter @beagle/web dev
+```
+
+## Vercel build
+
+Set Vercel Build Command to:
+
+```bash
+pnpm vercel:build
+```
+
+This script runs Prisma client generation, builds the app, and applies committed migrations only after a successful build (by default).
+
+To skip migrations for a specific environment, set:
+
+```bash
+RUN_DB_MIGRATIONS=false
 ```
 
 ## Quality checks

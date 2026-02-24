@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "pnpm --filter @beagle/web dev",
     "build": "turbo build",
+    "vercel:build": "bash ./scripts/vercel-build.sh",
     "vercel:ignored-build": "bash ./scripts/vercel-ignored-build.sh",
     "lint": "turbo lint",
     "format": "prettier . --write",
