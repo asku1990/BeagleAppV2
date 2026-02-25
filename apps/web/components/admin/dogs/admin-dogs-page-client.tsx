@@ -13,6 +13,7 @@ import {
   useAdminDogParentOptionsQuery,
   useAdminDogsQuery,
   useCreateAdminDogMutation,
+  useUpdateAdminDogMutation,
 } from "@/queries/admin/dogs";
 import { DeleteDogConfirmModal } from "./delete-dog-confirm-modal";
 import { DogFilters } from "./dog-filters";
@@ -85,42 +86,6 @@ function normalizeEkNo(value: string): number | null {
   return Number.isNaN(parsed) ? null : parsed;
 }
 
-function toRecord(
-  values: AdminDogFormValues,
-  id: string,
-  counts?: { trialCount: number; showCount: number },
-): AdminDogRecord {
-  return {
-    id,
-    name: values.name.trim(),
-    sex: values.sex,
-    birthDate: normalizeOptionalText(values.birthDate),
-    breederNameText: normalizeOptionalText(values.breederNameText),
-    trialCount: counts?.trialCount ?? 0,
-    showCount: counts?.showCount ?? 0,
-    ownershipPreview: values.ownershipNames,
-    ekNo: normalizeEkNo(values.ekNo),
-    note: normalizeOptionalText(values.note),
-    registrationNo: normalizeOptionalText(values.registrationNo),
-    sirePreview:
-      normalizeOptionalText(values.sirePreviewName) ||
-      normalizeOptionalText(values.sirePreviewRegistrationNo)
-        ? {
-            name: values.sirePreviewName.trim(),
-            registrationNo: values.sirePreviewRegistrationNo.trim(),
-          }
-        : null,
-    damPreview:
-      normalizeOptionalText(values.damPreviewName) ||
-      normalizeOptionalText(values.damPreviewRegistrationNo)
-        ? {
-            name: values.damPreviewName.trim(),
-            registrationNo: values.damPreviewRegistrationNo.trim(),
-          }
-        : null,
-  };
-}
-
 function mapDogFromQuery(item: AdminDogListItem): AdminDogRecord {
   return {
     id: item.id,
@@ -153,9 +118,6 @@ export function AdminDogsPageClient() {
   const { t } = useI18n();
   const [query, setQuery] = useState("");
   const [sex, setSex] = useState<"all" | AdminDogSex>("all");
-  const [updatedDogsById, setUpdatedDogsById] = useState<
-    Record<string, AdminDogRecord>
-  >({});
   const [deletedDogIds, setDeletedDogIds] = useState<Set<string>>(new Set());
   const [deleteTarget, setDeleteTarget] = useState<AdminDogRecord | null>(null);
   const [formState, setFormState] = useState<DogFormState>({
@@ -183,6 +145,7 @@ export function AdminDogsPageClient() {
 
   const dogsQuery = useAdminDogsQuery(filters);
   const createDogMutation = useCreateAdminDogMutation();
+  const updateDogMutation = useUpdateAdminDogMutation();
   const breederOptionsQuery = useAdminDogBreederOptionsQuery({
     query: breederLookupQuery,
     limit: 100,
@@ -204,12 +167,8 @@ export function AdminDogsPageClient() {
     [dogsQuery.data?.items],
   );
   const dogs = useMemo(() => {
-    const mergedBaseDogs = baseDogs
-      .filter((dog) => !deletedDogIds.has(dog.id))
-      .map((dog) => updatedDogsById[dog.id] ?? dog);
-
-    return mergedBaseDogs;
-  }, [baseDogs, deletedDogIds, updatedDogsById]);
+    return baseDogs.filter((dog) => !deletedDogIds.has(dog.id));
+  }, [baseDogs, deletedDogIds]);
 
   const breederOptions = useMemo(
     (): NamedEntityOption[] =>
@@ -297,19 +256,34 @@ export function AdminDogsPageClient() {
       return;
     }
 
-    const nextDog = toRecord(values, formState.target.id, {
-      trialCount: formState.target.trialCount,
-      showCount: formState.target.showCount,
-    });
-    const targetId = formState.target.id;
+    try {
+      await updateDogMutation.mutateAsync({
+        id: formState.target.id,
+        name: values.name,
+        sex: values.sex,
+        birthDate: normalizeOptionalText(values.birthDate) ?? undefined,
+        breederNameText:
+          normalizeOptionalText(values.breederNameText) ?? undefined,
+        ownerNames: values.ownershipNames,
+        ekNo: normalizeEkNo(values.ekNo) ?? undefined,
+        note: normalizeOptionalText(values.note) ?? undefined,
+        registrationNo:
+          normalizeOptionalText(values.registrationNo) ?? undefined,
+        sireRegistrationNo:
+          normalizeOptionalText(values.sirePreviewRegistrationNo) ?? undefined,
+        damRegistrationNo:
+          normalizeOptionalText(values.damPreviewRegistrationNo) ?? undefined,
+      });
 
-    setUpdatedDogsById((current) => ({
-      ...current,
-      [targetId]: nextDog,
-    }));
-
-    toast.success(t("admin.dogs.edit.success"));
-    setFormState({ open: false, mode: "create", target: null });
+      toast.success(t("admin.dogs.edit.success"));
+      setFormState({ open: false, mode: "create", target: null });
+    } catch (error) {
+      const message =
+        error instanceof AdminMutationError
+          ? error.message
+          : "Failed to update dog.";
+      toast.error(message);
+    }
   }
 
   function handleDeleteConfirm() {
@@ -322,12 +296,6 @@ export function AdminDogsPageClient() {
       next.add(deleteTarget.id);
       return next;
     });
-    setUpdatedDogsById((current) => {
-      const next = { ...current };
-      delete next[deleteTarget.id];
-      return next;
-    });
-
     toast.success(t("admin.dogs.delete.success"));
     setDeleteTarget(null);
   }
@@ -388,7 +356,9 @@ export function AdminDogsPageClient() {
         onClose={closeFormModal}
         onValuesChange={setFormValues}
         onSubmit={handleSubmit}
-        isSubmitting={createDogMutation.isPending}
+        isSubmitting={
+          createDogMutation.isPending || updateDogMutation.isPending
+        }
       />
 
       <DeleteDogConfirmModal

@@ -14,10 +14,13 @@ export { setAdminUserStatusDb } from "./set-user-status";
 export { setAdminUserPasswordDb } from "./set-user-password";
 export {
   createAdminDogWriteDb,
+  updateAdminDogWriteDb,
   listAdminDogsDb,
   runAdminDogWriteTransactionDb,
   type CreateAdminDogDbInput,
   type CreatedAdminDogRowDb,
+  type UpdateAdminDogDbInput,
+  type UpdatedAdminDogRowDb,
   type AdminDogListRequestDb,
   type AdminDogListResponseDb,
   type AdminDogListRowDb,

@@ -28,6 +28,8 @@ export type {
   AdminDogParentPreview,
   CreateAdminDogRequest,
   CreateAdminDogResponse,
+  UpdateAdminDogRequest,
+  UpdateAdminDogResponse,
   AdminDogLookupRequest,
   AdminBreederLookupOption,
   AdminOwnerLookupOption,

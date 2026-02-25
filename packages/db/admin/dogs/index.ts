@@ -13,6 +13,11 @@ export {
   type CreatedAdminDogRowDb,
 } from "./create-dog";
 export {
+  updateAdminDogWriteDb,
+  type UpdateAdminDogDbInput,
+  type UpdatedAdminDogRowDb,
+} from "./update-dog";
+export {
   listAdminBreederOptionsDb,
   type AdminBreederLookupRequestDb,
   type AdminBreederLookupOptionDb,

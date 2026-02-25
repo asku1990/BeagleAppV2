@@ -1,14 +1,19 @@
 import {
-  createAdminDogWriteDb,
   runAdminDogWriteTransactionDb,
+  updateAdminDogWriteDb,
   type AuditContextDb,
 } from "@beagle/db";
 import type {
-  CreateAdminDogRequest,
-  CreateAdminDogResponse,
+  UpdateAdminDogRequest,
+  UpdateAdminDogResponse,
 } from "@beagle/contracts";
 import { toErrorLog, withLogContext } from "../../shared/logger";
 import type { ServiceResult } from "../../shared/result";
+
+function normalizeRequiredId(value: string): string | null {
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : null;
+}
 
 function normalizeRequiredName(value: string): string | null {
   const normalized = value.trim();
@@ -81,14 +86,18 @@ function isDuplicateError(error: unknown): boolean {
   );
 }
 
-export async function createAdminDog(
-  input: CreateAdminDogRequest,
+function isDogNotFoundError(error: unknown): boolean {
+  return error instanceof Error && error.message === "DOG_NOT_FOUND";
+}
+
+export async function updateAdminDog(
+  input: UpdateAdminDogRequest,
   auditContext?: AuditContextDb,
-): Promise<ServiceResult<CreateAdminDogResponse>> {
+): Promise<ServiceResult<UpdateAdminDogResponse>> {
   const startedAt = Date.now();
   const log = withLogContext({
     layer: "service",
-    useCase: "admin-dogs.createAdminDog",
+    useCase: "admin-dogs.updateAdminDog",
     ...(auditContext?.actorUserId
       ? { actorUserId: auditContext.actorUserId }
       : {}),
@@ -97,19 +106,36 @@ export async function createAdminDog(
   log.info(
     {
       event: "start",
+      dogId: input.id,
       sex: input.sex,
       hasBirthDate: Boolean(input.birthDate),
       hasRegistrationNo: Boolean(input.registrationNo),
       ownerCount: normalizeOwnerNames(input.ownerNames).length,
     },
-    "admin dog create started",
+    "admin dog update started",
   );
+
+  const id = normalizeRequiredId(input.id);
+  if (!id) {
+    log.warn(
+      { event: "invalid_dog_id", durationMs: Date.now() - startedAt },
+      "admin dog update rejected because dog id is invalid",
+    );
+    return {
+      status: 400,
+      body: {
+        ok: false,
+        error: "Dog id is required.",
+        code: "INVALID_DOG_ID",
+      },
+    };
+  }
 
   const name = normalizeRequiredName(input.name);
   if (!name) {
     log.warn(
-      { event: "invalid_name", durationMs: Date.now() - startedAt },
-      "admin dog create rejected because name is invalid",
+      { event: "invalid_name", dogId: id, durationMs: Date.now() - startedAt },
+      "admin dog update rejected because name is invalid",
     );
     return {
       status: 400,
@@ -126,10 +152,11 @@ export async function createAdminDog(
     log.warn(
       {
         event: "invalid_sex",
+        dogId: id,
         sex: input.sex,
         durationMs: Date.now() - startedAt,
       },
-      "admin dog create rejected because sex is invalid",
+      "admin dog update rejected because sex is invalid",
     );
     return {
       status: 400,
@@ -146,10 +173,11 @@ export async function createAdminDog(
     log.warn(
       {
         event: "invalid_birth_date",
+        dogId: id,
         birthDate: input.birthDate,
         durationMs: Date.now() - startedAt,
       },
-      "admin dog create rejected because birth date is invalid",
+      "admin dog update rejected because birth date is invalid",
     );
     return {
       status: 400,
@@ -166,10 +194,11 @@ export async function createAdminDog(
     log.warn(
       {
         event: "invalid_ek_no",
+        dogId: id,
         ekNo: input.ekNo,
         durationMs: Date.now() - startedAt,
       },
-      "admin dog create rejected because EK number is invalid",
+      "admin dog update rejected because EK number is invalid",
     );
     return {
       status: 400,
@@ -182,10 +211,11 @@ export async function createAdminDog(
   }
 
   try {
-    const createdDog = await runAdminDogWriteTransactionDb(
+    const updatedDog = await runAdminDogWriteTransactionDb(
       async (tx) =>
-        createAdminDogWriteDb(
+        updateAdminDogWriteDb(
           {
+            id,
             name,
             sex,
             birthDate,
@@ -199,35 +229,58 @@ export async function createAdminDog(
           },
           tx,
         ),
-      { ...auditContext, intent: "CREATE_DOG" },
+      { ...auditContext, intent: "UPDATE_DOG" },
     );
 
     log.info(
       {
         event: "success",
-        dogId: createdDog.id,
+        dogId: updatedDog.id,
         durationMs: Date.now() - startedAt,
       },
-      "admin dog create succeeded",
+      "admin dog update succeeded",
     );
 
     return {
-      status: 201,
+      status: 200,
       body: {
         ok: true,
         data: {
-          id: createdDog.id,
-          name: createdDog.name,
-          sex: createdDog.sex,
-          registrationNo: createdDog.registrationNo,
+          id: updatedDog.id,
+          name: updatedDog.name,
+          sex: updatedDog.sex,
+          registrationNo: updatedDog.registrationNo,
         },
       },
     };
   } catch (error) {
+    if (isDogNotFoundError(error)) {
+      log.warn(
+        {
+          event: "dog_not_found",
+          dogId: id,
+          durationMs: Date.now() - startedAt,
+        },
+        "admin dog update failed because dog was not found",
+      );
+      return {
+        status: 404,
+        body: {
+          ok: false,
+          error: "Dog not found.",
+          code: "DOG_NOT_FOUND",
+        },
+      };
+    }
+
     if (isDuplicateError(error)) {
       log.warn(
-        { event: "duplicate_dog", durationMs: Date.now() - startedAt },
-        "admin dog create rejected because duplicate dog exists",
+        {
+          event: "duplicate_dog",
+          dogId: id,
+          durationMs: Date.now() - startedAt,
+        },
+        "admin dog update rejected because duplicate dog exists",
       );
       return {
         status: 409,
@@ -243,17 +296,18 @@ export async function createAdminDog(
     log.error(
       {
         event: "exception",
+        dogId: id,
         durationMs: Date.now() - startedAt,
         ...toErrorLog(error),
       },
-      "admin dog create failed",
+      "admin dog update failed",
     );
 
     return {
       status: 500,
       body: {
         ok: false,
-        error: "Failed to create dog.",
+        error: "Failed to update dog.",
         code: "INTERNAL_ERROR",
       },
     };

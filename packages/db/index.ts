@@ -52,6 +52,7 @@ export {
 
 export {
   createAdminDogWriteDb,
+  updateAdminDogWriteDb,
   createAdminUserDb,
   listAdminDogsDb,
   countActiveAdminUsersDb,
@@ -86,4 +87,6 @@ export {
   type AdminDogParentLookupResponseDb,
   type CreateAdminDogDbInput,
   type CreatedAdminDogRowDb,
+  type UpdateAdminDogDbInput,
+  type UpdatedAdminDogRowDb,
 } from "./admin";
