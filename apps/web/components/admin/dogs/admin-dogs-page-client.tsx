@@ -1,15 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { toast } from "@/components/ui/sonner";
+import type { AdminDogListItem } from "@beagle/contracts";
 import { ListingSectionShell } from "@/components/listing";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/sonner";
 import { useI18n } from "@/hooks/i18n";
+import { useAdminDogsQuery } from "@/queries/admin/dogs";
 import { DeleteDogConfirmModal } from "./delete-dog-confirm-modal";
 import { DogFilters } from "./dog-filters";
 import { DogFormModal } from "./dog-form-modal";
 import { DogResults } from "./dog-results";
-import { mockAdminDogs } from "./mock-dogs";
 import type { AdminDogFormValues, AdminDogRecord, AdminDogSex } from "./types";
 
 type DogFormState = {
@@ -108,28 +109,43 @@ function toRecord(
   };
 }
 
-function toSearchText(dog: AdminDogRecord): string {
-  return [
-    dog.registrationNo ?? "",
-    dog.name,
-    dog.breederNameText ?? "",
-    dog.ownershipPreview.join(" "),
-    dog.sirePreview?.name ?? "",
-    dog.sirePreview?.registrationNo ?? "",
-    dog.damPreview?.name ?? "",
-    dog.damPreview?.registrationNo ?? "",
-    dog.ekNo === null ? "" : String(dog.ekNo),
-    dog.note ?? "",
-  ]
-    .join(" ")
-    .toLowerCase();
+function mapDogFromQuery(item: AdminDogListItem): AdminDogRecord {
+  return {
+    id: item.id,
+    registrationNo: item.registrationNo,
+    name: item.name,
+    sex: item.sex,
+    birthDate: item.birthDate,
+    breederNameText: item.breederName,
+    ownershipPreview: item.ownerNames,
+    sirePreview: item.sire
+      ? {
+          name: item.sire.name,
+          registrationNo: item.sire.registrationNo ?? "",
+        }
+      : null,
+    damPreview: item.dam
+      ? {
+          name: item.dam.name,
+          registrationNo: item.dam.registrationNo ?? "",
+        }
+      : null,
+    trialCount: item.trialCount,
+    showCount: item.showCount,
+    ekNo: item.ekNo,
+    note: item.note,
+  };
 }
 
 export function AdminDogsPageClient() {
   const { t } = useI18n();
-  const [dogs, setDogs] = useState<AdminDogRecord[]>(mockAdminDogs);
   const [query, setQuery] = useState("");
   const [sex, setSex] = useState<"all" | AdminDogSex>("all");
+  const [createdDogs, setCreatedDogs] = useState<AdminDogRecord[]>([]);
+  const [updatedDogsById, setUpdatedDogsById] = useState<
+    Record<string, AdminDogRecord>
+  >({});
+  const [deletedDogIds, setDeletedDogIds] = useState<Set<string>>(new Set());
   const [deleteTarget, setDeleteTarget] = useState<AdminDogRecord | null>(null);
   const [formState, setFormState] = useState<DogFormState>({
     open: false,
@@ -140,22 +156,30 @@ export function AdminDogsPageClient() {
     createEmptyFormValues,
   );
 
-  const filteredDogs = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+  const filters = useMemo(
+    () => ({
+      query: query.trim().length > 0 ? query.trim() : undefined,
+      sex: sex === "all" ? undefined : sex,
+      page: 1,
+      pageSize: 50,
+      sort: "name-asc" as const,
+    }),
+    [query, sex],
+  );
 
-    return dogs.filter((dog) => {
-      const matchesSex = sex === "all" || dog.sex === sex;
-      if (!matchesSex) {
-        return false;
-      }
+  const dogsQuery = useAdminDogsQuery(filters);
 
-      if (normalizedQuery.length === 0) {
-        return true;
-      }
+  const baseDogs = useMemo(
+    () => (dogsQuery.data?.items ?? []).map(mapDogFromQuery),
+    [dogsQuery.data?.items],
+  );
+  const dogs = useMemo(() => {
+    const mergedBaseDogs = baseDogs
+      .filter((dog) => !deletedDogIds.has(dog.id))
+      .map((dog) => updatedDogsById[dog.id] ?? dog);
 
-      return toSearchText(dog).includes(normalizedQuery);
-    });
-  }, [dogs, query, sex]);
+    return [...createdDogs, ...mergedBaseDogs];
+  }, [baseDogs, createdDogs, deletedDogIds, updatedDogsById]);
 
   const breederOptions = useMemo(
     () =>
@@ -211,7 +235,7 @@ export function AdminDogsPageClient() {
   function handleSubmit(values: AdminDogFormValues) {
     if (formState.mode === "create") {
       const nextDog = toRecord(values, `dog-${Date.now()}`);
-      setDogs((current) => [nextDog, ...current]);
+      setCreatedDogs((current) => [nextDog, ...current]);
       toast.success(t("admin.dogs.create.success"));
       setFormState({ open: false, mode: "create", target: null });
       return;
@@ -225,9 +249,19 @@ export function AdminDogsPageClient() {
       trialCount: formState.target.trialCount,
       showCount: formState.target.showCount,
     });
-    setDogs((current) =>
-      current.map((dog) => (dog.id === formState.target?.id ? nextDog : dog)),
-    );
+    const targetId = formState.target.id;
+
+    if (targetId.startsWith("dog-")) {
+      setCreatedDogs((current) =>
+        current.map((dog) => (dog.id === targetId ? nextDog : dog)),
+      );
+    } else {
+      setUpdatedDogsById((current) => ({
+        ...current,
+        [targetId]: nextDog,
+      }));
+    }
+
     toast.success(t("admin.dogs.edit.success"));
     setFormState({ open: false, mode: "create", target: null });
   }
@@ -237,10 +271,28 @@ export function AdminDogsPageClient() {
       return;
     }
 
-    setDogs((current) => current.filter((dog) => dog.id !== deleteTarget.id));
+    if (deleteTarget.id.startsWith("dog-")) {
+      setCreatedDogs((current) =>
+        current.filter((dog) => dog.id !== deleteTarget.id),
+      );
+    } else {
+      setDeletedDogIds((current) => {
+        const next = new Set(current);
+        next.add(deleteTarget.id);
+        return next;
+      });
+      setUpdatedDogsById((current) => {
+        const next = { ...current };
+        delete next[deleteTarget.id];
+        return next;
+      });
+    }
+
     toast.success(t("admin.dogs.delete.success"));
     setDeleteTarget(null);
   }
+
+  const resultCount = dogs.length;
 
   return (
     <div className="space-y-4">
@@ -262,13 +314,23 @@ export function AdminDogsPageClient() {
             onSexChange={setSex}
           />
           <p className="text-sm text-muted-foreground">
-            {t("admin.dogs.management.countPrefix")} {filteredDogs.length}
+            {t("admin.dogs.management.countPrefix")} {resultCount}
           </p>
-          <DogResults
-            dogs={filteredDogs}
-            onEdit={openEditModal}
-            onDelete={setDeleteTarget}
-          />
+          {dogsQuery.isLoading ? (
+            <p className="text-sm text-muted-foreground">
+              {t("admin.dogs.loading")}
+            </p>
+          ) : null}
+          {dogsQuery.isError ? (
+            <p className="text-sm text-destructive">{t("admin.dogs.error")}</p>
+          ) : null}
+          {!dogsQuery.isLoading ? (
+            <DogResults
+              dogs={dogs}
+              onEdit={openEditModal}
+              onDelete={setDeleteTarget}
+            />
+          ) : null}
         </div>
       </ListingSectionShell>
 

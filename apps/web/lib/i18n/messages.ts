@@ -7,15 +7,19 @@ import { fiAuthMessages, svAuthMessages } from "@/lib/i18n/messages/auth";
 import {
   fiAdminHomeMessages,
   svAdminHomeMessages,
-} from "@/lib/i18n/messages/admin-home";
+} from "@/lib/i18n/messages/admin/home";
 import {
   fiAdminUsersMessages,
   svAdminUsersMessages,
-} from "@/lib/i18n/messages/admin-users";
+} from "@/lib/i18n/messages/admin/users";
+import {
+  fiAdminDogsMessages,
+  svAdminDogsMessages,
+} from "@/lib/i18n/messages/admin/dogs";
 import {
   fiAdminSettingsMessages,
   svAdminSettingsMessages,
-} from "@/lib/i18n/messages/admin-settings";
+} from "@/lib/i18n/messages/admin/settings";
 import {
   fiAccountMessages,
   svAccountMessages,
@@ -31,6 +35,7 @@ const fi = {
   ...fiAuthMessages,
   ...fiAdminHomeMessages,
   ...fiAdminUsersMessages,
+  ...fiAdminDogsMessages,
   ...fiAdminSettingsMessages,
   ...fiAccountMessages,
   ...fiCommonMessages,
@@ -47,6 +52,7 @@ const sv: Messages = {
   ...svAuthMessages,
   ...svAdminHomeMessages,
   ...svAdminUsersMessages,
+  ...svAdminDogsMessages,
   ...svAdminSettingsMessages,
   ...svAccountMessages,
   ...svCommonMessages,

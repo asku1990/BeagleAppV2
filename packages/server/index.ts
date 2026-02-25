@@ -1,6 +1,7 @@
 export {
   createAdminUser,
   deleteAdminUser,
+  listAdminDogs,
   listAdminUsers,
   requireAdmin,
   setAdminUserPassword,

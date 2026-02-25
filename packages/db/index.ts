@@ -52,6 +52,7 @@ export {
 
 export {
   createAdminUserDb,
+  listAdminDogsDb,
   countActiveAdminUsersDb,
   countAdminUsersDb,
   deleteAdminUserDb,
@@ -64,4 +65,9 @@ export {
   type AdminUserLookupRowDb,
   type AdminUserRowDb,
   type CreatedAdminUserRowDb,
+  type AdminDogListRequestDb,
+  type AdminDogListResponseDb,
+  type AdminDogListRowDb,
+  type AdminDogListSortDb,
+  type AdminDogParentPreviewDb,
 } from "./admin";

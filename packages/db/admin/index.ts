@@ -12,3 +12,11 @@ export {
 } from "./delete-user";
 export { setAdminUserStatusDb } from "./set-user-status";
 export { setAdminUserPasswordDb } from "./set-user-password";
+export {
+  listAdminDogsDb,
+  type AdminDogListRequestDb,
+  type AdminDogListResponseDb,
+  type AdminDogListRowDb,
+  type AdminDogListSortDb,
+  type AdminDogParentPreviewDb,
+} from "./dogs";

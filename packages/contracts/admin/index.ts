@@ -19,3 +19,11 @@ export type {
   SetAdminUserPasswordRequest,
   SetAdminUserPasswordResponse,
 } from "./set-admin-user-password";
+export type {
+  AdminDogListItem,
+  AdminDogListRequest,
+  AdminDogListResponse,
+  AdminDogListSex,
+  AdminDogListSort,
+  AdminDogParentPreview,
+} from "./dogs";

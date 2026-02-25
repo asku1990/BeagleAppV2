@@ -41,6 +41,23 @@ function showDash(value: string | number | null): string {
   return normalized.length > 0 ? normalized : "-";
 }
 
+function formatBirthDate(
+  value: string | null,
+  locale: "fi" | "sv",
+): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+
+  const dateLocale = locale === "fi" ? "fi-FI" : "sv-SE";
+  return new Intl.DateTimeFormat(dateLocale).format(parsed);
+}
+
 function formatOwners(owners: string[]): string {
   if (owners.length === 0) {
     return "-";
@@ -103,7 +120,7 @@ function DogActionsMenu({
 }
 
 export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   if (dogs.length === 0) {
     return (
@@ -146,7 +163,9 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
                 <td className="px-2 py-2">
                   <DogSexLabel sex={dog.sex} />
                 </td>
-                <td className="px-2 py-2">{showDash(dog.birthDate)}</td>
+                <td className="px-2 py-2">
+                  {showDash(formatBirthDate(dog.birthDate, locale))}
+                </td>
                 <td className="px-2 py-2">{showDash(dog.breederNameText)}</td>
                 <td className="px-2 py-2">
                   {formatOwners(dog.ownershipPreview)}
@@ -188,7 +207,7 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
               </p>
               <p>
                 {t("admin.dogs.mobile.birthDateLabel")}:{" "}
-                {showDash(dog.birthDate)}
+                {showDash(formatBirthDate(dog.birthDate, locale))}
               </p>
               <p>
                 {t("admin.dogs.mobile.breederLabel")}:{" "}

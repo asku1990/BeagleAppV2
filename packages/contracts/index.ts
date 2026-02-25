@@ -107,6 +107,12 @@ export type {
   SetAdminUserStatusResponse,
   SetAdminUserPasswordRequest,
   SetAdminUserPasswordResponse,
+  AdminDogListItem,
+  AdminDogListRequest,
+  AdminDogListResponse,
+  AdminDogListSex,
+  AdminDogListSort,
+  AdminDogParentPreview,
 } from "./admin";
 export type { HomeStatisticsResponse } from "./home";
 export {

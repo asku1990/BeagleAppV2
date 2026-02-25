@@ -41,6 +41,18 @@ Agent instructions for working in this repository.
 - Keep non-hook helpers, types, and constants in `apps/web/lib/**`.
 - Query hooks in `apps/web/queries/**` are allowed to stay there unless explicitly refactored.
 
+## Web Feature Foldering (`apps/web`)
+
+- Prefer domain-first folders for transport/data layers:
+  - Server Actions: `apps/web/app/actions/<domain>/<feature>/**` (example: `app/actions/admin/dogs/**`).
+  - Query hooks: `apps/web/queries/<domain>/<feature>/**` (example: `queries/admin/dogs/**`).
+  - Contracts: `packages/contracts/<domain>/<feature>/**` (example: `packages/contracts/admin/dogs/**`).
+  - I18n messages: `apps/web/lib/i18n/messages/<domain>/<feature>/**` (example: `messages/admin/dogs/*`).
+- Avoid mixing multiple features in a flat domain folder once feature-specific files exist. Keep `admin/users` and `admin/dogs` separated.
+- When touching files in a mixed folder, move the touched feature files into a dedicated subfolder in the same change.
+- Keep feature-local `query-keys.ts` inside the same feature folder; do not place unrelated feature keys in shared domain `query-keys.ts`.
+- Keep tests co-located under each feature folder `__tests__/`.
+
 ## Implementation Preferences
 
 - Keep business rules in `packages/server` (and shared domain concepts in `packages/domain`).
