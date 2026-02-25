@@ -10,81 +10,19 @@ import type {
 } from "@beagle/contracts";
 import { toErrorLog, withLogContext } from "../../shared/logger";
 import type { ServiceResult } from "../../shared/result";
+import {
+  hasMaxLength,
+  normalizeDistinctNames,
+  normalizeOptionalText,
+  normalizeRequiredText,
+  parseBirthDate,
+  parseDogSex,
+  parsePositiveInteger,
+} from "./normalization";
 
 const DOG_NAME_MAX_LENGTH = 120;
 const DOG_REGISTRATION_NO_MAX_LENGTH = 40;
 const DOG_NOTE_MAX_LENGTH = 500;
-
-function normalizeRequiredName(value: string): string | null {
-  const normalized = value.trim();
-  return normalized.length > 0 ? normalized : null;
-}
-
-function normalizeOptionalText(value: string | undefined): string | null {
-  const normalized = (value ?? "").trim();
-  return normalized.length > 0 ? normalized : null;
-}
-
-function normalizeOwnerNames(value: string[] | undefined): string[] {
-  const seen = new Set<string>();
-  for (const rawName of value ?? []) {
-    const normalized = rawName.trim();
-    if (!normalized || seen.has(normalized)) {
-      continue;
-    }
-
-    seen.add(normalized);
-  }
-
-  return Array.from(seen);
-}
-
-function parseSex(value: string): "MALE" | "FEMALE" | "UNKNOWN" | null {
-  if (value === "MALE" || value === "FEMALE" || value === "UNKNOWN") {
-    return value;
-  }
-
-  return null;
-}
-
-function parseBirthDate(value: string | undefined): Date | null | "INVALID" {
-  const normalized = normalizeOptionalText(value);
-  if (!normalized) {
-    return null;
-  }
-
-  if (!/^\d{4}-\d{2}-\d{2}$/u.test(normalized)) {
-    return "INVALID";
-  }
-
-  const parsed = new Date(`${normalized}T00:00:00.000Z`);
-  if (Number.isNaN(parsed.getTime())) {
-    return "INVALID";
-  }
-
-  const [year, month, day] = normalized.split("-").map(Number);
-  if (
-    parsed.getUTCFullYear() !== year ||
-    parsed.getUTCMonth() + 1 !== month ||
-    parsed.getUTCDate() !== day
-  ) {
-    return "INVALID";
-  }
-
-  return parsed;
-}
-
-function parseEkNo(value: number | undefined): number | null | "INVALID" {
-  if (value === undefined) {
-    return null;
-  }
-
-  if (!Number.isInteger(value) || value <= 0) {
-    return "INVALID";
-  }
-
-  return value;
-}
 
 function isDuplicateError(error: unknown): boolean {
   return Boolean(
@@ -110,10 +48,6 @@ async function resolveParentByRegistration(
   return { id: row.id, sex: row.sex };
 }
 
-function hasMaxLength(value: string | null, maxLength: number): boolean {
-  return !value || value.length <= maxLength;
-}
-
 export async function createAdminDog(
   input: CreateAdminDogRequest,
   auditContext?: AuditContextDb,
@@ -133,12 +67,12 @@ export async function createAdminDog(
       sex: input.sex,
       hasBirthDate: Boolean(input.birthDate),
       hasRegistrationNo: Boolean(input.registrationNo),
-      ownerCount: normalizeOwnerNames(input.ownerNames).length,
+      ownerCount: normalizeDistinctNames(input.ownerNames).length,
     },
     "admin dog create started",
   );
 
-  const name = normalizeRequiredName(input.name);
+  const name = normalizeRequiredText(input.name);
   if (!name) {
     log.warn(
       { event: "invalid_name", durationMs: Date.now() - startedAt },
@@ -168,7 +102,7 @@ export async function createAdminDog(
     };
   }
 
-  const sex = parseSex(input.sex);
+  const sex = parseDogSex(input.sex);
   if (!sex) {
     log.warn(
       {
@@ -208,7 +142,7 @@ export async function createAdminDog(
     };
   }
 
-  const ekNo = parseEkNo(input.ekNo);
+  const ekNo = parsePositiveInteger(input.ekNo);
   if (ekNo === "INVALID") {
     log.warn(
       {
@@ -334,7 +268,7 @@ export async function createAdminDog(
             breederNameText: normalizeOptionalText(input.breederNameText),
             sireId: sire?.id ?? null,
             damId: dam?.id ?? null,
-            ownerNames: normalizeOwnerNames(input.ownerNames),
+            ownerNames: normalizeDistinctNames(input.ownerNames),
             ekNo,
             note,
             registrationNo,

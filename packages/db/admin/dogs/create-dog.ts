@@ -3,6 +3,7 @@ import {
   runInAuditContextDb,
   type AuditContextDb,
 } from "../../core/audit-context";
+import { uniqueNonEmptyNames } from "./normalization";
 
 export type CreateAdminDogDbInput = {
   name: string;
@@ -42,26 +43,12 @@ async function resolveBreederId(
   return breeder?.id ?? null;
 }
 
-function uniqueNames(names: string[]): string[] {
-  const seen = new Set<string>();
-  for (const rawName of names) {
-    const value = rawName.trim();
-    if (!value || seen.has(value)) {
-      continue;
-    }
-
-    seen.add(value);
-  }
-
-  return Array.from(seen);
-}
-
 async function createOwnerships(
   dogId: string,
   ownerNames: string[],
   tx: Prisma.TransactionClient,
 ): Promise<void> {
-  const uniqueOwnerNames = uniqueNames(ownerNames);
+  const uniqueOwnerNames = uniqueNonEmptyNames(ownerNames);
   for (const ownerName of uniqueOwnerNames) {
     const existingOwner = await tx.owner.findFirst({
       where: { name: ownerName },

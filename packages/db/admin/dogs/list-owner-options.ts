@@ -1,4 +1,5 @@
 import { prisma } from "../../core/prisma";
+import { normalizeQuery, parseLookupLimit } from "./normalization";
 
 export type AdminOwnerLookupRequestDb = {
   query?: string;
@@ -14,26 +15,11 @@ export type AdminOwnerLookupResponseDb = {
   items: AdminOwnerLookupOptionDb[];
 };
 
-const DEFAULT_LIMIT = 20;
-const MAX_LIMIT = 100;
-
-function parseLimit(value: number | undefined): number {
-  if (!Number.isFinite(value)) {
-    return DEFAULT_LIMIT;
-  }
-
-  return Math.min(MAX_LIMIT, Math.max(1, Math.floor(value ?? DEFAULT_LIMIT)));
-}
-
-function normalizeQuery(value: string | undefined): string {
-  return (value ?? "").trim();
-}
-
 export async function listAdminOwnerOptionsDb(
   input: AdminOwnerLookupRequestDb,
 ): Promise<AdminOwnerLookupResponseDb> {
   const query = normalizeQuery(input.query);
-  const limit = parseLimit(input.limit);
+  const limit = parseLookupLimit(input.limit);
 
   const rows = await prisma.owner.findMany({
     where:

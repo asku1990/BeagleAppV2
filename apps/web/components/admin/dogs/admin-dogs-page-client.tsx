@@ -97,13 +97,21 @@ function getMutationErrorCode(error: unknown): string | undefined {
   return undefined;
 }
 
+function normalizeDateForInput(value: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+
+  return value.slice(0, 10);
+}
+
 function mapDogFromQuery(item: AdminDogListItem): AdminDogRecord {
   return {
     id: item.id,
     registrationNo: item.registrationNo,
     name: item.name,
     sex: item.sex,
-    birthDate: item.birthDate,
+    birthDate: normalizeDateForInput(item.birthDate),
     breederNameText: item.breederName,
     ownershipPreview: item.ownerNames,
     sirePreview: item.sire

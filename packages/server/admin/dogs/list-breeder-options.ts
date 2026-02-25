@@ -7,26 +7,12 @@ import type {
 import { toErrorLog, withLogContext } from "../../shared/logger";
 import type { ServiceResult } from "../../shared/result";
 import { requireAdmin } from "../service";
+import { normalizeQuery, parseLookupLimit } from "./normalization";
 
 type ServiceLogContext = {
   requestId?: string;
   actorUserId?: string;
 };
-
-const DEFAULT_LIMIT = 20;
-const MAX_LIMIT = 100;
-
-function normalizeQuery(value: string | undefined): string {
-  return (value ?? "").trim();
-}
-
-function parseLimit(value: number | undefined): number {
-  if (!Number.isFinite(value)) {
-    return DEFAULT_LIMIT;
-  }
-
-  return Math.min(MAX_LIMIT, Math.max(1, Math.floor(value ?? DEFAULT_LIMIT)));
-}
 
 export async function listAdminBreederOptions(
   input: AdminDogLookupRequest,
@@ -42,7 +28,7 @@ export async function listAdminBreederOptions(
   });
 
   const query = normalizeQuery(input.query);
-  const limit = parseLimit(input.limit);
+  const limit = parseLookupLimit(input.limit);
 
   log.info(
     { event: "start", query, limit },

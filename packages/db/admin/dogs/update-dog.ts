@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+import { uniqueNonEmptyNames } from "./normalization";
 
 export type UpdateAdminDogDbInput = {
   id: string;
@@ -23,19 +24,6 @@ export type UpdatedAdminDogRowDb = {
 
 const OWNERSHIP_DATE_KEY_UNKNOWN = "0000-00-00";
 
-function uniqueNames(names: string[]): string[] {
-  const seen = new Set<string>();
-  for (const rawName of names) {
-    const value = rawName.trim();
-    if (!value || seen.has(value)) {
-      continue;
-    }
-    seen.add(value);
-  }
-
-  return Array.from(seen);
-}
-
 async function resolveBreederId(
   breederNameText: string | null,
   tx: Prisma.TransactionClient,
@@ -58,7 +46,7 @@ async function resolveOwnerIds(
 ): Promise<string[]> {
   const ownerIds: string[] = [];
 
-  for (const ownerName of uniqueNames(ownerNames)) {
+  for (const ownerName of uniqueNonEmptyNames(ownerNames)) {
     const existingOwner = await tx.owner.findFirst({
       where: { name: ownerName },
       select: { id: true },

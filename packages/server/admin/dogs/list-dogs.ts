@@ -7,6 +7,7 @@ import type {
 import type { ServiceResult } from "../../shared/result";
 import { requireAdmin } from "../service";
 import { toErrorLog, withLogContext } from "../../shared/logger";
+import { normalizeQuery } from "./normalization";
 
 type ServiceLogContext = {
   requestId?: string;
@@ -18,10 +19,6 @@ const ALLOWED_SORTS: ReadonlySet<AdminDogListSortDb> = new Set([
   "birth-desc",
   "created-desc",
 ]);
-
-function parseQuery(value: string | undefined): string {
-  return (value ?? "").trim();
-}
 
 function parseSort(
   value: string | undefined,
@@ -79,7 +76,7 @@ export async function listAdminDogs(
   log.info(
     {
       event: "start",
-      query: parseQuery(input.query),
+      query: normalizeQuery(input.query),
       sex: input.sex ?? null,
       page: input.page ?? 1,
       pageSize: input.pageSize ?? 20,
@@ -149,7 +146,7 @@ export async function listAdminDogs(
 
   try {
     const result = await listAdminDogsDb({
-      query: parseQuery(input.query),
+      query: normalizeQuery(input.query),
       sex: parsedSex.value,
       page: parsePage(input.page),
       pageSize: parsePageSize(input.pageSize),

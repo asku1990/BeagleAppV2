@@ -1,5 +1,6 @@
 import { DogSex, type Prisma } from "@prisma/client";
 import { prisma } from "../../core/prisma";
+import { normalizeQuery, uniqueNonEmptyNames } from "./normalization";
 
 export type AdminDogListSortDb = "name-asc" | "birth-desc" | "created-desc";
 
@@ -43,10 +44,6 @@ export type AdminDogListResponseDb = {
 const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 100;
-
-function normalizeQuery(value: string | undefined): string {
-  return (value ?? "").trim();
-}
 
 function parsePage(value: number | undefined): number {
   if (!Number.isFinite(value)) {
@@ -114,19 +111,6 @@ function resolveOrderBy(
   }
 
   return [{ name: "asc" }, { id: "asc" }];
-}
-
-function uniqueNonEmpty(values: string[]): string[] {
-  const seen = new Set<string>();
-  for (const rawValue of values) {
-    const value = rawValue.trim();
-    if (!value || seen.has(value)) {
-      continue;
-    }
-    seen.add(value);
-  }
-
-  return Array.from(seen);
 }
 
 function toParentPreview(
@@ -298,7 +282,7 @@ export async function listAdminDogsDb(
       sex: row.sex,
       birthDate: row.birthDate,
       breederName: row.breeder?.name ?? row.breederNameText ?? null,
-      ownerNames: uniqueNonEmpty(
+      ownerNames: uniqueNonEmptyNames(
         row.ownerships.map((ownership) => ownership.owner.name),
       ),
       sire: toParentPreview(row.sire),

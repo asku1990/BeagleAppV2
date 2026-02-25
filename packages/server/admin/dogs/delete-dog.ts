@@ -9,11 +9,7 @@ import type {
 } from "@beagle/contracts";
 import { toErrorLog, withLogContext } from "../../shared/logger";
 import type { ServiceResult } from "../../shared/result";
-
-function normalizeRequiredId(value: string): string | null {
-  const normalized = value.trim();
-  return normalized.length > 0 ? normalized : null;
-}
+import { normalizeRequiredText } from "./normalization";
 
 export async function deleteAdminDog(
   input: DeleteAdminDogRequest,
@@ -30,7 +26,7 @@ export async function deleteAdminDog(
 
   log.info({ event: "start", dogId: input.id }, "admin dog delete started");
 
-  const id = normalizeRequiredId(input.id);
+  const id = normalizeRequiredText(input.id);
   if (!id) {
     log.warn(
       { event: "invalid_dog_id", durationMs: Date.now() - startedAt },
