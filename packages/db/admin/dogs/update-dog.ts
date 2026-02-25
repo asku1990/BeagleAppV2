@@ -137,9 +137,9 @@ async function syncPrimaryRegistration(
 
   const primaryRegistration = existingRegistrations[0] ?? null;
   if (!registrationNo) {
-    if (primaryRegistration) {
-      await tx.dogRegistration.delete({
-        where: { id: primaryRegistration.id },
+    if (existingRegistrations.length > 0) {
+      await tx.dogRegistration.deleteMany({
+        where: { dogId },
       });
     }
 

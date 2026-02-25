@@ -39,12 +39,10 @@ type NamedEntityOption = {
 };
 
 function createEmptyFormValues(): AdminDogFormValues {
-  const today = new Date().toISOString().slice(0, 10);
-
   return {
     name: "",
     sex: "UNKNOWN",
-    birthDate: today,
+    birthDate: "",
     breederNameText: "",
     ownershipNames: [],
     ekNo: "",

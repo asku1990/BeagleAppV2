@@ -49,8 +49,24 @@ function formatBirthDate(
     return null;
   }
 
-  const parsed = new Date(value);
+  if (!/^\d{4}-\d{2}-\d{2}$/u.test(value)) {
+    return value;
+  }
+
+  const [year, month, day] = value.split("-").map(Number);
+  if (month < 1 || month > 12 || day < 1 || day > 31) {
+    return value;
+  }
+
+  const parsed = new Date(year, month - 1, day);
   if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+  if (
+    parsed.getFullYear() !== year ||
+    parsed.getMonth() + 1 !== month ||
+    parsed.getDate() !== day
+  ) {
     return value;
   }
 

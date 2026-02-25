@@ -87,6 +87,23 @@ describe("createAdminDog", () => {
     });
   });
 
+  it("returns 400 for EK number above DB integer range", async () => {
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        ekNo: 2_147_483_648,
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "EK number must be a positive integer.",
+        code: "INVALID_EK_NO",
+      },
+    });
+  });
+
   it("returns 400 when name is too long", async () => {
     await expect(
       createAdminDog({ name: "a".repeat(121), sex: "FEMALE" }),

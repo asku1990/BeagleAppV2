@@ -1,5 +1,6 @@
 const DEFAULT_LOOKUP_LIMIT = 20;
 const MAX_LOOKUP_LIMIT = 100;
+const MAX_DB_INT = 2_147_483_647;
 
 export function normalizeRequiredText(value: string): string | null {
   const normalized = value.trim();
@@ -72,7 +73,7 @@ export function parsePositiveInteger(
     return null;
   }
 
-  if (!Number.isInteger(value) || value <= 0) {
+  if (!Number.isInteger(value) || value <= 0 || value > MAX_DB_INT) {
     return "INVALID";
   }
 

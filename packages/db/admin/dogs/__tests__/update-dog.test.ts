@@ -11,6 +11,7 @@ describe("updateAdminDogWriteDb", () => {
   const dogOwnershipCreateMock = vi.fn();
   const dogRegistrationFindManyMock = vi.fn();
   const dogRegistrationDeleteMock = vi.fn();
+  const dogRegistrationDeleteManyMock = vi.fn();
   const dogRegistrationUpdateMock = vi.fn();
   const dogRegistrationCreateMock = vi.fn();
 
@@ -34,6 +35,7 @@ describe("updateAdminDogWriteDb", () => {
     dogRegistration: {
       findMany: dogRegistrationFindManyMock,
       delete: dogRegistrationDeleteMock,
+      deleteMany: dogRegistrationDeleteManyMock,
       update: dogRegistrationUpdateMock,
       create: dogRegistrationCreateMock,
     },
@@ -49,6 +51,7 @@ describe("updateAdminDogWriteDb", () => {
     dogOwnershipCreateMock.mockReset();
     dogRegistrationFindManyMock.mockReset();
     dogRegistrationDeleteMock.mockReset();
+    dogRegistrationDeleteManyMock.mockReset();
     dogRegistrationUpdateMock.mockReset();
     dogRegistrationCreateMock.mockReset();
   });
@@ -98,5 +101,49 @@ describe("updateAdminDogWriteDb", () => {
       where: { id: "reg_primary" },
       data: { registrationNo: "FI22222/21" },
     });
+  });
+
+  it("removes every registration when registration number is cleared", async () => {
+    dogFindUniqueMock.mockResolvedValue({ id: "dog_1" });
+    breederFindUniqueMock.mockResolvedValue(null);
+    dogUpdateMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Kide",
+      sex: "FEMALE",
+    });
+    dogOwnershipFindManyMock.mockResolvedValue([]);
+    dogRegistrationFindManyMock.mockResolvedValue([
+      { id: "reg_primary", registrationNo: "FI11111/21" },
+      { id: "reg_secondary", registrationNo: "FI22222/21" },
+    ]);
+
+    await expect(
+      updateAdminDogWriteDb(
+        {
+          id: "dog_1",
+          name: "Kide",
+          sex: "FEMALE",
+          birthDate: null,
+          breederNameText: null,
+          sireId: null,
+          damId: null,
+          ownerNames: [],
+          ekNo: null,
+          note: null,
+          registrationNo: null,
+        },
+        tx as never,
+      ),
+    ).resolves.toEqual({
+      id: "dog_1",
+      name: "Kide",
+      sex: "FEMALE",
+      registrationNo: null,
+    });
+
+    expect(dogRegistrationDeleteManyMock).toHaveBeenCalledWith({
+      where: { dogId: "dog_1" },
+    });
+    expect(dogRegistrationDeleteMock).not.toHaveBeenCalled();
   });
 });
