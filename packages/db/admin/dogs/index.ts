@@ -17,6 +17,7 @@ export {
   type UpdateAdminDogDbInput,
   type UpdatedAdminDogRowDb,
 } from "./update-dog";
+export { deleteAdminDogWriteDb } from "./delete-dog";
 export {
   listAdminBreederOptionsDb,
   type AdminBreederLookupRequestDb,

@@ -15,6 +15,10 @@ export type {
   UpdateAdminDogResponse,
 } from "./update-admin-dog";
 export type {
+  DeleteAdminDogRequest,
+  DeleteAdminDogResponse,
+} from "./delete-admin-dog";
+export type {
   AdminDogLookupRequest,
   AdminBreederLookupOption,
   AdminOwnerLookupOption,

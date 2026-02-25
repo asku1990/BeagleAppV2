@@ -52,6 +52,7 @@ export {
 
 export {
   createAdminDogWriteDb,
+  deleteAdminDogWriteDb,
   updateAdminDogWriteDb,
   createAdminUserDb,
   listAdminDogsDb,

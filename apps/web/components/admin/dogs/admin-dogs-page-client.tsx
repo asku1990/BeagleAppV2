@@ -9,6 +9,7 @@ import { useI18n } from "@/hooks/i18n";
 import { AdminMutationError } from "@/queries/admin";
 import {
   useAdminDogBreederOptionsQuery,
+  useDeleteAdminDogMutation,
   useAdminDogOwnerOptionsQuery,
   useAdminDogParentOptionsQuery,
   useAdminDogsQuery,
@@ -118,7 +119,6 @@ export function AdminDogsPageClient() {
   const { t } = useI18n();
   const [query, setQuery] = useState("");
   const [sex, setSex] = useState<"all" | AdminDogSex>("all");
-  const [deletedDogIds, setDeletedDogIds] = useState<Set<string>>(new Set());
   const [deleteTarget, setDeleteTarget] = useState<AdminDogRecord | null>(null);
   const [formState, setFormState] = useState<DogFormState>({
     open: false,
@@ -146,6 +146,7 @@ export function AdminDogsPageClient() {
   const dogsQuery = useAdminDogsQuery(filters);
   const createDogMutation = useCreateAdminDogMutation();
   const updateDogMutation = useUpdateAdminDogMutation();
+  const deleteDogMutation = useDeleteAdminDogMutation();
   const breederOptionsQuery = useAdminDogBreederOptionsQuery({
     query: breederLookupQuery,
     limit: 100,
@@ -166,9 +167,7 @@ export function AdminDogsPageClient() {
     () => (dogsQuery.data?.items ?? []).map(mapDogFromQuery),
     [dogsQuery.data?.items],
   );
-  const dogs = useMemo(() => {
-    return baseDogs.filter((dog) => !deletedDogIds.has(dog.id));
-  }, [baseDogs, deletedDogIds]);
+  const dogs = useMemo(() => baseDogs, [baseDogs]);
 
   const breederOptions = useMemo(
     (): NamedEntityOption[] =>
@@ -286,18 +285,22 @@ export function AdminDogsPageClient() {
     }
   }
 
-  function handleDeleteConfirm() {
+  async function handleDeleteConfirm() {
     if (!deleteTarget) {
       return;
     }
 
-    setDeletedDogIds((current) => {
-      const next = new Set(current);
-      next.add(deleteTarget.id);
-      return next;
-    });
-    toast.success(t("admin.dogs.delete.success"));
-    setDeleteTarget(null);
+    try {
+      await deleteDogMutation.mutateAsync({ id: deleteTarget.id });
+      toast.success(t("admin.dogs.delete.success"));
+      setDeleteTarget(null);
+    } catch (error) {
+      const message =
+        error instanceof AdminMutationError
+          ? error.message
+          : "Failed to delete dog.";
+      toast.error(message);
+    }
   }
 
   const resultCount = dogs.length;
@@ -365,6 +368,7 @@ export function AdminDogsPageClient() {
         dog={deleteTarget}
         onCancel={() => setDeleteTarget(null)}
         onConfirm={handleDeleteConfirm}
+        isDeleting={deleteDogMutation.isPending}
       />
     </div>
   );

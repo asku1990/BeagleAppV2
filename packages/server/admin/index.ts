@@ -6,6 +6,7 @@ export { setAdminUserStatus } from "./set-user-status";
 export { setAdminUserPassword } from "./set-user-password";
 export { createAdminDog } from "./dogs";
 export { updateAdminDog } from "./dogs";
+export { deleteAdminDog } from "./dogs";
 export { listAdminBreederOptions } from "./dogs";
 export { listAdminDogParentOptions } from "./dogs";
 export { listAdminDogs } from "./dogs";

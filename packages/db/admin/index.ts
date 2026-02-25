@@ -14,6 +14,7 @@ export { setAdminUserStatusDb } from "./set-user-status";
 export { setAdminUserPasswordDb } from "./set-user-password";
 export {
   createAdminDogWriteDb,
+  deleteAdminDogWriteDb,
   updateAdminDogWriteDb,
   listAdminDogsDb,
   runAdminDogWriteTransactionDb,

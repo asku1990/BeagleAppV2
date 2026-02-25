@@ -117,6 +117,8 @@ export type {
   CreateAdminDogResponse,
   UpdateAdminDogRequest,
   UpdateAdminDogResponse,
+  DeleteAdminDogRequest,
+  DeleteAdminDogResponse,
   AdminDogLookupRequest,
   AdminBreederLookupOption,
   AdminOwnerLookupOption,
