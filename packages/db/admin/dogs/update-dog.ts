@@ -162,6 +162,23 @@ async function syncPrimaryRegistration(
     (row) => row.registrationNo === registrationNo,
   );
   if (alreadyOwned) {
+    const requestedRegistration = existingRegistrations.find(
+      (row) => row.registrationNo === registrationNo,
+    );
+    if (
+      primaryRegistration &&
+      requestedRegistration &&
+      requestedRegistration.id !== primaryRegistration.id
+    ) {
+      await tx.dogRegistration.delete({
+        where: { id: requestedRegistration.id },
+      });
+      await tx.dogRegistration.update({
+        where: { id: primaryRegistration.id },
+        data: { registrationNo },
+      });
+    }
+
     return registrationNo;
   }
 

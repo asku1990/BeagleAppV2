@@ -58,6 +58,24 @@ describe("updateAdminDog", () => {
     });
   });
 
+  it("returns 400 for non-existent calendar birth date", async () => {
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        birthDate: "2026-02-31",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Birth date must use YYYY-MM-DD format.",
+        code: "INVALID_BIRTH_DATE",
+      },
+    });
+  });
+
   it("returns 400 for invalid EK number", async () => {
     await expect(
       updateAdminDog({

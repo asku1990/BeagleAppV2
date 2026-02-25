@@ -62,6 +62,15 @@ function parseBirthDate(value: string | undefined): Date | null | "INVALID" {
     return "INVALID";
   }
 
+  const [year, month, day] = normalized.split("-").map(Number);
+  if (
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() + 1 !== month ||
+    parsed.getUTCDate() !== day
+  ) {
+    return "INVALID";
+  }
+
   return parsed;
 }
 
