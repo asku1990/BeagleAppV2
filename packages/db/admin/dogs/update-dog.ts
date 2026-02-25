@@ -6,12 +6,12 @@ export type UpdateAdminDogDbInput = {
   sex: "MALE" | "FEMALE" | "UNKNOWN";
   birthDate: Date | null;
   breederNameText: string | null;
+  sireId: string | null;
+  damId: string | null;
   ownerNames: string[];
   ekNo: number | null;
   note: string | null;
   registrationNo: string | null;
-  sireRegistrationNo: string | null;
-  damRegistrationNo: string | null;
 };
 
 export type UpdatedAdminDogRowDb = {
@@ -34,22 +34,6 @@ function uniqueNames(names: string[]): string[] {
   }
 
   return Array.from(seen);
-}
-
-async function findDogIdByRegistrationNo(
-  registrationNo: string | null,
-  tx: Prisma.TransactionClient,
-): Promise<string | null> {
-  if (!registrationNo) {
-    return null;
-  }
-
-  const row = await tx.dogRegistration.findUnique({
-    where: { registrationNo },
-    select: { dogId: true },
-  });
-
-  return row?.dogId ?? null;
 }
 
 async function resolveBreederId(
@@ -213,8 +197,6 @@ export async function updateAdminDogWriteDb(
     throw new Error("DOG_NOT_FOUND");
   }
 
-  const sireId = await findDogIdByRegistrationNo(input.sireRegistrationNo, tx);
-  const damId = await findDogIdByRegistrationNo(input.damRegistrationNo, tx);
   const breederId = await resolveBreederId(input.breederNameText, tx);
 
   const updatedDog = await tx.dog.update({
@@ -225,8 +207,8 @@ export async function updateAdminDogWriteDb(
       birthDate: input.birthDate,
       breederNameText: input.breederNameText,
       breederId,
-      sireId,
-      damId,
+      sireId: input.sireId,
+      damId: input.damId,
       ekNo: input.ekNo,
       note: input.note,
     },

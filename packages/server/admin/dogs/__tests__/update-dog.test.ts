@@ -1,21 +1,27 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { updateAdminDog } from "../update-dog";
 
-const { updateAdminDogWriteDbMock, runAdminDogWriteTransactionDbMock } =
-  vi.hoisted(() => ({
-    updateAdminDogWriteDbMock: vi.fn(),
-    runAdminDogWriteTransactionDbMock: vi.fn(),
-  }));
+const {
+  updateAdminDogWriteDbMock,
+  runAdminDogWriteTransactionDbMock,
+  findDogByRegistrationNoDbMock,
+} = vi.hoisted(() => ({
+  updateAdminDogWriteDbMock: vi.fn(),
+  runAdminDogWriteTransactionDbMock: vi.fn(),
+  findDogByRegistrationNoDbMock: vi.fn(),
+}));
 
 vi.mock("@beagle/db", () => ({
   updateAdminDogWriteDb: updateAdminDogWriteDbMock,
   runAdminDogWriteTransactionDb: runAdminDogWriteTransactionDbMock,
+  findDogByRegistrationNoDb: findDogByRegistrationNoDbMock,
 }));
 
 describe("updateAdminDog", () => {
   beforeEach(() => {
     updateAdminDogWriteDbMock.mockReset();
     runAdminDogWriteTransactionDbMock.mockReset();
+    findDogByRegistrationNoDbMock.mockReset();
     runAdminDogWriteTransactionDbMock.mockImplementation(async (callback) =>
       callback({}),
     );
@@ -71,6 +77,7 @@ describe("updateAdminDog", () => {
   });
 
   it("updates dog and returns 200", async () => {
+    findDogByRegistrationNoDbMock.mockResolvedValue(null);
     updateAdminDogWriteDbMock.mockResolvedValue({
       id: "dog_1",
       name: "Metsapolun Kide",
@@ -110,18 +117,19 @@ describe("updateAdminDog", () => {
         sex: "FEMALE",
         birthDate: new Date("2021-04-09T00:00:00.000Z"),
         breederNameText: "Metsapolun",
+        sireId: null,
+        damId: null,
         ownerNames: ["Tiina Virtanen"],
         ekNo: 5588,
         note: "Important",
         registrationNo: "FI12345/21",
-        sireRegistrationNo: null,
-        damRegistrationNo: null,
       },
       {},
     );
   });
 
   it("returns 404 when dog is not found", async () => {
+    findDogByRegistrationNoDbMock.mockResolvedValue(null);
     updateAdminDogWriteDbMock.mockRejectedValue(new Error("DOG_NOT_FOUND"));
 
     await expect(
@@ -137,6 +145,7 @@ describe("updateAdminDog", () => {
   });
 
   it("returns 409 for duplicate dog", async () => {
+    findDogByRegistrationNoDbMock.mockResolvedValue(null);
     updateAdminDogWriteDbMock.mockRejectedValue({ code: "P2002" });
 
     await expect(
@@ -147,6 +156,52 @@ describe("updateAdminDog", () => {
         ok: false,
         error: "Dog with same EK number or registration number already exists.",
         code: "DUPLICATE_DOG",
+      },
+    });
+  });
+
+  it("returns 400 when parent resolves to same dog", async () => {
+    findDogByRegistrationNoDbMock.mockResolvedValue({
+      id: "dog_1",
+      sex: "MALE",
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        sireRegistrationNo: "FI11111/11",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Dog cannot be its own sire.",
+        code: "INVALID_SELF_PARENT",
+      },
+    });
+  });
+
+  it("returns 400 when sire has invalid sex", async () => {
+    findDogByRegistrationNoDbMock.mockResolvedValue({
+      id: "dog_parent",
+      sex: "FEMALE",
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        sireRegistrationNo: "FI11111/11",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Selected sire must be a male dog.",
+        code: "INVALID_SIRE_SEX",
       },
     });
   });

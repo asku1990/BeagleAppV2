@@ -53,6 +53,7 @@ export {
 export {
   createAdminDogWriteDb,
   deleteAdminDogWriteDb,
+  findDogByRegistrationNoDb,
   updateAdminDogWriteDb,
   createAdminUserDb,
   listAdminDogsDb,
@@ -90,4 +91,5 @@ export {
   type CreatedAdminDogRowDb,
   type UpdateAdminDogDbInput,
   type UpdatedAdminDogRowDb,
+  type DogByRegistrationLookupDb,
 } from "./admin";

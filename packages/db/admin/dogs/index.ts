@@ -19,6 +19,10 @@ export {
 } from "./update-dog";
 export { deleteAdminDogWriteDb } from "./delete-dog";
 export {
+  findDogByRegistrationNoDb,
+  type DogByRegistrationLookupDb,
+} from "./find-dog-by-registration";
+export {
   listAdminBreederOptionsDb,
   type AdminBreederLookupRequestDb,
   type AdminBreederLookupOptionDb,

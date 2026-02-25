@@ -1,4 +1,5 @@
 import {
+  findDogByRegistrationNoDb,
   runAdminDogWriteTransactionDb,
   updateAdminDogWriteDb,
   type AuditContextDb,
@@ -75,6 +76,21 @@ function parseEkNo(value: number | undefined): number | null | "INVALID" {
   }
 
   return value;
+}
+
+async function resolveParentByRegistration(
+  registrationNo: string | null,
+): Promise<{ id: string; sex: "MALE" | "FEMALE" | "UNKNOWN" } | null> {
+  if (!registrationNo) {
+    return null;
+  }
+
+  const row = await findDogByRegistrationNoDb(registrationNo);
+  if (!row) {
+    return null;
+  }
+
+  return { id: row.id, sex: row.sex };
 }
 
 function isDuplicateError(error: unknown): boolean {
@@ -211,6 +227,88 @@ export async function updateAdminDog(
   }
 
   try {
+    const sireRegistrationNo = normalizeOptionalText(input.sireRegistrationNo);
+    const damRegistrationNo = normalizeOptionalText(input.damRegistrationNo);
+
+    const sire = await resolveParentByRegistration(sireRegistrationNo);
+    if (sireRegistrationNo && !sire) {
+      return {
+        status: 400,
+        body: {
+          ok: false,
+          error: "Sire registration number was not found.",
+          code: "INVALID_SIRE_REGISTRATION",
+        },
+      };
+    }
+
+    const dam = await resolveParentByRegistration(damRegistrationNo);
+    if (damRegistrationNo && !dam) {
+      return {
+        status: 400,
+        body: {
+          ok: false,
+          error: "Dam registration number was not found.",
+          code: "INVALID_DAM_REGISTRATION",
+        },
+      };
+    }
+
+    if (sire && dam && sire.id === dam.id) {
+      return {
+        status: 400,
+        body: {
+          ok: false,
+          error: "Sire and dam must be different dogs.",
+          code: "INVALID_PARENT_COMBINATION",
+        },
+      };
+    }
+
+    if (sire && sire.id === id) {
+      return {
+        status: 400,
+        body: {
+          ok: false,
+          error: "Dog cannot be its own sire.",
+          code: "INVALID_SELF_PARENT",
+        },
+      };
+    }
+
+    if (dam && dam.id === id) {
+      return {
+        status: 400,
+        body: {
+          ok: false,
+          error: "Dog cannot be its own dam.",
+          code: "INVALID_SELF_PARENT",
+        },
+      };
+    }
+
+    if (sire && sire.sex !== "MALE") {
+      return {
+        status: 400,
+        body: {
+          ok: false,
+          error: "Selected sire must be a male dog.",
+          code: "INVALID_SIRE_SEX",
+        },
+      };
+    }
+
+    if (dam && dam.sex !== "FEMALE") {
+      return {
+        status: 400,
+        body: {
+          ok: false,
+          error: "Selected dam must be a female dog.",
+          code: "INVALID_DAM_SEX",
+        },
+      };
+    }
+
     const updatedDog = await runAdminDogWriteTransactionDb(
       async (tx) =>
         updateAdminDogWriteDb(
@@ -220,12 +318,12 @@ export async function updateAdminDog(
             sex,
             birthDate,
             breederNameText: normalizeOptionalText(input.breederNameText),
+            sireId: sire?.id ?? null,
+            damId: dam?.id ?? null,
             ownerNames: normalizeOwnerNames(input.ownerNames),
             ekNo,
             note: normalizeOptionalText(input.note),
             registrationNo: normalizeOptionalText(input.registrationNo),
-            sireRegistrationNo: normalizeOptionalText(input.sireRegistrationNo),
-            damRegistrationNo: normalizeOptionalText(input.damRegistrationNo),
           },
           tx,
         ),

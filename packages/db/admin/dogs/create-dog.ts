@@ -9,12 +9,12 @@ export type CreateAdminDogDbInput = {
   sex: "MALE" | "FEMALE" | "UNKNOWN";
   birthDate: Date | null;
   breederNameText: string | null;
+  sireId: string | null;
+  damId: string | null;
   ownerNames: string[];
   ekNo: number | null;
   note: string | null;
   registrationNo: string | null;
-  sireRegistrationNo: string | null;
-  damRegistrationNo: string | null;
 };
 
 export type CreatedAdminDogRowDb = {
@@ -25,22 +25,6 @@ export type CreatedAdminDogRowDb = {
 };
 
 const OWNERSHIP_DATE_KEY_UNKNOWN = "0000-00-00";
-
-async function findDogIdByRegistrationNo(
-  registrationNo: string | null,
-  tx: Prisma.TransactionClient,
-): Promise<string | null> {
-  if (!registrationNo) {
-    return null;
-  }
-
-  const row = await tx.dogRegistration.findUnique({
-    where: { registrationNo },
-    select: { dogId: true },
-  });
-
-  return row?.dogId ?? null;
-}
 
 async function resolveBreederId(
   breederNameText: string | null,
@@ -113,8 +97,6 @@ async function createAdminDogDb(
   input: CreateAdminDogDbInput,
   tx: Prisma.TransactionClient,
 ): Promise<CreatedAdminDogRowDb> {
-  const sireId = await findDogIdByRegistrationNo(input.sireRegistrationNo, tx);
-  const damId = await findDogIdByRegistrationNo(input.damRegistrationNo, tx);
   const breederId = await resolveBreederId(input.breederNameText, tx);
 
   const createdDog = await tx.dog.create({
@@ -123,8 +105,8 @@ async function createAdminDogDb(
       sex: input.sex,
       birthDate: input.birthDate,
       breederNameText: input.breederNameText,
-      sireId,
-      damId,
+      sireId: input.sireId,
+      damId: input.damId,
       breederId,
       ekNo: input.ekNo,
       note: input.note,
