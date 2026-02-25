@@ -227,10 +227,22 @@ export async function updateAdminDog(
       };
     }
 
-    const sireRegistrationNo = normalizeOptionalText(input.sireRegistrationNo);
-    const damRegistrationNo = normalizeOptionalText(input.damRegistrationNo);
+    const sireRegistrationNo =
+      input.sireRegistrationNo === undefined
+        ? undefined
+        : normalizeOptionalText(input.sireRegistrationNo);
+    const damRegistrationNo =
+      input.damRegistrationNo === undefined
+        ? undefined
+        : normalizeOptionalText(input.damRegistrationNo);
 
-    const sire = await resolveParentByRegistration(sireRegistrationNo);
+    let sire:
+      | { id: string; sex: "MALE" | "FEMALE" | "UNKNOWN" }
+      | null
+      | undefined;
+    if (sireRegistrationNo !== undefined) {
+      sire = await resolveParentByRegistration(sireRegistrationNo);
+    }
     if (sireRegistrationNo && !sire) {
       return {
         status: 400,
@@ -242,7 +254,13 @@ export async function updateAdminDog(
       };
     }
 
-    const dam = await resolveParentByRegistration(damRegistrationNo);
+    let dam:
+      | { id: string; sex: "MALE" | "FEMALE" | "UNKNOWN" }
+      | null
+      | undefined;
+    if (damRegistrationNo !== undefined) {
+      dam = await resolveParentByRegistration(damRegistrationNo);
+    }
     if (damRegistrationNo && !dam) {
       return {
         status: 400,
@@ -318,8 +336,8 @@ export async function updateAdminDog(
             sex,
             birthDate,
             breederNameText: normalizeOptionalText(input.breederNameText),
-            sireId: sire?.id ?? null,
-            damId: dam?.id ?? null,
+            sireId: sire === undefined ? undefined : (sire?.id ?? null),
+            damId: dam === undefined ? undefined : (dam?.id ?? null),
             ownerNames: normalizeDistinctNames(input.ownerNames),
             ekNo,
             note,

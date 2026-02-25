@@ -38,6 +38,51 @@ type NamedEntityOption = {
   name: string;
 };
 
+function mergeNamedOption(
+  options: NamedEntityOption[],
+  name: string,
+): NamedEntityOption[] {
+  const normalizedName = name.trim();
+  if (!normalizedName) {
+    return options;
+  }
+
+  if (options.some((option) => option.name === normalizedName)) {
+    return options;
+  }
+
+  return [
+    { id: `selected:${normalizedName}`, name: normalizedName },
+    ...options,
+  ];
+}
+
+function mergeParentOption(
+  options: DogParentOption[],
+  option: DogParentOption | null,
+): DogParentOption[] {
+  if (!option) {
+    return options;
+  }
+
+  const normalizedRegistrationNo = option.registrationNo.trim();
+  const normalizedName = option.name.trim();
+  if (!normalizedRegistrationNo || !normalizedName) {
+    return options;
+  }
+
+  if (
+    options.some((item) => item.registrationNo === normalizedRegistrationNo)
+  ) {
+    return options;
+  }
+
+  return [
+    { registrationNo: normalizedRegistrationNo, name: normalizedName },
+    ...options,
+  ];
+}
+
 function createEmptyFormValues(): AdminDogFormValues {
   return {
     name: "",
@@ -75,6 +120,25 @@ function mapDogToFormValues(dog: AdminDogRecord): AdminDogFormValues {
 function normalizeOptionalText(value: string): string | null {
   const normalized = value.trim();
   return normalized.length > 0 ? normalized : null;
+}
+
+function normalizeParentRegistrationForUpdate(value: string): string {
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : "";
+}
+
+function resolveParentRegistrationUpdateValue(
+  currentValue: string,
+  initialValue: string,
+): string | undefined {
+  const normalizedCurrent = normalizeParentRegistrationForUpdate(currentValue);
+  const normalizedInitial = normalizeParentRegistrationForUpdate(initialValue);
+
+  if (normalizedCurrent === normalizedInitial) {
+    return undefined;
+  }
+
+  return normalizedCurrent;
 }
 
 function normalizeEkNo(value: string): number | null {
@@ -224,14 +288,14 @@ export function AdminDogsPageClient() {
     }
   }
 
-  const breederOptions = useMemo(
-    (): NamedEntityOption[] =>
-      (breederOptionsQuery.data ?? []).map((option) => ({
-        id: option.id,
-        name: option.name,
-      })),
-    [breederOptionsQuery.data],
-  );
+  const breederOptions = useMemo((): NamedEntityOption[] => {
+    const mapped = (breederOptionsQuery.data ?? []).map((option) => ({
+      id: option.id,
+      name: option.name,
+    }));
+
+    return mergeNamedOption(mapped, formValues.breederNameText);
+  }, [breederOptionsQuery.data, formValues.breederNameText]);
 
   const ownerOptions = useMemo(
     (): NamedEntityOption[] =>
@@ -242,16 +306,30 @@ export function AdminDogsPageClient() {
     [ownerOptionsQuery.data],
   );
 
-  const parentOptions = useMemo<DogParentOption[]>(
-    () =>
-      (parentOptionsQuery.data ?? [])
-        .filter((option) => (option.registrationNo?.trim().length ?? 0) > 0)
-        .map((option) => ({
-          registrationNo: option.registrationNo ?? "",
-          name: option.name,
-        })),
-    [parentOptionsQuery.data],
-  );
+  const parentOptions = useMemo<DogParentOption[]>(() => {
+    const mapped = (parentOptionsQuery.data ?? [])
+      .filter((option) => (option.registrationNo?.trim().length ?? 0) > 0)
+      .map((option) => ({
+        registrationNo: option.registrationNo ?? "",
+        name: option.name,
+      }));
+
+    const withSire = mergeParentOption(mapped, {
+      registrationNo: formValues.sirePreviewRegistrationNo,
+      name: formValues.sirePreviewName,
+    });
+
+    return mergeParentOption(withSire, {
+      registrationNo: formValues.damPreviewRegistrationNo,
+      name: formValues.damPreviewName,
+    });
+  }, [
+    parentOptionsQuery.data,
+    formValues.sirePreviewRegistrationNo,
+    formValues.sirePreviewName,
+    formValues.damPreviewRegistrationNo,
+    formValues.damPreviewName,
+  ]);
 
   function openCreateModal() {
     setBreederLookupQuery("");
@@ -319,10 +397,14 @@ export function AdminDogsPageClient() {
         note: normalizeOptionalText(values.note) ?? undefined,
         registrationNo:
           normalizeOptionalText(values.registrationNo) ?? undefined,
-        sireRegistrationNo:
-          normalizeOptionalText(values.sirePreviewRegistrationNo) ?? undefined,
-        damRegistrationNo:
-          normalizeOptionalText(values.damPreviewRegistrationNo) ?? undefined,
+        sireRegistrationNo: resolveParentRegistrationUpdateValue(
+          values.sirePreviewRegistrationNo,
+          formState.target.sirePreview?.registrationNo ?? "",
+        ),
+        damRegistrationNo: resolveParentRegistrationUpdateValue(
+          values.damPreviewRegistrationNo,
+          formState.target.damPreview?.registrationNo ?? "",
+        ),
       });
 
       toast.success(t("admin.dogs.edit.success"));

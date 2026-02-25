@@ -146,4 +146,42 @@ describe("updateAdminDogWriteDb", () => {
     });
     expect(dogRegistrationDeleteMock).not.toHaveBeenCalled();
   });
+
+  it("does not update parent links when parent ids are undefined", async () => {
+    dogFindUniqueMock.mockResolvedValue({ id: "dog_1" });
+    breederFindUniqueMock.mockResolvedValue(null);
+    dogUpdateMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Kide",
+      sex: "FEMALE",
+    });
+    dogOwnershipFindManyMock.mockResolvedValue([]);
+    dogRegistrationFindManyMock.mockResolvedValue([]);
+
+    await updateAdminDogWriteDb(
+      {
+        id: "dog_1",
+        name: "Kide",
+        sex: "FEMALE",
+        birthDate: null,
+        breederNameText: null,
+        sireId: undefined,
+        damId: undefined,
+        ownerNames: [],
+        ekNo: null,
+        note: null,
+        registrationNo: null,
+      },
+      tx as never,
+    );
+
+    expect(dogUpdateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.not.objectContaining({
+          sireId: expect.anything(),
+          damId: expect.anything(),
+        }),
+      }),
+    );
+  });
 });

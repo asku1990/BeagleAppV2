@@ -42,7 +42,7 @@ export const fiAdminDogsCommonMessages = {
   "admin.dogs.mutation.errorInvalidDamSex":
     "Valitun emän sukupuoli ei ole narttu.",
   "admin.dogs.mutation.errorDuplicateDog":
-    "Koira samalla rekisterinumerolla on jo olemassa.",
+    "Koira samalla EK-numerolla tai rekisterinumerolla on jo olemassa.",
   "admin.dogs.mutation.errorDogNotFound": "Koiraa ei löytynyt.",
 } as const;
 
@@ -88,6 +88,6 @@ export const svAdminDogsCommonMessages = {
   "admin.dogs.mutation.errorInvalidSireSex": "Vald hane har inte kon hane.",
   "admin.dogs.mutation.errorInvalidDamSex": "Vald tik har inte kon tik.",
   "admin.dogs.mutation.errorDuplicateDog":
-    "En hund med samma registreringsnummer finns redan.",
+    "En hund med samma EK-nummer eller registreringsnummer finns redan.",
   "admin.dogs.mutation.errorDogNotFound": "Hunden hittades inte.",
 } as const;

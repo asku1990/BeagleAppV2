@@ -7,8 +7,8 @@ export type UpdateAdminDogDbInput = {
   sex: "MALE" | "FEMALE" | "UNKNOWN";
   birthDate: Date | null;
   breederNameText: string | null;
-  sireId: string | null;
-  damId: string | null;
+  sireId: string | null | undefined;
+  damId: string | null | undefined;
   ownerNames: string[];
   ekNo: number | null;
   note: string | null;
@@ -212,8 +212,8 @@ export async function updateAdminDogWriteDb(
       birthDate: input.birthDate,
       breederNameText: input.breederNameText,
       breederId,
-      sireId: input.sireId,
-      damId: input.damId,
+      ...(input.sireId === undefined ? {} : { sireId: input.sireId }),
+      ...(input.damId === undefined ? {} : { damId: input.damId }),
       ekNo: input.ekNo,
       note: input.note,
     },
