@@ -76,6 +76,23 @@ describe("updateAdminDog", () => {
     });
   });
 
+  it("returns 400 when name is too long", async () => {
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "a".repeat(121),
+        sex: "FEMALE",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Name cannot exceed 120 characters.",
+        code: "NAME_TOO_LONG",
+      },
+    });
+  });
+
   it("updates dog and returns 200", async () => {
     findDogByRegistrationNoDbMock.mockResolvedValue(null);
     updateAdminDogWriteDbMock.mockResolvedValue({
@@ -202,6 +219,42 @@ describe("updateAdminDog", () => {
         ok: false,
         error: "Selected sire must be a male dog.",
         code: "INVALID_SIRE_SEX",
+      },
+    });
+  });
+
+  it("returns 400 when registration number is too long", async () => {
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "R".repeat(41),
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Registration number cannot exceed 40 characters.",
+        code: "REGISTRATION_NO_TOO_LONG",
+      },
+    });
+  });
+
+  it("returns 400 when note is too long", async () => {
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        note: "n".repeat(501),
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Note cannot exceed 500 characters.",
+        code: "NOTE_TOO_LONG",
       },
     });
   });

@@ -11,6 +11,10 @@ import type {
 import { toErrorLog, withLogContext } from "../../shared/logger";
 import type { ServiceResult } from "../../shared/result";
 
+const DOG_NAME_MAX_LENGTH = 120;
+const DOG_REGISTRATION_NO_MAX_LENGTH = 40;
+const DOG_NOTE_MAX_LENGTH = 500;
+
 function normalizeRequiredId(value: string): string | null {
   const normalized = value.trim();
   return normalized.length > 0 ? normalized : null;
@@ -76,6 +80,10 @@ function parseEkNo(value: number | undefined): number | null | "INVALID" {
   }
 
   return value;
+}
+
+function hasMaxLength(value: string | null, maxLength: number): boolean {
+  return !value || value.length <= maxLength;
 }
 
 async function resolveParentByRegistration(
@@ -162,6 +170,20 @@ export async function updateAdminDog(
       },
     };
   }
+  if (!hasMaxLength(name, DOG_NAME_MAX_LENGTH)) {
+    log.warn(
+      { event: "name_too_long", dogId: id, durationMs: Date.now() - startedAt },
+      "admin dog update rejected because name is too long",
+    );
+    return {
+      status: 400,
+      body: {
+        ok: false,
+        error: `Name cannot exceed ${DOG_NAME_MAX_LENGTH} characters.`,
+        code: "NAME_TOO_LONG",
+      },
+    };
+  }
 
   const sex = parseSex(input.sex);
   if (!sex) {
@@ -227,6 +249,46 @@ export async function updateAdminDog(
   }
 
   try {
+    const registrationNo = normalizeOptionalText(input.registrationNo);
+    if (!hasMaxLength(registrationNo, DOG_REGISTRATION_NO_MAX_LENGTH)) {
+      log.warn(
+        {
+          event: "registration_no_too_long",
+          dogId: id,
+          durationMs: Date.now() - startedAt,
+        },
+        "admin dog update rejected because registration number is too long",
+      );
+      return {
+        status: 400,
+        body: {
+          ok: false,
+          error: `Registration number cannot exceed ${DOG_REGISTRATION_NO_MAX_LENGTH} characters.`,
+          code: "REGISTRATION_NO_TOO_LONG",
+        },
+      };
+    }
+
+    const note = normalizeOptionalText(input.note);
+    if (!hasMaxLength(note, DOG_NOTE_MAX_LENGTH)) {
+      log.warn(
+        {
+          event: "note_too_long",
+          dogId: id,
+          durationMs: Date.now() - startedAt,
+        },
+        "admin dog update rejected because note is too long",
+      );
+      return {
+        status: 400,
+        body: {
+          ok: false,
+          error: `Note cannot exceed ${DOG_NOTE_MAX_LENGTH} characters.`,
+          code: "NOTE_TOO_LONG",
+        },
+      };
+    }
+
     const sireRegistrationNo = normalizeOptionalText(input.sireRegistrationNo);
     const damRegistrationNo = normalizeOptionalText(input.damRegistrationNo);
 
@@ -322,8 +384,8 @@ export async function updateAdminDog(
             damId: dam?.id ?? null,
             ownerNames: normalizeOwnerNames(input.ownerNames),
             ekNo,
-            note: normalizeOptionalText(input.note),
-            registrationNo: normalizeOptionalText(input.registrationNo),
+            note,
+            registrationNo,
           },
           tx,
         ),

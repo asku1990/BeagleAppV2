@@ -39,10 +39,12 @@ type NamedEntityOption = {
 };
 
 function createEmptyFormValues(): AdminDogFormValues {
+  const today = new Date().toISOString().slice(0, 10);
+
   return {
     name: "",
     sex: "UNKNOWN",
-    birthDate: "",
+    birthDate: today,
     breederNameText: "",
     ownershipNames: [],
     ekNo: "",
@@ -85,6 +87,14 @@ function normalizeEkNo(value: string): number | null {
 
   const parsed = Number.parseInt(normalized, 10);
   return Number.isNaN(parsed) ? null : parsed;
+}
+
+function getMutationErrorCode(error: unknown): string | undefined {
+  if (error instanceof AdminMutationError) {
+    return error.errorCode;
+  }
+
+  return undefined;
 }
 
 function mapDogFromQuery(item: AdminDogListItem): AdminDogRecord {
@@ -169,6 +179,45 @@ export function AdminDogsPageClient() {
   );
   const dogs = useMemo(() => baseDogs, [baseDogs]);
 
+  function getDogMutationErrorMessage(errorCode?: string): string {
+    switch (errorCode) {
+      case "INVALID_DOG_ID":
+        return t("admin.dogs.mutation.errorInvalidDogId");
+      case "INVALID_NAME":
+        return t("admin.dogs.mutation.errorInvalidName");
+      case "NAME_TOO_LONG":
+        return t("admin.dogs.mutation.errorNameTooLong");
+      case "INVALID_SEX":
+        return t("admin.dogs.mutation.errorInvalidSex");
+      case "INVALID_BIRTH_DATE":
+        return t("admin.dogs.mutation.errorInvalidBirthDate");
+      case "INVALID_EK_NO":
+        return t("admin.dogs.mutation.errorInvalidEkNo");
+      case "REGISTRATION_NO_TOO_LONG":
+        return t("admin.dogs.mutation.errorRegistrationTooLong");
+      case "NOTE_TOO_LONG":
+        return t("admin.dogs.mutation.errorNoteTooLong");
+      case "INVALID_SIRE_REGISTRATION":
+        return t("admin.dogs.mutation.errorInvalidSireRegistration");
+      case "INVALID_DAM_REGISTRATION":
+        return t("admin.dogs.mutation.errorInvalidDamRegistration");
+      case "INVALID_PARENT_COMBINATION":
+        return t("admin.dogs.mutation.errorInvalidParentCombination");
+      case "INVALID_SELF_PARENT":
+        return t("admin.dogs.mutation.errorInvalidSelfParent");
+      case "INVALID_SIRE_SEX":
+        return t("admin.dogs.mutation.errorInvalidSireSex");
+      case "INVALID_DAM_SEX":
+        return t("admin.dogs.mutation.errorInvalidDamSex");
+      case "DUPLICATE_DOG":
+        return t("admin.dogs.mutation.errorDuplicateDog");
+      case "DOG_NOT_FOUND":
+        return t("admin.dogs.mutation.errorDogNotFound");
+      default:
+        return t("admin.dogs.mutation.errorDefault");
+    }
+  }
+
   const breederOptions = useMemo(
     (): NamedEntityOption[] =>
       (breederOptionsQuery.data ?? []).map((option) => ({
@@ -242,11 +291,7 @@ export function AdminDogsPageClient() {
         toast.success(t("admin.dogs.create.success"));
         setFormState({ open: false, mode: "create", target: null });
       } catch (error) {
-        const message =
-          error instanceof AdminMutationError
-            ? error.message
-            : "Failed to create dog.";
-        toast.error(message);
+        toast.error(getDogMutationErrorMessage(getMutationErrorCode(error)));
       }
       return;
     }
@@ -277,11 +322,7 @@ export function AdminDogsPageClient() {
       toast.success(t("admin.dogs.edit.success"));
       setFormState({ open: false, mode: "create", target: null });
     } catch (error) {
-      const message =
-        error instanceof AdminMutationError
-          ? error.message
-          : "Failed to update dog.";
-      toast.error(message);
+      toast.error(getDogMutationErrorMessage(getMutationErrorCode(error)));
     }
   }
 
@@ -295,11 +336,7 @@ export function AdminDogsPageClient() {
       toast.success(t("admin.dogs.delete.success"));
       setDeleteTarget(null);
     } catch (error) {
-      const message =
-        error instanceof AdminMutationError
-          ? error.message
-          : "Failed to delete dog.";
-      toast.error(message);
+      toast.error(getDogMutationErrorMessage(getMutationErrorCode(error)));
     }
   }
 

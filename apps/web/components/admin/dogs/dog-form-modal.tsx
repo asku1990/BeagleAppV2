@@ -56,6 +56,10 @@ export function DogFormModal({
 }: DogFormModalProps) {
   const { t } = useI18n();
   const [ownerCandidate, setOwnerCandidate] = useState("");
+  const todayDateInputValue = useMemo(
+    () => new Date().toISOString().slice(0, 10),
+    [],
+  );
 
   const isSubmitDisabled = useMemo(() => {
     return isSubmitting || values.name.trim().length === 0;
@@ -121,9 +125,13 @@ export function DogFormModal({
           <Input
             value={values.registrationNo}
             onChange={(event) =>
-              onValuesChange({ ...values, registrationNo: event.target.value })
+              onValuesChange({
+                ...values,
+                registrationNo: event.target.value.toUpperCase(),
+              })
             }
             placeholder={t("admin.dogs.form.registrationNoPlaceholder")}
+            maxLength={40}
           />
           <Input
             value={values.name}
@@ -131,6 +139,7 @@ export function DogFormModal({
               onValuesChange({ ...values, name: event.target.value })
             }
             placeholder={t("admin.dogs.form.namePlaceholder")}
+            maxLength={120}
           />
           <Input
             type="date"
@@ -139,6 +148,7 @@ export function DogFormModal({
               onValuesChange({ ...values, birthDate: event.target.value })
             }
             aria-label={t("admin.dogs.form.birthDateAria")}
+            max={todayDateInputValue}
           />
 
           <div className="space-y-2">
@@ -334,10 +344,16 @@ export function DogFormModal({
           <Input
             value={values.ekNo}
             onChange={(event) =>
-              onValuesChange({ ...values, ekNo: event.target.value })
+              onValuesChange({
+                ...values,
+                ekNo: event.target.value.replace(/\D+/gu, ""),
+              })
             }
+            type="text"
             inputMode="numeric"
+            pattern="[0-9]*"
             placeholder={t("admin.dogs.form.ekNoPlaceholder")}
+            maxLength={10}
           />
           <Input
             value={values.note}
@@ -345,6 +361,7 @@ export function DogFormModal({
               onValuesChange({ ...values, note: event.target.value })
             }
             placeholder={t("admin.dogs.form.notePlaceholder")}
+            maxLength={500}
           />
 
           {mode === "edit" && dog ? (
