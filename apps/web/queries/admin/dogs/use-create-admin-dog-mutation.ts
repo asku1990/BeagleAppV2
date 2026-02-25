@@ -7,7 +7,12 @@ import type {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createAdminDogAction } from "@/app/actions/admin/dogs/create-admin-dog";
 import { AdminMutationError } from "@/queries/admin/mutation-error";
-import { adminDogsQueryKeyRoot } from "./query-keys";
+import {
+  adminDogBreederOptionsQueryKeyRoot,
+  adminDogOwnerOptionsQueryKeyRoot,
+  adminDogParentOptionsQueryKeyRoot,
+  adminDogsQueryKeyRoot,
+} from "./query-keys";
 
 export function useCreateAdminDogMutation() {
   const queryClient = useQueryClient();
@@ -30,6 +35,15 @@ export function useCreateAdminDogMutation() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: adminDogsQueryKeyRoot });
+      await queryClient.invalidateQueries({
+        queryKey: adminDogBreederOptionsQueryKeyRoot,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: adminDogOwnerOptionsQueryKeyRoot,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: adminDogParentOptionsQueryKeyRoot,
+      });
     },
   });
 }

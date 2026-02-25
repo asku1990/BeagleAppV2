@@ -14,6 +14,7 @@ type ComboboxProps = {
   value: string;
   options: ComboboxOption[];
   onChange: (value: string) => void;
+  onSearchChange?: (value: string) => void;
   placeholder?: string;
   searchPlaceholder?: string;
   emptyLabel?: string;
@@ -25,6 +26,7 @@ export function Combobox({
   value,
   options,
   onChange,
+  onSearchChange,
   placeholder,
   searchPlaceholder,
   emptyLabel = "No results",
@@ -89,10 +91,13 @@ export function Combobox({
         onFocus={() => {
           setIsOpen(true);
           setQuery("");
+          onSearchChange?.("");
           setActiveIndex(0);
         }}
         onChange={(event) => {
-          setQuery(event.target.value);
+          const nextQuery = event.target.value;
+          setQuery(nextQuery);
+          onSearchChange?.(nextQuery);
           setIsOpen(true);
           setActiveIndex(0);
         }}

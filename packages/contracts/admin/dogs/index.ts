@@ -10,3 +10,12 @@ export type {
   CreateAdminDogRequest,
   CreateAdminDogResponse,
 } from "./create-admin-dog";
+export type {
+  AdminDogLookupRequest,
+  AdminBreederLookupOption,
+  AdminOwnerLookupOption,
+  AdminDogParentLookupOption,
+  AdminBreederLookupResponse,
+  AdminOwnerLookupResponse,
+  AdminDogParentLookupResponse,
+} from "./lookup-options";

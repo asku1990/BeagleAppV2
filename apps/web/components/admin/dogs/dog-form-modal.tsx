@@ -16,13 +16,21 @@ type DogParentOption = {
   name: string;
 };
 
+type NamedEntityOption = {
+  id: string;
+  name: string;
+};
+
 type DogFormModalProps = {
   mode: "create" | "edit";
   dog: AdminDogRecord | null;
   values: AdminDogFormValues;
-  breederOptions: string[];
-  ownerOptions: string[];
+  breederOptions: NamedEntityOption[];
+  ownerOptions: NamedEntityOption[];
   parentOptions: DogParentOption[];
+  onBreederSearchChange: (value: string) => void;
+  onOwnerSearchChange: (value: string) => void;
+  onParentSearchChange: (value: string) => void;
   open: boolean;
   isSubmitting?: boolean;
   onClose: () => void;
@@ -37,6 +45,9 @@ export function DogFormModal({
   breederOptions,
   ownerOptions,
   parentOptions,
+  onBreederSearchChange,
+  onOwnerSearchChange,
+  onParentSearchChange,
   open,
   isSubmitting = false,
   onClose,
@@ -51,21 +62,27 @@ export function DogFormModal({
   }, [isSubmitting, values.name]);
 
   const selectedOwners = values.ownershipNames;
+  const breederSelectedId = useMemo(
+    () =>
+      breederOptions.find((option) => option.name === values.breederNameText)
+        ?.id ?? "",
+    [breederOptions, values.breederNameText],
+  );
   const breederComboboxOptions = useMemo<ComboboxOption[]>(
     () =>
-      breederOptions.map((breederName) => ({
-        value: breederName,
-        label: breederName,
+      breederOptions.map((option) => ({
+        value: option.id,
+        label: option.name,
       })),
     [breederOptions],
   );
   const ownerComboboxOptions = useMemo<ComboboxOption[]>(
     () =>
       ownerOptions
-        .filter((ownerName) => !selectedOwners.includes(ownerName))
-        .map((ownerName) => ({
-          value: ownerName,
-          label: ownerName,
+        .filter((option) => !selectedOwners.includes(option.name))
+        .map((option) => ({
+          value: option.id,
+          label: option.name,
         })),
     [ownerOptions, selectedOwners],
   );
@@ -165,11 +182,18 @@ export function DogFormModal({
               {t("admin.dogs.form.breederSelectLabel")}
             </p>
             <Combobox
-              value={values.breederNameText}
+              value={breederSelectedId}
               options={breederComboboxOptions}
-              onChange={(value) =>
-                onValuesChange({ ...values, breederNameText: value })
-              }
+              onChange={(value) => {
+                const selected = breederOptions.find(
+                  (option) => option.id === value,
+                );
+                onValuesChange({
+                  ...values,
+                  breederNameText: selected?.name ?? "",
+                });
+              }}
+              onSearchChange={onBreederSearchChange}
               placeholder={t("admin.dogs.form.breederNameTextPlaceholder")}
               searchPlaceholder={t("admin.dogs.form.searchPlaceholder")}
               clearLabel={t("admin.dogs.form.selectNone")}
@@ -186,6 +210,7 @@ export function DogFormModal({
                 value={ownerCandidate}
                 options={ownerComboboxOptions}
                 onChange={setOwnerCandidate}
+                onSearchChange={onOwnerSearchChange}
                 placeholder={t("admin.dogs.form.ownersSelectLabel")}
                 searchPlaceholder={t("admin.dogs.form.searchPlaceholder")}
                 clearLabel={t("admin.dogs.form.selectNone")}
@@ -200,13 +225,20 @@ export function DogFormModal({
                     return;
                   }
 
-                  if (selectedOwners.includes(ownerCandidate)) {
+                  const selectedOwner = ownerOptions.find(
+                    (option) => option.id === ownerCandidate,
+                  );
+                  if (!selectedOwner) {
+                    return;
+                  }
+
+                  if (selectedOwners.includes(selectedOwner.name)) {
                     return;
                   }
 
                   onValuesChange({
                     ...values,
-                    ownershipNames: [...selectedOwners, ownerCandidate],
+                    ownershipNames: [...selectedOwners, selectedOwner.name],
                   });
                   setOwnerCandidate("");
                 }}
@@ -254,6 +286,7 @@ export function DogFormModal({
               <Combobox
                 value={values.sirePreviewRegistrationNo}
                 options={parentComboboxOptions}
+                onSearchChange={onParentSearchChange}
                 onChange={(registrationNo) => {
                   const selected = parentOptions.find(
                     (option) => option.registrationNo === registrationNo,
@@ -278,6 +311,7 @@ export function DogFormModal({
               <Combobox
                 value={values.damPreviewRegistrationNo}
                 options={parentComboboxOptions}
+                onSearchChange={onParentSearchChange}
                 onChange={(registrationNo) => {
                   const selected = parentOptions.find(
                     (option) => option.registrationNo === registrationNo,

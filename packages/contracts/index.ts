@@ -115,6 +115,13 @@ export type {
   AdminDogParentPreview,
   CreateAdminDogRequest,
   CreateAdminDogResponse,
+  AdminDogLookupRequest,
+  AdminBreederLookupOption,
+  AdminOwnerLookupOption,
+  AdminDogParentLookupOption,
+  AdminBreederLookupResponse,
+  AdminOwnerLookupResponse,
+  AdminDogParentLookupResponse,
 } from "./admin";
 export type { HomeStatisticsResponse } from "./home";
 export {

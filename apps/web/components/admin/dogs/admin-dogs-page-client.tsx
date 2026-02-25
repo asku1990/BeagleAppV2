@@ -8,6 +8,9 @@ import { toast } from "@/components/ui/sonner";
 import { useI18n } from "@/hooks/i18n";
 import { AdminMutationError } from "@/queries/admin";
 import {
+  useAdminDogBreederOptionsQuery,
+  useAdminDogOwnerOptionsQuery,
+  useAdminDogParentOptionsQuery,
   useAdminDogsQuery,
   useCreateAdminDogMutation,
 } from "@/queries/admin/dogs";
@@ -25,6 +28,11 @@ type DogFormState = {
 
 type DogParentOption = {
   registrationNo: string;
+  name: string;
+};
+
+type NamedEntityOption = {
+  id: string;
   name: string;
 };
 
@@ -158,6 +166,9 @@ export function AdminDogsPageClient() {
   const [formValues, setFormValues] = useState<AdminDogFormValues>(
     createEmptyFormValues,
   );
+  const [breederLookupQuery, setBreederLookupQuery] = useState("");
+  const [ownerLookupQuery, setOwnerLookupQuery] = useState("");
+  const [parentLookupQuery, setParentLookupQuery] = useState("");
 
   const filters = useMemo(
     () => ({
@@ -172,6 +183,21 @@ export function AdminDogsPageClient() {
 
   const dogsQuery = useAdminDogsQuery(filters);
   const createDogMutation = useCreateAdminDogMutation();
+  const breederOptionsQuery = useAdminDogBreederOptionsQuery({
+    query: breederLookupQuery,
+    limit: 100,
+    enabled: formState.open,
+  });
+  const ownerOptionsQuery = useAdminDogOwnerOptionsQuery({
+    query: ownerLookupQuery,
+    limit: 100,
+    enabled: formState.open,
+  });
+  const parentOptionsQuery = useAdminDogParentOptionsQuery({
+    query: parentLookupQuery,
+    limit: 100,
+    enabled: formState.open,
+  });
 
   const baseDogs = useMemo(
     () => (dogsQuery.data?.items ?? []).map(mapDogFromQuery),
@@ -186,48 +212,46 @@ export function AdminDogsPageClient() {
   }, [baseDogs, deletedDogIds, updatedDogsById]);
 
   const breederOptions = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          dogs
-            .map((dog) => dog.breederNameText?.trim() ?? "")
-            .filter((breederName) => breederName.length > 0),
-        ),
-      ),
-    [dogs],
+    (): NamedEntityOption[] =>
+      (breederOptionsQuery.data ?? []).map((option) => ({
+        id: option.id,
+        name: option.name,
+      })),
+    [breederOptionsQuery.data],
   );
 
   const ownerOptions = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          dogs.flatMap((dog) =>
-            dog.ownershipPreview
-              .map((ownerName) => ownerName.trim())
-              .filter((ownerName) => ownerName.length > 0),
-          ),
-        ),
-      ),
-    [dogs],
+    (): NamedEntityOption[] =>
+      (ownerOptionsQuery.data ?? []).map((option) => ({
+        id: option.id,
+        name: option.name,
+      })),
+    [ownerOptionsQuery.data],
   );
 
   const parentOptions = useMemo<DogParentOption[]>(
     () =>
-      dogs
-        .filter((dog) => (dog.registrationNo?.trim().length ?? 0) > 0)
-        .map((dog) => ({
-          registrationNo: dog.registrationNo ?? "",
-          name: dog.name,
+      (parentOptionsQuery.data ?? [])
+        .filter((option) => (option.registrationNo?.trim().length ?? 0) > 0)
+        .map((option) => ({
+          registrationNo: option.registrationNo ?? "",
+          name: option.name,
         })),
-    [dogs],
+    [parentOptionsQuery.data],
   );
 
   function openCreateModal() {
+    setBreederLookupQuery("");
+    setOwnerLookupQuery("");
+    setParentLookupQuery("");
     setFormValues(createEmptyFormValues());
     setFormState({ open: true, mode: "create", target: null });
   }
 
   function openEditModal(dog: AdminDogRecord) {
+    setBreederLookupQuery("");
+    setOwnerLookupQuery("");
+    setParentLookupQuery("");
     setFormValues(mapDogToFormValues(dog));
     setFormState({ open: true, mode: "edit", target: dog });
   }
@@ -358,6 +382,9 @@ export function AdminDogsPageClient() {
         breederOptions={breederOptions}
         ownerOptions={ownerOptions}
         parentOptions={parentOptions}
+        onBreederSearchChange={setBreederLookupQuery}
+        onOwnerSearchChange={setOwnerLookupQuery}
+        onParentSearchChange={setParentLookupQuery}
         onClose={closeFormModal}
         onValuesChange={setFormValues}
         onSubmit={handleSubmit}

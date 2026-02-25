@@ -28,4 +28,11 @@ export type {
   AdminDogParentPreview,
   CreateAdminDogRequest,
   CreateAdminDogResponse,
+  AdminDogLookupRequest,
+  AdminBreederLookupOption,
+  AdminOwnerLookupOption,
+  AdminDogParentLookupOption,
+  AdminBreederLookupResponse,
+  AdminOwnerLookupResponse,
+  AdminDogParentLookupResponse,
 } from "./dogs";
