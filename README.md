@@ -118,6 +118,8 @@ Prune audit log rows older than 12 months:
 pnpm audit:prune
 ```
 
+For SQL cleanup options and operational notes, see `docs/audit-logs.md`.
+
 Open Prisma Studio:
 
 ```bash
