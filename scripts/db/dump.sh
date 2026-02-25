@@ -35,6 +35,12 @@ fi
 output_dir="$(dirname "$output_file")"
 mkdir -p "$output_dir"
 
-pg_dump --no-owner --no-privileges --clean --if-exists "$DATABASE_URL" > "$output_file"
+exclude_table_data_args=()
+# Skip audit events by default; set DUMP_INCLUDE_AUDIT_LOGS=1 when you need them.
+if [ "${DUMP_INCLUDE_AUDIT_LOGS:-}" != "1" ]; then
+  exclude_table_data_args+=(--exclude-table-data='public."AuditEvent"')
+fi
+
+pg_dump --no-owner --no-privileges --clean --if-exists "${exclude_table_data_args[@]}" "$DATABASE_URL" > "$output_file"
 
 echo "Dump created: $output_file"

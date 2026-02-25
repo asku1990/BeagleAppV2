@@ -1,10 +1,33 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalEnv": ["BETTER_AUTH_SECRET", "BETTER_AUTH_URL"],
+  "globalEnv": [
+    "BETTER_AUTH_SECRET",
+    "BETTER_AUTH_URL",
+    "AUTH_SECRET",
+    "CORS_ORIGINS",
+    "BETTER_AUTH_SESSION_EXPIRES_IN",
+    "BETTER_AUTH_SESSION_UPDATE_AGE",
+    "beagle_db_develop_POSTGRES_USER",
+    "beagle_db_develop_DATABASE_URL_UNPOOLED",
+    "beagle_db_develop_NEON_PROJECT_ID",
+    "beagle_db_develop_PGDATABASE",
+    "beagle_db_develop_POSTGRES_URL",
+    "beagle_db_develop_DATABASE_URL",
+    "beagle_db_develop_POSTGRES_PRISMA_URL",
+    "beagle_db_develop_PGUSER",
+    "beagle_db_develop_POSTGRES_HOST",
+    "beagle_db_develop_POSTGRES_DATABASE",
+    "beagle_db_develop_POSTGRES_PASSWORD",
+    "beagle_db_develop_PGHOST_UNPOOLED",
+    "beagle_db_develop_POSTGRES_URL_NO_SSL",
+    "beagle_db_develop_POSTGRES_URL_NON_POOLING",
+    "beagle_db_develop_PGPASSWORD",
+    "beagle_db_develop_PGHOST"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "dist/**"]
+      "outputs": []
     },
     "dev": {
       "cache": false,
