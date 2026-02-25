@@ -1,14 +1,28 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useI18n } from "@/hooks/i18n";
 import type { AdminDogFormValues, AdminDogRecord } from "./types";
+
+type DogParentOption = {
+  registrationNo: string;
+  name: string;
+};
 
 type DogFormModalProps = {
   mode: "create" | "edit";
   dog: AdminDogRecord | null;
   values: AdminDogFormValues;
+  breederOptions: string[];
+  ownerOptions: string[];
+  parentOptions: DogParentOption[];
   open: boolean;
   isSubmitting?: boolean;
   onClose: () => void;
@@ -20,6 +34,9 @@ export function DogFormModal({
   mode,
   dog,
   values,
+  breederOptions,
+  ownerOptions,
+  parentOptions,
   open,
   isSubmitting = false,
   onClose,
@@ -27,35 +44,63 @@ export function DogFormModal({
   onSubmit,
 }: DogFormModalProps) {
   const { t } = useI18n();
+  const [ownerCandidate, setOwnerCandidate] = useState("");
 
   const isSubmitDisabled = useMemo(() => {
     return isSubmitting || values.name.trim().length === 0;
   }, [isSubmitting, values.name]);
 
-  if (!open) {
-    return null;
-  }
+  const selectedOwners = values.ownershipNames;
+  const breederComboboxOptions = useMemo<ComboboxOption[]>(
+    () =>
+      breederOptions.map((breederName) => ({
+        value: breederName,
+        label: breederName,
+      })),
+    [breederOptions],
+  );
+  const ownerComboboxOptions = useMemo<ComboboxOption[]>(
+    () =>
+      ownerOptions
+        .filter((ownerName) => !selectedOwners.includes(ownerName))
+        .map((ownerName) => ({
+          value: ownerName,
+          label: ownerName,
+        })),
+    [ownerOptions, selectedOwners],
+  );
+  const parentComboboxOptions = useMemo<ComboboxOption[]>(
+    () =>
+      parentOptions.map((option) => ({
+        value: option.registrationNo,
+        label: `${option.name} (${option.registrationNo})`,
+        keywords: [option.name, option.registrationNo],
+      })),
+    [parentOptions],
+  );
 
   return (
-    <div
-      className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-label={
-        mode === "create"
-          ? t("admin.dogs.form.createModalAria")
-          : t("admin.dogs.form.editModalAria")
-      }
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => (nextOpen ? null : onClose())}
     >
-      <Card className="w-full max-w-xl">
-        <CardHeader>
-          <CardTitle>
+      <DialogContent
+        className="max-h-[90vh] max-w-xl overflow-y-auto"
+        aria-label={
+          mode === "create"
+            ? t("admin.dogs.form.createModalAria")
+            : t("admin.dogs.form.editModalAria")
+        }
+      >
+        <DialogHeader>
+          <DialogTitle>
             {mode === "create"
               ? t("admin.dogs.form.createTitle")
               : t("admin.dogs.form.editTitle")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-3">
           <Input
             value={values.registrationNo}
             onChange={(event) =>
@@ -115,57 +160,143 @@ export function DogFormModal({
             </div>
           </div>
 
-          <Input
-            value={values.breederNameText}
-            onChange={(event) =>
-              onValuesChange({ ...values, breederNameText: event.target.value })
-            }
-            placeholder={t("admin.dogs.form.breederNameTextPlaceholder")}
-          />
-          <Input
-            value={values.ownershipPreviewText}
-            onChange={(event) =>
-              onValuesChange({
-                ...values,
-                ownershipPreviewText: event.target.value,
-              })
-            }
-            placeholder={t("admin.dogs.form.ownersPlaceholder")}
-          />
-          <Input
-            value={values.sirePreviewName}
-            onChange={(event) =>
-              onValuesChange({ ...values, sirePreviewName: event.target.value })
-            }
-            placeholder={t("admin.dogs.form.sireNamePlaceholder")}
-          />
-          <Input
-            value={values.sirePreviewRegistrationNo}
-            onChange={(event) =>
-              onValuesChange({
-                ...values,
-                sirePreviewRegistrationNo: event.target.value,
-              })
-            }
-            placeholder={t("admin.dogs.form.sireRegistrationNoPlaceholder")}
-          />
-          <Input
-            value={values.damPreviewName}
-            onChange={(event) =>
-              onValuesChange({ ...values, damPreviewName: event.target.value })
-            }
-            placeholder={t("admin.dogs.form.damNamePlaceholder")}
-          />
-          <Input
-            value={values.damPreviewRegistrationNo}
-            onChange={(event) =>
-              onValuesChange({
-                ...values,
-                damPreviewRegistrationNo: event.target.value,
-              })
-            }
-            placeholder={t("admin.dogs.form.damRegistrationNoPlaceholder")}
-          />
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground">
+              {t("admin.dogs.form.breederSelectLabel")}
+            </p>
+            <Combobox
+              value={values.breederNameText}
+              options={breederComboboxOptions}
+              onChange={(value) =>
+                onValuesChange({ ...values, breederNameText: value })
+              }
+              placeholder={t("admin.dogs.form.breederNameTextPlaceholder")}
+              searchPlaceholder={t("admin.dogs.form.searchPlaceholder")}
+              clearLabel={t("admin.dogs.form.selectNone")}
+              emptyLabel={t("admin.dogs.form.noOptions")}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground">
+              {t("admin.dogs.form.ownersSelectLabel")}
+            </p>
+            <div className="flex gap-2">
+              <Combobox
+                value={ownerCandidate}
+                options={ownerComboboxOptions}
+                onChange={setOwnerCandidate}
+                placeholder={t("admin.dogs.form.ownersSelectLabel")}
+                searchPlaceholder={t("admin.dogs.form.searchPlaceholder")}
+                clearLabel={t("admin.dogs.form.selectNone")}
+                emptyLabel={t("admin.dogs.form.noOptions")}
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  if (ownerCandidate.length === 0) {
+                    return;
+                  }
+
+                  if (selectedOwners.includes(ownerCandidate)) {
+                    return;
+                  }
+
+                  onValuesChange({
+                    ...values,
+                    ownershipNames: [...selectedOwners, ownerCandidate],
+                  });
+                  setOwnerCandidate("");
+                }}
+                disabled={ownerCandidate.length === 0}
+              >
+                {t("admin.dogs.form.ownersAddButton")}
+              </Button>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">
+                {t("admin.dogs.form.ownersSelectedLabel")}
+              </p>
+              {selectedOwners.length === 0 ? (
+                <p className="text-sm text-muted-foreground">-</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {selectedOwners.map((ownerName) => (
+                    <Button
+                      key={ownerName}
+                      type="button"
+                      size="xs"
+                      variant="outline"
+                      onClick={() =>
+                        onValuesChange({
+                          ...values,
+                          ownershipNames: selectedOwners.filter(
+                            (name) => name !== ownerName,
+                          ),
+                        })
+                      }
+                    >
+                      {ownerName}
+                    </Button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">
+                {t("admin.dogs.form.sireSelectLabel")}
+              </p>
+              <Combobox
+                value={values.sirePreviewRegistrationNo}
+                options={parentComboboxOptions}
+                onChange={(registrationNo) => {
+                  const selected = parentOptions.find(
+                    (option) => option.registrationNo === registrationNo,
+                  );
+
+                  onValuesChange({
+                    ...values,
+                    sirePreviewName: selected?.name ?? "",
+                    sirePreviewRegistrationNo: selected?.registrationNo ?? "",
+                  });
+                }}
+                placeholder={t("admin.dogs.form.sireSelectLabel")}
+                searchPlaceholder={t("admin.dogs.form.searchPlaceholder")}
+                clearLabel={t("admin.dogs.form.selectNone")}
+                emptyLabel={t("admin.dogs.form.noOptions")}
+              />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">
+                {t("admin.dogs.form.damSelectLabel")}
+              </p>
+              <Combobox
+                value={values.damPreviewRegistrationNo}
+                options={parentComboboxOptions}
+                onChange={(registrationNo) => {
+                  const selected = parentOptions.find(
+                    (option) => option.registrationNo === registrationNo,
+                  );
+
+                  onValuesChange({
+                    ...values,
+                    damPreviewName: selected?.name ?? "",
+                    damPreviewRegistrationNo: selected?.registrationNo ?? "",
+                  });
+                }}
+                placeholder={t("admin.dogs.form.damSelectLabel")}
+                searchPlaceholder={t("admin.dogs.form.searchPlaceholder")}
+                clearLabel={t("admin.dogs.form.selectNone")}
+                emptyLabel={t("admin.dogs.form.noOptions")}
+              />
+            </div>
+          </div>
+
           <Input
             value={values.ekNo}
             onChange={(event) =>
@@ -209,8 +340,8 @@ export function DogFormModal({
               {t("admin.dogs.form.cancel")}
             </Button>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

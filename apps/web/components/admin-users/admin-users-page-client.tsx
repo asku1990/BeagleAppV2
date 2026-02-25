@@ -5,6 +5,12 @@ import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@beagle/contracts";
 import { toast } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ListingResponsiveResults } from "@/components/listing";
 import { ListLoadingSkeleton } from "@/components/ui/list-loading-skeleton";
@@ -445,18 +451,26 @@ export function AdminUsersPageClient() {
         </CardContent>
       </Card>
 
-      {resetTarget ? (
-        <div
-          className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4"
-          role="dialog"
-          aria-modal="true"
+      <Dialog
+        open={Boolean(resetTarget)}
+        onOpenChange={(nextOpen) => {
+          if (nextOpen) {
+            return;
+          }
+          setResetTarget(null);
+          setResetPassword("");
+          setResetPasswordConfirm("");
+        }}
+      >
+        <DialogContent
+          className="max-w-md"
           aria-label={t("admin.users.reset.modalAria")}
         >
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <CardTitle>{t("admin.users.reset.title")}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <DialogHeader>
+            <DialogTitle>{t("admin.users.reset.title")}</DialogTitle>
+          </DialogHeader>
+          {resetTarget ? (
+            <div className="space-y-3">
               <p className="text-sm text-muted-foreground">
                 {t("admin.users.reset.descriptionPrefix")}{" "}
                 <strong>{resetTarget.email}</strong>.
@@ -502,22 +516,29 @@ export function AdminUsersPageClient() {
                   {t("admin.users.reset.cancel")}
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      ) : null}
-      {deleteTarget ? (
-        <div
-          className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4"
-          role="dialog"
-          aria-modal="true"
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={Boolean(deleteTarget)}
+        onOpenChange={(nextOpen) => {
+          if (nextOpen) {
+            return;
+          }
+          setDeleteTarget(null);
+        }}
+      >
+        <DialogContent
+          className="max-w-md"
           aria-label={t("admin.users.delete.modalAria")}
         >
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <CardTitle>{t("admin.users.delete.title")}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <DialogHeader>
+            <DialogTitle>{t("admin.users.delete.title")}</DialogTitle>
+          </DialogHeader>
+          {deleteTarget ? (
+            <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
                 {t("admin.users.delete.descriptionPrefix")}{" "}
                 <strong>{deleteTarget.email}</strong>.
@@ -542,10 +563,10 @@ export function AdminUsersPageClient() {
                   {t("admin.users.delete.cancel")}
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      ) : null}
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

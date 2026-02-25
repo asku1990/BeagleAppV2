@@ -1,5 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useI18n } from "@/hooks/i18n";
 import type { AdminDogRecord } from "./types";
 
@@ -18,48 +23,47 @@ export function DeleteDogConfirmModal({
 }: DeleteDogConfirmModalProps) {
   const { t } = useI18n();
 
-  if (!dog) {
-    return null;
-  }
-
   return (
-    <div
-      className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-label={t("admin.dogs.delete.modalAria")}
+    <Dialog
+      open={Boolean(dog)}
+      onOpenChange={(nextOpen) => (nextOpen ? null : onCancel())}
     >
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>{t("admin.dogs.delete.title")}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            {t("admin.dogs.delete.descriptionPrefix")}{" "}
-            <strong>{dog.name}</strong> ({dog.registrationNo ?? "-"}).
-          </p>
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={onConfirm}
-              disabled={isDeleting}
-            >
-              {isDeleting
-                ? t("admin.dogs.delete.confirming")
-                : t("admin.dogs.delete.confirm")}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onCancel}
-              disabled={isDeleting}
-            >
-              {t("admin.dogs.delete.cancel")}
-            </Button>
+      <DialogContent
+        className="max-w-md"
+        aria-label={t("admin.dogs.delete.modalAria")}
+      >
+        <DialogHeader>
+          <DialogTitle>{t("admin.dogs.delete.title")}</DialogTitle>
+        </DialogHeader>
+        {dog ? (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              {t("admin.dogs.delete.descriptionPrefix")}{" "}
+              <strong>{dog.name}</strong> ({dog.registrationNo ?? "-"}).
+            </p>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={onConfirm}
+                disabled={isDeleting}
+              >
+                {isDeleting
+                  ? t("admin.dogs.delete.confirming")
+                  : t("admin.dogs.delete.confirm")}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                disabled={isDeleting}
+              >
+                {t("admin.dogs.delete.cancel")}
+              </Button>
+            </div>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        ) : null}
+      </DialogContent>
+    </Dialog>
   );
 }

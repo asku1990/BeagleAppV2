@@ -26,7 +26,7 @@ export type AdminDogFormValues = {
   sex: AdminDogSex;
   birthDate: string;
   breederNameText: string;
-  ownershipPreviewText: string;
+  ownershipNames: string[];
   ekNo: string;
   note: string;
   registrationNo: string;

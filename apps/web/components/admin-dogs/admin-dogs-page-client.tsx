@@ -18,13 +18,18 @@ type DogFormState = {
   target: AdminDogRecord | null;
 };
 
+type DogParentOption = {
+  registrationNo: string;
+  name: string;
+};
+
 function createEmptyFormValues(): AdminDogFormValues {
   return {
     name: "",
     sex: "UNKNOWN",
     birthDate: "",
     breederNameText: "",
-    ownershipPreviewText: "",
+    ownershipNames: [],
     ekNo: "",
     note: "",
     registrationNo: "",
@@ -41,7 +46,7 @@ function mapDogToFormValues(dog: AdminDogRecord): AdminDogFormValues {
     sex: dog.sex,
     birthDate: dog.birthDate ?? "",
     breederNameText: dog.breederNameText ?? "",
-    ownershipPreviewText: dog.ownershipPreview.join(", "),
+    ownershipNames: dog.ownershipPreview,
     ekNo: dog.ekNo === null ? "" : String(dog.ekNo),
     note: dog.note ?? "",
     registrationNo: dog.registrationNo ?? "",
@@ -67,13 +72,6 @@ function normalizeEkNo(value: string): number | null {
   return Number.isNaN(parsed) ? null : parsed;
 }
 
-function parseOwnershipPreview(value: string): string[] {
-  return value
-    .split(",")
-    .map((item) => item.trim())
-    .filter((item) => item.length > 0);
-}
-
 function toRecord(
   values: AdminDogFormValues,
   id: string,
@@ -87,7 +85,7 @@ function toRecord(
     breederNameText: normalizeOptionalText(values.breederNameText),
     trialCount: counts?.trialCount ?? 0,
     showCount: counts?.showCount ?? 0,
-    ownershipPreview: parseOwnershipPreview(values.ownershipPreviewText),
+    ownershipPreview: values.ownershipNames,
     ekNo: normalizeEkNo(values.ekNo),
     note: normalizeOptionalText(values.note),
     registrationNo: normalizeOptionalText(values.registrationNo),
@@ -158,6 +156,43 @@ export function AdminDogsPageClient() {
       return toSearchText(dog).includes(normalizedQuery);
     });
   }, [dogs, query, sex]);
+
+  const breederOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          dogs
+            .map((dog) => dog.breederNameText?.trim() ?? "")
+            .filter((breederName) => breederName.length > 0),
+        ),
+      ),
+    [dogs],
+  );
+
+  const ownerOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          dogs.flatMap((dog) =>
+            dog.ownershipPreview
+              .map((ownerName) => ownerName.trim())
+              .filter((ownerName) => ownerName.length > 0),
+          ),
+        ),
+      ),
+    [dogs],
+  );
+
+  const parentOptions = useMemo<DogParentOption[]>(
+    () =>
+      dogs
+        .filter((dog) => (dog.registrationNo?.trim().length ?? 0) > 0)
+        .map((dog) => ({
+          registrationNo: dog.registrationNo ?? "",
+          name: dog.name,
+        })),
+    [dogs],
+  );
 
   function openCreateModal() {
     setFormValues(createEmptyFormValues());
@@ -242,6 +277,9 @@ export function AdminDogsPageClient() {
         mode={formState.mode}
         dog={formState.target}
         values={formValues}
+        breederOptions={breederOptions}
+        ownerOptions={ownerOptions}
+        parentOptions={parentOptions}
         onClose={closeFormModal}
         onValuesChange={setFormValues}
         onSubmit={handleSubmit}
