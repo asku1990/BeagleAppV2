@@ -26,4 +26,6 @@ export type {
   AdminDogListSex,
   AdminDogListSort,
   AdminDogParentPreview,
+  CreateAdminDogRequest,
+  CreateAdminDogResponse,
 } from "./dogs";

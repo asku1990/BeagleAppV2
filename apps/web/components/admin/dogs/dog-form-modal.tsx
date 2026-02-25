@@ -27,7 +27,7 @@ type DogFormModalProps = {
   isSubmitting?: boolean;
   onClose: () => void;
   onValuesChange: (values: AdminDogFormValues) => void;
-  onSubmit: (values: AdminDogFormValues) => void;
+  onSubmit: (values: AdminDogFormValues) => void | Promise<void>;
 };
 
 export function DogFormModal({
@@ -322,7 +322,7 @@ export function DogFormModal({
           <div className="flex gap-2">
             <Button
               type="button"
-              onClick={() => onSubmit(values)}
+              onClick={() => void onSubmit(values)}
               disabled={isSubmitDisabled}
             >
               {isSubmitting

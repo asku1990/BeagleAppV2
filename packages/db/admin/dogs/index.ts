@@ -6,3 +6,9 @@ export {
   type AdminDogListSortDb,
   type AdminDogParentPreviewDb,
 } from "./list-dogs";
+export {
+  createAdminDogWriteDb,
+  runAdminDogWriteTransactionDb,
+  type CreateAdminDogDbInput,
+  type CreatedAdminDogRowDb,
+} from "./create-dog";

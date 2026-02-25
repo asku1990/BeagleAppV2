@@ -4,4 +4,5 @@ export { createAdminUser } from "./create-user";
 export { deleteAdminUser } from "./delete-user";
 export { setAdminUserStatus } from "./set-user-status";
 export { setAdminUserPassword } from "./set-user-password";
+export { createAdminDog } from "./dogs";
 export { listAdminDogs } from "./dogs";

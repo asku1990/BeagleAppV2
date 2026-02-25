@@ -1,0 +1,35 @@
+"use client";
+
+import type {
+  CreateAdminDogRequest,
+  CreateAdminDogResponse,
+} from "@beagle/contracts";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createAdminDogAction } from "@/app/actions/admin/dogs/create-admin-dog";
+import { AdminMutationError } from "@/queries/admin/mutation-error";
+import { adminDogsQueryKeyRoot } from "./query-keys";
+
+export function useCreateAdminDogMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    CreateAdminDogResponse,
+    AdminMutationError,
+    CreateAdminDogRequest
+  >({
+    mutationFn: async (input) => {
+      const result = await createAdminDogAction(input);
+      if (result.hasError || !result.data) {
+        throw new AdminMutationError(
+          result.message ?? "Failed to create dog.",
+          result.errorCode,
+        );
+      }
+
+      return result.data;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: adminDogsQueryKeyRoot });
+    },
+  });
+}

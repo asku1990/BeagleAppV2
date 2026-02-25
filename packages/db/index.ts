@@ -51,6 +51,7 @@ export {
 } from "./dogs";
 
 export {
+  createAdminDogWriteDb,
   createAdminUserDb,
   listAdminDogsDb,
   countActiveAdminUsersDb,
@@ -59,6 +60,7 @@ export {
   getAdminUserByIdDb,
   lockAdminUsersForUpdateDb,
   listAdminUsersDb,
+  runAdminDogWriteTransactionDb,
   runAdminUserWriteTransactionDb,
   setAdminUserPasswordDb,
   setAdminUserStatusDb,
@@ -70,4 +72,6 @@ export {
   type AdminDogListRowDb,
   type AdminDogListSortDb,
   type AdminDogParentPreviewDb,
+  type CreateAdminDogDbInput,
+  type CreatedAdminDogRowDb,
 } from "./admin";

@@ -6,7 +6,11 @@ import { ListingSectionShell } from "@/components/listing";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/sonner";
 import { useI18n } from "@/hooks/i18n";
-import { useAdminDogsQuery } from "@/queries/admin/dogs";
+import { AdminMutationError } from "@/queries/admin";
+import {
+  useAdminDogsQuery,
+  useCreateAdminDogMutation,
+} from "@/queries/admin/dogs";
 import { DeleteDogConfirmModal } from "./delete-dog-confirm-modal";
 import { DogFilters } from "./dog-filters";
 import { DogFormModal } from "./dog-form-modal";
@@ -141,7 +145,6 @@ export function AdminDogsPageClient() {
   const { t } = useI18n();
   const [query, setQuery] = useState("");
   const [sex, setSex] = useState<"all" | AdminDogSex>("all");
-  const [createdDogs, setCreatedDogs] = useState<AdminDogRecord[]>([]);
   const [updatedDogsById, setUpdatedDogsById] = useState<
     Record<string, AdminDogRecord>
   >({});
@@ -168,6 +171,7 @@ export function AdminDogsPageClient() {
   );
 
   const dogsQuery = useAdminDogsQuery(filters);
+  const createDogMutation = useCreateAdminDogMutation();
 
   const baseDogs = useMemo(
     () => (dogsQuery.data?.items ?? []).map(mapDogFromQuery),
@@ -178,8 +182,8 @@ export function AdminDogsPageClient() {
       .filter((dog) => !deletedDogIds.has(dog.id))
       .map((dog) => updatedDogsById[dog.id] ?? dog);
 
-    return [...createdDogs, ...mergedBaseDogs];
-  }, [baseDogs, createdDogs, deletedDogIds, updatedDogsById]);
+    return mergedBaseDogs;
+  }, [baseDogs, deletedDogIds, updatedDogsById]);
 
   const breederOptions = useMemo(
     () =>
@@ -232,12 +236,36 @@ export function AdminDogsPageClient() {
     setFormState((current) => ({ ...current, open: false }));
   }
 
-  function handleSubmit(values: AdminDogFormValues) {
+  async function handleSubmit(values: AdminDogFormValues) {
     if (formState.mode === "create") {
-      const nextDog = toRecord(values, `dog-${Date.now()}`);
-      setCreatedDogs((current) => [nextDog, ...current]);
-      toast.success(t("admin.dogs.create.success"));
-      setFormState({ open: false, mode: "create", target: null });
+      try {
+        await createDogMutation.mutateAsync({
+          name: values.name,
+          sex: values.sex,
+          birthDate: normalizeOptionalText(values.birthDate) ?? undefined,
+          breederNameText:
+            normalizeOptionalText(values.breederNameText) ?? undefined,
+          ownerNames: values.ownershipNames,
+          ekNo: normalizeEkNo(values.ekNo) ?? undefined,
+          note: normalizeOptionalText(values.note) ?? undefined,
+          registrationNo:
+            normalizeOptionalText(values.registrationNo) ?? undefined,
+          sireRegistrationNo:
+            normalizeOptionalText(values.sirePreviewRegistrationNo) ??
+            undefined,
+          damRegistrationNo:
+            normalizeOptionalText(values.damPreviewRegistrationNo) ?? undefined,
+        });
+
+        toast.success(t("admin.dogs.create.success"));
+        setFormState({ open: false, mode: "create", target: null });
+      } catch (error) {
+        const message =
+          error instanceof AdminMutationError
+            ? error.message
+            : "Failed to create dog.";
+        toast.error(message);
+      }
       return;
     }
 
@@ -251,16 +279,10 @@ export function AdminDogsPageClient() {
     });
     const targetId = formState.target.id;
 
-    if (targetId.startsWith("dog-")) {
-      setCreatedDogs((current) =>
-        current.map((dog) => (dog.id === targetId ? nextDog : dog)),
-      );
-    } else {
-      setUpdatedDogsById((current) => ({
-        ...current,
-        [targetId]: nextDog,
-      }));
-    }
+    setUpdatedDogsById((current) => ({
+      ...current,
+      [targetId]: nextDog,
+    }));
 
     toast.success(t("admin.dogs.edit.success"));
     setFormState({ open: false, mode: "create", target: null });
@@ -271,22 +293,16 @@ export function AdminDogsPageClient() {
       return;
     }
 
-    if (deleteTarget.id.startsWith("dog-")) {
-      setCreatedDogs((current) =>
-        current.filter((dog) => dog.id !== deleteTarget.id),
-      );
-    } else {
-      setDeletedDogIds((current) => {
-        const next = new Set(current);
-        next.add(deleteTarget.id);
-        return next;
-      });
-      setUpdatedDogsById((current) => {
-        const next = { ...current };
-        delete next[deleteTarget.id];
-        return next;
-      });
-    }
+    setDeletedDogIds((current) => {
+      const next = new Set(current);
+      next.add(deleteTarget.id);
+      return next;
+    });
+    setUpdatedDogsById((current) => {
+      const next = { ...current };
+      delete next[deleteTarget.id];
+      return next;
+    });
 
     toast.success(t("admin.dogs.delete.success"));
     setDeleteTarget(null);
@@ -345,6 +361,7 @@ export function AdminDogsPageClient() {
         onClose={closeFormModal}
         onValuesChange={setFormValues}
         onSubmit={handleSubmit}
+        isSubmitting={createDogMutation.isPending}
       />
 
       <DeleteDogConfirmModal

@@ -10,7 +10,7 @@ Monorepo for a public Beagle database app with auth, admin-ready routing, and a 
 - `packages/contracts`: shared API request/response types.
 - `packages/api-client`: typed HTTP client used by frontend hooks.
 
-Current feature foldering conventions:
+Feature foldering conventions:
 
 - Web server actions and query hooks are domain-first, feature-scoped (example: `apps/web/app/actions/admin/dogs/*` and `apps/web/queries/admin/dogs/*`).
 - Admin dog business logic is isolated in dedicated backend modules:

@@ -113,6 +113,8 @@ export type {
   AdminDogListSex,
   AdminDogListSort,
   AdminDogParentPreview,
+  CreateAdminDogRequest,
+  CreateAdminDogResponse,
 } from "./admin";
 export type { HomeStatisticsResponse } from "./home";
 export {

@@ -1,8 +1,10 @@
 import type { AdminDogListRequest } from "@beagle/contracts";
 
+export const adminDogsQueryKeyRoot = ["admin-dogs"] as const;
+
 export function adminDogsQueryKey(filters: AdminDogListRequest) {
   return [
-    "admin-dogs",
+    ...adminDogsQueryKeyRoot,
     filters.query ?? "",
     filters.sex ?? null,
     filters.page ?? 1,

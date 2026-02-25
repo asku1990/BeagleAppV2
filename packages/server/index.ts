@@ -1,4 +1,5 @@
 export {
+  createAdminDog,
   createAdminUser,
   deleteAdminUser,
   listAdminDogs,
