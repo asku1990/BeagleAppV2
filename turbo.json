@@ -22,7 +22,23 @@
     "beagle_db_develop_POSTGRES_URL_NO_SSL",
     "beagle_db_develop_POSTGRES_URL_NON_POOLING",
     "beagle_db_develop_PGPASSWORD",
-    "beagle_db_develop_PGHOST"
+    "beagle_db_develop_PGHOST",
+    "beagle_db_production_PGHOST",
+    "beagle_db_production_POSTGRES_PASSWORD",
+    "beagle_db_production_NEON_PROJECT_ID",
+    "beagle_db_production_PGDATABASE",
+    "beagle_db_production_DATABASE_URL",
+    "beagle_db_production_POSTGRES_DATABASE",
+    "beagle_db_production_POSTGRES_USER",
+    "beagle_db_production_POSTGRES_URL_NON_POOLING",
+    "beagle_db_production_PGUSER",
+    "beagle_db_production_PGPASSWORD",
+    "beagle_db_production_PGHOST_UNPOOLED",
+    "beagle_db_production_POSTGRES_HOST",
+    "beagle_db_production_DATABASE_URL_UNPOOLED",
+    "beagle_db_production_POSTGRES_URL",
+    "beagle_db_production_POSTGRES_PRISMA_URL",
+    "beagle_db_production_POSTGRES_URL_NO_SSL"
   ],
   "tasks": {
     "build": {
