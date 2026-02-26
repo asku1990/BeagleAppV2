@@ -13,6 +13,11 @@ import {
   adminDogParentOptionsQueryKeyRoot,
   adminDogsQueryKeyRoot,
 } from "./query-keys";
+import {
+  beagleNewestQueryKeyRoot,
+  beagleSearchQueryKeyRoot,
+} from "@/queries/beagle-search/query-keys";
+import { homeStatisticsQueryKey } from "@/queries/home/query-keys";
 
 export function useCreateAdminDogMutation() {
   const queryClient = useQueryClient();
@@ -43,6 +48,15 @@ export function useCreateAdminDogMutation() {
       });
       await queryClient.invalidateQueries({
         queryKey: adminDogParentOptionsQueryKeyRoot,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: beagleSearchQueryKeyRoot,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: beagleNewestQueryKeyRoot,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: homeStatisticsQueryKey,
       });
     },
   });
