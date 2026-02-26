@@ -8,8 +8,8 @@ import { useI18n } from "@/hooks/i18n";
 import { createSeedDogProfile, getMockDogProfileById } from "@/lib/beagle-dogs";
 import { cn } from "@/lib/utils";
 import { DogProfileDetailsCard } from "./dog-profile-details-card";
+import { DogProfileLineageCard } from "./dog-profile-lineage-card";
 import { DogProfileNotFoundState } from "./dog-profile-not-found-state";
-import { DogProfilePedigreeCard } from "./dog-profile-pedigree-card";
 import { DogProfileShowsCard } from "./dog-profile-shows-card";
 import { DogProfileTrialsCard } from "./dog-profile-trials-card";
 
@@ -70,10 +70,8 @@ export function BeagleDogProfilePage({
         <DogProfileNotFoundState />
       ) : (
         <>
-          <div className="grid gap-4 lg:grid-cols-2">
-            <DogProfileDetailsCard profile={profile} />
-            <DogProfilePedigreeCard profile={profile} />
-          </div>
+          <DogProfileDetailsCard profile={profile} />
+          <DogProfileLineageCard profile={profile} />
           <DogProfileShowsCard rows={profile.shows} />
           <DogProfileTrialsCard rows={profile.trials} />
         </>

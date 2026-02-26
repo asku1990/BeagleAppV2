@@ -73,6 +73,36 @@ function formatEkNo(value: number | null): string {
   return String(value);
 }
 
+function DetailRow({
+  label,
+  value,
+  emphasized = false,
+  numeric = false,
+}: {
+  label: string;
+  value: string;
+  emphasized?: boolean;
+  numeric?: boolean;
+}) {
+  return (
+    <div className="grid gap-1.5 py-1.5 sm:grid-cols-[170px_1fr] sm:gap-3">
+      <dt className={cn("text-xs font-semibold", beagleTheme.mutedText)}>
+        {label}
+      </dt>
+      <dd
+        className={cn(
+          "text-sm",
+          beagleTheme.inkStrongText,
+          emphasized ? "font-semibold" : "font-medium",
+          numeric ? "tabular-nums" : "",
+        )}
+      >
+        {value}
+      </dd>
+    </div>
+  );
+}
+
 export function DogProfileDetailsCard({ profile }: { profile: DogProfile }) {
   const { t, locale } = useI18n();
   const secondaryRegistrations = profile.registrationNos.filter(
@@ -81,63 +111,49 @@ export function DogProfileDetailsCard({ profile }: { profile: DogProfile }) {
 
   return (
     <ListingSectionShell title={t("dog.profile.card.details.title")}>
-      <dl className="space-y-2 text-sm">
-        <div className="grid grid-cols-[150px_1fr] gap-3">
-          <dt className={beagleTheme.mutedText}>
-            {t("dog.profile.field.name")}
-          </dt>
-          <dd className={cn("font-medium", beagleTheme.inkStrongText)}>
-            {profile.title ? `${profile.title} ${profile.name}` : profile.name}
-          </dd>
-        </div>
-        <div className="grid grid-cols-[150px_1fr] gap-3">
-          <dt className={beagleTheme.mutedText}>
-            {t("dog.profile.field.registrationNo")}
-          </dt>
-          <dd className={cn("font-medium", beagleTheme.inkStrongText)}>
-            {profile.registrationNo}
-          </dd>
-        </div>
-        <div className="grid grid-cols-[150px_1fr] gap-3">
-          <dt className={beagleTheme.mutedText}>
-            {t("dog.profile.field.additionalRegistrationNos")}
-          </dt>
-          <dd>
-            {secondaryRegistrations.length > 0
+      <dl className="space-y-1 text-sm">
+        <DetailRow
+          label={t("dog.profile.field.name")}
+          value={
+            profile.title ? `${profile.title} ${profile.name}` : profile.name
+          }
+          emphasized
+        />
+        <DetailRow
+          label={t("dog.profile.field.registrationNo")}
+          value={profile.registrationNo}
+          emphasized
+        />
+        <DetailRow
+          label={t("dog.profile.field.additionalRegistrationNos")}
+          value={
+            secondaryRegistrations.length > 0
               ? secondaryRegistrations.join(", ")
-              : FALLBACK_VALUE}
-          </dd>
-        </div>
-        <div className="grid grid-cols-[150px_1fr] gap-3">
-          <dt className={beagleTheme.mutedText}>
-            {t("dog.profile.field.birthDate")}
-          </dt>
-          <dd>{formatBirthDateWithAge(profile.birthDate, locale, t)}</dd>
-        </div>
-        <div className="grid grid-cols-[150px_1fr] gap-3">
-          <dt className={beagleTheme.mutedText}>
-            {t("dog.profile.field.sex")}
-          </dt>
-          <dd>{mapSexLabel(profile.sex, t)}</dd>
-        </div>
-        <div className="grid grid-cols-[150px_1fr] gap-3">
-          <dt className={beagleTheme.mutedText}>
-            {t("dog.profile.field.color")}
-          </dt>
-          <dd>{profile.color ?? FALLBACK_VALUE}</dd>
-        </div>
-        <div className="grid grid-cols-[150px_1fr] gap-3">
-          <dt className={beagleTheme.mutedText}>
-            {t("dog.profile.field.ekNo")}
-          </dt>
-          <dd>{formatEkNo(profile.ekNo)}</dd>
-        </div>
-        <div className="grid grid-cols-[150px_1fr] gap-3">
-          <dt className={beagleTheme.mutedText}>
-            {t("dog.profile.field.inbreeding")}
-          </dt>
-          <dd>{formatPercent(profile.inbreedingCoefficientPct)}</dd>
-        </div>
+              : FALLBACK_VALUE
+          }
+        />
+        <DetailRow
+          label={t("dog.profile.field.birthDate")}
+          value={formatBirthDateWithAge(profile.birthDate, locale, t)}
+        />
+        <DetailRow
+          label={t("dog.profile.field.sex")}
+          value={mapSexLabel(profile.sex, t)}
+        />
+        <DetailRow
+          label={t("dog.profile.field.color")}
+          value={profile.color ?? FALLBACK_VALUE}
+        />
+        <DetailRow
+          label={t("dog.profile.field.ekNo")}
+          value={formatEkNo(profile.ekNo)}
+          numeric
+        />
+        <DetailRow
+          label={t("dog.profile.field.inbreeding")}
+          value={formatPercent(profile.inbreedingCoefficientPct)}
+          numeric
+        />
       </dl>
     </ListingSectionShell>
   );

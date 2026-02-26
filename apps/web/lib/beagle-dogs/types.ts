@@ -5,6 +5,17 @@ export type DogProfileParent = {
   registrationNo: string | null;
 };
 
+export type DogProfilePedigreeCard = {
+  id: string;
+  sire: DogProfileParent | null;
+  dam: DogProfileParent | null;
+};
+
+export type DogProfilePedigreeGeneration = {
+  generation: number;
+  cards: DogProfilePedigreeCard[];
+};
+
 export type DogProfileTrialRow = {
   id: string;
   place: string;
@@ -37,6 +48,7 @@ export type DogProfile = {
   inbreedingCoefficientPct: number | null;
   sire: DogProfileParent | null;
   dam: DogProfileParent | null;
+  pedigree: DogProfilePedigreeGeneration[];
   shows: DogProfileShowRow[];
   trials: DogProfileTrialRow[];
 };

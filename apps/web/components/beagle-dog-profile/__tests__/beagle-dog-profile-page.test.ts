@@ -25,9 +25,14 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain("Ajometsän Aada");
     expect(html).toContain("FI-11/24");
     expect(html).toContain("dog.profile.card.details.title");
-    expect(html).toContain("dog.profile.card.pedigree.title");
+    expect(html).toContain("dog.profile.card.lineage.title");
+    expect(html).toContain("dog.profile.field.sire");
+    expect(html).toContain("dog.profile.field.dam");
     expect(html).toContain("dog.profile.card.shows.title");
     expect(html).toContain("dog.profile.card.trials.title");
+    expect(html).toContain("dog.profile.lineage.generationLabel 1");
+    expect(html).toContain("dog.profile.lineage.generationLabel 2");
+    expect(html).toContain("dog.profile.lineage.generationLabel 3");
   });
 
   it("renders not-found state for an unknown dog id", () => {
@@ -58,6 +63,8 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain("FI-500/26");
     expect(html).toContain("Mock Show 1");
     expect(html).toContain("Mock Trial 1");
+    expect(html).toContain("SF10409F/79");
+    expect(html).toContain("SF213414/79");
   });
 
   it("renders empty state text when shows or trials are missing", () => {

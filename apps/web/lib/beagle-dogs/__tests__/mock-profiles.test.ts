@@ -39,6 +39,10 @@ describe("beagle-dogs mock profile utilities", () => {
     expect(href).toContain("/beagle/dogs/x-10?");
     expect(href).toContain("name=Seed+Dog");
     expect(seeded?.registrationNo).toBe("FI-100/24");
+    expect(seeded?.pedigree).toHaveLength(3);
+    expect(seeded?.pedigree[0]?.cards).toHaveLength(1);
+    expect(seeded?.pedigree[1]?.cards).toHaveLength(2);
+    expect(seeded?.pedigree[2]?.cards).toHaveLength(4);
     expect(seeded?.shows).toHaveLength(2);
     expect(seeded?.trials).toHaveLength(1);
   });

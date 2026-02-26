@@ -7,6 +7,7 @@ export const fiBeagleDogProfileMessages = {
   "dog.profile.notFound.backCta": "Palaa beaglehakuun",
   "dog.profile.card.details.title": "Perustiedot",
   "dog.profile.card.pedigree.title": "Sukutaulu",
+  "dog.profile.card.lineage.title": "Sukutaulu",
   "dog.profile.card.shows.title": "Näyttelyt",
   "dog.profile.card.trials.title": "Kokeet",
   "dog.profile.count.entries": "Merkintöjä",
@@ -40,6 +41,10 @@ export const fiBeagleDogProfileMessages = {
   "dog.profile.trials.col.class": "Palkinto",
   "dog.profile.trials.col.rank": "Sija",
   "dog.profile.trials.col.points": "Pisteet",
+  "dog.profile.lineage.col.generation": "Sukupolvi",
+  "dog.profile.lineage.col.sire": "Isän linja",
+  "dog.profile.lineage.col.dam": "Emän linja",
+  "dog.profile.lineage.generationLabel": "G",
 } as const;
 
 export const svBeagleDogProfileMessages = {
@@ -51,6 +56,7 @@ export const svBeagleDogProfileMessages = {
   "dog.profile.notFound.backCta": "Till beaglesökning",
   "dog.profile.card.details.title": "Grunduppgifter",
   "dog.profile.card.pedigree.title": "Stamtavla",
+  "dog.profile.card.lineage.title": "Stamtavla",
   "dog.profile.card.shows.title": "Utställningar",
   "dog.profile.card.trials.title": "Jaktprov",
   "dog.profile.count.entries": "Poster",
@@ -84,4 +90,8 @@ export const svBeagleDogProfileMessages = {
   "dog.profile.trials.col.class": "Pris",
   "dog.profile.trials.col.rank": "Placering",
   "dog.profile.trials.col.points": "Poäng",
+  "dog.profile.lineage.col.generation": "Generation",
+  "dog.profile.lineage.col.sire": "Faderslinje",
+  "dog.profile.lineage.col.dam": "Moderslinje",
+  "dog.profile.lineage.generationLabel": "G",
 } as const;
