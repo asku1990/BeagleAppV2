@@ -28,6 +28,10 @@ import {
   fiSidebarMessages,
   svSidebarMessages,
 } from "@/lib/i18n/messages/sidebar";
+import {
+  fiBeagleDogProfileMessages,
+  svBeagleDogProfileMessages,
+} from "@/lib/i18n/messages/beagle/dogs/profile";
 
 const fi = {
   ...fiHeaderMessages,
@@ -41,6 +45,7 @@ const fi = {
   ...fiCommonMessages,
   ...fiHomeMessages,
   ...fiSearchMessages,
+  ...fiBeagleDogProfileMessages,
 } as const;
 
 export type MessageKey = keyof typeof fi;
@@ -58,6 +63,7 @@ const sv: Messages = {
   ...svCommonMessages,
   ...svHomeMessages,
   ...svSearchMessages,
+  ...svBeagleDogProfileMessages,
 };
 
 export const messages: Record<Locale, Messages> = {

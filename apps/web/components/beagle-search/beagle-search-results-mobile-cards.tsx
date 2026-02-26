@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import type { BeagleSearchResultRow } from "@/lib/beagle-search";
+import { getDogProfileHref } from "@/lib/beagle-dogs";
 import type { MessageKey } from "@/lib/i18n";
 import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
@@ -42,7 +44,22 @@ export function BeagleSearchResultsMobileCards({
                 <span className={beagleTheme.mutedText}>
                   {t("search.results.col.reg")}:{" "}
                 </span>
-                <span>{row.registrationNo}</span>
+                <Link
+                  href={getDogProfileHref(row.id, {
+                    registrationNo: row.registrationNo,
+                    name: row.name,
+                    sex: row.sex,
+                    ekNo: row.ekNo,
+                    showCount: row.showCount,
+                    trialCount: row.trialCount,
+                  })}
+                  className={cn(
+                    "font-medium underline underline-offset-2",
+                    beagleTheme.inkStrongText,
+                  )}
+                >
+                  {row.registrationNo}
+                </Link>
               </p>
               {additionalRegistrationNos.length > 0 ? (
                 <p className="col-span-2">
@@ -68,12 +85,23 @@ export function BeagleSearchResultsMobileCards({
                 <span className={beagleTheme.mutedText}>
                   {t("search.results.col.name")}:{" "}
                 </span>
-                <span
+                <Link
+                  href={getDogProfileHref(row.id, {
+                    registrationNo: row.registrationNo,
+                    name: row.name,
+                    sex: row.sex,
+                    ekNo: row.ekNo,
+                    showCount: row.showCount,
+                    trialCount: row.trialCount,
+                  })}
                   title={`${t("search.results.parents.sire")}: ${row.sire}\n${t("search.results.parents.dam")}: ${row.dam}`}
-                  className={cn("font-medium", beagleTheme.inkStrongText)}
+                  className={cn(
+                    "font-medium underline underline-offset-2",
+                    beagleTheme.inkStrongText,
+                  )}
                 >
                   {row.name}
-                </span>
+                </Link>
               </p>
               <p>
                 <span className={beagleTheme.mutedText}>
