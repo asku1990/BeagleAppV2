@@ -27,6 +27,7 @@ This project uses a user-facing changelog format.
 - Ylläpidon koirasivulla voi nyt myös muokata ja poistaa koiria.
 - Pudotusvalikkoihin koiraa luodessa ja muokatessa lisättiin kasvattaja-, omistaja- ja vanhempivalinnat automaattisilla ehdotuksilla.
 - Kenttiin lisättiin validointeja (esim. rekisterinumero, syntymäaika ja vanhempien sukupuolirajoitteet).
+- Admin koiralista sekä muokkaus että luontisivu tukevat useaa rekisterinumeroa, ensimmäinen on aina esitetty defaulttina. Järjestystä voi muuttaa.
 
 ### Changed
 
