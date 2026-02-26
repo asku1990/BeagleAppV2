@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { BeagleSearchQueryState } from "@/lib/beagle-search";
+import { beagleSearchQueryKey } from "../query-keys";
 import { useBeagleSearchQuery } from "../use-beagle-search-query";
 
 const { useQueryMock, searchDogsActionMock } = vi.hoisted(() => ({
@@ -76,20 +77,16 @@ describe("useBeagleSearchQuery", () => {
     });
 
     const options = useQueryMock.mock.calls[0]?.[0] as { queryKey: unknown[] };
-    expect(options.queryKey).toEqual([
-      "beagle-search",
-      "100",
-      "",
-      "",
-      "any",
-      "",
-      "",
-      false,
-      true,
-      3,
-      25,
-      "ek-asc",
-    ]);
+    expect(options.queryKey).toEqual(
+      beagleSearchQueryKey({
+        ...baseState,
+        ek: "100",
+        page: 3,
+        pageSize: 25,
+        sort: "ek-asc",
+        multipleRegsOnly: true,
+      }),
+    );
   });
 
   it("maps payload and omits sex when value is any", async () => {

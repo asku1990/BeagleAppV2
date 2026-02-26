@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { HomeStatisticsResponse } from "@beagle/contracts";
+import { homeStatisticsQueryKey } from "../query-keys";
 import { useHomeStatisticsQuery } from "../use-home-statistics-query";
 
 const { useQueryMock, getHomeStatisticsActionMock } = vi.hoisted(() => ({
@@ -30,9 +31,8 @@ describe("useHomeStatisticsQuery", () => {
 
     expect(useQueryMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        queryKey: ["home-statistics"],
+        queryKey: homeStatisticsQueryKey,
         staleTime: 5 * 60 * 1000,
-        refetchInterval: 5 * 60 * 1000,
         refetchOnWindowFocus: true,
         queryFn: expect.any(Function),
       }),

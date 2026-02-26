@@ -23,6 +23,12 @@ Domain modules should remain explicit and isolated as they grow:
 - `admin`
 - `forum`
 
+Domain submodules are must when a domain grows, for example:
+
+- `admin/dogs` web transport + query layers
+- `packages/server/admin/dogs`
+- `packages/db/admin/dogs`
+
 When adding features, place shared domain concepts in `packages/domain`, business rules in `packages/server`, then expose through `apps/web/app/api/*` for public/compat HTTP needs or `apps/web/app/actions/*` for web-only transport, then consume in UIs.
 
 ## Dependency rules
@@ -52,6 +58,9 @@ Not allowed:
 - For `apps/web`: place custom React hooks under `apps/web/hooks/**` (prefer feature-scoped folders).
 - Query and mutation data-access hooks may live under `apps/web/queries/**` to keep read/write cache logic co-located with feature data APIs.
 - For `apps/web`: keep `apps/web/lib/**` for non-hook utilities/support code (helpers, types, constants, providers, etc.).
+- For `apps/web` server actions and queries, prefer domain-first feature folders over flat domain files:
+  - `app/actions/<domain>/<feature>/**` (example: `app/actions/admin/dogs/**`)
+  - `queries/<domain>/<feature>/**` (example: `queries/admin/dogs/**`)
 
 ## React Query data-access conventions
 
