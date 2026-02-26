@@ -181,6 +181,42 @@ describe("updateAdminDog", () => {
     );
   });
 
+  it("does not pass owner names when ownerNames is omitted", async () => {
+    findDogByRegistrationNoDbMock.mockResolvedValue(null);
+    updateAdminDogWriteDbMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Metsapolun Kide",
+      sex: "FEMALE",
+      registrationNo: "FI12345/21",
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+      }),
+    ).resolves.toEqual({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          id: "dog_1",
+          name: "Metsapolun Kide",
+          sex: "FEMALE",
+          registrationNo: "FI12345/21",
+        },
+      },
+    });
+
+    expect(updateAdminDogWriteDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ownerNames: undefined,
+      }),
+      {},
+    );
+  });
+
   it("returns 404 when dog is not found", async () => {
     findDogByRegistrationNoDbMock.mockResolvedValue(null);
     updateAdminDogWriteDbMock.mockRejectedValue(new Error("DOG_NOT_FOUND"));

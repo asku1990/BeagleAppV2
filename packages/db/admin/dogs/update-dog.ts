@@ -9,7 +9,7 @@ export type UpdateAdminDogDbInput = {
   breederNameText: string | null;
   sireId: string | null | undefined;
   damId: string | null | undefined;
-  ownerNames: string[];
+  ownerNames?: string[];
   ekNo: number | null;
   note: string | null;
   registrationNo: string | null;
@@ -224,8 +224,10 @@ export async function updateAdminDogWriteDb(
     },
   });
 
-  const ownerIds = await resolveOwnerIds(input.ownerNames, tx);
-  await syncOwnerships(updatedDog.id, ownerIds, tx);
+  if (input.ownerNames !== undefined) {
+    const ownerIds = await resolveOwnerIds(input.ownerNames, tx);
+    await syncOwnerships(updatedDog.id, ownerIds, tx);
+  }
   const syncedRegistrationNo = await syncPrimaryRegistration(
     updatedDog.id,
     input.registrationNo,

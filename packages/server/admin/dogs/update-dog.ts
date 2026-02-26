@@ -72,6 +72,7 @@ export async function updateAdminDog(
       sex: input.sex,
       hasBirthDate: Boolean(input.birthDate),
       hasRegistrationNo: Boolean(input.registrationNo),
+      hasOwnerNames: input.ownerNames !== undefined,
       ownerCount: normalizeDistinctNames(input.ownerNames).length,
     },
     "admin dog update started",
@@ -338,7 +339,10 @@ export async function updateAdminDog(
             breederNameText: normalizeOptionalText(input.breederNameText),
             sireId: sire === undefined ? undefined : (sire?.id ?? null),
             damId: dam === undefined ? undefined : (dam?.id ?? null),
-            ownerNames: normalizeDistinctNames(input.ownerNames),
+            ownerNames:
+              input.ownerNames === undefined
+                ? undefined
+                : normalizeDistinctNames(input.ownerNames),
             ekNo,
             note,
             registrationNo,

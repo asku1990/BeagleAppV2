@@ -184,4 +184,37 @@ describe("updateAdminDogWriteDb", () => {
       }),
     );
   });
+
+  it("does not sync ownerships when owner names are omitted", async () => {
+    dogFindUniqueMock.mockResolvedValue({ id: "dog_1" });
+    breederFindUniqueMock.mockResolvedValue(null);
+    dogUpdateMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Kide",
+      sex: "FEMALE",
+    });
+    dogRegistrationFindManyMock.mockResolvedValue([]);
+
+    await updateAdminDogWriteDb(
+      {
+        id: "dog_1",
+        name: "Kide",
+        sex: "FEMALE",
+        birthDate: null,
+        breederNameText: null,
+        sireId: undefined,
+        damId: undefined,
+        ownerNames: undefined,
+        ekNo: null,
+        note: null,
+        registrationNo: null,
+      },
+      tx as never,
+    );
+
+    expect(ownerFindFirstMock).not.toHaveBeenCalled();
+    expect(dogOwnershipDeleteManyMock).not.toHaveBeenCalled();
+    expect(dogOwnershipFindManyMock).not.toHaveBeenCalled();
+    expect(dogOwnershipCreateMock).not.toHaveBeenCalled();
+  });
 });
