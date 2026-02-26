@@ -22,6 +22,7 @@ export {
   findDogByRegistrationNoDb,
   type DogByRegistrationLookupDb,
 } from "./find-dog-by-registration";
+export { findDogByIdDb, type DogByIdLookupDb } from "./find-dog-by-id";
 export {
   listAdminBreederOptionsDb,
   type AdminBreederLookupRequestDb,

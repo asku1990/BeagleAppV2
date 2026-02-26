@@ -15,6 +15,7 @@ export { setAdminUserPasswordDb } from "./set-user-password";
 export {
   createAdminDogWriteDb,
   deleteAdminDogWriteDb,
+  findDogByIdDb,
   findDogByRegistrationNoDb,
   updateAdminDogWriteDb,
   listAdminDogsDb,
@@ -23,6 +24,7 @@ export {
   type CreatedAdminDogRowDb,
   type UpdateAdminDogDbInput,
   type UpdatedAdminDogRowDb,
+  type DogByIdLookupDb,
   type DogByRegistrationLookupDb,
   type AdminDogListRequestDb,
   type AdminDogListResponseDb,

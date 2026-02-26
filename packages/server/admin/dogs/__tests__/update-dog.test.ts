@@ -4,16 +4,19 @@ import { updateAdminDog } from "../update-dog";
 const {
   updateAdminDogWriteDbMock,
   runAdminDogWriteTransactionDbMock,
+  findDogByIdDbMock,
   findDogByRegistrationNoDbMock,
 } = vi.hoisted(() => ({
   updateAdminDogWriteDbMock: vi.fn(),
   runAdminDogWriteTransactionDbMock: vi.fn(),
+  findDogByIdDbMock: vi.fn(),
   findDogByRegistrationNoDbMock: vi.fn(),
 }));
 
 vi.mock("@beagle/db", () => ({
   updateAdminDogWriteDb: updateAdminDogWriteDbMock,
   runAdminDogWriteTransactionDb: runAdminDogWriteTransactionDbMock,
+  findDogByIdDb: findDogByIdDbMock,
   findDogByRegistrationNoDb: findDogByRegistrationNoDbMock,
 }));
 
@@ -21,10 +24,16 @@ describe("updateAdminDog", () => {
   beforeEach(() => {
     updateAdminDogWriteDbMock.mockReset();
     runAdminDogWriteTransactionDbMock.mockReset();
+    findDogByIdDbMock.mockReset();
     findDogByRegistrationNoDbMock.mockReset();
     runAdminDogWriteTransactionDbMock.mockImplementation(async (callback) =>
       callback({}),
     );
+    findDogByIdDbMock.mockResolvedValue({
+      id: "dog_1",
+      sire: null,
+      dam: null,
+    });
   });
 
   it("returns 400 for invalid id", async () => {
@@ -299,8 +308,7 @@ describe("updateAdminDog", () => {
   });
 
   it("returns 404 when dog is not found", async () => {
-    findDogByRegistrationNoDbMock.mockResolvedValue(null);
-    updateAdminDogWriteDbMock.mockRejectedValue(new Error("DOG_NOT_FOUND"));
+    findDogByIdDbMock.mockResolvedValue(null);
 
     await expect(
       updateAdminDog({
@@ -317,6 +325,8 @@ describe("updateAdminDog", () => {
         code: "DOG_NOT_FOUND",
       },
     });
+
+    expect(updateAdminDogWriteDbMock).not.toHaveBeenCalled();
   });
 
   it("returns 409 for duplicate dog", async () => {
@@ -384,6 +394,64 @@ describe("updateAdminDog", () => {
         ok: false,
         error: "Selected sire must be a male dog.",
         code: "INVALID_SIRE_SEX",
+      },
+    });
+  });
+
+  it("returns 400 when updated dam matches existing sire", async () => {
+    findDogByIdDbMock.mockResolvedValue({
+      id: "dog_1",
+      sire: { id: "dog_parent", sex: "MALE" },
+      dam: null,
+    });
+    findDogByRegistrationNoDbMock.mockResolvedValue({
+      id: "dog_parent",
+      sex: "MALE",
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        damRegistrationNo: "FI11111/11",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Sire and dam must be different dogs.",
+        code: "INVALID_PARENT_COMBINATION",
+      },
+    });
+  });
+
+  it("returns 400 when updated sire matches existing dam", async () => {
+    findDogByIdDbMock.mockResolvedValue({
+      id: "dog_1",
+      sire: null,
+      dam: { id: "dog_parent", sex: "FEMALE" },
+    });
+    findDogByRegistrationNoDbMock.mockResolvedValue({
+      id: "dog_parent",
+      sex: "FEMALE",
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        sireRegistrationNo: "FI11111/11",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Sire and dam must be different dogs.",
+        code: "INVALID_PARENT_COMBINATION",
       },
     });
   });

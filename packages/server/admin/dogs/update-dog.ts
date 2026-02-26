@@ -1,4 +1,5 @@
 import {
+  findDogByIdDb,
   findDogByRegistrationNoDb,
   runAdminDogWriteTransactionDb,
   updateAdminDogWriteDb,
@@ -23,10 +24,11 @@ import {
 const DOG_NAME_MAX_LENGTH = 120;
 const DOG_REGISTRATION_NO_MAX_LENGTH = 40;
 const DOG_NOTE_MAX_LENGTH = 500;
+type ParentRef = { id: string; sex: "MALE" | "FEMALE" | "UNKNOWN" };
 
 async function resolveParentByRegistration(
   registrationNo: string | null,
-): Promise<{ id: string; sex: "MALE" | "FEMALE" | "UNKNOWN" } | null> {
+): Promise<ParentRef | null> {
   if (!registrationNo) {
     return null;
   }
@@ -265,10 +267,7 @@ export async function updateAdminDog(
         ? undefined
         : normalizeOptionalText(input.damRegistrationNo ?? undefined);
 
-    let sire:
-      | { id: string; sex: "MALE" | "FEMALE" | "UNKNOWN" }
-      | null
-      | undefined;
+    let sire: ParentRef | null | undefined;
     if (sireRegistrationNo !== undefined) {
       sire = await resolveParentByRegistration(sireRegistrationNo);
     }
@@ -283,10 +282,7 @@ export async function updateAdminDog(
       };
     }
 
-    let dam:
-      | { id: string; sex: "MALE" | "FEMALE" | "UNKNOWN" }
-      | null
-      | undefined;
+    let dam: ParentRef | null | undefined;
     if (damRegistrationNo !== undefined) {
       dam = await resolveParentByRegistration(damRegistrationNo);
     }
@@ -301,7 +297,24 @@ export async function updateAdminDog(
       };
     }
 
-    if (sire && dam && sire.id === dam.id) {
+    const existingDog = await findDogByIdDb(id);
+    if (!existingDog) {
+      return {
+        status: 404,
+        body: {
+          ok: false,
+          error: "Dog not found.",
+          code: "DOG_NOT_FOUND",
+        },
+      };
+    }
+
+    const effectiveSire: ParentRef | null =
+      sire === undefined ? existingDog.sire : sire;
+    const effectiveDam: ParentRef | null =
+      dam === undefined ? existingDog.dam : dam;
+
+    if (effectiveSire && effectiveDam && effectiveSire.id === effectiveDam.id) {
       return {
         status: 400,
         body: {
@@ -312,7 +325,7 @@ export async function updateAdminDog(
       };
     }
 
-    if (sire && sire.id === id) {
+    if (effectiveSire && effectiveSire.id === id) {
       return {
         status: 400,
         body: {
@@ -323,7 +336,7 @@ export async function updateAdminDog(
       };
     }
 
-    if (dam && dam.id === id) {
+    if (effectiveDam && effectiveDam.id === id) {
       return {
         status: 400,
         body: {
@@ -334,7 +347,7 @@ export async function updateAdminDog(
       };
     }
 
-    if (sire && sire.sex !== "MALE") {
+    if (effectiveSire && effectiveSire.sex !== "MALE") {
       return {
         status: 400,
         body: {
@@ -345,7 +358,7 @@ export async function updateAdminDog(
       };
     }
 
-    if (dam && dam.sex !== "FEMALE") {
+    if (effectiveDam && effectiveDam.sex !== "FEMALE") {
       return {
         status: 400,
         body: {
