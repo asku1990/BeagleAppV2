@@ -8,6 +8,32 @@ This project uses a user-facing changelog format.
 - Internal-only changes are optional in the changelog.
 - Use sections: `Added`, `Changed`, `Fixed`, `Removed`.
 
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.3.0] - 2026-02-26
+
+### Added
+
+- Ylläpidon koirasivulla voi nyt lisätä uusia koiria: rekisterinumero, nimi, sukupuoli, syntymäaika, kasvattaja, omistajat, uros, emä, EK-numero ja muistiinpanot.
+- Ylläpidon koirasivun haku ja listaus hakee datan suoraan tietokannasta.
+- Ylläpidon koirasivulla voi nyt myös muokata ja poistaa koiria.
+- Pudotusvalikkoihin koiraa luodessa ja muokatessa lisättiin kasvattaja-, omistaja- ja vanhempivalinnat automaattisilla ehdotuksilla.
+- Kenttiin lisättiin validointeja (esim. rekisterinumero, syntymäaika ja vanhempien sukupuolirajoitteet).
+
+### Changed
+
+### Fixed
+
+### Removed
+
 ## [0.2.0] - 2026-02-19
 
 ### Tärkeintä tässä julkaisussa
