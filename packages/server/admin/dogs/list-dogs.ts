@@ -175,6 +175,7 @@ export async function listAdminDogs(
           items: result.items.map((item) => ({
             id: item.id,
             registrationNo: item.registrationNo,
+            secondaryRegistrationNos: item.secondaryRegistrationNos,
             name: item.name,
             sex: item.sex,
             birthDate: item.birthDate?.toISOString() ?? null,

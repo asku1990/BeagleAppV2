@@ -20,6 +20,8 @@ export const fiAdminDogsCommonMessages = {
   "admin.dogs.mutation.errorInvalidName": "Koiran nimi on pakollinen.",
   "admin.dogs.mutation.errorInvalidRegistrationNo":
     "Koiran rekisterinumero on pakollinen.",
+  "admin.dogs.mutation.errorDuplicateRegistrationNo":
+    "Rekisterinumeroiden tulee olla ykslöllisiä.",
   "admin.dogs.mutation.errorNameTooLong":
     "Koiran nimi on liian pitkä (max 120 merkkiä).",
   "admin.dogs.mutation.errorInvalidSex": "Virheellinen sukupuoli.",
@@ -70,6 +72,8 @@ export const svAdminDogsCommonMessages = {
   "admin.dogs.mutation.errorInvalidName": "Hundens namn ar obligatoriskt.",
   "admin.dogs.mutation.errorInvalidRegistrationNo":
     "Hundens registreringsnummer ar obligatoriskt.",
+  "admin.dogs.mutation.errorDuplicateRegistrationNo":
+    "Registreringsnummer maste vara unika.",
   "admin.dogs.mutation.errorNameTooLong":
     "Hundens namn ar for langt (max 120 tecken).",
   "admin.dogs.mutation.errorInvalidSex": "Ogiltigt kon.",

@@ -16,6 +16,7 @@ export type CreateAdminDogDbInput = {
   ekNo: number | null;
   note: string | null;
   registrationNo: string;
+  secondaryRegistrationNos?: string[];
 };
 
 export type CreatedAdminDogRowDb = {
@@ -112,6 +113,15 @@ async function createAdminDogDb(
       source: "ADMIN_UI",
     },
   });
+  if ((input.secondaryRegistrationNos?.length ?? 0) > 0) {
+    await tx.dogRegistration.createMany({
+      data: (input.secondaryRegistrationNos ?? []).map((registrationNo) => ({
+        dogId: createdDog.id,
+        registrationNo,
+        source: "ADMIN_UI",
+      })),
+    });
+  }
 
   await createOwnerships(createdDog.id, input.ownerNames, tx);
 

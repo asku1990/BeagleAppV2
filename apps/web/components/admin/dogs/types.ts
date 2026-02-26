@@ -17,6 +17,7 @@ export type AdminDogRecord = {
   ekNo: number | null;
   note: string | null;
   registrationNo: string | null;
+  secondaryRegistrationNos: string[];
   sirePreview: AdminDogParentPreview | null;
   damPreview: AdminDogParentPreview | null;
 };
@@ -30,6 +31,7 @@ export type AdminDogFormValues = {
   ekNo: string;
   note: string;
   registrationNo: string;
+  secondaryRegistrationNos: string[];
   sirePreviewName: string;
   sirePreviewRegistrationNo: string;
   damPreviewName: string;

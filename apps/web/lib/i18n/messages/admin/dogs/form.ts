@@ -4,6 +4,13 @@ export const fiAdminDogsFormMessages = {
   "admin.dogs.form.createTitle": "Luo koira",
   "admin.dogs.form.editTitle": "Muokkaa koiraa",
   "admin.dogs.form.registrationNoPlaceholder": "Rekisterinumero",
+  "admin.dogs.form.secondaryRegistrationLabel": "Toissijaiset rekisterinumerot",
+  "admin.dogs.form.secondaryRegistrationAdd": "+ Lisää toissijainen",
+  "admin.dogs.form.secondaryRegistrationEmpty":
+    "Ei toissijaisia rekisterinumeroita.",
+  "admin.dogs.form.secondaryRegistrationPlaceholder":
+    "Toissijainen rekisterinumero",
+  "admin.dogs.form.secondaryRegistrationRemove": "Poista",
   "admin.dogs.form.namePlaceholder": "Koiran nimi",
   "admin.dogs.form.birthDateAria": "Syntymäaika",
   "admin.dogs.form.sexLabel": "Sukupuoli",
@@ -37,6 +44,13 @@ export const svAdminDogsFormMessages = {
   "admin.dogs.form.createTitle": "Skapa hund",
   "admin.dogs.form.editTitle": "Redigera hund",
   "admin.dogs.form.registrationNoPlaceholder": "Registreringsnummer",
+  "admin.dogs.form.secondaryRegistrationLabel": "Sekundara registreringsnummer",
+  "admin.dogs.form.secondaryRegistrationAdd": "+ Lagg till sekundar",
+  "admin.dogs.form.secondaryRegistrationEmpty":
+    "Inga sekundara registreringsnummer.",
+  "admin.dogs.form.secondaryRegistrationPlaceholder":
+    "Sekundart registreringsnummer",
+  "admin.dogs.form.secondaryRegistrationRemove": "Ta bort",
   "admin.dogs.form.namePlaceholder": "Hundens namn",
   "admin.dogs.form.birthDateAria": "Fodelsedatum",
   "admin.dogs.form.sexLabel": "Kon",

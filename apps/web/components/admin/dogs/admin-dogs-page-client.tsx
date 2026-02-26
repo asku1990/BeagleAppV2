@@ -93,6 +93,7 @@ function createEmptyFormValues(): AdminDogFormValues {
     ekNo: "",
     note: "",
     registrationNo: "",
+    secondaryRegistrationNos: [],
     sirePreviewName: "",
     sirePreviewRegistrationNo: "",
     damPreviewName: "",
@@ -110,6 +111,7 @@ function mapDogToFormValues(dog: AdminDogRecord): AdminDogFormValues {
     ekNo: dog.ekNo === null ? "" : String(dog.ekNo),
     note: dog.note ?? "",
     registrationNo: dog.registrationNo ?? "",
+    secondaryRegistrationNos: dog.secondaryRegistrationNos,
     sirePreviewName: dog.sirePreview?.name ?? "",
     sirePreviewRegistrationNo: dog.sirePreview?.registrationNo ?? "",
     damPreviewName: dog.damPreview?.name ?? "",
@@ -151,6 +153,12 @@ function normalizeEkNo(value: string): number | null {
   return Number.isNaN(parsed) ? null : parsed;
 }
 
+function normalizeSecondaryRegistrations(values: string[]): string[] {
+  return values
+    .map((value) => value.trim().toUpperCase())
+    .filter((value) => value.length > 0);
+}
+
 function getMutationErrorCode(error: unknown): string | undefined {
   if (error instanceof AdminMutationError) {
     return error.errorCode;
@@ -171,6 +179,7 @@ function mapDogFromQuery(item: AdminDogListItem): AdminDogRecord {
   return {
     id: item.id,
     registrationNo: item.registrationNo,
+    secondaryRegistrationNos: item.secondaryRegistrationNos,
     name: item.name,
     sex: item.sex,
     birthDate: normalizeDateForInput(item.birthDate),
@@ -257,6 +266,8 @@ export function AdminDogsPageClient() {
         return t("admin.dogs.mutation.errorInvalidName");
       case "INVALID_REGISTRATION_NO":
         return t("admin.dogs.mutation.errorInvalidRegistrationNo");
+      case "DUPLICATE_REGISTRATION_NO":
+        return t("admin.dogs.mutation.errorDuplicateRegistrationNo");
       case "NAME_TOO_LONG":
         return t("admin.dogs.mutation.errorNameTooLong");
       case "INVALID_SEX":
@@ -366,6 +377,9 @@ export function AdminDogsPageClient() {
           ekNo: normalizeEkNo(values.ekNo) ?? undefined,
           note: normalizeOptionalText(values.note) ?? undefined,
           registrationNo: values.registrationNo.trim(),
+          secondaryRegistrationNos: normalizeSecondaryRegistrations(
+            values.secondaryRegistrationNos,
+          ),
           sireRegistrationNo:
             normalizeOptionalText(values.sirePreviewRegistrationNo) ??
             undefined,
@@ -396,6 +410,9 @@ export function AdminDogsPageClient() {
         ekNo: normalizeEkNo(values.ekNo),
         note: normalizeOptionalText(values.note),
         registrationNo: values.registrationNo.trim(),
+        secondaryRegistrationNos: normalizeSecondaryRegistrations(
+          values.secondaryRegistrationNos,
+        ),
         sireRegistrationNo: resolveParentRegistrationUpdateValue(
           values.sirePreviewRegistrationNo,
           formState.target.sirePreview?.registrationNo ?? "",

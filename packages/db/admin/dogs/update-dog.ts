@@ -13,6 +13,7 @@ export type UpdateAdminDogDbInput = {
   ekNo?: number | null;
   note?: string | null;
   registrationNo: string;
+  secondaryRegistrationNos?: string[];
 };
 
 export type UpdatedAdminDogRowDb = {
@@ -124,6 +125,7 @@ async function syncOwnerships(
 async function syncPrimaryRegistration(
   dogId: string,
   registrationNo: string,
+  secondaryRegistrationNos: string[] | undefined,
   tx: Prisma.TransactionClient,
 ): Promise<string | null> {
   const existingRegistrations = await tx.dogRegistration.findMany({
@@ -134,6 +136,72 @@ async function syncPrimaryRegistration(
     },
     orderBy: [{ createdAt: "asc" }, { id: "asc" }],
   });
+
+  if (secondaryRegistrationNos !== undefined) {
+    const primaryRegistration = existingRegistrations[0] ?? null;
+    let secondaryRows = existingRegistrations.filter(
+      (row) => row.id !== primaryRegistration?.id,
+    );
+
+    // Remove any existing secondary that matches the target primary first to
+    // avoid hitting unique registration constraints during primary update.
+    const duplicatePrimaryRow = secondaryRows.find(
+      (row) => row.registrationNo === registrationNo,
+    );
+    if (duplicatePrimaryRow) {
+      await tx.dogRegistration.delete({
+        where: { id: duplicatePrimaryRow.id },
+      });
+      secondaryRows = secondaryRows.filter(
+        (row) => row.id !== duplicatePrimaryRow.id,
+      );
+    }
+
+    if (primaryRegistration) {
+      await tx.dogRegistration.update({
+        where: { id: primaryRegistration.id },
+        data: { registrationNo },
+      });
+    } else {
+      await tx.dogRegistration.create({
+        data: {
+          dogId,
+          registrationNo,
+          source: "ADMIN_UI",
+        },
+      });
+    }
+    const desiredSecondarySet = new Set(secondaryRegistrationNos);
+
+    const removableIds = secondaryRows
+      .filter((row) => !desiredSecondarySet.has(row.registrationNo))
+      .map((row) => row.id);
+    if (removableIds.length > 0) {
+      await tx.dogRegistration.deleteMany({
+        where: { id: { in: removableIds } },
+      });
+    }
+
+    const existingSecondarySet = new Set(
+      secondaryRows
+        .filter((row) => desiredSecondarySet.has(row.registrationNo))
+        .map((row) => row.registrationNo),
+    );
+    const missingSecondary = secondaryRegistrationNos.filter(
+      (value) => !existingSecondarySet.has(value),
+    );
+    if (missingSecondary.length > 0) {
+      await tx.dogRegistration.createMany({
+        data: missingSecondary.map((value) => ({
+          dogId,
+          registrationNo: value,
+          source: "ADMIN_UI",
+        })),
+      });
+    }
+
+    return registrationNo;
+  }
 
   const primaryRegistration = existingRegistrations[0] ?? null;
   const alreadyOwned = existingRegistrations.some(
@@ -226,6 +294,7 @@ export async function updateAdminDogWriteDb(
   const syncedRegistrationNo = await syncPrimaryRegistration(
     updatedDog.id,
     input.registrationNo,
+    input.secondaryRegistrationNos,
     tx,
   );
 

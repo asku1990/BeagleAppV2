@@ -1,5 +1,6 @@
 export const fiAdminDogsTableMessages = {
   "admin.dogs.columns.registrationNo": "Rekisterinumero",
+  "admin.dogs.columns.additionalRegistrationNos": "Muut rekisterinumerot",
   "admin.dogs.columns.name": "Nimi",
   "admin.dogs.columns.sex": "Sukupuoli",
   "admin.dogs.columns.birthDate": "Syntymaaika",
@@ -17,6 +18,7 @@ export const fiAdminDogsTableMessages = {
   "admin.dogs.actions.more": "Lisää toimintoja",
   "admin.dogs.mobile.sexLabel": "Sukupuoli",
   "admin.dogs.mobile.birthDateLabel": "Syntymaaika",
+  "admin.dogs.mobile.additionalRegistrationNosLabel": "Muut rekisterinumerot",
   "admin.dogs.mobile.breederLabel": "Kasvattaja",
   "admin.dogs.mobile.ownersLabel": "Omistajat",
   "admin.dogs.mobile.sireLabel": "Uros",
@@ -31,6 +33,8 @@ export const fiAdminDogsTableMessages = {
 
 export const svAdminDogsTableMessages = {
   "admin.dogs.columns.registrationNo": "Registreringsnummer",
+  "admin.dogs.columns.additionalRegistrationNos":
+    "Ytterligare registreringsnummer",
   "admin.dogs.columns.name": "Namn",
   "admin.dogs.columns.sex": "Kon",
   "admin.dogs.columns.birthDate": "Fodelsedatum",
@@ -48,6 +52,8 @@ export const svAdminDogsTableMessages = {
   "admin.dogs.actions.more": "Fler åtgärder",
   "admin.dogs.mobile.sexLabel": "Kon",
   "admin.dogs.mobile.birthDateLabel": "Fodelsedatum",
+  "admin.dogs.mobile.additionalRegistrationNosLabel":
+    "Ytterligare registreringsnummer",
   "admin.dogs.mobile.breederLabel": "Uppfödare",
   "admin.dogs.mobile.ownersLabel": "Ägare",
   "admin.dogs.mobile.sireLabel": "Hane",

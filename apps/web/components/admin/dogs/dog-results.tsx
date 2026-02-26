@@ -82,6 +82,14 @@ function formatOwners(owners: string[]): string {
   return owners.join(", ");
 }
 
+function formatAdditionalRegistrations(registrationNos: string[]): string {
+  if (registrationNos.length === 0) {
+    return "-";
+  }
+
+  return registrationNos.join(", ");
+}
+
 function formatParent(parent: AdminDogParentPreview | null): string {
   if (!parent) {
     return "-";
@@ -174,7 +182,19 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
           <tbody>
             {dogs.map((dog) => (
               <tr key={dog.id} className="border-b align-top">
-                <td className="px-2 py-2">{showDash(dog.registrationNo)}</td>
+                <td className="px-2 py-2">
+                  <div className="font-medium">
+                    {showDash(dog.registrationNo)}
+                  </div>
+                  {dog.secondaryRegistrationNos.length > 0 ? (
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      {t("admin.dogs.columns.additionalRegistrationNos")}:{" "}
+                      {formatAdditionalRegistrations(
+                        dog.secondaryRegistrationNos,
+                      )}
+                    </div>
+                  ) : null}
+                </td>
                 <td className="px-2 py-2">{showDash(dog.name)}</td>
                 <td className="px-2 py-2">
                   <DogSexLabel sex={dog.sex} />
@@ -224,6 +244,10 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
               <p>
                 {t("admin.dogs.mobile.birthDateLabel")}:{" "}
                 {showDash(formatBirthDate(dog.birthDate, locale))}
+              </p>
+              <p>
+                {t("admin.dogs.mobile.additionalRegistrationNosLabel")}:{" "}
+                {formatAdditionalRegistrations(dog.secondaryRegistrationNos)}
               </p>
               <p>
                 {t("admin.dogs.mobile.breederLabel")}:{" "}

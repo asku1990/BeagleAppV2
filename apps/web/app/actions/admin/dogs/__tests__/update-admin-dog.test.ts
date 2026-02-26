@@ -122,4 +122,51 @@ describe("updateAdminDogAction", () => {
       hasError: false,
     });
   });
+
+  it("forwards full update payload unchanged to service", async () => {
+    requireAdminLayoutAccessMock.mockResolvedValue({ ok: true });
+    getSessionCurrentUserMock.mockResolvedValue({
+      id: "u_1",
+      email: "admin@example.com",
+      name: "Admin",
+      role: "ADMIN",
+      createdAt: null,
+      sessionId: "s_1",
+    });
+    updateAdminDogMock.mockResolvedValue({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          id: "dog_1",
+          name: "Metsapolun Kide",
+          sex: "FEMALE",
+          registrationNo: "FI12345/21",
+        },
+      },
+    });
+
+    const payload = {
+      id: "dog_1",
+      name: "Metsapolun Kide",
+      sex: "FEMALE" as const,
+      birthDate: "2021-04-09",
+      breederNameText: "Metsapolun",
+      ownerNames: ["Tiina Virtanen", "Antti Virtanen"],
+      ekNo: 5588,
+      note: "Important note",
+      registrationNo: "FI12345/21",
+      secondaryRegistrationNos: ["FI54321/21"],
+      sireRegistrationNo: "FI54321/20",
+      damRegistrationNo: "FI77777/18",
+    };
+
+    await updateAdminDogAction(payload);
+
+    expect(updateAdminDogMock).toHaveBeenCalledWith(payload, {
+      actorUserId: "u_1",
+      actorSessionId: "s_1",
+      source: "WEB",
+    });
+  });
 });

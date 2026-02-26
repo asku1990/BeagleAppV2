@@ -1,6 +1,7 @@
 const DEFAULT_LOOKUP_LIMIT = 20;
 const MAX_LOOKUP_LIMIT = 100;
 const MAX_DB_INT = 2_147_483_647;
+const REGISTRATION_NO_PATTERN = /^[\p{L}\p{N}/.-]+$/u;
 
 export function normalizeRequiredText(value: string): string | null {
   const normalized = value.trim();
@@ -97,4 +98,33 @@ export function parseLookupLimit(value: number | undefined): number {
     MAX_LOOKUP_LIMIT,
     Math.max(1, Math.floor(value ?? DEFAULT_LOOKUP_LIMIT)),
   );
+}
+
+export function normalizeRegistrationNo(value: string): string | null {
+  const normalized = value.trim();
+  if (!normalized) {
+    return null;
+  }
+
+  return normalized.toUpperCase();
+}
+
+export function normalizeRegistrationNos(
+  values: string[] | undefined,
+): string[] {
+  const normalizedValues: string[] = [];
+
+  for (const value of values ?? []) {
+    const normalized = normalizeRegistrationNo(value);
+    if (!normalized) {
+      continue;
+    }
+    normalizedValues.push(normalized);
+  }
+
+  return normalizedValues;
+}
+
+export function isValidRegistrationNo(value: string): boolean {
+  return REGISTRATION_NO_PATTERN.test(value);
 }

@@ -9,6 +9,7 @@ export type CreateAdminDogRequest = {
   ekNo?: number;
   note?: string;
   registrationNo: string;
+  secondaryRegistrationNos?: string[];
   sireRegistrationNo?: string;
   damRegistrationNo?: string;
 };

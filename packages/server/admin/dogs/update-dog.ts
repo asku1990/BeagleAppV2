@@ -13,8 +13,11 @@ import { toErrorLog, withLogContext } from "../../shared/logger";
 import type { ServiceResult } from "../../shared/result";
 import {
   hasMaxLength,
+  isValidRegistrationNo,
   normalizeDistinctNames,
   normalizeOptionalText,
+  normalizeRegistrationNo,
+  normalizeRegistrationNos,
   normalizeRequiredText,
   parseBirthDate,
   parseDogSex,
@@ -145,11 +148,43 @@ export async function updateAdminDog(
       },
     };
   }
-  if (!hasMaxLength(registrationNo, DOG_REGISTRATION_NO_MAX_LENGTH)) {
+  const normalizedPrimaryRegistrationNo =
+    normalizeRegistrationNo(registrationNo);
+  if (!normalizedPrimaryRegistrationNo) {
+    log.warn(
+      {
+        event: "invalid_registration_no",
+        dogId: id,
+        durationMs: Date.now() - startedAt,
+      },
+      "admin dog update rejected because registration number is invalid",
+    );
+    return {
+      status: 400,
+      body: {
+        ok: false,
+        error: "Registration number is required.",
+        code: "INVALID_REGISTRATION_NO",
+      },
+    };
+  }
+  const secondaryRegistrationNos = normalizeRegistrationNos(
+    input.secondaryRegistrationNos,
+  );
+  const allRegistrationNos = [
+    normalizedPrimaryRegistrationNo,
+    ...secondaryRegistrationNos,
+  ];
+  if (
+    allRegistrationNos.some(
+      (value) => !hasMaxLength(value, DOG_REGISTRATION_NO_MAX_LENGTH),
+    )
+  ) {
     log.warn(
       {
         event: "registration_no_too_long",
         dogId: id,
+        registrationCount: allRegistrationNos.length,
         durationMs: Date.now() - startedAt,
       },
       "admin dog update rejected because registration number is too long",
@@ -160,6 +195,44 @@ export async function updateAdminDog(
         ok: false,
         error: `Registration number cannot exceed ${DOG_REGISTRATION_NO_MAX_LENGTH} characters.`,
         code: "REGISTRATION_NO_TOO_LONG",
+      },
+    };
+  }
+  if (allRegistrationNos.some((value) => !isValidRegistrationNo(value))) {
+    log.warn(
+      {
+        event: "invalid_registration_no_format",
+        dogId: id,
+        registrationCount: allRegistrationNos.length,
+        durationMs: Date.now() - startedAt,
+      },
+      "admin dog update rejected because registration number format is invalid",
+    );
+    return {
+      status: 400,
+      body: {
+        ok: false,
+        error: "Registration number format is invalid.",
+        code: "INVALID_REGISTRATION_NO",
+      },
+    };
+  }
+  if (new Set(allRegistrationNos).size !== allRegistrationNos.length) {
+    log.warn(
+      {
+        event: "duplicate_registration_no_payload",
+        dogId: id,
+        registrationCount: allRegistrationNos.length,
+        durationMs: Date.now() - startedAt,
+      },
+      "admin dog update rejected because duplicate registration numbers were provided",
+    );
+    return {
+      status: 400,
+      body: {
+        ok: false,
+        error: "Registration numbers must be unique.",
+        code: "DUPLICATE_REGISTRATION_NO",
       },
     };
   }
@@ -386,7 +459,11 @@ export async function updateAdminDog(
                 : normalizeDistinctNames(input.ownerNames),
             ekNo,
             note,
-            registrationNo,
+            registrationNo: normalizedPrimaryRegistrationNo,
+            secondaryRegistrationNos:
+              input.secondaryRegistrationNos === undefined
+                ? undefined
+                : secondaryRegistrationNos,
           },
           tx,
         ),
