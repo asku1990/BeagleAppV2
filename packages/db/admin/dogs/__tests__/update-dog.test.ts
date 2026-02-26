@@ -103,50 +103,6 @@ describe("updateAdminDogWriteDb", () => {
     });
   });
 
-  it("removes every registration when registration number is cleared", async () => {
-    dogFindUniqueMock.mockResolvedValue({ id: "dog_1" });
-    breederFindUniqueMock.mockResolvedValue(null);
-    dogUpdateMock.mockResolvedValue({
-      id: "dog_1",
-      name: "Kide",
-      sex: "FEMALE",
-    });
-    dogOwnershipFindManyMock.mockResolvedValue([]);
-    dogRegistrationFindManyMock.mockResolvedValue([
-      { id: "reg_primary", registrationNo: "FI11111/21" },
-      { id: "reg_secondary", registrationNo: "FI22222/21" },
-    ]);
-
-    await expect(
-      updateAdminDogWriteDb(
-        {
-          id: "dog_1",
-          name: "Kide",
-          sex: "FEMALE",
-          birthDate: null,
-          breederNameText: null,
-          sireId: null,
-          damId: null,
-          ownerNames: [],
-          ekNo: null,
-          note: null,
-          registrationNo: null,
-        },
-        tx as never,
-      ),
-    ).resolves.toEqual({
-      id: "dog_1",
-      name: "Kide",
-      sex: "FEMALE",
-      registrationNo: null,
-    });
-
-    expect(dogRegistrationDeleteManyMock).toHaveBeenCalledWith({
-      where: { dogId: "dog_1" },
-    });
-    expect(dogRegistrationDeleteMock).not.toHaveBeenCalled();
-  });
-
   it("does not update parent links when parent ids are undefined", async () => {
     dogFindUniqueMock.mockResolvedValue({ id: "dog_1" });
     breederFindUniqueMock.mockResolvedValue(null);
@@ -170,7 +126,7 @@ describe("updateAdminDogWriteDb", () => {
         ownerNames: [],
         ekNo: null,
         note: null,
-        registrationNo: null,
+        registrationNo: "FI11111/21",
       },
       tx as never,
     );
@@ -207,7 +163,7 @@ describe("updateAdminDogWriteDb", () => {
         ownerNames: undefined,
         ekNo: null,
         note: null,
-        registrationNo: null,
+        registrationNo: "FI11111/21",
       },
       tx as never,
     );
@@ -216,5 +172,49 @@ describe("updateAdminDogWriteDb", () => {
     expect(dogOwnershipDeleteManyMock).not.toHaveBeenCalled();
     expect(dogOwnershipFindManyMock).not.toHaveBeenCalled();
     expect(dogOwnershipCreateMock).not.toHaveBeenCalled();
+  });
+
+  it("does not update optional scalar fields when they are omitted", async () => {
+    dogFindUniqueMock.mockResolvedValue({ id: "dog_1" });
+    dogUpdateMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Kide",
+      sex: "FEMALE",
+    });
+    dogRegistrationFindManyMock.mockResolvedValue([
+      { id: "reg_primary", registrationNo: "FI11111/21" },
+    ]);
+
+    await expect(
+      updateAdminDogWriteDb(
+        {
+          id: "dog_1",
+          name: "Kide",
+          sex: "FEMALE",
+          sireId: undefined,
+          damId: undefined,
+          registrationNo: "FI11111/21",
+        },
+        tx as never,
+      ),
+    ).resolves.toEqual({
+      id: "dog_1",
+      name: "Kide",
+      sex: "FEMALE",
+      registrationNo: "FI11111/21",
+    });
+
+    const dogUpdateArg = dogUpdateMock.mock.calls[0]?.[0];
+    expect(dogUpdateArg?.data).not.toHaveProperty("birthDate");
+    expect(dogUpdateArg?.data).not.toHaveProperty("breederNameText");
+    expect(dogUpdateArg?.data).not.toHaveProperty("breederId");
+    expect(dogUpdateArg?.data).not.toHaveProperty("ekNo");
+    expect(dogUpdateArg?.data).not.toHaveProperty("note");
+
+    expect(breederFindUniqueMock).not.toHaveBeenCalled();
+    expect(dogRegistrationDeleteMock).not.toHaveBeenCalled();
+    expect(dogRegistrationDeleteManyMock).not.toHaveBeenCalled();
+    expect(dogRegistrationUpdateMock).not.toHaveBeenCalled();
+    expect(dogRegistrationCreateMock).not.toHaveBeenCalled();
   });
 });

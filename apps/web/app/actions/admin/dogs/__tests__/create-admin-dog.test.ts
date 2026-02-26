@@ -34,7 +34,11 @@ describe("createAdminDogAction", () => {
     requireAdminLayoutAccessMock.mockResolvedValue({ ok: false, status: 403 });
 
     await expect(
-      createAdminDogAction({ name: "Metsapolun Kide", sex: "FEMALE" }),
+      createAdminDogAction({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
     ).resolves.toEqual({
       data: null,
       hasError: true,
@@ -63,7 +67,11 @@ describe("createAdminDogAction", () => {
     });
 
     await expect(
-      createAdminDogAction({ name: "Metsapolun Kide", sex: "FEMALE" }),
+      createAdminDogAction({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
     ).resolves.toEqual({
       data: null,
       hasError: true,

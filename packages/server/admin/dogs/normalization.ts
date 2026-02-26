@@ -38,9 +38,9 @@ export function parseDogSex(
 }
 
 export function parseBirthDate(
-  value: string | undefined,
+  value: string | null | undefined,
 ): Date | null | "INVALID" {
-  const normalized = normalizeOptionalText(value);
+  const normalized = normalizeOptionalText(value ?? undefined);
   if (!normalized) {
     return null;
   }
@@ -67,9 +67,9 @@ export function parseBirthDate(
 }
 
 export function parsePositiveInteger(
-  value: number | undefined,
+  value: number | null | undefined,
 ): number | null | "INVALID" {
-  if (value === undefined) {
+  if (value === undefined || value === null) {
     return null;
   }
 

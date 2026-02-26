@@ -130,7 +130,7 @@ function normalizeParentRegistrationForUpdate(value: string): string {
 function resolveParentRegistrationUpdateValue(
   currentValue: string,
   initialValue: string,
-): string | undefined {
+): string | null | undefined {
   const normalizedCurrent = normalizeParentRegistrationForUpdate(currentValue);
   const normalizedInitial = normalizeParentRegistrationForUpdate(initialValue);
 
@@ -138,7 +138,7 @@ function resolveParentRegistrationUpdateValue(
     return undefined;
   }
 
-  return normalizedCurrent;
+  return normalizedCurrent.length > 0 ? normalizedCurrent : null;
 }
 
 function normalizeEkNo(value: string): number | null {
@@ -255,6 +255,8 @@ export function AdminDogsPageClient() {
         return t("admin.dogs.mutation.errorInvalidDogId");
       case "INVALID_NAME":
         return t("admin.dogs.mutation.errorInvalidName");
+      case "INVALID_REGISTRATION_NO":
+        return t("admin.dogs.mutation.errorInvalidRegistrationNo");
       case "NAME_TOO_LONG":
         return t("admin.dogs.mutation.errorNameTooLong");
       case "INVALID_SEX":
@@ -363,8 +365,7 @@ export function AdminDogsPageClient() {
           ownerNames: values.ownershipNames,
           ekNo: normalizeEkNo(values.ekNo) ?? undefined,
           note: normalizeOptionalText(values.note) ?? undefined,
-          registrationNo:
-            normalizeOptionalText(values.registrationNo) ?? undefined,
+          registrationNo: values.registrationNo.trim(),
           sireRegistrationNo:
             normalizeOptionalText(values.sirePreviewRegistrationNo) ??
             undefined,
@@ -389,14 +390,12 @@ export function AdminDogsPageClient() {
         id: formState.target.id,
         name: values.name,
         sex: values.sex,
-        birthDate: normalizeOptionalText(values.birthDate) ?? undefined,
-        breederNameText:
-          normalizeOptionalText(values.breederNameText) ?? undefined,
+        birthDate: normalizeOptionalText(values.birthDate),
+        breederNameText: normalizeOptionalText(values.breederNameText),
         ownerNames: values.ownershipNames,
-        ekNo: normalizeEkNo(values.ekNo) ?? undefined,
-        note: normalizeOptionalText(values.note) ?? undefined,
-        registrationNo:
-          normalizeOptionalText(values.registrationNo) ?? undefined,
+        ekNo: normalizeEkNo(values.ekNo),
+        note: normalizeOptionalText(values.note),
+        registrationNo: values.registrationNo.trim(),
         sireRegistrationNo: resolveParentRegistrationUpdateValue(
           values.sirePreviewRegistrationNo,
           formState.target.sirePreview?.registrationNo ?? "",

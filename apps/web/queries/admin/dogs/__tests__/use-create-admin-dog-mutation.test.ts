@@ -52,7 +52,11 @@ describe("useCreateAdminDogMutation", () => {
       mutationFn: (input: unknown) => Promise<unknown>;
     };
 
-    const input = { name: "Metsapolun Kide", sex: "FEMALE" };
+    const input = {
+      name: "Metsapolun Kide",
+      sex: "FEMALE",
+      registrationNo: "FI12345/21",
+    };
     await expect(options.mutationFn(input)).resolves.toEqual({
       id: "dog_1",
       name: "Metsapolun Kide",
@@ -77,7 +81,11 @@ describe("useCreateAdminDogMutation", () => {
     };
 
     await expect(
-      options.mutationFn({ name: "Metsapolun Kide", sex: "FEMALE" }),
+      options.mutationFn({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
     ).rejects.toMatchObject({
       name: "AdminMutationError",
       errorCode: "DUPLICATE_DOG",
@@ -114,7 +122,11 @@ describe("useCreateAdminDogMutation", () => {
     };
 
     await expect(
-      options.mutationFn({ name: "Metsapolun Kide", sex: "FEMALE" }),
+      options.mutationFn({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
     ).rejects.toBeInstanceOf(AdminMutationError);
     expect(invalidateQueriesMock).not.toHaveBeenCalled();
   });

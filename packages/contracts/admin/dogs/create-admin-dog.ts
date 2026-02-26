@@ -8,7 +8,7 @@ export type CreateAdminDogRequest = {
   ownerNames?: string[];
   ekNo?: number;
   note?: string;
-  registrationNo?: string;
+  registrationNo: string;
   sireRegistrationNo?: string;
   damRegistrationNo?: string;
 };

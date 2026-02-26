@@ -34,7 +34,12 @@ describe("updateAdminDogAction", () => {
     requireAdminLayoutAccessMock.mockResolvedValue({ ok: false, status: 403 });
 
     await expect(
-      updateAdminDogAction({ id: "dog_1", name: "Kide", sex: "FEMALE" }),
+      updateAdminDogAction({
+        id: "dog_1",
+        name: "Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
     ).resolves.toEqual({
       data: null,
       hasError: true,
@@ -63,7 +68,12 @@ describe("updateAdminDogAction", () => {
     });
 
     await expect(
-      updateAdminDogAction({ id: "dog_1", name: "Kide", sex: "FEMALE" }),
+      updateAdminDogAction({
+        id: "dog_1",
+        name: "Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
     ).resolves.toEqual({
       data: null,
       hasError: true,

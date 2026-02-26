@@ -15,14 +15,14 @@ export type CreateAdminDogDbInput = {
   ownerNames: string[];
   ekNo: number | null;
   note: string | null;
-  registrationNo: string | null;
+  registrationNo: string;
 };
 
 export type CreatedAdminDogRowDb = {
   id: string;
   name: string;
   sex: "MALE" | "FEMALE" | "UNKNOWN";
-  registrationNo: string | null;
+  registrationNo: string;
 };
 
 const OWNERSHIP_DATE_KEY_UNKNOWN = "0000-00-00";
@@ -105,15 +105,13 @@ async function createAdminDogDb(
     },
   });
 
-  if (input.registrationNo) {
-    await tx.dogRegistration.create({
-      data: {
-        dogId: createdDog.id,
-        registrationNo: input.registrationNo,
-        source: "ADMIN_UI",
-      },
-    });
-  }
+  await tx.dogRegistration.create({
+    data: {
+      dogId: createdDog.id,
+      registrationNo: input.registrationNo,
+      source: "ADMIN_UI",
+    },
+  });
 
   await createOwnerships(createdDog.id, input.ownerNames, tx);
 

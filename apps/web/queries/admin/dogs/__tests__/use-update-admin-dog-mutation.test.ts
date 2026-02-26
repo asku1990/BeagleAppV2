@@ -52,7 +52,12 @@ describe("useUpdateAdminDogMutation", () => {
       mutationFn: (input: unknown) => Promise<unknown>;
     };
 
-    const input = { id: "dog_1", name: "Kide", sex: "FEMALE" };
+    const input = {
+      id: "dog_1",
+      name: "Kide",
+      sex: "FEMALE",
+      registrationNo: "FI12345/21",
+    };
     await expect(options.mutationFn(input)).resolves.toEqual({
       id: "dog_1",
       name: "Kide",
@@ -77,7 +82,12 @@ describe("useUpdateAdminDogMutation", () => {
     };
 
     await expect(
-      options.mutationFn({ id: "dog_1", name: "Kide", sex: "FEMALE" }),
+      options.mutationFn({
+        id: "dog_1",
+        name: "Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
     ).rejects.toMatchObject({
       name: "AdminMutationError",
       errorCode: "DOG_NOT_FOUND",
@@ -114,7 +124,12 @@ describe("useUpdateAdminDogMutation", () => {
     };
 
     await expect(
-      options.mutationFn({ id: "dog_1", name: "Kide", sex: "FEMALE" }),
+      options.mutationFn({
+        id: "dog_1",
+        name: "Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
     ).rejects.toBeInstanceOf(AdminMutationError);
     expect(invalidateQueriesMock).not.toHaveBeenCalled();
   });

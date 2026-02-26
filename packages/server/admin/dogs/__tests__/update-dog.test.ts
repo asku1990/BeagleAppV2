@@ -29,7 +29,12 @@ describe("updateAdminDog", () => {
 
   it("returns 400 for invalid id", async () => {
     await expect(
-      updateAdminDog({ id: " ", name: "Metsapolun Kide", sex: "FEMALE" }),
+      updateAdminDog({
+        id: " ",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
     ).resolves.toEqual({
       status: 400,
       body: {
@@ -40,12 +45,31 @@ describe("updateAdminDog", () => {
     });
   });
 
+  it("returns 400 for empty registration number", async () => {
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: " ",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Registration number is required.",
+        code: "INVALID_REGISTRATION_NO",
+      },
+    });
+  });
+
   it("returns 400 for invalid birth date", async () => {
     await expect(
       updateAdminDog({
         id: "dog_1",
         name: "Metsapolun Kide",
         sex: "FEMALE",
+        registrationNo: "FI12345/21",
         birthDate: "2026/01/01",
       }),
     ).resolves.toEqual({
@@ -64,6 +88,7 @@ describe("updateAdminDog", () => {
         id: "dog_1",
         name: "Metsapolun Kide",
         sex: "FEMALE",
+        registrationNo: "FI12345/21",
         birthDate: "2026-02-31",
       }),
     ).resolves.toEqual({
@@ -82,6 +107,7 @@ describe("updateAdminDog", () => {
         id: "dog_1",
         name: "Metsapolun Kide",
         sex: "FEMALE",
+        registrationNo: "FI12345/21",
         ekNo: -1,
       }),
     ).resolves.toEqual({
@@ -100,6 +126,7 @@ describe("updateAdminDog", () => {
         id: "dog_1",
         name: "Metsapolun Kide",
         sex: "FEMALE",
+        registrationNo: "FI12345/21",
         ekNo: 2_147_483_648,
       }),
     ).resolves.toEqual({
@@ -118,6 +145,7 @@ describe("updateAdminDog", () => {
         id: "dog_1",
         name: "a".repeat(121),
         sex: "FEMALE",
+        registrationNo: "FI12345/21",
       }),
     ).resolves.toEqual({
       status: 400,
@@ -181,7 +209,7 @@ describe("updateAdminDog", () => {
     );
   });
 
-  it("does not pass owner names when ownerNames is omitted", async () => {
+  it("preserves optional fields when omitted", async () => {
     findDogByRegistrationNoDbMock.mockResolvedValue(null);
     updateAdminDogWriteDbMock.mockResolvedValue({
       id: "dog_1",
@@ -195,6 +223,7 @@ describe("updateAdminDog", () => {
         id: "dog_1",
         name: "Metsapolun Kide",
         sex: "FEMALE",
+        registrationNo: "FI12345/21",
       }),
     ).resolves.toEqual({
       status: 200,
@@ -211,7 +240,59 @@ describe("updateAdminDog", () => {
 
     expect(updateAdminDogWriteDbMock).toHaveBeenCalledWith(
       expect.objectContaining({
+        birthDate: undefined,
+        breederNameText: undefined,
+        ekNo: undefined,
+        note: undefined,
+        registrationNo: "FI12345/21",
+        sireId: undefined,
+        damId: undefined,
         ownerNames: undefined,
+      }),
+      {},
+    );
+  });
+
+  it("passes null values to clear optional non-required fields", async () => {
+    findDogByRegistrationNoDbMock.mockResolvedValue(null);
+    updateAdminDogWriteDbMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Metsapolun Kide",
+      sex: "FEMALE",
+      registrationNo: "FI12345/21",
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        birthDate: null,
+        breederNameText: null,
+        ekNo: null,
+        note: null,
+        registrationNo: "FI12345/21",
+      }),
+    ).resolves.toEqual({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          id: "dog_1",
+          name: "Metsapolun Kide",
+          sex: "FEMALE",
+          registrationNo: "FI12345/21",
+        },
+      },
+    });
+
+    expect(updateAdminDogWriteDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        birthDate: null,
+        breederNameText: null,
+        ekNo: null,
+        note: null,
+        registrationNo: "FI12345/21",
       }),
       {},
     );
@@ -222,7 +303,12 @@ describe("updateAdminDog", () => {
     updateAdminDogWriteDbMock.mockRejectedValue(new Error("DOG_NOT_FOUND"));
 
     await expect(
-      updateAdminDog({ id: "dog_1", name: "Metsapolun Kide", sex: "FEMALE" }),
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
     ).resolves.toEqual({
       status: 404,
       body: {
@@ -238,7 +324,12 @@ describe("updateAdminDog", () => {
     updateAdminDogWriteDbMock.mockRejectedValue({ code: "P2002" });
 
     await expect(
-      updateAdminDog({ id: "dog_1", name: "Metsapolun Kide", sex: "FEMALE" }),
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
     ).resolves.toEqual({
       status: 409,
       body: {
@@ -260,6 +351,7 @@ describe("updateAdminDog", () => {
         id: "dog_1",
         name: "Metsapolun Kide",
         sex: "FEMALE",
+        registrationNo: "FI12345/21",
         sireRegistrationNo: "FI11111/11",
       }),
     ).resolves.toEqual({
@@ -283,6 +375,7 @@ describe("updateAdminDog", () => {
         id: "dog_1",
         name: "Metsapolun Kide",
         sex: "FEMALE",
+        registrationNo: "FI12345/21",
         sireRegistrationNo: "FI11111/11",
       }),
     ).resolves.toEqual({
@@ -319,6 +412,7 @@ describe("updateAdminDog", () => {
         id: "dog_1",
         name: "Metsapolun Kide",
         sex: "FEMALE",
+        registrationNo: "FI12345/21",
         note: "n".repeat(501),
       }),
     ).resolves.toEqual({

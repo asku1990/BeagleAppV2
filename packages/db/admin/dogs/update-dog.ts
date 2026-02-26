@@ -5,14 +5,14 @@ export type UpdateAdminDogDbInput = {
   id: string;
   name: string;
   sex: "MALE" | "FEMALE" | "UNKNOWN";
-  birthDate: Date | null;
-  breederNameText: string | null;
+  birthDate?: Date | null;
+  breederNameText?: string | null;
   sireId: string | null | undefined;
   damId: string | null | undefined;
   ownerNames?: string[];
-  ekNo: number | null;
-  note: string | null;
-  registrationNo: string | null;
+  ekNo?: number | null;
+  note?: string | null;
+  registrationNo: string;
 };
 
 export type UpdatedAdminDogRowDb = {
@@ -123,7 +123,7 @@ async function syncOwnerships(
 
 async function syncPrimaryRegistration(
   dogId: string,
-  registrationNo: string | null,
+  registrationNo: string,
   tx: Prisma.TransactionClient,
 ): Promise<string | null> {
   const existingRegistrations = await tx.dogRegistration.findMany({
@@ -136,16 +136,6 @@ async function syncPrimaryRegistration(
   });
 
   const primaryRegistration = existingRegistrations[0] ?? null;
-  if (!registrationNo) {
-    if (existingRegistrations.length > 0) {
-      await tx.dogRegistration.deleteMany({
-        where: { dogId },
-      });
-    }
-
-    return null;
-  }
-
   const alreadyOwned = existingRegistrations.some(
     (row) => row.registrationNo === registrationNo,
   );
@@ -202,20 +192,25 @@ export async function updateAdminDogWriteDb(
     throw new Error("DOG_NOT_FOUND");
   }
 
-  const breederId = await resolveBreederId(input.breederNameText, tx);
+  const breederId =
+    input.breederNameText === undefined
+      ? undefined
+      : await resolveBreederId(input.breederNameText, tx);
 
   const updatedDog = await tx.dog.update({
     where: { id: input.id },
     data: {
       name: input.name,
       sex: input.sex,
-      birthDate: input.birthDate,
-      breederNameText: input.breederNameText,
-      breederId,
+      ...(input.birthDate === undefined ? {} : { birthDate: input.birthDate }),
+      ...(input.breederNameText === undefined
+        ? {}
+        : { breederNameText: input.breederNameText }),
+      ...(breederId === undefined ? {} : { breederId }),
       ...(input.sireId === undefined ? {} : { sireId: input.sireId }),
       ...(input.damId === undefined ? {} : { damId: input.damId }),
-      ekNo: input.ekNo,
-      note: input.note,
+      ...(input.ekNo === undefined ? {} : { ekNo: input.ekNo }),
+      ...(input.note === undefined ? {} : { note: input.note }),
     },
     select: {
       id: true,

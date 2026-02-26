@@ -1,8 +1,8 @@
 export const fiAdminDogsCommonMessages = {
-  "admin.dogs.title": "Yllapito: koirat",
+  "admin.dogs.title": "Ylläpito: koirat",
   "admin.dogs.create.button": "Luo koira",
   "admin.dogs.create.success": "Koira luotu",
-  "admin.dogs.edit.success": "Koiran tiedot paivitetty",
+  "admin.dogs.edit.success": "Koiran tiedot päivitetty",
   "admin.dogs.management.title": "Koirahallinta",
   "admin.dogs.management.countPrefix": "Hakutulokset",
   "admin.dogs.loading": "Ladataan koiria...",
@@ -18,6 +18,8 @@ export const fiAdminDogsCommonMessages = {
   "admin.dogs.mutation.errorDefault": "Koiran tallennus epäonnistui.",
   "admin.dogs.mutation.errorInvalidDogId": "Virheellinen koiran tunniste.",
   "admin.dogs.mutation.errorInvalidName": "Koiran nimi on pakollinen.",
+  "admin.dogs.mutation.errorInvalidRegistrationNo":
+    "Koiran rekisterinumero on pakollinen.",
   "admin.dogs.mutation.errorNameTooLong":
     "Koiran nimi on liian pitkä (max 120 merkkiä).",
   "admin.dogs.mutation.errorInvalidSex": "Virheellinen sukupuoli.",
@@ -66,6 +68,8 @@ export const svAdminDogsCommonMessages = {
   "admin.dogs.mutation.errorDefault": "Det gick inte att spara hunden.",
   "admin.dogs.mutation.errorInvalidDogId": "Ogiltigt hund-ID.",
   "admin.dogs.mutation.errorInvalidName": "Hundens namn ar obligatoriskt.",
+  "admin.dogs.mutation.errorInvalidRegistrationNo":
+    "Hundens registreringsnummer ar obligatoriskt.",
   "admin.dogs.mutation.errorNameTooLong":
     "Hundens namn ar for langt (max 120 tecken).",
   "admin.dogs.mutation.errorInvalidSex": "Ogiltigt kon.",

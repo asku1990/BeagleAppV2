@@ -124,6 +124,44 @@ export async function updateAdminDog(
     };
   }
 
+  const registrationNo = normalizeRequiredText(input.registrationNo);
+  if (!registrationNo) {
+    log.warn(
+      {
+        event: "invalid_registration_no",
+        dogId: id,
+        durationMs: Date.now() - startedAt,
+      },
+      "admin dog update rejected because registration number is invalid",
+    );
+    return {
+      status: 400,
+      body: {
+        ok: false,
+        error: "Registration number is required.",
+        code: "INVALID_REGISTRATION_NO",
+      },
+    };
+  }
+  if (!hasMaxLength(registrationNo, DOG_REGISTRATION_NO_MAX_LENGTH)) {
+    log.warn(
+      {
+        event: "registration_no_too_long",
+        dogId: id,
+        durationMs: Date.now() - startedAt,
+      },
+      "admin dog update rejected because registration number is too long",
+    );
+    return {
+      status: 400,
+      body: {
+        ok: false,
+        error: `Registration number cannot exceed ${DOG_REGISTRATION_NO_MAX_LENGTH} characters.`,
+        code: "REGISTRATION_NO_TOO_LONG",
+      },
+    };
+  }
+
   const sex = parseDogSex(input.sex);
   if (!sex) {
     log.warn(
@@ -145,7 +183,8 @@ export async function updateAdminDog(
     };
   }
 
-  const birthDate = parseBirthDate(input.birthDate);
+  const birthDate =
+    input.birthDate === undefined ? undefined : parseBirthDate(input.birthDate);
   if (birthDate === "INVALID") {
     log.warn(
       {
@@ -166,7 +205,8 @@ export async function updateAdminDog(
     };
   }
 
-  const ekNo = parsePositiveInteger(input.ekNo);
+  const ekNo =
+    input.ekNo === undefined ? undefined : parsePositiveInteger(input.ekNo);
   if (ekNo === "INVALID") {
     log.warn(
       {
@@ -188,28 +228,11 @@ export async function updateAdminDog(
   }
 
   try {
-    const registrationNo = normalizeOptionalText(input.registrationNo);
-    if (!hasMaxLength(registrationNo, DOG_REGISTRATION_NO_MAX_LENGTH)) {
-      log.warn(
-        {
-          event: "registration_no_too_long",
-          dogId: id,
-          durationMs: Date.now() - startedAt,
-        },
-        "admin dog update rejected because registration number is too long",
-      );
-      return {
-        status: 400,
-        body: {
-          ok: false,
-          error: `Registration number cannot exceed ${DOG_REGISTRATION_NO_MAX_LENGTH} characters.`,
-          code: "REGISTRATION_NO_TOO_LONG",
-        },
-      };
-    }
-
-    const note = normalizeOptionalText(input.note);
-    if (!hasMaxLength(note, DOG_NOTE_MAX_LENGTH)) {
+    const note =
+      input.note === undefined
+        ? undefined
+        : normalizeOptionalText(input.note ?? undefined);
+    if (note !== undefined && !hasMaxLength(note, DOG_NOTE_MAX_LENGTH)) {
       log.warn(
         {
           event: "note_too_long",
@@ -228,14 +251,19 @@ export async function updateAdminDog(
       };
     }
 
+    const breederNameText =
+      input.breederNameText === undefined
+        ? undefined
+        : normalizeOptionalText(input.breederNameText ?? undefined);
+
     const sireRegistrationNo =
       input.sireRegistrationNo === undefined
         ? undefined
-        : normalizeOptionalText(input.sireRegistrationNo);
+        : normalizeOptionalText(input.sireRegistrationNo ?? undefined);
     const damRegistrationNo =
       input.damRegistrationNo === undefined
         ? undefined
-        : normalizeOptionalText(input.damRegistrationNo);
+        : normalizeOptionalText(input.damRegistrationNo ?? undefined);
 
     let sire:
       | { id: string; sex: "MALE" | "FEMALE" | "UNKNOWN" }
@@ -336,7 +364,7 @@ export async function updateAdminDog(
             name,
             sex,
             birthDate,
-            breederNameText: normalizeOptionalText(input.breederNameText),
+            breederNameText,
             sireId: sire === undefined ? undefined : (sire?.id ?? null),
             damId: dam === undefined ? undefined : (dam?.id ?? null),
             ownerNames:

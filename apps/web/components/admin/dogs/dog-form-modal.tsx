@@ -69,8 +69,12 @@ export function DogFormModal({
   );
 
   const isSubmitDisabled = useMemo(() => {
-    return isSubmitting || values.name.trim().length === 0;
-  }, [isSubmitting, values.name]);
+    return (
+      isSubmitting ||
+      values.name.trim().length === 0 ||
+      values.registrationNo.trim().length === 0
+    );
+  }, [isSubmitting, values.name, values.registrationNo]);
 
   const selectedOwners = values.ownershipNames;
   const breederSelectedId = useMemo(
@@ -129,6 +133,9 @@ export function DogFormModal({
         </DialogHeader>
 
         <div className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            {t("admin.dogs.form.registrationNoPlaceholder")} *
+          </p>
           <Input
             value={values.registrationNo}
             onChange={(event) =>
@@ -139,7 +146,11 @@ export function DogFormModal({
             }
             placeholder={t("admin.dogs.form.registrationNoPlaceholder")}
             maxLength={40}
+            required
           />
+          <p className="text-sm text-muted-foreground">
+            {t("admin.dogs.form.namePlaceholder")} *
+          </p>
           <Input
             value={values.name}
             onChange={(event) =>
@@ -147,7 +158,11 @@ export function DogFormModal({
             }
             placeholder={t("admin.dogs.form.namePlaceholder")}
             maxLength={120}
+            required
           />
+          <p className="text-sm text-muted-foreground">
+            {t("admin.dogs.form.birthDateAria")}
+          </p>
           <Input
             type="date"
             value={values.birthDate}
@@ -160,7 +175,7 @@ export function DogFormModal({
 
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">
-              {t("admin.dogs.form.sexLabel")}
+              {t("admin.dogs.form.sexLabel")} *
             </p>
             <div
               className="flex flex-wrap gap-2"

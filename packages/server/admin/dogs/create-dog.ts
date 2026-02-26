@@ -162,8 +162,26 @@ export async function createAdminDog(
     };
   }
 
+  const registrationNo = normalizeRequiredText(input.registrationNo);
+  if (!registrationNo) {
+    log.warn(
+      {
+        event: "invalid_registration_no",
+        durationMs: Date.now() - startedAt,
+      },
+      "admin dog create rejected because registration number is invalid",
+    );
+    return {
+      status: 400,
+      body: {
+        ok: false,
+        error: "Registration number is required.",
+        code: "INVALID_REGISTRATION_NO",
+      },
+    };
+  }
+
   try {
-    const registrationNo = normalizeOptionalText(input.registrationNo);
     if (!hasMaxLength(registrationNo, DOG_REGISTRATION_NO_MAX_LENGTH)) {
       log.warn(
         {

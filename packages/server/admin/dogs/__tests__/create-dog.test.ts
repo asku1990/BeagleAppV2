@@ -28,16 +28,37 @@ describe("createAdminDog", () => {
   });
 
   it("returns 400 for empty name", async () => {
-    await expect(createAdminDog({ name: " ", sex: "FEMALE" })).resolves.toEqual(
-      {
-        status: 400,
-        body: {
-          ok: false,
-          error: "Name is required.",
-          code: "INVALID_NAME",
-        },
+    await expect(
+      createAdminDog({
+        name: " ",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Name is required.",
+        code: "INVALID_NAME",
       },
-    );
+    });
+  });
+
+  it("returns 400 for empty registration number", async () => {
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: " ",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Registration number is required.",
+        code: "INVALID_REGISTRATION_NO",
+      },
+    });
   });
 
   it("returns 400 for invalid birth date", async () => {
@@ -45,6 +66,7 @@ describe("createAdminDog", () => {
       createAdminDog({
         name: "Metsapolun Kide",
         sex: "FEMALE",
+        registrationNo: "FI12345/21",
         birthDate: "2026/01/01",
       }),
     ).resolves.toEqual({
@@ -62,6 +84,7 @@ describe("createAdminDog", () => {
       createAdminDog({
         name: "Metsapolun Kide",
         sex: "FEMALE",
+        registrationNo: "FI12345/21",
         birthDate: "2026-02-31",
       }),
     ).resolves.toEqual({
@@ -76,7 +99,12 @@ describe("createAdminDog", () => {
 
   it("returns 400 for invalid EK number", async () => {
     await expect(
-      createAdminDog({ name: "Metsapolun Kide", sex: "FEMALE", ekNo: -1 }),
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        ekNo: -1,
+      }),
     ).resolves.toEqual({
       status: 400,
       body: {
@@ -92,6 +120,7 @@ describe("createAdminDog", () => {
       createAdminDog({
         name: "Metsapolun Kide",
         sex: "FEMALE",
+        registrationNo: "FI12345/21",
         ekNo: 2_147_483_648,
       }),
     ).resolves.toEqual({
@@ -106,7 +135,11 @@ describe("createAdminDog", () => {
 
   it("returns 400 when name is too long", async () => {
     await expect(
-      createAdminDog({ name: "a".repeat(121), sex: "FEMALE" }),
+      createAdminDog({
+        name: "a".repeat(121),
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
     ).resolves.toEqual({
       status: 400,
       body: {
@@ -177,7 +210,11 @@ describe("createAdminDog", () => {
     createAdminDogWriteDbMock.mockRejectedValue({ code: "P2002" });
 
     await expect(
-      createAdminDog({ name: "Metsapolun Kide", sex: "FEMALE" }),
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
     ).resolves.toEqual({
       status: 409,
       body: {
@@ -195,6 +232,7 @@ describe("createAdminDog", () => {
       createAdminDog({
         name: "Metsapolun Kide",
         sex: "FEMALE",
+        registrationNo: "FI12345/21",
         sireRegistrationNo: "FI00000/00",
       }),
     ).resolves.toEqual({
@@ -233,6 +271,7 @@ describe("createAdminDog", () => {
       createAdminDog({
         name: "Metsapolun Kide",
         sex: "FEMALE",
+        registrationNo: "FI12345/21",
         note: "n".repeat(501),
       }),
     ).resolves.toEqual({
@@ -255,6 +294,7 @@ describe("createAdminDog", () => {
       createAdminDog({
         name: "Metsapolun Kide",
         sex: "FEMALE",
+        registrationNo: "FI12345/21",
         sireRegistrationNo: "FI11111/11",
         damRegistrationNo: "FI22222/22",
       }),
