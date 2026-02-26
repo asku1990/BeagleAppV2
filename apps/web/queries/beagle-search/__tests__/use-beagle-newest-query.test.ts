@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beagleNewestQueryKey } from "../query-keys";
 import { useBeagleNewestQuery } from "../use-beagle-newest-query";
 
 const { useQueryMock, getNewestDogsActionMock } = vi.hoisted(() => ({
@@ -32,7 +33,7 @@ describe("useBeagleNewestQuery", () => {
       refetchOnWindowFocus: boolean;
     };
 
-    expect(options.queryKey).toEqual(["beagle-newest", 5]);
+    expect(options.queryKey).toEqual(beagleNewestQueryKey(5));
     expect(options.staleTime).toBe(300_000);
     expect(options.refetchInterval).toBe(300_000);
     expect(options.refetchOnWindowFocus).toBe(true);

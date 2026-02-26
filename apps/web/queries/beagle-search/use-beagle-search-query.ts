@@ -7,6 +7,7 @@ import {
   parseBirthYearInput,
   type BeagleSearchQueryState,
 } from "@/lib/beagle-search";
+import { beagleSearchQueryKey } from "./query-keys";
 
 export function useBeagleSearchQuery(state: BeagleSearchQueryState) {
   const birthYearFrom = parseBirthYearInput(state.birthYearFrom);
@@ -22,20 +23,7 @@ export function useBeagleSearchQuery(state: BeagleSearchQueryState) {
     state.multipleRegsOnly;
 
   return useQuery<BeagleSearchResponse>({
-    queryKey: [
-      "beagle-search",
-      state.ek,
-      state.reg,
-      state.name,
-      state.sex,
-      state.birthYearFrom,
-      state.birthYearTo,
-      state.ekOnly,
-      state.multipleRegsOnly,
-      state.page,
-      state.pageSize,
-      state.sort,
-    ],
+    queryKey: beagleSearchQueryKey(state),
     enabled: hasSearchInput,
     queryFn: async () => {
       const result = await searchDogsAction({

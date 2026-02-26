@@ -3,12 +3,13 @@
 import type { BeagleSearchRow } from "@beagle/contracts";
 import { useQuery } from "@tanstack/react-query";
 import { getNewestDogsAction } from "@/app/actions/beagle-search/get-newest-dogs";
+import { beagleNewestQueryKey } from "./query-keys";
 
 const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 
 export function useBeagleNewestQuery(limit = 5) {
   return useQuery<BeagleSearchRow[]>({
-    queryKey: ["beagle-newest", limit],
+    queryKey: beagleNewestQueryKey(limit),
     queryFn: async () => {
       const result = await getNewestDogsAction({ limit });
       if (result.hasError || !result.data) {

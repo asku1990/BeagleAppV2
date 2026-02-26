@@ -1,6 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  beagleNewestQueryKeyRoot,
+  beagleSearchQueryKeyRoot,
+} from "@/queries/beagle-search/query-keys";
+import { homeStatisticsQueryKey } from "@/queries/home/query-keys";
 import { AdminMutationError } from "@/queries/admin/mutation-error";
-import { adminDogsQueryKeyRoot } from "../query-keys";
+import {
+  adminDogBreederOptionsQueryKeyRoot,
+  adminDogOwnerOptionsQueryKeyRoot,
+  adminDogParentOptionsQueryKeyRoot,
+  adminDogsQueryKeyRoot,
+} from "../query-keys";
 import { useDeleteAdminDogMutation } from "../use-delete-admin-dog-mutation";
 
 const {
@@ -76,7 +86,7 @@ describe("useDeleteAdminDogMutation", () => {
     });
   });
 
-  it("invalidates admin dogs query on success", async () => {
+  it("invalidates admin and public dog query roots on success", async () => {
     useMutationMock.mockImplementation((options) => options);
 
     useDeleteAdminDogMutation();
@@ -86,8 +96,27 @@ describe("useDeleteAdminDogMutation", () => {
 
     await options.onSuccess();
 
+    expect(invalidateQueriesMock).toHaveBeenCalledTimes(7);
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
       queryKey: adminDogsQueryKeyRoot,
+    });
+    expect(invalidateQueriesMock).toHaveBeenCalledWith({
+      queryKey: adminDogBreederOptionsQueryKeyRoot,
+    });
+    expect(invalidateQueriesMock).toHaveBeenCalledWith({
+      queryKey: adminDogOwnerOptionsQueryKeyRoot,
+    });
+    expect(invalidateQueriesMock).toHaveBeenCalledWith({
+      queryKey: adminDogParentOptionsQueryKeyRoot,
+    });
+    expect(invalidateQueriesMock).toHaveBeenCalledWith({
+      queryKey: beagleSearchQueryKeyRoot,
+    });
+    expect(invalidateQueriesMock).toHaveBeenCalledWith({
+      queryKey: beagleNewestQueryKeyRoot,
+    });
+    expect(invalidateQueriesMock).toHaveBeenCalledWith({
+      queryKey: homeStatisticsQueryKey,
     });
   });
 
