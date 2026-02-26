@@ -213,9 +213,29 @@ describe("updateAdminDog", () => {
         ekNo: 5588,
         note: "Important",
         registrationNo: "FI12345/21",
+        secondaryRegistrationNos: undefined,
       },
       {},
     );
+  });
+
+  it("returns 400 for duplicate registration numbers in payload", async () => {
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        secondaryRegistrationNos: ["FI12345/21"],
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Registration numbers must be unique.",
+        code: "DUPLICATE_REGISTRATION_NO",
+      },
+    });
   });
 
   it("preserves optional fields when omitted", async () => {

@@ -9,6 +9,7 @@ export type AdminDogParentPreview = {
 export type AdminDogListItem = {
   id: string;
   registrationNo: string | null;
+  secondaryRegistrationNos: string[];
   name: string;
   sex: AdminDogListSex;
   birthDate: string | null;

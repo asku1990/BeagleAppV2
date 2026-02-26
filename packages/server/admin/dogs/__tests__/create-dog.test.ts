@@ -195,6 +195,7 @@ describe("createAdminDog", () => {
         ekNo: 5588,
         note: "Important",
         registrationNo: "FI12345/21",
+        secondaryRegistrationNos: [],
       },
       {},
     );
@@ -260,6 +261,24 @@ describe("createAdminDog", () => {
         ok: false,
         error: "Registration number cannot exceed 40 characters.",
         code: "REGISTRATION_NO_TOO_LONG",
+      },
+    });
+  });
+
+  it("returns 400 for duplicate registration numbers in payload", async () => {
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        secondaryRegistrationNos: [" FI12345/21 "],
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Registration numbers must be unique.",
+        code: "DUPLICATE_REGISTRATION_NO",
       },
     });
   });

@@ -51,6 +51,7 @@ describe("useAdminDogsQuery", () => {
           {
             id: "dog_1",
             registrationNo: "FI12345/21",
+            secondaryRegistrationNos: ["FI54321/21"],
             name: "Metsapolun Kide",
             sex: "FEMALE",
             birthDate: "2021-04-09T00:00:00.000Z",
@@ -80,6 +81,7 @@ describe("useAdminDogsQuery", () => {
         {
           id: "dog_1",
           registrationNo: "FI12345/21",
+          secondaryRegistrationNos: ["FI54321/21"],
           name: "Metsapolun Kide",
           sex: "FEMALE",
           birthDate: "2021-04-09T00:00:00.000Z",

@@ -21,6 +21,7 @@ export type AdminDogParentPreviewDb = {
 export type AdminDogListRowDb = {
   id: string;
   registrationNo: string | null;
+  secondaryRegistrationNos: string[];
   name: string;
   sex: "MALE" | "FEMALE" | "UNKNOWN";
   birthDate: Date | null;
@@ -196,10 +197,7 @@ export async function listAdminDogsDb(
         select: {
           registrationNo: true,
         },
-        orderBy: {
-          createdAt: "asc",
-        },
-        take: 1,
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
       },
       ownerships: {
         select: {
@@ -264,6 +262,9 @@ export async function listAdminDogsDb(
     items: rows.map((row) => ({
       id: row.id,
       registrationNo: row.registrations[0]?.registrationNo ?? null,
+      secondaryRegistrationNos: row.registrations
+        .slice(1)
+        .map((registration) => registration.registrationNo),
       name: row.name,
       sex: row.sex,
       birthDate: row.birthDate,

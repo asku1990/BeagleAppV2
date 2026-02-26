@@ -85,6 +85,7 @@ describe("listAdminDogsDb", () => {
         {
           id: "dog_1",
           registrationNo: "FI12345/21",
+          secondaryRegistrationNos: [],
           name: "Metsapolun Kide",
           sex: "FEMALE",
           birthDate: new Date("2021-04-09T00:00:00.000Z"),

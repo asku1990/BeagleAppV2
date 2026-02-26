@@ -10,6 +10,7 @@ export type UpdateAdminDogRequest = {
   ekNo?: number | null;
   note?: string | null;
   registrationNo: string;
+  secondaryRegistrationNos?: string[];
   sireRegistrationNo?: string | null;
   damRegistrationNo?: string | null;
 };
