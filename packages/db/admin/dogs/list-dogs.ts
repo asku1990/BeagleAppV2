@@ -90,15 +90,6 @@ function parseSex(sex: string | undefined): DogSex | undefined {
   return undefined;
 }
 
-function parseQueryEkNo(query: string): number | undefined {
-  if (!/^\d+$/u.test(query)) {
-    return undefined;
-  }
-
-  const parsed = Number.parseInt(query, 10);
-  return Number.isSafeInteger(parsed) ? parsed : undefined;
-}
-
 function resolveOrderBy(
   sort: AdminDogListSortDb,
 ): Prisma.DogOrderByWithRelationInput[] {
@@ -139,7 +130,6 @@ export async function listAdminDogsDb(
   const page = parsePage(input.page);
   const pageSize = parsePageSize(input.pageSize);
   const sort = parseSort(input.sort);
-  const queryEkNo = parseQueryEkNo(query);
 
   const andFilters: Prisma.DogWhereInput[] = [];
   if (parsedSex) {
@@ -167,10 +157,6 @@ export async function listAdminDogsDb(
         },
       },
     ];
-
-    if (queryEkNo !== undefined) {
-      orFilters.push({ ekNo: queryEkNo });
-    }
 
     andFilters.push({ OR: orFilters });
   }

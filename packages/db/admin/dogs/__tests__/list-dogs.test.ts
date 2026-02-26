@@ -136,4 +136,22 @@ describe("listAdminDogsDb", () => {
     expect(findManyArgs.take).toBe(10);
     expect(JSON.stringify(findManyArgs.orderBy)).toContain("birthDate");
   });
+
+  it("does not apply ekNo filter for numeric queries", async () => {
+    dogCountMock.mockResolvedValue(1);
+    dogFindManyMock.mockResolvedValue([]);
+
+    await listAdminDogsDb({ query: "5588" });
+
+    const countArgs = dogCountMock.mock.calls[0]?.[0] as {
+      where?: {
+        AND?: Array<{ OR?: Array<Record<string, unknown>> }>;
+      };
+    };
+
+    const orFilters = countArgs.where?.AND?.[0]?.OR ?? [];
+
+    expect(orFilters.some((filter) => "ekNo" in filter)).toBe(false);
+    expect(JSON.stringify(countArgs.where)).toContain("5588");
+  });
 });
