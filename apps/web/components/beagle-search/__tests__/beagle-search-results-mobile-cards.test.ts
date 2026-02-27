@@ -3,6 +3,11 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { BeagleSearchResultsMobileCards } from "../beagle-search-results-mobile-cards";
 
+vi.mock("next/link", () => ({
+  default: ({ href, children, ...props }: React.ComponentProps<"a">) =>
+    React.createElement("a", { href, ...props }, children),
+}));
+
 vi.mock("../beagle-search-row-actions", () => ({
   BeagleSearchRowActions: () =>
     React.createElement("div", null, "actions-mobile"),
@@ -42,6 +47,7 @@ describe("BeagleSearchResultsMobileCards", () => {
     expect(html).toContain("search.results.sex.female");
     expect(html).toContain("Meri");
     expect(html).toContain("actions-mobile");
+    expect(html).toContain('href="/beagle/dogs/d1"');
   });
 
   it("renders dash fallbacks for missing ek and unknown sex", () => {

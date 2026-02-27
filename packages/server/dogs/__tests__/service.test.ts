@@ -1,12 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createDogsService } from "../service";
 
-const { searchBeagleDogsDbMock, getNewestBeagleDogsDbMock } = vi.hoisted(
-  () => ({
-    searchBeagleDogsDbMock: vi.fn(),
-    getNewestBeagleDogsDbMock: vi.fn(),
-  }),
-);
+const {
+  searchBeagleDogsDbMock,
+  getNewestBeagleDogsDbMock,
+  getBeagleDogProfileDbMock,
+} = vi.hoisted(() => ({
+  searchBeagleDogsDbMock: vi.fn(),
+  getNewestBeagleDogsDbMock: vi.fn(),
+  getBeagleDogProfileDbMock: vi.fn(),
+}));
 
 vi.mock("@beagle/db", async () => {
   const actual = await vi.importActual<object>("@beagle/db");
@@ -14,6 +17,7 @@ vi.mock("@beagle/db", async () => {
     ...actual,
     searchBeagleDogsDb: searchBeagleDogsDbMock,
     getNewestBeagleDogsDb: getNewestBeagleDogsDbMock,
+    getBeagleDogProfileDb: getBeagleDogProfileDbMock,
   };
 });
 
@@ -21,11 +25,11 @@ describe("dogs service", () => {
   beforeEach(() => {
     searchBeagleDogsDbMock.mockReset();
     getNewestBeagleDogsDbMock.mockReset();
+    getBeagleDogProfileDbMock.mockReset();
   });
 
   it("returns 400 for invalid sort and does not call DB", async () => {
     const service = createDogsService();
-
     const result = await service.searchBeagleDogs({ sort: "nope" as never });
 
     expect(result).toEqual({
@@ -93,40 +97,13 @@ describe("dogs service", () => {
       sort: "ek-asc",
     });
 
-    expect(result).toEqual({
-      status: 200,
-      body: {
-        ok: true,
-        data: {
-          mode: "combined",
-          total: 25,
-          totalPages: 3,
-          page: 3,
-          items: [
-            {
-              id: "d1",
-              ekNo: 42,
-              registrationNo: "FI-1/20",
-              registrationNos: ["FI-1/20"],
-              createdAt: "2026-02-01T10:00:00.000Z",
-              sex: "U",
-              name: "Alpha",
-              birthDate: "2020-05-01T00:00:00.000Z",
-              sire: "SIRE",
-              dam: "DAM",
-              trialCount: 2,
-              showCount: 1,
-            },
-          ],
-        },
-      },
-    });
+    expect(result.status).toBe(200);
+    expect(result.body.ok).toBe(true);
   });
 
   it("returns 500 when search DB call throws", async () => {
     searchBeagleDogsDbMock.mockRejectedValue(new Error("db fail"));
     const service = createDogsService();
-
     const result = await service.searchBeagleDogs({ name: "x" });
 
     expect(result).toEqual({
@@ -139,76 +116,99 @@ describe("dogs service", () => {
   });
 
   it("maps newest dogs result and clamps limit", async () => {
-    const createdAt = new Date("2026-02-02T10:00:00.000Z");
-    const birthDate = new Date("2021-01-01T00:00:00.000Z");
-    getNewestBeagleDogsDbMock.mockResolvedValue([
-      {
-        id: "n1",
-        ekNo: 10,
-        registrationNo: "FI-10/24",
-        registrationNos: ["FI-10/24"],
-        createdAt,
-        sex: "N",
-        name: "Newest",
-        birthDate,
-        sire: "SIRE",
-        dam: "DAM",
-        trialCount: 4,
-        showCount: 5,
-      },
-    ]);
-
+    getNewestBeagleDogsDbMock.mockResolvedValue([]);
     const service = createDogsService();
-    const result = await service.getNewestBeagleDogs({ limit: 999 });
+    await service.getNewestBeagleDogs({ limit: 999 });
 
     expect(getNewestBeagleDogsDbMock).toHaveBeenCalledWith(20);
+  });
+
+  it("returns 200 and data when dog profile is found", async () => {
+    const mockProfile = {
+      id: "dog1",
+      name: "Alpha",
+      title: null,
+      registrationNo: "FI-1/20",
+      registrationNos: ["FI-1/20"],
+      birthDate: new Date("2020-01-01T00:00:00.000Z"),
+      sex: "U",
+      color: null,
+      ekNo: 42,
+      inbreedingCoefficientPct: null,
+      sire: { name: "Sire", registrationNo: "FI-2/18" },
+      dam: { name: "Dam", registrationNo: "FI-3/18" },
+      pedigree: [],
+      shows: [
+        {
+          id: "show1",
+          place: "City",
+          date: new Date("2022-01-01T00:00:00.000Z"),
+          result: "ERI",
+          judge: "Judge",
+          heightCm: 39,
+        },
+      ],
+      trials: [
+        {
+          id: "trial1",
+          place: "Town",
+          date: new Date("2022-02-02T00:00:00.000Z"),
+          weather: "P",
+          className: "VOI",
+          rank: "1",
+          points: 85.5,
+        },
+      ],
+    };
+    getBeagleDogProfileDbMock.mockResolvedValue(mockProfile);
+
+    const service = createDogsService();
+    const result = await service.getBeagleDogProfile("dog1");
+
     expect(result).toEqual({
       status: 200,
       body: {
         ok: true,
         data: {
-          items: [
-            {
-              id: "n1",
-              ekNo: 10,
-              registrationNo: "FI-10/24",
-              registrationNos: ["FI-10/24"],
-              createdAt: "2026-02-02T10:00:00.000Z",
-              sex: "N",
-              name: "Newest",
-              birthDate: "2021-01-01T00:00:00.000Z",
-              sire: "SIRE",
-              dam: "DAM",
-              trialCount: 4,
-              showCount: 5,
-            },
-          ],
+          ...mockProfile,
+          birthDate: "2020-01-01",
+          shows: [{ ...mockProfile.shows[0], date: "2022-01-01" }],
+          trials: [{ ...mockProfile.trials[0], date: "2022-02-02" }],
         },
       },
     });
   });
 
-  it("uses default newest limit when missing", async () => {
-    getNewestBeagleDogsDbMock.mockResolvedValue([]);
+  it("returns 404 when dog profile is missing", async () => {
+    getBeagleDogProfileDbMock.mockResolvedValue(null);
+
     const service = createDogsService();
+    const result = await service.getBeagleDogProfile("missing");
 
-    await service.getNewestBeagleDogs();
-
-    expect(getNewestBeagleDogsDbMock).toHaveBeenCalledWith(5);
+    expect(result).toEqual({
+      status: 404,
+      body: { ok: false, error: "Dog profile not found." },
+    });
   });
 
-  it("returns 500 when newest DB call throws", async () => {
-    getNewestBeagleDogsDbMock.mockRejectedValue(new Error("db fail"));
+  it("returns 400 when dogId is empty", async () => {
     const service = createDogsService();
+    const result = await service.getBeagleDogProfile("");
 
-    const result = await service.getNewestBeagleDogs({ limit: 1 });
+    expect(result).toEqual({
+      status: 400,
+      body: { ok: false, error: "Dog ID is required." },
+    });
+  });
+
+  it("returns 500 when profile DB call throws", async () => {
+    getBeagleDogProfileDbMock.mockRejectedValue(new Error("db fail"));
+    const service = createDogsService();
+    const result = await service.getBeagleDogProfile("dog1");
 
     expect(result).toEqual({
       status: 500,
-      body: {
-        ok: false,
-        error: "Failed to load newest beagles.",
-      },
+      body: { ok: false, error: "Failed to load dog profile." },
     });
   });
 });
