@@ -16,66 +16,94 @@ vi.mock("@/hooks/i18n", () => ({
 }));
 
 describe("BeagleDogProfilePage", () => {
-  it("renders full profile cards for a known mock dog", () => {
-    const html = renderToStaticMarkup(
-      React.createElement(BeagleDogProfilePage, { dogId: "dog_1" }),
-    );
-
-    expect(html).toContain("dog.profile.page.title");
-    expect(html).toContain("Ajometsän Aada");
-    expect(html).toContain("FI-11/24");
-    expect(html).toContain("dog.profile.card.details.title");
-    expect(html).toContain("dog.profile.card.lineage.title");
-    expect(html).toContain("dog.profile.field.sire");
-    expect(html).toContain("dog.profile.field.dam");
-    expect(html).toContain("dog.profile.card.shows.title");
-    expect(html).toContain("dog.profile.card.trials.title");
-    expect(html).toContain("dog.profile.lineage.generationLabel 1");
-    expect(html).toContain("dog.profile.lineage.generationLabel 2");
-    expect(html).toContain("dog.profile.lineage.generationLabel 3");
-  });
-
-  it("renders not-found state for an unknown dog id", () => {
-    const html = renderToStaticMarkup(
-      React.createElement(BeagleDogProfilePage, { dogId: "missing-dog" }),
-    );
-
-    expect(html).toContain("dog.profile.notFound.title");
-    expect(html).toContain("dog.profile.notFound.description");
-  });
-
-  it("renders seeded profile when fixed mock data does not include the dog id", () => {
+  it("renders full profile cards", () => {
     const html = renderToStaticMarkup(
       React.createElement(BeagleDogProfilePage, {
-        dogId: "seed-1",
-        seed: {
-          name: "Seed Name",
-          registrationNo: "FI-500/26",
-          sex: "U",
-          ekNo: 5,
-          showCount: 1,
-          trialCount: 2,
+        profile: {
+          id: "dog_1",
+          name: "Ajometsan Aada",
+          title: null,
+          registrationNo: "FI-11/24",
+          registrationNos: ["FI-11/24", "FI-22/24"],
+          birthDate: "2020-01-01T00:00:00.000Z",
+          sex: "N",
+          color: null,
+          ekNo: 11,
+          inbreedingCoefficientPct: null,
+          sire: { name: "Sire", registrationNo: "SIRE-1" },
+          dam: { name: "Dam", registrationNo: "DAM-1" },
+          pedigree: [
+            {
+              generation: 1,
+              cards: [
+                {
+                  id: "g1",
+                  sire: { name: "Sire", registrationNo: "SIRE-1" },
+                  dam: { name: "Dam", registrationNo: "DAM-1" },
+                },
+              ],
+            },
+          ],
+          shows: [
+            {
+              id: "show1",
+              place: "Helsinki",
+              date: "2024-01-01T00:00:00.000Z",
+              result: "ERI",
+              judge: "Judge",
+              heightCm: 39,
+            },
+          ],
+          trials: [
+            {
+              id: "trial1",
+              place: "Turku",
+              date: "2024-02-01T00:00:00.000Z",
+              weather: "P",
+              className: "VOI",
+              rank: "1",
+              points: 85.5,
+            },
+          ],
         },
       }),
     );
 
-    expect(html).toContain("Seed Name");
-    expect(html).toContain("FI-500/26");
-    expect(html).toContain("Mock Show 1");
-    expect(html).toContain("Mock Trial 1");
-    expect(html).toContain("SF10409F/79");
-    expect(html).toContain("SF213414/79");
+    expect(html).toContain("dog.profile.page.title");
+    expect(html).toContain("Ajometsan Aada");
+    expect(html).toContain("FI-11/24");
+    expect(html).toContain("dog.profile.card.details.title");
+    expect(html).toContain("dog.profile.card.lineage.title");
+    expect(html).toContain("dog.profile.card.shows.title");
+    expect(html).toContain("dog.profile.card.trials.title");
   });
 
   it("renders empty state text when shows or trials are missing", () => {
-    const htmlWithNoTrials = renderToStaticMarkup(
-      React.createElement(BeagleDogProfilePage, { dogId: "dog_3" }),
-    );
-    const htmlWithNoShows = renderToStaticMarkup(
-      React.createElement(BeagleDogProfilePage, { dogId: "dog_2" }),
+    const html = renderToStaticMarkup(
+      React.createElement(BeagleDogProfilePage, {
+        profile: {
+          id: "dog_2",
+          name: "No Results",
+          title: null,
+          registrationNo: "FI-2/24",
+          registrationNos: ["FI-2/24"],
+          birthDate: null,
+          sex: "U",
+          color: null,
+          ekNo: null,
+          inbreedingCoefficientPct: null,
+          sire: null,
+          dam: null,
+          pedigree: [
+            { generation: 1, cards: [{ id: "g1", sire: null, dam: null }] },
+          ],
+          shows: [],
+          trials: [],
+        },
+      }),
     );
 
-    expect(htmlWithNoTrials).toContain("dog.profile.empty.trials");
-    expect(htmlWithNoShows).toContain("dog.profile.empty.shows");
+    expect(html).toContain("dog.profile.empty.trials");
+    expect(html).toContain("dog.profile.empty.shows");
   });
 });

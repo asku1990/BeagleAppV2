@@ -41,8 +41,16 @@ export {
 } from "./stats";
 
 export {
+  getBeagleDogProfileDb,
   getNewestBeagleDogsDb,
   searchBeagleDogsDb,
+  type BeagleDogProfileDb,
+  type BeagleDogProfileParentDb,
+  type BeagleDogProfilePedigreeCardDb,
+  type BeagleDogProfilePedigreeGenerationDb,
+  type BeagleDogProfileSexDb,
+  type BeagleDogProfileShowRowDb,
+  type BeagleDogProfileTrialRowDb,
   type BeagleSearchModeDb,
   type BeagleSearchRequestDb,
   type BeagleSearchResponseDb,

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import type { BeagleSearchResultRow } from "@/lib/beagle-search";
-import { getDogProfileHref } from "@/lib/beagle-dogs";
+import { getDogProfileHref } from "@/lib/public/beagle/dogs/profile";
 import type { MessageKey } from "@/lib/i18n";
 import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
@@ -64,14 +64,7 @@ export function BeagleSearchResultsDesktopTable({
               >
                 <td className="px-2 py-2">
                   <Link
-                    href={getDogProfileHref(row.id, {
-                      registrationNo: row.registrationNo,
-                      name: row.name,
-                      sex: row.sex,
-                      ekNo: row.ekNo,
-                      showCount: row.showCount,
-                      trialCount: row.trialCount,
-                    })}
+                    href={getDogProfileHref(row.id)}
                     className={cn(
                       "font-medium underline underline-offset-2",
                       beagleTheme.inkStrongText,
@@ -92,14 +85,7 @@ export function BeagleSearchResultsDesktopTable({
                 <td className="px-2 py-2">{mapSexLabel(row.sex, t)}</td>
                 <td className="px-2 py-2">
                   <Link
-                    href={getDogProfileHref(row.id, {
-                      registrationNo: row.registrationNo,
-                      name: row.name,
-                      sex: row.sex,
-                      ekNo: row.ekNo,
-                      showCount: row.showCount,
-                      trialCount: row.trialCount,
-                    })}
+                    href={getDogProfileHref(row.id)}
                     title={`${t("search.results.parents.sire")}: ${row.sire}\n${t("search.results.parents.dam")}: ${row.dam}`}
                     className={cn(
                       "font-medium underline underline-offset-2",

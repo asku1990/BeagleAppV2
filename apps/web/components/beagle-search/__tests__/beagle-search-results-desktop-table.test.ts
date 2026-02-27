@@ -47,7 +47,7 @@ describe("BeagleSearchResultsDesktopTable", () => {
     expect(html).toContain("search.results.sex.male");
     expect(html).toContain("Alpha");
     expect(html).toContain("actions");
-    expect(html).toContain('href="/beagle/dogs/d1?');
+    expect(html).toContain('href="/beagle/dogs/d1"');
   });
 
   it("renders dash fallback for missing ek/unknown sex", () => {

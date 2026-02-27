@@ -1,9 +1,13 @@
 import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
-import { parseLocalIsoDate, type DogProfile } from "@/lib/beagle-dogs";
+import { parseLocalIsoDate } from "@/lib/beagle-dogs";
 import type { MessageKey } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import type {
+  BeagleDogProfileDto,
+  BeagleDogProfileSex,
+} from "@beagle/contracts";
 
 const FALLBACK_VALUE = "-";
 
@@ -43,7 +47,7 @@ function formatBirthDateWithAge(
 }
 
 function mapSexLabel(
-  sex: DogProfile["sex"],
+  sex: BeagleDogProfileSex,
   t: (key: MessageKey) => string,
 ): string {
   if (sex === "U") {
@@ -103,10 +107,14 @@ function DetailRow({
   );
 }
 
-export function DogProfileDetailsCard({ profile }: { profile: DogProfile }) {
+export function DogProfileDetailsCard({
+  profile,
+}: {
+  profile: BeagleDogProfileDto;
+}) {
   const { t, locale } = useI18n();
   const secondaryRegistrations = profile.registrationNos.filter(
-    (registrationNo) => registrationNo !== profile.registrationNo,
+    (registrationNo: string) => registrationNo !== profile.registrationNo,
   );
 
   return (

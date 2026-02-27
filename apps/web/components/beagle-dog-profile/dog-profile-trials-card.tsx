@@ -4,8 +4,9 @@ import {
 } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
-import { parseLocalIsoDate, type DogProfileTrialRow } from "@/lib/beagle-dogs";
+import { parseLocalIsoDate } from "@/lib/beagle-dogs";
 import { cn } from "@/lib/utils";
+import type { BeagleDogProfileTrialRowDto } from "@beagle/contracts";
 
 const FALLBACK_VALUE = "-";
 
@@ -27,7 +28,11 @@ function formatPoints(points: number | null): string {
   return points.toFixed(1);
 }
 
-export function DogProfileTrialsCard({ rows }: { rows: DogProfileTrialRow[] }) {
+export function DogProfileTrialsCard({
+  rows,
+}: {
+  rows: BeagleDogProfileTrialRowDto[];
+}) {
   const { t, locale } = useI18n();
 
   return (
