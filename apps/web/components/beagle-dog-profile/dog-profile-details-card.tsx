@@ -1,7 +1,7 @@
 import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
-import type { DogProfile } from "@/lib/beagle-dogs";
+import { parseLocalIsoDate, type DogProfile } from "@/lib/beagle-dogs";
 import type { MessageKey } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -16,8 +16,8 @@ function formatBirthDateWithAge(
     return FALLBACK_VALUE;
   }
 
-  const parsed = new Date(birthDate);
-  if (Number.isNaN(parsed.getTime())) {
+  const parsed = parseLocalIsoDate(birthDate);
+  if (!parsed || Number.isNaN(parsed.getTime())) {
     return FALLBACK_VALUE;
   }
 

@@ -4,14 +4,14 @@ import {
 } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
-import type { DogProfileTrialRow } from "@/lib/beagle-dogs";
+import { parseLocalIsoDate, type DogProfileTrialRow } from "@/lib/beagle-dogs";
 import { cn } from "@/lib/utils";
 
 const FALLBACK_VALUE = "-";
 
 function formatDate(value: string, locale: "fi" | "sv"): string {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
+  const parsed = parseLocalIsoDate(value);
+  if (!parsed || Number.isNaN(parsed.getTime())) {
     return FALLBACK_VALUE;
   }
 
