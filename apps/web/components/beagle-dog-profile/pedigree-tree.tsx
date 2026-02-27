@@ -47,7 +47,9 @@ export function PedigreeTree<TNode>({
       >
         {generations.map((generation) => (
           <section key={generation.generation} className={columnClassName}>
-            <h3 className={labelClassName}>{generation.label}</h3>
+            {generation.label ? (
+              <h3 className={labelClassName}>{generation.label}</h3>
+            ) : null}
             <div
               className={cn(
                 nodeStackClassName,

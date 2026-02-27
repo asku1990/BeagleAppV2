@@ -34,11 +34,7 @@ export function DogProfileLineageCard({
   const { t } = useI18n();
   const generations = profile.pedigree.map((generation) => ({
     generation: generation.generation,
-    label: (
-      <>
-        {t("dog.profile.lineage.generationLabel")} {generation.generation}
-      </>
-    ),
+    label: null,
     nodes: generation.cards,
   }));
 
