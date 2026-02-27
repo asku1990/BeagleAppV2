@@ -132,43 +132,42 @@ export function DogProfileDetailsCard({
           value={profile.registrationNo}
           emphasized
         />
-        <DetailRow
-          label={t("dog.profile.field.additionalRegistrationNos")}
-          value={
-            secondaryRegistrations.length > 0
-              ? secondaryRegistrations.join(", ")
-              : FALLBACK_VALUE
-          }
-        />
-        <DetailRow
-          label={t("dog.profile.field.birthDate")}
-          value={formatBirthDateWithAge(profile.birthDate, locale, t)}
-        />
+        {secondaryRegistrations.length > 0 && (
+          <DetailRow
+            label={t("dog.profile.field.additionalRegistrationNos")}
+            value={secondaryRegistrations.join(", ")}
+          />
+        )}
+        {profile.birthDate && (
+          <DetailRow
+            label={t("dog.profile.field.birthDate")}
+            value={formatBirthDateWithAge(profile.birthDate, locale, t)}
+          />
+        )}
         <DetailRow
           label={t("dog.profile.field.sex")}
           value={mapSexLabel(profile.sex, t)}
         />
-        <DetailRow
-          label={t("dog.profile.field.color")}
-          value={
-            profile.color ??
-            `${FALLBACK_VALUE} ${t("dog.profile.field.comingSoon")}`
-          }
-        />
-        <DetailRow
-          label={t("dog.profile.field.ekNo")}
-          value={formatEkNo(profile.ekNo)}
-          numeric
-        />
-        <DetailRow
-          label={t("dog.profile.field.inbreeding")}
-          value={
-            profile.inbreedingCoefficientPct != null
-              ? formatPercent(profile.inbreedingCoefficientPct)
-              : `${FALLBACK_VALUE} ${t("dog.profile.field.comingSoon")}`
-          }
-          numeric
-        />
+        {profile.color && (
+          <DetailRow
+            label={t("dog.profile.field.color")}
+            value={profile.color}
+          />
+        )}
+        {profile.ekNo != null && (
+          <DetailRow
+            label={t("dog.profile.field.ekNo")}
+            value={formatEkNo(profile.ekNo)}
+            numeric
+          />
+        )}
+        {profile.inbreedingCoefficientPct != null && (
+          <DetailRow
+            label={t("dog.profile.field.inbreeding")}
+            value={formatPercent(profile.inbreedingCoefficientPct)}
+            numeric
+          />
+        )}
       </dl>
     </ListingSectionShell>
   );
