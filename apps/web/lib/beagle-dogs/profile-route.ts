@@ -30,7 +30,7 @@ export function getDogProfileHref(
   if (seed.name?.trim()) {
     params.set("name", seed.name.trim());
   }
-  if (seed.sex && (seed.sex === "U" || seed.sex === "N" || seed.sex === "-")) {
+  if (seed.sex === "U" || seed.sex === "N") {
     params.set("sex", seed.sex);
   }
   if (seed.ekNo != null) {
