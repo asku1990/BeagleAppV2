@@ -39,7 +39,7 @@ export const fiBeagleDogProfileMessages = {
   "dog.profile.trials.col.date": "Päivä",
   "dog.profile.trials.col.weather": "Keli",
   "dog.profile.trials.col.class": "Palkinto",
-  "dog.profile.trials.col.rank": "Sija",
+  "dog.profile.trials.col.rank": "Sijoitus",
   "dog.profile.trials.col.points": "Pisteet",
   "dog.profile.lineage.col.generation": "Sukupolvi",
   "dog.profile.lineage.col.sire": "Isän linja",

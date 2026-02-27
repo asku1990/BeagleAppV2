@@ -28,6 +28,34 @@ function formatPoints(points: number | null): string {
   return points.toFixed(1);
 }
 
+function formatRank(rank: string | null): string {
+  if (!rank) {
+    return FALLBACK_VALUE;
+  }
+
+  const trimmed = rank.trim();
+  if (!trimmed) {
+    return FALLBACK_VALUE;
+  }
+
+  const sourceCodeRank = /^s\s*(\d+)$/i.exec(trimmed);
+  if (sourceCodeRank) {
+    return `${sourceCodeRank[1]}.`;
+  }
+
+  const plainNumericRank = /^(\d+)$/.exec(trimmed);
+  if (plainNumericRank) {
+    return `${plainNumericRank[1]}.`;
+  }
+
+  const pairRank = /^(\d+)\s*\|\s*(\d+)$/.exec(trimmed);
+  if (pairRank) {
+    return `${pairRank[1]}/${pairRank[2]}`;
+  }
+
+  return trimmed;
+}
+
 export function DogProfileTrialsCard({
   rows,
 }: {
@@ -115,9 +143,7 @@ export function DogProfileTrialsCard({
                         </td>
                       )}
                       {hasRank && (
-                        <td className="px-2 py-2">
-                          {row.rank ?? FALLBACK_VALUE}
-                        </td>
+                        <td className="px-2 py-2">{formatRank(row.rank)}</td>
                       )}
                       {hasPoints && (
                         <td className="px-2 py-2">
@@ -183,7 +209,7 @@ export function DogProfileTrialsCard({
                         <span className={beagleTheme.mutedText}>
                           {t("dog.profile.trials.col.rank")}:
                         </span>{" "}
-                        <span>{row.rank ?? FALLBACK_VALUE}</span>
+                        <span>{formatRank(row.rank)}</span>
                       </p>
                     )}
                     {hasPoints && (
