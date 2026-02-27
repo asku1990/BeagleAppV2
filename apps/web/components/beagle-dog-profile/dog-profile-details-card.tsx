@@ -150,7 +150,10 @@ export function DogProfileDetailsCard({
         />
         <DetailRow
           label={t("dog.profile.field.color")}
-          value={profile.color ?? FALLBACK_VALUE}
+          value={
+            profile.color ??
+            `${FALLBACK_VALUE} ${t("dog.profile.field.comingSoon")}`
+          }
         />
         <DetailRow
           label={t("dog.profile.field.ekNo")}
@@ -159,7 +162,11 @@ export function DogProfileDetailsCard({
         />
         <DetailRow
           label={t("dog.profile.field.inbreeding")}
-          value={formatPercent(profile.inbreedingCoefficientPct)}
+          value={
+            profile.inbreedingCoefficientPct != null
+              ? formatPercent(profile.inbreedingCoefficientPct)
+              : `${FALLBACK_VALUE} ${t("dog.profile.field.comingSoon")}`
+          }
           numeric
         />
       </dl>
