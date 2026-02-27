@@ -95,7 +95,7 @@ export function DogProfileTrialsCard({
                         {row.weather ?? FALLBACK_VALUE}
                       </td>
                       <td className="px-2 py-2">
-                        {row.className ?? FALLBACK_VALUE}
+                        {row.award ?? FALLBACK_VALUE}
                       </td>
                       <td className="px-2 py-2">
                         {row.rank ?? FALLBACK_VALUE}
@@ -147,7 +147,7 @@ export function DogProfileTrialsCard({
                       <span className={beagleTheme.mutedText}>
                         {t("dog.profile.trials.col.class")}:
                       </span>{" "}
-                      <span>{row.className ?? FALLBACK_VALUE}</span>
+                      <span>{row.award ?? FALLBACK_VALUE}</span>
                     </p>
                     <p>
                       <span className={beagleTheme.mutedText}>
