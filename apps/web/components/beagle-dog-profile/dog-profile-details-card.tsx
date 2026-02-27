@@ -113,6 +113,8 @@ export function DogProfileDetailsCard({
   profile: BeagleDogProfileDto;
 }) {
   const { t, locale } = useI18n();
+  const hasBirthDate =
+    profile.birthDate != null && profile.birthDate.trim().length > 0;
   const secondaryRegistrations = profile.registrationNos.filter(
     (registrationNo: string) => registrationNo !== profile.registrationNo,
   );
@@ -132,34 +134,43 @@ export function DogProfileDetailsCard({
           value={profile.registrationNo}
           emphasized
         />
-        <DetailRow
-          label={t("dog.profile.field.additionalRegistrationNos")}
-          value={
-            secondaryRegistrations.length > 0
-              ? secondaryRegistrations.join(", ")
-              : FALLBACK_VALUE
-          }
-        />
-        <DetailRow
-          label={t("dog.profile.field.birthDate")}
-          value={formatBirthDateWithAge(profile.birthDate, locale, t)}
-        />
+        {secondaryRegistrations.length > 0 && (
+          <DetailRow
+            label={t("dog.profile.field.additionalRegistrationNos")}
+            value={secondaryRegistrations.join(", ")}
+          />
+        )}
+        {hasBirthDate && (
+          <DetailRow
+            label={t("dog.profile.field.birthDate")}
+            value={formatBirthDateWithAge(profile.birthDate, locale, t)}
+          />
+        )}
         <DetailRow
           label={t("dog.profile.field.sex")}
           value={mapSexLabel(profile.sex, t)}
         />
         <DetailRow
           label={t("dog.profile.field.color")}
-          value={profile.color ?? FALLBACK_VALUE}
+          value={
+            profile.color ??
+            `${FALLBACK_VALUE} ${t("dog.profile.field.comingSoon")}`
+          }
         />
-        <DetailRow
-          label={t("dog.profile.field.ekNo")}
-          value={formatEkNo(profile.ekNo)}
-          numeric
-        />
+        {profile.ekNo != null && (
+          <DetailRow
+            label={t("dog.profile.field.ekNo")}
+            value={formatEkNo(profile.ekNo)}
+            numeric
+          />
+        )}
         <DetailRow
           label={t("dog.profile.field.inbreeding")}
-          value={formatPercent(profile.inbreedingCoefficientPct)}
+          value={
+            profile.inbreedingCoefficientPct != null
+              ? formatPercent(profile.inbreedingCoefficientPct)
+              : `${FALLBACK_VALUE} ${t("dog.profile.field.comingSoon")}`
+          }
           numeric
         />
       </dl>

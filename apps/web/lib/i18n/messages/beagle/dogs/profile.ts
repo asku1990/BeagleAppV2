@@ -45,6 +45,7 @@ export const fiBeagleDogProfileMessages = {
   "dog.profile.lineage.col.sire": "Isän linja",
   "dog.profile.lineage.col.dam": "Emän linja",
   "dog.profile.lineage.generationLabel": "G",
+  "dog.profile.field.comingSoon": "(tulossa)",
 } as const;
 
 export const svBeagleDogProfileMessages = {
@@ -94,4 +95,5 @@ export const svBeagleDogProfileMessages = {
   "dog.profile.lineage.col.sire": "Faderslinje",
   "dog.profile.lineage.col.dam": "Moderslinje",
   "dog.profile.lineage.generationLabel": "G",
+  "dog.profile.field.comingSoon": "(kommer snart)",
 } as const;

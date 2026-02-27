@@ -35,6 +35,10 @@ export function DogProfileShowsCard({
 }) {
   const { t, locale } = useI18n();
 
+  const hasResult = rows.some((r) => r.result != null);
+  const hasJudge = rows.some((r) => r.judge != null);
+  const hasHeight = rows.some((r) => r.heightCm != null);
+
   return (
     <ListingSectionShell
       title={t("dog.profile.card.shows.title")}
@@ -66,15 +70,21 @@ export function DogProfileShowsCard({
                     <th className="px-2 py-2 font-semibold">
                       {t("dog.profile.shows.col.date")}
                     </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("dog.profile.shows.col.result")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("dog.profile.shows.col.judge")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("dog.profile.shows.col.height")}
-                    </th>
+                    {hasResult && (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("dog.profile.shows.col.result")}
+                      </th>
+                    )}
+                    {hasJudge && (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("dog.profile.shows.col.judge")}
+                      </th>
+                    )}
+                    {hasHeight && (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("dog.profile.shows.col.height")}
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -88,15 +98,21 @@ export function DogProfileShowsCard({
                       <td className="px-2 py-2">
                         {formatDate(row.date, locale)}
                       </td>
-                      <td className="px-2 py-2">
-                        {row.result ?? FALLBACK_VALUE}
-                      </td>
-                      <td className="px-2 py-2">
-                        {row.judge ?? FALLBACK_VALUE}
-                      </td>
-                      <td className="px-2 py-2">
-                        {formatHeight(row.heightCm)}
-                      </td>
+                      {hasResult && (
+                        <td className="px-2 py-2">
+                          {row.result ?? FALLBACK_VALUE}
+                        </td>
+                      )}
+                      {hasJudge && (
+                        <td className="px-2 py-2">
+                          {row.judge ?? FALLBACK_VALUE}
+                        </td>
+                      )}
+                      {hasHeight && (
+                        <td className="px-2 py-2">
+                          {formatHeight(row.heightCm)}
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -133,24 +149,30 @@ export function DogProfileShowsCard({
                       </span>{" "}
                       <span>{row.place}</span>
                     </p>
-                    <p className="col-span-2">
-                      <span className={beagleTheme.mutedText}>
-                        {t("dog.profile.shows.col.result")}:
-                      </span>{" "}
-                      <span>{row.result ?? FALLBACK_VALUE}</span>
-                    </p>
-                    <p className="col-span-2">
-                      <span className={beagleTheme.mutedText}>
-                        {t("dog.profile.shows.col.judge")}:
-                      </span>{" "}
-                      <span>{row.judge ?? FALLBACK_VALUE}</span>
-                    </p>
-                    <p className="col-span-2">
-                      <span className={beagleTheme.mutedText}>
-                        {t("dog.profile.shows.col.height")}:
-                      </span>{" "}
-                      <span>{formatHeight(row.heightCm)}</span>
-                    </p>
+                    {hasResult && (
+                      <p className="col-span-2">
+                        <span className={beagleTheme.mutedText}>
+                          {t("dog.profile.shows.col.result")}:
+                        </span>{" "}
+                        <span>{row.result ?? FALLBACK_VALUE}</span>
+                      </p>
+                    )}
+                    {hasJudge && (
+                      <p className="col-span-2">
+                        <span className={beagleTheme.mutedText}>
+                          {t("dog.profile.shows.col.judge")}:
+                        </span>{" "}
+                        <span>{row.judge ?? FALLBACK_VALUE}</span>
+                      </p>
+                    )}
+                    {hasHeight && (
+                      <p className="col-span-2">
+                        <span className={beagleTheme.mutedText}>
+                          {t("dog.profile.shows.col.height")}:
+                        </span>{" "}
+                        <span>{formatHeight(row.heightCm)}</span>
+                      </p>
+                    )}
                   </div>
                 </article>
               ))}

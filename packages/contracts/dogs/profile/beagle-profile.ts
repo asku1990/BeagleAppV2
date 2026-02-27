@@ -24,6 +24,7 @@ export type BeagleDogProfileTrialRowDto = {
   className: string | null;
   rank: string | null;
   points: number | null;
+  award: string | null;
 };
 
 export type BeagleDogProfileShowRowDto = {

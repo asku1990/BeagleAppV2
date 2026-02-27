@@ -43,6 +43,7 @@ function mapDogProfileFromDb(profile: BeagleDogProfileDb): BeagleDogProfileDto {
       className: trial.className,
       rank: trial.rank,
       points: trial.points,
+      award: trial.award,
     })),
   };
 }

@@ -63,6 +63,7 @@ describe("getBeagleDogProfileDb", () => {
           eventName: "Class1",
           sija: "1",
           piste: new Decimal(80.5),
+          pa: "1",
         },
       ],
       showResults: [
@@ -102,6 +103,7 @@ describe("getBeagleDogProfileDb", () => {
     expect(result?.birthDate).toEqual(mockDog.birthDate);
     expect(result?.trials).toHaveLength(1);
     expect(result?.trials[0].points).toBe(80.5);
+    expect(result?.trials[0].award).toBe("BEAJ 1");
     expect(result?.trials[0].date).toEqual(new Date("2021-05-05"));
     expect(result?.shows).toHaveLength(1);
     expect(result?.shows[0].heightCm).toBe(38.5);

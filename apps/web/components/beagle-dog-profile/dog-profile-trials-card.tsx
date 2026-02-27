@@ -35,6 +35,11 @@ export function DogProfileTrialsCard({
 }) {
   const { t, locale } = useI18n();
 
+  const hasWeather = rows.some((r) => r.weather != null);
+  const hasAward = rows.some((r) => r.className != null || r.award != null);
+  const hasRank = rows.some((r) => r.rank != null);
+  const hasPoints = rows.some((r) => r.points != null);
+
   return (
     <ListingSectionShell
       title={t("dog.profile.card.trials.title")}
@@ -66,18 +71,26 @@ export function DogProfileTrialsCard({
                     <th className="px-2 py-2 font-semibold">
                       {t("dog.profile.trials.col.date")}
                     </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("dog.profile.trials.col.weather")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("dog.profile.trials.col.class")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("dog.profile.trials.col.rank")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("dog.profile.trials.col.points")}
-                    </th>
+                    {hasWeather && (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("dog.profile.trials.col.weather")}
+                      </th>
+                    )}
+                    {hasAward && (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("dog.profile.trials.col.class")}
+                      </th>
+                    )}
+                    {hasRank && (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("dog.profile.trials.col.rank")}
+                      </th>
+                    )}
+                    {hasPoints && (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("dog.profile.trials.col.points")}
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -91,16 +104,26 @@ export function DogProfileTrialsCard({
                       <td className="px-2 py-2">
                         {formatDate(row.date, locale)}
                       </td>
-                      <td className="px-2 py-2">
-                        {row.weather ?? FALLBACK_VALUE}
-                      </td>
-                      <td className="px-2 py-2">
-                        {row.className ?? FALLBACK_VALUE}
-                      </td>
-                      <td className="px-2 py-2">
-                        {row.rank ?? FALLBACK_VALUE}
-                      </td>
-                      <td className="px-2 py-2">{formatPoints(row.points)}</td>
+                      {hasWeather && (
+                        <td className="px-2 py-2">
+                          {row.weather ?? FALLBACK_VALUE}
+                        </td>
+                      )}
+                      {hasAward && (
+                        <td className="px-2 py-2">
+                          {row.className ?? row.award ?? FALLBACK_VALUE}
+                        </td>
+                      )}
+                      {hasRank && (
+                        <td className="px-2 py-2">
+                          {row.rank ?? FALLBACK_VALUE}
+                        </td>
+                      )}
+                      {hasPoints && (
+                        <td className="px-2 py-2">
+                          {formatPoints(row.points)}
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -137,30 +160,40 @@ export function DogProfileTrialsCard({
                       </span>{" "}
                       <span>{row.place}</span>
                     </p>
-                    <p>
-                      <span className={beagleTheme.mutedText}>
-                        {t("dog.profile.trials.col.weather")}:
-                      </span>{" "}
-                      <span>{row.weather ?? FALLBACK_VALUE}</span>
-                    </p>
-                    <p>
-                      <span className={beagleTheme.mutedText}>
-                        {t("dog.profile.trials.col.class")}:
-                      </span>{" "}
-                      <span>{row.className ?? FALLBACK_VALUE}</span>
-                    </p>
-                    <p>
-                      <span className={beagleTheme.mutedText}>
-                        {t("dog.profile.trials.col.rank")}:
-                      </span>{" "}
-                      <span>{row.rank ?? FALLBACK_VALUE}</span>
-                    </p>
-                    <p>
-                      <span className={beagleTheme.mutedText}>
-                        {t("dog.profile.trials.col.points")}:
-                      </span>{" "}
-                      <span>{formatPoints(row.points)}</span>
-                    </p>
+                    {hasWeather && (
+                      <p>
+                        <span className={beagleTheme.mutedText}>
+                          {t("dog.profile.trials.col.weather")}:
+                        </span>{" "}
+                        <span>{row.weather ?? FALLBACK_VALUE}</span>
+                      </p>
+                    )}
+                    {hasAward && (
+                      <p>
+                        <span className={beagleTheme.mutedText}>
+                          {t("dog.profile.trials.col.class")}:
+                        </span>{" "}
+                        <span>
+                          {row.className ?? row.award ?? FALLBACK_VALUE}
+                        </span>
+                      </p>
+                    )}
+                    {hasRank && (
+                      <p>
+                        <span className={beagleTheme.mutedText}>
+                          {t("dog.profile.trials.col.rank")}:
+                        </span>{" "}
+                        <span>{row.rank ?? FALLBACK_VALUE}</span>
+                      </p>
+                    )}
+                    {hasPoints && (
+                      <p>
+                        <span className={beagleTheme.mutedText}>
+                          {t("dog.profile.trials.col.points")}:
+                        </span>{" "}
+                        <span>{formatPoints(row.points)}</span>
+                      </p>
+                    )}
                   </div>
                 </article>
               ))}
