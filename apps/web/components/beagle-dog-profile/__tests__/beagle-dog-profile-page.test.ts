@@ -63,6 +63,7 @@ describe("BeagleDogProfilePage", () => {
               className: "VOI",
               rank: "1",
               points: 85.5,
+              award: "BEAJ-1",
             },
           ],
         },
