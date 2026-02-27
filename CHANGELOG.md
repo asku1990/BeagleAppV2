@@ -18,6 +18,21 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.4.0] - 2026-02-27
+
+### Added
+
+- Uusi ulkinen koiran profiilisivu `/beagle/dogs/[dogId]`.
+- Profiilisivulla koiran perustiedot, sukutaulu (3 sukupolvea), sekä näyttely- ja koetulokset.
+
+### Changed
+
+- Beagle-haun tuloksissa koiran rekisterinumero ja nimi toimivat nyt linkkeinä koiran profiilisivulle sekä desktop- että mobiilinäkymässä.
+
+### Fixed
+
+### Removed
+
 ## [0.3.0] - 2026-02-26
 
 ### Added
