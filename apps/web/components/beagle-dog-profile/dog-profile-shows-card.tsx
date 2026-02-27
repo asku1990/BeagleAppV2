@@ -113,37 +113,37 @@ export function DogProfileShowsCard({ rows }: { rows: DogProfileShowRow[] }) {
                     <p>
                       <span className={beagleTheme.mutedText}>
                         {t("dog.profile.shows.col.no")}:
-                      </span>
+                      </span>{" "}
                       <span>{index + 1}</span>
                     </p>
                     <p>
                       <span className={beagleTheme.mutedText}>
                         {t("dog.profile.shows.col.date")}:
-                      </span>
+                      </span>{" "}
                       <span>{formatDate(row.date, locale)}</span>
                     </p>
                     <p className="col-span-2">
                       <span className={beagleTheme.mutedText}>
                         {t("dog.profile.shows.col.place")}:
-                      </span>
+                      </span>{" "}
                       <span>{row.place}</span>
                     </p>
                     <p className="col-span-2">
                       <span className={beagleTheme.mutedText}>
                         {t("dog.profile.shows.col.result")}:
-                      </span>
+                      </span>{" "}
                       <span>{row.result ?? FALLBACK_VALUE}</span>
                     </p>
                     <p className="col-span-2">
                       <span className={beagleTheme.mutedText}>
                         {t("dog.profile.shows.col.judge")}:
-                      </span>
+                      </span>{" "}
                       <span>{row.judge ?? FALLBACK_VALUE}</span>
                     </p>
                     <p className="col-span-2">
                       <span className={beagleTheme.mutedText}>
                         {t("dog.profile.shows.col.height")}:
-                      </span>
+                      </span>{" "}
                       <span>{formatHeight(row.heightCm)}</span>
                     </p>
                   </div>

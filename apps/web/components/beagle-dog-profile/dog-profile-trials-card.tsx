@@ -117,43 +117,43 @@ export function DogProfileTrialsCard({ rows }: { rows: DogProfileTrialRow[] }) {
                     <p>
                       <span className={beagleTheme.mutedText}>
                         {t("dog.profile.trials.col.no")}:
-                      </span>
+                      </span>{" "}
                       <span>{index + 1}</span>
                     </p>
                     <p>
                       <span className={beagleTheme.mutedText}>
                         {t("dog.profile.trials.col.date")}:
-                      </span>
+                      </span>{" "}
                       <span>{formatDate(row.date, locale)}</span>
                     </p>
                     <p className="col-span-2">
                       <span className={beagleTheme.mutedText}>
                         {t("dog.profile.trials.col.place")}:
-                      </span>
+                      </span>{" "}
                       <span>{row.place}</span>
                     </p>
                     <p>
                       <span className={beagleTheme.mutedText}>
                         {t("dog.profile.trials.col.weather")}:
-                      </span>
+                      </span>{" "}
                       <span>{row.weather ?? FALLBACK_VALUE}</span>
                     </p>
                     <p>
                       <span className={beagleTheme.mutedText}>
                         {t("dog.profile.trials.col.class")}:
-                      </span>
+                      </span>{" "}
                       <span>{row.className ?? FALLBACK_VALUE}</span>
                     </p>
                     <p>
                       <span className={beagleTheme.mutedText}>
                         {t("dog.profile.trials.col.rank")}:
-                      </span>
+                      </span>{" "}
                       <span>{row.rank ?? FALLBACK_VALUE}</span>
                     </p>
                     <p>
                       <span className={beagleTheme.mutedText}>
                         {t("dog.profile.trials.col.points")}:
-                      </span>
+                      </span>{" "}
                       <span>{formatPoints(row.points)}</span>
                     </p>
                   </div>
