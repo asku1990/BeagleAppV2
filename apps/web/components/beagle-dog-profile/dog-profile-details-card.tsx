@@ -148,12 +148,13 @@ export function DogProfileDetailsCard({
           label={t("dog.profile.field.sex")}
           value={mapSexLabel(profile.sex, t)}
         />
-        {profile.color && (
-          <DetailRow
-            label={t("dog.profile.field.color")}
-            value={profile.color}
-          />
-        )}
+        <DetailRow
+          label={t("dog.profile.field.color")}
+          value={
+            profile.color ??
+            `${FALLBACK_VALUE} ${t("dog.profile.field.comingSoon")}`
+          }
+        />
         {profile.ekNo != null && (
           <DetailRow
             label={t("dog.profile.field.ekNo")}
@@ -161,13 +162,15 @@ export function DogProfileDetailsCard({
             numeric
           />
         )}
-        {profile.inbreedingCoefficientPct != null && (
-          <DetailRow
-            label={t("dog.profile.field.inbreeding")}
-            value={formatPercent(profile.inbreedingCoefficientPct)}
-            numeric
-          />
-        )}
+        <DetailRow
+          label={t("dog.profile.field.inbreeding")}
+          value={
+            profile.inbreedingCoefficientPct != null
+              ? formatPercent(profile.inbreedingCoefficientPct)
+              : `${FALLBACK_VALUE} ${t("dog.profile.field.comingSoon")}`
+          }
+          numeric
+        />
       </dl>
     </ListingSectionShell>
   );
