@@ -1,7 +1,10 @@
 import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
-import type { DogProfile } from "@/lib/beagle-dogs";
+import type {
+  BeagleDogProfileDto,
+  BeagleDogProfileParentDto,
+} from "@beagle/contracts";
 import { cn } from "@/lib/utils";
 import { PedigreePairCard } from "./pedigree-pair-card";
 import { PedigreeTree } from "./pedigree-tree";
@@ -9,7 +12,7 @@ import { PedigreeTree } from "./pedigree-tree";
 const FALLBACK_VALUE = "-";
 
 function formatPedigreeLine(
-  parent: DogProfile["sire"],
+  parent: BeagleDogProfileParentDto | null,
   sexSymbol: "♂" | "♀",
 ): string {
   if (!parent) {
@@ -23,7 +26,11 @@ function formatPedigreeLine(
   return `${sexSymbol} ${parent.registrationNo} ${parent.name}`;
 }
 
-export function DogProfileLineageCard({ profile }: { profile: DogProfile }) {
+export function DogProfileLineageCard({
+  profile,
+}: {
+  profile: BeagleDogProfileDto;
+}) {
   const { t } = useI18n();
   const generations = profile.pedigree.map((generation) => ({
     generation: generation.generation,

@@ -4,8 +4,9 @@ import {
 } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
-import { parseLocalIsoDate, type DogProfileShowRow } from "@/lib/beagle-dogs";
+import { parseLocalIsoDate } from "@/lib/beagle-dogs";
 import { cn } from "@/lib/utils";
+import type { BeagleDogProfileShowRowDto } from "@beagle/contracts";
 
 const FALLBACK_VALUE = "-";
 
@@ -27,7 +28,11 @@ function formatHeight(heightCm: number | null): string {
   return `${heightCm} cm`;
 }
 
-export function DogProfileShowsCard({ rows }: { rows: DogProfileShowRow[] }) {
+export function DogProfileShowsCard({
+  rows,
+}: {
+  rows: BeagleDogProfileShowRowDto[];
+}) {
   const { t, locale } = useI18n();
 
   return (

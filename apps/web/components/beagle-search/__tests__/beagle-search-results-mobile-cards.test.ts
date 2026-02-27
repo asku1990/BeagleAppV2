@@ -47,7 +47,7 @@ describe("BeagleSearchResultsMobileCards", () => {
     expect(html).toContain("search.results.sex.female");
     expect(html).toContain("Meri");
     expect(html).toContain("actions-mobile");
-    expect(html).toContain('href="/beagle/dogs/d1?');
+    expect(html).toContain('href="/beagle/dogs/d1"');
   });
 
   it("renders dash fallbacks for missing ek and unknown sex", () => {
