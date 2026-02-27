@@ -113,6 +113,8 @@ export function DogProfileDetailsCard({
   profile: BeagleDogProfileDto;
 }) {
   const { t, locale } = useI18n();
+  const hasBirthDate =
+    profile.birthDate != null && profile.birthDate.trim().length > 0;
   const secondaryRegistrations = profile.registrationNos.filter(
     (registrationNo: string) => registrationNo !== profile.registrationNo,
   );
@@ -138,7 +140,7 @@ export function DogProfileDetailsCard({
             value={secondaryRegistrations.join(", ")}
           />
         )}
-        {profile.birthDate && (
+        {hasBirthDate && (
           <DetailRow
             label={t("dog.profile.field.birthDate")}
             value={formatBirthDateWithAge(profile.birthDate, locale, t)}
