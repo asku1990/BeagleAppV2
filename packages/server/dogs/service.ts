@@ -8,9 +8,15 @@ import type {
   BeagleNewestResponse,
   BeagleSearchRequest,
   BeagleSearchResponse,
+  BeagleDogProfileDto,
 } from "@beagle/contracts";
+import { toBusinessDateOnly } from "../shared/date-only";
 import type { ServiceResult } from "../shared/result";
 import { toErrorLog, withLogContext } from "../shared/logger";
+import {
+  getBeagleDogProfileService,
+  type DogsServiceLogContext,
+} from "./profile/get-beagle-dog-profile";
 
 const ALLOWED_SORTS: ReadonlySet<BeagleSearchSortDb> = new Set([
   "name-asc",
@@ -47,16 +53,11 @@ function parseNewestLimit(value: number | undefined): number {
   return Math.min(20, Math.max(1, Math.floor(value ?? 5)));
 }
 
-type ServiceLogContext = {
-  requestId?: string;
-  actorUserId?: string;
-};
-
 export function createDogsService() {
   return {
     async searchBeagleDogs(
       input: BeagleSearchRequest,
-      context?: ServiceLogContext,
+      context?: DogsServiceLogContext,
     ): Promise<ServiceResult<BeagleSearchResponse>> {
       const startedAt = Date.now();
       const log = withLogContext({
@@ -135,7 +136,9 @@ export function createDogsService() {
                 createdAt: item.createdAt.toISOString(),
                 sex: item.sex,
                 name: item.name,
-                birthDate: item.birthDate?.toISOString() ?? null,
+                birthDate: item.birthDate
+                  ? toBusinessDateOnly(item.birthDate)
+                  : null,
                 sire: item.sire,
                 dam: item.dam,
                 trialCount: item.trialCount,
@@ -165,7 +168,7 @@ export function createDogsService() {
 
     async getNewestBeagleDogs(
       input: BeagleNewestRequest = {},
-      context?: ServiceLogContext,
+      context?: DogsServiceLogContext,
     ): Promise<ServiceResult<BeagleNewestResponse>> {
       const startedAt = Date.now();
       const log = withLogContext({
@@ -206,7 +209,9 @@ export function createDogsService() {
                 createdAt: item.createdAt.toISOString(),
                 sex: item.sex,
                 name: item.name,
-                birthDate: item.birthDate?.toISOString() ?? null,
+                birthDate: item.birthDate
+                  ? toBusinessDateOnly(item.birthDate)
+                  : null,
                 sire: item.sire,
                 dam: item.dam,
                 trialCount: item.trialCount,
@@ -232,6 +237,13 @@ export function createDogsService() {
           },
         };
       }
+    },
+
+    async getBeagleDogProfile(
+      dogId: string,
+      context?: DogsServiceLogContext,
+    ): Promise<ServiceResult<BeagleDogProfileDto>> {
+      return getBeagleDogProfileService(dogId, context);
     },
   };
 }

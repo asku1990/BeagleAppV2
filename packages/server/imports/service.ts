@@ -19,6 +19,7 @@ import type {
 } from "@beagle/contracts";
 import type { ServiceResult } from "../shared/result";
 import { upsertOwner, upsertShowRows, upsertTrialRows } from "./persistence";
+import { toOwnershipDateKey } from "./date-key";
 import {
   normalizeBreederKey,
   isValidRegistrationNo,
@@ -73,11 +74,6 @@ function parseRegistrationNo(value: string | null | undefined): {
     registrationNo,
     isInvalid: !isValidRegistrationNo(registrationNo),
   };
-}
-
-// Internal dedupe key: MariaDB/MySQL unique indexes allow multiple NULL values.
-function toOwnershipDateKey(value: Date | null): string {
-  return value ? value.toISOString().slice(0, 10) : "__NULL__";
 }
 
 async function loadDogIdByRegistration(): Promise<Map<string, string>> {

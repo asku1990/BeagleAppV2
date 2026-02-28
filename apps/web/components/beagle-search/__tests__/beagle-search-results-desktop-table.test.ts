@@ -3,6 +3,11 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { BeagleSearchResultsDesktopTable } from "../beagle-search-results-desktop-table";
 
+vi.mock("next/link", () => ({
+  default: ({ href, children, ...props }: React.ComponentProps<"a">) =>
+    React.createElement("a", { href, ...props }, children),
+}));
+
 vi.mock("../beagle-search-row-actions", () => ({
   BeagleSearchRowActions: () => React.createElement("div", null, "actions"),
 }));
@@ -42,6 +47,7 @@ describe("BeagleSearchResultsDesktopTable", () => {
     expect(html).toContain("search.results.sex.male");
     expect(html).toContain("Alpha");
     expect(html).toContain("actions");
+    expect(html).toContain('href="/beagle/dogs/d1"');
   });
 
   it("renders dash fallback for missing ek/unknown sex", () => {

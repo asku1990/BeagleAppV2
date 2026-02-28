@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import type { BeagleSearchResultRow } from "@/lib/beagle-search";
+import { getDogProfileHref } from "@/lib/public/beagle/dogs/profile";
 import type { MessageKey } from "@/lib/i18n";
 import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
@@ -61,9 +63,15 @@ export function BeagleSearchResultsDesktopTable({
                 className={cn("border-b align-top", beagleTheme.border)}
               >
                 <td className="px-2 py-2">
-                  <div className={cn("font-medium", beagleTheme.inkStrongText)}>
+                  <Link
+                    href={getDogProfileHref(row.id)}
+                    className={cn(
+                      "font-medium underline underline-offset-2",
+                      beagleTheme.inkStrongText,
+                    )}
+                  >
                     {row.registrationNo}
-                  </div>
+                  </Link>
                   {additionalRegistrationNos.length > 0 ? (
                     <div className={cn("mt-1 text-xs", beagleTheme.mutedText)}>
                       {t("search.results.col.regAll")}:{" "}
@@ -76,12 +84,16 @@ export function BeagleSearchResultsDesktopTable({
                 </td>
                 <td className="px-2 py-2">{mapSexLabel(row.sex, t)}</td>
                 <td className="px-2 py-2">
-                  <span
+                  <Link
+                    href={getDogProfileHref(row.id)}
                     title={`${t("search.results.parents.sire")}: ${row.sire}\n${t("search.results.parents.dam")}: ${row.dam}`}
-                    className={cn("font-medium", beagleTheme.inkStrongText)}
+                    className={cn(
+                      "font-medium underline underline-offset-2",
+                      beagleTheme.inkStrongText,
+                    )}
                   >
                     {row.name}
-                  </span>
+                  </Link>
                 </td>
                 <td className="px-2 py-2">{row.trialCount}</td>
                 <td className="px-2 py-2">{row.showCount}</td>

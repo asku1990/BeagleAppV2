@@ -28,7 +28,7 @@ describe("formatBeagleRowsForClipboard", () => {
           createdAt: "2026-01-01T00:00:00.000Z",
           sex: "U",
           name: "Alpha",
-          birthDate: "2020-05-12T00:00:00.000Z",
+          birthDate: "2020-05-12",
           sire: "Sire One",
           dam: "Dam One",
           trialCount: 2,
