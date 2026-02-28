@@ -136,6 +136,8 @@ Refactor incrementally using the target structure below.
 - Distinguish timestamp fields from date-only calendar fields at API boundaries.
 - For date-only fields (for example birth dates or event dates shown as `YYYY-MM-DD`), do not derive the value with `toISOString().slice(0, 10)`.
 - Serialize date-only values with an explicit business timezone to avoid server-environment timezone drift.
+- In `packages/server`, prefer the shared `toBusinessDateOnly` helper for date-only serialization.
+- Keep true timestamp fields (for example `createdAt` and `updatedAt`) as full ISO datetime strings.
 
 ## UI feedback consistency rules
 

@@ -1,5 +1,6 @@
 import { getBeagleDogProfileDb, type BeagleDogProfileDb } from "@beagle/db";
 import type { BeagleDogProfileDto } from "@beagle/contracts";
+import { toBusinessDateOnly } from "../../shared/date-only";
 import { toErrorLog, withLogContext } from "../../shared/logger";
 import type { ServiceResult } from "../../shared/result";
 
@@ -8,21 +9,6 @@ export type DogsServiceLogContext = {
   actorUserId?: string;
 };
 
-const HELSINKI_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
-  timeZone: "Europe/Helsinki",
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-});
-
-function toIsoDate(value: Date): string {
-  const parts = HELSINKI_DATE_FORMATTER.formatToParts(value);
-  const year = parts.find((part) => part.type === "year")?.value ?? "";
-  const month = parts.find((part) => part.type === "month")?.value ?? "";
-  const day = parts.find((part) => part.type === "day")?.value ?? "";
-  return `${year}-${month}-${day}`;
-}
-
 function mapDogProfileFromDb(profile: BeagleDogProfileDb): BeagleDogProfileDto {
   return {
     id: profile.id,
@@ -30,7 +16,7 @@ function mapDogProfileFromDb(profile: BeagleDogProfileDb): BeagleDogProfileDto {
     title: profile.title,
     registrationNo: profile.registrationNo,
     registrationNos: profile.registrationNos,
-    birthDate: profile.birthDate ? toIsoDate(profile.birthDate) : null,
+    birthDate: profile.birthDate ? toBusinessDateOnly(profile.birthDate) : null,
     sex: profile.sex,
     color: profile.color,
     ekNo: profile.ekNo,
@@ -41,7 +27,7 @@ function mapDogProfileFromDb(profile: BeagleDogProfileDb): BeagleDogProfileDto {
     shows: profile.shows.map((show) => ({
       id: show.id,
       place: show.place,
-      date: toIsoDate(show.date),
+      date: toBusinessDateOnly(show.date),
       result: show.result,
       judge: show.judge,
       heightCm: show.heightCm,
@@ -49,7 +35,7 @@ function mapDogProfileFromDb(profile: BeagleDogProfileDb): BeagleDogProfileDto {
     trials: profile.trials.map((trial) => ({
       id: trial.id,
       place: trial.place,
-      date: toIsoDate(trial.date),
+      date: toBusinessDateOnly(trial.date),
       weather: trial.weather,
       className: trial.className,
       rank: trial.rank,

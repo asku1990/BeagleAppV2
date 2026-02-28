@@ -25,7 +25,7 @@ describe("BeagleDogProfilePage", () => {
           title: null,
           registrationNo: "FI-11/24",
           registrationNos: ["FI-11/24", "FI-22/24"],
-          birthDate: "2020-01-01T00:00:00.000Z",
+          birthDate: "2020-01-01",
           sex: "N",
           color: null,
           ekNo: 11,
@@ -48,7 +48,7 @@ describe("BeagleDogProfilePage", () => {
             {
               id: "show1",
               place: "Helsinki",
-              date: "2024-01-01T00:00:00.000Z",
+              date: "2024-01-01",
               result: "ERI",
               judge: "Judge",
               heightCm: 39,
@@ -58,7 +58,7 @@ describe("BeagleDogProfilePage", () => {
             {
               id: "trial1",
               place: "Turku",
-              date: "2024-02-01T00:00:00.000Z",
+              date: "2024-02-01",
               weather: "P",
               className: "VOI",
               rank: "1",

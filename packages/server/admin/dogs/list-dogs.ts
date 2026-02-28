@@ -4,6 +4,7 @@ import type {
   AdminDogListResponse,
   CurrentUserDto,
 } from "@beagle/contracts";
+import { toBusinessDateOnly } from "../../shared/date-only";
 import type { ServiceResult } from "../../shared/result";
 import { requireAdmin } from "../service";
 import { toErrorLog, withLogContext } from "../../shared/logger";
@@ -178,7 +179,9 @@ export async function listAdminDogs(
             secondaryRegistrationNos: item.secondaryRegistrationNos,
             name: item.name,
             sex: item.sex,
-            birthDate: item.birthDate?.toISOString() ?? null,
+            birthDate: item.birthDate
+              ? toBusinessDateOnly(item.birthDate)
+              : null,
             breederName: item.breederName,
             ownerNames: item.ownerNames,
             sire: item.sire,

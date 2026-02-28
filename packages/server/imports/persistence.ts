@@ -10,6 +10,7 @@ import {
   normalizeRegistrationNo,
   parseLegacyDate,
 } from "./transform";
+import { toEventSourceDatePart } from "./date-key";
 
 type PrismaUniqueError = {
   code?: string;
@@ -154,7 +155,7 @@ export async function upsertTrialRows(
       continue;
     }
 
-    const normalizedEventDate = eventDate.toISOString().slice(0, 10);
+    const normalizedEventDate = toEventSourceDatePart(eventDate);
     const sourceKey = `${registrationNo}|${normalizedEventDate}|${eventPlace}`;
 
     await prisma.trialResult.upsert({
@@ -282,7 +283,7 @@ export async function upsertShowRows(
       continue;
     }
 
-    const normalizedEventDate = eventDate.toISOString().slice(0, 10);
+    const normalizedEventDate = toEventSourceDatePart(eventDate);
     const sourceKey = `${registrationNo}|${normalizedEventDate}|${eventPlace}`;
 
     await prisma.showResult.upsert({

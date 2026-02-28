@@ -145,7 +145,7 @@ describe("listAdminDogs", () => {
               secondaryRegistrationNos: ["FI54321/21"],
               name: "Metsapolun Kide",
               sex: "FEMALE",
-              birthDate: "2021-04-09T00:00:00.000Z",
+              birthDate: "2021-04-09",
               breederName: "Metsapolun",
               ownerNames: ["Tiina Virtanen", "Antti Virtanen"],
               sire: {

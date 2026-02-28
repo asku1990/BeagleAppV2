@@ -10,6 +10,7 @@ import type {
   BeagleSearchResponse,
   BeagleDogProfileDto,
 } from "@beagle/contracts";
+import { toBusinessDateOnly } from "../shared/date-only";
 import type { ServiceResult } from "../shared/result";
 import { toErrorLog, withLogContext } from "../shared/logger";
 import {
@@ -135,7 +136,9 @@ export function createDogsService() {
                 createdAt: item.createdAt.toISOString(),
                 sex: item.sex,
                 name: item.name,
-                birthDate: item.birthDate?.toISOString() ?? null,
+                birthDate: item.birthDate
+                  ? toBusinessDateOnly(item.birthDate)
+                  : null,
                 sire: item.sire,
                 dam: item.dam,
                 trialCount: item.trialCount,
@@ -206,7 +209,9 @@ export function createDogsService() {
                 createdAt: item.createdAt.toISOString(),
                 sex: item.sex,
                 name: item.name,
-                birthDate: item.birthDate?.toISOString() ?? null,
+                birthDate: item.birthDate
+                  ? toBusinessDateOnly(item.birthDate)
+                  : null,
                 sire: item.sire,
                 dam: item.dam,
                 trialCount: item.trialCount,

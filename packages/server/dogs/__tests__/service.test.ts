@@ -97,8 +97,34 @@ describe("dogs service", () => {
       sort: "ek-asc",
     });
 
-    expect(result.status).toBe(200);
-    expect(result.body.ok).toBe(true);
+    expect(result).toEqual({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          mode: "combined",
+          total: 25,
+          totalPages: 3,
+          page: 3,
+          items: [
+            {
+              id: "d1",
+              ekNo: 42,
+              registrationNo: "FI-1/20",
+              registrationNos: ["FI-1/20"],
+              createdAt: "2026-02-01T10:00:00.000Z",
+              sex: "U",
+              name: "Alpha",
+              birthDate: "2020-05-01",
+              sire: "SIRE",
+              dam: "DAM",
+              trialCount: 2,
+              showCount: 1,
+            },
+          ],
+        },
+      },
+    });
   });
 
   it("returns 500 when search DB call throws", async () => {
@@ -116,11 +142,50 @@ describe("dogs service", () => {
   });
 
   it("maps newest dogs result and clamps limit", async () => {
-    getNewestBeagleDogsDbMock.mockResolvedValue([]);
+    getNewestBeagleDogsDbMock.mockResolvedValue([
+      {
+        id: "d2",
+        ekNo: null,
+        registrationNo: "FI-2/20",
+        registrationNos: ["FI-2/20"],
+        createdAt: new Date("2026-02-02T10:00:00.000Z"),
+        sex: "N",
+        name: "Beta",
+        birthDate: new Date("2020-01-01T00:00:00+02:00"),
+        sire: "SIRE2",
+        dam: "DAM2",
+        trialCount: 0,
+        showCount: 0,
+      },
+    ]);
     const service = createDogsService();
-    await service.getNewestBeagleDogs({ limit: 999 });
+    const result = await service.getNewestBeagleDogs({ limit: 999 });
 
     expect(getNewestBeagleDogsDbMock).toHaveBeenCalledWith(20);
+    expect(result).toEqual({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          items: [
+            {
+              id: "d2",
+              ekNo: null,
+              registrationNo: "FI-2/20",
+              registrationNos: ["FI-2/20"],
+              createdAt: "2026-02-02T10:00:00.000Z",
+              sex: "N",
+              name: "Beta",
+              birthDate: "2020-01-01",
+              sire: "SIRE2",
+              dam: "DAM2",
+              trialCount: 0,
+              showCount: 0,
+            },
+          ],
+        },
+      },
+    });
   });
 
   it("returns 200 and data when dog profile is found", async () => {
