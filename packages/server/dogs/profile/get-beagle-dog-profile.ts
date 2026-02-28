@@ -8,8 +8,19 @@ export type DogsServiceLogContext = {
   actorUserId?: string;
 };
 
+const HELSINKI_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
+  timeZone: "Europe/Helsinki",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
 function toIsoDate(value: Date): string {
-  return value.toISOString().slice(0, 10);
+  const parts = HELSINKI_DATE_FORMATTER.formatToParts(value);
+  const year = parts.find((part) => part.type === "year")?.value ?? "";
+  const month = parts.find((part) => part.type === "month")?.value ?? "";
+  const day = parts.find((part) => part.type === "day")?.value ?? "";
+  return `${year}-${month}-${day}`;
 }
 
 function mapDogProfileFromDb(profile: BeagleDogProfileDb): BeagleDogProfileDto {

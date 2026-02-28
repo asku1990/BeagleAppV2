@@ -131,6 +131,12 @@ Refactor incrementally using the target structure below.
 - Mutation hooks are responsible for cache coherence and should invalidate affected query keys in `onSuccess` by default.
 - Prefer shared query-key constants over inline arrays so query invalidation stays consistent.
 
+## Date/time conventions
+
+- Distinguish timestamp fields from date-only calendar fields at API boundaries.
+- For date-only fields (for example birth dates or event dates shown as `YYYY-MM-DD`), do not derive the value with `toISOString().slice(0, 10)`.
+- Serialize date-only values with an explicit business timezone to avoid server-environment timezone drift.
+
 ## UI feedback consistency rules
 
 - Use Sonner toasts as the default user feedback mechanism for new user-visible actions and async operation outcomes in `apps/web`.

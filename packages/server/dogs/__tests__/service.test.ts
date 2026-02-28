@@ -179,6 +179,63 @@ describe("dogs service", () => {
     });
   });
 
+  it("maps date-only profile fields in Helsinki timezone", async () => {
+    const mockProfile = {
+      id: "dog2",
+      name: "Beta",
+      title: null,
+      registrationNo: "FI-2/20",
+      registrationNos: ["FI-2/20"],
+      birthDate: new Date("2020-01-01T00:00:00+02:00"),
+      sex: "N",
+      color: null,
+      ekNo: null,
+      inbreedingCoefficientPct: null,
+      sire: null,
+      dam: null,
+      pedigree: [],
+      shows: [
+        {
+          id: "show2",
+          place: "Helsinki",
+          date: new Date("2022-03-15T00:00:00+02:00"),
+          result: null,
+          judge: null,
+          heightCm: null,
+        },
+      ],
+      trials: [
+        {
+          id: "trial2",
+          place: "Lahti",
+          date: new Date("2022-04-16T00:00:00+03:00"),
+          weather: null,
+          className: null,
+          rank: null,
+          points: null,
+          award: null,
+        },
+      ],
+    };
+    getBeagleDogProfileDbMock.mockResolvedValue(mockProfile);
+
+    const service = createDogsService();
+    const result = await service.getBeagleDogProfile("dog2");
+
+    expect(result).toEqual({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          ...mockProfile,
+          birthDate: "2020-01-01",
+          shows: [{ ...mockProfile.shows[0], date: "2022-03-15" }],
+          trials: [{ ...mockProfile.trials[0], date: "2022-04-16" }],
+        },
+      },
+    });
+  });
+
   it("returns 404 when dog profile is missing", async () => {
     getBeagleDogProfileDbMock.mockResolvedValue(null);
 
