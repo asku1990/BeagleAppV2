@@ -11,6 +11,17 @@ export type GetDogProfileActionResult = {
   error?: string;
 };
 
+function parseDogId(value: string): string | null {
+  const normalized = value.trim();
+  if (!normalized) {
+    return null;
+  }
+  if (!/^[A-Za-z0-9_-]{3,64}$/u.test(normalized)) {
+    return null;
+  }
+  return normalized;
+}
+
 export async function getDogProfileAction(
   dogId: string,
 ): Promise<GetDogProfileActionResult> {
@@ -18,10 +29,29 @@ export async function getDogProfileAction(
   const { log, requestId } = await createActionLogger({
     action: "getDogProfileAction",
   });
-  log.info({ event: "start", dogId }, "get dog profile action started");
+  const parsedDogId = parseDogId(dogId);
+  log.info(
+    { event: "start", dogId: parsedDogId ?? dogId },
+    "get dog profile action started",
+  );
+
+  if (!parsedDogId) {
+    log.warn(
+      { event: "invalid_dog_id", durationMs: Date.now() - startedAt },
+      "get dog profile action rejected because dog id is invalid",
+    );
+    return {
+      data: null,
+      hasError: true,
+      status: 400,
+      error: "Invalid dog id.",
+    };
+  }
 
   try {
-    const result = await dogsService.getBeagleDogProfile(dogId, { requestId });
+    const result = await dogsService.getBeagleDogProfile(parsedDogId, {
+      requestId,
+    });
     if (!result.body.ok) {
       log.warn(
         {
@@ -42,7 +72,7 @@ export async function getDogProfileAction(
     log.info(
       {
         event: "success",
-        dogId,
+        dogId: parsedDogId,
         durationMs: Date.now() - startedAt,
       },
       "get dog profile action succeeded",
@@ -57,12 +87,17 @@ export async function getDogProfileAction(
     log.error(
       {
         event: "exception",
-        dogId,
+        dogId: parsedDogId,
         durationMs: Date.now() - startedAt,
         ...toErrorLog(error),
       },
       "get dog profile action threw",
     );
-    throw error;
+    return {
+      data: null,
+      hasError: true,
+      status: 500,
+      error: "Failed to load dog profile.",
+    };
   }
 }
