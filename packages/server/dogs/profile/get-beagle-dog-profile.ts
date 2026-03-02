@@ -1,5 +1,7 @@
 import { getBeagleDogProfileDb, type BeagleDogProfileDb } from "@beagle/db";
 import type { BeagleDogProfileDto } from "@beagle/contracts";
+import { normalizeShowResult } from "../show-results";
+import { formatTrialAward } from "../trial-results";
 import { toBusinessDateOnly } from "../../shared/date-only";
 import { toErrorLog, withLogContext } from "../../shared/logger";
 import type { ServiceResult } from "../../shared/result";
@@ -28,7 +30,7 @@ function mapDogProfileFromDb(profile: BeagleDogProfileDb): BeagleDogProfileDto {
       id: show.id,
       place: show.place,
       date: toBusinessDateOnly(show.date),
-      result: show.result,
+      result: normalizeShowResult(show.result, toBusinessDateOnly(show.date)),
       judge: show.judge,
       heightCm: show.heightCm,
     })),
@@ -40,7 +42,7 @@ function mapDogProfileFromDb(profile: BeagleDogProfileDb): BeagleDogProfileDto {
       className: trial.className,
       rank: trial.rank,
       points: trial.points,
-      award: trial.award,
+      award: formatTrialAward(trial.award, trial.classCode),
     })),
   };
 }

@@ -4,8 +4,10 @@ import { prisma } from "../../core/prisma";
 export type BeagleDogProfileSexDb = "U" | "N" | "-";
 
 export type BeagleDogProfileParentDb = {
+  id: string;
   name: string;
   registrationNo: string | null;
+  ekNo: number | null;
 };
 
 export type BeagleDogProfilePedigreeCardDb = {
@@ -25,6 +27,7 @@ export type BeagleDogProfileTrialRowDb = {
   date: Date;
   weather: string | null;
   className: string | null;
+  classCode: string | null;
   rank: string | null;
   points: number | null;
   award: string | null;
@@ -76,7 +79,9 @@ function getPrimaryRegistrationNo(
 
 function mapParent(
   dog: {
+    id: string;
     name: string;
+    ekNo?: number | null;
     registrations: { registrationNo: string; createdAt: Date }[];
   } | null,
 ): BeagleDogProfileParentDb | null {
@@ -86,8 +91,10 @@ function mapParent(
       ? getPrimaryRegistrationNo(dog.registrations)
       : null;
   return {
+    id: dog.id,
     name: dog.name,
     registrationNo,
+    ekNo: dog.ekNo ?? null,
   };
 }
 
@@ -253,9 +260,10 @@ export async function getBeagleDogProfileDb(
       date: trial.eventDate,
       weather: trial.ke,
       className: trial.eventName,
+      classCode: trial.lk,
       rank: trial.sija,
       points: trial.piste ? trial.piste.toNumber() : null,
-      award: trial.pa ? `BEAJ ${trial.pa}` : null,
+      award: trial.pa,
     })),
   };
 }

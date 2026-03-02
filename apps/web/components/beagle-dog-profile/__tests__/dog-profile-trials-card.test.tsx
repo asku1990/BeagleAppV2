@@ -11,7 +11,7 @@ vi.mock("@/hooks/i18n", () => ({
 }));
 
 describe("DogProfileTrialsCard", () => {
-  it("formats source rank code for readability", () => {
+  it("keeps source rank code unchanged", () => {
     const html = renderToStaticMarkup(
       React.createElement(DogProfileTrialsCard, {
         rows: [
@@ -29,11 +29,10 @@ describe("DogProfileTrialsCard", () => {
       }),
     );
 
-    expect(html).toContain("1.");
-    expect(html).not.toContain(">S1<");
+    expect(html).toContain(">S1<");
   });
 
-  it("formats pair rank using slash separator", () => {
+  it("keeps pair rank separator as pipe", () => {
     const html = renderToStaticMarkup(
       React.createElement(DogProfileTrialsCard, {
         rows: [
@@ -51,7 +50,6 @@ describe("DogProfileTrialsCard", () => {
       }),
     );
 
-    expect(html).toContain("8/12");
-    expect(html).not.toContain(">8|12<");
+    expect(html).toContain(">8|12<");
   });
 });
