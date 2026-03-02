@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   beagleNewestQueryKeyRoot,
   beagleSearchQueryKeyRoot,
-} from "@/queries/beagle-search/query-keys";
+} from "@/queries/public/beagle/search/query-keys";
 import { homeStatisticsQueryKey } from "@/queries/home/query-keys";
 import { AdminMutationError } from "@/queries/admin/mutation-error";
 import {

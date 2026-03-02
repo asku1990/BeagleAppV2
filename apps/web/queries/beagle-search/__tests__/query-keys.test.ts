@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { BeagleSearchQueryState } from "@/lib/beagle-search";
+import type { BeagleSearchQueryState } from "@/lib/public/beagle/search";
 import {
   beagleNewestQueryKey,
   beagleNewestQueryKeyRoot,

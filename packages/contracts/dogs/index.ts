@@ -7,7 +7,7 @@ export type {
   BeagleSearchRow,
   BeagleSearchSex,
   BeagleSearchSort,
-} from "./beagle-search";
+} from "./search/beagle-search";
 
 export type {
   BeagleDogProfileDto,

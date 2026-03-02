@@ -12,12 +12,12 @@ import {
   formatBeagleRowsForClipboard,
   normalizeBirthYearInput,
   resolvePrimarySearchMode,
-} from "@/lib/beagle-search";
-import { useBeagleSearchUiState } from "@/hooks/beagle-search";
+} from "@/lib/public/beagle/search";
+import { useBeagleSearchUiState } from "@/hooks/public/beagle/search";
 import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
 import { useBeagleNewestQuery } from "@/queries/beagle-search/use-beagle-newest-query";
-import { useBeagleSearchQuery } from "@/queries/beagle-search/use-beagle-search-query";
+import { useBeagleSearchQuery } from "@/queries/public/beagle/search/use-beagle-search-query";
 import { BeagleSearchEmptyState } from "./beagle-search-empty-state";
 import { BeagleSearchForm } from "./beagle-search-form";
 import { BeagleSearchResultsDesktopTable } from "./beagle-search-results-desktop-table";

@@ -9,7 +9,7 @@ import type {
   BeaglePrimarySearchMode,
   BeagleSearchQueryState,
   BeagleSearchSort,
-} from "@/lib/beagle-search";
+} from "@/lib/public/beagle/search";
 import { BeagleSearchAdvancedFilters } from "./beagle-search-advanced-filters";
 
 const modeKeyMap: Record<BeaglePrimarySearchMode, MessageKey> = {

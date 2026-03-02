@@ -16,4 +16,4 @@ export {
   type BeagleSearchResponseDb,
   type BeagleSearchRowDb,
   type BeagleSearchSortDb,
-} from "./repository";
+} from "./search";

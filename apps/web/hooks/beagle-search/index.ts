@@ -1,1 +1,1 @@
-export * from "./use-beagle-search-ui-state";
+export * from "@/hooks/public/beagle/search";

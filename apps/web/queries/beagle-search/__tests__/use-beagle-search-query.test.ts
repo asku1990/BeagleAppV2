@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { BeagleSearchQueryState } from "@/lib/beagle-search";
+import type { BeagleSearchQueryState } from "@/lib/public/beagle/search";
 import { beagleSearchQueryKey } from "../query-keys";
 import { useBeagleSearchQuery } from "../use-beagle-search-query";
 
@@ -12,7 +12,7 @@ vi.mock("@tanstack/react-query", () => ({
   useQuery: useQueryMock,
 }));
 
-vi.mock("@/app/actions/beagle-search/search-dogs", () => ({
+vi.mock("@/app/actions/public/beagle/search/search-dogs", () => ({
   searchDogsAction: searchDogsActionMock,
 }));
 

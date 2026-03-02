@@ -3,4 +3,5 @@ export {
   beagleNewestQueryKeyRoot,
   beagleSearchQueryKey,
   beagleSearchQueryKeyRoot,
-} from "@/queries/public/beagle/search/query-keys";
+} from "./query-keys";
+export { useBeagleSearchQuery } from "./use-beagle-search-query";
