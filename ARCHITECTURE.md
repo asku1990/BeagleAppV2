@@ -66,17 +66,16 @@ Not allowed:
 - For `apps/web`: place custom React hooks under `apps/web/hooks/**` (prefer feature-scoped folders).
 - Query and mutation data-access hooks may live under `apps/web/queries/**` to keep read/write cache logic co-located with feature data APIs.
 - For `apps/web`: keep `apps/web/lib/**` for non-hook utilities/support code (helpers, types, constants, providers, etc.).
-- During ongoing normalization, use audience-aware folders for new `apps/web/lib` feature utilities:
+- Use audience-aware folders for `apps/web/lib` feature utilities:
   - `lib/<audience>/<domain>/<feature>/**`
 - For `apps/web` server actions and queries, prefer domain-first feature folders over flat domain files.
-- During ongoing normalization, use audience-aware folders for new public/admin transport code:
   - `app/actions/<audience>/<domain>/<feature>/**`
   - `queries/<audience>/<domain>/<feature>/**`
 
-## Ongoing refactor: folder consistency plan
+## Folder consistency status
 
-Current state includes mixed folder styles (`beagle-search/*` flat folders and feature folders like `admin/dogs/*` and `public/beagle/dogs/profile/*`).
-Refactor incrementally using the target structure below.
+Current state for dogs/public transport is normalized to audience/domain/feature folders.
+Keep this section as the canonical target when adding new features.
 
 ### Target structure by layer
 
@@ -101,7 +100,7 @@ Refactor incrementally using the target structure below.
   - Do not mirror web transport audiences with `public/**` in db.
   - `packages/db` must not import `packages/contracts`; DTO shaping belongs in `packages/server`.
 
-### Incremental migration policy (ongoing work)
+### Incremental migration policy
 
 - No big-bang rename required.
 - For new code, use the target structure immediately.
@@ -109,20 +108,38 @@ Refactor incrementally using the target structure below.
 - Keep each migration PR small and behavior-preserving (structure-only unless feature work requires behavior changes).
 - Maintain temporary re-export shims only when needed to keep imports stable during phased migration; remove shims once call sites are migrated.
 
-### Immediate migration targets
+### Current dogs examples
 
-- Move remaining public beagle transport/query code from flat folders:
-  - `apps/web/app/actions/beagle-search/*` -> `apps/web/app/actions/public/beagle/search/*`
-  - `apps/web/queries/beagle-search/*` -> `apps/web/queries/public/beagle/search/*`
-- Keep new profile feature additions under:
+- Public dogs search:
+  - `apps/web/app/actions/public/beagle/search/*`
+  - `apps/web/queries/public/beagle/search/*`
+  - `apps/web/hooks/public/beagle/search/*`
+  - `apps/web/lib/public/beagle/search/*`
+- Public dogs profile:
   - `apps/web/app/actions/public/beagle/dogs/profile/*`
   - `apps/web/queries/public/beagle/dogs/profile/*`
   - `apps/web/lib/public/beagle/dogs/profile/*`
   - `packages/contracts/dogs/profile/*`
   - `packages/server/dogs/profile/*`
   - `packages/db/dogs/profile/*`
-- Keep current `admin/*` structure as-is; it already matches target.
+- Dogs package feature folders:
+  - `packages/contracts/dogs/search/*`, `packages/contracts/dogs/newest/*`, `packages/contracts/dogs/profile/*`
+  - `packages/server/dogs/search/*`, `packages/server/dogs/newest/*`, `packages/server/dogs/profile/*`
+  - `packages/db/dogs/search/*`, `packages/db/dogs/newest/*`, `packages/db/dogs/profile/*`
+- `admin/*` structure remains valid as-is.
 - In `packages/db/dogs/*`, keep repository return types DB/domain-shaped; keep contract mapping in `packages/server/dogs/*`.
+
+## Helper placement rules
+
+- Default: keep helpers inside the feature folder that uses them.
+- Use `internal/*` inside a feature for helpers shared only within that feature.
+  - Example: `<domain>/<feature>/internal/*`
+- Use `<domain>/core/*` only for helpers shared by multiple features inside the same domain.
+  - Example: `packages/db/dogs/core/*`
+- Keep package-level `core/*` for runtime/foundation concerns only.
+  - Example: `packages/db/core/prisma.ts`
+- Avoid generic catch-all helper files like `utils.ts`.
+- Keep helper internals private by default; export only through intentional module entrypoints.
 
 ## React Query data-access conventions
 

@@ -1,1 +1,1 @@
-export { getNewestBeagleDogsDb } from "../repository";
+export { getNewestBeagleDogsDb } from "../search/repository";
