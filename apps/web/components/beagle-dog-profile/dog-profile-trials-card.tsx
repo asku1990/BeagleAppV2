@@ -25,7 +25,7 @@ function formatPoints(points: number | null): string {
     return FALLBACK_VALUE;
   }
 
-  return points.toFixed(1);
+  return points.toFixed(2);
 }
 
 function formatRank(rank: string | null): string {
@@ -36,21 +36,6 @@ function formatRank(rank: string | null): string {
   const trimmed = rank.trim();
   if (!trimmed) {
     return FALLBACK_VALUE;
-  }
-
-  const sourceCodeRank = /^s\s*(\d+)$/i.exec(trimmed);
-  if (sourceCodeRank) {
-    return `${sourceCodeRank[1]}.`;
-  }
-
-  const plainNumericRank = /^(\d+)$/.exec(trimmed);
-  if (plainNumericRank) {
-    return `${plainNumericRank[1]}.`;
-  }
-
-  const pairRank = /^(\d+)\s*\|\s*(\d+)$/.exec(trimmed);
-  if (pairRank) {
-    return `${pairRank[1]}/${pairRank[2]}`;
   }
 
   return trimmed;

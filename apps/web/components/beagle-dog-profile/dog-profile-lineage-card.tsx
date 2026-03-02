@@ -1,10 +1,13 @@
 import { ListingSectionShell } from "@/components/listing";
+import Link from "next/link";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
+import { getDogProfileHref } from "@/lib/public/beagle/dogs/profile";
 import type {
   BeagleDogProfileDto,
   BeagleDogProfileParentDto,
 } from "@beagle/contracts";
+import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { PedigreePairCard } from "./pedigree-pair-card";
 import { PedigreeTree } from "./pedigree-tree";
@@ -14,16 +17,50 @@ const FALLBACK_VALUE = "-";
 function formatPedigreeLine(
   parent: BeagleDogProfileParentDto | null,
   sexSymbol: "♂" | "♀",
-): string {
+): { text: string; id: string | null; ekNo: number | null } {
   if (!parent) {
-    return `${sexSymbol} ${FALLBACK_VALUE}`;
+    return { text: `${sexSymbol} ${FALLBACK_VALUE}`, id: null, ekNo: null };
   }
 
   if (!parent.registrationNo) {
-    return `${sexSymbol} ${FALLBACK_VALUE} ${parent.name}`;
+    return {
+      text: `${sexSymbol} ${FALLBACK_VALUE} ${parent.name}`,
+      id: parent.id ?? null,
+      ekNo: parent.ekNo ?? null,
+    };
   }
 
-  return `${sexSymbol} ${parent.registrationNo} ${parent.name}`;
+  return {
+    text: `${sexSymbol} ${parent.registrationNo} ${parent.name}`,
+    id: parent.id ?? null,
+    ekNo: parent.ekNo ?? null,
+  };
+}
+
+function renderPedigreeLine(line: {
+  text: string;
+  id: string | null;
+  ekNo: number | null;
+  shortEkLabel: string;
+}): ReactNode {
+  const ekSuffix =
+    line.ekNo == null ? "" : ` (${line.shortEkLabel}: ${String(line.ekNo)})`;
+
+  if (!line.id) {
+    return `${line.text}${ekSuffix}`;
+  }
+
+  return (
+    <>
+      <Link
+        className="underline-offset-2 hover:underline"
+        href={getDogProfileHref(line.id)}
+      >
+        {line.text}
+      </Link>
+      {ekSuffix}
+    </>
+  );
 }
 
 export function DogProfileLineageCard({
@@ -31,7 +68,8 @@ export function DogProfileLineageCard({
 }: {
   profile: BeagleDogProfileDto;
 }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const shortEkLabel = locale === "sv" ? "SSB" : "EK";
   const generations = profile.pedigree.map((generation) => ({
     generation: generation.generation,
     label: null,
@@ -47,14 +85,19 @@ export function DogProfileLineageCard({
           "text-center text-xs font-semibold",
           beagleTheme.mutedText,
         )}
-        renderNode={(card) => (
-          <PedigreePairCard
-            sireLine={formatPedigreeLine(card.sire, "♂")}
-            damLine={formatPedigreeLine(card.dam, "♀")}
-            sireSrLabel={`${t("dog.profile.field.sire")}: `}
-            damSrLabel={`${t("dog.profile.field.dam")}: `}
-          />
-        )}
+        renderNode={(card) => {
+          const sireLine = formatPedigreeLine(card.sire, "♂");
+          const damLine = formatPedigreeLine(card.dam, "♀");
+
+          return (
+            <PedigreePairCard
+              sireLine={renderPedigreeLine({ ...sireLine, shortEkLabel })}
+              damLine={renderPedigreeLine({ ...damLine, shortEkLabel })}
+              sireSrLabel={`${t("dog.profile.field.sire")}: `}
+              damSrLabel={`${t("dog.profile.field.dam")}: `}
+            />
+          );
+        }}
       />
     </ListingSectionShell>
   );
