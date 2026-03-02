@@ -1,1 +1,1 @@
-export * from "./date";
+export * from "@/lib/public/beagle/dogs/profile";
