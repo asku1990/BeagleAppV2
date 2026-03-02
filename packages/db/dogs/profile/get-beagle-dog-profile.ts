@@ -25,6 +25,7 @@ export type BeagleDogProfileTrialRowDb = {
   date: Date;
   weather: string | null;
   className: string | null;
+  classCode: string | null;
   rank: string | null;
   points: number | null;
   award: string | null;
@@ -253,9 +254,10 @@ export async function getBeagleDogProfileDb(
       date: trial.eventDate,
       weather: trial.ke,
       className: trial.eventName,
+      classCode: trial.lk,
       rank: trial.sija,
       points: trial.piste ? trial.piste.toNumber() : null,
-      award: trial.pa ? `BEAJ ${trial.pa}` : null,
+      award: trial.pa,
     })),
   };
 }

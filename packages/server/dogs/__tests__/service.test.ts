@@ -207,8 +207,8 @@ describe("dogs service", () => {
         {
           id: "show1",
           place: "City",
-          date: new Date("2022-01-01T00:00:00.000Z"),
-          result: "ERI",
+          date: new Date("2024-01-01T00:00:00.000Z"),
+          result: "JUN1",
           judge: "Judge",
           heightCm: 39,
         },
@@ -220,8 +220,10 @@ describe("dogs service", () => {
           date: new Date("2022-02-02T00:00:00.000Z"),
           weather: "P",
           className: "VOI",
+          classCode: "A",
           rank: "1",
           points: 85.5,
+          award: "1",
         },
       ],
     };
@@ -237,8 +239,21 @@ describe("dogs service", () => {
         data: {
           ...mockProfile,
           birthDate: "2020-01-01",
-          shows: [{ ...mockProfile.shows[0], date: "2022-01-01" }],
-          trials: [{ ...mockProfile.trials[0], date: "2022-02-02" }],
+          shows: [
+            { ...mockProfile.shows[0], date: "2024-01-01", result: "JUN-ERI" },
+          ],
+          trials: [
+            {
+              id: "trial1",
+              place: "Town",
+              date: "2022-02-02",
+              weather: "P",
+              className: "VOI",
+              rank: "1",
+              points: 85.5,
+              award: "Avo 1",
+            },
+          ],
         },
       },
     });
@@ -276,6 +291,7 @@ describe("dogs service", () => {
           date: new Date("2022-04-16T00:00:00+03:00"),
           weather: null,
           className: null,
+          classCode: null,
           rank: null,
           points: null,
           award: null,
@@ -295,7 +311,69 @@ describe("dogs service", () => {
           ...mockProfile,
           birthDate: "2020-01-01",
           shows: [{ ...mockProfile.shows[0], date: "2022-03-15" }],
-          trials: [{ ...mockProfile.trials[0], date: "2022-04-16" }],
+          trials: [
+            {
+              id: "trial2",
+              place: "Lahti",
+              date: "2022-04-16",
+              weather: null,
+              className: null,
+              rank: null,
+              points: null,
+              award: null,
+            },
+          ],
+        },
+      },
+    });
+  });
+
+  it("preserves non-code casing in show results", async () => {
+    const mockProfile = {
+      id: "dog-casing",
+      name: "Case Dog",
+      title: null,
+      registrationNo: "FI-7/21",
+      registrationNos: ["FI-7/21"],
+      birthDate: null,
+      sex: "N",
+      color: null,
+      ekNo: null,
+      inbreedingCoefficientPct: null,
+      sire: null,
+      dam: null,
+      pedigree: [],
+      shows: [
+        {
+          id: "show-case",
+          place: "City",
+          date: new Date("2024-02-01T00:00:00.000Z"),
+          result: "JUN1 (specialNote)",
+          judge: null,
+          heightCm: null,
+        },
+      ],
+      trials: [],
+    };
+    getBeagleDogProfileDbMock.mockResolvedValue(mockProfile);
+
+    const service = createDogsService();
+    const result = await service.getBeagleDogProfile("dog-casing");
+
+    expect(result).toEqual({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          ...mockProfile,
+          shows: [
+            {
+              ...mockProfile.shows[0],
+              date: "2024-02-01",
+              result: "JUN-ERI (specialNote)",
+            },
+          ],
+          trials: [],
         },
       },
     });
