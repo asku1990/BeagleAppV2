@@ -1,1 +1,1 @@
-export { createDogsService, dogsService } from "./search-beagle-dogs";
+export { createDogsService, dogsService } from "./service";

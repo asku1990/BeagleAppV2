@@ -1,1 +1,1 @@
-export { createDogsService, dogsService } from "../service";
+export { createDogsService, dogsService } from "./service";

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createDogsService } from "../service";
+import { createDogsService } from "../search";
 
 const {
   searchBeagleDogsDbMock,
