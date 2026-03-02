@@ -17,39 +17,49 @@ const FALLBACK_VALUE = "-";
 function formatPedigreeLine(
   parent: BeagleDogProfileParentDto | null,
   sexSymbol: "♂" | "♀",
-): { text: string; id: string | null } {
+): { text: string; id: string | null; ekNo: number | null } {
   if (!parent) {
-    return { text: `${sexSymbol} ${FALLBACK_VALUE}`, id: null };
+    return { text: `${sexSymbol} ${FALLBACK_VALUE}`, id: null, ekNo: null };
   }
 
   if (!parent.registrationNo) {
     return {
       text: `${sexSymbol} ${FALLBACK_VALUE} ${parent.name}`,
       id: parent.id ?? null,
+      ekNo: parent.ekNo ?? null,
     };
   }
 
   return {
     text: `${sexSymbol} ${parent.registrationNo} ${parent.name}`,
     id: parent.id ?? null,
+    ekNo: parent.ekNo ?? null,
   };
 }
 
 function renderPedigreeLine(line: {
   text: string;
   id: string | null;
+  ekNo: number | null;
+  shortEkLabel: string;
 }): ReactNode {
+  const ekSuffix =
+    line.ekNo == null ? "" : ` (${line.shortEkLabel}: ${String(line.ekNo)})`;
+
   if (!line.id) {
-    return line.text;
+    return `${line.text}${ekSuffix}`;
   }
 
   return (
-    <Link
-      className="underline-offset-2 hover:underline"
-      href={getDogProfileHref(line.id)}
-    >
-      {line.text}
-    </Link>
+    <>
+      <Link
+        className="underline-offset-2 hover:underline"
+        href={getDogProfileHref(line.id)}
+      >
+        {line.text}
+      </Link>
+      {ekSuffix}
+    </>
   );
 }
 
@@ -58,7 +68,8 @@ export function DogProfileLineageCard({
 }: {
   profile: BeagleDogProfileDto;
 }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const shortEkLabel = locale === "sv" ? "SSB" : "EK";
   const generations = profile.pedigree.map((generation) => ({
     generation: generation.generation,
     label: null,
@@ -74,14 +85,19 @@ export function DogProfileLineageCard({
           "text-center text-xs font-semibold",
           beagleTheme.mutedText,
         )}
-        renderNode={(card) => (
-          <PedigreePairCard
-            sireLine={renderPedigreeLine(formatPedigreeLine(card.sire, "♂"))}
-            damLine={renderPedigreeLine(formatPedigreeLine(card.dam, "♀"))}
-            sireSrLabel={`${t("dog.profile.field.sire")}: `}
-            damSrLabel={`${t("dog.profile.field.dam")}: `}
-          />
-        )}
+        renderNode={(card) => {
+          const sireLine = formatPedigreeLine(card.sire, "♂");
+          const damLine = formatPedigreeLine(card.dam, "♀");
+
+          return (
+            <PedigreePairCard
+              sireLine={renderPedigreeLine({ ...sireLine, shortEkLabel })}
+              damLine={renderPedigreeLine({ ...damLine, shortEkLabel })}
+              sireSrLabel={`${t("dog.profile.field.sire")}: `}
+              damSrLabel={`${t("dog.profile.field.dam")}: `}
+            />
+          );
+        }}
       />
     </ListingSectionShell>
   );

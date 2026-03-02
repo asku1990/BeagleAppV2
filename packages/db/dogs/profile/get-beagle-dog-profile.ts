@@ -7,6 +7,7 @@ export type BeagleDogProfileParentDb = {
   id: string;
   name: string;
   registrationNo: string | null;
+  ekNo: number | null;
 };
 
 export type BeagleDogProfilePedigreeCardDb = {
@@ -80,6 +81,7 @@ function mapParent(
   dog: {
     id: string;
     name: string;
+    ekNo?: number | null;
     registrations: { registrationNo: string; createdAt: Date }[];
   } | null,
 ): BeagleDogProfileParentDb | null {
@@ -92,6 +94,7 @@ function mapParent(
     id: dog.id,
     name: dog.name,
     registrationNo,
+    ekNo: dog.ekNo ?? null,
   };
 }
 

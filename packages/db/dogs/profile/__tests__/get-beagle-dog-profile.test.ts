@@ -240,6 +240,7 @@ describe("getBeagleDogProfileDb", () => {
       id: "sire-no-reg",
       name: "Sire Without Reg",
       registrationNo: null,
+      ekNo: null,
     });
   });
 
