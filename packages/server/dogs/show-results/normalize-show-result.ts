@@ -1,3 +1,16 @@
+const SHOW_GRADE_AWARDS = ["ERI", "EH", "H", "T", "EVA", "HYL"] as const;
+
+function replaceLegacyClassGrades(input: string, classPattern: string): string {
+  return input.replace(
+    new RegExp(`\\b(${classPattern})([1-6])\\b`, "gi"),
+    (_, cls, grade) => {
+      const idx = Number(grade) - 1;
+      const suffix = SHOW_GRADE_AWARDS[idx] ?? grade;
+      return `${String(cls).toUpperCase()}-${suffix}`;
+    },
+  );
+}
+
 export function normalizeShowResult(
   result: string | null,
   eventDateIsoDate: string,
@@ -17,20 +30,15 @@ export function normalizeShowResult(
     return trimmed;
   }
 
-  const normalizedLegacyGrades = trimmed
-    .replace(/\bVAKL\b/gi, "VAK")
-    .replace(/\b(JUN|NUO|AVO|VAL|VET)([1-6])\b/gi, (_, cls, grade) => {
-      const awards = ["ERI", "EH", "H", "T", "EVA", "HYL"] as const;
-      const idx = Number(grade) - 1;
-      const suffix = awards[idx] ?? grade;
-      return `${String(cls).toUpperCase()}-${suffix}`;
-    })
-    .replace(/\b(KÄY|KAY)([1-6])\b/gi, (_, cls, grade) => {
-      const awards = ["ERI", "EH", "H", "T", "EVA", "HYL"] as const;
-      const idx = Number(grade) - 1;
-      const suffix = awards[idx] ?? grade;
-      return `${String(cls).toUpperCase()}-${suffix}`;
-    });
+  const normalizedVak = trimmed.replace(/\bVAKL\b/gi, "VAK");
+  const normalizedMainClasses = replaceLegacyClassGrades(
+    normalizedVak,
+    "JUN|NUO|AVO|VAL|VET",
+  );
+  const normalizedLegacyGrades = replaceLegacyClassGrades(
+    normalizedMainClasses,
+    "KÄY|KAY",
+  );
 
   return normalizedLegacyGrades;
 }

@@ -118,6 +118,7 @@ describe("getBeagleDogProfileDb", () => {
       sire: {
         id: "sire1",
         name: "Sire Dog",
+        ekNo: 501,
         registrations: [makeRegistration("SIRE-REG", "2018-01-01")],
         sire: null,
         dam: null,
@@ -125,6 +126,7 @@ describe("getBeagleDogProfileDb", () => {
       dam: {
         id: "dam1",
         name: "Dam Dog",
+        ekNo: 777,
         registrations: [makeRegistration("DAM-REG", "2018-01-01")],
         sire: null,
         dam: null,
@@ -157,6 +159,8 @@ describe("getBeagleDogProfileDb", () => {
     expect(result?.pedigree).toHaveLength(2); // Gen 1 and Gen 2 (since sire/dam exist but their parents don't)
     expect(result?.pedigree[0].cards[0].sire?.name).toBe("Sire Dog");
     expect(result?.pedigree[0].cards[0].dam?.name).toBe("Dam Dog");
+    expect(result?.pedigree[0].cards[0].sire?.ekNo).toBe(501);
+    expect(result?.pedigree[0].cards[0].dam?.ekNo).toBe(777);
     expect(result?.pedigree[1].cards).toHaveLength(2);
     expect(result?.pedigree[1].cards[0].sire).toBeNull();
   });
