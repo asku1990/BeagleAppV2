@@ -18,6 +18,21 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.4.1] - 2026-03-02
+
+### Added
+
+### Changed
+
+- Koiran profiilin näyttely osiossa sarakejärjestys päivitettiin niin, että korkeus näytetään ennen tuomaria.
+- Koiran profiilin sukutaulussa vanhemmat toimivat profiililinkkeinä ja vanhemman EK/SSB-numero näytetään nimen perässä, kun arvo on saatavilla. Näin on mahdollista seurata sukutaulua eteenpäin.
+
+### Fixed
+
+- Koiran profiilin koetulosten palkinto sasarake noudattaa nyt vanhaa luokkalogiikkaa (`Avo` / `Voi` / `Beaj`) kovakoodatun `BEAJ`-prefiksin sijaan.
+
+### Removed
+
 ## [0.4.0] - 2026-02-27
 
 ### Added
