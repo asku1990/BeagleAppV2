@@ -75,14 +75,14 @@ export function DogProfileShowsCard({
                         {t("dog.profile.shows.col.result")}
                       </th>
                     )}
-                    {hasJudge && (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("dog.profile.shows.col.judge")}
-                      </th>
-                    )}
                     {hasHeight && (
                       <th className="px-2 py-2 font-semibold">
                         {t("dog.profile.shows.col.height")}
+                      </th>
+                    )}
+                    {hasJudge && (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("dog.profile.shows.col.judge")}
                       </th>
                     )}
                   </tr>
@@ -103,14 +103,14 @@ export function DogProfileShowsCard({
                           {row.result ?? FALLBACK_VALUE}
                         </td>
                       )}
-                      {hasJudge && (
-                        <td className="px-2 py-2">
-                          {row.judge ?? FALLBACK_VALUE}
-                        </td>
-                      )}
                       {hasHeight && (
                         <td className="px-2 py-2">
                           {formatHeight(row.heightCm)}
+                        </td>
+                      )}
+                      {hasJudge && (
+                        <td className="px-2 py-2">
+                          {row.judge ?? FALLBACK_VALUE}
                         </td>
                       )}
                     </tr>
@@ -157,20 +157,20 @@ export function DogProfileShowsCard({
                         <span>{row.result ?? FALLBACK_VALUE}</span>
                       </p>
                     )}
-                    {hasJudge && (
-                      <p className="col-span-2">
-                        <span className={beagleTheme.mutedText}>
-                          {t("dog.profile.shows.col.judge")}:
-                        </span>{" "}
-                        <span>{row.judge ?? FALLBACK_VALUE}</span>
-                      </p>
-                    )}
                     {hasHeight && (
                       <p className="col-span-2">
                         <span className={beagleTheme.mutedText}>
                           {t("dog.profile.shows.col.height")}:
                         </span>{" "}
                         <span>{formatHeight(row.heightCm)}</span>
+                      </p>
+                    )}
+                    {hasJudge && (
+                      <p className="col-span-2">
+                        <span className={beagleTheme.mutedText}>
+                          {t("dog.profile.shows.col.judge")}:
+                        </span>{" "}
+                        <span>{row.judge ?? FALLBACK_VALUE}</span>
                       </p>
                     )}
                   </div>
