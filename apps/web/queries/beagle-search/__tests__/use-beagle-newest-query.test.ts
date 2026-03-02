@@ -11,7 +11,7 @@ vi.mock("@tanstack/react-query", () => ({
   useQuery: useQueryMock,
 }));
 
-vi.mock("@/app/actions/beagle-search/get-newest-dogs", () => ({
+vi.mock("@/app/actions/public/beagle/search/get-newest-dogs", () => ({
   getNewestDogsAction: getNewestDogsActionMock,
 }));
 

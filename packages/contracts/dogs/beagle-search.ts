@@ -1,6 +1,4 @@
 export type {
-  BeagleNewestRequest,
-  BeagleNewestResponse,
   BeagleSearchMode,
   BeagleSearchRequest,
   BeagleSearchResponse,
@@ -8,3 +6,7 @@ export type {
   BeagleSearchSex,
   BeagleSearchSort,
 } from "./search/beagle-search";
+export type {
+  BeagleNewestRequest,
+  BeagleNewestResponse,
+} from "./newest/beagle-newest";

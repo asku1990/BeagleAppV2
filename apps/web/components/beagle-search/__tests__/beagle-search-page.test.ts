@@ -32,7 +32,7 @@ vi.mock("@/queries/public/beagle/search/use-beagle-search-query", () => ({
   useBeagleSearchQuery: useBeagleSearchQueryMock,
 }));
 
-vi.mock("@/queries/beagle-search/use-beagle-newest-query", () => ({
+vi.mock("@/queries/public/beagle/search/use-beagle-newest-query", () => ({
   useBeagleNewestQuery: useBeagleNewestQueryMock,
 }));
 

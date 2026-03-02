@@ -8,8 +8,8 @@ export {
   type BeagleDogProfileShowRowDb,
   type BeagleDogProfileTrialRowDb,
 } from "./profile/get-beagle-dog-profile";
+export { getNewestBeagleDogsDb } from "./newest";
 export {
-  getNewestBeagleDogsDb,
   searchBeagleDogsDb,
   type BeagleSearchModeDb,
   type BeagleSearchRequestDb,

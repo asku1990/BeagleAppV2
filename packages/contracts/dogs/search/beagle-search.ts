@@ -44,11 +44,3 @@ export type BeagleSearchResponse = {
   page: number;
   items: BeagleSearchRow[];
 };
-
-export type BeagleNewestRequest = {
-  limit?: number;
-};
-
-export type BeagleNewestResponse = {
-  items: BeagleSearchRow[];
-};

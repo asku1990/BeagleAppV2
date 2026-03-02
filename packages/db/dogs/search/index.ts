@@ -1,5 +1,4 @@
 export {
-  getNewestBeagleDogsDb,
   searchBeagleDogsDb,
   type BeagleSearchModeDb,
   type BeagleSearchRequestDb,

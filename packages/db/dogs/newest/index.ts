@@ -1,0 +1,1 @@
+export { getNewestBeagleDogsDb } from "./repository";
