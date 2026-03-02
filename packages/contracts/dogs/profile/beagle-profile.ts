@@ -1,6 +1,7 @@
 export type BeagleDogProfileSex = "U" | "N" | "-";
 
 export type BeagleDogProfileParentDto = {
+  id?: string;
   name: string;
   registrationNo: string | null;
 };

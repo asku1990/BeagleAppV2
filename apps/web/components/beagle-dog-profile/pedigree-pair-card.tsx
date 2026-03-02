@@ -1,9 +1,10 @@
+import type { ReactNode } from "react";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { cn } from "@/lib/utils";
 
 type PedigreePairCardProps = {
-  sireLine: string;
-  damLine: string;
+  sireLine: ReactNode;
+  damLine: ReactNode;
   sireSrLabel: string;
   damSrLabel: string;
   className?: string;

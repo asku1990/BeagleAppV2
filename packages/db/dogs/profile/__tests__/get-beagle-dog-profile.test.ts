@@ -237,6 +237,7 @@ describe("getBeagleDogProfileDb", () => {
     const result = await getBeagleDogProfileDb("dog4");
 
     expect(result?.sire).toEqual({
+      id: "sire-no-reg",
       name: "Sire Without Reg",
       registrationNo: null,
     });

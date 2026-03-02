@@ -30,16 +30,20 @@ describe("BeagleDogProfilePage", () => {
           color: null,
           ekNo: 11,
           inbreedingCoefficientPct: null,
-          sire: { name: "Sire", registrationNo: "SIRE-1" },
-          dam: { name: "Dam", registrationNo: "DAM-1" },
+          sire: { id: "sire_1", name: "Sire", registrationNo: "SIRE-1" },
+          dam: { id: "dam_1", name: "Dam", registrationNo: "DAM-1" },
           pedigree: [
             {
               generation: 1,
               cards: [
                 {
                   id: "g1",
-                  sire: { name: "Sire", registrationNo: "SIRE-1" },
-                  dam: { name: "Dam", registrationNo: "DAM-1" },
+                  sire: {
+                    id: "sire_1",
+                    name: "Sire",
+                    registrationNo: "SIRE-1",
+                  },
+                  dam: { id: "dam_1", name: "Dam", registrationNo: "DAM-1" },
                 },
               ],
             },
@@ -77,6 +81,8 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain("dog.profile.card.lineage.title");
     expect(html).toContain("dog.profile.card.shows.title");
     expect(html).toContain("dog.profile.card.trials.title");
+    expect(html).toContain('href="/beagle/dogs/sire_1"');
+    expect(html).toContain('href="/beagle/dogs/dam_1"');
   });
 
   it("renders empty state text when shows or trials are missing", () => {

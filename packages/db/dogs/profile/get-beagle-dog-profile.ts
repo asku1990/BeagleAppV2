@@ -4,6 +4,7 @@ import { prisma } from "../../core/prisma";
 export type BeagleDogProfileSexDb = "U" | "N" | "-";
 
 export type BeagleDogProfileParentDb = {
+  id: string;
   name: string;
   registrationNo: string | null;
 };
@@ -77,6 +78,7 @@ function getPrimaryRegistrationNo(
 
 function mapParent(
   dog: {
+    id: string;
     name: string;
     registrations: { registrationNo: string; createdAt: Date }[];
   } | null,
@@ -87,6 +89,7 @@ function mapParent(
       ? getPrimaryRegistrationNo(dog.registrations)
       : null;
   return {
+    id: dog.id,
     name: dog.name,
     registrationNo,
   };
