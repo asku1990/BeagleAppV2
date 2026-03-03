@@ -20,7 +20,7 @@ vi.mock("@tanstack/react-query", () => ({
   useQueryClient: useQueryClientMock,
 }));
 
-vi.mock("@/app/actions/admin/set-admin-user-password", () => ({
+vi.mock("@/app/actions/admin/users/manage/set-admin-user-password", () => ({
   setAdminUserPasswordAction: setAdminUserPasswordActionMock,
 }));
 

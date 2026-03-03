@@ -5,7 +5,7 @@ import type {
   DeleteAdminUserResponse,
 } from "@beagle/contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteAdminUserAction } from "@/app/actions/admin/delete-admin-user";
+import { deleteAdminUserAction } from "@/app/actions/admin/users/manage/delete-admin-user";
 import { AdminMutationError } from "./mutation-error";
 import { adminUsersQueryKey } from "./query-keys";
 

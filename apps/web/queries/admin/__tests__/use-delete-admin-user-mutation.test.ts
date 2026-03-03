@@ -20,7 +20,7 @@ vi.mock("@tanstack/react-query", () => ({
   useQueryClient: useQueryClientMock,
 }));
 
-vi.mock("@/app/actions/admin/delete-admin-user", () => ({
+vi.mock("@/app/actions/admin/users/manage/delete-admin-user", () => ({
   deleteAdminUserAction: deleteAdminUserActionMock,
 }));
 

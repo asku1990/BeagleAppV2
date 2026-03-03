@@ -5,7 +5,7 @@ import type {
   CreateAdminUserResponse,
 } from "@beagle/contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createAdminUserAction } from "@/app/actions/admin/create-admin-user";
+import { createAdminUserAction } from "@/app/actions/admin/users/manage/create-admin-user";
 import { AdminMutationError } from "./mutation-error";
 import { adminUsersQueryKey } from "./query-keys";
 

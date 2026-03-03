@@ -5,7 +5,7 @@ import type {
   SetAdminUserStatusResponse,
 } from "@beagle/contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { setAdminUserStatusAction } from "@/app/actions/admin/set-admin-user-status";
+import { setAdminUserStatusAction } from "@/app/actions/admin/users/manage/set-admin-user-status";
 import { AdminMutationError } from "./mutation-error";
 import { adminUsersQueryKey } from "./query-keys";
 

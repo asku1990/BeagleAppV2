@@ -20,7 +20,7 @@ vi.mock("@tanstack/react-query", () => ({
   useQueryClient: useQueryClientMock,
 }));
 
-vi.mock("@/app/actions/admin/create-admin-user", () => ({
+vi.mock("@/app/actions/admin/users/manage/create-admin-user", () => ({
   createAdminUserAction: createAdminUserActionMock,
 }));
 

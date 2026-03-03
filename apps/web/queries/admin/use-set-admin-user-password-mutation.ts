@@ -5,7 +5,7 @@ import type {
   SetAdminUserPasswordResponse,
 } from "@beagle/contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { setAdminUserPasswordAction } from "@/app/actions/admin/set-admin-user-password";
+import { setAdminUserPasswordAction } from "@/app/actions/admin/users/manage/set-admin-user-password";
 import { AdminMutationError } from "./mutation-error";
 import { adminUsersQueryKey } from "./query-keys";
 
