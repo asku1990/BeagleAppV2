@@ -466,6 +466,15 @@ describe("dogs service", () => {
     });
   });
 
+  it("trims dogId before profile DB call", async () => {
+    getBeagleDogProfileDbMock.mockResolvedValue(null);
+
+    const service = createDogsService();
+    await service.getBeagleDogProfile(" dog-casing ");
+
+    expect(getBeagleDogProfileDbMock).toHaveBeenCalledWith("dog-casing");
+  });
+
   it("returns 500 when profile DB call throws", async () => {
     getBeagleDogProfileDbMock.mockRejectedValue(new Error("db fail"));
     const service = createDogsService();

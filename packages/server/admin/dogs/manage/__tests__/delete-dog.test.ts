@@ -30,6 +30,8 @@ describe("deleteAdminDog", () => {
         code: "INVALID_DOG_ID",
       },
     });
+
+    expect(deleteAdminDogWriteDbMock).not.toHaveBeenCalled();
   });
 
   it("returns 404 when dog is not found", async () => {

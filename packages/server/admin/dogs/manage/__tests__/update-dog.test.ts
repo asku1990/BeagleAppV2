@@ -52,6 +52,9 @@ describe("updateAdminDog", () => {
         code: "INVALID_DOG_ID",
       },
     });
+
+    expect(updateAdminDogWriteDbMock).not.toHaveBeenCalled();
+    expect(findDogByIdDbMock).not.toHaveBeenCalled();
   });
 
   it("returns 400 for empty registration number", async () => {

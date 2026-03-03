@@ -1,7 +1,7 @@
 "use server";
 
 import type { BeagleDogProfileDto } from "@beagle/contracts";
-import { dogsService, toErrorLog } from "@beagle/server";
+import { dogsService, parseDogId, toErrorLog } from "@beagle/server";
 import { createActionLogger } from "@/lib/server/action-logger";
 
 export type GetDogProfileActionResult = {
@@ -10,17 +10,6 @@ export type GetDogProfileActionResult = {
   status: number;
   error?: string;
 };
-
-function parseDogId(value: string): string | null {
-  const normalized = value.trim();
-  if (!normalized) {
-    return null;
-  }
-  if (!/^[A-Za-z0-9_-]{3,64}$/u.test(normalized)) {
-    return null;
-  }
-  return normalized;
-}
 
 export async function getDogProfileAction(
   dogId: string,
