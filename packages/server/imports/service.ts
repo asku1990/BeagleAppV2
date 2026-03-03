@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import {
   type AuditContextDb,
   ImportKind,
@@ -114,7 +115,7 @@ function extractRegistrationPrefix(registrationNo: string): string | null {
 
 function isFinnishRegistration(registrationNo: string): boolean {
   const prefix = extractRegistrationPrefix(registrationNo);
-  return prefix != null && FINNISH_REGISTRATION_PREFIXES.has(prefix);
+  return FINNISH_REGISTRATION_PREFIXES.has(prefix ?? "");
 }
 
 function resolvePreferredFinnishRegistration(
@@ -846,12 +847,10 @@ export function createImportsService() {
                 select: { id: true, registrationNo: true },
               },
             );
-            const finnishRow = preferredFinnishRegistration
-              ? await prisma.dogRegistration.findUnique({
-                  where: { registrationNo: preferredFinnishRegistration },
-                  select: { id: true, dogId: true },
-                })
-              : null;
+            const finnishRow = await prisma.dogRegistration.findUnique({
+              where: { registrationNo: preferredFinnishRegistration },
+              select: { id: true, dogId: true },
+            });
 
             if (
               firstRegistrationRow &&
@@ -860,20 +859,22 @@ export function createImportsService() {
               finnishRow &&
               finnishRow.dogId === canonicalDogId
             ) {
-              const temporaryRegistrationNo = `TMP-${canonicalDogId}-${samakoiraProcessed}`;
+              const temporaryRegistrationNo = `TMP-${randomUUID()}`;
               const previousFirstRegistrationNo =
                 firstRegistrationRow.registrationNo;
+              const firstRegistrationRowId = firstRegistrationRow.id;
+              const finnishRowId = finnishRow.id;
               await prisma.$transaction(async (tx) => {
                 await tx.dogRegistration.update({
-                  where: { id: finnishRow.id },
+                  where: { id: finnishRowId },
                   data: { registrationNo: temporaryRegistrationNo },
                 });
                 await tx.dogRegistration.update({
-                  where: { id: firstRegistrationRow.id },
+                  where: { id: firstRegistrationRowId },
                   data: { registrationNo: preferredFinnishRegistration },
                 });
                 await tx.dogRegistration.update({
-                  where: { id: finnishRow.id },
+                  where: { id: finnishRowId },
                   data: { registrationNo: previousFirstRegistrationNo },
                 });
               });
