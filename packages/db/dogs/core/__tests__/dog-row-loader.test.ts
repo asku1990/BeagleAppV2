@@ -100,8 +100,8 @@ describe("dogs/core/dog-row-loader", () => {
     expect(rows).toHaveLength(3);
     expect(rows[0]).toMatchObject({
       id: "dog-1",
-      registrationNos: ["FI-101/25", "FI-100/24"],
-      primaryRegistrationNo: "FI-101/25",
+      registrationNos: ["FI-100/24", "FI-101/25"],
+      primaryRegistrationNo: "FI-100/24",
       sire: "FI-1/20 Sire Name",
       dam: "Dam Name",
       trialCount: 2,

@@ -72,7 +72,7 @@ function getPrimaryRegistrationNo(
   if (registrations.length === 0) return "-";
   return (
     [...registrations].sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+      (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
     )[0]?.registrationNo ?? "-"
   );
 }

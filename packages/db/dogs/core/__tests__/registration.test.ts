@@ -15,7 +15,7 @@ describe("dogs/core/registration", () => {
     expect(compareByRegistrationDesc("abc", "def")).toBeGreaterThan(0);
   });
 
-  it("sorts rows by createdAt first and then registration order", () => {
+  it("sorts rows by oldest createdAt first and then registration order", () => {
     const rows = sortRegistrationsDesc([
       { registrationNo: "FI-10/24", createdAt: new Date("2026-01-01") },
       { registrationNo: "FI-11/24", createdAt: new Date("2026-01-01") },
@@ -23,9 +23,9 @@ describe("dogs/core/registration", () => {
     ]);
 
     expect(rows.map((row) => row.registrationNo)).toEqual([
-      "FI-12/24",
-      "FI-11/24",
       "FI-10/24",
+      "FI-11/24",
+      "FI-12/24",
     ]);
   });
 

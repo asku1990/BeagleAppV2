@@ -55,9 +55,9 @@ function compareRegistrationRowsDesc(
   right: RegistrationRow,
 ): number {
   const createdComparison =
-    right.createdAt.getTime() - left.createdAt.getTime();
+    left.createdAt.getTime() - right.createdAt.getTime();
   if (createdComparison !== 0) return createdComparison;
-  return compareByRegistrationDesc(left.registrationNo, right.registrationNo);
+  return compareByRegistrationDesc(right.registrationNo, left.registrationNo);
 }
 
 export function sortRegistrationsDesc(
