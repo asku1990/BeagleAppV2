@@ -9,8 +9,8 @@ import type {
   UpdateAdminDogRequest,
   UpdateAdminDogResponse,
 } from "@beagle/contracts";
-import { toErrorLog, withLogContext } from "../../../shared/logger";
-import type { ServiceResult } from "../../../shared/result";
+import { toErrorLog, withLogContext } from "../../../core/logger";
+import type { ServiceResult } from "../../../core/result";
 import {
   hasMaxLength,
   isValidRegistrationNo,

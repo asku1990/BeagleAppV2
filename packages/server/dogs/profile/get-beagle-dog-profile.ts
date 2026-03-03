@@ -2,9 +2,9 @@ import { getBeagleDogProfileDb, type BeagleDogProfileDb } from "@beagle/db";
 import type { BeagleDogProfileDto } from "@beagle/contracts";
 import { normalizeShowResult } from "../show-results";
 import { formatTrialAward } from "../trial-results";
-import { toBusinessDateOnly } from "../../shared/date-only";
-import { toErrorLog, withLogContext } from "../../shared/logger";
-import type { ServiceResult } from "../../shared/result";
+import { toBusinessDateOnly } from "../../core/date-only";
+import { toErrorLog, withLogContext } from "../../core/logger";
+import type { ServiceResult } from "../../core/result";
 
 export type DogsServiceLogContext = {
   requestId?: string;
