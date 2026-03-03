@@ -1,4 +1,4 @@
 export {
   getHomeStatisticsSnapshot,
   type HomeStatisticsSnapshot,
-} from "./home/statistics/get-home-statistics-snapshot";
+} from "./get-home-statistics-snapshot";

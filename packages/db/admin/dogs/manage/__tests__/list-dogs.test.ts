@@ -17,7 +17,7 @@ const { dogCountMock, dogFindManyMock, prismaMock } = vi.hoisted(() => {
   };
 });
 
-vi.mock("../../../core/prisma", () => ({
+vi.mock("../../../../core/prisma", () => ({
   prisma: prismaMock,
 }));
 

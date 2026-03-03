@@ -1,4 +1,4 @@
 export {
   getAdminOwnerOptionsAction,
-  type GetAdminOwnerOptionsActionResult,
+  type AdminOwnerOptionsActionResult as GetAdminOwnerOptionsActionResult,
 } from "@/app/actions/admin/dogs/lookups/get-admin-owner-options";
