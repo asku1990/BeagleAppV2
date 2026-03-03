@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   BEAGLE_ROW_ACTIONS,
   type BeagleSearchQuickAction,
-} from "@/lib/beagle-search";
+} from "@/lib/public/beagle/search";
 import type { MessageKey } from "@/lib/i18n";
 import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";

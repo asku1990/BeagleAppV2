@@ -8,12 +8,12 @@ export {
   type BeagleDogProfileShowRowDb,
   type BeagleDogProfileTrialRowDb,
 } from "./profile/get-beagle-dog-profile";
+export { getNewestBeagleDogsDb } from "./newest";
 export {
-  getNewestBeagleDogsDb,
   searchBeagleDogsDb,
   type BeagleSearchModeDb,
   type BeagleSearchRequestDb,
   type BeagleSearchResponseDb,
   type BeagleSearchRowDb,
   type BeagleSearchSortDb,
-} from "./repository";
+} from "./search";

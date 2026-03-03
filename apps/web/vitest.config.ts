@@ -16,13 +16,13 @@ export default defineConfig({
     coverage: {
       include: [
         "app/actions/admin/**/*.ts",
-        "app/actions/home/**/*.ts",
+        "app/actions/public/home/**/*.ts",
         "app/api/**/*.ts",
         "components/beagle-search/**/*.tsx",
         "components/home/**/*.tsx",
-        "hooks/beagle-search/**/*.ts",
+        "hooks/public/beagle/search/**/*.ts",
         "hooks/i18n/**/*.ts",
-        "lib/beagle-search/**/*.ts",
+        "lib/public/beagle/search/**/*.ts",
         "lib/i18n/**/*.ts",
         "lib/server/**/*.ts",
         "queries/**/*.ts",

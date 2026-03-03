@@ -35,10 +35,7 @@ export {
   type LegacyPhase1Rows,
 } from "./legacy/source";
 
-export {
-  getHomeStatisticsSnapshot,
-  type HomeStatisticsSnapshot,
-} from "./stats";
+export { getHomeStatisticsSnapshot, type HomeStatisticsSnapshot } from "./home";
 
 export {
   getBeagleDogProfileDb,

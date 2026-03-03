@@ -22,7 +22,7 @@ vi.mock("@/hooks/i18n", () => ({
   }),
 }));
 
-vi.mock("@/queries/home/use-home-statistics-query", () => ({
+vi.mock("@/queries/public/home/statistics/use-home-statistics-query", () => ({
   useHomeStatisticsQuery: () => ({
     data: mockedQueryData,
     isError: mockedQueryIsError,

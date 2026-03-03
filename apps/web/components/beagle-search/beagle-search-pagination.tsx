@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { beagleTheme } from "@/components/ui/beagle-theme";
-import { BEAGLE_PAGE_SIZE_OPTIONS } from "@/lib/beagle-search";
+import { BEAGLE_PAGE_SIZE_OPTIONS } from "@/lib/public/beagle/search";
 import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
 

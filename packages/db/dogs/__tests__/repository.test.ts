@@ -31,7 +31,8 @@ vi.mock("../../core/prisma", () => ({
   prisma: prismaMock,
 }));
 
-import { getNewestBeagleDogsDb, searchBeagleDogsDb } from "../repository";
+import { getNewestBeagleDogsDb } from "../newest";
+import { searchBeagleDogsDb } from "../search";
 
 function makeDogRow(input: {
   id: string;

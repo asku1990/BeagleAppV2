@@ -1,4 +1,4 @@
-export { createDogsService, dogsService } from "./service";
+export { createDogsService, dogsService } from "./search";
 export {
   getBeagleDogProfileService,
   type DogsServiceLogContext,

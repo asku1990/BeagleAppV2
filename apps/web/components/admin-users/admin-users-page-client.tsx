@@ -22,7 +22,7 @@ import {
   useDeleteAdminUserMutation,
   useSetAdminUserPasswordMutation,
   useSetAdminUserStatusMutation,
-} from "@/queries/admin";
+} from "@/queries/admin/users/manage";
 import { AdminUserSearch } from "./admin-user-search";
 
 export function AdminUsersPageClient() {

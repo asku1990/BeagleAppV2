@@ -1,13 +1,15 @@
 export type {
-  BeagleNewestRequest,
-  BeagleNewestResponse,
   BeagleSearchMode,
   BeagleSearchRequest,
   BeagleSearchResponse,
   BeagleSearchRow,
   BeagleSearchSex,
   BeagleSearchSort,
-} from "./beagle-search";
+} from "./search/beagle-search";
+export type {
+  BeagleNewestRequest,
+  BeagleNewestResponse,
+} from "./newest/beagle-newest";
 
 export type {
   BeagleDogProfileDto,

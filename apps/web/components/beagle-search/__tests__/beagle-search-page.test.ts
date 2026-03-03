@@ -24,15 +24,15 @@ vi.mock("@/hooks/i18n", () => ({
   }),
 }));
 
-vi.mock("@/hooks/beagle-search", () => ({
+vi.mock("@/hooks/public/beagle/search", () => ({
   useBeagleSearchUiState: useBeagleSearchUiStateMock,
 }));
 
-vi.mock("@/queries/beagle-search/use-beagle-search-query", () => ({
+vi.mock("@/queries/public/beagle/search/use-beagle-search-query", () => ({
   useBeagleSearchQuery: useBeagleSearchQueryMock,
 }));
 
-vi.mock("@/queries/beagle-search/use-beagle-newest-query", () => ({
+vi.mock("@/queries/public/beagle/search/use-beagle-newest-query", () => ({
   useBeagleNewestQuery: useBeagleNewestQueryMock,
 }));
 

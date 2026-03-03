@@ -1,1 +1,1 @@
-export type { HomeStatisticsResponse } from "./home-statistics-response";
+export type { HomeStatisticsResponse } from "./statistics/home-statistics-response";

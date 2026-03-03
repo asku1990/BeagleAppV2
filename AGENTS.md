@@ -1,98 +1,74 @@
 # AGENTS.md
 
-Agent instructions for working in this repository.
+Agent operating rules for this repository.
 
-## Source Of Truth
+## Source of truth
 
-- Follow `/Users/akikuivas/personal-projects/beagle/beagle-app-v2/ARCHITECTURE.md` for architecture and dependency boundaries.
-- If this file and architecture guidance conflict, prefer architecture constraints and note the conflict in your response.
+- Architecture and dependency boundaries are defined in [ARCHITECTURE.md](/Users/akikuivas/personal-projects/beagle/beagle-app-v2/ARCHITECTURE.md).
+- If this file and architecture guidance conflict, follow `ARCHITECTURE.md` and mention the conflict in your response.
 
-## Working Style
+## Working style
 
-- Make focused changes with minimal blast radius.
-- Prefer opportunistic refactors: when introducing cross-cutting improvements (for example logging), update files you are already modifying and defer untouched areas.
-- Structured server logging standard is `pino`; when touching server actions/use-cases, use the shared logger and replace adjacent legacy `console.*` in the same file.
-- When you add server logging around input parameters (search filters, IDs, etc.), validate those fields (e.g., normalize/parse registration numbers through `parseRegistrationNo`) and log a warning/failure before calling downstream services or the DB.
-- Prefer small files and clear names over large multi-purpose files.
-- Prefer one primary function/use-case per file.
-- Re-export public module APIs via `index.ts`.
-- Keep internal helpers private; do not re-export everything by default.
+- Keep changes focused with minimal blast radius.
+- Prefer opportunistic refactors only in files you already touch.
+- Preserve behavior unless behavior changes are explicitly requested.
+- Prefer small files and clear names; one primary use-case/function per file when practical.
+- Re-export public module APIs through `index.ts` entrypoints.
+- Keep internal helpers private; do not re-export by default.
 
-## Monorepo Boundaries
+## Server logging rule
 
-- `apps/web` UI/client code can depend on: `packages/api-client`, `packages/contracts`.
-- `apps/web` API transport code (`app/api/**`, `lib/server/**`) can depend on: `packages/server`, `packages/contracts`.
-- `packages/server` can depend on: `packages/domain`, `packages/db`, `packages/auth`, `packages/contracts`.
-- Do not put business logic in API route handlers.
+- Structured logging standard is `pino`.
+- When touching server actions/use-cases, use the shared logger and replace adjacent `console.*` in the same file.
+- When logging user input parameters (IDs, filters, registration numbers), validate/normalize first and log warning/failure before downstream calls.
+
+## Web implementation rules
+
+- Custom React hooks belong in `apps/web/hooks/**`.
+- Non-hook utilities/types/constants belong in `apps/web/lib/**`.
+- Query/mutation hooks may live in `apps/web/queries/**`.
+- Prefer feature-local query key constants over inline query key arrays.
+
+## Boundaries to enforce
+
 - Do not import `packages/server` or `packages/db` into `apps/web` UI/client code.
+- Do not place business logic in API route handlers.
+- Keep business rules in `packages/server`.
 
-## Utility Code (`lib`)
+## Validation rules
 
-- In this repo, `lib` folders/files are utility/support code.
-- Keep utilities close to the feature/package that uses them.
-- Create shared utilities only when reused in multiple places.
-- Avoid generic catch-all files like `utils.ts` with unrelated helpers.
-- Do not place custom React hooks under `apps/web/lib/**`.
+- Run targeted checks for touched code.
+- If checks are not run, state that explicitly.
+- CI note: if Turbo task chains include `build` (for example via `test:e2e`), required env vars must be present in CI and forwarded via `turbo.json` `globalEnv`.
 
-## Hooks (`apps/web/hooks`)
-
-- Place custom React hooks for `apps/web` under `apps/web/hooks/**` (feature-scoped subfolders are preferred).
-- Import hooks from `@/hooks/**`.
-- Keep non-hook helpers, types, and constants in `apps/web/lib/**`.
-- Query hooks in `apps/web/queries/**` are allowed to stay there unless explicitly refactored.
-
-## Web Feature Foldering (`apps/web`)
-
-- Prefer domain-first folders for transport/data layers:
-  - Server Actions: `apps/web/app/actions/<domain>/<feature>/**` (example: `app/actions/admin/dogs/**`).
-  - Query hooks: `apps/web/queries/<domain>/<feature>/**` (example: `queries/admin/dogs/**`).
-  - Contracts: `packages/contracts/<domain>/<feature>/**` (example: `packages/contracts/admin/dogs/**`).
-  - I18n messages: `apps/web/lib/i18n/messages/<domain>/<feature>/**` (example: `messages/admin/dogs/*`).
-- Avoid mixing multiple features in a flat domain folder once feature-specific files exist. Keep `admin/users` and `admin/dogs` separated.
-- When touching files in a mixed folder, move the touched feature files into a dedicated subfolder in the same change.
-- Keep feature-local `query-keys.ts` inside the same feature folder; do not place unrelated feature keys in shared domain `query-keys.ts`.
-- Keep tests co-located under each feature folder `__tests__/`.
-
-## Implementation Preferences
-
-- Keep business rules in `packages/server` (and shared domain concepts in `packages/domain`).
-- Keep UI components presentational when possible; call typed clients for data access.
-- For TanStack Query writes in `apps/web`, use feature mutation hooks and invalidate impacted query keys on success.
-- Prefer shared query key constants (for example `query-keys.ts`) instead of inline query key arrays.
-- Preserve existing naming and folder conventions unless a refactor is explicitly requested.
-
-## Validation
-
-- Run targeted checks for touched code when possible.
-- If tests/checks are not run, explicitly say so in the final response.
-- CI note: when a Turbo task chain includes `build` (for example via `test:e2e`), any build-time required environment variables must be provided in CI job env and forwarded through `turbo.json` `globalEnv`.
-
-## Release & Changelog Rules
+## Release and versioning rules
 
 - Source of truth for release communication is root `CHANGELOG.md`.
-- Add user-visible changes directly to a dated version block:
+- Add user-visible changes under a dated version block:
   - `## [x.y.z] - YYYY-MM-DD`
-  - Keep sections: `Added`, `Changed`, `Fixed`, `Removed`.
-- Important: web "Mitä uutta" reads only versioned blocks, not `Unreleased`.
-  - Parsing code: `apps/web/lib/release-notes/latest.ts`
-  - UI page: `apps/web/app/(public)/whats-new/page.tsx`
+  - Sections: `Added`, `Changed`, `Fixed`, `Removed`.
+- Web “Mitä uutta” reads only versioned blocks (not `Unreleased`):
+  - `apps/web/lib/release-notes/latest.ts`
+  - `apps/web/app/(public)/whats-new/page.tsx`
 
-### Version Alignment
+### Workspace version alignment
 
-- Keep all workspace package versions aligned to the same version:
-  - `package.json`
-  - `apps/web/package.json`
-  - `packages/api-client/package.json`
-  - `packages/auth/package.json`
-  - `packages/config-eslint/package.json`
-  - `packages/config-typescript/package.json`
-  - `packages/contracts/package.json`
-  - `packages/db/package.json`
-  - `packages/server/package.json`
-- Do not edit generated `apps/web/.next/**/package.json` files.
+Keep all workspace versions aligned:
 
-## Test Conventions
+- `package.json`
+- `apps/web/package.json`
+- `packages/api-client/package.json`
+- `packages/auth/package.json`
+- `packages/config-eslint/package.json`
+- `packages/config-typescript/package.json`
+- `packages/contracts/package.json`
+- `packages/db/package.json`
+- `packages/server/package.json`
 
-- Place unit and integration tests in `__tests__/` folders next to the relevant feature/module.
-- Place global Playwright e2e tests in root `tests/e2e/`.
-- Keep test refactors structure-only unless behavior changes are explicitly requested.
+Do not edit generated `apps/web/.next/**/package.json` files.
+
+## Test conventions
+
+- Unit/integration tests should be co-located under `__tests__/` near the feature/module.
+- Playwright e2e tests should live in root `tests/e2e/`.
+- Keep test refactors structure-only unless behavior changes are requested.
