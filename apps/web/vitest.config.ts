@@ -16,7 +16,7 @@ export default defineConfig({
     coverage: {
       include: [
         "app/actions/admin/**/*.ts",
-        "app/actions/home/**/*.ts",
+        "app/actions/public/home/**/*.ts",
         "app/api/**/*.ts",
         "components/beagle-search/**/*.tsx",
         "components/home/**/*.tsx",

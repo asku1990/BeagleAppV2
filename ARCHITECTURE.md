@@ -126,7 +126,28 @@ Keep this section as the canonical target when adding new features.
   - `packages/contracts/dogs/search/*`, `packages/contracts/dogs/newest/*`, `packages/contracts/dogs/profile/*`
   - `packages/server/dogs/search/*`, `packages/server/dogs/newest/*`, `packages/server/dogs/profile/*`
   - `packages/db/dogs/search/*`, `packages/db/dogs/newest/*`, `packages/db/dogs/profile/*`
-- `admin/*` structure remains valid as-is.
+- Admin users and dogs are feature-scoped:
+  - `apps/web/app/actions/admin/users/manage/*`
+  - `apps/web/queries/admin/users/manage/*`
+  - `apps/web/app/actions/admin/dogs/manage/*`
+  - `apps/web/app/actions/admin/dogs/lookups/*`
+  - `apps/web/queries/admin/dogs/manage/*`
+  - `apps/web/queries/admin/dogs/lookups/*`
+  - `packages/contracts/admin/users/manage/*`
+  - `packages/contracts/admin/dogs/manage/*`
+  - `packages/contracts/admin/dogs/lookups/*`
+  - `packages/server/admin/users/manage/*`
+  - `packages/server/admin/dogs/manage/*`
+  - `packages/server/admin/dogs/lookups/*`
+  - `packages/db/admin/users/manage/*`
+  - `packages/db/admin/dogs/manage/*`
+  - `packages/db/admin/dogs/lookups/*`
+- Home statistics is feature-scoped:
+  - `apps/web/app/actions/public/home/statistics/*`
+  - `apps/web/queries/public/home/statistics/*`
+  - `packages/contracts/home/statistics/*`
+  - `packages/server/stats/home/statistics/*`
+  - `packages/db/stats/home/statistics/*`
 - In `packages/db/dogs/*`, keep repository return types DB/domain-shaped; keep contract mapping in `packages/server/dogs/*`.
 
 ## Helper placement rules
