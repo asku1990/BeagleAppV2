@@ -10,7 +10,7 @@ import {
   type SetAdminUserPasswordRequest,
   type SetAdminUserPasswordResponse,
 } from "@beagle/contracts";
-import type { ServiceResult } from "../../../shared/result";
+import type { ServiceResult } from "../../../core/result";
 
 export async function setAdminUserPassword(
   input: SetAdminUserPasswordRequest,

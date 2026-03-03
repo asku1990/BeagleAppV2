@@ -6,9 +6,9 @@ import type {
   BeagleSearchResponse,
   BeagleDogProfileDto,
 } from "@beagle/contracts";
-import { toBusinessDateOnly } from "../../shared/date-only";
-import type { ServiceResult } from "../../shared/result";
-import { toErrorLog, withLogContext } from "../../shared/logger";
+import { toBusinessDateOnly } from "../../core/date-only";
+import type { ServiceResult } from "../../core/result";
+import { toErrorLog, withLogContext } from "../../core/logger";
 import {
   getBeagleDogProfileService,
   type DogsServiceLogContext,

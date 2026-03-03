@@ -10,7 +10,6 @@ This document is the source of truth for code architecture and dependency bounda
 - `packages/contracts`: request/response DTOs and shared API payload types.
 - `packages/server`: business use-cases, authorization, and orchestration.
 - `packages/db`: persistence adapters and Prisma-backed repositories.
-- `packages/domain`: framework-agnostic domain concepts.
 
 ## Dependency Boundaries
 
@@ -19,14 +18,13 @@ Allowed:
 1. `apps/web` UI/client -> `packages/api-client`, `packages/contracts`
 2. `apps/web` API transport (`app/api/**`, `lib/server/**`) -> `packages/server`, `packages/contracts`
 3. `apps/web` Server Actions (`app/actions/**`) -> `packages/server`, `packages/contracts`
-4. `packages/server` -> `packages/domain`, `packages/db`, `packages/auth`, `packages/contracts`
+4. `packages/server` -> `packages/db`, `packages/auth`, `packages/contracts`
 5. `packages/db` -> Prisma/database adapters only
 
 Not allowed:
 
 - `apps/web` UI/client importing `packages/server` or `packages/db`
 - business logic in API route handlers
-- `packages/domain` importing runtime/framework concerns
 - `packages/db` importing `packages/contracts`
 
 ## Canonical Folder Conventions
@@ -48,17 +46,17 @@ Audience values:
 
 ### Contracts (`packages/contracts`)
 
-- Public/shared: `<domain>/<feature>/**`
+- Public/common: `<domain>/<feature>/**`
 - Admin-specific: `admin/<domain>/<feature>/**`
 
 ### Server (`packages/server`)
 
-- Public/shared: `<domain>/<feature>/**`
+- Public/common: `<domain>/<feature>/**`
 - Admin-specific: `admin/<domain>/<feature>/**`
 
 ### DB (`packages/db`)
 
-- Public/shared: `<domain>/<feature>/**`
+- Public/common: `<domain>/<feature>/**`
 - Admin-specific: `admin/<domain>/<feature>/**`
 - DTO mapping must happen in `packages/server`, not in DB layer
 
@@ -115,9 +113,25 @@ Audience values:
 
 ## Helper Placement
 
-- Feature-only shared helpers: `<domain>/<feature>/internal/*`
-- Domain-wide shared helpers: `<domain>/core/*`
-- Runtime infrastructure helpers: package-level `core/*`
+Preferred backend helper structure:
+
+- Feature-local helpers: `<package>/<domain>/<feature>/internal/*`
+- Domain-reusable helpers: `<package>/<domain>/core/*`
+- Package-level cross-cutting helpers: `<package>/core/*`
+
+Backend rules (`packages/server`, `packages/db`):
+
+- Domain/business helpers must live under domain folders (`<domain>/core/*`), not package-level folders.
+- Package-level `core/*` is for cross-cutting runtime concerns only (logger/context, generic result wrappers, generic date/time, package-wide types).
+- Do not create package-level `shared/*`, `utils/*`, or `helpers/*` for new backend code.
+- Avoid generic catch-all files (`utils.ts`, `helpers.ts`) when helper intent is domain-specific.
+- `packages/server/core/*` is the canonical package-level runtime folder in server code.
+
+Examples:
+
+- `dogId` parser -> `packages/server/dogs/core/dog-id.ts`
+- registration normalization -> `packages/server/dogs/core/registration.ts`
+- DB audit runtime helper -> `packages/db/core/audit-context.ts`
 
 ## Authorization Boundary
 

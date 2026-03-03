@@ -9,7 +9,7 @@ export default defineConfig({
         "auth/**/*.ts",
         "dogs/**/*.ts",
         "home/**/*.ts",
-        "shared/**/*.ts",
+        "core/**/*.ts",
       ],
       exclude: ["**/__tests__/**", "**/index.ts"],
       thresholds: {

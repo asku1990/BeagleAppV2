@@ -17,7 +17,7 @@ import type {
   ImportRunIssuesResponse,
   ImportRunResponse,
 } from "@beagle/contracts";
-import type { ServiceResult } from "../shared/result";
+import type { ServiceResult } from "../core/result";
 import { upsertOwner, upsertShowRows, upsertTrialRows } from "./persistence";
 import { toOwnershipDateKey } from "./date-key";
 import {

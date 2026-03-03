@@ -1,6 +1,6 @@
 import { listAdminUsersDb } from "@beagle/db";
 import type { AdminUsersResponse } from "@beagle/contracts";
-import type { ServiceResult } from "../../../shared/result";
+import type { ServiceResult } from "../../../core/result";
 
 function toUserRole(role: string): "ADMIN" | "USER" {
   return role === "ADMIN" ? "ADMIN" : "USER";
