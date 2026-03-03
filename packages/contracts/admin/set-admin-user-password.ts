@@ -1,8 +1,4 @@
-export type SetAdminUserPasswordRequest = {
-  userId: string;
-  newPassword: string;
-};
-
-export type SetAdminUserPasswordResponse = {
-  userId: string;
-};
+export type {
+  SetAdminUserPasswordRequest,
+  SetAdminUserPasswordResponse,
+} from "./users/manage/set-admin-user-password";

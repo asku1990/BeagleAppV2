@@ -6,4 +6,4 @@ export type {
   AdminBreederLookupResponse,
   AdminOwnerLookupResponse,
   AdminDogParentLookupResponse,
-} from "./lookups/lookup-options";
+} from "./lookup-options";

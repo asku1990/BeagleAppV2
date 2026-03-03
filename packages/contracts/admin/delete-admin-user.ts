@@ -1,7 +1,4 @@
-export type DeleteAdminUserRequest = {
-  userId: string;
-};
-
-export type DeleteAdminUserResponse = {
-  deletedUserId: string;
-};
+export type {
+  DeleteAdminUserRequest,
+  DeleteAdminUserResponse,
+} from "./users/manage/delete-admin-user";

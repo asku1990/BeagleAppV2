@@ -1,7 +1,4 @@
-export type DeleteAdminDogRequest = {
-  id: string;
-};
-
-export type DeleteAdminDogResponse = {
-  deletedDogId: string;
-};
+export type {
+  DeleteAdminDogRequest,
+  DeleteAdminDogResponse,
+} from "./manage/delete-admin-dog";
