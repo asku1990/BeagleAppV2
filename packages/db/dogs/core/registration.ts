@@ -55,6 +55,16 @@ function compareRegistrationRowsDesc(
   right: RegistrationRow,
 ): number {
   const createdComparison =
+    right.createdAt.getTime() - left.createdAt.getTime();
+  if (createdComparison !== 0) return createdComparison;
+  return compareByRegistrationDesc(left.registrationNo, right.registrationNo);
+}
+
+function compareRegistrationRowsByInsertedAsc(
+  left: RegistrationRow,
+  right: RegistrationRow,
+): number {
+  const createdComparison =
     left.createdAt.getTime() - right.createdAt.getTime();
   if (createdComparison !== 0) return createdComparison;
   return compareByRegistrationDesc(right.registrationNo, left.registrationNo);
@@ -70,4 +80,16 @@ export function getLatestRegistrationNo(
   rows: RegistrationRow[],
 ): string | null {
   return sortRegistrationsDesc(rows)[0]?.registrationNo ?? null;
+}
+
+export function sortRegistrationsByInsertedAsc(
+  rows: RegistrationRow[],
+): RegistrationRow[] {
+  return [...rows].sort(compareRegistrationRowsByInsertedAsc);
+}
+
+export function getFirstInsertedRegistrationNo(
+  rows: RegistrationRow[],
+): string | null {
+  return sortRegistrationsByInsertedAsc(rows)[0]?.registrationNo ?? null;
 }

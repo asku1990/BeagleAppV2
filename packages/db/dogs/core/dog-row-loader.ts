@@ -1,6 +1,9 @@
 import { DogSex, type Prisma } from "@prisma/client";
 import { prisma } from "../../core/prisma";
-import { getLatestRegistrationNo, sortRegistrationsDesc } from "./registration";
+import {
+  getFirstInsertedRegistrationNo,
+  sortRegistrationsByInsertedAsc,
+} from "./registration";
 
 export type RawDogRow = {
   id: string;
@@ -94,7 +97,9 @@ export async function loadDogs(input: LoadDogsInput): Promise<RawDogRow[]> {
   });
 
   return dogs.map((dog) => {
-    const sortedRegistrations = sortRegistrationsDesc(dog.registrations);
+    const sortedRegistrations = sortRegistrationsByInsertedAsc(
+      dog.registrations,
+    );
     const registrationNos = sortedRegistrations.map(
       (registration) => registration.registrationNo,
     );
@@ -112,13 +117,13 @@ export async function loadDogs(input: LoadDogsInput): Promise<RawDogRow[]> {
       sire: formatParent({
         name: dog.sire?.name ?? "",
         registrationNo: dog.sire
-          ? getLatestRegistrationNo(dog.sire.registrations)
+          ? getFirstInsertedRegistrationNo(dog.sire.registrations)
           : null,
       }),
       dam: formatParent({
         name: dog.dam?.name ?? "",
         registrationNo: dog.dam
-          ? getLatestRegistrationNo(dog.dam.registrations)
+          ? getFirstInsertedRegistrationNo(dog.dam.registrations)
           : null,
       }),
       trialCount: dog._count.trialResults,

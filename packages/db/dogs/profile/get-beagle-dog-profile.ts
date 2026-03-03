@@ -1,5 +1,6 @@
 import { DogSex } from "@prisma/client";
 import { prisma } from "../../core/prisma";
+import { getFirstInsertedRegistrationNo } from "../core/registration";
 
 export type BeagleDogProfileSexDb = "U" | "N" | "-";
 
@@ -70,11 +71,7 @@ function getPrimaryRegistrationNo(
   registrations: { registrationNo: string; createdAt: Date }[],
 ): string {
   if (registrations.length === 0) return "-";
-  return (
-    [...registrations].sort(
-      (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
-    )[0]?.registrationNo ?? "-"
-  );
+  return getFirstInsertedRegistrationNo(registrations) ?? "-";
 }
 
 function mapParent(

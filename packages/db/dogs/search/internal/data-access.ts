@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../../../core/prisma";
-import { sortRegistrationsDesc } from "../../core/registration";
+import { sortRegistrationsByInsertedAsc } from "../../core/registration";
 import type { RegistrationOrderKeyRow } from "./types";
 
 export async function loadRegistrationOrderKeys(
@@ -20,7 +20,9 @@ export async function loadRegistrationOrderKeys(
   });
 
   return dogs.map((dog) => {
-    const sortedRegistrations = sortRegistrationsDesc(dog.registrations);
+    const sortedRegistrations = sortRegistrationsByInsertedAsc(
+      dog.registrations,
+    );
     return {
       id: dog.id,
       primaryRegistrationNo: sortedRegistrations[0]?.registrationNo ?? "-",
