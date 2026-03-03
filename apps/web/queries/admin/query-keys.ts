@@ -1,1 +1,1 @@
-export const adminUsersQueryKey = ["admin-users"] as const;
+export { adminUsersQueryKey } from "@/queries/admin/users/manage/query-keys";
