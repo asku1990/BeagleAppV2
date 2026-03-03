@@ -1,4 +1,4 @@
-import { getHomeStatistics } from "./home/statistics/get-home-statistics";
+import { getHomeStatistics } from "./statistics";
 
 export function createStatsService() {
   return {

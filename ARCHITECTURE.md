@@ -146,8 +146,8 @@ Keep this section as the canonical target when adding new features.
   - `apps/web/app/actions/public/home/statistics/*`
   - `apps/web/queries/public/home/statistics/*`
   - `packages/contracts/home/statistics/*`
-  - `packages/server/stats/home/statistics/*`
-  - `packages/db/stats/home/statistics/*`
+  - `packages/server/home/statistics/*`
+  - `packages/db/home/statistics/*`
 - In `packages/db/dogs/*`, keep repository return types DB/domain-shaped; keep contract mapping in `packages/server/dogs/*`.
 
 ## Helper placement rules
