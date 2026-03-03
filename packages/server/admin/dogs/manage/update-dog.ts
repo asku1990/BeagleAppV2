@@ -11,6 +11,7 @@ import type {
 } from "@beagle/contracts";
 import { toErrorLog, withLogContext } from "../../../core/logger";
 import type { ServiceResult } from "../../../core/result";
+import { parseDogId } from "../../../dogs/core";
 import {
   hasMaxLength,
   isValidRegistrationNo,
@@ -83,7 +84,7 @@ export async function updateAdminDog(
     "admin dog update started",
   );
 
-  const id = normalizeRequiredText(input.id);
+  const id = parseDogId(input.id);
   if (!id) {
     log.warn(
       { event: "invalid_dog_id", durationMs: Date.now() - startedAt },
