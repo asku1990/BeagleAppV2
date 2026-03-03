@@ -1,4 +1,4 @@
-import type { AdminDogListSex } from "./admin-dogs-list";
+import type { AdminDogListSex } from "../manage/admin-dogs-list";
 
 export type AdminDogLookupRequest = {
   query?: string;

@@ -1,7 +1,7 @@
-export { listAdminDogs } from "./list-dogs";
-export { createAdminDog } from "./create-dog";
-export { updateAdminDog } from "./update-dog";
-export { deleteAdminDog } from "./delete-dog";
-export { listAdminBreederOptions } from "./list-breeder-options";
-export { listAdminOwnerOptions } from "./list-owner-options";
-export { listAdminDogParentOptions } from "./list-parent-options";
+export { listAdminDogs } from "./manage/list-dogs";
+export { createAdminDog } from "./manage/create-dog";
+export { updateAdminDog } from "./manage/update-dog";
+export { deleteAdminDog } from "./manage/delete-dog";
+export { listAdminBreederOptions } from "./lookups/list-breeder-options";
+export { listAdminOwnerOptions } from "./lookups/list-owner-options";
+export { listAdminDogParentOptions } from "./lookups/list-parent-options";
