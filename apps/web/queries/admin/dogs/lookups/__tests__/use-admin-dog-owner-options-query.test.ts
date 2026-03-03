@@ -1,34 +1,30 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { adminDogBreederOptionsQueryKey } from "../query-keys";
-import { useAdminDogBreederOptionsQuery } from "../use-admin-dog-breeder-options-query";
+import { adminDogOwnerOptionsQueryKey } from "@/queries/admin/dogs/manage/query-keys";
+import { useAdminDogOwnerOptionsQuery } from "../use-admin-dog-owner-options-query";
 
-const { useQueryMock, getAdminBreederOptionsActionMock } = vi.hoisted(() => ({
+const { useQueryMock, getAdminOwnerOptionsActionMock } = vi.hoisted(() => ({
   useQueryMock: vi.fn(),
-  getAdminBreederOptionsActionMock: vi.fn(),
+  getAdminOwnerOptionsActionMock: vi.fn(),
 }));
 
 vi.mock("@tanstack/react-query", () => ({
   useQuery: useQueryMock,
 }));
 
-vi.mock("@/app/actions/admin/dogs/get-admin-breeder-options", () => ({
-  getAdminBreederOptionsAction: getAdminBreederOptionsActionMock,
+vi.mock("@/app/actions/admin/dogs/lookups/get-admin-owner-options", () => ({
+  getAdminOwnerOptionsAction: getAdminOwnerOptionsActionMock,
 }));
 
-describe("useAdminDogBreederOptionsQuery", () => {
+describe("useAdminDogOwnerOptionsQuery", () => {
   beforeEach(() => {
     useQueryMock.mockReset();
-    getAdminBreederOptionsActionMock.mockReset();
+    getAdminOwnerOptionsActionMock.mockReset();
   });
 
   it("uses expected query key and options", () => {
     useQueryMock.mockImplementation((options) => options);
 
-    useAdminDogBreederOptionsQuery({
-      query: " metsa ",
-      limit: 20,
-      enabled: false,
-    });
+    useAdminDogOwnerOptionsQuery({ query: " esa ", limit: 20, enabled: false });
 
     const options = useQueryMock.mock.calls[0]?.[0] as {
       queryKey: readonly unknown[];
@@ -37,9 +33,7 @@ describe("useAdminDogBreederOptionsQuery", () => {
       enabled: boolean;
     };
 
-    expect(options.queryKey).toEqual(
-      adminDogBreederOptionsQueryKey("metsa", 20),
-    );
+    expect(options.queryKey).toEqual(adminDogOwnerOptionsQueryKey("esa", 20));
     expect(options.staleTime).toBe(30_000);
     expect(options.refetchOnWindowFocus).toBe(true);
     expect(options.enabled).toBe(false);
@@ -47,38 +41,38 @@ describe("useAdminDogBreederOptionsQuery", () => {
 
   it("returns options when action succeeds", async () => {
     useQueryMock.mockImplementation((options) => options);
-    getAdminBreederOptionsActionMock.mockResolvedValue({
+    getAdminOwnerOptionsActionMock.mockResolvedValue({
       hasError: false,
       data: {
-        items: [{ id: "br_1", name: "Metsapolun" }],
+        items: [{ id: "ow_1", name: "Aalto Esa" }],
       },
     });
 
-    useAdminDogBreederOptionsQuery({ query: "metsa" });
+    useAdminDogOwnerOptionsQuery({ query: "esa" });
     const options = useQueryMock.mock.calls[0]?.[0] as {
       queryFn: () => Promise<unknown>;
     };
 
     await expect(options.queryFn()).resolves.toEqual([
-      { id: "br_1", name: "Metsapolun" },
+      { id: "ow_1", name: "Aalto Esa" },
     ]);
   });
 
   it("throws when action returns error", async () => {
     useQueryMock.mockImplementation((options) => options);
-    getAdminBreederOptionsActionMock.mockResolvedValue({
+    getAdminOwnerOptionsActionMock.mockResolvedValue({
       hasError: true,
       data: null,
       errorCode: "INTERNAL_ERROR",
     });
 
-    useAdminDogBreederOptionsQuery({ query: "metsa" });
+    useAdminDogOwnerOptionsQuery({ query: "esa" });
     const options = useQueryMock.mock.calls[0]?.[0] as {
       queryFn: () => Promise<unknown>;
     };
 
     await expect(options.queryFn()).rejects.toThrow(
-      "Failed to load breeder options.",
+      "Failed to load owner options.",
     );
   });
 });

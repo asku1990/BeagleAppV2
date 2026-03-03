@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { adminDogParentOptionsQueryKey } from "../query-keys";
+import { adminDogParentOptionsQueryKey } from "@/queries/admin/dogs/manage/query-keys";
 import { useAdminDogParentOptionsQuery } from "../use-admin-dog-parent-options-query";
 
 const { useQueryMock, getAdminParentOptionsActionMock } = vi.hoisted(() => ({
@@ -11,7 +11,7 @@ vi.mock("@tanstack/react-query", () => ({
   useQuery: useQueryMock,
 }));
 
-vi.mock("@/app/actions/admin/dogs/get-admin-parent-options", () => ({
+vi.mock("@/app/actions/admin/dogs/lookups/get-admin-parent-options", () => ({
   getAdminParentOptionsAction: getAdminParentOptionsActionMock,
 }));
 

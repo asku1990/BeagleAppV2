@@ -11,18 +11,18 @@ import {
   adminDogParentOptionsQueryKeyRoot,
   adminDogsQueryKeyRoot,
 } from "../query-keys";
-import { useUpdateAdminDogMutation } from "../use-update-admin-dog-mutation";
+import { useCreateAdminDogMutation } from "../use-create-admin-dog-mutation";
 
 const {
   useMutationMock,
   useQueryClientMock,
   invalidateQueriesMock,
-  updateAdminDogActionMock,
+  createAdminDogActionMock,
 } = vi.hoisted(() => ({
   useMutationMock: vi.fn(),
   useQueryClientMock: vi.fn(),
   invalidateQueriesMock: vi.fn(),
-  updateAdminDogActionMock: vi.fn(),
+  createAdminDogActionMock: vi.fn(),
 }));
 
 vi.mock("@tanstack/react-query", () => ({
@@ -30,84 +30,82 @@ vi.mock("@tanstack/react-query", () => ({
   useQueryClient: useQueryClientMock,
 }));
 
-vi.mock("@/app/actions/admin/dogs/update-admin-dog", () => ({
-  updateAdminDogAction: updateAdminDogActionMock,
+vi.mock("@/app/actions/admin/dogs/manage/create-admin-dog", () => ({
+  createAdminDogAction: createAdminDogActionMock,
 }));
 
-describe("useUpdateAdminDogMutation", () => {
+describe("useCreateAdminDogMutation", () => {
   beforeEach(() => {
     useMutationMock.mockReset();
     useQueryClientMock.mockReset();
     invalidateQueriesMock.mockReset();
-    updateAdminDogActionMock.mockReset();
+    createAdminDogActionMock.mockReset();
     useQueryClientMock.mockReturnValue({
       invalidateQueries: invalidateQueriesMock,
     });
   });
 
-  it("calls update action and returns response data", async () => {
+  it("calls create dog action and returns response data", async () => {
     useMutationMock.mockImplementation((options) => options);
-    updateAdminDogActionMock.mockResolvedValue({
+    createAdminDogActionMock.mockResolvedValue({
       hasError: false,
       data: {
         id: "dog_1",
-        name: "Kide",
+        name: "Metsapolun Kide",
         sex: "FEMALE",
         registrationNo: "FI12345/21",
       },
     });
 
-    useUpdateAdminDogMutation();
+    useCreateAdminDogMutation();
     const options = useMutationMock.mock.calls[0]?.[0] as {
       mutationFn: (input: unknown) => Promise<unknown>;
     };
 
     const input = {
-      id: "dog_1",
-      name: "Kide",
+      name: "Metsapolun Kide",
       sex: "FEMALE",
       registrationNo: "FI12345/21",
     };
     await expect(options.mutationFn(input)).resolves.toEqual({
       id: "dog_1",
-      name: "Kide",
+      name: "Metsapolun Kide",
       sex: "FEMALE",
       registrationNo: "FI12345/21",
     });
-    expect(updateAdminDogActionMock).toHaveBeenCalledWith(input);
+    expect(createAdminDogActionMock).toHaveBeenCalledWith(input);
   });
 
   it("throws AdminMutationError when action returns error", async () => {
     useMutationMock.mockImplementation((options) => options);
-    updateAdminDogActionMock.mockResolvedValue({
+    createAdminDogActionMock.mockResolvedValue({
       hasError: true,
       data: null,
-      errorCode: "DOG_NOT_FOUND",
-      message: "Dog not found.",
+      errorCode: "DUPLICATE_DOG",
+      message: "Dog already exists.",
     });
 
-    useUpdateAdminDogMutation();
+    useCreateAdminDogMutation();
     const options = useMutationMock.mock.calls[0]?.[0] as {
       mutationFn: (input: unknown) => Promise<unknown>;
     };
 
     await expect(
       options.mutationFn({
-        id: "dog_1",
-        name: "Kide",
+        name: "Metsapolun Kide",
         sex: "FEMALE",
         registrationNo: "FI12345/21",
       }),
     ).rejects.toMatchObject({
       name: "AdminMutationError",
-      errorCode: "DOG_NOT_FOUND",
+      errorCode: "DUPLICATE_DOG",
     });
   });
 
   it("invalidates admin and public dog query roots on success", async () => {
     useMutationMock.mockImplementation((options) => options);
 
-    useUpdateAdminDogMutation();
+    useCreateAdminDogMutation();
     const options = useMutationMock.mock.calls[0]?.[0] as {
       onSuccess: () => Promise<void>;
     };
@@ -140,22 +138,21 @@ describe("useUpdateAdminDogMutation", () => {
 
   it("does not invalidate cache when mutation fails", async () => {
     useMutationMock.mockImplementation((options) => options);
-    updateAdminDogActionMock.mockResolvedValue({
+    createAdminDogActionMock.mockResolvedValue({
       hasError: true,
       data: null,
-      errorCode: "DOG_NOT_FOUND",
-      message: "Dog not found.",
+      errorCode: "DUPLICATE_DOG",
+      message: "Dog already exists.",
     });
 
-    useUpdateAdminDogMutation();
+    useCreateAdminDogMutation();
     const options = useMutationMock.mock.calls[0]?.[0] as {
       mutationFn: (input: unknown) => Promise<unknown>;
     };
 
     await expect(
       options.mutationFn({
-        id: "dog_1",
-        name: "Kide",
+        name: "Metsapolun Kide",
         sex: "FEMALE",
         registrationNo: "FI12345/21",
       }),

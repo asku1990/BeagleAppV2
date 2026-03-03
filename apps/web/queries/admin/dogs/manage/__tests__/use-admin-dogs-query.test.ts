@@ -11,7 +11,7 @@ vi.mock("@tanstack/react-query", () => ({
   useQuery: useQueryMock,
 }));
 
-vi.mock("@/app/actions/admin/dogs/get-admin-dogs", () => ({
+vi.mock("@/app/actions/admin/dogs/manage/get-admin-dogs", () => ({
   getAdminDogsAction: getAdminDogsActionMock,
 }));
 
