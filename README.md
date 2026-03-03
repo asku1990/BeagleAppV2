@@ -4,26 +4,17 @@ Monorepo for a public Beagle database app with auth, admin-ready routing, and a 
 
 ## Architecture
 
-- `apps/web`: main Next.js app (public pages, auth pages, admin route group, API routes under `app/api/*`, and Server Actions under `app/actions/*`).
-- `packages/server`: backend use-case services (auth + authorization helpers).
-- `packages/db`: Prisma + PostgreSQL access (legacy import source uses MariaDB).
-- `packages/contracts`: shared API request/response types.
-- `packages/api-client`: typed HTTP client used by frontend hooks.
+High-level runtime layout:
 
-Feature foldering conventions:
+- `apps/web`: Next.js app (UI, API routes under `app/api/*`, Server Actions under `app/actions/*`).
+- `packages/server`: backend use-cases, authorization, orchestration.
+- `packages/db`: Prisma/database repositories.
+- `packages/contracts`: shared request/response DTOs.
+- `packages/api-client`: typed client wrappers for web usage.
 
-- Web server actions and query hooks are domain-first, feature-scoped (example: `apps/web/app/actions/admin/dogs/*` and `apps/web/queries/admin/dogs/*`).
-- Admin dog business logic is isolated in dedicated backend modules:
-  - `packages/contracts/admin/dogs/*`
-  - `packages/server/admin/dogs/*`
-  - `packages/db/admin/dogs/*`
-- Locale bundles follow the same feature split (example: `apps/web/lib/i18n/messages/admin/dogs/*`).
+Source of truth for dependency boundaries, canonical folder conventions, helper placement, and migration rules:
 
-Current access model:
-
-- Public reads are allowed.
-- Admin area is guarded in `apps/web/app/(admin)`.
-- Import write flow is not implemented yet.
+- `ARCHITECTURE.md`
 
 ## Requirements
 
@@ -230,7 +221,7 @@ CI note:
 - v1 import endpoints implemented:
   - `GET /api/v1/imports/:id`
   - `GET /api/v1/imports/:id/issues`
-- Home statistics are now loaded via Server Action + React Query hook in web UI (`app/actions/home/get-home-statistics.ts` + `queries/home/use-home-statistics-query.ts`).
+- Home statistics are loaded via Server Action + React Query hook in web UI (`apps/web/app/actions/public/home/statistics/get-home-statistics.ts` + `apps/web/queries/public/home/statistics/use-home-statistics-query.ts`).
 
 ## Better Auth CLI
 
@@ -399,45 +390,14 @@ For full import behavior (source tables, stage handling, required fields, issue 
 - `ARCHITECTURE.md`: monorepo boundaries, dependency rules, and scaling path.
 - `docs/api-versioning.md`: API path versioning policy (`/api/v1/...`).
 - `docs/roles-and-permissions.md`: baseline role and authorization rules.
-- `docs/migration-plan-v1-to-v2.md`: staged migration approach from legacy app.
 - `docs/import-phase1.md`: phase-1 import flow, data handling, and issue logging behavior.
 
-## How we communicate changes
+Historical docs:
 
-- User-facing changes are tracked in root `CHANGELOG.md`.
-- Changelog source format:
-  - `## [Unreleased]`
-  - `## [x.y.z] - YYYY-MM-DD`
-  - Sections: `Added`, `Changed`, `Fixed`, `Removed`
-- When a PR includes user-visible behavior, add one line under `Unreleased`.
-- For internal-only changes (`refactor`, `test`, `chore`), changelog updates are optional.
-- User-facing release-note surfaces:
-  - Header entry point: `Mitä uutta` in the app shell.
-  - Public app page: `/whats-new` (latest Finnish summary + full notes).
-  - Matching GitHub Release notes per tagged version.
+- `docs/archive/migration-plan-v1-to-v2.md`: archived migration planning notes from legacy app transition.
 
-## Release procedure (manual)
+## Release notes and changelog
 
-1. Confirm `CHANGELOG.md` `Unreleased` entries are complete and user-facing.
-2. Move `Unreleased` bullets into a new version block `## [x.y.z] - YYYY-MM-DD`.
-3. Keep entries grouped under `Added`, `Changed`, `Fixed`, `Removed`.
-4. Commit the changelog update.
-5. Tag the release (example: `git tag v0.4.0` and `git push origin v0.4.0`).
-6. Create a GitHub Release for that tag and paste the same changelog block as release notes.
-7. Reset `Unreleased` to an empty section skeleton for the next cycle.
-
-Dry-run example:
-
-```md
-## [Unreleased]
-
-### Added
-
-- No user-facing additions yet.
-
-## [0.4.0] - 2026-02-16
-
-### Added
-
-- Added Beagle search filters for owner and registration number.
-```
+- Source of truth for release communication is `CHANGELOG.md`.
+- Keep release entries in versioned blocks (`## [x.y.z] - YYYY-MM-DD`) with sections: `Added`, `Changed`, `Fixed`, `Removed`.
+- For user-visible changes in a PR, add an `Unreleased` entry in `CHANGELOG.md`.
