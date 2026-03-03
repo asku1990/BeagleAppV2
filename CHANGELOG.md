@@ -14,6 +14,8 @@ This project uses a user-facing changelog format.
 
 ### Changed
 
+- Koko sovelluksen kansiorakenne yhtenäistettiin paremman hallittavuuden mahdollistamiseksi ilman toiminnallisia muutoksia.
+
 ### Fixed
 
 ### Removed
