@@ -12,7 +12,7 @@ vi.mock("@tanstack/react-query", () => ({
   useQuery: useQueryMock,
 }));
 
-vi.mock("@/app/actions/home/get-home-statistics", () => ({
+vi.mock("@/app/actions/public/home/statistics/get-home-statistics", () => ({
   getHomeStatisticsAction: getHomeStatisticsActionMock,
 }));
 

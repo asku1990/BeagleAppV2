@@ -17,7 +17,7 @@ import {
   beagleNewestQueryKeyRoot,
   beagleSearchQueryKeyRoot,
 } from "@/queries/public/beagle/search/query-keys";
-import { homeStatisticsQueryKey } from "@/queries/home/query-keys";
+import { homeStatisticsQueryKey } from "@/queries/public/home/statistics/query-keys";
 
 export function useUpdateAdminDogMutation() {
   const queryClient = useQueryClient();

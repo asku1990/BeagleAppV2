@@ -1,1 +1,1 @@
-export const homeStatisticsQueryKey = ["home-statistics"] as const;
+export { homeStatisticsQueryKey } from "@/queries/public/home/statistics/query-keys";

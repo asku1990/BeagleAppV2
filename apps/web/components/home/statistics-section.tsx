@@ -9,7 +9,7 @@ import { StatsGridLoadingSkeleton } from "@/components/ui/stats-grid-loading-ske
 import { cn } from "@/lib/utils";
 import type { MessageKey } from "@/lib/i18n";
 import { useI18n } from "@/hooks/i18n";
-import { useHomeStatisticsQuery } from "@/queries/home/use-home-statistics-query";
+import { useHomeStatisticsQuery } from "@/queries/public/home/statistics/use-home-statistics-query";
 
 type StatRow = {
   labelKey: MessageKey;
