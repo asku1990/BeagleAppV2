@@ -12,19 +12,18 @@ import { cn } from "@/lib/utils";
 import { PedigreePairCard } from "./pedigree-pair-card";
 import { PedigreeTree } from "./pedigree-tree";
 
-const FALLBACK_VALUE = "-";
-
 function formatPedigreeLine(
   parent: BeagleDogProfileParentDto | null,
   sexSymbol: "♂" | "♀",
+  unknownLabel: string,
 ): { text: string; id: string | null; ekNo: number | null } {
   if (!parent) {
-    return { text: `${sexSymbol} ${FALLBACK_VALUE}`, id: null, ekNo: null };
+    return { text: `${sexSymbol} ${unknownLabel}`, id: null, ekNo: null };
   }
 
   if (!parent.registrationNo) {
     return {
-      text: `${sexSymbol} ${FALLBACK_VALUE} ${parent.name}`,
+      text: `${sexSymbol} - ${parent.name}`,
       id: parent.id ?? null,
       ekNo: parent.ekNo ?? null,
     };
@@ -69,6 +68,7 @@ export function DogProfileLineageCard({
   profile: BeagleDogProfileDto;
 }) {
   const { t, locale } = useI18n();
+  const unknownLabel = t("dog.profile.sex.unknown");
   const shortEkLabel = locale === "sv" ? "SSB" : "EK";
   const generations = profile.pedigree.map((generation) => ({
     generation: generation.generation,
@@ -86,8 +86,8 @@ export function DogProfileLineageCard({
           beagleTheme.mutedText,
         )}
         renderNode={(card) => {
-          const sireLine = formatPedigreeLine(card.sire, "♂");
-          const damLine = formatPedigreeLine(card.dam, "♀");
+          const sireLine = formatPedigreeLine(card.sire, "♂", unknownLabel);
+          const damLine = formatPedigreeLine(card.dam, "♀", unknownLabel);
 
           return (
             <PedigreePairCard

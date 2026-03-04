@@ -156,13 +156,16 @@ describe("getBeagleDogProfileDb", () => {
     expect(result?.shows[0].date).toEqual(new Date("2021-06-06"));
 
     // Pedigree check
-    expect(result?.pedigree).toHaveLength(2); // Gen 1 and Gen 2 (since sire/dam exist but their parents don't)
+    expect(result?.pedigree).toHaveLength(3);
     expect(result?.pedigree[0].cards[0].sire?.name).toBe("Sire Dog");
     expect(result?.pedigree[0].cards[0].dam?.name).toBe("Dam Dog");
     expect(result?.pedigree[0].cards[0].sire?.ekNo).toBe(501);
     expect(result?.pedigree[0].cards[0].dam?.ekNo).toBe(777);
     expect(result?.pedigree[1].cards).toHaveLength(2);
+    expect(result?.pedigree[1].cards[1].sire).toBeNull();
     expect(result?.pedigree[1].cards[0].sire).toBeNull();
+    expect(result?.pedigree[2].cards).toHaveLength(4);
+    expect(result?.pedigree[2].cards[3].dam).toBeNull();
   });
 
   it("handles empty results and null fields gracefully", async () => {
@@ -185,8 +188,10 @@ describe("getBeagleDogProfileDb", () => {
     expect(result?.sex).toBe("-");
     expect(result?.trials).toEqual([]);
     expect(result?.shows).toEqual([]);
-    expect(result?.pedigree).toHaveLength(1);
+    expect(result?.pedigree).toHaveLength(3);
     expect(result?.pedigree[0].cards[0].sire).toBeNull();
+    expect(result?.pedigree[1].cards).toHaveLength(2);
+    expect(result?.pedigree[2].cards).toHaveLength(4);
   });
 
   it("keeps zero show height as a number", async () => {
@@ -246,6 +251,10 @@ describe("getBeagleDogProfileDb", () => {
       registrationNo: null,
       ekNo: null,
     });
+    expect(result?.pedigree[1].cards).toHaveLength(2);
+    expect(result?.pedigree[1].cards[0].sire).toBeNull();
+    expect(result?.pedigree[1].cards[1].sire).toBeNull();
+    expect(result?.pedigree[2].cards).toHaveLength(4);
   });
 
   it("keeps show result text unchanged", async () => {
