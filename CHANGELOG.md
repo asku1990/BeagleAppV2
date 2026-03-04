@@ -15,6 +15,7 @@ This project uses a user-facing changelog format.
 ### Changed
 
 - Koko sovelluksen kansiorakenne yhtenäistettiin paremman hallittavuuden mahdollistamiseksi ilman toiminnallisia muutoksia.
+- Datan tuonti scripti 1 vanhasta tietokannasta päivitetty niin, että `FI`- ja `SF`-prefiksilliset rekisterinumerot lisätään aina ensin, jolloin ensimmäisestä tulee oletusrekisterinumero. Käyttöliittymä näyttää oletuksena vanhimman (ensimmäisenä lisätyn) rekisterinumeron. Tämä mahdollistaa käyttää suomalaista numeroa ensisijaisena.
 
 ### Fixed
 
