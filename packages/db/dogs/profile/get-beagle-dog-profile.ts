@@ -61,6 +61,15 @@ export type BeagleDogProfileDb = {
   trials: BeagleDogProfileTrialRowDb[];
 };
 
+type PedigreeDogNode = {
+  id: string;
+  name: string;
+  ekNo?: number | null;
+  registrations: { registrationNo: string; createdAt: Date }[];
+  sire?: PedigreeDogNode | null;
+  dam?: PedigreeDogNode | null;
+};
+
 function toSexCode(value: DogSex): BeagleDogProfileSexDb {
   if (value === DogSex.MALE) return "U";
   if (value === DogSex.FEMALE) return "N";
@@ -102,6 +111,19 @@ function parseHeightCm(value: string | null): number | null {
 
   const parsed = Number.parseFloat(value);
   return Number.isNaN(parsed) ? null : parsed;
+}
+
+function createPedigreeCard(
+  dogId: string,
+  generation: number,
+  index: number,
+  parent: PedigreeDogNode | null | undefined,
+): BeagleDogProfilePedigreeCardDb {
+  return {
+    id: `${dogId}-g${String(generation)}-c${String(index + 1)}`,
+    sire: mapParent(parent?.sire ?? null),
+    dam: mapParent(parent?.dam ?? null),
+  };
 }
 
 export async function getBeagleDogProfileDb(
@@ -175,57 +197,25 @@ export async function getBeagleDogProfileDb(
     ],
   });
 
-  const g2Cards: BeagleDogProfilePedigreeCardDb[] = [];
-  if (dog.sire) {
-    g2Cards.push({
-      id: `${dog.id}-g2-c1`,
-      sire: mapParent(dog.sire.sire),
-      dam: mapParent(dog.sire.dam),
-    });
-  }
-  if (dog.dam) {
-    g2Cards.push({
-      id: `${dog.id}-g2-c2`,
-      sire: mapParent(dog.dam.sire),
-      dam: mapParent(dog.dam.dam),
-    });
-  }
-  if (g2Cards.length > 0) {
-    pedigree.push({ generation: 2, cards: g2Cards });
-  }
+  const g2Parents: Array<PedigreeDogNode | null | undefined> = [
+    dog.sire,
+    dog.dam,
+  ];
+  const g2Cards = g2Parents.map((parent, index) =>
+    createPedigreeCard(dog.id, 2, index, parent),
+  );
+  pedigree.push({ generation: 2, cards: g2Cards });
 
-  const g3Cards: BeagleDogProfilePedigreeCardDb[] = [];
-  if (dog.sire?.sire) {
-    g3Cards.push({
-      id: `${dog.id}-g3-c1`,
-      sire: mapParent(dog.sire.sire.sire),
-      dam: mapParent(dog.sire.sire.dam),
-    });
-  }
-  if (dog.sire?.dam) {
-    g3Cards.push({
-      id: `${dog.id}-g3-c2`,
-      sire: mapParent(dog.sire.dam.sire),
-      dam: mapParent(dog.sire.dam.dam),
-    });
-  }
-  if (dog.dam?.sire) {
-    g3Cards.push({
-      id: `${dog.id}-g3-c3`,
-      sire: mapParent(dog.dam.sire.sire),
-      dam: mapParent(dog.dam.sire.dam),
-    });
-  }
-  if (dog.dam?.dam) {
-    g3Cards.push({
-      id: `${dog.id}-g3-c4`,
-      sire: mapParent(dog.dam.dam.sire),
-      dam: mapParent(dog.dam.dam.dam),
-    });
-  }
-  if (g3Cards.length > 0) {
-    pedigree.push({ generation: 3, cards: g3Cards });
-  }
+  const g3Parents: Array<PedigreeDogNode | null | undefined> = [
+    dog.sire?.sire,
+    dog.sire?.dam,
+    dog.dam?.sire,
+    dog.dam?.dam,
+  ];
+  const g3Cards = g3Parents.map((parent, index) =>
+    createPedigreeCard(dog.id, 3, index, parent),
+  );
+  pedigree.push({ generation: 3, cards: g3Cards });
 
   return {
     id: dog.id,

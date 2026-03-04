@@ -130,5 +130,6 @@ describe("BeagleDogProfilePage", () => {
 
     expect(html).toContain("dog.profile.empty.trials");
     expect(html).toContain("dog.profile.empty.shows");
+    expect(html).toContain("dog.profile.sex.unknown");
   });
 });
