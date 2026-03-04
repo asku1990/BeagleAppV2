@@ -8,8 +8,8 @@ export default defineConfig({
         "admin/**/*.ts",
         "auth/**/*.ts",
         "dogs/**/*.ts",
-        "stats/**/*.ts",
-        "shared/**/*.ts",
+        "home/**/*.ts",
+        "core/**/*.ts",
       ],
       exclude: ["**/__tests__/**", "**/index.ts"],
       thresholds: {

@@ -1,168 +1,145 @@
 # Architecture Guardrails
 
-This file defines architecture and dependency boundaries for Beagle App v2 so the codebase stays modular while features are added.
-Agent behavior/instructions should live in `AGENTS.md`; that file can reference this document.
+This document is the source of truth for code architecture and dependency boundaries in Beagle App v2.
+`AGENTS.md` defines execution/workflow rules and references this file.
 
-## Monorepo layout
+## Monorepo Layers
 
-- `apps/web`: Next.js app containing UI route groups, HTTP transport routes under `app/api/*`, and Server Actions under `app/actions/*`.
-- `packages/server`: backend use cases and authorization rules.
-- `packages/domain`: domain models/value objects that are framework-agnostic.
-- `packages/db`: Prisma/MariaDB persistence and DB adapters.
-- `packages/contracts`: request/response DTOs and shared API result types.
-- `packages/api-client`: typed frontend API client.
+- `apps/web`: Next.js UI, API routes, and server actions.
+- `packages/api-client`: typed client wrappers for web consumption.
+- `packages/contracts`: request/response DTOs and shared API payload types.
+- `packages/server`: business use-cases, authorization, and orchestration.
+- `packages/db`: persistence adapters and Prisma-backed repositories.
 
-## Domain boundaries
+## Dependency Boundaries
 
-Domain modules should remain explicit and isolated as they grow:
+Allowed:
 
-- `dogs`
-- `breeding`
-- `trials`
-- `imports`
-- `admin`
-- `forum`
-
-Domain submodules are must when a domain grows, for example:
-
-- `admin/dogs` web transport + query layers
-- `packages/server/admin/dogs`
-- `packages/db/admin/dogs`
-
-When adding features, place shared domain concepts in `packages/domain`, business rules in `packages/server`, then expose through `apps/web/app/api/*` for public/compat HTTP needs or `apps/web/app/actions/*` for web-only transport, then consume in UIs.
-
-## Dependency rules
-
-Allowed direction:
-
-1. `apps/web` UI/client code -> `packages/api-client`, `packages/contracts`
-2. `apps/web` API transport code (`app/api/**`, `lib/server/**`) -> `packages/server`, `packages/contracts`
+1. `apps/web` UI/client -> `packages/api-client`, `packages/contracts`
+2. `apps/web` API transport (`app/api/**`, `lib/server/**`) -> `packages/server`, `packages/contracts`
 3. `apps/web` Server Actions (`app/actions/**`) -> `packages/server`, `packages/contracts`
-4. `packages/server` -> `packages/domain`, `packages/db`, `packages/auth`, `packages/contracts`
-5. `packages/db` -> Prisma + DB adapters only (no server/business logic)
+4. `packages/server` -> `packages/db`, `packages/auth`, `packages/contracts`
+5. `packages/db` -> Prisma/database adapters only
 
 Not allowed:
 
-- `apps/web` importing `packages/db`
-- `apps/web` UI/client code importing `packages/server`
-- Business logic inside API route handlers
-- `packages/domain` importing framework-specific runtime concerns (Next.js, Prisma client, HTTP/cookies)
+- `apps/web` UI/client importing `packages/server` or `packages/db`
+- business logic in API route handlers
+- `packages/db` importing `packages/contracts`
 
-## File organization rules
+## Canonical Folder Conventions
 
-- Avoid large files. Split code by responsibility before files become hard to review.
-- Prefer one primary function/use-case per file.
-- Keep related folder-level `index.ts` files that re-export the public surface.
-- Import from module `index.ts` entrypoints when crossing package/module boundaries.
-- Keep internals private: do not re-export helper files that are only for local use inside a module.
-- For `apps/web`, default to audience-aware domain-first feature folders for all new or touched feature-oriented code:
-  - `<audience>/<domain>/<feature>/**`
-  - Audience values:
-    - `admin`: admin-only flows
-    - `public`: public site flows
-  - Applies to feature code under `app/actions/**`, `queries/**`, and `lib/**`.
-  - Flat legacy folders are transitional only; when touching a legacy feature file, move that touched feature to the target structure in the same change.
-  - Any intentional exception must be documented in the PR rationale.
-- For `apps/web`: place custom React hooks under `apps/web/hooks/**` (prefer feature-scoped folders).
-- Query and mutation data-access hooks may live under `apps/web/queries/**` to keep read/write cache logic co-located with feature data APIs.
-- For `apps/web`: keep `apps/web/lib/**` for non-hook utilities/support code (helpers, types, constants, providers, etc.).
-- During ongoing normalization, use audience-aware folders for new `apps/web/lib` feature utilities:
-  - `lib/<audience>/<domain>/<feature>/**`
-- For `apps/web` server actions and queries, prefer domain-first feature folders over flat domain files.
-- During ongoing normalization, use audience-aware folders for new public/admin transport code:
-  - `app/actions/<audience>/<domain>/<feature>/**`
-  - `queries/<audience>/<domain>/<feature>/**`
+Use `/<audience>/<domain>/<feature>/` for web transport/query layers.
+Use `/<domain>/<feature>/` for contracts/server/db, with `admin/<domain>/<feature>/` when admin-specific.
 
-## Ongoing refactor: folder consistency plan
+### Web (`apps/web`)
 
-Current state includes mixed folder styles (`beagle-search/*` flat folders and feature folders like `admin/dogs/*` and `public/beagle/dogs/profile/*`).
-Refactor incrementally using the target structure below.
+- Server Actions: `app/actions/<audience>/<domain>/<feature>/**`
+- Queries: `queries/<audience>/<domain>/<feature>/**`
+- Hooks: `hooks/<audience>/<domain>/<feature>/**` (or feature-scoped non-audience folders where appropriate)
+- Non-hook utilities: `lib/<audience>/<domain>/<feature>/**`
 
-### Target structure by layer
+Audience values:
 
-- `apps/web` transport/query/lib layers should use audience + domain + feature:
-  - Server Actions: `app/actions/<audience>/<domain>/<feature>/**`
-  - Queries: `queries/<audience>/<domain>/<feature>/**`
-  - Feature utilities in `lib`: `lib/<audience>/<domain>/<feature>/**`
-  - Audience values:
-    - `admin`: admin-only flows
-    - `public`: public site flows
-- `packages/contracts` should use business domain/use-case folders:
-  - `admin/<domain>/<feature>/**` for admin-specific request/response types
-  - `<domain>/<feature>/**` for shared/public domain contracts
-  - Do not add `public/**` under contracts unless payloads diverge by audience and cannot be shared.
-- `packages/server` should use business domain modules:
-  - `admin/<domain>/<feature>/**` only when admin rules/authorization differ
-  - `<domain>/<feature>/**` for shared/public domain logic
-  - Do not mirror web transport audiences with `public/**` in server.
-- `packages/db` should use persistence domain modules:
-  - `admin/<domain>/<feature>/**` for admin-specific repository operations
-  - `<domain>/<feature>/**` for shared/public persistence operations
-  - Do not mirror web transport audiences with `public/**` in db.
-  - `packages/db` must not import `packages/contracts`; DTO shaping belongs in `packages/server`.
+- `public`
+- `admin`
 
-### Incremental migration policy (ongoing work)
+### Contracts (`packages/contracts`)
 
-- No big-bang rename required.
-- For new code, use the target structure immediately.
-- For touched legacy folders/files in `apps/web`, move touched feature files to target structure in the same change.
-- Keep each migration PR small and behavior-preserving (structure-only unless feature work requires behavior changes).
-- Maintain temporary re-export shims only when needed to keep imports stable during phased migration; remove shims once call sites are migrated.
+- Public/common: `<domain>/<feature>/**`
+- Admin-specific: `admin/<domain>/<feature>/**`
 
-### Immediate migration targets
+### Server (`packages/server`)
 
-- Move remaining public beagle transport/query code from flat folders:
-  - `apps/web/app/actions/beagle-search/*` -> `apps/web/app/actions/public/beagle/search/*`
-  - `apps/web/queries/beagle-search/*` -> `apps/web/queries/public/beagle/search/*`
-- Keep new profile feature additions under:
+- Public/common: `<domain>/<feature>/**`
+- Admin-specific: `admin/<domain>/<feature>/**`
+
+### DB (`packages/db`)
+
+- Public/common: `<domain>/<feature>/**`
+- Admin-specific: `admin/<domain>/<feature>/**`
+- DTO mapping must happen in `packages/server`, not in DB layer
+
+## Current Canonical Examples
+
+- Public beagle search:
+  - `apps/web/app/actions/public/beagle/search/*`
+  - `apps/web/queries/public/beagle/search/*`
+  - `apps/web/hooks/public/beagle/search/*`
+  - `apps/web/lib/public/beagle/search/*`
+  - `packages/contracts/dogs/search/*`
+  - `packages/server/dogs/search/*`
+  - `packages/db/dogs/search/*`
+
+- Public beagle profile:
   - `apps/web/app/actions/public/beagle/dogs/profile/*`
   - `apps/web/queries/public/beagle/dogs/profile/*`
-  - `apps/web/lib/public/beagle/dogs/profile/*`
   - `packages/contracts/dogs/profile/*`
   - `packages/server/dogs/profile/*`
   - `packages/db/dogs/profile/*`
-- Keep current `admin/*` structure as-is; it already matches target.
-- In `packages/db/dogs/*`, keep repository return types DB/domain-shaped; keep contract mapping in `packages/server/dogs/*`.
 
-## React Query data-access conventions
+- Admin users manage:
+  - `apps/web/app/actions/admin/users/manage/*`
+  - `apps/web/queries/admin/users/manage/*`
+  - `packages/contracts/admin/users/manage/*`
+  - `packages/server/admin/users/manage/*`
+  - `packages/db/admin/users/manage/*`
 
-- UI reads should be wrapped in `useQuery` hooks.
-- UI writes should be wrapped in `useMutation` hooks.
-- Mutation hooks are responsible for cache coherence and should invalidate affected query keys in `onSuccess` by default.
-- Prefer shared query-key constants over inline arrays so query invalidation stays consistent.
+- Admin dogs manage/lookups:
+  - `apps/web/app/actions/admin/dogs/manage/*`
+  - `apps/web/app/actions/admin/dogs/lookups/*`
+  - `apps/web/queries/admin/dogs/manage/*`
+  - `apps/web/queries/admin/dogs/lookups/*`
+  - `packages/contracts/admin/dogs/manage/*`
+  - `packages/contracts/admin/dogs/lookups/*`
+  - `packages/server/admin/dogs/manage/*`
+  - `packages/server/admin/dogs/lookups/*`
+  - `packages/db/admin/dogs/manage/*`
+  - `packages/db/admin/dogs/lookups/*`
 
-## Date/time conventions
+- Home statistics:
+  - `apps/web/app/actions/public/home/statistics/*`
+  - `apps/web/queries/public/home/statistics/*`
+  - `packages/contracts/home/statistics/*`
+  - `packages/server/home/statistics/*`
+  - `packages/db/home/statistics/*`
 
-- Distinguish timestamp fields from date-only calendar fields at API boundaries.
-- For date-only fields (for example birth dates or event dates shown as `YYYY-MM-DD`), do not derive the value with `toISOString().slice(0, 10)`.
-- Serialize date-only values with an explicit business timezone to avoid server-environment timezone drift.
-- In `packages/server`, prefer the shared `toBusinessDateOnly` helper for date-only serialization.
-- Keep true timestamp fields (for example `createdAt` and `updatedAt`) as full ISO datetime strings.
+## Module Design Rules
 
-## UI feedback consistency rules
+- Prefer one primary use-case/function per file.
+- Keep feature-local helpers private by default.
+- Re-export public APIs via local `index.ts` files.
+- Avoid generic catch-all helper files (`utils.ts`) with unrelated logic.
 
-- Use Sonner toasts as the default user feedback mechanism for new user-visible actions and async operation outcomes in `apps/web`.
-- Use semantic toast variants (`toast.success`, `toast.error`, `toast.warning`, `toast.info`) instead of plain `toast(...)` so styling and meaning stay consistent.
-- Keep existing inline error/empty states when they provide page context, but pair them with a toast for failed operations when user feedback is expected.
-- Refactor legacy non-toast feedback paths to this toast convention whenever touched by feature work or bug fixes.
+## Helper Placement
 
-## Test organization rules
+Preferred backend helper structure:
 
-- Co-locate unit/integration tests in `__tests__/` folders near the module/feature they verify.
-- Keep global end-to-end tests in root `tests/e2e/`.
-- For `apps/web`, keep Playwright configuration in `apps/web/playwright.config.ts` with `testDir` targeting root `tests/e2e`.
+- Feature-local helpers: `<package>/<domain>/<feature>/internal/*`
+- Domain-reusable helpers: `<package>/<domain>/core/*`
+- Package-level cross-cutting helpers: `<package>/core/*`
 
-## Authorization rule
+Backend rules (`packages/server`, `packages/db`):
+
+- Domain/business helpers must live under domain folders (`<domain>/core/*`), not package-level folders.
+- Package-level `core/*` is for cross-cutting runtime concerns only (logger/context, generic result wrappers, generic date/time, package-wide types).
+- Do not create package-level `shared/*`, `utils/*`, or `helpers/*` for new backend code.
+- Avoid generic catch-all files (`utils.ts`, `helpers.ts`) when helper intent is domain-specific.
+- `packages/server/core/*` is the canonical package-level runtime folder in server code.
+
+Examples:
+
+- `dogId` parser -> `packages/server/dogs/core/dog-id.ts`
+- registration normalization -> `packages/server/dogs/core/registration.ts`
+- DB audit runtime helper -> `packages/db/core/audit-context.ts`
+
+## Authorization Boundary
 
 - UI gating is convenience only.
-- Actual access control must be enforced in server-side/backend logic (`packages/server` + API handlers).
-- DB queries alone are not authorization.
+- Real authorization must be enforced in backend logic (`packages/server` and handlers).
 
-## Scalability path
+## Migration Rule
 
-Current approach is correct:
-
-- Keep one Web UI app while feature scope is manageable.
-- Split to separate `apps/admin` and/or `apps/forum` only when deployment, ownership, or UX divergence requires it.
-
-Shared packages must remain the source of truth regardless of UI split.
+- New code must follow canonical paths immediately.
+- Touched legacy files should be moved to canonical paths in the same change.
+- Temporary compatibility shims are allowed only during migrations and should be removed once call sites are migrated.

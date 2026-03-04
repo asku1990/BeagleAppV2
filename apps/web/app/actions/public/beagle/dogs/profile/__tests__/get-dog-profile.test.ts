@@ -23,6 +23,10 @@ vi.mock("@beagle/server", () => ({
   dogsService: {
     getBeagleDogProfile: getBeagleDogProfileMock,
   },
+  parseDogId: (value: string) => {
+    const normalized = value.trim();
+    return normalized.length > 0 ? normalized : null;
+  },
   toErrorLog: (error: unknown) => ({ error }),
 }));
 
@@ -45,7 +49,7 @@ describe("getDogProfileAction", () => {
   });
 
   it("returns 400 for invalid dogId and skips service call", async () => {
-    await expect(getDogProfileAction("??")).resolves.toEqual({
+    await expect(getDogProfileAction("   ")).resolves.toEqual({
       data: null,
       hasError: true,
       status: 400,

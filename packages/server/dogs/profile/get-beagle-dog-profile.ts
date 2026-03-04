@@ -2,9 +2,10 @@ import { getBeagleDogProfileDb, type BeagleDogProfileDb } from "@beagle/db";
 import type { BeagleDogProfileDto } from "@beagle/contracts";
 import { normalizeShowResult } from "../show-results";
 import { formatTrialAward } from "../trial-results";
-import { toBusinessDateOnly } from "../../shared/date-only";
-import { toErrorLog, withLogContext } from "../../shared/logger";
-import type { ServiceResult } from "../../shared/result";
+import { toBusinessDateOnly } from "../../core/date-only";
+import { toErrorLog, withLogContext } from "../../core/logger";
+import type { ServiceResult } from "../../core/result";
+import { parseDogId } from "../core";
 
 export type DogsServiceLogContext = {
   requestId?: string;
@@ -58,12 +59,16 @@ export async function getBeagleDogProfileService(
     ...(context?.requestId ? { requestId: context.requestId } : {}),
     ...(context?.actorUserId ? { actorUserId: context.actorUserId } : {}),
   });
-  log.info({ event: "start", dogId }, "dog profile fetch started");
+  const parsedDogId = parseDogId(dogId);
+  log.info(
+    { event: "start", dogId: parsedDogId ?? dogId },
+    "dog profile fetch started",
+  );
 
-  if (!dogId) {
+  if (!parsedDogId) {
     log.warn(
-      { event: "invalid_input", durationMs: Date.now() - startedAt },
-      "dog profile fetch rejected: missing dogId",
+      { event: "invalid_dog_id", durationMs: Date.now() - startedAt },
+      "dog profile fetch rejected: invalid dogId",
     );
     return {
       status: 400,
@@ -72,10 +77,14 @@ export async function getBeagleDogProfileService(
   }
 
   try {
-    const data = await getBeagleDogProfileDb(dogId);
+    const data = await getBeagleDogProfileDb(parsedDogId);
     if (!data) {
       log.info(
-        { event: "not_found", dogId, durationMs: Date.now() - startedAt },
+        {
+          event: "not_found",
+          dogId: parsedDogId,
+          durationMs: Date.now() - startedAt,
+        },
         "dog profile not found",
       );
       return {
@@ -85,7 +94,11 @@ export async function getBeagleDogProfileService(
     }
 
     log.info(
-      { event: "success", dogId, durationMs: Date.now() - startedAt },
+      {
+        event: "success",
+        dogId: parsedDogId,
+        durationMs: Date.now() - startedAt,
+      },
       "dog profile fetch succeeded",
     );
     return {
@@ -96,7 +109,7 @@ export async function getBeagleDogProfileService(
     log.error(
       {
         event: "exception",
-        dogId,
+        dogId: parsedDogId,
         durationMs: Date.now() - startedAt,
         ...toErrorLog(error),
       },

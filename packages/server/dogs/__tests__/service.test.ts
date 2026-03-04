@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createDogsService } from "../service";
+import { createDogsService } from "../search";
 
 const {
   searchBeagleDogsDbMock,
@@ -184,6 +184,71 @@ describe("dogs service", () => {
             },
           ],
         },
+      },
+    });
+  });
+
+  it("uses default/min newest limits and maps null birthDate", async () => {
+    getNewestBeagleDogsDbMock.mockResolvedValue([
+      {
+        id: "d3",
+        ekNo: 7,
+        registrationNo: "FI-3/20",
+        registrationNos: ["FI-3/20"],
+        createdAt: new Date("2026-02-03T10:00:00.000Z"),
+        sex: "U",
+        name: "Gamma",
+        birthDate: null,
+        sire: null,
+        dam: null,
+        trialCount: 1,
+        showCount: 2,
+      },
+    ]);
+    const service = createDogsService();
+
+    await service.getNewestBeagleDogs();
+    const clamped = await service.getNewestBeagleDogs({ limit: 0 });
+
+    expect(getNewestBeagleDogsDbMock).toHaveBeenNthCalledWith(1, 5);
+    expect(getNewestBeagleDogsDbMock).toHaveBeenNthCalledWith(2, 1);
+    expect(clamped).toEqual({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          items: [
+            {
+              id: "d3",
+              ekNo: 7,
+              registrationNo: "FI-3/20",
+              registrationNos: ["FI-3/20"],
+              createdAt: "2026-02-03T10:00:00.000Z",
+              sex: "U",
+              name: "Gamma",
+              birthDate: null,
+              sire: null,
+              dam: null,
+              trialCount: 1,
+              showCount: 2,
+            },
+          ],
+        },
+      },
+    });
+  });
+
+  it("returns 500 when newest dogs DB call throws", async () => {
+    getNewestBeagleDogsDbMock.mockRejectedValue(new Error("db fail"));
+
+    const service = createDogsService();
+    const result = await service.getNewestBeagleDogs({ limit: 5 });
+
+    expect(result).toEqual({
+      status: 500,
+      body: {
+        ok: false,
+        error: "Failed to load newest beagles.",
       },
     });
   });
@@ -399,6 +464,15 @@ describe("dogs service", () => {
       status: 400,
       body: { ok: false, error: "Dog ID is required." },
     });
+  });
+
+  it("trims dogId before profile DB call", async () => {
+    getBeagleDogProfileDbMock.mockResolvedValue(null);
+
+    const service = createDogsService();
+    await service.getBeagleDogProfile(" dog-casing ");
+
+    expect(getBeagleDogProfileDbMock).toHaveBeenCalledWith("dog-casing");
   });
 
   it("returns 500 when profile DB call throws", async () => {

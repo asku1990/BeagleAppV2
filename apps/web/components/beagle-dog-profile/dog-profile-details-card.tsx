@@ -1,7 +1,7 @@
 import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
-import { parseLocalIsoDate } from "@/lib/beagle-dogs";
+import { parseLocalIsoDate } from "@/lib/public/beagle/dogs/profile";
 import type { MessageKey } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type {

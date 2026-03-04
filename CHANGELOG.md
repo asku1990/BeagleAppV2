@@ -18,6 +18,21 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.4.2] - 2026-03-04
+
+### Added
+
+### Changed
+
+- Koko sovelluksen kansiorakenne yhtenäistettiin paremman hallittavuuden mahdollistamiseksi ilman toiminnallisia muutoksia.
+- Datan tuonti scripti 1 vanhasta tietokannasta päivitetty niin, että `FI`- ja `SF`-prefiksilliset rekisterinumerot lisätään aina ensin, jolloin ensimmäisestä tulee oletusrekisterinumero. Käyttöliittymä näyttää oletuksena vanhimman (ensimmäisenä lisätyn) rekisterinumeron. Tämä mahdollistaa käyttää suomalaista numeroa ensisijaisena.
+
+### Fixed
+
+- Koiran profiilin sukutaulun kortit pysyvät nyt aina oikean jälkeläislinjan kohdalla myös silloin, kun osa sukupuun tiedoista puuttuu. Puuttuvat vanhemmat näytetään lokalisoidulla "Tuntematon/Okänd"-tekstillä, jotta taulun rakenne pysyy selkeänä.
+
+### Removed
+
 ## [0.4.1] - 2026-03-02
 
 ### Added

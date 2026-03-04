@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { beagleTheme } from "@/components/ui/beagle-theme";
-import type { BeagleSearchResultRow } from "@/lib/beagle-search";
+import type { BeagleSearchResultRow } from "@/lib/public/beagle/search";
 import { getDogProfileHref } from "@/lib/public/beagle/dogs/profile";
 import type { MessageKey } from "@/lib/i18n";
 import { useI18n } from "@/hooks/i18n";

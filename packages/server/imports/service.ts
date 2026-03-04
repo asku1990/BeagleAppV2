@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import {
   type AuditContextDb,
   ImportKind,
@@ -17,7 +18,7 @@ import type {
   ImportRunIssuesResponse,
   ImportRunResponse,
 } from "@beagle/contracts";
-import type { ServiceResult } from "../shared/result";
+import type { ServiceResult } from "../core/result";
 import { upsertOwner, upsertShowRows, upsertTrialRows } from "./persistence";
 import { toOwnershipDateKey } from "./date-key";
 import {
@@ -30,6 +31,8 @@ import {
   toImportRunIssueResponse,
   toImportRunResponse,
 } from "./transform";
+
+const FINNISH_REGISTRATION_PREFIXES = new Set(["FI", "SF"]);
 
 function formatImportError(error: unknown): string {
   if (!(error instanceof Error)) return "Import failed.";
@@ -100,6 +103,27 @@ function mergeNoteValue(existing: string | null, incoming: string): string {
   }
 
   return `${existing} | ${incoming}`;
+}
+
+function extractRegistrationPrefix(registrationNo: string): string | null {
+  const match = registrationNo
+    .trim()
+    .toUpperCase()
+    .match(/^[A-Z]+/);
+  return match?.[0] ?? null;
+}
+
+function isFinnishRegistration(registrationNo: string): boolean {
+  const prefix = extractRegistrationPrefix(registrationNo);
+  return FINNISH_REGISTRATION_PREFIXES.has(prefix ?? "");
+}
+
+function resolvePreferredFinnishRegistration(
+  canonicalRegistrationNo: string,
+  attachedAliases: string[],
+): string | null {
+  const candidates = [canonicalRegistrationNo, ...attachedAliases];
+  return candidates.find((value) => isFinnishRegistration(value)) ?? null;
 }
 
 type BreederDetailsInput = {
@@ -650,6 +674,7 @@ export function createImportsService() {
         let samakoiraProcessed = 0;
         let aliasesCreated = 0;
         let aliasConflicts = 0;
+        let finnishCanonicalPromotions = 0;
         let notesUpdated = 0;
         const dogIdByRegistrationForSamakoira = await loadDogIdByRegistration();
         const noteByDogId = new Map<string, string | null>();
@@ -714,6 +739,7 @@ export function createImportsService() {
             { key: "REK_2", value: row.rek2 },
             { key: "REK_3", value: row.rek3 },
           ];
+          const attachedAliases: string[] = [];
           for (const alias of aliases) {
             const parsedAlias = parseRegistrationNo(alias.value);
             if (!parsedAlias.registrationNo) {
@@ -778,7 +804,13 @@ export function createImportsService() {
                 parsedAlias.registrationNo,
                 canonicalDogId,
               );
+              attachedAliases.push(parsedAlias.registrationNo);
               aliasesCreated += 1;
+              continue;
+            }
+
+            if (existingAlias.dogId === canonicalDogId) {
+              attachedAliases.push(parsedAlias.registrationNo);
               continue;
             }
 
@@ -799,6 +831,63 @@ export function createImportsService() {
                   existingDogId: existingAlias.dogId,
                 }),
               });
+            }
+          }
+
+          const preferredFinnishRegistration =
+            resolvePreferredFinnishRegistration(
+              canonical.registrationNo,
+              attachedAliases,
+            );
+          if (preferredFinnishRegistration) {
+            const firstRegistrationRow = await prisma.dogRegistration.findFirst(
+              {
+                where: { dogId: canonicalDogId },
+                orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+                select: { id: true, registrationNo: true },
+              },
+            );
+            const finnishRow = await prisma.dogRegistration.findUnique({
+              where: { registrationNo: preferredFinnishRegistration },
+              select: { id: true, dogId: true },
+            });
+
+            if (
+              firstRegistrationRow &&
+              firstRegistrationRow.registrationNo !==
+                preferredFinnishRegistration &&
+              finnishRow &&
+              finnishRow.dogId === canonicalDogId
+            ) {
+              const temporaryRegistrationNo = `TMP-${randomUUID()}`;
+              const previousFirstRegistrationNo =
+                firstRegistrationRow.registrationNo;
+              const firstRegistrationRowId = firstRegistrationRow.id;
+              const finnishRowId = finnishRow.id;
+              await prisma.$transaction(async (tx) => {
+                await tx.dogRegistration.update({
+                  where: { id: finnishRowId },
+                  data: { registrationNo: temporaryRegistrationNo },
+                });
+                await tx.dogRegistration.update({
+                  where: { id: firstRegistrationRowId },
+                  data: { registrationNo: preferredFinnishRegistration },
+                });
+                await tx.dogRegistration.update({
+                  where: { id: finnishRowId },
+                  data: { registrationNo: previousFirstRegistrationNo },
+                });
+              });
+
+              dogIdByRegistrationForSamakoira.set(
+                preferredFinnishRegistration,
+                canonicalDogId,
+              );
+              dogIdByRegistrationForSamakoira.set(
+                previousFirstRegistrationNo,
+                canonicalDogId,
+              );
+              finnishCanonicalPromotions += 1;
             }
           }
 
@@ -839,7 +928,7 @@ export function createImportsService() {
         logProgress("samakoira", samakoiraProcessed, totalSamakoira);
         finishStage(
           "samakoira",
-          `aliasesCreated=${aliasesCreated}, aliasConflicts=${aliasConflicts}, notesUpdated=${notesUpdated}`,
+          `aliasesCreated=${aliasesCreated}, aliasConflicts=${aliasConflicts}, finnishCanonicalPromotions=${finnishCanonicalPromotions}, notesUpdated=${notesUpdated}`,
         );
 
         startStage("index");

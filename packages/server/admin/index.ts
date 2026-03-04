@@ -1,9 +1,9 @@
-export { requireAdmin } from "./service";
-export { listAdminUsers } from "./list-users";
-export { createAdminUser } from "./create-user";
-export { deleteAdminUser } from "./delete-user";
-export { setAdminUserStatus } from "./set-user-status";
-export { setAdminUserPassword } from "./set-user-password";
+export { requireAdmin } from "./core/service";
+export { listAdminUsers } from "./users/manage/list-users";
+export { createAdminUser } from "./users/manage/create-user";
+export { deleteAdminUser } from "./users/manage/delete-user";
+export { setAdminUserStatus } from "./users/manage/set-user-status";
+export { setAdminUserPassword } from "./users/manage/set-user-password";
 export { createAdminDog } from "./dogs";
 export { updateAdminDog } from "./dogs";
 export { deleteAdminDog } from "./dogs";
