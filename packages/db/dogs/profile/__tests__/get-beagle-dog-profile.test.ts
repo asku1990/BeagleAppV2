@@ -52,7 +52,7 @@ describe("getBeagleDogProfileDb", () => {
       ekNo: 1234,
       registrations: [
         makeRegistration("REG-1", "2020-01-01"),
-        makeRegistration("REG-2", "2021-01-01"), // Primary (latest)
+        makeRegistration("REG-2", "2021-01-01"), // Primary (oldest inserted)
       ],
       trialResults: [
         {
@@ -139,7 +139,7 @@ describe("getBeagleDogProfileDb", () => {
 
     expect(result).not.toBeNull();
     expect(result?.name).toBe("Test Dog");
-    expect(result?.registrationNo).toBe("REG-2");
+    expect(result?.registrationNo).toBe("REG-1");
     expect(result?.sex).toBe("N");
     expect(result?.birthDate).toEqual(mockDog.birthDate);
     expect(result?.trials).toHaveLength(3);
