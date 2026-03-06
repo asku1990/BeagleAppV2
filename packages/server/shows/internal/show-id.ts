@@ -70,10 +70,9 @@ export function parseShowId(value: string): ParsedShowId | null {
 
   const eventDateIsoDate =
     typeof parsedPayload.d === "string" ? parsedPayload.d.trim() : "";
-  const eventPlace =
-    typeof parsedPayload.p === "string" ? parsedPayload.p.trim() : "";
+  const eventPlace = typeof parsedPayload.p === "string" ? parsedPayload.p : "";
 
-  if (!eventDateIsoDate || !eventPlace) {
+  if (!eventDateIsoDate || eventPlace.trim().length === 0) {
     return null;
   }
 

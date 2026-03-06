@@ -20,4 +20,11 @@ describe("showId", () => {
   it("returns null for malformed base64", () => {
     expect(parseShowId("%%%")).toBeNull();
   });
+
+  it("preserves exact event place when decoding", () => {
+    const showId = encodeShowId("2025-06-01", " Helsinki ");
+    const parsed = parseShowId(showId);
+
+    expect(parsed?.eventPlace).toBe(" Helsinki ");
+  });
 });

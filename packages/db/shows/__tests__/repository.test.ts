@@ -50,6 +50,18 @@ describe("searchBeagleShowsDb", () => {
           _max: { judge: "Judge B" },
         },
       ]);
+    showResultFindManyMock.mockResolvedValue([
+      {
+        eventDate: new Date("2025-06-01T00:00:00.000Z"),
+        eventPlace: "Helsinki",
+        judge: "Judge A",
+      },
+      {
+        eventDate: new Date("2025-09-01T00:00:00.000Z"),
+        eventPlace: "Turku",
+        judge: "Judge B",
+      },
+    ]);
 
     const result = await searchBeagleShowsDb({
       mode: "year",
@@ -98,6 +110,13 @@ describe("searchBeagleShowsDb", () => {
           _max: { judge: "Judge B" },
         },
       ]);
+    showResultFindManyMock.mockResolvedValue([
+      {
+        eventDate: new Date("2025-04-01T00:00:00.000Z"),
+        eventPlace: "Borga",
+        judge: "Judge B",
+      },
+    ]);
 
     const result = await searchBeagleShowsDb({
       mode: "range",
@@ -117,6 +136,41 @@ describe("searchBeagleShowsDb", () => {
     };
     expect(groupedArgs.where.eventDate.gte).toBe(dateFrom);
     expect(groupedArgs.where.eventDate.lt).toBe(dateTo);
+  });
+
+  it("returns null judge when grouped show has multiple judges", async () => {
+    showResultGroupByMock
+      .mockResolvedValueOnce([{ eventDate: new Date("2025-06-01T00:00:00Z") }])
+      .mockResolvedValueOnce([
+        {
+          eventDate: new Date("2025-06-01T00:00:00.000Z"),
+          eventPlace: "Helsinki",
+          _count: { _all: 2 },
+          _max: { judge: "Judge B" },
+        },
+      ]);
+    showResultFindManyMock.mockResolvedValue([
+      {
+        eventDate: new Date("2025-06-01T00:00:00.000Z"),
+        eventPlace: "Helsinki",
+        judge: "Judge A",
+      },
+      {
+        eventDate: new Date("2025-06-01T00:00:00.000Z"),
+        eventPlace: "Helsinki",
+        judge: "Judge B",
+      },
+    ]);
+
+    const result = await searchBeagleShowsDb({
+      mode: "year",
+      year: 2025,
+      sort: "date-desc",
+      page: 1,
+      pageSize: 10,
+    });
+
+    expect(result.items[0]?.judge).toBeNull();
   });
 });
 

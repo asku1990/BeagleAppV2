@@ -184,7 +184,50 @@ export async function searchBeagleShowsDb(
 
   const total = rows.length;
   const pagination = resolvePagination(total, page, pageSize);
-  const items = rows.slice(pagination.start, pagination.start + pageSize);
+  const pageRows = rows.slice(pagination.start, pagination.start + pageSize);
+
+  const judgeRows =
+    pageRows.length === 0
+      ? []
+      : await prisma.showResult.findMany({
+          where: {
+            OR: pageRows.map((row) => ({
+              eventDate: row.eventDate,
+              eventPlace: row.eventPlace,
+            })),
+          },
+          select: {
+            eventDate: true,
+            eventPlace: true,
+            judge: true,
+          },
+        });
+
+  const judgeByEvent = new Map<string, string | null>();
+  for (const row of judgeRows) {
+    const key = `${row.eventDate.toISOString()}::${row.eventPlace}`;
+    const normalizedJudge = row.judge?.trim() ?? "";
+    if (!normalizedJudge) {
+      continue;
+    }
+    const existing = judgeByEvent.get(key);
+    if (existing == null) {
+      judgeByEvent.set(key, normalizedJudge);
+      continue;
+    }
+    if (existing !== normalizedJudge) {
+      judgeByEvent.set(key, null);
+    }
+  }
+
+  const items = pageRows.map((row) => {
+    const key = `${row.eventDate.toISOString()}::${row.eventPlace}`;
+    const judge = judgeByEvent.get(key);
+    return {
+      ...row,
+      judge: judge === undefined ? null : judge,
+    };
+  });
 
   return {
     mode: input.mode,
