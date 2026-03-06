@@ -1,0 +1,132 @@
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { BeagleShowDetailsPageContainer } from "../beagle-show-details-page-container";
+
+const { useBeagleShowDetailsQueryMock } = vi.hoisted(() => ({
+  useBeagleShowDetailsQueryMock: vi.fn(),
+}));
+
+vi.mock("@/queries/public/beagle/shows", () => ({
+  useBeagleShowDetailsQuery: useBeagleShowDetailsQueryMock,
+}));
+
+vi.mock("@/hooks/i18n", () => ({
+  useI18n: () => ({
+    t: (key: string) => key,
+    locale: "fi",
+  }),
+}));
+
+vi.mock("next/link", () => ({
+  default: ({ href, children, ...props }: React.ComponentProps<"a">) =>
+    React.createElement("a", { href, ...props }, children),
+}));
+
+describe("BeagleShowDetailsPageContainer", () => {
+  beforeEach(() => {
+    useBeagleShowDetailsQueryMock.mockReset();
+    useBeagleShowDetailsQueryMock.mockReturnValue({
+      data: null,
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+  });
+
+  it("renders invalid state when show id is empty", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(BeagleShowDetailsPageContainer, { showId: "   " }),
+    );
+
+    expect(html).toContain("shows.details.state.invalid.title");
+    expect(useBeagleShowDetailsQueryMock).toHaveBeenCalledWith("");
+  });
+
+  it("renders loading skeleton while query is loading", () => {
+    useBeagleShowDetailsQueryMock.mockReturnValue({
+      data: null,
+      isLoading: true,
+      isError: false,
+      error: null,
+    });
+
+    const html = renderToStaticMarkup(
+      React.createElement(BeagleShowDetailsPageContainer, { showId: "show_1" }),
+    );
+
+    expect(html).toContain('data-slot="skeleton"');
+  });
+
+  it("renders not-found state for 404 errors", () => {
+    useBeagleShowDetailsQueryMock.mockReturnValue({
+      data: null,
+      isLoading: false,
+      isError: true,
+      error: { status: 404, message: "Show not found." },
+    });
+
+    const html = renderToStaticMarkup(
+      React.createElement(BeagleShowDetailsPageContainer, {
+        showId: "show_missing",
+      }),
+    );
+
+    expect(html).toContain("shows.details.state.notFound.title");
+  });
+
+  it("renders invalid state for 400 errors", () => {
+    useBeagleShowDetailsQueryMock.mockReturnValue({
+      data: null,
+      isLoading: false,
+      isError: true,
+      error: { status: 400, message: "Invalid show id." },
+    });
+
+    const html = renderToStaticMarkup(
+      React.createElement(BeagleShowDetailsPageContainer, { showId: "bad" }),
+    );
+
+    expect(html).toContain("shows.details.state.invalid.title");
+  });
+
+  it("renders details table when query succeeds", () => {
+    useBeagleShowDetailsQueryMock.mockReturnValue({
+      data: {
+        show: {
+          showId: "show_1",
+          eventDate: "2025-06-01",
+          eventPlace: "Helsinki",
+          judge: "Judge Main",
+          dogCount: 1,
+        },
+        items: [
+          {
+            id: "r_1",
+            dogId: "dog_1",
+            registrationNo: "FI-1/20",
+            name: "Aatu",
+            sex: "U",
+            result: "ERI",
+            heightCm: 40,
+            judge: "Judge Main",
+          },
+        ],
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+
+    const html = renderToStaticMarkup(
+      React.createElement(BeagleShowDetailsPageContainer, { showId: "show_1" }),
+    );
+
+    expect(html).toContain("shows.details.title");
+    expect(html).toContain("Helsinki");
+    expect(html).toContain("FI-1/20");
+    expect(html).toContain("Aatu");
+    expect(html).toContain("40 cm");
+    expect(html).toContain('href="/beagle/dogs/dog_1"');
+  });
+});

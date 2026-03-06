@@ -60,6 +60,18 @@ Audience values:
 - Admin-specific: `admin/<domain>/<feature>/**`
 - DTO mapping must happen in `packages/server`, not in DB layer
 
+## Domain Ownership (Public Beagle)
+
+- `dogs/*`: dog identity/profile/pedigree and dog-centric search/use-cases.
+- `shows/*`: show event-centric search/detail/use-cases and show-specific helpers.
+- `trials/*`: trial event-centric search/detail/use-cases and trial-specific helpers.
+
+Rule of thumb:
+
+- If the primary query key is a dog (`dogId`, reg no, dog name), start in `dogs/*`.
+- If the primary query key is an event (`date`, `place`, `event id`), use `shows/*` or `trials/*`.
+- Keep each feature in one domain root across contracts, db, server, and web transport/query layers.
+
 ## Current Canonical Examples
 
 - Public beagle search:
@@ -77,6 +89,24 @@ Audience values:
   - `packages/contracts/dogs/profile/*`
   - `packages/server/dogs/profile/*`
   - `packages/db/dogs/profile/*`
+
+- Public beagle shows (event-centric):
+  - `apps/web/app/actions/public/beagle/shows/*`
+  - `apps/web/queries/public/beagle/shows/*`
+  - `apps/web/hooks/public/beagle/shows/*`
+  - `apps/web/lib/public/beagle/shows/*`
+  - `packages/contracts/shows/*`
+  - `packages/server/shows/*`
+  - `packages/db/shows/*`
+
+- Public beagle trials (event-centric):
+  - `apps/web/app/actions/public/beagle/trials/*`
+  - `apps/web/queries/public/beagle/trials/*`
+  - `apps/web/hooks/public/beagle/trials/*`
+  - `apps/web/lib/public/beagle/trials/*`
+  - `packages/contracts/trials/*`
+  - `packages/server/trials/*`
+  - `packages/db/trials/*`
 
 - Admin users manage:
   - `apps/web/app/actions/admin/users/manage/*`
@@ -132,6 +162,18 @@ Examples:
 - `dogId` parser -> `packages/server/dogs/core/dog-id.ts`
 - registration normalization -> `packages/server/dogs/core/registration.ts`
 - DB audit runtime helper -> `packages/db/core/audit-context.ts`
+
+## Profile Composition Rule
+
+Dog profile remains a `dogs/*` use-case, but it may orchestrate `shows/*` and
+`trials/*` services when richer event data is needed in future.
+
+Constraints:
+
+- Composition happens in `packages/server` service layer only.
+- `packages/db` repositories stay domain-local and do not cross-import.
+- Reuse show/trial domain helpers instead of duplicating event mapping logic in
+  dog profile modules.
 
 ## Authorization Boundary
 
