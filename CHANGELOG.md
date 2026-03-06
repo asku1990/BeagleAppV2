@@ -18,6 +18,20 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.5.0] - 2026-03-06
+
+### Added
+
+- Uusi julkinen näyttelyhaku sivulle `/beagle/shows`: haku vuosittain tai päivämäärävälillä, lajittelu, sivutus sekä desktop- ja mobiilitulosnäkymät.
+- Uusi julkinen näyttelyn tulossivu `/beagle/shows/[showId]`, jossa näkyvät näyttelyn koirat riveittäin (rekisterinumero, nimi, sukupuoli, tulos, korkeus, tuomari).
+- Näyttelyn tulossivulla varaus arvostelutekstille (arvostelu tekstit eivät ole vielä uudessa tietokannassa).
+
+### Changed
+
+### Fixed
+
+### Removed
+
 ## [0.4.2] - 2026-03-04
 
 ### Added
