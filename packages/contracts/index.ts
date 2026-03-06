@@ -101,6 +101,18 @@ export type {
   BeagleDogProfileShowRowDto,
   BeagleDogProfileTrialRowDto,
 } from "./dogs";
+export type {
+  BeagleShowDetailsEvent,
+  BeagleShowDetailsRequest,
+  BeagleShowDetailsResponse,
+  BeagleShowDetailsRow,
+  BeagleShowSearchFilters,
+  BeagleShowSearchMode,
+  BeagleShowSearchRequest,
+  BeagleShowSearchResponse,
+  BeagleShowSearchRow,
+  BeagleShowSearchSort,
+} from "./shows";
 
 export type {
   AdminUserListItem,
