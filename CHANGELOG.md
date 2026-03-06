@@ -12,7 +12,12 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+- Uusi julkinen ajokoehaku sivulle `/beagle/trials`: haku vuosittain tai päivämäärävälillä, lajittelu, sivutus sekä desktop- ja mobiilitulosnäkymät.
+- Uusi julkinen ajokokeen tulossivu `/beagle/trials/[trialId]`, jossa näkyvät koirakohtaiset koetiedot (rekisterinumero, nimi, sukupuoli, keli, palkinto, sijoitus, pisteet, tuomari).
+
 ### Changed
+
+- Sivupalkin `Koetulosten haku`-valinta avaa nyt uuden julkisen ajokoehaun (`/beagle/trials`). `Ajokokeet`-valinta on edelleen toistaiseksi tulossa myöhemmin.
 
 ### Fixed
 
