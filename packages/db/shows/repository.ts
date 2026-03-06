@@ -178,6 +178,11 @@ function addIsoDateDays(isoDate: string, days: number): string | null {
   return base.toISOString().slice(0, 10);
 }
 
+function normalizeUtcDateToBusinessDateStart(value: Date): Date | null {
+  const isoDate = formatBusinessDateOnly(value);
+  return toBusinessDateStartUtc(isoDate);
+}
+
 function parsePage(value: number | undefined): number {
   if (!Number.isFinite(value)) return 1;
   return Math.max(1, Math.floor(value ?? 1));
@@ -235,10 +240,16 @@ function buildWhere(
   }
 
   if (input.mode === "range" && input.dateFrom && input.dateTo) {
+    const start = normalizeUtcDateToBusinessDateStart(input.dateFrom);
+    const end = normalizeUtcDateToBusinessDateStart(input.dateTo);
+    if (!start || !end) {
+      return {};
+    }
+
     return {
       eventDate: {
-        gte: input.dateFrom,
-        lt: input.dateTo,
+        gte: start,
+        lt: end,
       },
     };
   }

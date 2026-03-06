@@ -92,7 +92,7 @@ describe("searchBeagleShowsDb", () => {
 
   it("applies range filter and clamps pagination page", async () => {
     const dateFrom = new Date("2025-01-01T00:00:00.000Z");
-    const dateTo = new Date("2025-12-31T00:00:00.000Z");
+    const dateTo = new Date("2026-01-01T00:00:00.000Z");
 
     showResultGroupByMock
       .mockResolvedValueOnce([{ eventDate: new Date("2025-02-01T00:00:00Z") }])
@@ -134,8 +134,12 @@ describe("searchBeagleShowsDb", () => {
     const groupedArgs = showResultGroupByMock.mock.calls[1]?.[0] as {
       where: { eventDate: { gte: Date; lt: Date } };
     };
-    expect(groupedArgs.where.eventDate.gte).toBe(dateFrom);
-    expect(groupedArgs.where.eventDate.lt).toBe(dateTo);
+    expect(groupedArgs.where.eventDate.gte.toISOString()).toBe(
+      "2024-12-31T22:00:00.000Z",
+    );
+    expect(groupedArgs.where.eventDate.lt.toISOString()).toBe(
+      "2025-12-31T22:00:00.000Z",
+    );
   });
 
   it("returns null judge when grouped show has multiple judges", async () => {
