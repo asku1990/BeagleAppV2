@@ -16,6 +16,7 @@ export {
 export { betterAuth } from "./auth";
 export { createDogsService, dogsService } from "./dogs";
 export { parseDogId } from "./dogs";
+export { createShowsService, showsService } from "./shows";
 export { createImportsService, importsService } from "./imports";
 export { createStatsService, statsService } from "./home";
 export type { ServiceResult } from "./core/result";
