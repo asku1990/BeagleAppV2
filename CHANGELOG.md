@@ -8,12 +8,14 @@ This project uses a user-facing changelog format.
 - Internal-only changes are optional in the changelog.
 - Use sections: `Added`, `Changed`, `Fixed`, `Removed`.
 
-## [Unreleased]
+## [0.6.0] - 2026-03-06
 
 ### Added
 
 - Uusi julkinen ajokoehaku sivulle `/beagle/trials`: haku vuosittain tai päivämäärävälillä, lajittelu, sivutus sekä desktop- ja mobiilitulosnäkymät.
 - Uusi julkinen ajokokeen tulossivu `/beagle/trials/[trialId]`, jossa näkyvät koirakohtaiset koetiedot (rekisterinumero, nimi, sukupuoli, keli, palkinto, sijoitus, pisteet, tuomari).
+- Ajokoetulosten hakusivulle lisättiin "Kopioi sivun tulokset" -toiminto, joka kopioi näkyvät tulosrivit leikepöydälle taulukkomuodossa. (kaikki tietokannan data)
+- Ajokokeen tulossivulle lisättiin "Kopioi rivi" ja "Kopioi kaikki" -toiminnot koirakohtaisten tulosten vientiin leikepöydälle.
 
 ### Changed
 
