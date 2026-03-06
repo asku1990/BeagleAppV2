@@ -51,6 +51,11 @@ export const fiBeagleShowsMessages = {
   "shows.details.col.name": "Nimi",
   "shows.details.col.sex": "Sukupuoli",
   "shows.details.col.result": "Tulos",
+  "shows.details.col.reviewText": "Arvostelu",
+  "shows.details.reviewText.pending":
+    "Arvostelutekstiä ei ole vielä tuotu uuteen tietokantaan. Tiedot lisätään myöhemmin, kun arvostelutekstit tuodaan ja schema on päivitetty.",
+  "shows.details.reviewText.showMore": "Näytä lisää",
+  "shows.details.reviewText.showLess": "Näytä vähemmän",
   "shows.details.col.height": "Korkeus",
   "shows.details.col.judge": "Tuomari",
   "shows.details.sex.male": "Uros",
@@ -118,6 +123,11 @@ export const svBeagleShowsMessages = {
   "shows.details.col.name": "Namn",
   "shows.details.col.sex": "Kön",
   "shows.details.col.result": "Resultat",
+  "shows.details.col.reviewText": "Kritik",
+  "shows.details.reviewText.pending":
+    "Kritiktexten har ännu inte importerats till denna vy. Uppgifterna läggs till senare när importen av kritiktexter är klar.",
+  "shows.details.reviewText.showMore": "Visa mer",
+  "shows.details.reviewText.showLess": "Visa mindre",
   "shows.details.col.height": "Höjd",
   "shows.details.col.judge": "Domare",
   "shows.details.sex.male": "Hane",
