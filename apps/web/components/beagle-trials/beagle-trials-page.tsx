@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useMemo } from "react";
+import { toast } from "@/components/ui/sonner";
 import {
   ListingResponsiveResults,
   ListingSectionShell,
@@ -12,6 +13,7 @@ import { useI18n } from "@/hooks/i18n";
 import type { MessageKey } from "@/lib/i18n";
 import {
   formatIsoDateForDisplay,
+  formatTrialSearchRowsForClipboard,
   normalizeIsoDateOnlyInput,
   parseTrialYearInput,
   toBeagleTrialSearchRequest,
@@ -103,6 +105,30 @@ export function BeagleTrialsPage() {
       : normalizeIsoDateOnlyInput(formState.dateFrom).length > 0 &&
         normalizeIsoDateOnlyInput(formState.dateTo).length > 0;
 
+  const handleCopyResults = async () => {
+    if (response.items.length === 0) return;
+
+    const clipboard = globalThis.navigator?.clipboard;
+    if (!clipboard?.writeText) {
+      toast.warning(t("trials.results.copy.unsupported"));
+      return;
+    }
+
+    const output = formatTrialSearchRowsForClipboard(response.items, {
+      date: t("trials.results.col.date"),
+      place: t("trials.results.col.place"),
+      judge: t("trials.results.col.judge"),
+      dogCount: t("trials.results.col.dogCount"),
+    });
+
+    try {
+      await clipboard.writeText(output);
+      toast.success(t("trials.results.copy.success"));
+    } catch {
+      toast.error(t("trials.results.copy.error"));
+    }
+  };
+
   return (
     <>
       <header className={cn(beagleTheme.panel, "px-5 py-5 md:px-6 md:py-6")}>
@@ -151,9 +177,25 @@ export function BeagleTrialsPage() {
         title={t("trials.results.title")}
         count={
           !hasError ? (
-            <span>
-              {t("trials.results.count")} {response.total} {" • "}{" "}
-              {getFilterLabel(response.filters, locale, t)}
+            <span className="flex flex-wrap items-center gap-2">
+              <span>
+                {t("trials.results.count")} {response.total} {" • "}{" "}
+                {getFilterLabel(response.filters, locale, t)}
+              </span>
+              {hasItems ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    void handleCopyResults();
+                  }}
+                  className={cn(
+                    "cursor-pointer text-xs underline underline-offset-2",
+                    beagleTheme.inkStrongText,
+                  )}
+                >
+                  {t("trials.results.copy.button")}
+                </button>
+              ) : null}
             </span>
           ) : undefined
         }

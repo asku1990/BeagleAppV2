@@ -82,6 +82,13 @@ export async function getBeagleTrialDetailsService(
         rank: item.rank,
         points: item.points,
         judge: item.judge,
+        haku: item.haku,
+        hauk: item.hauk,
+        yva: item.yva,
+        hlo: item.hlo,
+        alo: item.alo,
+        tja: item.tja,
+        pin: item.pin,
       })),
     };
 
