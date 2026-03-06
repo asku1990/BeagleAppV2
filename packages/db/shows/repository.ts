@@ -228,6 +228,15 @@ function compareDetailRows(
   const sexComparison = sexOrder[left.sex] - sexOrder[right.sex];
   if (sexComparison !== 0) return sexComparison;
 
+  const resultComparison = (left.result ?? "").localeCompare(
+    right.result ?? "",
+    "fi",
+    {
+      sensitivity: "base",
+    },
+  );
+  if (resultComparison !== 0) return resultComparison;
+
   const nameComparison = left.name.localeCompare(right.name, "fi", {
     sensitivity: "base",
   });

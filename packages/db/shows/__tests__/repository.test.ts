@@ -137,7 +137,7 @@ describe("getBeagleShowDetailsDb", () => {
     expect(result).toBeNull();
   });
 
-  it("maps detail rows with sex/registration/height and stable order", async () => {
+  it("maps detail rows using v1-like detail ordering", async () => {
     showResultFindManyMock.mockResolvedValue([
       {
         id: "r3",
@@ -168,6 +168,20 @@ describe("getBeagleShowDetailsDb", () => {
         },
       },
       {
+        id: "r4",
+        eventDate: new Date("2025-06-01T00:00:00.000Z"),
+        eventPlace: "Helsinki",
+        judge: "Judge Main",
+        resultText: "AVO1",
+        heightText: "40",
+        dog: {
+          id: "d4",
+          name: "Zorro",
+          sex: DogSex.MALE,
+          registrations: [{ registrationNo: "FI-050/25" }],
+        },
+      },
+      {
         id: "r1",
         eventDate: new Date("2025-06-01T00:00:00.000Z"),
         eventPlace: "Helsinki",
@@ -189,15 +203,21 @@ describe("getBeagleShowDetailsDb", () => {
     });
 
     expect(result).not.toBeNull();
-    expect(result?.dogCount).toBe(3);
+    expect(result?.dogCount).toBe(4);
     expect(result?.judge).toBe("Judge Main");
-    expect(result?.items.map((item) => item.id)).toEqual(["r1", "r2", "r3"]);
+    expect(result?.items.map((item) => item.id)).toEqual([
+      "r4",
+      "r1",
+      "r2",
+      "r3",
+    ]);
     expect(result?.items[0]).toMatchObject({
       sex: "U",
-      registrationNo: "FI-100/25",
-      heightCm: 41.5,
+      registrationNo: "FI-050/25",
+      result: "AVO1",
+      heightCm: 40,
     });
-    expect(result?.items[2]).toMatchObject({
+    expect(result?.items[3]).toMatchObject({
       sex: "-",
       result: null,
       heightCm: null,
