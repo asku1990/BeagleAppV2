@@ -113,6 +113,18 @@ export type {
   BeagleShowSearchRow,
   BeagleShowSearchSort,
 } from "./shows";
+export type {
+  BeagleTrialDetailsEvent,
+  BeagleTrialDetailsRequest,
+  BeagleTrialDetailsResponse,
+  BeagleTrialDetailsRow,
+  BeagleTrialSearchFilters,
+  BeagleTrialSearchMode,
+  BeagleTrialSearchRequest,
+  BeagleTrialSearchResponse,
+  BeagleTrialSearchRow,
+  BeagleTrialSearchSort,
+} from "./trials";
 
 export type {
   AdminUserListItem,

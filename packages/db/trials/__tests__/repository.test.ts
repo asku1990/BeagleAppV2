@@ -1,0 +1,301 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DogSex } from "@prisma/client";
+
+const { trialResultGroupByMock, trialResultFindManyMock, prismaMock } =
+  vi.hoisted(() => {
+    const trialResultGroupBy = vi.fn();
+    const trialResultFindMany = vi.fn();
+
+    return {
+      trialResultGroupByMock: trialResultGroupBy,
+      trialResultFindManyMock: trialResultFindMany,
+      prismaMock: {
+        trialResult: {
+          groupBy: trialResultGroupBy,
+          findMany: trialResultFindMany,
+        },
+      },
+    };
+  });
+
+vi.mock("../../core/prisma", () => ({
+  prisma: prismaMock,
+}));
+
+import { getBeagleTrialDetailsDb, searchBeagleTrialsDb } from "../repository";
+
+describe("searchBeagleTrialsDb", () => {
+  beforeEach(() => {
+    trialResultGroupByMock.mockReset();
+    trialResultFindManyMock.mockReset();
+  });
+
+  it("groups trial rows by eventDate+eventPlace and returns available years", async () => {
+    trialResultGroupByMock
+      .mockResolvedValueOnce([
+        { eventDate: new Date("2025-08-01T00:00:00.000Z") },
+        { eventDate: new Date("2024-07-01T00:00:00.000Z") },
+      ])
+      .mockResolvedValueOnce([
+        {
+          eventDate: new Date("2025-06-01T00:00:00.000Z"),
+          eventPlace: "Helsinki",
+          _count: { _all: 7 },
+          _max: { judge: "Judge A" },
+        },
+        {
+          eventDate: new Date("2025-09-01T00:00:00.000Z"),
+          eventPlace: "Turku",
+          _count: { _all: 4 },
+          _max: { judge: "Judge B" },
+        },
+      ]);
+    trialResultFindManyMock.mockResolvedValue([
+      {
+        eventDate: new Date("2025-06-01T00:00:00.000Z"),
+        eventPlace: "Helsinki",
+        judge: "Judge A",
+      },
+      {
+        eventDate: new Date("2025-09-01T00:00:00.000Z"),
+        eventPlace: "Turku",
+        judge: "Judge B",
+      },
+    ]);
+
+    const result = await searchBeagleTrialsDb({
+      mode: "year",
+      year: 2025,
+      sort: "date-desc",
+      page: 1,
+      pageSize: 10,
+    });
+
+    expect(result.availableYears).toEqual([2025, 2024]);
+    expect(result.items.map((row) => row.eventPlace)).toEqual([
+      "Turku",
+      "Helsinki",
+    ]);
+    expect(result.total).toBe(2);
+    expect(result.totalPages).toBe(1);
+
+    const groupedArgs = trialResultGroupByMock.mock.calls[1]?.[0] as {
+      where: { eventDate: { gte: Date; lt: Date } };
+    };
+    expect(groupedArgs.where.eventDate.gte.toISOString()).toBe(
+      "2024-12-31T22:00:00.000Z",
+    );
+    expect(groupedArgs.where.eventDate.lt.toISOString()).toBe(
+      "2025-12-31T22:00:00.000Z",
+    );
+  });
+
+  it("applies range filter and clamps pagination page", async () => {
+    const dateFrom = new Date("2025-01-01T00:00:00.000Z");
+    const dateTo = new Date("2026-01-01T00:00:00.000Z");
+
+    trialResultGroupByMock
+      .mockResolvedValueOnce([{ eventDate: new Date("2025-02-01T00:00:00Z") }])
+      .mockResolvedValueOnce([
+        {
+          eventDate: new Date("2025-03-01T00:00:00.000Z"),
+          eventPlace: "Akaa",
+          _count: { _all: 1 },
+          _max: { judge: "Judge A" },
+        },
+        {
+          eventDate: new Date("2025-04-01T00:00:00.000Z"),
+          eventPlace: "Borga",
+          _count: { _all: 1 },
+          _max: { judge: "Judge B" },
+        },
+      ]);
+    trialResultFindManyMock.mockResolvedValue([
+      {
+        eventDate: new Date("2025-04-01T00:00:00.000Z"),
+        eventPlace: "Borga",
+        judge: "Judge B",
+      },
+    ]);
+
+    const result = await searchBeagleTrialsDb({
+      mode: "range",
+      dateFrom,
+      dateTo,
+      sort: "date-asc",
+      page: 9,
+      pageSize: 1,
+    });
+
+    expect(result.page).toBe(2);
+    expect(result.totalPages).toBe(2);
+    expect(result.items[0]?.eventPlace).toBe("Borga");
+  });
+
+  it("returns null judge when grouped trial has multiple judges", async () => {
+    trialResultGroupByMock
+      .mockResolvedValueOnce([{ eventDate: new Date("2025-06-01T00:00:00Z") }])
+      .mockResolvedValueOnce([
+        {
+          eventDate: new Date("2025-06-01T00:00:00.000Z"),
+          eventPlace: "Helsinki",
+          _count: { _all: 2 },
+          _max: { judge: "Judge B" },
+        },
+      ]);
+    trialResultFindManyMock.mockResolvedValue([
+      {
+        eventDate: new Date("2025-06-01T00:00:00.000Z"),
+        eventPlace: "Helsinki",
+        judge: "Judge A",
+      },
+      {
+        eventDate: new Date("2025-06-01T00:00:00.000Z"),
+        eventPlace: "Helsinki",
+        judge: "Judge B",
+      },
+    ]);
+
+    const result = await searchBeagleTrialsDb({
+      mode: "year",
+      year: 2025,
+      sort: "date-desc",
+      page: 1,
+      pageSize: 10,
+    });
+
+    expect(result.items[0]?.judge).toBeNull();
+  });
+});
+
+describe("getBeagleTrialDetailsDb", () => {
+  beforeEach(() => {
+    trialResultGroupByMock.mockReset();
+    trialResultFindManyMock.mockReset();
+  });
+
+  it("returns null when trial does not exist", async () => {
+    trialResultFindManyMock.mockResolvedValue([]);
+
+    const result = await getBeagleTrialDetailsDb({
+      eventDate: new Date("2025-06-01T00:00:00.000Z"),
+      eventPlace: "Helsinki",
+    });
+
+    expect(result).toBeNull();
+  });
+
+  it("maps detail rows using trial result fields", async () => {
+    trialResultFindManyMock.mockResolvedValue([
+      {
+        id: "r3",
+        eventDate: new Date("2025-06-01T12:34:00.000Z"),
+        eventPlace: "Helsinki",
+        judge: "Judge Main",
+        ke: null,
+        pa: null,
+        lk: null,
+        sija: null,
+        piste: null,
+        haku: null,
+        hauk: null,
+        yva: null,
+        hlo: null,
+        alo: null,
+        tja: null,
+        pin: null,
+        legacyFlag: null,
+        sourceKey: "src_3",
+        createdAt: new Date("2025-06-01T00:00:00.000Z"),
+        updatedAt: new Date("2025-06-01T00:00:00.000Z"),
+        dog: {
+          id: "d3",
+          name: "Cora",
+          sex: DogSex.UNKNOWN,
+          registrations: [{ registrationNo: "FI-300/25" }],
+        },
+      },
+      {
+        id: "r2",
+        eventDate: new Date("2025-06-01T12:34:00.000Z"),
+        eventPlace: "Helsinki",
+        judge: "Judge Main",
+        ke: "P",
+        pa: "2",
+        lk: "A",
+        sija: "2",
+        piste: { toNumber: () => 72.5 },
+        haku: { toNumber: () => 4.1 },
+        hauk: { toNumber: () => 4.2 },
+        yva: { toNumber: () => 4.3 },
+        hlo: { toNumber: () => 4.4 },
+        alo: { toNumber: () => 4.5 },
+        tja: { toNumber: () => 4.6 },
+        pin: { toNumber: () => 4.7 },
+        legacyFlag: "L",
+        sourceKey: "src_2",
+        createdAt: new Date("2025-06-01T00:00:00.000Z"),
+        updatedAt: new Date("2025-06-01T00:00:00.000Z"),
+        dog: {
+          id: "d2",
+          name: "Bella",
+          sex: DogSex.FEMALE,
+          registrations: [{ registrationNo: "FI-200/25" }],
+        },
+      },
+      {
+        id: "r1",
+        eventDate: new Date("2025-06-01T12:34:00.000Z"),
+        eventPlace: "Helsinki",
+        judge: "Judge Main",
+        ke: "L",
+        pa: "1",
+        lk: "V",
+        sija: "1",
+        piste: { toNumber: () => 88.25 },
+        haku: { toNumber: () => 5.1 },
+        hauk: { toNumber: () => 5.2 },
+        yva: { toNumber: () => 5.3 },
+        hlo: { toNumber: () => 5.4 },
+        alo: { toNumber: () => 5.5 },
+        tja: { toNumber: () => 5.6 },
+        pin: { toNumber: () => 5.7 },
+        legacyFlag: "X",
+        sourceKey: "src_1",
+        createdAt: new Date("2025-06-01T00:00:00.000Z"),
+        updatedAt: new Date("2025-06-01T00:00:00.000Z"),
+        dog: {
+          id: "d1",
+          name: "Aatu",
+          sex: DogSex.MALE,
+          registrations: [{ registrationNo: "FI-100/25" }],
+        },
+      },
+    ]);
+
+    const result = await getBeagleTrialDetailsDb({
+      eventDate: new Date("2025-06-01T00:00:00.000Z"),
+      eventPlace: "Helsinki",
+    });
+
+    expect(result).not.toBeNull();
+    expect(result?.dogCount).toBe(3);
+    expect(result?.judge).toBe("Judge Main");
+    expect(result?.items.map((item) => item.id)).toEqual(["r1", "r2", "r3"]);
+    expect(result?.items[0]).toMatchObject({
+      sex: "U",
+      registrationNo: "FI-100/25",
+      weather: "L",
+      award: "1",
+      classCode: "V",
+      rank: "1",
+      points: 88.25,
+      sourceKey: "src_1",
+    });
+    expect(result?.items[2]).toMatchObject({
+      sex: "-",
+      weather: null,
+      points: null,
+    });
+  });
+});
