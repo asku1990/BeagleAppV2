@@ -36,6 +36,10 @@ import {
   fiBeagleShowsMessages,
   svBeagleShowsMessages,
 } from "@/lib/i18n/messages/beagle/shows";
+import {
+  fiBeagleTrialsMessages,
+  svBeagleTrialsMessages,
+} from "@/lib/i18n/messages/beagle/trials";
 
 const fi = {
   ...fiHeaderMessages,
@@ -51,6 +55,7 @@ const fi = {
   ...fiSearchMessages,
   ...fiBeagleDogProfileMessages,
   ...fiBeagleShowsMessages,
+  ...fiBeagleTrialsMessages,
 } as const;
 
 export type MessageKey = keyof typeof fi;
@@ -70,6 +75,7 @@ const sv: Messages = {
   ...svSearchMessages,
   ...svBeagleDogProfileMessages,
   ...svBeagleShowsMessages,
+  ...svBeagleTrialsMessages,
 };
 
 export const messages: Record<Locale, Messages> = {
