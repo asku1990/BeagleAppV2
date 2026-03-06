@@ -3,6 +3,12 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { BeagleShowsPagination } from "../beagle-shows-pagination";
 
+vi.mock("@/hooks/i18n", () => ({
+  useI18n: () => ({
+    t: (key: string) => key,
+  }),
+}));
+
 type ElementProps = {
   children?: React.ReactNode;
   onClick?: () => void;
@@ -53,10 +59,10 @@ describe("BeagleShowsPagination", () => {
       }),
     );
 
-    expect(html).toContain("Edellinen");
-    expect(html).toContain("Seuraava");
-    expect(html).toContain("Tulokset 11-20 / 25");
-    expect(html).toContain("Sivukoko");
+    expect(html).toContain("shows.pagination.previous");
+    expect(html).toContain("shows.pagination.next");
+    expect(html).toContain("shows.pagination.range 11-20 / 25");
+    expect(html).toContain("shows.pagination.pageSize");
   });
 
   it("shows compact pagination with ellipsis on large sets", () => {
@@ -107,10 +113,10 @@ describe("BeagleShowsPagination", () => {
     };
 
     buttonElements
-      .find((button) => getText(button) === "Edellinen")
+      .find((button) => getText(button) === "shows.pagination.previous")
       ?.props.onClick?.();
     buttonElements
-      .find((button) => getText(button) === "Seuraava")
+      .find((button) => getText(button) === "shows.pagination.next")
       ?.props.onClick?.();
     buttonElements
       .find((button) => button.props["aria-current"] === "page")

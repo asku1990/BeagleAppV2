@@ -8,7 +8,10 @@ import {
 } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useBeagleShowsUiState } from "@/hooks/public/beagle/shows";
+import { useI18n } from "@/hooks/i18n";
+import type { MessageKey } from "@/lib/i18n";
 import {
+  formatIsoDateForDisplay,
   normalizeIsoDateOnlyInput,
   toBeagleShowSearchRequest,
 } from "@/lib/public/beagle/shows";
@@ -21,27 +24,32 @@ import { BeagleShowsPagination } from "./beagle-shows-pagination";
 import { BeagleShowsResultsDesktopTable } from "./beagle-shows-results-desktop-table";
 import { BeagleShowsResultsMobileCards } from "./beagle-shows-results-mobile-cards";
 
-function getFilterLabel(filters: {
-  mode: "year" | "range";
-  year: number | null;
-  dateFrom: string | null;
-  dateTo: string | null;
-}): string {
+function getFilterLabel(
+  filters: {
+    mode: "year" | "range";
+    year: number | null;
+    dateFrom: string | null;
+    dateTo: string | null;
+  },
+  locale: "fi" | "sv",
+  t: (key: MessageKey) => string,
+): string {
   if (filters.mode === "range") {
     if (filters.dateFrom && filters.dateTo) {
-      return `Aikaväli ${filters.dateFrom} - ${filters.dateTo}`;
+      return `${t("shows.results.filter.range")} ${formatIsoDateForDisplay(filters.dateFrom, locale)} - ${formatIsoDateForDisplay(filters.dateTo, locale)}`;
     }
-    return "Aikaväli";
+    return t("shows.results.filter.range");
   }
 
   if (filters.year == null) {
-    return "Vuosi: uusin saatavilla";
+    return t("shows.results.filter.latestYear");
   }
 
-  return `Vuosi ${filters.year}`;
+  return `${t("shows.results.filter.year")} ${filters.year}`;
 }
 
 export function BeagleShowsPage() {
+  const { t, locale } = useI18n();
   const {
     formState,
     urlState,
@@ -85,7 +93,7 @@ export function BeagleShowsPage() {
   const errorMessage =
     showsQuery.error instanceof Error
       ? showsQuery.error.message
-      : "Näyttelyiden haku epäonnistui.";
+      : t("shows.empty.error");
 
   const canSubmit =
     formState.mode === "year"
@@ -99,7 +107,7 @@ export function BeagleShowsPage() {
         <div className="flex items-center gap-3 md:gap-4">
           <Image
             src="/legacy-v1-assets/v1-root-belogo.png"
-            alt="Suomen Beaglejärjestön logo"
+            alt={t("shows.page.logoAlt")}
             width={132}
             height={74}
             className={cn(
@@ -109,7 +117,7 @@ export function BeagleShowsPage() {
             )}
           />
           <h1 className={cn(beagleTheme.headingLg, beagleTheme.inkStrongText)}>
-            Näyttelyhaku
+            {t("shows.page.title")}
           </h1>
         </div>
         <p
@@ -118,8 +126,7 @@ export function BeagleShowsPage() {
             beagleTheme.mutedText,
           )}
         >
-          Hae beagle-näyttelyitä vuosittain tai valitulla aikavälillä. Avaa
-          näyttely nähdäksesi koirien tulokset.
+          {t("shows.page.description")}
         </p>
       </header>
 
@@ -139,12 +146,12 @@ export function BeagleShowsPage() {
       />
 
       <ListingSectionShell
-        title="Näyttelyt"
+        title={t("shows.results.title")}
         count={
           !hasError ? (
-            <span className="flex flex-wrap items-center gap-2">
-              <span>Näyttelyitä {response.total}</span>
-              <span>• {getFilterLabel(response.filters)}</span>
+            <span>
+              {t("shows.results.count")} {response.total} {" • "}{" "}
+              {getFilterLabel(response.filters, locale, t)}
             </span>
           ) : undefined
         }

@@ -2,6 +2,7 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { beagleTheme } from "@/components/ui/beagle-theme";
+import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
 import { useBeagleShowDetailsQuery } from "@/queries/public/beagle/shows";
 import { BeagleShowDetailsPage } from "./beagle-show-details-page";
@@ -14,6 +15,7 @@ type BeagleShowDetailsPageContainerProps = {
 export function BeagleShowDetailsPageContainer({
   showId,
 }: BeagleShowDetailsPageContainerProps) {
+  const { t } = useI18n();
   const normalizedShowId = showId.trim();
   const {
     data: details,
@@ -57,7 +59,9 @@ export function BeagleShowDetailsPageContainer({
     }
 
     const errorMessage =
-      error instanceof Error ? error.message : "Näyttelyn lataus epäonnistui.";
+      error instanceof Error
+        ? error.message
+        : t("shows.details.error.loadFailed");
 
     return (
       <div className={cn(beagleTheme.panel, "p-12 text-center")}>

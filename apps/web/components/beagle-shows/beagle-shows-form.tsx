@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { beagleTheme } from "@/components/ui/beagle-theme";
+import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
 import type {
   BeagleShowsFilterMode,
@@ -36,6 +37,8 @@ export function BeagleShowsForm({
   onSubmit: () => void;
   onReset: () => void;
 }) {
+  const { t } = useI18n();
+
   return (
     <Card className={cn(beagleTheme.panel, "gap-0 py-0")}>
       <CardHeader className="px-5 pt-5 pb-3 md:px-6 md:pt-6 md:pb-4">
@@ -44,15 +47,15 @@ export function BeagleShowsForm({
             <CardTitle
               className={cn(beagleTheme.headingMd, beagleTheme.inkStrongText)}
             >
-              Hae näyttelyitä
+              {t("shows.form.title")}
             </CardTitle>
             <p className={cn("mt-1 text-xs", beagleTheme.mutedText)}>
-              Hae vuoden perusteella tai valitse tarkka aikaväli.
+              {t("shows.form.description")}
             </p>
           </div>
           <label className="space-y-1 text-xs">
             <span className={cn(beagleTheme.mutedText, "mb-2 block")}>
-              Järjestys
+              {t("shows.form.sort.label")}
             </span>
             <select
               value={sort}
@@ -65,8 +68,8 @@ export function BeagleShowsForm({
                 beagleTheme.focusRing,
               )}
             >
-              <option value="date-desc">Uusin ensin</option>
-              <option value="date-asc">Vanhin ensin</option>
+              <option value="date-desc">{t("shows.form.sort.dateDesc")}</option>
+              <option value="date-asc">{t("shows.form.sort.dateAsc")}</option>
             </select>
           </label>
         </div>
@@ -83,7 +86,7 @@ export function BeagleShowsForm({
         >
           <fieldset className="space-y-2">
             <legend className={cn("text-xs", beagleTheme.mutedText)}>
-              Hakutapa
+              {t("shows.form.mode.label")}
             </legend>
             <div className="flex flex-wrap gap-4 text-sm">
               <label className="inline-flex items-center gap-2">
@@ -93,7 +96,7 @@ export function BeagleShowsForm({
                   checked={values.mode === "year"}
                   onChange={() => onModeChange("year")}
                 />
-                <span>Vuosihaku</span>
+                <span>{t("shows.form.mode.year")}</span>
               </label>
               <label className="inline-flex items-center gap-2">
                 <input
@@ -102,18 +105,20 @@ export function BeagleShowsForm({
                   checked={values.mode === "range"}
                   onChange={() => onModeChange("range")}
                 />
-                <span>Aikaväli</span>
+                <span>{t("shows.form.mode.range")}</span>
               </label>
             </div>
           </fieldset>
 
           {values.mode === "year" ? (
             <label className="space-y-1 text-xs md:max-w-xs">
-              <span className={beagleTheme.mutedText}>Vuosi</span>
+              <span className={beagleTheme.mutedText}>
+                {t("shows.form.year.label")}
+              </span>
               <Input
                 value={values.year}
                 onChange={(event) => onYearChange(event.target.value)}
-                placeholder="esim. 2025"
+                placeholder={t("shows.form.year.placeholder")}
                 list="beagle-show-years"
                 inputMode="numeric"
               />
@@ -125,13 +130,15 @@ export function BeagleShowsForm({
                 </datalist>
               ) : null}
               <p className={cn("text-[11px]", beagleTheme.mutedText)}>
-                Jätä tyhjäksi hakeaksesi uusimman vuoden.
+                {t("shows.form.year.helper")}
               </p>
             </label>
           ) : (
             <div className="grid gap-3 md:max-w-xl md:grid-cols-2">
               <label className="space-y-1 text-xs">
-                <span className={beagleTheme.mutedText}>Päivä alkaen</span>
+                <span className={beagleTheme.mutedText}>
+                  {t("shows.form.dateFrom")}
+                </span>
                 <Input
                   type="date"
                   value={values.dateFrom}
@@ -139,7 +146,9 @@ export function BeagleShowsForm({
                 />
               </label>
               <label className="space-y-1 text-xs">
-                <span className={beagleTheme.mutedText}>Päivä asti</span>
+                <span className={beagleTheme.mutedText}>
+                  {t("shows.form.dateTo")}
+                </span>
                 <Input
                   type="date"
                   value={values.dateTo}
@@ -151,14 +160,14 @@ export function BeagleShowsForm({
 
           <div className="flex flex-wrap items-center gap-2">
             <Button type="submit" disabled={!canSubmit || isPending}>
-              Hae
+              {t("shows.form.submit")}
             </Button>
             <Button type="button" variant="outline" onClick={onReset}>
-              Tyhjennä
+              {t("shows.form.reset")}
             </Button>
             {!canSubmit && values.mode === "range" ? (
               <p className="text-xs text-red-700">
-                Valitse sekä alkupäivä että loppupäivä.
+                {t("shows.form.rangeValidation")}
               </p>
             ) : null}
           </div>

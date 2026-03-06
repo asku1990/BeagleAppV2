@@ -5,14 +5,23 @@ import {
   ListingSectionShell,
 } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
+import { useI18n } from "@/hooks/i18n";
 import { formatIsoDateForDisplay } from "@/lib/public/beagle/shows";
 import { getDogProfileHref } from "@/lib/public/beagle/dogs/profile";
 import { cn } from "@/lib/utils";
 
-function mapSexLabel(value: "U" | "N" | "-"): string {
-  if (value === "U") return "Uros";
-  if (value === "N") return "Narttu";
-  return "-";
+function mapSexLabel(
+  value: "U" | "N" | "-",
+  t: (
+    key:
+      | "shows.details.sex.male"
+      | "shows.details.sex.female"
+      | "shows.details.sex.unknown",
+  ) => string,
+): string {
+  if (value === "U") return t("shows.details.sex.male");
+  if (value === "N") return t("shows.details.sex.female");
+  return t("shows.details.sex.unknown");
 }
 
 function formatHeight(heightCm: number | null): string {
@@ -27,6 +36,8 @@ export function BeagleShowDetailsPage({
 }: {
   details: BeagleShowDetailsResponse;
 }) {
+  const { t, locale } = useI18n();
+
   return (
     <>
       <header className={cn(beagleTheme.panel, "px-5 py-5 md:px-6 md:py-6")}>
@@ -35,35 +46,47 @@ export function BeagleShowDetailsPage({
             <h1
               className={cn(beagleTheme.headingLg, beagleTheme.inkStrongText)}
             >
-              Näyttelyn tulokset
+              {t("shows.details.title")}
             </h1>
             <p className={cn("mt-1 text-sm", beagleTheme.mutedText)}>
-              {formatIsoDateForDisplay(details.show.eventDate)} •{" "}
+              {formatIsoDateForDisplay(details.show.eventDate, locale)} •{" "}
               {details.show.eventPlace}
             </p>
             <p className={cn("mt-1 text-sm", beagleTheme.mutedText)}>
-              Tuomari: {details.show.judge ?? "-"}
+              {t("shows.details.judge")}: {details.show.judge ?? "-"}
             </p>
             <p className={cn("mt-1 text-sm", beagleTheme.mutedText)}>
-              Koiria: {details.show.dogCount}
+              {t("shows.details.dogCount")}: {details.show.dogCount}
             </p>
           </div>
         </div>
       </header>
 
-      <ListingSectionShell title="Koirat ja tulokset">
+      <ListingSectionShell title={t("shows.details.section.title")}>
         <ListingResponsiveResults
           desktop={
             <div className="overflow-x-auto">
               <table className="w-full min-w-[860px] border-collapse text-sm">
                 <thead>
                   <tr className={cn("border-b text-left", beagleTheme.border)}>
-                    <th className="px-2 py-2 font-semibold">Rek.nro</th>
-                    <th className="px-2 py-2 font-semibold">Nimi</th>
-                    <th className="px-2 py-2 font-semibold">Sukupuoli</th>
-                    <th className="px-2 py-2 font-semibold">Tulos</th>
-                    <th className="px-2 py-2 font-semibold">Korkeus</th>
-                    <th className="px-2 py-2 font-semibold">Tuomari</th>
+                    <th className="px-2 py-2 font-semibold">
+                      {t("shows.details.col.reg")}
+                    </th>
+                    <th className="px-2 py-2 font-semibold">
+                      {t("shows.details.col.name")}
+                    </th>
+                    <th className="px-2 py-2 font-semibold">
+                      {t("shows.details.col.sex")}
+                    </th>
+                    <th className="px-2 py-2 font-semibold">
+                      {t("shows.details.col.result")}
+                    </th>
+                    <th className="px-2 py-2 font-semibold">
+                      {t("shows.details.col.height")}
+                    </th>
+                    <th className="px-2 py-2 font-semibold">
+                      {t("shows.details.col.judge")}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -94,7 +117,7 @@ export function BeagleShowDetailsPage({
                           {row.name}
                         </Link>
                       </td>
-                      <td className="px-2 py-2">{mapSexLabel(row.sex)}</td>
+                      <td className="px-2 py-2">{mapSexLabel(row.sex, t)}</td>
                       <td className="px-2 py-2">{row.result ?? "-"}</td>
                       <td className="px-2 py-2">
                         {formatHeight(row.heightCm)}
@@ -119,7 +142,9 @@ export function BeagleShowDetailsPage({
                 >
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <p className="col-span-2">
-                      <span className={beagleTheme.mutedText}>Rek.nro: </span>
+                      <span className={beagleTheme.mutedText}>
+                        {t("shows.details.col.reg")}:
+                      </span>
                       <Link
                         href={getDogProfileHref(row.dogId)}
                         className={cn(
@@ -131,7 +156,9 @@ export function BeagleShowDetailsPage({
                       </Link>
                     </p>
                     <p className="col-span-2">
-                      <span className={beagleTheme.mutedText}>Nimi: </span>
+                      <span className={beagleTheme.mutedText}>
+                        {t("shows.details.col.name")}:
+                      </span>
                       <Link
                         href={getDogProfileHref(row.dogId)}
                         className={cn(
@@ -143,19 +170,27 @@ export function BeagleShowDetailsPage({
                       </Link>
                     </p>
                     <p>
-                      <span className={beagleTheme.mutedText}>Sukupuoli: </span>
-                      <span>{mapSexLabel(row.sex)}</span>
+                      <span className={beagleTheme.mutedText}>
+                        {t("shows.details.col.sex")}:
+                      </span>
+                      <span>{mapSexLabel(row.sex, t)}</span>
                     </p>
                     <p>
-                      <span className={beagleTheme.mutedText}>Tulos: </span>
+                      <span className={beagleTheme.mutedText}>
+                        {t("shows.details.col.result")}:
+                      </span>
                       <span>{row.result ?? "-"}</span>
                     </p>
                     <p>
-                      <span className={beagleTheme.mutedText}>Korkeus: </span>
+                      <span className={beagleTheme.mutedText}>
+                        {t("shows.details.col.height")}:
+                      </span>
                       <span>{formatHeight(row.heightCm)}</span>
                     </p>
                     <p>
-                      <span className={beagleTheme.mutedText}>Tuomari: </span>
+                      <span className={beagleTheme.mutedText}>
+                        {t("shows.details.col.judge")}:
+                      </span>
                       <span>{row.judge ?? "-"}</span>
                     </p>
                   </div>

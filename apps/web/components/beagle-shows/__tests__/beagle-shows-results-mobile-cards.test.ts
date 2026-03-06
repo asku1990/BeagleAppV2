@@ -8,6 +8,13 @@ vi.mock("next/link", () => ({
     React.createElement("a", { href, ...props }, children),
 }));
 
+vi.mock("@/hooks/i18n", () => ({
+  useI18n: () => ({
+    t: (key: string) => key,
+    locale: "fi",
+  }),
+}));
+
 describe("BeagleShowsResultsMobileCards", () => {
   it("renders show card content with details link", () => {
     const html = renderToStaticMarkup(
@@ -27,7 +34,7 @@ describe("BeagleShowsResultsMobileCards", () => {
     expect(html).toContain("Helsinki");
     expect(html).toContain("Judge Main");
     expect(html).toContain("12");
-    expect(html).toContain("Avaa näyttely");
+    expect(html).toContain("shows.results.open");
     expect(html).toContain('href="/beagle/shows/show_1"');
   });
 
@@ -47,7 +54,7 @@ describe("BeagleShowsResultsMobileCards", () => {
     );
 
     expect(html).toContain("Turku");
-    expect(html).toContain("Tuomari:");
+    expect(html).toContain("shows.results.col.judge:");
     expect(html).toContain("-");
   });
 });

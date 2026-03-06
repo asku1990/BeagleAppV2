@@ -1,11 +1,15 @@
 import { beagleTheme } from "@/components/ui/beagle-theme";
+import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
 
 type EmptyVariant = "no-results" | "error";
 
-const messageByVariant: Record<EmptyVariant, string> = {
-  "no-results": "Hakuehdoilla ei löytynyt näyttelyitä.",
-  error: "Näyttelyiden haku epäonnistui. Yritä uudelleen.",
+const messageKeyByVariant: Record<
+  EmptyVariant,
+  "shows.empty.noResults" | "shows.empty.error"
+> = {
+  "no-results": "shows.empty.noResults",
+  error: "shows.empty.error",
 };
 
 export function BeagleShowsEmptyState({
@@ -15,6 +19,7 @@ export function BeagleShowsEmptyState({
   variant: EmptyVariant;
   message?: string;
 }) {
+  const { t } = useI18n();
   return (
     <div
       className={cn(
@@ -23,7 +28,7 @@ export function BeagleShowsEmptyState({
         beagleTheme.mutedText,
       )}
     >
-      {message ?? messageByVariant[variant]}
+      {message ?? t(messageKeyByVariant[variant])}
     </div>
   );
 }

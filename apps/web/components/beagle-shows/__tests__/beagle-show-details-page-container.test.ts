@@ -11,6 +11,13 @@ vi.mock("@/queries/public/beagle/shows", () => ({
   useBeagleShowDetailsQuery: useBeagleShowDetailsQueryMock,
 }));
 
+vi.mock("@/hooks/i18n", () => ({
+  useI18n: () => ({
+    t: (key: string) => key,
+    locale: "fi",
+  }),
+}));
+
 vi.mock("next/link", () => ({
   default: ({ href, children, ...props }: React.ComponentProps<"a">) =>
     React.createElement("a", { href, ...props }, children),
@@ -32,7 +39,7 @@ describe("BeagleShowDetailsPageContainer", () => {
       React.createElement(BeagleShowDetailsPageContainer, { showId: "   " }),
     );
 
-    expect(html).toContain("Virheellinen näyttelytunniste");
+    expect(html).toContain("shows.details.state.invalid.title");
     expect(useBeagleShowDetailsQueryMock).toHaveBeenCalledWith("");
   });
 
@@ -65,7 +72,7 @@ describe("BeagleShowDetailsPageContainer", () => {
       }),
     );
 
-    expect(html).toContain("Näyttelyä ei löytynyt");
+    expect(html).toContain("shows.details.state.notFound.title");
   });
 
   it("renders invalid state for 400 errors", () => {
@@ -80,7 +87,7 @@ describe("BeagleShowDetailsPageContainer", () => {
       React.createElement(BeagleShowDetailsPageContainer, { showId: "bad" }),
     );
 
-    expect(html).toContain("Virheellinen näyttelytunniste");
+    expect(html).toContain("shows.details.state.invalid.title");
   });
 
   it("renders details table when query succeeds", () => {
@@ -115,7 +122,7 @@ describe("BeagleShowDetailsPageContainer", () => {
       React.createElement(BeagleShowDetailsPageContainer, { showId: "show_1" }),
     );
 
-    expect(html).toContain("Näyttelyn tulokset");
+    expect(html).toContain("shows.details.title");
     expect(html).toContain("Helsinki");
     expect(html).toContain("FI-1/20");
     expect(html).toContain("Aatu");

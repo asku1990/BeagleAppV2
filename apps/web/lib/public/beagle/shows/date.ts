@@ -35,11 +35,15 @@ export function normalizeIsoDateOnlyInput(
   return parseLocalIsoDate(trimmed) ? trimmed : "";
 }
 
-export function formatIsoDateForDisplay(value: string): string {
+export function formatIsoDateForDisplay(
+  value: string,
+  locale: "fi" | "sv",
+): string {
   const parsed = parseLocalIsoDate(value);
   if (!parsed || Number.isNaN(parsed.getTime())) {
     return "-";
   }
 
-  return new Intl.DateTimeFormat("fi-FI").format(parsed);
+  const localeTag = locale === "fi" ? "fi-FI" : "sv-FI";
+  return new Intl.DateTimeFormat(localeTag).format(parsed);
 }

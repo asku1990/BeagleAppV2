@@ -1,22 +1,22 @@
 import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
+import { useI18n } from "@/hooks/i18n";
+import type { MessageKey } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 type ShowDetailsStateVariant = "invalid" | "not-found";
 
 const copy: Record<
   ShowDetailsStateVariant,
-  { title: string; description: string }
+  { titleKey: MessageKey; descriptionKey: MessageKey }
 > = {
   invalid: {
-    title: "Virheellinen näyttelytunniste",
-    description:
-      "Linkki on virheellinen tai puuttuu. Avaa näyttely uudelleen hakusivulta.",
+    titleKey: "shows.details.state.invalid.title",
+    descriptionKey: "shows.details.state.invalid.description",
   },
   "not-found": {
-    title: "Näyttelyä ei löytynyt",
-    description:
-      "Näyttelyä ei löytynyt annetulla tunnisteella. Se on voitu poistaa tai linkki on vanhentunut.",
+    titleKey: "shows.details.state.notFound.title",
+    descriptionKey: "shows.details.state.notFound.description",
   },
 };
 
@@ -25,10 +25,12 @@ export function BeagleShowDetailsState({
 }: {
   variant: ShowDetailsStateVariant;
 }) {
+  const { t } = useI18n();
+
   return (
-    <ListingSectionShell title={copy[variant].title}>
+    <ListingSectionShell title={t(copy[variant].titleKey)}>
       <p className={cn("text-sm", beagleTheme.mutedText)}>
-        {copy[variant].description}
+        {t(copy[variant].descriptionKey)}
       </p>
     </ListingSectionShell>
   );

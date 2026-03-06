@@ -15,6 +15,13 @@ vi.mock("next/image", () => ({
     React.createElement("img", props),
 }));
 
+vi.mock("@/hooks/i18n", () => ({
+  useI18n: () => ({
+    t: (key: string) => key,
+    locale: "fi",
+  }),
+}));
+
 vi.mock("@/hooks/public/beagle/shows", () => ({
   useBeagleShowsUiState: useBeagleShowsUiStateMock,
 }));
@@ -112,7 +119,7 @@ describe("BeagleShowsPage", () => {
     });
 
     const html = renderToStaticMarkup(React.createElement(BeagleShowsPage));
-    expect(html).toContain("Hakuehdoilla ei löytynyt näyttelyitä.");
+    expect(html).toContain("shows.empty.noResults");
   });
 
   it("renders desktop/mobile results and pagination when rows exist", () => {
@@ -145,10 +152,10 @@ describe("BeagleShowsPage", () => {
 
     const html = renderToStaticMarkup(React.createElement(BeagleShowsPage));
 
-    expect(html).toContain("Näyttelyitä 1");
+    expect(html).toContain("shows.results.count 1");
     expect(html).toContain("Helsinki");
     expect(html).toContain("Judge Main");
-    expect(html).toContain("Avaa näyttely");
-    expect(html).toContain("Tulokset 1-1 / 1");
+    expect(html).toContain("shows.results.open");
+    expect(html).toContain("shows.pagination.range 1-1 / 1");
   });
 });

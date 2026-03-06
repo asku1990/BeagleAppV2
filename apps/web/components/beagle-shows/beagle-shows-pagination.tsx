@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { beagleTheme } from "@/components/ui/beagle-theme";
+import { useI18n } from "@/hooks/i18n";
 import { BEAGLE_SHOWS_PAGE_SIZE_OPTIONS } from "@/lib/public/beagle/shows";
 import { cn } from "@/lib/utils";
 
@@ -51,6 +52,8 @@ export function BeagleShowsPagination({
   onPageSelect: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
 }) {
+  const { t } = useI18n();
+
   if (total === 0) {
     return null;
   }
@@ -62,7 +65,9 @@ export function BeagleShowsPagination({
   return (
     <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
       <div className="flex items-center gap-2">
-        <span className={cn("text-xs", beagleTheme.mutedText)}>Sivukoko</span>
+        <span className={cn("text-xs", beagleTheme.mutedText)}>
+          {t("shows.pagination.pageSize")}
+        </span>
         <select
           value={pageSize}
           onChange={(event) => onPageSizeChange(Number(event.target.value))}
@@ -89,7 +94,7 @@ export function BeagleShowsPagination({
           onClick={() => onPageSelect(page - 1)}
           disabled={page <= 1}
         >
-          Edellinen
+          {t("shows.pagination.previous")}
         </Button>
         {items.map((item, index) =>
           item === "ellipsis" ? (
@@ -109,7 +114,7 @@ export function BeagleShowsPagination({
               className="h-8 min-w-8 px-2 text-xs md:h-9 md:min-w-9 md:px-3 md:text-sm"
               onClick={() => onPageSelect(item)}
               aria-current={item === page ? "page" : undefined}
-              aria-label={`Sivu ${item}`}
+              aria-label={`${t("shows.pagination.page")} ${item}`}
             >
               {item}
             </Button>
@@ -123,12 +128,12 @@ export function BeagleShowsPagination({
           onClick={() => onPageSelect(page + 1)}
           disabled={page >= totalPages}
         >
-          Seuraava
+          {t("shows.pagination.next")}
         </Button>
       </div>
 
       <p className={cn("text-sm md:text-right", beagleTheme.mutedText)}>
-        Tulokset {start}-{end} / {total}
+        {t("shows.pagination.range")} {start}-{end} / {total}
       </p>
     </div>
   );

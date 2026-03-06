@@ -3,6 +3,12 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { BeagleShowsForm } from "../beagle-shows-form";
 
+vi.mock("@/hooks/i18n", () => ({
+  useI18n: () => ({
+    t: (key: string) => key,
+  }),
+}));
+
 const baseProps = {
   values: {
     mode: "year" as const,
@@ -52,13 +58,13 @@ describe("BeagleShowsForm", () => {
       React.createElement(BeagleShowsForm, baseProps),
     );
 
-    expect(html).toContain("Hae näyttelyitä");
-    expect(html).toContain("Vuosihaku");
-    expect(html).toContain("Aikaväli");
+    expect(html).toContain("shows.form.title");
+    expect(html).toContain("shows.form.mode.year");
+    expect(html).toContain("shows.form.mode.range");
     expect(html).toContain('value="date-desc"');
     expect(html).toContain('value="date-asc"');
-    expect(html).toContain('placeholder="esim. 2025"');
-    expect(html).toContain("Jätä tyhjäksi hakeaksesi uusimman vuoden.");
+    expect(html).toContain('placeholder="shows.form.year.placeholder"');
+    expect(html).toContain("shows.form.year.helper");
   });
 
   it("renders range date fields when mode is range", () => {
@@ -74,8 +80,8 @@ describe("BeagleShowsForm", () => {
       }),
     );
 
-    expect(html).toContain("Päivä alkaen");
-    expect(html).toContain("Päivä asti");
+    expect(html).toContain("shows.form.dateFrom");
+    expect(html).toContain("shows.form.dateTo");
     expect(html).toContain('type="date"');
   });
 
@@ -104,14 +110,14 @@ describe("BeagleShowsForm", () => {
     sortSelect?.props.onChange?.({ target: { value: "date-asc" } });
 
     const yearInput = elements.find(
-      (element) => element.props.placeholder === "esim. 2025",
+      (element) => element.props.placeholder === "shows.form.year.placeholder",
     );
     yearInput?.props.onChange?.({ target: { value: "2025" } });
 
     const button = elements.find(
       (element) =>
         typeof element.props.onClick === "function" &&
-        String(element.props.children) === "Tyhjennä",
+        String(element.props.children) === "shows.form.reset",
     );
     button?.props.onClick?.();
 
