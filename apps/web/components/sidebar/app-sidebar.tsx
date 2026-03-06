@@ -58,7 +58,7 @@ const publicNavItems: NavItem[] = [
   { labelKey: "sidebar.nav.ownerSearch", icon: Users },
   { labelKey: "sidebar.nav.trialResults", icon: FileSearch },
   { labelKey: "sidebar.nav.fieldTrials", icon: Flag },
-  { labelKey: "sidebar.nav.shows", icon: Award },
+  { labelKey: "sidebar.nav.shows", icon: Award, href: "/beagle/shows" },
   { labelKey: "sidebar.nav.ekDogs", icon: Dog },
   { labelKey: "sidebar.nav.kennelNames", icon: PawPrint },
   { labelKey: "sidebar.nav.virtualPairing", icon: Link2 },

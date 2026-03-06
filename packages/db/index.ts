@@ -54,6 +54,18 @@ export {
   type BeagleSearchRowDb,
   type BeagleSearchSortDb,
 } from "./dogs";
+export {
+  getBeagleShowDetailsDb,
+  searchBeagleShowsDb,
+  type BeagleShowDetailsRequestDb,
+  type BeagleShowDetailsResponseDb,
+  type BeagleShowDetailsRowDb,
+  type BeagleShowSearchModeDb,
+  type BeagleShowSearchRequestDb,
+  type BeagleShowSearchResponseDb,
+  type BeagleShowSearchRowDb,
+  type BeagleShowSearchSortDb,
+} from "./shows";
 
 export {
   createAdminDogWriteDb,
