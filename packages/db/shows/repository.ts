@@ -114,6 +114,7 @@ function getTimeZoneOffsetMs(date: Date, timeZone: string): number {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
+    hourCycle: "h23",
     hour12: false,
   });
   const parts = formatter.formatToParts(date);
@@ -141,7 +142,18 @@ function getTimeZoneOffsetMs(date: Date, timeZone: string): number {
     parts.find((part) => part.type === "second")?.value ?? "0",
     10,
   );
-  const asUtc = Date.UTC(year, month - 1, day, hour, minute, second, 0);
+  // Some runtimes can still emit 24 for midnight. Treat it as 00 of the same
+  // calendar day to avoid introducing a +24h offset drift.
+  const normalizedHour = hour === 24 ? 0 : hour;
+  const asUtc = Date.UTC(
+    year,
+    month - 1,
+    day,
+    normalizedHour,
+    minute,
+    second,
+    0,
+  );
   return asUtc - date.getTime();
 }
 
