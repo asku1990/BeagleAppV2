@@ -83,10 +83,10 @@ describe("searchBeagleShowsDb", () => {
       where: { eventDate: { gte: Date; lt: Date } };
     };
     expect(groupedArgs.where.eventDate.gte.toISOString()).toBe(
-      "2025-01-01T00:00:00.000Z",
+      "2024-12-31T22:00:00.000Z",
     );
     expect(groupedArgs.where.eventDate.lt.toISOString()).toBe(
-      "2026-01-01T00:00:00.000Z",
+      "2025-12-31T22:00:00.000Z",
     );
   });
 
@@ -195,7 +195,7 @@ describe("getBeagleShowDetailsDb", () => {
     showResultFindManyMock.mockResolvedValue([
       {
         id: "r3",
-        eventDate: new Date("2025-06-01T00:00:00.000Z"),
+        eventDate: new Date("2025-06-01T12:34:00.000Z"),
         eventPlace: "Helsinki",
         judge: "Judge Main",
         resultText: null,
@@ -209,7 +209,7 @@ describe("getBeagleShowDetailsDb", () => {
       },
       {
         id: "r2",
-        eventDate: new Date("2025-06-01T00:00:00.000Z"),
+        eventDate: new Date("2025-06-01T12:34:00.000Z"),
         eventPlace: "Helsinki",
         judge: "Judge Main",
         resultText: "NUO1",
@@ -223,7 +223,7 @@ describe("getBeagleShowDetailsDb", () => {
       },
       {
         id: "r4",
-        eventDate: new Date("2025-06-01T00:00:00.000Z"),
+        eventDate: new Date("2025-06-01T12:34:00.000Z"),
         eventPlace: "Helsinki",
         judge: "Judge Main",
         resultText: "AVO1",
@@ -237,7 +237,7 @@ describe("getBeagleShowDetailsDb", () => {
       },
       {
         id: "r1",
-        eventDate: new Date("2025-06-01T00:00:00.000Z"),
+        eventDate: new Date("2025-06-01T12:34:00.000Z"),
         eventPlace: "Helsinki",
         judge: "Judge Main",
         resultText: "AVO2",
@@ -255,6 +255,20 @@ describe("getBeagleShowDetailsDb", () => {
       eventDate: new Date("2025-06-01T00:00:00.000Z"),
       eventPlace: "Helsinki",
     });
+
+    const detailsArgs = showResultFindManyMock.mock.calls[0]?.[0] as {
+      where: {
+        eventDate: { gte: Date; lt: Date };
+        eventPlace: string;
+      };
+    };
+    expect(detailsArgs.where.eventDate.gte.toISOString()).toBe(
+      "2025-05-31T21:00:00.000Z",
+    );
+    expect(detailsArgs.where.eventDate.lt.toISOString()).toBe(
+      "2025-06-01T21:00:00.000Z",
+    );
+    expect(detailsArgs.where.eventPlace).toBe("Helsinki");
 
     expect(result).not.toBeNull();
     expect(result?.dogCount).toBe(4);

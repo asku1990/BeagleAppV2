@@ -57,6 +57,127 @@ export type BeagleShowDetailsResponseDb = {
   items: BeagleShowDetailsRowDb[];
 };
 
+const BUSINESS_TIME_ZONE = "Europe/Helsinki";
+const BUSINESS_DATE_ONLY_FORMATTER = new Intl.DateTimeFormat("en-CA", {
+  timeZone: BUSINESS_TIME_ZONE,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+function formatBusinessDateOnly(value: Date): string {
+  const parts = BUSINESS_DATE_ONLY_FORMATTER.formatToParts(value);
+  const year = parts.find((part) => part.type === "year")?.value;
+  const month = parts.find((part) => part.type === "month")?.value;
+  const day = parts.find((part) => part.type === "day")?.value;
+  if (!year || !month || !day) {
+    return value.toISOString().slice(0, 10);
+  }
+  return `${year}-${month}-${day}`;
+}
+
+function parseIsoDateOnlyParts(
+  value: string,
+): { year: number; month: number; day: number } | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return null;
+
+  const year = Number.parseInt(match[1], 10);
+  const month = Number.parseInt(match[2], 10);
+  const day = Number.parseInt(match[3], 10);
+  if (
+    !Number.isFinite(year) ||
+    !Number.isFinite(month) ||
+    !Number.isFinite(day)
+  ) {
+    return null;
+  }
+
+  const utcDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+  if (
+    utcDate.getUTCFullYear() !== year ||
+    utcDate.getUTCMonth() !== month - 1 ||
+    utcDate.getUTCDate() !== day
+  ) {
+    return null;
+  }
+
+  return { year, month, day };
+}
+
+function getTimeZoneOffsetMs(date: Date, timeZone: string): number {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+  const parts = formatter.formatToParts(date);
+  const year = Number.parseInt(
+    parts.find((part) => part.type === "year")?.value ?? "0",
+    10,
+  );
+  const month = Number.parseInt(
+    parts.find((part) => part.type === "month")?.value ?? "0",
+    10,
+  );
+  const day = Number.parseInt(
+    parts.find((part) => part.type === "day")?.value ?? "0",
+    10,
+  );
+  const hour = Number.parseInt(
+    parts.find((part) => part.type === "hour")?.value ?? "0",
+    10,
+  );
+  const minute = Number.parseInt(
+    parts.find((part) => part.type === "minute")?.value ?? "0",
+    10,
+  );
+  const second = Number.parseInt(
+    parts.find((part) => part.type === "second")?.value ?? "0",
+    10,
+  );
+  const asUtc = Date.UTC(year, month - 1, day, hour, minute, second, 0);
+  return asUtc - date.getTime();
+}
+
+function toBusinessDateStartUtc(isoDate: string): Date | null {
+  const parsed = parseIsoDateOnlyParts(isoDate);
+  if (!parsed) {
+    return null;
+  }
+
+  const { year, month, day } = parsed;
+  const midnightAsUtcMs = Date.UTC(year, month - 1, day, 0, 0, 0, 0);
+  let utcTimeMs = midnightAsUtcMs;
+
+  for (let index = 0; index < 3; index += 1) {
+    const offsetMs = getTimeZoneOffsetMs(
+      new Date(utcTimeMs),
+      BUSINESS_TIME_ZONE,
+    );
+    utcTimeMs = midnightAsUtcMs - offsetMs;
+  }
+
+  return new Date(utcTimeMs);
+}
+
+function addIsoDateDays(isoDate: string, days: number): string | null {
+  const parsed = parseIsoDateOnlyParts(isoDate);
+  if (!parsed) {
+    return null;
+  }
+  const base = new Date(
+    Date.UTC(parsed.year, parsed.month - 1, parsed.day, 0, 0, 0, 0),
+  );
+  base.setUTCDate(base.getUTCDate() + days);
+  return base.toISOString().slice(0, 10);
+}
+
 function parsePage(value: number | undefined): number {
   if (!Number.isFinite(value)) return 1;
   return Math.max(1, Math.floor(value ?? 1));
@@ -100,10 +221,15 @@ function buildWhere(
 ): Prisma.ShowResultWhereInput {
   if (input.mode === "year" && Number.isFinite(input.year)) {
     const year = Math.floor(input.year ?? 0);
+    const start = toBusinessDateStartUtc(`${year}-01-01`);
+    const end = toBusinessDateStartUtc(`${year + 1}-01-01`);
+    if (!start || !end) {
+      return {};
+    }
     return {
       eventDate: {
-        gte: new Date(Date.UTC(year, 0, 1, 0, 0, 0, 0)),
-        lt: new Date(Date.UTC(year + 1, 0, 1, 0, 0, 0, 0)),
+        gte: start,
+        lt: end,
       },
     };
   }
@@ -121,7 +247,7 @@ function buildWhere(
 }
 
 const BUSINESS_YEAR_FORMATTER = new Intl.DateTimeFormat("en-US", {
-  timeZone: "Europe/Helsinki",
+  timeZone: BUSINESS_TIME_ZONE,
   year: "numeric",
 });
 
@@ -293,9 +419,22 @@ function compareDetailRows(
 export async function getBeagleShowDetailsDb(
   input: BeagleShowDetailsRequestDb,
 ): Promise<BeagleShowDetailsResponseDb | null> {
+  const eventDateIso = formatBusinessDateOnly(input.eventDate);
+  const rangeStart = toBusinessDateStartUtc(eventDateIso);
+  const nextEventDateIso = addIsoDateDays(eventDateIso, 1);
+  const rangeEnd = nextEventDateIso
+    ? toBusinessDateStartUtc(nextEventDateIso)
+    : null;
+  if (!rangeStart || !rangeEnd) {
+    return null;
+  }
+
   const rows = await prisma.showResult.findMany({
     where: {
-      eventDate: input.eventDate,
+      eventDate: {
+        gte: rangeStart,
+        lt: rangeEnd,
+      },
       eventPlace: input.eventPlace,
     },
     include: {

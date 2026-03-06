@@ -6,6 +6,7 @@ import type {
 import { toBusinessDateOnly } from "../core/date-only";
 import { toErrorLog, withLogContext } from "../core/logger";
 import type { ServiceResult } from "../core/result";
+import { parseIsoDateOnly } from "./internal/iso-date";
 import { encodeShowId } from "./internal/show-id";
 import type { ShowsServiceLogContext } from "./types";
 
@@ -39,18 +40,6 @@ function parseYear(value: number | undefined): number | null {
   const year = Math.floor(value ?? 0);
   if (year < 1900 || year > 2100) return null;
   return year;
-}
-
-function parseIsoDateOnly(value: string | undefined): string | null {
-  const normalized = value?.trim() ?? "";
-  if (!normalized) return null;
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return null;
-
-  const date = new Date(`${normalized}T00:00:00.000Z`);
-  if (Number.isNaN(date.getTime())) return null;
-
-  const normalizedAgain = date.toISOString().slice(0, 10);
-  return normalizedAgain === normalized ? normalized : null;
 }
 
 function toUtcDateStart(isoDate: string): Date {

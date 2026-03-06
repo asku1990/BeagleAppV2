@@ -1,4 +1,4 @@
-const SHOW_ID_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+import { parseIsoDateOnlyToUtcDate } from "./iso-date";
 
 type ShowIdPayload = {
   d: string;
@@ -10,23 +10,6 @@ export type ParsedShowId = {
   eventDate: Date;
   eventPlace: string;
 };
-
-function parseIsoDateOnlyToUtcDate(value: string): Date | null {
-  if (!SHOW_ID_DATE_PATTERN.test(value)) {
-    return null;
-  }
-
-  const date = new Date(`${value}T00:00:00.000Z`);
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(date.getUTCDate()).padStart(2, "0");
-  const normalized = `${year}-${month}-${day}`;
-  return normalized === value ? date : null;
-}
 
 export function encodeShowId(
   eventDateIsoDate: string,
