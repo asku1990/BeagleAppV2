@@ -50,6 +50,20 @@ export type BeagleTrialDetailsRowDb = {
   rank: string | null;
   points: number | null;
   judge: string | null;
+  // Legacy per-dog scoring fields from `akoeall` rows.
+  // TAPPA -> eventPlace (event-level), these remain dog-row metrics.
+  haku: number | null;
+  hauk: number | null;
+  yva: number | null;
+  hlo: number | null;
+  alo: number | null;
+  tja: number | null;
+  pin: number | null;
+  // Internal import-trace fields (not exposed in public contract/UI).
+  legacyFlag: string | null;
+  sourceKey: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type BeagleTrialDetailsResponseDb = {
@@ -480,12 +494,24 @@ export async function getBeagleTrialDetailsDb(
       registrationNo: row.dog.registrations[0]?.registrationNo ?? "-",
       name: row.dog.name,
       sex: toSexCode(row.dog.sex),
+      // Legacy akoeall result columns shown/copied to users.
       weather: row.ke,
       award: row.pa,
       classCode: row.lk,
       rank: row.sija,
       points: row.piste ? row.piste.toNumber() : null,
       judge: row.judge,
+      haku: row.haku ? row.haku.toNumber() : null,
+      hauk: row.hauk ? row.hauk.toNumber() : null,
+      yva: row.yva ? row.yva.toNumber() : null,
+      hlo: row.hlo ? row.hlo.toNumber() : null,
+      alo: row.alo ? row.alo.toNumber() : null,
+      tja: row.tja ? row.tja.toNumber() : null,
+      pin: row.pin ? row.pin.toNumber() : null,
+      legacyFlag: row.legacyFlag,
+      sourceKey: row.sourceKey,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
     }))
     .sort(compareDetailRows);
 
