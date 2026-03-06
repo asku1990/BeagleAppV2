@@ -137,6 +137,35 @@ describe("shows service", () => {
     });
   });
 
+  it("keeps year mode when default search has no available years", async () => {
+    searchBeagleShowsDbMock.mockResolvedValueOnce({
+      mode: "range",
+      year: null,
+      dateFrom: null,
+      dateTo: null,
+      availableYears: [],
+      total: 0,
+      totalPages: 0,
+      page: 1,
+      items: [],
+    });
+
+    const service = createShowsService();
+    const result = await service.searchBeagleShows({});
+
+    expect(searchBeagleShowsDbMock).toHaveBeenCalledTimes(1);
+    expect(result.status).toBe(200);
+    if (!result.body.ok) {
+      throw new Error("Expected ok=true response");
+    }
+    expect(result.body.data.filters).toEqual({
+      mode: "year",
+      year: null,
+      dateFrom: null,
+      dateTo: null,
+    });
+  });
+
   it("returns 404 when show details are missing", async () => {
     getBeagleShowDetailsDbMock.mockResolvedValue(null);
     const service = createShowsService();

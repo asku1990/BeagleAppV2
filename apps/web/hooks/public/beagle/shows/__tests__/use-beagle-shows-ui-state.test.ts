@@ -22,6 +22,12 @@ describe("useBeagleShowsUiState helpers", () => {
     expect(state.sort).toBe("date-desc");
   });
 
+  it("drops out-of-range year from url state", () => {
+    const state = readUrlShowsState(readParams("year=1800"));
+    expect(state.mode).toBe("year");
+    expect(state.year).toBe("");
+  });
+
   it("parses range mode and valid iso dates", () => {
     const state = readUrlShowsState(
       readParams(

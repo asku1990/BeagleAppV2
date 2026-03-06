@@ -170,6 +170,11 @@ export function BeagleShowsForm({
                 {t("shows.form.rangeValidation")}
               </p>
             ) : null}
+            {!canSubmit && values.mode === "year" ? (
+              <p className="text-xs text-red-700">
+                {t("shows.form.yearValidation")}
+              </p>
+            ) : null}
           </div>
         </form>
       </CardContent>

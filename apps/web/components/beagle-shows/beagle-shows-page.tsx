@@ -13,6 +13,7 @@ import type { MessageKey } from "@/lib/i18n";
 import {
   formatIsoDateForDisplay,
   normalizeIsoDateOnlyInput,
+  parseShowYearInput,
   toBeagleShowSearchRequest,
 } from "@/lib/public/beagle/shows";
 import { cn } from "@/lib/utils";
@@ -97,7 +98,8 @@ export function BeagleShowsPage() {
 
   const canSubmit =
     formState.mode === "year"
-      ? true
+      ? formState.year.trim().length === 0 ||
+        parseShowYearInput(formState.year) != null
       : normalizeIsoDateOnlyInput(formState.dateFrom).length > 0 &&
         normalizeIsoDateOnlyInput(formState.dateTo).length > 0;
 

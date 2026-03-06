@@ -245,7 +245,7 @@ export async function searchBeagleShowsService(
               });
             })();
 
-    const filterMode = resolvedMode ?? (result.year != null ? "year" : "range");
+    const filterMode = resolvedMode ?? result.mode;
     const filterYear =
       resolvedMode === "year"
         ? year

@@ -13,6 +13,7 @@ import {
   BEAGLE_SHOWS_DEFAULT_SORT,
   BEAGLE_SHOWS_PAGE_SIZE_OPTIONS,
   normalizeIsoDateOnlyInput,
+  parseShowYearInput,
   type BeagleShowsFilterMode,
   type BeagleShowsQueryState,
   type BeagleShowSearchSort,
@@ -91,7 +92,7 @@ function readMode(
 
 function readYearInput(value: string | null): string {
   const trimmed = trimValue(value);
-  return /^\d{4}$/.test(trimmed) ? trimmed : "";
+  return parseShowYearInput(trimmed) != null ? trimmed : "";
 }
 
 export function readUrlShowsState(

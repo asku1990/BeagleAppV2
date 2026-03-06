@@ -21,6 +21,8 @@ export const fiBeagleShowsMessages = {
   "shows.form.submit": "Hae",
   "shows.form.reset": "Tyhjennä",
   "shows.form.rangeValidation": "Valitse sekä alkupäivä että loppupäivä.",
+  "shows.form.yearValidation":
+    "Anna vuosi välillä 1900-2100 tai jätä kenttä tyhjäksi.",
 
   "shows.results.title": "Näyttelyt",
   "shows.results.count": "Näyttelyitä",
@@ -93,6 +95,8 @@ export const svBeagleShowsMessages = {
   "shows.form.submit": "Sök",
   "shows.form.reset": "Rensa",
   "shows.form.rangeValidation": "Välj både startdatum och slutdatum.",
+  "shows.form.yearValidation":
+    "Ange ett år mellan 1900 och 2100 eller lämna fältet tomt.",
 
   "shows.results.title": "Utställningar",
   "shows.results.count": "Utställningar",
