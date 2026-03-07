@@ -20,6 +20,7 @@ export type BeagleDogProfilePedigreeGenerationDto = {
 
 export type BeagleDogProfileTrialRowDto = {
   id: string;
+  trialId: string;
   place: string;
   date: string;
   weather: string | null;
@@ -39,6 +40,7 @@ export type BeagleDogProfileTrialRowDto = {
 
 export type BeagleDogProfileShowRowDto = {
   id: string;
+  showId: string;
   place: string;
   date: string;
   result: string | null;

@@ -3,6 +3,11 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { DogProfileTrialsCard } from "../dog-profile-trials-card";
 
+vi.mock("next/link", () => ({
+  default: ({ href, children, ...props }: React.ComponentProps<"a">) =>
+    React.createElement("a", { href, ...props }, children),
+}));
+
 vi.mock("@/hooks/i18n", () => ({
   useI18n: () => ({
     locale: "fi",
@@ -17,6 +22,7 @@ describe("DogProfileTrialsCard", () => {
         rows: [
           {
             id: "trial1",
+            trialId: "trial-route-1",
             place: "Turku",
             date: "2024-02-01",
             weather: "P",
@@ -39,6 +45,7 @@ describe("DogProfileTrialsCard", () => {
 
     expect(html).toContain(">S1<");
     expect(html).toContain("dog.profile.trials.copy.button");
+    expect(html).toContain('href="/beagle/trials/trial-route-1"');
   });
 
   it("keeps pair rank separator as pipe", () => {
@@ -47,6 +54,7 @@ describe("DogProfileTrialsCard", () => {
         rows: [
           {
             id: "trial2",
+            trialId: "trial-route-2",
             place: "Rovaniemi",
             date: "2024-02-01",
             weather: "P",

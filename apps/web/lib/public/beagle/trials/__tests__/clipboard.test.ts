@@ -215,6 +215,7 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
       [
         {
           id: "t1",
+          trialId: "trial-1",
           place: "Helsinki",
           date: "2025-06-01",
           weather: "L",
@@ -233,6 +234,7 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
         },
         {
           id: "t2",
+          trialId: "trial-2",
           place: "Turku",
           date: "2025-06-02",
           weather: null,
@@ -300,6 +302,7 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
       [
         {
           id: "t3",
+          trialId: "trial-3",
           place: "Tam\tpe\nre",
           date: "2025-06-03",
           weather: null,

@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createDogsService } from "../search";
+import { encodeShowId } from "../../shows/internal/show-id";
+import { encodeTrialId } from "../../trials/internal/trial-id";
 
 const {
   searchBeagleDogsDbMock,
@@ -325,10 +327,18 @@ describe("dogs service", () => {
         data: {
           ...mockProfile,
           birthDate: "2020-01-01",
-          shows: [{ ...mockShows[0], date: "2024-01-01", result: "JUN-ERI" }],
+          shows: [
+            {
+              ...mockShows[0],
+              showId: encodeShowId("2024-01-01", "City"),
+              date: "2024-01-01",
+              result: "JUN-ERI",
+            },
+          ],
           trials: [
             {
               id: "trial1",
+              trialId: encodeTrialId("2022-02-02", "Town"),
               place: "Town",
               date: "2022-02-02",
               weather: "P",
@@ -412,10 +422,17 @@ describe("dogs service", () => {
         data: {
           ...mockProfile,
           birthDate: "2020-01-01",
-          shows: [{ ...mockShows[0], date: "2022-03-15" }],
+          shows: [
+            {
+              ...mockShows[0],
+              showId: encodeShowId("2022-03-15", "Helsinki"),
+              date: "2022-03-15",
+            },
+          ],
           trials: [
             {
               id: "trial2",
+              trialId: encodeTrialId("2022-04-16", "Lahti"),
               place: "Lahti",
               date: "2022-04-16",
               weather: null,
@@ -480,6 +497,7 @@ describe("dogs service", () => {
           shows: [
             {
               ...mockShows[0],
+              showId: encodeShowId("2024-02-01", "City"),
               date: "2024-02-01",
               result: "JUN-ERI (specialNote)",
             },

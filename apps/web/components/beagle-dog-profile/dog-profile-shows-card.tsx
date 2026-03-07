@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   ListingResponsiveResults,
   ListingSectionShell,
@@ -6,7 +7,10 @@ import { beagleTheme } from "@/components/ui/beagle-theme";
 import { toast } from "@/components/ui/sonner";
 import { useI18n } from "@/hooks/i18n";
 import { parseLocalIsoDate } from "@/lib/public/beagle/dogs/profile";
-import { copyDogProfileShowRowsToClipboard } from "@/lib/public/beagle/shows";
+import {
+  copyDogProfileShowRowsToClipboard,
+  getBeagleShowHref,
+} from "@/lib/public/beagle/shows";
 import { cn } from "@/lib/utils";
 import type { BeagleDogProfileShowRowDto } from "@beagle/contracts";
 
@@ -142,7 +146,17 @@ export function DogProfileShowsCard({
                       className={cn("border-b align-top", beagleTheme.border)}
                     >
                       <td className="px-2 py-2">{index + 1}</td>
-                      <td className="px-2 py-2">{row.place}</td>
+                      <td className="px-2 py-2">
+                        <Link
+                          href={getBeagleShowHref(row.showId)}
+                          className={cn(
+                            "font-medium underline underline-offset-2",
+                            beagleTheme.inkStrongText,
+                          )}
+                        >
+                          {row.place}
+                        </Link>
+                      </td>
                       <td className="px-2 py-2">
                         {formatDate(row.date, locale)}
                       </td>
@@ -195,7 +209,15 @@ export function DogProfileShowsCard({
                       <span className={beagleTheme.mutedText}>
                         {t("dog.profile.shows.col.place")}:
                       </span>{" "}
-                      <span>{row.place}</span>
+                      <Link
+                        href={getBeagleShowHref(row.showId)}
+                        className={cn(
+                          "font-medium underline underline-offset-2",
+                          beagleTheme.inkStrongText,
+                        )}
+                      >
+                        {row.place}
+                      </Link>
                     </p>
                     {hasResult && (
                       <p className="col-span-2">

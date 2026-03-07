@@ -10,7 +10,9 @@ import {
 } from "@beagle/db";
 import type { BeagleDogProfileDto } from "@beagle/contracts";
 import { normalizeShowResult } from "../../shows/core";
+import { encodeShowId } from "../../shows/internal/show-id";
 import { formatTrialAward } from "../../trials/core";
+import { encodeTrialId } from "../../trials/internal/trial-id";
 import { toBusinessDateOnly } from "../../core/date-only";
 import { toErrorLog, withLogContext } from "../../core/logger";
 import type { ServiceResult } from "../../core/result";
@@ -44,6 +46,7 @@ function mapDogProfileFromDb(
       const showDate = toBusinessDateOnly(show.date);
       return {
         id: show.id,
+        showId: encodeShowId(showDate, show.place),
         place: show.place,
         date: showDate,
         result: normalizeShowResult(show.result, showDate),
@@ -53,6 +56,7 @@ function mapDogProfileFromDb(
     }),
     trials: trials.map((trial) => ({
       id: trial.id,
+      trialId: encodeTrialId(toBusinessDateOnly(trial.date), trial.place),
       place: trial.place,
       date: toBusinessDateOnly(trial.date),
       weather: trial.weather,

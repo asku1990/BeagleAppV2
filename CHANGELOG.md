@@ -20,6 +20,7 @@ This project uses a user-facing changelog format.
 - Julkiselle näyttelyhaulle lisättiin leikepöytätoiminnot: hakusivulla voi kopioida näkyvän sivun tulokset ja näyttelyn tulossivulla yksittäisen rivin tai kaikki rivit TSV-muodossa.
 - Koiran profiilin näyttely- ja koetuloskortteihin lisättiin "Kopioi kaikki" -toiminnot TSV-vientiä varten.
 - Koiran profiilin koetuloskortin TSV-vienti sisältää nyt myös samat yksityiskohtaiset koemittarit kuin julkinen ajokokeen tulossivu, jotta rivien vertailu onnistuu paremmin esimerkiksi Excelissä.
+- Koiraprofiilin näyttely sekä ajokoe paikkojen nimet toimii linkkinä tapahtumaan.
 
 ### Changed
 

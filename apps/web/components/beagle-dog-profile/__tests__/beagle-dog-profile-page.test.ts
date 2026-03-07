@@ -67,6 +67,7 @@ describe("BeagleDogProfilePage", () => {
           shows: [
             {
               id: "show1",
+              showId: "show-route-1",
               place: "Helsinki",
               date: "2024-01-01",
               result: "ERI",
@@ -77,6 +78,7 @@ describe("BeagleDogProfilePage", () => {
           trials: [
             {
               id: "trial1",
+              trialId: "trial-route-1",
               place: "Turku",
               date: "2024-02-01",
               weather: "P",
@@ -108,6 +110,8 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain("dog.profile.card.trials.title");
     expect(html).toContain("dog.profile.shows.copy.button");
     expect(html).toContain("dog.profile.trials.copy.button");
+    expect(html).toContain('href="/beagle/shows/show-route-1"');
+    expect(html).toContain('href="/beagle/trials/trial-route-1"');
     expect(html).toContain('href="/beagle/dogs/sire_1"');
     expect(html).toContain('href="/beagle/dogs/dam_1"');
     expect(html).toContain("(EK: 101)");

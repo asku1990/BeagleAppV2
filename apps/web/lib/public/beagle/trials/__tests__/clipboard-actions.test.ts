@@ -115,6 +115,7 @@ describe("trial clipboard actions", () => {
       rows: [
         {
           id: "d1",
+          trialId: "trial-1",
           place: "Turku",
           date: "2025-06-01",
           weather: "P",

@@ -165,6 +165,7 @@ describe("formatDogProfileShowRowsForClipboard", () => {
       [
         {
           id: "s1",
+          showId: "show-1",
           place: "Helsinki",
           date: "2025-06-01",
           result: "ERI",
@@ -173,6 +174,7 @@ describe("formatDogProfileShowRowsForClipboard", () => {
         },
         {
           id: "s2",
+          showId: "show-2",
           place: "Turku",
           date: "2025-05-01",
           result: null,
@@ -206,6 +208,7 @@ describe("formatDogProfileShowRowsForClipboard", () => {
       [
         {
           id: "s3",
+          showId: "show-3",
           place: "Tam\tpe\nre",
           date: "2025-06-03",
           result: null,

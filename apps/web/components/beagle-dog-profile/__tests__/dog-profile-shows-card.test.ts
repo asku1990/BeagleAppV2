@@ -3,6 +3,11 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { DogProfileShowsCard } from "../dog-profile-shows-card";
 
+vi.mock("next/link", () => ({
+  default: ({ href, children, ...props }: React.ComponentProps<"a">) =>
+    React.createElement("a", { href, ...props }, children),
+}));
+
 vi.mock("@/hooks/i18n", () => ({
   useI18n: () => ({
     locale: "fi",
@@ -17,6 +22,7 @@ describe("DogProfileShowsCard", () => {
         rows: [
           {
             id: "show1",
+            showId: "show-route-1",
             place: "Helsinki",
             date: "2024-01-01",
             result: "ERI",
@@ -28,6 +34,7 @@ describe("DogProfileShowsCard", () => {
     );
 
     expect(html).toContain("dog.profile.shows.copy.button");
+    expect(html).toContain('href="/beagle/shows/show-route-1"');
   });
 
   it("hides copy action when no rows exist", () => {

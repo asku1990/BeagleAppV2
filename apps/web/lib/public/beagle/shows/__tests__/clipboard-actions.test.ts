@@ -126,6 +126,7 @@ describe("show clipboard actions", () => {
       rows: [
         {
           id: "s1",
+          showId: "show-1",
           place: "Helsinki",
           date: "2025-06-01",
           result: "ERI",
