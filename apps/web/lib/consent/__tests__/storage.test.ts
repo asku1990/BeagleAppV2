@@ -13,11 +13,16 @@ import {
 } from "@/lib/consent/storage";
 
 const originalDocument = globalThis.document;
+const originalWindow = globalThis.window;
 
 afterEach(() => {
   Object.defineProperty(globalThis, "document", {
     configurable: true,
     value: originalDocument,
+  });
+  Object.defineProperty(globalThis, "window", {
+    configurable: true,
+    value: originalWindow,
   });
 });
 
@@ -72,10 +77,39 @@ describe("consent storage", () => {
         cookie: "",
       },
     });
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      value: {
+        location: {
+          protocol: "http:",
+        },
+      },
+    });
 
     writeAnalyticsConsentCookie(ANALYTICS_CONSENT_ACCEPTED);
     expect(globalThis.document.cookie).toContain(
       `${ANALYTICS_CONSENT_COOKIE_NAME}=accepted`,
     );
+    expect(globalThis.document.cookie).not.toContain("secure");
+  });
+
+  it("writes secure consent cookie on https", () => {
+    Object.defineProperty(globalThis, "document", {
+      configurable: true,
+      value: {
+        cookie: "",
+      },
+    });
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      value: {
+        location: {
+          protocol: "https:",
+        },
+      },
+    });
+
+    writeAnalyticsConsentCookie(ANALYTICS_CONSENT_ACCEPTED);
+    expect(globalThis.document.cookie).toContain("secure");
   });
 });

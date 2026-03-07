@@ -38,7 +38,12 @@ export function writeAnalyticsConsentCookie(
     return;
   }
 
+  const secureAttribute =
+    typeof window !== "undefined" && window.location.protocol === "https:"
+      ? "; secure"
+      : "";
+
   document.cookie =
     `${ANALYTICS_CONSENT_COOKIE_NAME}=${decision}; ` +
-    `path=/; max-age=${ANALYTICS_CONSENT_MAX_AGE}; samesite=lax`;
+    `path=/; max-age=${ANALYTICS_CONSENT_MAX_AGE}; samesite=lax${secureAttribute}`;
 }
