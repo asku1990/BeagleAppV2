@@ -101,6 +101,7 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain("dog.profile.page.title");
     expect(html).toContain("Ajometsan Aada");
     expect(html).toContain("FI-11/24");
+    expect(html).not.toContain("dog.profile.page.backToSearch");
     expect(html).toContain("dog.profile.card.details.title");
     expect(html).toContain("dog.profile.card.lineage.title");
     expect(html).toContain("dog.profile.card.shows.title");
