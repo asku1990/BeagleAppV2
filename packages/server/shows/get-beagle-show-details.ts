@@ -3,7 +3,7 @@ import type { BeagleShowDetailsResponse } from "@beagle/contracts";
 import { toBusinessDateOnly } from "../core/date-only";
 import { toErrorLog, withLogContext } from "../core/logger";
 import type { ServiceResult } from "../core/result";
-import { normalizeShowResult } from "./internal/normalize-show-result";
+import { normalizeShowResult } from "./core";
 import { encodeShowId, parseShowId } from "./internal/show-id";
 import type { ShowsServiceLogContext } from "./types";
 
@@ -78,6 +78,8 @@ export async function getBeagleShowDetailsService(
         sex: item.sex,
         result: normalizeShowResult(item.result, eventDate),
         heightCm: item.heightCm,
+        // Note: ShowResult.eventName exists in DB but is intentionally excluded
+        // from the public show contract/clipboard until product requirements need it.
         judge: item.judge,
       })),
     };

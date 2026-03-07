@@ -141,6 +141,27 @@ Rule of thumb:
 - Re-export public APIs via local `index.ts` files.
 - Avoid generic catch-all helper files (`utils.ts`) with unrelated logic.
 
+## Use-Case Sizing Rule
+
+Apply the same anti-bloat rule across `packages/db`, `packages/server`, and
+`apps/web/lib` feature utilities.
+
+Rules:
+
+- Keep files use-case-scoped by default (`search`, `details`, `dog`, etc.).
+- If a file grows beyond ~250-300 lines or has more than 2 exported use-case
+  functions, split it in the same task.
+- Move shared helpers (date/filter/sort/format mapping) into `<domain>/core/*`
+  or feature-local `internal/*` based on reuse scope.
+- Keep public exports stable through local `index.ts` re-exports.
+
+Layer intent:
+
+- `packages/db`: one repository query function per file by default.
+- `packages/server`: one service/use-case entry function per file by default.
+- `apps/web/lib/<audience>/<domain>/<feature>`: keep clipboard/formatter/query
+  param/state helpers split by concern when size/exports exceed the threshold.
+
 ## Helper Placement
 
 Preferred backend helper structure:

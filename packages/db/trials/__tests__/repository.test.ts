@@ -22,7 +22,11 @@ vi.mock("../../core/prisma", () => ({
   prisma: prismaMock,
 }));
 
-import { getBeagleTrialDetailsDb, searchBeagleTrialsDb } from "../repository";
+import {
+  getBeagleTrialDetailsDb,
+  getBeagleTrialsForDogDb,
+  searchBeagleTrialsDb,
+} from "../repository";
 
 describe("searchBeagleTrialsDb", () => {
   beforeEach(() => {
@@ -297,5 +301,121 @@ describe("getBeagleTrialDetailsDb", () => {
       weather: null,
       points: null,
     });
+  });
+});
+
+describe("getBeagleTrialsForDogDb", () => {
+  beforeEach(() => {
+    trialResultGroupByMock.mockReset();
+    trialResultFindManyMock.mockReset();
+  });
+
+  it("maps dog trial rows in date-desc order", async () => {
+    trialResultFindManyMock.mockResolvedValue([
+      {
+        id: "t2",
+        eventPlace: "Lahti",
+        eventDate: new Date("2025-06-02T00:00:00.000Z"),
+        ke: "L",
+        eventName: "VOI",
+        lk: "V",
+        sija: "1",
+        piste: { toNumber: () => 88.25 },
+        pa: "1",
+        judge: "Judge A",
+        haku: { toNumber: () => 4.1 },
+        hauk: { toNumber: () => 4.2 },
+        yva: { toNumber: () => 4.3 },
+        hlo: { toNumber: () => 0.1 },
+        alo: { toNumber: () => 0.2 },
+        tja: { toNumber: () => 0.3 },
+        pin: { toNumber: () => 5.6 },
+      },
+      {
+        id: "t1",
+        eventPlace: "Helsinki",
+        eventDate: new Date("2025-06-01T00:00:00.000Z"),
+        ke: null,
+        eventName: null,
+        lk: null,
+        sija: null,
+        piste: null,
+        pa: null,
+        judge: null,
+        haku: null,
+        hauk: null,
+        yva: null,
+        hlo: null,
+        alo: null,
+        tja: null,
+        pin: null,
+      },
+    ]);
+
+    const result = await getBeagleTrialsForDogDb("dog-1");
+
+    expect(trialResultFindManyMock).toHaveBeenCalledWith({
+      where: { dogId: "dog-1" },
+      select: {
+        id: true,
+        eventPlace: true,
+        eventDate: true,
+        ke: true,
+        eventName: true,
+        lk: true,
+        sija: true,
+        piste: true,
+        pa: true,
+        judge: true,
+        haku: true,
+        hauk: true,
+        yva: true,
+        hlo: true,
+        alo: true,
+        tja: true,
+        pin: true,
+      },
+      orderBy: [{ eventDate: "desc" }, { eventPlace: "asc" }, { id: "asc" }],
+    });
+    expect(result).toEqual([
+      {
+        id: "t2",
+        place: "Lahti",
+        date: new Date("2025-06-02T00:00:00.000Z"),
+        weather: "L",
+        className: "VOI",
+        classCode: "V",
+        rank: "1",
+        points: 88.25,
+        award: "1",
+        judge: "Judge A",
+        haku: 4.1,
+        hauk: 4.2,
+        yva: 4.3,
+        hlo: 0.1,
+        alo: 0.2,
+        tja: 0.3,
+        pin: 5.6,
+      },
+      {
+        id: "t1",
+        place: "Helsinki",
+        date: new Date("2025-06-01T00:00:00.000Z"),
+        weather: null,
+        className: null,
+        classCode: null,
+        rank: null,
+        points: null,
+        award: null,
+        judge: null,
+        haku: null,
+        hauk: null,
+        yva: null,
+        hlo: null,
+        alo: null,
+        tja: null,
+        pin: null,
+      },
+    ]);
   });
 });

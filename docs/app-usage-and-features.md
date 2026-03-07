@@ -12,6 +12,10 @@ Routes:
 
 - `/` (home with statistics)
 - `/beagle/search` (search page)
+- `/beagle/shows` (show search page)
+- `/beagle/shows/[showId]` (show detail page)
+- `/beagle/trials` (trial search page)
+- `/beagle/trials/[trialId]` (trial detail page)
 - `/beagle/dogs/[dogId]` (dog profile page)
 - `/whats-new`
 
@@ -22,20 +26,39 @@ Can do:
    - primary fields: EK number, registration number, dog name
    - advanced filters: sex, birth year range, EK-only, multiple registrations
    - sorts: `name-asc`, `birth-desc`, `reg-desc`, `created-desc`, `ek-asc`
-3. Open dog profile `/beagle/dogs/[dogId]`:
+3. Search shows on `/beagle/shows`:
+   - year or date range filters
+   - date sorting
+   - pagination
+   - copy the current visible result page as TSV
+4. Open show detail `/beagle/shows/[showId]`:
+   - event summary (date, place, judge, dog count)
+   - dog rows with registration number, name, sex, result, review text placeholder, height, and judge
+   - copy one row or all rows as TSV
+5. Search trials on `/beagle/trials`:
+   - year or date range filters
+   - date sorting
+   - pagination
+   - copy the current visible result page as TSV
+6. Open trial detail `/beagle/trials/[trialId]`:
+   - event summary (date, place, judge, dog count)
+   - dog rows with result details
+   - copy one row or all rows as TSV
+7. Open dog profile `/beagle/dogs/[dogId]`:
    - basic details (name, registrations, birth date/age, sex, EK number)
    - lineage cards (parent profile links when available)
    - show results section
    - trial results section
    - not-found state for unknown IDs and error panel for other fetch failures
-4. Read release notes on `/whats-new`.
+8. Read release notes on `/whats-new`.
 
 Sidebar:
 
 - Active links for everyone:
   - `/`
   - `/beagle/search`
-- Other public sidebar items are placeholders that currently show a "not implemented yet" message.
+  - `/beagle/shows`
+  - `/beagle/trials`
 
 Limits:
 

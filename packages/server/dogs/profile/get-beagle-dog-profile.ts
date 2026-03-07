@@ -1,7 +1,18 @@
-import { getBeagleDogProfileDb, type BeagleDogProfileDb } from "@beagle/db";
+// Builds the public dog profile DTO by combining base dog profile data with
+// show/trial domain fetches and shared legacy result normalization helpers.
+import {
+  getBeagleDogProfileDb,
+  getBeagleShowsForDogDb,
+  getBeagleTrialsForDogDb,
+  type BeagleDogProfileDb,
+  type BeagleShowDogRowDb,
+  type BeagleTrialDogRowDb,
+} from "@beagle/db";
 import type { BeagleDogProfileDto } from "@beagle/contracts";
-import { normalizeShowResult } from "../show-results";
-import { formatTrialAward } from "../trial-results";
+import { normalizeShowResult } from "../../shows/core";
+import { encodeShowId } from "../../shows/internal/show-id";
+import { formatTrialAward } from "../../trials/core";
+import { encodeTrialId } from "../../trials/internal/trial-id";
 import { toBusinessDateOnly } from "../../core/date-only";
 import { toErrorLog, withLogContext } from "../../core/logger";
 import type { ServiceResult } from "../../core/result";
@@ -12,7 +23,11 @@ export type DogsServiceLogContext = {
   actorUserId?: string;
 };
 
-function mapDogProfileFromDb(profile: BeagleDogProfileDb): BeagleDogProfileDto {
+function mapDogProfileFromDb(
+  profile: BeagleDogProfileDb,
+  shows: BeagleShowDogRowDb[],
+  trials: BeagleTrialDogRowDb[],
+): BeagleDogProfileDto {
   return {
     id: profile.id,
     name: profile.name,
@@ -27,16 +42,21 @@ function mapDogProfileFromDb(profile: BeagleDogProfileDb): BeagleDogProfileDto {
     sire: profile.sire,
     dam: profile.dam,
     pedigree: profile.pedigree,
-    shows: profile.shows.map((show) => ({
-      id: show.id,
-      place: show.place,
-      date: toBusinessDateOnly(show.date),
-      result: normalizeShowResult(show.result, toBusinessDateOnly(show.date)),
-      judge: show.judge,
-      heightCm: show.heightCm,
-    })),
-    trials: profile.trials.map((trial) => ({
+    shows: shows.map((show) => {
+      const showDate = toBusinessDateOnly(show.date);
+      return {
+        id: show.id,
+        showId: encodeShowId(showDate, show.place),
+        place: show.place,
+        date: showDate,
+        result: normalizeShowResult(show.result, showDate),
+        judge: show.judge,
+        heightCm: show.heightCm,
+      };
+    }),
+    trials: trials.map((trial) => ({
       id: trial.id,
+      trialId: encodeTrialId(toBusinessDateOnly(trial.date), trial.place),
       place: trial.place,
       date: toBusinessDateOnly(trial.date),
       weather: trial.weather,
@@ -44,6 +64,14 @@ function mapDogProfileFromDb(profile: BeagleDogProfileDb): BeagleDogProfileDto {
       rank: trial.rank,
       points: trial.points,
       award: formatTrialAward(trial.award, trial.classCode),
+      judge: trial.judge,
+      haku: trial.haku,
+      hauk: trial.hauk,
+      yva: trial.yva,
+      hlo: trial.hlo,
+      alo: trial.alo,
+      tja: trial.tja,
+      pin: trial.pin,
     })),
   };
 }
@@ -77,8 +105,8 @@ export async function getBeagleDogProfileService(
   }
 
   try {
-    const data = await getBeagleDogProfileDb(parsedDogId);
-    if (!data) {
+    const profile = await getBeagleDogProfileDb(parsedDogId);
+    if (!profile) {
       log.info(
         {
           event: "not_found",
@@ -93,6 +121,11 @@ export async function getBeagleDogProfileService(
       };
     }
 
+    const [shows, trials] = await Promise.all([
+      getBeagleShowsForDogDb(parsedDogId),
+      getBeagleTrialsForDogDb(parsedDogId),
+    ]);
+
     log.info(
       {
         event: "success",
@@ -103,7 +136,7 @@ export async function getBeagleDogProfileService(
     );
     return {
       status: 200,
-      body: { ok: true, data: mapDogProfileFromDb(data) },
+      body: { ok: true, data: mapDogProfileFromDb(profile, shows, trials) },
     };
   } catch (error) {
     log.error(

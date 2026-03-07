@@ -156,6 +156,7 @@ describe("BeagleShowsPage", () => {
     expect(html).toContain("Helsinki");
     expect(html).toContain("Judge Main");
     expect(html).toContain("shows.results.open");
+    expect(html).toContain("shows.results.copy.button");
     expect(html).toContain("shows.pagination.range 1-1 / 1");
   });
 });

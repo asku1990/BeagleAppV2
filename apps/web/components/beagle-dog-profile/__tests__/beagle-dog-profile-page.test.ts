@@ -67,6 +67,7 @@ describe("BeagleDogProfilePage", () => {
           shows: [
             {
               id: "show1",
+              showId: "show-route-1",
               place: "Helsinki",
               date: "2024-01-01",
               result: "ERI",
@@ -77,6 +78,7 @@ describe("BeagleDogProfilePage", () => {
           trials: [
             {
               id: "trial1",
+              trialId: "trial-route-1",
               place: "Turku",
               date: "2024-02-01",
               weather: "P",
@@ -84,6 +86,14 @@ describe("BeagleDogProfilePage", () => {
               rank: "1",
               points: 85.5,
               award: "BEAJ-1",
+              judge: "Judge A",
+              haku: 4,
+              hauk: 4,
+              yva: 4,
+              hlo: 0,
+              alo: 0,
+              tja: 0,
+              pin: 8,
             },
           ],
         },
@@ -93,10 +103,15 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain("dog.profile.page.title");
     expect(html).toContain("Ajometsan Aada");
     expect(html).toContain("FI-11/24");
+    expect(html).not.toContain("dog.profile.page.backToSearch");
     expect(html).toContain("dog.profile.card.details.title");
     expect(html).toContain("dog.profile.card.lineage.title");
     expect(html).toContain("dog.profile.card.shows.title");
     expect(html).toContain("dog.profile.card.trials.title");
+    expect(html).toContain("dog.profile.shows.copy.button");
+    expect(html).toContain("dog.profile.trials.copy.button");
+    expect(html).toContain('href="/beagle/shows/show-route-1"');
+    expect(html).toContain('href="/beagle/trials/trial-route-1"');
     expect(html).toContain('href="/beagle/dogs/sire_1"');
     expect(html).toContain('href="/beagle/dogs/dam_1"');
     expect(html).toContain("(EK: 101)");
@@ -131,5 +146,7 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain("dog.profile.empty.trials");
     expect(html).toContain("dog.profile.empty.shows");
     expect(html).toContain("dog.profile.sex.unknown");
+    expect(html).not.toContain("dog.profile.shows.copy.button");
+    expect(html).not.toContain("dog.profile.trials.copy.button");
   });
 });

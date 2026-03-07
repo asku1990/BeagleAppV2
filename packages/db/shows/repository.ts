@@ -57,6 +57,15 @@ export type BeagleShowDetailsResponseDb = {
   items: BeagleShowDetailsRowDb[];
 };
 
+export type BeagleShowDogRowDb = {
+  id: string;
+  place: string;
+  date: Date;
+  result: string | null;
+  judge: string | null;
+  heightCm: number | null;
+};
+
 const BUSINESS_TIME_ZONE = "Europe/Helsinki";
 const BUSINESS_DATE_ONLY_FORMATTER = new Intl.DateTimeFormat("en-CA", {
   timeZone: BUSINESS_TIME_ZONE,
@@ -510,4 +519,30 @@ export async function getBeagleShowDetailsDb(
     dogCount: items.length,
     items,
   };
+}
+
+export async function getBeagleShowsForDogDb(
+  dogId: string,
+): Promise<BeagleShowDogRowDb[]> {
+  const rows = await prisma.showResult.findMany({
+    where: { dogId },
+    select: {
+      id: true,
+      eventPlace: true,
+      eventDate: true,
+      resultText: true,
+      judge: true,
+      heightText: true,
+    },
+    orderBy: [{ eventDate: "desc" }, { eventPlace: "asc" }, { id: "asc" }],
+  });
+
+  return rows.map((row) => ({
+    id: row.id,
+    place: row.eventPlace,
+    date: row.eventDate,
+    result: row.resultText,
+    judge: row.judge,
+    heightCm: parseHeightCm(row.heightText),
+  }));
 }

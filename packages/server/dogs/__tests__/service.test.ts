@@ -1,14 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createDogsService } from "../search";
+import { encodeShowId } from "../../shows/internal/show-id";
+import { encodeTrialId } from "../../trials/internal/trial-id";
 
 const {
   searchBeagleDogsDbMock,
   getNewestBeagleDogsDbMock,
   getBeagleDogProfileDbMock,
+  getBeagleShowsForDogDbMock,
+  getBeagleTrialsForDogDbMock,
 } = vi.hoisted(() => ({
   searchBeagleDogsDbMock: vi.fn(),
   getNewestBeagleDogsDbMock: vi.fn(),
   getBeagleDogProfileDbMock: vi.fn(),
+  getBeagleShowsForDogDbMock: vi.fn(),
+  getBeagleTrialsForDogDbMock: vi.fn(),
 }));
 
 vi.mock("@beagle/db", async () => {
@@ -18,6 +24,8 @@ vi.mock("@beagle/db", async () => {
     searchBeagleDogsDb: searchBeagleDogsDbMock,
     getNewestBeagleDogsDb: getNewestBeagleDogsDbMock,
     getBeagleDogProfileDb: getBeagleDogProfileDbMock,
+    getBeagleShowsForDogDb: getBeagleShowsForDogDbMock,
+    getBeagleTrialsForDogDb: getBeagleTrialsForDogDbMock,
   };
 });
 
@@ -26,6 +34,8 @@ describe("dogs service", () => {
     searchBeagleDogsDbMock.mockReset();
     getNewestBeagleDogsDbMock.mockReset();
     getBeagleDogProfileDbMock.mockReset();
+    getBeagleShowsForDogDbMock.mockReset();
+    getBeagleTrialsForDogDbMock.mockReset();
   });
 
   it("returns 400 for invalid sort and does not call DB", async () => {
@@ -268,35 +278,48 @@ describe("dogs service", () => {
       sire: { name: "Sire", registrationNo: "FI-2/18" },
       dam: { name: "Dam", registrationNo: "FI-3/18" },
       pedigree: [],
-      shows: [
-        {
-          id: "show1",
-          place: "City",
-          date: new Date("2024-01-01T00:00:00.000Z"),
-          result: "JUN1",
-          judge: "Judge",
-          heightCm: 39,
-        },
-      ],
-      trials: [
-        {
-          id: "trial1",
-          place: "Town",
-          date: new Date("2022-02-02T00:00:00.000Z"),
-          weather: "P",
-          className: "VOI",
-          classCode: "A",
-          rank: "1",
-          points: 85.5,
-          award: "1",
-        },
-      ],
     };
+    const mockShows = [
+      {
+        id: "show1",
+        place: "City",
+        date: new Date("2024-01-01T00:00:00.000Z"),
+        result: "JUN1",
+        judge: "Judge",
+        heightCm: 39,
+      },
+    ];
+    const mockTrials = [
+      {
+        id: "trial1",
+        place: "Town",
+        date: new Date("2022-02-02T00:00:00.000Z"),
+        weather: "P",
+        className: "VOI",
+        classCode: "A",
+        rank: "1",
+        points: 85.5,
+        award: "1",
+        judge: "Judge Main",
+        haku: 4.1,
+        hauk: 4.2,
+        yva: 4.3,
+        hlo: 0.1,
+        alo: 0.2,
+        tja: 0.3,
+        pin: 6,
+      },
+    ];
     getBeagleDogProfileDbMock.mockResolvedValue(mockProfile);
+    getBeagleShowsForDogDbMock.mockResolvedValue(mockShows);
+    getBeagleTrialsForDogDbMock.mockResolvedValue(mockTrials);
 
     const service = createDogsService();
     const result = await service.getBeagleDogProfile("dog1");
 
+    expect(getBeagleDogProfileDbMock).toHaveBeenCalledWith("dog1");
+    expect(getBeagleShowsForDogDbMock).toHaveBeenCalledWith("dog1");
+    expect(getBeagleTrialsForDogDbMock).toHaveBeenCalledWith("dog1");
     expect(result).toEqual({
       status: 200,
       body: {
@@ -305,11 +328,17 @@ describe("dogs service", () => {
           ...mockProfile,
           birthDate: "2020-01-01",
           shows: [
-            { ...mockProfile.shows[0], date: "2024-01-01", result: "JUN-ERI" },
+            {
+              ...mockShows[0],
+              showId: encodeShowId("2024-01-01", "City"),
+              date: "2024-01-01",
+              result: "JUN-ERI",
+            },
           ],
           trials: [
             {
               id: "trial1",
+              trialId: encodeTrialId("2022-02-02", "Town"),
               place: "Town",
               date: "2022-02-02",
               weather: "P",
@@ -317,6 +346,14 @@ describe("dogs service", () => {
               rank: "1",
               points: 85.5,
               award: "Avo 1",
+              judge: "Judge Main",
+              haku: 4.1,
+              hauk: 4.2,
+              yva: 4.3,
+              hlo: 0.1,
+              alo: 0.2,
+              tja: 0.3,
+              pin: 6,
             },
           ],
         },
@@ -339,31 +376,41 @@ describe("dogs service", () => {
       sire: null,
       dam: null,
       pedigree: [],
-      shows: [
-        {
-          id: "show2",
-          place: "Helsinki",
-          date: new Date("2022-03-15T00:00:00+02:00"),
-          result: null,
-          judge: null,
-          heightCm: null,
-        },
-      ],
-      trials: [
-        {
-          id: "trial2",
-          place: "Lahti",
-          date: new Date("2022-04-16T00:00:00+03:00"),
-          weather: null,
-          className: null,
-          classCode: null,
-          rank: null,
-          points: null,
-          award: null,
-        },
-      ],
     };
+    const mockShows = [
+      {
+        id: "show2",
+        place: "Helsinki",
+        date: new Date("2022-03-15T00:00:00+02:00"),
+        result: null,
+        judge: null,
+        heightCm: null,
+      },
+    ];
+    const mockTrials = [
+      {
+        id: "trial2",
+        place: "Lahti",
+        date: new Date("2022-04-16T00:00:00+03:00"),
+        weather: null,
+        className: null,
+        classCode: null,
+        rank: null,
+        points: null,
+        award: null,
+        judge: null,
+        haku: null,
+        hauk: null,
+        yva: null,
+        hlo: null,
+        alo: null,
+        tja: null,
+        pin: null,
+      },
+    ];
     getBeagleDogProfileDbMock.mockResolvedValue(mockProfile);
+    getBeagleShowsForDogDbMock.mockResolvedValue(mockShows);
+    getBeagleTrialsForDogDbMock.mockResolvedValue(mockTrials);
 
     const service = createDogsService();
     const result = await service.getBeagleDogProfile("dog2");
@@ -375,10 +422,17 @@ describe("dogs service", () => {
         data: {
           ...mockProfile,
           birthDate: "2020-01-01",
-          shows: [{ ...mockProfile.shows[0], date: "2022-03-15" }],
+          shows: [
+            {
+              ...mockShows[0],
+              showId: encodeShowId("2022-03-15", "Helsinki"),
+              date: "2022-03-15",
+            },
+          ],
           trials: [
             {
               id: "trial2",
+              trialId: encodeTrialId("2022-04-16", "Lahti"),
               place: "Lahti",
               date: "2022-04-16",
               weather: null,
@@ -386,6 +440,14 @@ describe("dogs service", () => {
               rank: null,
               points: null,
               award: null,
+              judge: null,
+              haku: null,
+              hauk: null,
+              yva: null,
+              hlo: null,
+              alo: null,
+              tja: null,
+              pin: null,
             },
           ],
         },
@@ -408,19 +470,20 @@ describe("dogs service", () => {
       sire: null,
       dam: null,
       pedigree: [],
-      shows: [
-        {
-          id: "show-case",
-          place: "City",
-          date: new Date("2024-02-01T00:00:00.000Z"),
-          result: "JUN1 (specialNote)",
-          judge: null,
-          heightCm: null,
-        },
-      ],
-      trials: [],
     };
+    const mockShows = [
+      {
+        id: "show-case",
+        place: "City",
+        date: new Date("2024-02-01T00:00:00.000Z"),
+        result: "JUN1 (specialNote)",
+        judge: null,
+        heightCm: null,
+      },
+    ];
     getBeagleDogProfileDbMock.mockResolvedValue(mockProfile);
+    getBeagleShowsForDogDbMock.mockResolvedValue(mockShows);
+    getBeagleTrialsForDogDbMock.mockResolvedValue([]);
 
     const service = createDogsService();
     const result = await service.getBeagleDogProfile("dog-casing");
@@ -433,7 +496,8 @@ describe("dogs service", () => {
           ...mockProfile,
           shows: [
             {
-              ...mockProfile.shows[0],
+              ...mockShows[0],
+              showId: encodeShowId("2024-02-01", "City"),
               date: "2024-02-01",
               result: "JUN-ERI (specialNote)",
             },
@@ -450,6 +514,8 @@ describe("dogs service", () => {
     const service = createDogsService();
     const result = await service.getBeagleDogProfile("missing");
 
+    expect(getBeagleShowsForDogDbMock).not.toHaveBeenCalled();
+    expect(getBeagleTrialsForDogDbMock).not.toHaveBeenCalled();
     expect(result).toEqual({
       status: 404,
       body: { ok: false, error: "Dog profile not found." },
@@ -467,12 +533,30 @@ describe("dogs service", () => {
   });
 
   it("trims dogId before profile DB call", async () => {
-    getBeagleDogProfileDbMock.mockResolvedValue(null);
+    getBeagleDogProfileDbMock.mockResolvedValue({
+      id: "dog-casing",
+      name: "Case Dog",
+      title: null,
+      registrationNo: "FI-7/21",
+      registrationNos: ["FI-7/21"],
+      birthDate: null,
+      sex: "N",
+      color: null,
+      ekNo: null,
+      inbreedingCoefficientPct: null,
+      sire: null,
+      dam: null,
+      pedigree: [],
+    });
+    getBeagleShowsForDogDbMock.mockResolvedValue([]);
+    getBeagleTrialsForDogDbMock.mockResolvedValue([]);
 
     const service = createDogsService();
     await service.getBeagleDogProfile(" dog-casing ");
 
     expect(getBeagleDogProfileDbMock).toHaveBeenCalledWith("dog-casing");
+    expect(getBeagleShowsForDogDbMock).toHaveBeenCalledWith("dog-casing");
+    expect(getBeagleTrialsForDogDbMock).toHaveBeenCalledWith("dog-casing");
   });
 
   it("returns 500 when profile DB call throws", async () => {

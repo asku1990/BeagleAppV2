@@ -20,6 +20,7 @@ export type BeagleDogProfilePedigreeGenerationDto = {
 
 export type BeagleDogProfileTrialRowDto = {
   id: string;
+  trialId: string;
   place: string;
   date: string;
   weather: string | null;
@@ -27,10 +28,19 @@ export type BeagleDogProfileTrialRowDto = {
   rank: string | null;
   points: number | null;
   award: string | null;
+  judge: string | null;
+  haku: number | null;
+  hauk: number | null;
+  yva: number | null;
+  hlo: number | null;
+  alo: number | null;
+  tja: number | null;
+  pin: number | null;
 };
 
 export type BeagleDogProfileShowRowDto = {
   id: string;
+  showId: string;
   place: string;
   date: string;
   result: string | null;
