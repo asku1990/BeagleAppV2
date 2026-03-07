@@ -26,4 +26,11 @@ Use this format for new entries:
 
 ## Entries
 
-_No open entries yet._
+## 2026-03-07 - Split trials DB repository by use-case
+
+- Area: `packages/db/trials/repository.ts`
+- Issue: The repository still combines search, event detail, and dog-profile queries in one large file.
+- Impact: Harder to navigate and review; mapping and date/filter helper changes have wider blast radius.
+- Suggested fix: Split into `trials/search/*`, `trials/details/*`, and `trials/dog/*` repositories and move shared helpers to `trials/core/*`.
+- Trigger to revisit: Next BEJ trial-domain task that touches query/filter/date logic in this file.
+- Ticket: BEJ-29 follow-up (create dedicated split task key).

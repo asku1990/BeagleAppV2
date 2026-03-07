@@ -1,3 +1,5 @@
+// Prisma repository functions for trial search, event details, and dog-centric
+// trial result lookups used by public trial features and dog profile composition.
 import { DogSex, type Prisma } from "@prisma/client";
 import { prisma } from "../core/prisma";
 
@@ -84,6 +86,14 @@ export type BeagleTrialDogRowDb = {
   rank: string | null;
   points: number | null;
   award: string | null;
+  judge: string | null;
+  haku: number | null;
+  hauk: number | null;
+  yva: number | null;
+  hlo: number | null;
+  alo: number | null;
+  tja: number | null;
+  pin: number | null;
 };
 
 const BUSINESS_TIME_ZONE = "Europe/Helsinki";
@@ -559,6 +569,14 @@ export async function getBeagleTrialsForDogDb(
       sija: true,
       piste: true,
       pa: true,
+      judge: true,
+      haku: true,
+      hauk: true,
+      yva: true,
+      hlo: true,
+      alo: true,
+      tja: true,
+      pin: true,
     },
     orderBy: [{ eventDate: "desc" }, { eventPlace: "asc" }, { id: "asc" }],
   });
@@ -573,5 +591,13 @@ export async function getBeagleTrialsForDogDb(
     rank: row.sija,
     points: row.piste ? row.piste.toNumber() : null,
     award: row.pa,
+    judge: row.judge,
+    haku: row.haku ? row.haku.toNumber() : null,
+    hauk: row.hauk ? row.hauk.toNumber() : null,
+    yva: row.yva ? row.yva.toNumber() : null,
+    hlo: row.hlo ? row.hlo.toNumber() : null,
+    alo: row.alo ? row.alo.toNumber() : null,
+    tja: row.tja ? row.tja.toNumber() : null,
+    pin: row.pin ? row.pin.toNumber() : null,
   }));
 }

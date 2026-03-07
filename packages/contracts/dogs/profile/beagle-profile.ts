@@ -27,6 +27,14 @@ export type BeagleDogProfileTrialRowDto = {
   rank: string | null;
   points: number | null;
   award: string | null;
+  judge: string | null;
+  haku: number | null;
+  hauk: number | null;
+  yva: number | null;
+  hlo: number | null;
+  alo: number | null;
+  tja: number | null;
+  pin: number | null;
 };
 
 export type BeagleDogProfileShowRowDto = {

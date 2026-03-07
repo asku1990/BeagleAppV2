@@ -1,3 +1,5 @@
+// Builds the public dog profile DTO by combining base dog profile data with
+// show/trial domain fetches and shared legacy result normalization helpers.
 import {
   getBeagleDogProfileDb,
   getBeagleShowsForDogDb,
@@ -58,6 +60,14 @@ function mapDogProfileFromDb(
       rank: trial.rank,
       points: trial.points,
       award: formatTrialAward(trial.award, trial.classCode),
+      judge: trial.judge,
+      haku: trial.haku,
+      hauk: trial.hauk,
+      yva: trial.yva,
+      hlo: trial.hlo,
+      alo: trial.alo,
+      tja: trial.tja,
+      pin: trial.pin,
     })),
   };
 }

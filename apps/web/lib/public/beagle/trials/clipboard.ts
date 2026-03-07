@@ -1,3 +1,5 @@
+// Formats public beagle trial rows into TSV output and centralizes clipboard
+// write/toast handling for trial pages and dog profile trial sections.
 import type {
   BeagleDogProfileTrialRowDto,
   BeagleTrialDetailsRow,
@@ -35,16 +37,32 @@ type DogProfileTrialClipboardLabels = {
   place: string;
   date: string;
   weather: string;
-  className: string;
+  award: string;
   rank: string;
   points: string;
+  judge: string;
+  searchWork: string;
+  barking: string;
+  generalImpression: string;
+  searchLoosenessPenalty: string;
+  chaseLoosenessPenalty: string;
+  obstacleWork: string;
+  totalPoints: string;
 };
 
 type DogProfileTrialClipboardColumns = {
   includeWeather: boolean;
-  includeClass: boolean;
+  includeAward: boolean;
   includeRank: boolean;
   includePoints: boolean;
+  includeJudge: boolean;
+  includeSearchWork: boolean;
+  includeBarking: boolean;
+  includeGeneralImpression: boolean;
+  includeSearchLoosenessPenalty: boolean;
+  includeChaseLoosenessPenalty: boolean;
+  includeObstacleWork: boolean;
+  includeTotalPoints: boolean;
 };
 
 type ClipboardMessages = {
@@ -227,18 +245,43 @@ export function formatDogProfileTrialRowsForClipboard(
 
   const header = [labels.no, labels.place, labels.date];
   if (columns.includeWeather) header.push(labels.weather);
-  if (columns.includeClass) header.push(labels.className);
+  if (columns.includeAward) header.push(labels.award);
   if (columns.includeRank) header.push(labels.rank);
   if (columns.includePoints) header.push(labels.points);
+  if (columns.includeJudge) header.push(labels.judge);
+  if (columns.includeSearchWork) header.push(labels.searchWork);
+  if (columns.includeBarking) header.push(labels.barking);
+  if (columns.includeGeneralImpression) header.push(labels.generalImpression);
+  if (columns.includeSearchLoosenessPenalty) {
+    header.push(labels.searchLoosenessPenalty);
+  }
+  if (columns.includeChaseLoosenessPenalty) {
+    header.push(labels.chaseLoosenessPenalty);
+  }
+  if (columns.includeObstacleWork) header.push(labels.obstacleWork);
+  if (columns.includeTotalPoints) header.push(labels.totalPoints);
 
   const body = rows.map((row, index) => {
     const cells = [String(index + 1), row.place, row.date];
     if (columns.includeWeather) cells.push(formatMaybeString(row.weather));
-    if (columns.includeClass) {
+    if (columns.includeAward) {
       cells.push(formatMaybeString(row.className ?? row.award));
     }
     if (columns.includeRank) cells.push(formatMaybeString(row.rank));
     if (columns.includePoints) cells.push(formatDogProfilePoints(row.points));
+    if (columns.includeJudge) cells.push(formatMaybeString(row.judge));
+    if (columns.includeSearchWork) cells.push(formatMaybeNumber(row.haku));
+    if (columns.includeBarking) cells.push(formatMaybeNumber(row.hauk));
+    if (columns.includeGeneralImpression)
+      cells.push(formatMaybeNumber(row.yva));
+    if (columns.includeSearchLoosenessPenalty) {
+      cells.push(formatMaybeNumber(row.hlo));
+    }
+    if (columns.includeChaseLoosenessPenalty) {
+      cells.push(formatMaybeNumber(row.alo));
+    }
+    if (columns.includeObstacleWork) cells.push(formatMaybeNumber(row.tja));
+    if (columns.includeTotalPoints) cells.push(formatMaybeNumber(row.pin));
     return cells;
   });
 

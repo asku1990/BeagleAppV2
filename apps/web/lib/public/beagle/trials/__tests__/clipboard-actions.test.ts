@@ -122,6 +122,14 @@ describe("trial clipboard actions", () => {
           rank: "1",
           points: 85.5,
           award: "Voi 1",
+          judge: "Judge A",
+          haku: 4,
+          hauk: 5,
+          yva: 6,
+          hlo: 1,
+          alo: 2,
+          tja: 3,
+          pin: 9,
         },
       ],
       labels: {
@@ -129,15 +137,31 @@ describe("trial clipboard actions", () => {
         place: "Paikka",
         date: "Päivä",
         weather: "Keli",
-        className: "Palkinto",
+        award: "Palkinto",
         rank: "Sija",
         points: "Pisteet",
+        judge: "Tuomari",
+        searchWork: "Haku",
+        barking: "Haukku",
+        generalImpression: "YVA",
+        searchLoosenessPenalty: "HLO",
+        chaseLoosenessPenalty: "ALO",
+        obstacleWork: "TJA",
+        totalPoints: "PIN",
       },
       columns: {
         includeWeather: true,
-        includeClass: true,
+        includeAward: true,
         includeRank: true,
         includePoints: true,
+        includeJudge: true,
+        includeSearchWork: true,
+        includeBarking: true,
+        includeGeneralImpression: true,
+        includeSearchLoosenessPenalty: true,
+        includeChaseLoosenessPenalty: true,
+        includeObstacleWork: true,
+        includeTotalPoints: true,
       },
       messages,
       clipboard: { writeText },
@@ -146,7 +170,7 @@ describe("trial clipboard actions", () => {
 
     expect(result).toBe(false);
     expect(writeText).toHaveBeenCalledWith(
-      "N:o\tPaikka\tPäivä\tKeli\tPalkinto\tSija\tPisteet\n1\tTurku\t2025-06-01\tP\tVOI\t1\t85.50",
+      "N:o\tPaikka\tPäivä\tKeli\tPalkinto\tSija\tPisteet\tTuomari\tHaku\tHaukku\tYVA\tHLO\tALO\tTJA\tPIN\n1\tTurku\t2025-06-01\tP\tVOI\t1\t85.50\tJudge A\t4\t5\t6\t1\t2\t3\t9",
     );
     expect(toast.error).toHaveBeenCalledWith("copy.error");
   });

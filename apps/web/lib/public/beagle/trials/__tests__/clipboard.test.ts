@@ -222,6 +222,14 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
           rank: "1",
           points: 88.2,
           award: "Voi 1",
+          judge: "Judge A",
+          haku: 4,
+          hauk: 5,
+          yva: 6,
+          hlo: 1,
+          alo: 2,
+          tja: 3,
+          pin: 9,
         },
         {
           id: "t2",
@@ -232,6 +240,14 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
           rank: null,
           points: null,
           award: null,
+          judge: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          tja: null,
+          pin: null,
         },
       ],
       {
@@ -239,22 +255,44 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
         place: "Paikka",
         date: "Päivä",
         weather: "Keli",
-        className: "Palkinto",
+        award: "Palkinto",
         rank: "Sija",
         points: "Pisteet",
+        judge: "Tuomari",
+        searchWork: "Haku",
+        barking: "Haukku",
+        generalImpression: "YVA",
+        searchLoosenessPenalty: "HLO",
+        chaseLoosenessPenalty: "ALO",
+        obstacleWork: "TJA",
+        totalPoints: "PIN",
       },
       {
         includeWeather: true,
-        includeClass: true,
+        includeAward: true,
         includeRank: true,
         includePoints: true,
+        includeJudge: true,
+        includeSearchWork: true,
+        includeBarking: true,
+        includeGeneralImpression: true,
+        includeSearchLoosenessPenalty: true,
+        includeChaseLoosenessPenalty: true,
+        includeObstacleWork: true,
+        includeTotalPoints: true,
       },
     );
 
     const lines = output.split("\n");
-    expect(lines[0]).toBe("N:o\tPaikka\tPäivä\tKeli\tPalkinto\tSija\tPisteet");
-    expect(lines[1]).toBe("1\tHelsinki\t2025-06-01\tL\tVOI\t1\t88.20");
-    expect(lines[2]).toBe("2\tTurku\t2025-06-02\t-\t-\t-\t-");
+    expect(lines[0]).toBe(
+      "N:o\tPaikka\tPäivä\tKeli\tPalkinto\tSija\tPisteet\tTuomari\tHaku\tHaukku\tYVA\tHLO\tALO\tTJA\tPIN",
+    );
+    expect(lines[1]).toBe(
+      "1\tHelsinki\t2025-06-01\tL\tVOI\t1\t88.20\tJudge A\t4\t5\t6\t1\t2\t3\t9",
+    );
+    expect(lines[2]).toBe(
+      "2\tTurku\t2025-06-02\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-",
+    );
   });
 
   it("sanitizes tabs/newlines and falls back to award when class is missing", () => {
@@ -269,6 +307,14 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
           rank: "  ",
           points: 75,
           award: "Avo 2",
+          judge: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          tja: null,
+          pin: null,
         },
       ],
       {
@@ -276,15 +322,31 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
         place: "Paikka",
         date: "Päivä",
         weather: "Keli",
-        className: "Palkinto",
+        award: "Palkinto",
         rank: "Sija",
         points: "Pisteet",
+        judge: "Tuomari",
+        searchWork: "Haku",
+        barking: "Haukku",
+        generalImpression: "YVA",
+        searchLoosenessPenalty: "HLO",
+        chaseLoosenessPenalty: "ALO",
+        obstacleWork: "TJA",
+        totalPoints: "PIN",
       },
       {
         includeWeather: false,
-        includeClass: true,
+        includeAward: true,
         includeRank: true,
         includePoints: true,
+        includeJudge: false,
+        includeSearchWork: false,
+        includeBarking: false,
+        includeGeneralImpression: false,
+        includeSearchLoosenessPenalty: false,
+        includeChaseLoosenessPenalty: false,
+        includeObstacleWork: false,
+        includeTotalPoints: false,
       },
     );
 
