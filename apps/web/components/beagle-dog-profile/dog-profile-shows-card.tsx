@@ -3,8 +3,10 @@ import {
   ListingSectionShell,
 } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
+import { toast } from "@/components/ui/sonner";
 import { useI18n } from "@/hooks/i18n";
 import { parseLocalIsoDate } from "@/lib/public/beagle/dogs/profile";
+import { copyDogProfileShowRowsToClipboard } from "@/lib/public/beagle/shows";
 import { cn } from "@/lib/utils";
 import type { BeagleDogProfileShowRowDto } from "@beagle/contracts";
 
@@ -39,10 +41,56 @@ export function DogProfileShowsCard({
   const hasJudge = rows.some((r) => r.judge != null);
   const hasHeight = rows.some((r) => r.heightCm != null);
 
+  const handleCopyRows = async () => {
+    await copyDogProfileShowRowsToClipboard({
+      rows,
+      labels: {
+        no: t("dog.profile.shows.col.no"),
+        place: t("dog.profile.shows.col.place"),
+        date: t("dog.profile.shows.col.date"),
+        result: t("dog.profile.shows.col.result"),
+        height: t("dog.profile.shows.col.height"),
+        judge: t("dog.profile.shows.col.judge"),
+      },
+      columns: {
+        includeResult: hasResult,
+        includeHeight: hasHeight,
+        includeJudge: hasJudge,
+      },
+      messages: {
+        success: t("dog.profile.shows.copy.success"),
+        error: t("dog.profile.shows.copy.error"),
+        unsupported: t("dog.profile.shows.copy.unsupported"),
+      },
+      clipboard: globalThis.navigator?.clipboard,
+      toast,
+    });
+  };
+
   return (
     <ListingSectionShell
       title={t("dog.profile.card.shows.title")}
-      count={`${t("dog.profile.count.entries")}: ${rows.length}`}
+      count={
+        <span className="flex flex-wrap items-center gap-2">
+          <span>
+            {t("dog.profile.count.entries")}: {rows.length}
+          </span>
+          {rows.length > 0 ? (
+            <button
+              type="button"
+              onClick={() => {
+                void handleCopyRows();
+              }}
+              className={cn(
+                "cursor-pointer text-xs underline underline-offset-2",
+                beagleTheme.inkStrongText,
+              )}
+            >
+              {t("dog.profile.shows.copy.button")}
+            </button>
+          ) : null}
+        </span>
+      }
     >
       {rows.length === 0 ? (
         <div

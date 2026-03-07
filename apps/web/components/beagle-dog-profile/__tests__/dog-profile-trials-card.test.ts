@@ -30,6 +30,7 @@ describe("DogProfileTrialsCard", () => {
     );
 
     expect(html).toContain(">S1<");
+    expect(html).toContain("dog.profile.trials.copy.button");
   });
 
   it("keeps pair rank separator as pipe", () => {

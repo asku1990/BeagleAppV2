@@ -1,4 +1,5 @@
 import type {
+  BeagleDogProfileTrialRowDto,
   BeagleTrialDetailsRow,
   BeagleTrialSearchRow,
 } from "@beagle/contracts";
@@ -29,6 +30,39 @@ type TrialSearchClipboardLabels = {
   dogCount: string;
 };
 
+type DogProfileTrialClipboardLabels = {
+  no: string;
+  place: string;
+  date: string;
+  weather: string;
+  className: string;
+  rank: string;
+  points: string;
+};
+
+type DogProfileTrialClipboardColumns = {
+  includeWeather: boolean;
+  includeClass: boolean;
+  includeRank: boolean;
+  includePoints: boolean;
+};
+
+type ClipboardMessages = {
+  success: string;
+  error: string;
+  unsupported: string;
+};
+
+type ClipboardLike = {
+  writeText: (text: string) => Promise<void>;
+};
+
+type ClipboardToastHandlers = {
+  success: (message: string) => void;
+  error: (message: string) => void;
+  warning: (message: string) => void;
+};
+
 function sanitizeCell(value: string): string {
   return value.replace(/\t/g, " ").replace(/\r?\n/g, " ").trim();
 }
@@ -39,6 +73,10 @@ function formatMaybeString(value: string | null): string {
 
 function formatMaybeNumber(value: number | null): string {
   return value == null ? "-" : String(value);
+}
+
+function formatDogProfilePoints(value: number | null): string {
+  return value == null ? "-" : value.toFixed(2);
 }
 
 function formatAwardForClipboard(
@@ -178,4 +216,153 @@ export function formatTrialSearchRowsForClipboard(
   return [header, ...body]
     .map((cells) => cells.map(sanitizeCell).join("\t"))
     .join("\n");
+}
+
+export function formatDogProfileTrialRowsForClipboard(
+  rows: BeagleDogProfileTrialRowDto[],
+  labels: DogProfileTrialClipboardLabels,
+  columns: DogProfileTrialClipboardColumns,
+): string {
+  if (rows.length === 0) return "";
+
+  const header = [labels.no, labels.place, labels.date];
+  if (columns.includeWeather) header.push(labels.weather);
+  if (columns.includeClass) header.push(labels.className);
+  if (columns.includeRank) header.push(labels.rank);
+  if (columns.includePoints) header.push(labels.points);
+
+  const body = rows.map((row, index) => {
+    const cells = [String(index + 1), row.place, row.date];
+    if (columns.includeWeather) cells.push(formatMaybeString(row.weather));
+    if (columns.includeClass) {
+      cells.push(formatMaybeString(row.className ?? row.award));
+    }
+    if (columns.includeRank) cells.push(formatMaybeString(row.rank));
+    if (columns.includePoints) cells.push(formatDogProfilePoints(row.points));
+    return cells;
+  });
+
+  return [header, ...body]
+    .map((cells) => cells.map(sanitizeCell).join("\t"))
+    .join("\n");
+}
+
+async function writeClipboardOutput({
+  output,
+  clipboard,
+  messages,
+  toast,
+}: {
+  output: string;
+  clipboard: ClipboardLike | undefined;
+  messages: ClipboardMessages;
+  toast: ClipboardToastHandlers;
+}) {
+  if (!clipboard?.writeText) {
+    toast.warning(messages.unsupported);
+    return false;
+  }
+
+  try {
+    await clipboard.writeText(output);
+    toast.success(messages.success);
+    return true;
+  } catch {
+    toast.error(messages.error);
+    return false;
+  }
+}
+
+export async function copyTrialSearchRowsToClipboard({
+  rows,
+  labels,
+  messages,
+  clipboard,
+  toast,
+}: {
+  rows: BeagleTrialSearchRow[];
+  labels: TrialSearchClipboardLabels;
+  messages: ClipboardMessages;
+  clipboard?: ClipboardLike;
+  toast: ClipboardToastHandlers;
+}) {
+  if (rows.length === 0) return false;
+
+  return writeClipboardOutput({
+    output: formatTrialSearchRowsForClipboard(rows, labels),
+    clipboard,
+    messages,
+    toast,
+  });
+}
+
+export async function copyTrialDetailRowToClipboard({
+  row,
+  labels,
+  index,
+  messages,
+  clipboard,
+  toast,
+}: {
+  row: BeagleTrialDetailsRow;
+  labels: TrialClipboardLabels;
+  index: number;
+  messages: ClipboardMessages;
+  clipboard?: ClipboardLike;
+  toast: ClipboardToastHandlers;
+}) {
+  return writeClipboardOutput({
+    output: formatTrialDetailRowForClipboard(row, labels, index),
+    clipboard,
+    messages,
+    toast,
+  });
+}
+
+export async function copyTrialDetailRowsToClipboard({
+  rows,
+  labels,
+  messages,
+  clipboard,
+  toast,
+}: {
+  rows: BeagleTrialDetailsRow[];
+  labels: TrialClipboardLabels;
+  messages: ClipboardMessages;
+  clipboard?: ClipboardLike;
+  toast: ClipboardToastHandlers;
+}) {
+  if (rows.length === 0) return false;
+
+  return writeClipboardOutput({
+    output: formatTrialDetailRowsForClipboard(rows, labels),
+    clipboard,
+    messages,
+    toast,
+  });
+}
+
+export async function copyDogProfileTrialRowsToClipboard({
+  rows,
+  labels,
+  columns,
+  messages,
+  clipboard,
+  toast,
+}: {
+  rows: BeagleDogProfileTrialRowDto[];
+  labels: DogProfileTrialClipboardLabels;
+  columns: DogProfileTrialClipboardColumns;
+  messages: ClipboardMessages;
+  clipboard?: ClipboardLike;
+  toast: ClipboardToastHandlers;
+}) {
+  if (rows.length === 0) return false;
+
+  return writeClipboardOutput({
+    output: formatDogProfileTrialRowsForClipboard(rows, labels, columns),
+    clipboard,
+    messages,
+    toast,
+  });
 }

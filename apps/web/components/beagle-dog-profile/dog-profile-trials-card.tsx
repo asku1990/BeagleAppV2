@@ -3,8 +3,10 @@ import {
   ListingSectionShell,
 } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
+import { toast } from "@/components/ui/sonner";
 import { useI18n } from "@/hooks/i18n";
 import { parseLocalIsoDate } from "@/lib/public/beagle/dogs/profile";
+import { copyDogProfileTrialRowsToClipboard } from "@/lib/public/beagle/trials";
 import { cn } from "@/lib/utils";
 import type { BeagleDogProfileTrialRowDto } from "@beagle/contracts";
 
@@ -53,10 +55,58 @@ export function DogProfileTrialsCard({
   const hasRank = rows.some((r) => r.rank != null);
   const hasPoints = rows.some((r) => r.points != null);
 
+  const handleCopyRows = async () => {
+    await copyDogProfileTrialRowsToClipboard({
+      rows,
+      labels: {
+        no: t("dog.profile.trials.col.no"),
+        place: t("dog.profile.trials.col.place"),
+        date: t("dog.profile.trials.col.date"),
+        weather: t("dog.profile.trials.col.weather"),
+        className: t("dog.profile.trials.col.class"),
+        rank: t("dog.profile.trials.col.rank"),
+        points: t("dog.profile.trials.col.points"),
+      },
+      columns: {
+        includeWeather: hasWeather,
+        includeClass: hasAward,
+        includeRank: hasRank,
+        includePoints: hasPoints,
+      },
+      messages: {
+        success: t("dog.profile.trials.copy.success"),
+        error: t("dog.profile.trials.copy.error"),
+        unsupported: t("dog.profile.trials.copy.unsupported"),
+      },
+      clipboard: globalThis.navigator?.clipboard,
+      toast,
+    });
+  };
+
   return (
     <ListingSectionShell
       title={t("dog.profile.card.trials.title")}
-      count={`${t("dog.profile.count.entries")}: ${rows.length}`}
+      count={
+        <span className="flex flex-wrap items-center gap-2">
+          <span>
+            {t("dog.profile.count.entries")}: {rows.length}
+          </span>
+          {rows.length > 0 ? (
+            <button
+              type="button"
+              onClick={() => {
+                void handleCopyRows();
+              }}
+              className={cn(
+                "cursor-pointer text-xs underline underline-offset-2",
+                beagleTheme.inkStrongText,
+              )}
+            >
+              {t("dog.profile.trials.copy.button")}
+            </button>
+          ) : null}
+        </span>
+      }
     >
       {rows.length === 0 ? (
         <div

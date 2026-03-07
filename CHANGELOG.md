@@ -16,6 +16,12 @@ This project uses a user-facing changelog format.
 
 - Palveluun lisättiin Vercelin Web Analytics ja Speed Insights, joiden avulla Vercel-julkaisut keräävät automaattisesti tietoa kävijöistä, sivunäytöistä ja sivuston suorituskyvystä.
 - Julkiselle näyttelyhaulle lisättiin leikepöytätoiminnot: hakusivulla voi kopioida näkyvän sivun tulokset ja näyttelyn tulossivulla yksittäisen rivin tai kaikki rivit TSV-muodossa.
+- Koiran profiilin näyttely- ja koetuloskortteihin lisättiin "Kopioi kaikki" -toiminnot TSV-vientiä varten.
+
+### Changed
+
+- Julkisten näyttely- ja koetulossivujen leikepöytätoiminnot käyttävät nyt samaa jaettua formatter/action-polkujen rakennetta.
+- Koiran profiilin näyttely- ja koetulokset haetaan nyt show/trial-domainin kautta, ja vanhat dog-domainin päällekkäiset tuloshelperit poistettiin.
 
 ## [0.6.0] - 2026-03-06
 

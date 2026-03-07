@@ -97,6 +97,8 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain("dog.profile.card.lineage.title");
     expect(html).toContain("dog.profile.card.shows.title");
     expect(html).toContain("dog.profile.card.trials.title");
+    expect(html).toContain("dog.profile.shows.copy.button");
+    expect(html).toContain("dog.profile.trials.copy.button");
     expect(html).toContain('href="/beagle/dogs/sire_1"');
     expect(html).toContain('href="/beagle/dogs/dam_1"');
     expect(html).toContain("(EK: 101)");
@@ -131,5 +133,7 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain("dog.profile.empty.trials");
     expect(html).toContain("dog.profile.empty.shows");
     expect(html).toContain("dog.profile.sex.unknown");
+    expect(html).not.toContain("dog.profile.shows.copy.button");
+    expect(html).not.toContain("dog.profile.trials.copy.button");
   });
 });

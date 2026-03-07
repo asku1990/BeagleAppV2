@@ -3,7 +3,7 @@ import type { BeagleShowDetailsResponse } from "@beagle/contracts";
 import { toBusinessDateOnly } from "../core/date-only";
 import { toErrorLog, withLogContext } from "../core/logger";
 import type { ServiceResult } from "../core/result";
-import { normalizeShowResult } from "./internal/normalize-show-result";
+import { normalizeShowResult } from "./core";
 import { encodeShowId, parseShowId } from "./internal/show-id";
 import type { ShowsServiceLogContext } from "./types";
 

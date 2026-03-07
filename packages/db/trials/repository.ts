@@ -74,6 +74,18 @@ export type BeagleTrialDetailsResponseDb = {
   items: BeagleTrialDetailsRowDb[];
 };
 
+export type BeagleTrialDogRowDb = {
+  id: string;
+  place: string;
+  date: Date;
+  weather: string | null;
+  className: string | null;
+  classCode: string | null;
+  rank: string | null;
+  points: number | null;
+  award: string | null;
+};
+
 const BUSINESS_TIME_ZONE = "Europe/Helsinki";
 const BUSINESS_DATE_ONLY_FORMATTER = new Intl.DateTimeFormat("en-CA", {
   timeZone: BUSINESS_TIME_ZONE,
@@ -530,4 +542,36 @@ export async function getBeagleTrialDetailsDb(
     dogCount: items.length,
     items,
   };
+}
+
+export async function getBeagleTrialsForDogDb(
+  dogId: string,
+): Promise<BeagleTrialDogRowDb[]> {
+  const rows = await prisma.trialResult.findMany({
+    where: { dogId },
+    select: {
+      id: true,
+      eventPlace: true,
+      eventDate: true,
+      ke: true,
+      eventName: true,
+      lk: true,
+      sija: true,
+      piste: true,
+      pa: true,
+    },
+    orderBy: [{ eventDate: "desc" }, { eventPlace: "asc" }, { id: "asc" }],
+  });
+
+  return rows.map((row) => ({
+    id: row.id,
+    place: row.eventPlace,
+    date: row.eventDate,
+    weather: row.ke,
+    className: row.eventName,
+    classCode: row.lk,
+    rank: row.sija,
+    points: row.piste ? row.piste.toNumber() : null,
+    award: row.pa,
+  }));
 }

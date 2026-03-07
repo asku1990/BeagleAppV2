@@ -22,27 +22,6 @@ export type BeagleDogProfilePedigreeGenerationDb = {
   cards: BeagleDogProfilePedigreeCardDb[];
 };
 
-export type BeagleDogProfileTrialRowDb = {
-  id: string;
-  place: string;
-  date: Date;
-  weather: string | null;
-  className: string | null;
-  classCode: string | null;
-  rank: string | null;
-  points: number | null;
-  award: string | null;
-};
-
-export type BeagleDogProfileShowRowDb = {
-  id: string;
-  place: string;
-  date: Date;
-  result: string | null;
-  judge: string | null;
-  heightCm: number | null;
-};
-
 export type BeagleDogProfileDb = {
   id: string;
   name: string;
@@ -57,8 +36,6 @@ export type BeagleDogProfileDb = {
   sire: BeagleDogProfileParentDb | null;
   dam: BeagleDogProfileParentDb | null;
   pedigree: BeagleDogProfilePedigreeGenerationDb[];
-  shows: BeagleDogProfileShowRowDb[];
-  trials: BeagleDogProfileTrialRowDb[];
 };
 
 type PedigreeDogNode = {
@@ -104,15 +81,6 @@ function mapParent(
   };
 }
 
-function parseHeightCm(value: string | null): number | null {
-  if (!value) {
-    return null;
-  }
-
-  const parsed = Number.parseFloat(value);
-  return Number.isNaN(parsed) ? null : parsed;
-}
-
 function createPedigreeCard(
   dogId: string,
   generation: number,
@@ -133,12 +101,6 @@ export async function getBeagleDogProfileDb(
     where: { id: dogId },
     include: {
       registrations: true,
-      trialResults: {
-        orderBy: { eventDate: "desc" },
-      },
-      showResults: {
-        orderBy: { eventDate: "desc" },
-      },
       sire: {
         include: {
           registrations: true,
@@ -233,24 +195,5 @@ export async function getBeagleDogProfileDb(
     sire: mapParent(dog.sire),
     dam: mapParent(dog.dam),
     pedigree,
-    shows: dog.showResults.map((show) => ({
-      id: show.id,
-      place: show.eventPlace,
-      date: show.eventDate,
-      result: show.resultText,
-      judge: show.judge,
-      heightCm: parseHeightCm(show.heightText),
-    })),
-    trials: dog.trialResults.map((trial) => ({
-      id: trial.id,
-      place: trial.eventPlace,
-      date: trial.eventDate,
-      weather: trial.ke,
-      className: trial.eventName,
-      classCode: trial.lk,
-      rank: trial.sija,
-      points: trial.piste ? trial.piste.toNumber() : null,
-      award: trial.pa,
-    })),
   };
 }

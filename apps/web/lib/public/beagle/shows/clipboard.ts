@@ -1,6 +1,7 @@
 // Formats public beagle show search/detail rows into TSV output and
 // centralizes clipboard write and toast handling for show pages.
 import type {
+  BeagleDogProfileShowRowDto,
   BeagleShowDetailsRow,
   BeagleShowSearchRow,
 } from "@beagle/contracts";
@@ -27,6 +28,21 @@ type ShowDetailClipboardLabels = {
 
 type ShowDetailClipboardRow = BeagleShowDetailsRow & {
   reviewText?: string | null;
+};
+
+type DogProfileShowClipboardLabels = {
+  no: string;
+  place: string;
+  date: string;
+  result: string;
+  height: string;
+  judge: string;
+};
+
+type DogProfileShowClipboardColumns = {
+  includeResult: boolean;
+  includeHeight: boolean;
+  includeJudge: boolean;
 };
 
 type ClipboardMessages = {
@@ -150,6 +166,31 @@ export function formatShowDetailRowsForClipboard(
     .join("\n");
 }
 
+export function formatDogProfileShowRowsForClipboard(
+  rows: BeagleDogProfileShowRowDto[],
+  labels: DogProfileShowClipboardLabels,
+  columns: DogProfileShowClipboardColumns,
+): string {
+  if (rows.length === 0) return "";
+
+  const header = [labels.no, labels.place, labels.date];
+  if (columns.includeResult) header.push(labels.result);
+  if (columns.includeHeight) header.push(labels.height);
+  if (columns.includeJudge) header.push(labels.judge);
+
+  const body = rows.map((row, index) => {
+    const cells = [String(index + 1), row.place, row.date];
+    if (columns.includeResult) cells.push(formatMaybeString(row.result));
+    if (columns.includeHeight) cells.push(formatHeight(row.heightCm));
+    if (columns.includeJudge) cells.push(formatMaybeString(row.judge));
+    return cells;
+  });
+
+  return [header, ...body]
+    .map((cells) => cells.map(sanitizeCell).join("\t"))
+    .join("\n");
+}
+
 async function writeClipboardOutput({
   output,
   clipboard,
@@ -237,6 +278,31 @@ export async function copyShowDetailRowsToClipboard({
 
   return writeClipboardOutput({
     output: formatShowDetailRowsForClipboard(rows, labels),
+    clipboard,
+    messages,
+    toast,
+  });
+}
+
+export async function copyDogProfileShowRowsToClipboard({
+  rows,
+  labels,
+  columns,
+  messages,
+  clipboard,
+  toast,
+}: {
+  rows: BeagleDogProfileShowRowDto[];
+  labels: DogProfileShowClipboardLabels;
+  columns: DogProfileShowClipboardColumns;
+  messages: ClipboardMessages;
+  clipboard?: ClipboardLike;
+  toast: ClipboardToastHandlers;
+}) {
+  if (rows.length === 0) return false;
+
+  return writeClipboardOutput({
+    output: formatDogProfileShowRowsForClipboard(rows, labels, columns),
     clipboard,
     messages,
     toast,

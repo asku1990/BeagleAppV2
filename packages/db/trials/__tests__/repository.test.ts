@@ -22,7 +22,11 @@ vi.mock("../../core/prisma", () => ({
   prisma: prismaMock,
 }));
 
-import { getBeagleTrialDetailsDb, searchBeagleTrialsDb } from "../repository";
+import {
+  getBeagleTrialDetailsDb,
+  getBeagleTrialsForDogDb,
+  searchBeagleTrialsDb,
+} from "../repository";
 
 describe("searchBeagleTrialsDb", () => {
   beforeEach(() => {
@@ -297,5 +301,81 @@ describe("getBeagleTrialDetailsDb", () => {
       weather: null,
       points: null,
     });
+  });
+});
+
+describe("getBeagleTrialsForDogDb", () => {
+  beforeEach(() => {
+    trialResultGroupByMock.mockReset();
+    trialResultFindManyMock.mockReset();
+  });
+
+  it("maps dog trial rows in date-desc order", async () => {
+    trialResultFindManyMock.mockResolvedValue([
+      {
+        id: "t2",
+        eventPlace: "Lahti",
+        eventDate: new Date("2025-06-02T00:00:00.000Z"),
+        ke: "L",
+        eventName: "VOI",
+        lk: "V",
+        sija: "1",
+        piste: { toNumber: () => 88.25 },
+        pa: "1",
+      },
+      {
+        id: "t1",
+        eventPlace: "Helsinki",
+        eventDate: new Date("2025-06-01T00:00:00.000Z"),
+        ke: null,
+        eventName: null,
+        lk: null,
+        sija: null,
+        piste: null,
+        pa: null,
+      },
+    ]);
+
+    const result = await getBeagleTrialsForDogDb("dog-1");
+
+    expect(trialResultFindManyMock).toHaveBeenCalledWith({
+      where: { dogId: "dog-1" },
+      select: {
+        id: true,
+        eventPlace: true,
+        eventDate: true,
+        ke: true,
+        eventName: true,
+        lk: true,
+        sija: true,
+        piste: true,
+        pa: true,
+      },
+      orderBy: [{ eventDate: "desc" }, { eventPlace: "asc" }, { id: "asc" }],
+    });
+    expect(result).toEqual([
+      {
+        id: "t2",
+        place: "Lahti",
+        date: new Date("2025-06-02T00:00:00.000Z"),
+        weather: "L",
+        className: "VOI",
+        classCode: "V",
+        rank: "1",
+        points: 88.25,
+        award: "1",
+      },
+      {
+        id: "t1",
+        place: "Helsinki",
+        date: new Date("2025-06-01T00:00:00.000Z"),
+        weather: null,
+        className: null,
+        classCode: null,
+        rank: null,
+        points: null,
+        award: null,
+      },
+    ]);
   });
 });

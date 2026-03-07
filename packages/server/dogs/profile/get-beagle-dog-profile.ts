@@ -1,7 +1,14 @@
-import { getBeagleDogProfileDb, type BeagleDogProfileDb } from "@beagle/db";
+import {
+  getBeagleDogProfileDb,
+  getBeagleShowsForDogDb,
+  getBeagleTrialsForDogDb,
+  type BeagleDogProfileDb,
+  type BeagleShowDogRowDb,
+  type BeagleTrialDogRowDb,
+} from "@beagle/db";
 import type { BeagleDogProfileDto } from "@beagle/contracts";
-import { normalizeShowResult } from "../show-results";
-import { formatTrialAward } from "../trial-results";
+import { normalizeShowResult } from "../../shows/core";
+import { formatTrialAward } from "../../trials/core";
 import { toBusinessDateOnly } from "../../core/date-only";
 import { toErrorLog, withLogContext } from "../../core/logger";
 import type { ServiceResult } from "../../core/result";
@@ -12,7 +19,11 @@ export type DogsServiceLogContext = {
   actorUserId?: string;
 };
 
-function mapDogProfileFromDb(profile: BeagleDogProfileDb): BeagleDogProfileDto {
+function mapDogProfileFromDb(
+  profile: BeagleDogProfileDb,
+  shows: BeagleShowDogRowDb[],
+  trials: BeagleTrialDogRowDb[],
+): BeagleDogProfileDto {
   return {
     id: profile.id,
     name: profile.name,
@@ -27,15 +38,18 @@ function mapDogProfileFromDb(profile: BeagleDogProfileDb): BeagleDogProfileDto {
     sire: profile.sire,
     dam: profile.dam,
     pedigree: profile.pedigree,
-    shows: profile.shows.map((show) => ({
-      id: show.id,
-      place: show.place,
-      date: toBusinessDateOnly(show.date),
-      result: normalizeShowResult(show.result, toBusinessDateOnly(show.date)),
-      judge: show.judge,
-      heightCm: show.heightCm,
-    })),
-    trials: profile.trials.map((trial) => ({
+    shows: shows.map((show) => {
+      const showDate = toBusinessDateOnly(show.date);
+      return {
+        id: show.id,
+        place: show.place,
+        date: showDate,
+        result: normalizeShowResult(show.result, showDate),
+        judge: show.judge,
+        heightCm: show.heightCm,
+      };
+    }),
+    trials: trials.map((trial) => ({
       id: trial.id,
       place: trial.place,
       date: toBusinessDateOnly(trial.date),
@@ -77,8 +91,8 @@ export async function getBeagleDogProfileService(
   }
 
   try {
-    const data = await getBeagleDogProfileDb(parsedDogId);
-    if (!data) {
+    const profile = await getBeagleDogProfileDb(parsedDogId);
+    if (!profile) {
       log.info(
         {
           event: "not_found",
@@ -93,6 +107,11 @@ export async function getBeagleDogProfileService(
       };
     }
 
+    const [shows, trials] = await Promise.all([
+      getBeagleShowsForDogDb(parsedDogId),
+      getBeagleTrialsForDogDb(parsedDogId),
+    ]);
+
     log.info(
       {
         event: "success",
@@ -103,7 +122,7 @@ export async function getBeagleDogProfileService(
     );
     return {
       status: 200,
-      body: { ok: true, data: mapDogProfileFromDb(data) },
+      body: { ok: true, data: mapDogProfileFromDb(profile, shows, trials) },
     };
   } catch (error) {
     log.error(

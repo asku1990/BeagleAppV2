@@ -12,8 +12,8 @@ import { useBeagleTrialsUiState } from "@/hooks/public/beagle/trials";
 import { useI18n } from "@/hooks/i18n";
 import type { MessageKey } from "@/lib/i18n";
 import {
+  copyTrialSearchRowsToClipboard,
   formatIsoDateForDisplay,
-  formatTrialSearchRowsForClipboard,
   normalizeIsoDateOnlyInput,
   parseTrialYearInput,
   toBeagleTrialSearchRequest,
@@ -106,27 +106,22 @@ export function BeagleTrialsPage() {
         normalizeIsoDateOnlyInput(formState.dateTo).length > 0;
 
   const handleCopyResults = async () => {
-    if (response.items.length === 0) return;
-
-    const clipboard = globalThis.navigator?.clipboard;
-    if (!clipboard?.writeText) {
-      toast.warning(t("trials.results.copy.unsupported"));
-      return;
-    }
-
-    const output = formatTrialSearchRowsForClipboard(response.items, {
-      date: t("trials.results.col.date"),
-      place: t("trials.results.col.place"),
-      judge: t("trials.results.col.judge"),
-      dogCount: t("trials.results.col.dogCount"),
+    await copyTrialSearchRowsToClipboard({
+      rows: response.items,
+      labels: {
+        date: t("trials.results.col.date"),
+        place: t("trials.results.col.place"),
+        judge: t("trials.results.col.judge"),
+        dogCount: t("trials.results.col.dogCount"),
+      },
+      messages: {
+        success: t("trials.results.copy.success"),
+        error: t("trials.results.copy.error"),
+        unsupported: t("trials.results.copy.unsupported"),
+      },
+      clipboard: globalThis.navigator?.clipboard,
+      toast,
     });
-
-    try {
-      await clipboard.writeText(output);
-      toast.success(t("trials.results.copy.success"));
-    } catch {
-      toast.error(t("trials.results.copy.error"));
-    }
   };
 
   return (

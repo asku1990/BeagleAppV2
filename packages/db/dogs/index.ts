@@ -5,8 +5,6 @@ export {
   type BeagleDogProfilePedigreeCardDb,
   type BeagleDogProfilePedigreeGenerationDb,
   type BeagleDogProfileSexDb,
-  type BeagleDogProfileShowRowDb,
-  type BeagleDogProfileTrialRowDb,
 } from "./profile/get-beagle-dog-profile";
 export { getNewestBeagleDogsDb } from "./newest";
 export {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  formatDogProfileTrialRowsForClipboard,
   formatTrialDetailRowForClipboard,
   formatTrialDetailRowsForClipboard,
   formatTrialSearchRowsForClipboard,
@@ -205,5 +206,90 @@ describe("formatTrialSearchRowsForClipboard", () => {
     expect(lines[0]).toBe("Päivä\tPaikka\tTuomari\tKoiria");
     expect(lines[1]).toBe("2025-06-01\tHelsinki\tJudge A\t7");
     expect(lines[2]).toBe("2025-05-01\tTurku\t-\t3");
+  });
+});
+
+describe("formatDogProfileTrialRowsForClipboard", () => {
+  it("formats dog profile rows using visible columns", () => {
+    const output = formatDogProfileTrialRowsForClipboard(
+      [
+        {
+          id: "t1",
+          place: "Helsinki",
+          date: "2025-06-01",
+          weather: "L",
+          className: "VOI",
+          rank: "1",
+          points: 88.2,
+          award: "Voi 1",
+        },
+        {
+          id: "t2",
+          place: "Turku",
+          date: "2025-06-02",
+          weather: null,
+          className: null,
+          rank: null,
+          points: null,
+          award: null,
+        },
+      ],
+      {
+        no: "N:o",
+        place: "Paikka",
+        date: "Päivä",
+        weather: "Keli",
+        className: "Palkinto",
+        rank: "Sija",
+        points: "Pisteet",
+      },
+      {
+        includeWeather: true,
+        includeClass: true,
+        includeRank: true,
+        includePoints: true,
+      },
+    );
+
+    const lines = output.split("\n");
+    expect(lines[0]).toBe("N:o\tPaikka\tPäivä\tKeli\tPalkinto\tSija\tPisteet");
+    expect(lines[1]).toBe("1\tHelsinki\t2025-06-01\tL\tVOI\t1\t88.20");
+    expect(lines[2]).toBe("2\tTurku\t2025-06-02\t-\t-\t-\t-");
+  });
+
+  it("sanitizes tabs/newlines and falls back to award when class is missing", () => {
+    const output = formatDogProfileTrialRowsForClipboard(
+      [
+        {
+          id: "t3",
+          place: "Tam\tpe\nre",
+          date: "2025-06-03",
+          weather: null,
+          className: null,
+          rank: "  ",
+          points: 75,
+          award: "Avo 2",
+        },
+      ],
+      {
+        no: "N:o",
+        place: "Paikka",
+        date: "Päivä",
+        weather: "Keli",
+        className: "Palkinto",
+        rank: "Sija",
+        points: "Pisteet",
+      },
+      {
+        includeWeather: false,
+        includeClass: true,
+        includeRank: true,
+        includePoints: true,
+      },
+    );
+
+    expect(output.split("\n")[1]).toBe(
+      "1\tTam pe re\t2025-06-03\tAvo 2\t-\t75.00",
+    );
   });
 });

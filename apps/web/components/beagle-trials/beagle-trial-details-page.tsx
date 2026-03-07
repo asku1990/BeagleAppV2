@@ -8,9 +8,9 @@ import {
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
 import {
+  copyTrialDetailRowToClipboard,
+  copyTrialDetailRowsToClipboard,
   formatIsoDateForDisplay,
-  formatTrialDetailRowForClipboard,
-  formatTrialDetailRowsForClipboard,
 } from "@/lib/public/beagle/trials";
 import { getDogProfileHref } from "@/lib/public/beagle/dogs/profile";
 import { cn } from "@/lib/utils";
@@ -77,51 +77,34 @@ export function BeagleTrialDetailsPage({
       ? t("trials.details.copy.col.pmi")
       : t("trials.details.copy.col.mi"),
   };
+  const clipboardMessages = {
+    success: t("trials.details.copy.success"),
+    error: t("trials.details.copy.error"),
+    unsupported: t("trials.details.copy.unsupported"),
+  };
 
   const handleCopyRow = async (
     row: BeagleTrialDetailsResponse["items"][number],
     index: number,
   ) => {
-    const clipboard = globalThis.navigator?.clipboard;
-    if (!clipboard?.writeText) {
-      toast.warning(t("trials.details.copy.unsupported"));
-      return;
-    }
-
-    const output = formatTrialDetailRowForClipboard(
+    await copyTrialDetailRowToClipboard({
       row,
-      clipboardLabels,
       index,
-    );
-
-    try {
-      await clipboard.writeText(output);
-      toast.success(t("trials.details.copy.success"));
-    } catch {
-      toast.error(t("trials.details.copy.error"));
-    }
+      labels: clipboardLabels,
+      messages: clipboardMessages,
+      clipboard: globalThis.navigator?.clipboard,
+      toast,
+    });
   };
 
   const handleCopyAllRows = async () => {
-    if (details.items.length === 0) return;
-
-    const clipboard = globalThis.navigator?.clipboard;
-    if (!clipboard?.writeText) {
-      toast.warning(t("trials.details.copy.unsupported"));
-      return;
-    }
-
-    const output = formatTrialDetailRowsForClipboard(
-      details.items,
-      clipboardLabels,
-    );
-
-    try {
-      await clipboard.writeText(output);
-      toast.success(t("trials.details.copy.success"));
-    } catch {
-      toast.error(t("trials.details.copy.error"));
-    }
+    await copyTrialDetailRowsToClipboard({
+      rows: details.items,
+      labels: clipboardLabels,
+      messages: clipboardMessages,
+      clipboard: globalThis.navigator?.clipboard,
+      toast,
+    });
   };
 
   return (

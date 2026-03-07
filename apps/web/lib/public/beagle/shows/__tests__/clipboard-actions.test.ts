@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  copyDogProfileShowRowsToClipboard,
   copyShowDetailRowToClipboard,
   copyShowSearchRowsToClipboard,
 } from "../clipboard";
@@ -115,5 +116,45 @@ describe("show clipboard actions", () => {
       "Rek.nro\tNimi\tSukupuoli\tTulos\tArvostelu\tKorkeus\tTuomari\nFI-1/20\tAatu\tUros\tERI\tPending later\t40 cm\tJudge A",
     );
     expect(toast.error).toHaveBeenCalledWith("copy.error");
+  });
+
+  it("copies dog profile rows with visible columns", async () => {
+    const toast = createToastMocks();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+
+    const result = await copyDogProfileShowRowsToClipboard({
+      rows: [
+        {
+          id: "s1",
+          place: "Helsinki",
+          date: "2025-06-01",
+          result: "ERI",
+          judge: "Judge A",
+          heightCm: 40,
+        },
+      ],
+      labels: {
+        no: "N:o",
+        place: "Paikka",
+        date: "Päivä",
+        result: "Tulos",
+        height: "Korkeus",
+        judge: "Tuomari",
+      },
+      columns: {
+        includeResult: true,
+        includeHeight: true,
+        includeJudge: true,
+      },
+      messages,
+      clipboard: { writeText },
+      toast,
+    });
+
+    expect(result).toBe(true);
+    expect(writeText).toHaveBeenCalledWith(
+      "N:o\tPaikka\tPäivä\tTulos\tKorkeus\tTuomari\n1\tHelsinki\t2025-06-01\tERI\t40 cm\tJudge A",
+    );
+    expect(toast.success).toHaveBeenCalledWith("copy.success");
   });
 });

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  formatDogProfileShowRowsForClipboard,
   formatShowDetailRowForClipboard,
   formatShowDetailRowsForClipboard,
   formatShowSearchRowsForClipboard,
@@ -155,5 +156,78 @@ describe("formatShowDetailRowsForClipboard", () => {
     expect(lines).toHaveLength(3);
     expect(lines[1]).toBe("FI-1/20\tAatu\tUros\tERI\tReview A\t40 cm\tJudge A");
     expect(lines[2]).toBe("FI-2/20\tBella\tNarttu\t-\tPending later\t-\t-");
+  });
+});
+
+describe("formatDogProfileShowRowsForClipboard", () => {
+  it("formats dog profile rows with visible columns", () => {
+    const output = formatDogProfileShowRowsForClipboard(
+      [
+        {
+          id: "s1",
+          place: "Helsinki",
+          date: "2025-06-01",
+          result: "ERI",
+          judge: "Judge A",
+          heightCm: 40,
+        },
+        {
+          id: "s2",
+          place: "Turku",
+          date: "2025-05-01",
+          result: null,
+          judge: null,
+          heightCm: null,
+        },
+      ],
+      {
+        no: "N:o",
+        place: "Paikka",
+        date: "Päivä",
+        result: "Tulos",
+        height: "Korkeus",
+        judge: "Tuomari",
+      },
+      {
+        includeResult: true,
+        includeHeight: true,
+        includeJudge: true,
+      },
+    );
+
+    const lines = output.split("\n");
+    expect(lines[0]).toBe("N:o\tPaikka\tPäivä\tTulos\tKorkeus\tTuomari");
+    expect(lines[1]).toBe("1\tHelsinki\t2025-06-01\tERI\t40 cm\tJudge A");
+    expect(lines[2]).toBe("2\tTurku\t2025-05-01\t-\t-\t-");
+  });
+
+  it("sanitizes tabs/newlines", () => {
+    const output = formatDogProfileShowRowsForClipboard(
+      [
+        {
+          id: "s3",
+          place: "Tam\tpe\nre",
+          date: "2025-06-03",
+          result: null,
+          judge: null,
+          heightCm: null,
+        },
+      ],
+      {
+        no: "N:o",
+        place: "Paikka",
+        date: "Päivä",
+        result: "Tulos",
+        height: "Korkeus",
+        judge: "Tuomari",
+      },
+      {
+        includeResult: false,
+        includeHeight: false,
+        includeJudge: false,
+      },
+    );
+
+    expect(output.split("\n")[1]).toBe("1\tTam pe re\t2025-06-03");
   });
 });

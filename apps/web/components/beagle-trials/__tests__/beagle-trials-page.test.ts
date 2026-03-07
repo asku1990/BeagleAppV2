@@ -155,6 +155,7 @@ describe("BeagleTrialsPage", () => {
     expect(html).toContain("trials.results.count 1");
     expect(html).toContain("Helsinki");
     expect(html).toContain("Judge Main");
+    expect(html).toContain("trials.results.copy.button");
     expect(html).toContain("trials.results.open");
     expect(html).toContain("trials.pagination.range 1-1 / 1");
   });
