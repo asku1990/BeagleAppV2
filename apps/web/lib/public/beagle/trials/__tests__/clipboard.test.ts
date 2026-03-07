@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  formatDogProfileTrialRowsForClipboard,
   formatTrialDetailRowForClipboard,
   formatTrialDetailRowsForClipboard,
   formatTrialSearchRowsForClipboard,
@@ -205,5 +206,155 @@ describe("formatTrialSearchRowsForClipboard", () => {
     expect(lines[0]).toBe("Päivä\tPaikka\tTuomari\tKoiria");
     expect(lines[1]).toBe("2025-06-01\tHelsinki\tJudge A\t7");
     expect(lines[2]).toBe("2025-05-01\tTurku\t-\t3");
+  });
+});
+
+describe("formatDogProfileTrialRowsForClipboard", () => {
+  it("formats dog profile rows using visible columns", () => {
+    const output = formatDogProfileTrialRowsForClipboard(
+      [
+        {
+          id: "t1",
+          trialId: "trial-1",
+          place: "Helsinki",
+          date: "2025-06-01",
+          weather: "L",
+          className: "VOI",
+          rank: "1",
+          points: 88.2,
+          award: "Voi 1",
+          judge: "Judge A",
+          haku: 4,
+          hauk: 5,
+          yva: 6,
+          hlo: 1,
+          alo: 2,
+          tja: 3,
+          pin: 9,
+        },
+        {
+          id: "t2",
+          trialId: "trial-2",
+          place: "Turku",
+          date: "2025-06-02",
+          weather: null,
+          className: null,
+          rank: null,
+          points: null,
+          award: null,
+          judge: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          tja: null,
+          pin: null,
+        },
+      ],
+      {
+        no: "N:o",
+        place: "Paikka",
+        date: "Päivä",
+        weather: "Keli",
+        award: "Palkinto",
+        rank: "Sija",
+        points: "Pisteet",
+        judge: "Tuomari",
+        searchWork: "Haku",
+        barking: "Haukku",
+        generalImpression: "YVA",
+        searchLoosenessPenalty: "HLO",
+        chaseLoosenessPenalty: "ALO",
+        obstacleWork: "TJA",
+        totalPoints: "PIN",
+      },
+      {
+        includeWeather: true,
+        includeAward: true,
+        includeRank: true,
+        includePoints: true,
+        includeJudge: true,
+        includeSearchWork: true,
+        includeBarking: true,
+        includeGeneralImpression: true,
+        includeSearchLoosenessPenalty: true,
+        includeChaseLoosenessPenalty: true,
+        includeObstacleWork: true,
+        includeTotalPoints: true,
+      },
+    );
+
+    const lines = output.split("\n");
+    expect(lines[0]).toBe(
+      "N:o\tPaikka\tPäivä\tKeli\tPalkinto\tSija\tPisteet\tTuomari\tHaku\tHaukku\tYVA\tHLO\tALO\tTJA\tPIN",
+    );
+    expect(lines[1]).toBe(
+      "1\tHelsinki\t2025-06-01\tL\tVOI\t1\t88.20\tJudge A\t4\t5\t6\t1\t2\t3\t9",
+    );
+    expect(lines[2]).toBe(
+      "2\tTurku\t2025-06-02\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-",
+    );
+  });
+
+  it("sanitizes tabs/newlines and falls back to award when class is missing", () => {
+    const output = formatDogProfileTrialRowsForClipboard(
+      [
+        {
+          id: "t3",
+          trialId: "trial-3",
+          place: "Tam\tpe\nre",
+          date: "2025-06-03",
+          weather: null,
+          className: null,
+          rank: "  ",
+          points: 75,
+          award: "Avo 2",
+          judge: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          tja: null,
+          pin: null,
+        },
+      ],
+      {
+        no: "N:o",
+        place: "Paikka",
+        date: "Päivä",
+        weather: "Keli",
+        award: "Palkinto",
+        rank: "Sija",
+        points: "Pisteet",
+        judge: "Tuomari",
+        searchWork: "Haku",
+        barking: "Haukku",
+        generalImpression: "YVA",
+        searchLoosenessPenalty: "HLO",
+        chaseLoosenessPenalty: "ALO",
+        obstacleWork: "TJA",
+        totalPoints: "PIN",
+      },
+      {
+        includeWeather: false,
+        includeAward: true,
+        includeRank: true,
+        includePoints: true,
+        includeJudge: false,
+        includeSearchWork: false,
+        includeBarking: false,
+        includeGeneralImpression: false,
+        includeSearchLoosenessPenalty: false,
+        includeChaseLoosenessPenalty: false,
+        includeObstacleWork: false,
+        includeTotalPoints: false,
+      },
+    );
+
+    expect(output.split("\n")[1]).toBe(
+      "1\tTam pe re\t2025-06-03\tAvo 2\t-\t75.00",
+    );
   });
 });

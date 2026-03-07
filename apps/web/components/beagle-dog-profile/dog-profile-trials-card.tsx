@@ -1,10 +1,16 @@
+import Link from "next/link";
 import {
   ListingResponsiveResults,
   ListingSectionShell,
 } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
+import { toast } from "@/components/ui/sonner";
 import { useI18n } from "@/hooks/i18n";
 import { parseLocalIsoDate } from "@/lib/public/beagle/dogs/profile";
+import {
+  copyDogProfileTrialRowsToClipboard,
+  getBeagleTrialHref,
+} from "@/lib/public/beagle/trials";
 import { cn } from "@/lib/utils";
 import type { BeagleDogProfileTrialRowDto } from "@beagle/contracts";
 
@@ -52,11 +58,87 @@ export function DogProfileTrialsCard({
   const hasAward = rows.some((r) => r.className != null || r.award != null);
   const hasRank = rows.some((r) => r.rank != null);
   const hasPoints = rows.some((r) => r.points != null);
+  const hasJudge = rows.some((r) => r.judge != null);
+  const hasSearchWork = rows.some((r) => r.haku != null);
+  const hasBarking = rows.some((r) => r.hauk != null);
+  const hasGeneralImpression = rows.some((r) => r.yva != null);
+  const hasSearchLoosenessPenalty = rows.some((r) => r.hlo != null);
+  const hasChaseLoosenessPenalty = rows.some((r) => r.alo != null);
+  const hasObstacleWork = rows.some((r) => r.tja != null);
+  const hasTotalPoints = rows.some((r) => r.pin != null);
+
+  const handleCopyRows = async () => {
+    await copyDogProfileTrialRowsToClipboard({
+      rows,
+      labels: {
+        no: t("dog.profile.trials.col.no"),
+        place: t("dog.profile.trials.col.place"),
+        date: t("dog.profile.trials.col.date"),
+        weather: t("dog.profile.trials.col.weather"),
+        award: t("dog.profile.trials.col.class"),
+        rank: t("dog.profile.trials.col.rank"),
+        points: t("dog.profile.trials.col.points"),
+        judge: t("trials.details.col.judge"),
+        searchWork: t("trials.details.copy.col.searchWork"),
+        barking: t("trials.details.copy.col.barking"),
+        generalImpression: t("trials.details.copy.col.generalImpression"),
+        searchLoosenessPenalty: t(
+          "trials.details.copy.col.searchLoosenessPenalty",
+        ),
+        chaseLoosenessPenalty: t(
+          "trials.details.copy.col.chaseLoosenessPenalty",
+        ),
+        obstacleWork: t("trials.details.copy.col.obstacleWork"),
+        totalPoints: t("trials.details.copy.col.mi"),
+      },
+      columns: {
+        includeWeather: hasWeather,
+        includeAward: hasAward,
+        includeRank: hasRank,
+        includePoints: hasPoints,
+        includeJudge: hasJudge,
+        includeSearchWork: hasSearchWork,
+        includeBarking: hasBarking,
+        includeGeneralImpression: hasGeneralImpression,
+        includeSearchLoosenessPenalty: hasSearchLoosenessPenalty,
+        includeChaseLoosenessPenalty: hasChaseLoosenessPenalty,
+        includeObstacleWork: hasObstacleWork,
+        includeTotalPoints: hasTotalPoints,
+      },
+      messages: {
+        success: t("dog.profile.trials.copy.success"),
+        error: t("dog.profile.trials.copy.error"),
+        unsupported: t("dog.profile.trials.copy.unsupported"),
+      },
+      clipboard: globalThis.navigator?.clipboard,
+      toast,
+    });
+  };
 
   return (
     <ListingSectionShell
       title={t("dog.profile.card.trials.title")}
-      count={`${t("dog.profile.count.entries")}: ${rows.length}`}
+      count={
+        <span className="flex flex-wrap items-center gap-2">
+          <span>
+            {t("dog.profile.count.entries")}: {rows.length}
+          </span>
+          {rows.length > 0 ? (
+            <button
+              type="button"
+              onClick={() => {
+                void handleCopyRows();
+              }}
+              className={cn(
+                "cursor-pointer text-xs underline underline-offset-2",
+                beagleTheme.inkStrongText,
+              )}
+            >
+              {t("dog.profile.trials.copy.button")}
+            </button>
+          ) : null}
+        </span>
+      }
     >
       {rows.length === 0 ? (
         <div
@@ -113,7 +195,17 @@ export function DogProfileTrialsCard({
                       className={cn("border-b align-top", beagleTheme.border)}
                     >
                       <td className="px-2 py-2">{index + 1}</td>
-                      <td className="px-2 py-2">{row.place}</td>
+                      <td className="px-2 py-2">
+                        <Link
+                          href={getBeagleTrialHref(row.trialId)}
+                          className={cn(
+                            "font-medium underline underline-offset-2",
+                            beagleTheme.inkStrongText,
+                          )}
+                        >
+                          {row.place}
+                        </Link>
+                      </td>
                       <td className="px-2 py-2">
                         {formatDate(row.date, locale)}
                       </td>
@@ -169,7 +261,15 @@ export function DogProfileTrialsCard({
                       <span className={beagleTheme.mutedText}>
                         {t("dog.profile.trials.col.place")}:
                       </span>{" "}
-                      <span>{row.place}</span>
+                      <Link
+                        href={getBeagleTrialHref(row.trialId)}
+                        className={cn(
+                          "font-medium underline underline-offset-2",
+                          beagleTheme.inkStrongText,
+                        )}
+                      >
+                        {row.place}
+                      </Link>
                     </p>
                     {hasWeather && (
                       <p>

@@ -3,7 +3,7 @@ import type { BeagleTrialDetailsResponse } from "@beagle/contracts";
 import { toBusinessDateOnly } from "../core/date-only";
 import { toErrorLog, withLogContext } from "../core/logger";
 import type { ServiceResult } from "../core/result";
-import { formatTrialAward } from "../dogs/trial-results";
+import { formatTrialAward } from "./core";
 import { encodeTrialId, parseTrialId } from "./internal/trial-id";
 import type { TrialsServiceLogContext } from "./types";
 

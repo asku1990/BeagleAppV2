@@ -34,6 +34,11 @@ export const fiBeagleDogProfileMessages = {
   "dog.profile.shows.col.result": "Tulos",
   "dog.profile.shows.col.judge": "Tuomari",
   "dog.profile.shows.col.height": "Korkeus",
+  "dog.profile.shows.copy.button": "Kopioi kaikki",
+  "dog.profile.shows.copy.success": "Näyttelymerkinnät kopioitu leikepöydälle.",
+  "dog.profile.shows.copy.error": "Näyttelymerkintöjen kopiointi epäonnistui.",
+  "dog.profile.shows.copy.unsupported":
+    "Selaimesi ei tue leikepöydälle kopiointia.",
   "dog.profile.trials.col.no": "N:o",
   "dog.profile.trials.col.place": "Koepaikka",
   "dog.profile.trials.col.date": "Päivä",
@@ -41,6 +46,11 @@ export const fiBeagleDogProfileMessages = {
   "dog.profile.trials.col.class": "Palkinto",
   "dog.profile.trials.col.rank": "Sijoitus",
   "dog.profile.trials.col.points": "Pisteet",
+  "dog.profile.trials.copy.button": "Kopioi kaikki",
+  "dog.profile.trials.copy.success": "Koemerkinnät kopioitu leikepöydälle.",
+  "dog.profile.trials.copy.error": "Koemerkintöjen kopiointi epäonnistui.",
+  "dog.profile.trials.copy.unsupported":
+    "Selaimesi ei tue leikepöydälle kopiointia.",
   "dog.profile.lineage.col.generation": "Sukupolvi",
   "dog.profile.lineage.col.sire": "Isän linja",
   "dog.profile.lineage.col.dam": "Emän linja",
@@ -84,6 +94,13 @@ export const svBeagleDogProfileMessages = {
   "dog.profile.shows.col.result": "Resultat",
   "dog.profile.shows.col.judge": "Domare",
   "dog.profile.shows.col.height": "Höjd",
+  "dog.profile.shows.copy.button": "Kopiera alla",
+  "dog.profile.shows.copy.success":
+    "Utställningsposterna kopierades till urklipp.",
+  "dog.profile.shows.copy.error":
+    "Kopiering av utställningsposter misslyckades.",
+  "dog.profile.shows.copy.unsupported":
+    "Din webbläsare stöder inte kopiering till urklipp.",
   "dog.profile.trials.col.no": "Nr",
   "dog.profile.trials.col.place": "Provplats",
   "dog.profile.trials.col.date": "Datum",
@@ -91,6 +108,12 @@ export const svBeagleDogProfileMessages = {
   "dog.profile.trials.col.class": "Pris",
   "dog.profile.trials.col.rank": "Placering",
   "dog.profile.trials.col.points": "Poäng",
+  "dog.profile.trials.copy.button": "Kopiera alla",
+  "dog.profile.trials.copy.success":
+    "Jaktprovsposterna kopierades till urklipp.",
+  "dog.profile.trials.copy.error": "Kopiering av jaktprovsposter misslyckades.",
+  "dog.profile.trials.copy.unsupported":
+    "Din webbläsare stöder inte kopiering till urklipp.",
   "dog.profile.lineage.col.generation": "Generation",
   "dog.profile.lineage.col.sire": "Faderslinje",
   "dog.profile.lineage.col.dam": "Moderslinje",

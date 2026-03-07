@@ -22,7 +22,11 @@ vi.mock("../../core/prisma", () => ({
   prisma: prismaMock,
 }));
 
-import { getBeagleShowDetailsDb, searchBeagleShowsDb } from "../repository";
+import {
+  getBeagleShowDetailsDb,
+  getBeagleShowsForDogDb,
+  searchBeagleShowsDb,
+} from "../repository";
 
 describe("searchBeagleShowsDb", () => {
   beforeEach(() => {
@@ -294,5 +298,66 @@ describe("getBeagleShowDetailsDb", () => {
       result: null,
       heightCm: null,
     });
+  });
+});
+
+describe("getBeagleShowsForDogDb", () => {
+  beforeEach(() => {
+    showResultGroupByMock.mockReset();
+    showResultFindManyMock.mockReset();
+  });
+
+  it("maps dog show rows in date-desc order", async () => {
+    showResultFindManyMock.mockResolvedValue([
+      {
+        id: "s2",
+        eventPlace: "Lahti",
+        eventDate: new Date("2025-06-02T00:00:00.000Z"),
+        resultText: "JUN1",
+        judge: "Judge B",
+        heightText: "39.5",
+      },
+      {
+        id: "s1",
+        eventPlace: "Helsinki",
+        eventDate: new Date("2025-06-01T00:00:00.000Z"),
+        resultText: null,
+        judge: null,
+        heightText: null,
+      },
+    ]);
+
+    const result = await getBeagleShowsForDogDb("dog-1");
+
+    expect(showResultFindManyMock).toHaveBeenCalledWith({
+      where: { dogId: "dog-1" },
+      select: {
+        id: true,
+        eventPlace: true,
+        eventDate: true,
+        resultText: true,
+        judge: true,
+        heightText: true,
+      },
+      orderBy: [{ eventDate: "desc" }, { eventPlace: "asc" }, { id: "asc" }],
+    });
+    expect(result).toEqual([
+      {
+        id: "s2",
+        place: "Lahti",
+        date: new Date("2025-06-02T00:00:00.000Z"),
+        result: "JUN1",
+        judge: "Judge B",
+        heightCm: 39.5,
+      },
+      {
+        id: "s1",
+        place: "Helsinki",
+        date: new Date("2025-06-01T00:00:00.000Z"),
+        result: null,
+        judge: null,
+        heightCm: null,
+      },
+    ]);
   });
 });

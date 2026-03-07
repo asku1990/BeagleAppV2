@@ -6,6 +6,8 @@ Monorepo for a public Beagle database app with auth, admin-ready routing, and a 
 
 - Architecture rules and boundaries: [ARCHITECTURE.md](ARCHITECTURE.md)
 - Developer workflow and agent rules: [AGENTS.md](AGENTS.md)
+- Documentation rules: [docs/documentation-rules.md](docs/documentation-rules.md)
+- Tech debt register: [docs/tech-debt.md](docs/tech-debt.md)
 - App usage guide: [docs/app-usage-and-features.md](docs/app-usage-and-features.md)
 - Env safety and runbooks: [docs/ops-env-safety.md](docs/ops-env-safety.md)
 - Import behavior details: [docs/import-phase1.md](docs/import-phase1.md)
@@ -132,4 +134,5 @@ See `docs/vercel-deployment.md` for supported Vercel project setups.
 
 - README is intentionally minimal and usage-focused.
 - Detailed feature behavior, API surface, and implementation conventions are in `docs/app-usage-and-features.md`.
+- Documentation workflow and future cleanup note conventions are in `docs/documentation-rules.md` and `docs/tech-debt.md`.
 - Source of truth for architecture and dependency boundaries is `ARCHITECTURE.md`.

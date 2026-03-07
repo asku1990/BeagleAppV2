@@ -127,6 +127,8 @@ describe("BeagleShowDetailsPageContainer", () => {
     expect(html).toContain("FI-1/20");
     expect(html).toContain("Aatu");
     expect(html).toContain("40 cm");
+    expect(html).toContain("shows.details.copy.button");
+    expect(html).toContain("shows.details.copy.all");
     expect(html).toContain('href="/beagle/dogs/dog_1"');
   });
 });

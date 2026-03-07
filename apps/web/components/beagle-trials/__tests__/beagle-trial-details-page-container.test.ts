@@ -119,6 +119,8 @@ describe("BeagleTrialDetailsPageContainer", () => {
     expect(html).toContain("FI-1/20");
     expect(html).toContain("Aatu");
     expect(html).toContain("88,5");
+    expect(html).toContain("trials.details.copy.button");
+    expect(html).toContain("trials.details.copy.all");
     expect(html).toContain('href="/beagle/dogs/dog_1"');
   });
 });

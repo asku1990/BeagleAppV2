@@ -46,8 +46,6 @@ export {
   type BeagleDogProfilePedigreeCardDb,
   type BeagleDogProfilePedigreeGenerationDb,
   type BeagleDogProfileSexDb,
-  type BeagleDogProfileShowRowDb,
-  type BeagleDogProfileTrialRowDb,
   type BeagleSearchModeDb,
   type BeagleSearchRequestDb,
   type BeagleSearchResponseDb,
@@ -56,10 +54,12 @@ export {
 } from "./dogs";
 export {
   getBeagleShowDetailsDb,
+  getBeagleShowsForDogDb,
   searchBeagleShowsDb,
   type BeagleShowDetailsRequestDb,
   type BeagleShowDetailsResponseDb,
   type BeagleShowDetailsRowDb,
+  type BeagleShowDogRowDb,
   type BeagleShowSearchModeDb,
   type BeagleShowSearchRequestDb,
   type BeagleShowSearchResponseDb,
@@ -68,10 +68,12 @@ export {
 } from "./shows";
 export {
   getBeagleTrialDetailsDb,
+  getBeagleTrialsForDogDb,
   searchBeagleTrialsDb,
   type BeagleTrialDetailsRequestDb,
   type BeagleTrialDetailsResponseDb,
   type BeagleTrialDetailsRowDb,
+  type BeagleTrialDogRowDb,
   type BeagleTrialSearchModeDb,
   type BeagleTrialSearchRequestDb,
   type BeagleTrialSearchResponseDb,
