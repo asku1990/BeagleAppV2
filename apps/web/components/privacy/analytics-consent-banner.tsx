@@ -1,10 +1,12 @@
 "use client";
 
 import { beagleTheme } from "@/components/ui/beagle-theme";
+import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
 import { useAnalyticsConsent } from "@/hooks/consent";
 
 export function AnalyticsConsentBanner() {
+  const { t } = useI18n();
   const { isBannerOpen, acceptAnalytics, rejectAnalytics } =
     useAnalyticsConsent();
 
@@ -22,12 +24,10 @@ export function AnalyticsConsentBanner() {
         )}
       >
         <p className={cn("text-sm font-medium", beagleTheme.inkStrongText)}>
-          We use optional analytics cookies for anonymous traffic and
-          performance measurement.
+          {t("privacy.banner.title")}
         </p>
         <p className={cn("mt-1 text-sm", beagleTheme.inkText)}>
-          Choose Accept to enable Vercel Analytics and Speed Insights, or Reject
-          to keep them disabled.
+          {t("privacy.banner.body")}
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <button
@@ -41,7 +41,7 @@ export function AnalyticsConsentBanner() {
               beagleTheme.focusRing,
             )}
           >
-            Accept analytics
+            {t("privacy.banner.accept")}
           </button>
           <button
             type="button"
@@ -54,7 +54,7 @@ export function AnalyticsConsentBanner() {
               beagleTheme.focusRing,
             )}
           >
-            Reject analytics
+            {t("privacy.banner.reject")}
           </button>
         </div>
       </div>

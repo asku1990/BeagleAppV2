@@ -1,10 +1,12 @@
 "use client";
 
 import { beagleTheme } from "@/components/ui/beagle-theme";
+import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
 import { useAnalyticsConsent } from "@/hooks/consent";
 
 export function CookieChoicesButton() {
+  const { t } = useI18n();
   const { openBanner } = useAnalyticsConsent();
 
   return (
@@ -20,7 +22,7 @@ export function CookieChoicesButton() {
         beagleTheme.focusRing,
       )}
     >
-      Cookie choices
+      {t("privacy.button.openChoices")}
     </button>
   );
 }

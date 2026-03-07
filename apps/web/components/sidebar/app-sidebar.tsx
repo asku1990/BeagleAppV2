@@ -394,7 +394,7 @@ export function AppSidebar() {
           <SidebarMenuItem className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
             <SidebarMenuButton
               asChild
-              tooltip="Privacy"
+              tooltip={t("sidebar.footer.privacy")}
               isActive={pathname === "/privacy"}
               className={cn(
                 beagleTheme.inkStrongText,
@@ -407,7 +407,7 @@ export function AppSidebar() {
               <Link href="/privacy" onClick={closeSidebarOnMobile}>
                 <FileText className="size-4" />
                 <span className="group-data-[collapsible=icon]:hidden">
-                  Privacy
+                  {t("sidebar.footer.privacy")}
                 </span>
               </Link>
             </SidebarMenuButton>

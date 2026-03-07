@@ -29,9 +29,9 @@ Use this format for new entries:
 ## 2026-03-07 - Finalize privacy and consent legal details
 
 - Area: Public privacy page and analytics consent flow (`/privacy`, footer links, consent banner).
-- Issue: Current copy is a placeholder baseline and does not represent final legal-approved wording.
-- Impact: Compliance text may be incomplete; cookie inventory/retention/contact details can be inaccurate until verified in production.
-- Suggested fix: Run legal review, validate exact Better Auth cookie names/attributes in production, and finalize retention/contact/controller sections.
+- Issue: Privacy page now follows an interim Finnish template with verified contact email, but controller identifiers, postal details, and final legal wording still need authoritative verification.
+- Impact: Compliance text is closer to publishable, but missing controller fields or unverified processing details can still leave the policy incomplete.
+- Suggested fix: Run legal review, validate exact Better Auth cookie names/attributes in production, and replace the remaining placeholder controller details with approved values.
 - Trigger to revisit: Next compliance/legal pass or before broad production launch.
 - Ticket: BEJ-30 follow-up.
 

@@ -63,7 +63,7 @@ Sidebar:
 - Footer links for everyone:
   - `/privacy`
 - On `/privacy`:
-  - `Cookie choices` reopens analytics consent controls
+  - `Avaa evästevalinnat` avaa analytiikan suostumusvalinnat uudelleen
 
 Limits:
 
