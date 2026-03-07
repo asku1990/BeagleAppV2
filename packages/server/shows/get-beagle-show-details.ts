@@ -78,6 +78,8 @@ export async function getBeagleShowDetailsService(
         sex: item.sex,
         result: normalizeShowResult(item.result, eventDate),
         heightCm: item.heightCm,
+        // Note: ShowResult.eventName exists in DB but is intentionally excluded
+        // from the public show contract/clipboard until product requirements need it.
         judge: item.judge,
       })),
     };

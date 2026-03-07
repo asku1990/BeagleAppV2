@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useMemo } from "react";
+import { toast } from "@/components/ui/sonner";
 import {
   ListingResponsiveResults,
   ListingSectionShell,
@@ -11,6 +12,7 @@ import { useBeagleShowsUiState } from "@/hooks/public/beagle/shows";
 import { useI18n } from "@/hooks/i18n";
 import type { MessageKey } from "@/lib/i18n";
 import {
+  copyShowSearchRowsToClipboard,
   formatIsoDateForDisplay,
   normalizeIsoDateOnlyInput,
   parseShowYearInput,
@@ -103,6 +105,25 @@ export function BeagleShowsPage() {
       : normalizeIsoDateOnlyInput(formState.dateFrom).length > 0 &&
         normalizeIsoDateOnlyInput(formState.dateTo).length > 0;
 
+  const handleCopyResults = async () => {
+    await copyShowSearchRowsToClipboard({
+      rows: response.items,
+      labels: {
+        date: t("shows.results.col.date"),
+        place: t("shows.results.col.place"),
+        judge: t("shows.results.col.judge"),
+        dogCount: t("shows.results.col.dogCount"),
+      },
+      messages: {
+        success: t("shows.results.copy.success"),
+        error: t("shows.results.copy.error"),
+        unsupported: t("shows.results.copy.unsupported"),
+      },
+      clipboard: globalThis.navigator?.clipboard,
+      toast,
+    });
+  };
+
   return (
     <>
       <header className={cn(beagleTheme.panel, "px-5 py-5 md:px-6 md:py-6")}>
@@ -151,9 +172,25 @@ export function BeagleShowsPage() {
         title={t("shows.results.title")}
         count={
           !hasError ? (
-            <span>
-              {t("shows.results.count")} {response.total} {" • "}{" "}
-              {getFilterLabel(response.filters, locale, t)}
+            <span className="flex flex-wrap items-center gap-2">
+              <span>
+                {t("shows.results.count")} {response.total} {" • "}{" "}
+                {getFilterLabel(response.filters, locale, t)}
+              </span>
+              {hasItems ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    void handleCopyResults();
+                  }}
+                  className={cn(
+                    "cursor-pointer text-xs underline underline-offset-2",
+                    beagleTheme.inkStrongText,
+                  )}
+                >
+                  {t("shows.results.copy.button")}
+                </button>
+              ) : null}
             </span>
           ) : undefined
         }

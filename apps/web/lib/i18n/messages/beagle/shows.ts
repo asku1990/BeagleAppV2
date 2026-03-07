@@ -35,6 +35,11 @@ export const fiBeagleShowsMessages = {
   "shows.results.col.dogCount": "Koiria",
   "shows.results.col.details": "Tuloslista",
   "shows.results.open": "Avaa näyttely",
+  "shows.results.copy.button": "Kopioi sivun tulokset",
+  "shows.results.copy.success": "Näyttelyhaun tulokset kopioitu leikepöydälle.",
+  "shows.results.copy.error": "Näyttelyhaun tulosten kopiointi epäonnistui.",
+  "shows.results.copy.unsupported":
+    "Leikepöydän kirjoitus ei ole käytettävissä tässä selaimessa.",
 
   "shows.pagination.pageSize": "Sivukoko",
   "shows.pagination.previous": "Edellinen",
@@ -60,6 +65,12 @@ export const fiBeagleShowsMessages = {
   "shows.details.reviewText.showLess": "Näytä vähemmän",
   "shows.details.col.height": "Korkeus",
   "shows.details.col.judge": "Tuomari",
+  "shows.details.copy.button": "Kopioi rivi",
+  "shows.details.copy.all": "Kopioi kaikki",
+  "shows.details.copy.success": "Näyttelyrivi kopioitu leikepöydälle.",
+  "shows.details.copy.error": "Näyttelyrivin kopiointi epäonnistui.",
+  "shows.details.copy.unsupported":
+    "Leikepöydän kirjoitus ei ole käytettävissä tässä selaimessa.",
   "shows.details.sex.male": "Uros",
   "shows.details.sex.female": "Narttu",
   "shows.details.sex.unknown": "-",
@@ -109,6 +120,12 @@ export const svBeagleShowsMessages = {
   "shows.results.col.dogCount": "Hundar",
   "shows.results.col.details": "Resultatlista",
   "shows.results.open": "Öppna utställning",
+  "shows.results.copy.button": "Kopiera sidans resultat",
+  "shows.results.copy.success":
+    "Utställningsresultaten kopierades till urklipp.",
+  "shows.results.copy.error": "Kopiering av utställningsresultat misslyckades.",
+  "shows.results.copy.unsupported":
+    "Skrivning till urklipp stöds inte i den här webbläsaren.",
 
   "shows.pagination.pageSize": "Sidstorlek",
   "shows.pagination.previous": "Föregående",
@@ -134,6 +151,12 @@ export const svBeagleShowsMessages = {
   "shows.details.reviewText.showLess": "Visa mindre",
   "shows.details.col.height": "Höjd",
   "shows.details.col.judge": "Domare",
+  "shows.details.copy.button": "Kopiera rad",
+  "shows.details.copy.all": "Kopiera alla",
+  "shows.details.copy.success": "Utställningsraden kopierades till urklipp.",
+  "shows.details.copy.error": "Kopiering av utställningsrad misslyckades.",
+  "shows.details.copy.unsupported":
+    "Skrivning till urklipp stöds inte i den här webbläsaren.",
   "shows.details.sex.male": "Hane",
   "shows.details.sex.female": "Tik",
   "shows.details.sex.unknown": "-",

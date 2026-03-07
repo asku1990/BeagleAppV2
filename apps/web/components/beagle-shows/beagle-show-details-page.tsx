@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "@/components/ui/sonner";
 import type { BeagleShowDetailsResponse } from "@beagle/contracts";
 import {
   ListingResponsiveResults,
@@ -7,7 +8,11 @@ import {
 } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
-import { formatIsoDateForDisplay } from "@/lib/public/beagle/shows";
+import {
+  copyShowDetailRowToClipboard,
+  copyShowDetailRowsToClipboard,
+  formatIsoDateForDisplay,
+} from "@/lib/public/beagle/shows";
 import { getDogProfileHref } from "@/lib/public/beagle/dogs/profile";
 import { cn } from "@/lib/utils";
 
@@ -93,6 +98,49 @@ export function BeagleShowDetailsPage({
   const reviewPendingLabel = t("shows.details.reviewText.pending");
   const reviewShowMoreLabel = t("shows.details.reviewText.showMore");
   const reviewShowLessLabel = t("shows.details.reviewText.showLess");
+  const clipboardLabels = {
+    registrationNo: t("shows.details.col.reg"),
+    name: t("shows.details.col.name"),
+    sex: t("shows.details.col.sex"),
+    result: t("shows.details.col.result"),
+    reviewText: t("shows.details.col.reviewText"),
+    height: t("shows.details.col.height"),
+    judge: t("shows.details.col.judge"),
+    sexMale: t("shows.details.sex.male"),
+    sexFemale: t("shows.details.sex.female"),
+    sexUnknown: t("shows.details.sex.unknown"),
+  };
+  const clipboardMessages = {
+    success: t("shows.details.copy.success"),
+    error: t("shows.details.copy.error"),
+    unsupported: t("shows.details.copy.unsupported"),
+  };
+
+  const handleCopyRow = async (
+    row: ShowDetailsRowWithOptionalReview,
+    reviewText: string,
+  ) => {
+    await copyShowDetailRowToClipboard({
+      row: { ...row, reviewText },
+      labels: clipboardLabels,
+      messages: clipboardMessages,
+      clipboard: globalThis.navigator?.clipboard,
+      toast,
+    });
+  };
+
+  const handleCopyAllRows = async () => {
+    await copyShowDetailRowsToClipboard({
+      rows: details.items.map((row) => ({
+        ...row,
+        reviewText: getReviewTextValue(row, reviewPendingLabel).text,
+      })),
+      labels: clipboardLabels,
+      messages: clipboardMessages,
+      clipboard: globalThis.navigator?.clipboard,
+      toast,
+    });
+  };
 
   return (
     <>
@@ -118,7 +166,30 @@ export function BeagleShowDetailsPage({
         </div>
       </header>
 
-      <ListingSectionShell title={t("shows.details.section.title")}>
+      <ListingSectionShell
+        title={t("shows.details.section.title")}
+        count={
+          <span className="flex flex-wrap items-center gap-2">
+            <span>
+              {t("shows.details.dogCount")}: {details.items.length}
+            </span>
+            {details.items.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => {
+                  void handleCopyAllRows();
+                }}
+                className={cn(
+                  "cursor-pointer text-xs underline underline-offset-2",
+                  beagleTheme.inkStrongText,
+                )}
+              >
+                {t("shows.details.copy.all")}
+              </button>
+            ) : null}
+          </span>
+        }
+      >
         <ListingResponsiveResults
           desktop={
             <div className="overflow-x-auto">
@@ -145,6 +216,9 @@ export function BeagleShowDetailsPage({
                     </th>
                     <th className="px-2 py-2 font-semibold">
                       {t("shows.details.col.judge")}
+                    </th>
+                    <th className="px-2 py-2 font-semibold">
+                      {t("shows.details.copy.button")}
                     </th>
                   </tr>
                 </thead>
@@ -193,6 +267,18 @@ export function BeagleShowDetailsPage({
                           {formatHeight(row.heightCm)}
                         </td>
                         <td className="px-2 py-2">{row.judge ?? "-"}</td>
+                        <td className="px-2 py-2">
+                          <button
+                            type="button"
+                            onClick={() => void handleCopyRow(row, review.text)}
+                            className={cn(
+                              "cursor-pointer font-medium underline underline-offset-2",
+                              beagleTheme.inkStrongText,
+                            )}
+                          >
+                            {t("shows.details.copy.button")}
+                          </button>
+                        </td>
                       </tr>
                     );
                   })}
@@ -277,6 +363,18 @@ export function BeagleShowDetailsPage({
                           {t("shows.details.col.judge")}:
                         </span>
                         <span>{row.judge ?? "-"}</span>
+                      </p>
+                      <p className="col-span-2">
+                        <button
+                          type="button"
+                          onClick={() => void handleCopyRow(row, review.text)}
+                          className={cn(
+                            "cursor-pointer font-medium underline underline-offset-2",
+                            beagleTheme.inkStrongText,
+                          )}
+                        >
+                          {t("shows.details.copy.button")}
+                        </button>
                       </p>
                     </div>
                   </article>

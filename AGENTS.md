@@ -44,10 +44,11 @@ Agent operating rules for this repository.
 ## Release and versioning rules
 
 - Source of truth for release communication is root `CHANGELOG.md`.
-- Add user-visible changes under a dated version block:
+- Add new user-visible changes under `## Unreleased` while work is in progress.
+- Keep `Unreleased` grouped with sections: `Added`, `Changed`, `Fixed`, `Removed`.
+- When preparing a release, move relevant `Unreleased` entries into a dated version block:
   - `## [x.y.z] - YYYY-MM-DD`
-  - Sections: `Added`, `Changed`, `Fixed`, `Removed`.
-- Web “Mitä uutta” reads only versioned blocks (not `Unreleased`):
+- Web “Mitä uutta” reads only versioned blocks (not `Unreleased`), so unreleased notes must be promoted into a versioned block as part of the release process:
   - `apps/web/lib/release-notes/latest.ts`
   - `apps/web/app/(public)/whats-new/page.tsx`
 

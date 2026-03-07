@@ -7,12 +7,15 @@ This project uses a user-facing changelog format.
 - Keep language plain first; add technical detail only when useful.
 - Internal-only changes are optional in the changelog.
 - Use sections: `Added`, `Changed`, `Fixed`, `Removed`.
+- Add ongoing work under `## Unreleased`.
+- Move `Unreleased` entries into a dated `## [x.y.z] - YYYY-MM-DD` block only when preparing a release.
 
 ## Unreleased
 
 ### Added
 
 - Palveluun lisättiin Vercelin Web Analytics ja Speed Insights, joiden avulla Vercel-julkaisut keräävät automaattisesti tietoa kävijöistä, sivunäytöistä ja sivuston suorituskyvystä.
+- Julkiselle näyttelyhaulle lisättiin leikepöytätoiminnot: hakusivulla voi kopioida näkyvän sivun tulokset ja näyttelyn tulossivulla yksittäisen rivin tai kaikki rivit TSV-muodossa.
 
 ## [0.6.0] - 2026-03-06
 
