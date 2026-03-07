@@ -12,6 +12,22 @@ This project uses a user-facing changelog format.
 
 ## Unreleased
 
+### Added
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.6.2] - 2026-03-07
+
+### Added
+
+- Palveluun lisättiin julkinen `Tietosuoja`-sivu (`/privacy`) sekä sivupalkin alatunnisteessa aina näkyvä `Tietosuoja`-toiminto. `Avaa evästevalinnat` -painikkeella voi avata suostumusbannerin uudelleen `Tietosuoja`-sivulta.
+- Vercel Analytics ja Speed Insights otetaan nyt käyttöön vasta, kun käyttäjä antaa siihen suostumuksen analytiikkabannerissa.
+- `Tietosuoja`-sivu uudistettiin selkeäksi suomenkieliseksi tietosuojaselosteeksi. Sivulla kuvataan palvelun käytössä olevat evästeet, analytiikkasuostumus ja rekisteröidyn oikeudet.
+
 ## [0.6.1] - 2026-03-07
 
 ### Added

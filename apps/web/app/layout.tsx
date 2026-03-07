@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import {
+  ANALYTICS_CONSENT_COOKIE_NAME,
+  parseAnalyticsConsent,
+} from "@/lib/consent";
 import { Providers } from "@/lib/providers";
 import { DEFAULT_LOCALE, LOCALE_COOKIE_NAME, isLocale } from "@/lib/i18n/types";
 import "./globals.css";
@@ -25,14 +27,20 @@ export default async function RootLayout({
   const localeCookie = cookieStore.get(LOCALE_COOKIE_NAME)?.value;
   const initialLocale =
     localeCookie && isLocale(localeCookie) ? localeCookie : undefined;
+  const initialAnalyticsConsent = parseAnalyticsConsent(
+    cookieStore.get(ANALYTICS_CONSENT_COOKIE_NAME)?.value,
+  );
   const htmlLocale = initialLocale ?? DEFAULT_LOCALE;
 
   return (
     <html lang={htmlLocale}>
       <body className="antialiased">
-        <Providers initialLocale={initialLocale}>{children}</Providers>
-        <Analytics />
-        <SpeedInsights />
+        <Providers
+          initialLocale={initialLocale}
+          initialAnalyticsConsent={initialAnalyticsConsent}
+        >
+          {children}
+        </Providers>
       </body>
     </html>
   );

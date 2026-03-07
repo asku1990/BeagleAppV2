@@ -23,6 +23,7 @@ export const fiSidebarMessages = {
   "sidebar.account.roleUser": "USER",
   "sidebar.signIn": "Kirjaudu",
   "sidebar.signOut": "Kirjaudu ulos",
+  "sidebar.footer.privacy": "Tietosuoja",
 } as const;
 
 export const svSidebarMessages = {
@@ -50,4 +51,5 @@ export const svSidebarMessages = {
   "sidebar.account.roleUser": "USER",
   "sidebar.signIn": "Logga in",
   "sidebar.signOut": "Logga ut",
+  "sidebar.footer.privacy": "Dataskydd",
 } as const;
