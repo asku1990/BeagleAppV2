@@ -8,6 +8,12 @@ This project uses a user-facing changelog format.
 - Internal-only changes are optional in the changelog.
 - Use sections: `Added`, `Changed`, `Fixed`, `Removed`.
 
+## Unreleased
+
+### Added
+
+- Palveluun lisättiin Vercelin Web Analytics ja Speed Insights, joiden avulla Vercel-julkaisut keräävät automaattisesti tietoa kävijöistä, sivunäytöistä ja sivuston suorituskyvystä.
+
 ## [0.6.0] - 2026-03-06
 
 ### Added
