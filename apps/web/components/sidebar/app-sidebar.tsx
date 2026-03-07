@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   Award,
   Dog,
+  FileText,
   FileSearch,
   House,
   Link2,
@@ -371,11 +372,13 @@ export function AppSidebar() {
           <SidebarMenuButton
             asChild
             tooltip={t("sidebar.signIn")}
+            isActive={pathname === "/sign-in"}
             className={cn(
               beagleTheme.inkStrongText,
               beagleTheme.interactive,
               beagleTheme.focusRing,
               "min-h-11 md:min-h-9",
+              "data-[active=true]:bg-[var(--beagle-accent-soft)]",
             )}
           >
             <Link href="/sign-in" onClick={closeSidebarOnMobile}>
@@ -386,6 +389,30 @@ export function AppSidebar() {
             </Link>
           </SidebarMenuButton>
         )}
+
+        <SidebarMenu className="mt-1 border-t border-[var(--beagle-border)] pt-1">
+          <SidebarMenuItem className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
+            <SidebarMenuButton
+              asChild
+              tooltip="Privacy"
+              isActive={pathname === "/privacy"}
+              className={cn(
+                beagleTheme.inkStrongText,
+                beagleTheme.interactive,
+                beagleTheme.focusRing,
+                "min-h-11 md:min-h-9",
+                "data-[active=true]:bg-[var(--beagle-accent-soft)]",
+              )}
+            >
+              <Link href="/privacy" onClick={closeSidebarOnMobile}>
+                <FileText className="size-4" />
+                <span className="group-data-[collapsible=icon]:hidden">
+                  Privacy
+                </span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );

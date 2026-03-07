@@ -17,6 +17,7 @@ Routes:
 - `/beagle/trials` (trial search page)
 - `/beagle/trials/[trialId]` (trial detail page)
 - `/beagle/dogs/[dogId]` (dog profile page)
+- `/privacy`
 - `/whats-new`
 
 Can do:
@@ -59,6 +60,10 @@ Sidebar:
   - `/beagle/search`
   - `/beagle/shows`
   - `/beagle/trials`
+- Footer links for everyone:
+  - `/privacy`
+- On `/privacy`:
+  - `Cookie choices` reopens analytics consent controls
 
 Limits:
 

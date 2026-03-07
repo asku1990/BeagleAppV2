@@ -12,6 +12,11 @@ This project uses a user-facing changelog format.
 
 ## Unreleased
 
+### Added
+
+- Lisättiin `Privacy`-sivu (`/privacy`) sekä sivupalkin alatunnisteeseen aina näkyvä `Privacy`-toiminto. `Cookie choices`-painike avaa suostumusbannerin uudelleen `Privacy`-sivulta.
+- Vercel Analytics ja Speed Insights kytkeytyvät nyt päälle vasta, kun käyttäjä hyväksyy analytiikan suostumusbannerista (Accept/Reject).
+
 ## [0.6.1] - 2026-03-07
 
 ### Added
