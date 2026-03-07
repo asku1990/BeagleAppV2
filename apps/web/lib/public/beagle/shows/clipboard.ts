@@ -1,3 +1,5 @@
+// Formats public beagle show search/detail rows into TSV output and
+// centralizes clipboard write and toast handling for show pages.
 import type {
   BeagleShowDetailsRow,
   BeagleShowSearchRow,
