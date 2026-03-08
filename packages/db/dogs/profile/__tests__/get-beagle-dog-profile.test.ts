@@ -59,7 +59,7 @@ function makeOffspringCounts(
 
 function makeOffspringLitterRelation(
   id: string,
-  birthDate: string | Date,
+  birthDate: string | Date | null,
   overrides?: Partial<{
     sire: ReturnType<typeof makeOffspringLitterParent> | null;
     dam: ReturnType<typeof makeOffspringLitterParent> | null;
@@ -67,7 +67,12 @@ function makeOffspringLitterRelation(
 ) {
   return {
     id,
-    birthDate: birthDate instanceof Date ? birthDate : new Date(birthDate),
+    birthDate:
+      birthDate == null
+        ? null
+        : birthDate instanceof Date
+          ? birthDate
+          : new Date(birthDate),
     sire: overrides?.sire ?? null,
     dam: overrides?.dam ?? null,
   };
@@ -478,5 +483,59 @@ describe("getBeagleDogProfileDb", () => {
     expect(result?.litters).toHaveLength(1);
     expect(result?.litters[0]?.puppyCount).toBe(2);
     expect(result?.litters[0]?.puppies[0]?.litterCount).toBe(1);
+  });
+
+  it("keeps sparse unknown offspring in separate synthetic litters", async () => {
+    dogFindUniqueMock.mockResolvedValue({
+      id: "dam-sparse",
+      name: "Sparse Dam",
+      sex: DogSex.FEMALE,
+      birthDate: new Date("2020-01-01"),
+      ekNo: null,
+      registrations: [makeRegistration("DAM-SPARSE", "2020-01-01")],
+      sire: null,
+      dam: null,
+      siredPuppies: [],
+      whelpedPuppies: [
+        {
+          id: "puppy-unknown-a",
+          name: "Unknown Puppy A",
+          sex: DogSex.FEMALE,
+          birthDate: null,
+          ekNo: null,
+          registrations: [makeRegistration("FI-1/19", "2019-01-01")],
+          sire: null,
+          dam: makeParent("dam-sparse", "Sparse Dam", "DAM-SPARSE"),
+          whelpedPuppies: [
+            makeOffspringLitterRelation("grandchild-unknown-a", null),
+            makeOffspringLitterRelation("grandchild-unknown-b", null),
+          ],
+          siredPuppies: [],
+          _count: makeOffspringCounts(),
+        },
+        {
+          id: "puppy-unknown-b",
+          name: "Unknown Puppy B",
+          sex: DogSex.MALE,
+          birthDate: null,
+          ekNo: null,
+          registrations: [makeRegistration("FI-2/19", "2019-01-01")],
+          sire: null,
+          dam: makeParent("dam-sparse", "Sparse Dam", "DAM-SPARSE"),
+          whelpedPuppies: [],
+          siredPuppies: [],
+          _count: makeOffspringCounts(),
+        },
+      ],
+    });
+
+    const result = await getBeagleDogProfileDb("dam-sparse");
+
+    expect(result?.offspringSummary).toEqual({ litterCount: 2, puppyCount: 2 });
+    expect(result?.litters).toHaveLength(2);
+    expect(result?.litters?.every((litter) => litter.puppyCount === 1)).toBe(
+      true,
+    );
+    expect(result?.litters[0]?.puppies[0]?.litterCount).toBe(2);
   });
 });

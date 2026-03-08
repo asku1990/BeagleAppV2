@@ -1,4 +1,5 @@
 // Groups dog profile offspring into litters using birth date and co-parent identity.
+import { toBusinessDateOnly } from "../../../core/date-only";
 import {
   getPrimaryRegistrationNo,
   mapParent,
@@ -15,15 +16,6 @@ import type {
   OffspringLitterRelationNode,
   ParentDogNode,
 } from "./profile-types";
-
-const BUSINESS_TIME_ZONE = "Europe/Helsinki";
-
-const BUSINESS_DATE_ONLY_FORMATTER = new Intl.DateTimeFormat("en-CA", {
-  timeZone: BUSINESS_TIME_ZONE,
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-});
 
 type OffspringCandidate = {
   puppy: OffspringDogNode;
@@ -140,21 +132,8 @@ function compareOffspringRows(
   return left.name.localeCompare(right.name, "fi", { sensitivity: "base" });
 }
 
-function formatBusinessDateOnly(value: Date): string {
-  const parts = BUSINESS_DATE_ONLY_FORMATTER.formatToParts(value);
-  const year = parts.find((part) => part.type === "year")?.value;
-  const month = parts.find((part) => part.type === "month")?.value;
-  const day = parts.find((part) => part.type === "day")?.value;
-
-  if (!year || !month || !day) {
-    return value.toISOString().slice(0, 10);
-  }
-
-  return `${year}-${month}-${day}`;
-}
-
 function getBirthDateKey(value: Date | null): string {
-  return value ? formatBusinessDateOnly(value) : "unknown-date";
+  return value ? toBusinessDateOnly(value) : "unknown-date";
 }
 
 function getOtherParentKey(parent: BeagleDogProfileParentDb | null): string {
@@ -172,6 +151,21 @@ function getOffspringLitterParentKey(
   return parent.id || (registrationNo !== "-" ? registrationNo : "unknown");
 }
 
+// Keep sparse legacy rows isolated instead of inventing sibling relationships
+// when both litter date and co-parent identity are missing.
+function getLitterGroupKey(
+  puppyId: string,
+  birthDate: Date | null,
+  otherParentKey: string,
+): string {
+  const birthDateKey = getBirthDateKey(birthDate);
+  if (birthDateKey === "unknown-date" && otherParentKey === "unknown") {
+    return `unknown-offspring:${puppyId}`;
+  }
+
+  return `${birthDateKey}:${otherParentKey}`;
+}
+
 function countOffspringLitters(puppy: OffspringDogNode): number {
   const litterKeys = new Set<string>();
 
@@ -181,7 +175,11 @@ function countOffspringLitters(puppy: OffspringDogNode): number {
     puppy.siredPuppies,
   )) {
     litterKeys.add(
-      `${getBirthDateKey(candidate.puppy.birthDate)}:${getOffspringLitterParentKey(candidate.otherParent)}`,
+      getLitterGroupKey(
+        candidate.puppy.id,
+        candidate.puppy.birthDate,
+        getOffspringLitterParentKey(candidate.otherParent),
+      ),
     );
   }
 
@@ -225,8 +223,11 @@ export function buildLitters(
     siredPuppies,
   )) {
     const otherParent = mapParent(candidate.otherParent);
-    const birthDateKey = getBirthDateKey(candidate.puppy.birthDate);
-    const key = `${birthDateKey}:${getOtherParentKey(otherParent)}`;
+    const key = getLitterGroupKey(
+      candidate.puppy.id,
+      candidate.puppy.birthDate,
+      getOtherParentKey(otherParent),
+    );
     const group = groups.get(key) ?? {
       birthDate: candidate.puppy.birthDate,
       otherParent,
