@@ -14,7 +14,7 @@ This project uses a user-facing changelog format.
 
 ### Added
 
-- Koiraprofiilin datamalliin lisättiin pentueittain ryhmitellyt jälkeläistiedot (`pentueet` + yhteenvetolaskurit) tulevaa profiilin pentueosiota varten.
+- Koiraprofiili näyttää nyt pentueosion, jossa jälkeläiset on ryhmitelty pentueittain ja mukana ovat pentuemäärä-, pentumäärä- ja koirakohtaiset linkit.
 
 ### Changed
 

@@ -5,6 +5,7 @@ import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
 import type { BeagleDogProfileDto } from "@beagle/contracts";
 import { DogProfileDetailsCard } from "./dog-profile-details-card";
+import { DogProfileLittersCard } from "./dog-profile-litters-card";
 import { DogProfileLineageCard } from "./dog-profile-lineage-card";
 import { DogProfileShowsCard } from "./dog-profile-shows-card";
 import { DogProfileTrialsCard } from "./dog-profile-trials-card";
@@ -29,6 +30,7 @@ export function BeagleDogProfilePage({ profile }: BeagleDogProfilePageProps) {
 
       <DogProfileDetailsCard profile={profile} />
       <DogProfileLineageCard profile={profile} />
+      <DogProfileLittersCard profile={profile} />
       <DogProfileShowsCard rows={profile.shows} />
       <DogProfileTrialsCard rows={profile.trials} />
     </div>

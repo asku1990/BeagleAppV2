@@ -64,8 +64,36 @@ describe("BeagleDogProfilePage", () => {
               ],
             },
           ],
-          offspringSummary: { litterCount: 0, puppyCount: 0 },
-          litters: [],
+          offspringSummary: { litterCount: 1, puppyCount: 2 },
+          litters: [
+            {
+              id: "litter_1",
+              birthDate: "2024-05-01",
+              otherParent: {
+                id: "co_parent_1",
+                name: "Co Parent",
+                registrationNo: "CO-1",
+                ekNo: null,
+              },
+              puppyCount: 2,
+              puppies: [
+                {
+                  id: "puppy_1",
+                  dogId: "puppy_1",
+                  name: "Puppy One",
+                  registrationNo: "FI-30/24",
+                  sex: "U",
+                },
+                {
+                  id: "puppy_2",
+                  dogId: "puppy_2",
+                  name: "Puppy Two",
+                  registrationNo: "FI-31/24",
+                  sex: "N",
+                },
+              ],
+            },
+          ],
           shows: [
             {
               id: "show1",
@@ -108,14 +136,23 @@ describe("BeagleDogProfilePage", () => {
     expect(html).not.toContain("dog.profile.page.backToSearch");
     expect(html).toContain("dog.profile.card.details.title");
     expect(html).toContain("dog.profile.card.lineage.title");
+    expect(html).toContain("dog.profile.card.litters.title");
     expect(html).toContain("dog.profile.card.shows.title");
     expect(html).toContain("dog.profile.card.trials.title");
+    expect(html).toContain("dog.profile.litters.count.litters");
+    expect(html).toContain("dog.profile.litters.count.puppies");
+    expect(html).toContain("CO-1 Co Parent");
+    expect(html).toContain("FI-30/24 Puppy One");
+    expect(html).toContain("FI-31/24 Puppy Two");
     expect(html).toContain("dog.profile.shows.copy.button");
     expect(html).toContain("dog.profile.trials.copy.button");
     expect(html).toContain('href="/beagle/shows/show-route-1"');
     expect(html).toContain('href="/beagle/trials/trial-route-1"');
     expect(html).toContain('href="/beagle/dogs/sire_1"');
     expect(html).toContain('href="/beagle/dogs/dam_1"');
+    expect(html).toContain('href="/beagle/dogs/co_parent_1"');
+    expect(html).toContain('href="/beagle/dogs/puppy_1"');
+    expect(html).toContain('href="/beagle/dogs/puppy_2"');
     expect(html).toContain("(EK: 101)");
     expect(html).not.toContain("(EK: -)");
   });
@@ -149,6 +186,7 @@ describe("BeagleDogProfilePage", () => {
 
     expect(html).toContain("dog.profile.empty.trials");
     expect(html).toContain("dog.profile.empty.shows");
+    expect(html).toContain("dog.profile.empty.litters");
     expect(html).toContain("dog.profile.sex.unknown");
     expect(html).not.toContain("dog.profile.shows.copy.button");
     expect(html).not.toContain("dog.profile.trials.copy.button");

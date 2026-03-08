@@ -27,6 +27,7 @@ Developer notes for the public beagle dog profile feature.
    - show rows from the shows domain
    - trial rows from the trials domain
 3. The web page renders the profile as separate cards for details, lineage, shows, and trials.
+4. When offspring data exists, the profile also renders a dedicated litters card between lineage and result sections.
 
 ## Current contract rules
 
@@ -42,7 +43,7 @@ The public dog profile contract includes:
 Current note:
 
 - grouped litter data is already part of the profile contract and backend mapping
-- the UI does not yet render a dedicated litters card until the profile feature work reaches that checkpoint
+- the UI renders litters as grouped pentue blocks with summary counts, co-parent links, and puppy profile links
 
 ## Litter grouping rules
 
@@ -67,9 +68,11 @@ Ordering:
 ## Render rules
 
 - Keep the page header focused on dog identity: name and primary registration number
-- keep details, lineage, shows, and trials as separate cards
+- keep details, lineage, litters, shows, and trials as separate cards
 - keep unknown/missing data visible as explicit fallback values instead of collapsing the row unpredictably
 - parent links should remain the primary navigation path inside pedigree/profile content
+- render offspring as litters, not a flat child list
+- place the litters card after lineage and before shows/trials
 
 ## Error and loading behavior
 
