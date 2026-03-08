@@ -18,6 +18,8 @@ This project uses a user-facing changelog format.
 
 - Sivupalkki näyttää nyt vain toimivat kohteet. Keskeneräiset linkit poistettiin päävalikosta, ja näkyvien julkisten osioiden nimet yhtenäistettiin muotoon `Beaglet`, `Koetulokset` ja `Näyttelyt`.
 - Beaglehaun `Viimeisimmät lisäykset` näkyy nyt vain ennen haun suorittamista. Aktiivinen haku näyttää vain varsinaiset hakutulokset, jolloin sivu pysyy selkeämpänä.
+- Beaglehaun tuloslistasta poistettiin keskeneräinen `Lisätiedot`-toimintosarake. Tulosriviltä siirrytään nyt suoraan koiran profiiliin nimen tai rekisterinumeron kautta.
+- Beaglehaun desktop-tulostaulukossa `Nimi` siirrettiin heti rekisterinumeron jälkeen, jotta koiran tärkeimmät tunnistetiedot näkyvät vierekkäin.
 
 ### Fixed
 

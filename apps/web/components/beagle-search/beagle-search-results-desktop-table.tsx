@@ -5,7 +5,6 @@ import { getDogProfileHref } from "@/lib/public/beagle/dogs/profile";
 import type { MessageKey } from "@/lib/i18n";
 import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
-import { BeagleSearchRowActions } from "./beagle-search-row-actions";
 
 function mapSexLabel(
   sex: BeagleSearchResultRow["sex"],
@@ -25,11 +24,14 @@ export function BeagleSearchResultsDesktopTable({
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[920px] border-collapse text-sm">
+      <table className="w-full min-w-[820px] border-collapse text-sm">
         <thead>
           <tr className={cn("border-b text-left", beagleTheme.border)}>
             <th className="px-2 py-2 font-semibold">
               {t("search.results.col.reg")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
+              {t("search.results.col.name")}
             </th>
             <th className="px-2 py-2 font-semibold">
               {t("search.results.col.ek")}
@@ -38,16 +40,10 @@ export function BeagleSearchResultsDesktopTable({
               {t("search.results.col.sex")}
             </th>
             <th className="px-2 py-2 font-semibold">
-              {t("search.results.col.name")}
-            </th>
-            <th className="px-2 py-2 font-semibold">
               {t("search.results.col.trials")}
             </th>
             <th className="px-2 py-2 font-semibold">
               {t("search.results.col.shows")}
-            </th>
-            <th className="px-2 py-2 font-semibold">
-              {t("search.results.col.actions")}
             </th>
           </tr>
         </thead>
@@ -80,10 +76,6 @@ export function BeagleSearchResultsDesktopTable({
                   ) : null}
                 </td>
                 <td className="px-2 py-2">
-                  {row.ekNo == null ? "-" : row.ekNo}
-                </td>
-                <td className="px-2 py-2">{mapSexLabel(row.sex, t)}</td>
-                <td className="px-2 py-2">
                   <Link
                     href={getDogProfileHref(row.id)}
                     title={`${t("search.results.parents.sire")}: ${row.sire}\n${t("search.results.parents.dam")}: ${row.dam}`}
@@ -95,11 +87,12 @@ export function BeagleSearchResultsDesktopTable({
                     {row.name}
                   </Link>
                 </td>
+                <td className="px-2 py-2">
+                  {row.ekNo == null ? "-" : row.ekNo}
+                </td>
+                <td className="px-2 py-2">{mapSexLabel(row.sex, t)}</td>
                 <td className="px-2 py-2">{row.trialCount}</td>
                 <td className="px-2 py-2">{row.showCount}</td>
-                <td className="px-2 py-2">
-                  <BeagleSearchRowActions />
-                </td>
               </tr>
             );
           })}

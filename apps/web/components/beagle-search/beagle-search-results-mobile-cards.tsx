@@ -5,7 +5,6 @@ import { getDogProfileHref } from "@/lib/public/beagle/dogs/profile";
 import type { MessageKey } from "@/lib/i18n";
 import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
-import { BeagleSearchRowActions } from "./beagle-search-row-actions";
 
 function mapSexLabel(
   sex: BeagleSearchResultRow["sex"],
@@ -116,7 +115,6 @@ export function BeagleSearchResultsMobileCards({
                 </span>
               </p>
             </div>
-            <BeagleSearchRowActions className="mt-2" />
           </article>
         );
       })}

@@ -125,7 +125,9 @@ Developer notes for the public beagle search UI in this folder.
 
 ## Result actions and clipboard export
 
-- Result rows render additional actions through the row action components in this folder.
+- Result rows link to the dog profile through the primary registration number and name.
+- Desktop table scanning order is `Rekisterinumero`, `Nimi`, `EK-numero`, `Sukupuoli`, `Kokeet`, `Näyttelyt`.
+- The search results view intentionally avoids separate placeholder action buttons. Additional actions should be reintroduced only when they have real destinations or implemented behavior.
 - `handleCopyResults()` in [beagle-search-page.tsx](/Users/akikuivas/personal-projects/beagle/beagle-app-v2/apps/web/components/beagle-search/beagle-search-page.tsx) copies only the currently visible result page.
 - Clipboard formatting is handled by [clipboard.ts](/Users/akikuivas/personal-projects/beagle/beagle-app-v2/apps/web/lib/public/beagle/search/clipboard.ts).
 - Export output is TSV with a localized header row.
