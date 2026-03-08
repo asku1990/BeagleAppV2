@@ -538,4 +538,62 @@ describe("getBeagleDogProfileDb", () => {
     );
     expect(result?.litters[0]?.puppies[0]?.litterCount).toBe(2);
   });
+
+  it("does not merge missing-date litters that only share the same co-parent", async () => {
+    dogFindUniqueMock.mockResolvedValue({
+      id: "dam-missing-date",
+      name: "Missing Date Dam",
+      sex: DogSex.FEMALE,
+      birthDate: new Date("2020-01-01"),
+      ekNo: null,
+      registrations: [makeRegistration("DAM-MD", "2020-01-01")],
+      sire: null,
+      dam: null,
+      siredPuppies: [],
+      whelpedPuppies: [
+        {
+          id: "puppy-md-a",
+          name: "Missing Date Puppy A",
+          sex: DogSex.FEMALE,
+          birthDate: null,
+          ekNo: null,
+          registrations: [makeRegistration("FI-3/19", "2019-01-01")],
+          sire: makeParent("sire-md", "Shared Sire", "SIRE-MD"),
+          dam: makeParent("dam-missing-date", "Missing Date Dam", "DAM-MD"),
+          whelpedPuppies: [
+            makeOffspringLitterRelation("grandchild-md-a", null, {
+              sire: makeOffspringLitterParent("sire-shared", "SIRE-SHARED"),
+            }),
+            makeOffspringLitterRelation("grandchild-md-b", null, {
+              sire: makeOffspringLitterParent("sire-shared", "SIRE-SHARED"),
+            }),
+          ],
+          siredPuppies: [],
+          _count: makeOffspringCounts(),
+        },
+        {
+          id: "puppy-md-b",
+          name: "Missing Date Puppy B",
+          sex: DogSex.MALE,
+          birthDate: null,
+          ekNo: null,
+          registrations: [makeRegistration("FI-4/19", "2019-01-01")],
+          sire: makeParent("sire-md", "Shared Sire", "SIRE-MD"),
+          dam: makeParent("dam-missing-date", "Missing Date Dam", "DAM-MD"),
+          whelpedPuppies: [],
+          siredPuppies: [],
+          _count: makeOffspringCounts(),
+        },
+      ],
+    });
+
+    const result = await getBeagleDogProfileDb("dam-missing-date");
+
+    expect(result?.offspringSummary).toEqual({ litterCount: 2, puppyCount: 2 });
+    expect(result?.litters).toHaveLength(2);
+    expect(result?.litters?.every((litter) => litter.puppyCount === 1)).toBe(
+      true,
+    );
+    expect(result?.litters[0]?.puppies[0]?.litterCount).toBe(2);
+  });
 });

@@ -152,15 +152,16 @@ function getOffspringLitterParentKey(
 }
 
 // Keep sparse legacy rows isolated instead of inventing sibling relationships
-// when both litter date and co-parent identity are missing.
+// when the litter date is missing, because repeated matings for the same pair
+// are possible in legacy data and cannot be disambiguated safely.
 function getLitterGroupKey(
   puppyId: string,
   birthDate: Date | null,
   otherParentKey: string,
 ): string {
   const birthDateKey = getBirthDateKey(birthDate);
-  if (birthDateKey === "unknown-date" && otherParentKey === "unknown") {
-    return `unknown-offspring:${puppyId}`;
+  if (birthDateKey === "unknown-date") {
+    return `unknown-offspring:${otherParentKey}:${puppyId}`;
   }
 
   return `${birthDateKey}:${otherParentKey}`;
