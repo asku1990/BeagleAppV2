@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
 import { cn } from "@/lib/utils";
@@ -57,6 +58,18 @@ export function AnalyticsConsentBanner() {
             {t("privacy.banner.reject")}
           </button>
         </div>
+        <p className="mt-3 text-sm">
+          <Link
+            href="/privacy"
+            className={cn(
+              "underline underline-offset-2",
+              beagleTheme.inkStrongText,
+              beagleTheme.focusRing,
+            )}
+          >
+            {t("privacy.banner.link")}
+          </Link>
+        </p>
       </div>
     </div>
   );
