@@ -41,7 +41,8 @@ import { authClient } from "@/lib/auth/auth-client";
 type NavItem = {
   labelKey: MessageKey;
   icon: React.ComponentType<{ className?: string }>;
-  href?: string;
+  href: string;
+  availability: "enabled" | "planned";
 };
 
 type SessionUserWithOptionalRole = {
@@ -49,40 +50,93 @@ type SessionUserWithOptionalRole = {
 };
 
 const publicNavItems: NavItem[] = [
-  { labelKey: "sidebar.nav.home", icon: House, href: "/" },
+  {
+    labelKey: "sidebar.nav.home",
+    icon: House,
+    href: "/",
+    availability: "enabled",
+  },
   {
     labelKey: "sidebar.nav.beagleSearch",
     icon: Search,
     href: "/beagle/search",
+    availability: "enabled",
   },
-  { labelKey: "sidebar.nav.ownerSearch", icon: Users },
+  {
+    labelKey: "sidebar.nav.ownerSearch",
+    icon: Users,
+    href: "/beagle/owners",
+    availability: "planned",
+  },
   {
     labelKey: "sidebar.nav.trialResults",
     icon: FileSearch,
     href: "/beagle/trials",
+    availability: "enabled",
   },
-  { labelKey: "sidebar.nav.shows", icon: Award, href: "/beagle/shows" },
-  { labelKey: "sidebar.nav.ekDogs", icon: Dog },
-  { labelKey: "sidebar.nav.kennelNames", icon: PawPrint },
-  { labelKey: "sidebar.nav.virtualPairing", icon: Link2 },
-  { labelKey: "sidebar.nav.bestDriver", icon: Trophy },
+  {
+    labelKey: "sidebar.nav.shows",
+    icon: Award,
+    href: "/beagle/shows",
+    availability: "enabled",
+  },
+  {
+    labelKey: "sidebar.nav.ekDogs",
+    icon: Dog,
+    href: "/beagle/ek-dogs",
+    availability: "planned",
+  },
+  {
+    labelKey: "sidebar.nav.kennelNames",
+    icon: PawPrint,
+    href: "/beagle/kennels",
+    availability: "planned",
+  },
+  {
+    labelKey: "sidebar.nav.virtualPairing",
+    icon: Link2,
+    href: "/beagle/virtual-pairing",
+    availability: "planned",
+  },
+  {
+    labelKey: "sidebar.nav.bestDriver",
+    icon: Trophy,
+    href: "/beagle/best-driver",
+    availability: "planned",
+  },
 ];
 
 const adminNavItem: NavItem = {
   labelKey: "sidebar.nav.admin",
   icon: Shield,
   href: "/admin",
+  availability: "enabled",
 };
 
 const adminModuleNavItems: NavItem[] = [
-  { labelKey: "sidebar.nav.adminUsers", icon: Users, href: "/admin/users" },
-  { labelKey: "sidebar.nav.adminDogs", icon: Dog, href: "/admin/dogs" },
+  {
+    labelKey: "sidebar.nav.adminUsers",
+    icon: Users,
+    href: "/admin/users",
+    availability: "enabled",
+  },
+  {
+    labelKey: "sidebar.nav.adminDogs",
+    icon: Dog,
+    href: "/admin/dogs",
+    availability: "enabled",
+  },
   {
     labelKey: "sidebar.nav.adminSettings",
     icon: Settings,
     href: "/admin/settings",
+    availability: "enabled",
   },
 ];
+
+const enabledPublicNavItems = publicNavItems.filter(
+  (item) => item.availability === "enabled",
+);
 
 export function AppSidebar() {
   const { t } = useI18n();
@@ -96,11 +150,6 @@ export function AppSidebar() {
     if (isMobile) {
       setOpenMobile(false);
     }
-  };
-
-  const handleComingSoon = (item: string) => {
-    closeSidebarOnMobile();
-    toast.info(`${item}: ${t("common.notImplementedYet")}`);
   };
 
   const handleSignOut = async () => {
@@ -173,46 +222,29 @@ export function AppSidebar() {
         <SidebarGroup className="pt-1">
           <SidebarGroupContent>
             <SidebarMenu>
-              {publicNavItems.map((item) => (
+              {enabledPublicNavItems.map((item) => (
                 <SidebarMenuItem key={item.labelKey}>
-                  {item.href ? (
-                    <SidebarMenuButton
-                      asChild
-                      tooltip={t(item.labelKey)}
-                      isActive={
-                        item.href === "/"
-                          ? pathname === "/"
-                          : pathname.startsWith(item.href)
-                      }
-                      className={cn(
-                        beagleTheme.inkStrongText,
-                        beagleTheme.interactive,
-                        beagleTheme.focusRing,
-                        "min-h-11 md:min-h-9",
-                        "data-[active=true]:bg-[var(--beagle-accent-soft)]",
-                      )}
-                    >
-                      <Link href={item.href} onClick={closeSidebarOnMobile}>
-                        <item.icon className="size-4" />
-                        <span>{t(item.labelKey)}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  ) : (
-                    <SidebarMenuButton
-                      tooltip={t(item.labelKey)}
-                      onClick={() => handleComingSoon(t(item.labelKey))}
-                      className={cn(
-                        beagleTheme.inkStrongText,
-                        beagleTheme.interactive,
-                        beagleTheme.focusRing,
-                        "min-h-11 md:min-h-9",
-                        "data-[active=true]:bg-[var(--beagle-accent-soft)]",
-                      )}
-                    >
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={t(item.labelKey)}
+                    isActive={
+                      item.href === "/"
+                        ? pathname === "/"
+                        : pathname.startsWith(item.href)
+                    }
+                    className={cn(
+                      beagleTheme.inkStrongText,
+                      beagleTheme.interactive,
+                      beagleTheme.focusRing,
+                      "min-h-11 md:min-h-9",
+                      "data-[active=true]:bg-[var(--beagle-accent-soft)]",
+                    )}
+                  >
+                    <Link href={item.href} onClick={closeSidebarOnMobile}>
                       <item.icon className="size-4" />
                       <span>{t(item.labelKey)}</span>
-                    </SidebarMenuButton>
-                  )}
+                    </Link>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
               {isAdmin ? (
