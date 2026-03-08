@@ -8,11 +8,6 @@ vi.mock("next/link", () => ({
     React.createElement("a", { href, ...props }, children),
 }));
 
-vi.mock("../beagle-search-row-actions", () => ({
-  BeagleSearchRowActions: () =>
-    React.createElement("div", null, "actions-mobile"),
-}));
-
 vi.mock("@/hooks/i18n", () => ({
   useI18n: () => ({
     t: (key: string) => key,
@@ -46,7 +41,6 @@ describe("BeagleSearchResultsMobileCards", () => {
     expect(html).toContain("FI-9/25");
     expect(html).toContain("search.results.sex.female");
     expect(html).toContain("Meri");
-    expect(html).toContain("actions-mobile");
     expect(html).toContain('href="/beagle/dogs/d1"');
   });
 
