@@ -44,18 +44,11 @@ Agent operating rules for this repository.
 ## Documentation rules
 
 - If you change how something works, update the nearest durable documentation source for the touched area.
-- Documentation updates are required for touched areas when behavior, architecture, contracts, operations, or non-obvious implementation intent changes.
-- Acceptable documentation surfaces are:
-  - module or feature `README.md`
-  - a page under `docs/`
-  - concise code comments for non-obvious local context
-  - `CHANGELOG.md` for user-visible changes
-- Prefer durable docs over long code comments. Use code comments only for non-obvious transformations, exclusions, temporary constraints, or implementation caveats that are easiest to understand at the code site.
+- Follow `docs/documentation-rules.md` as the source of truth for documentation placement and detail level.
 - Non-obvious function, mapper, formatter, and use-case files should start with a brief 1-2 line responsibility comment when the file's purpose is not obvious from its name alone.
 - If a contract, integration, or operational workflow changes, update the corresponding doc in the same change when practical.
 - If you discover cleanup or follow-up work that will not be done now, record it in `docs/tech-debt.md` instead of relying on memory.
 - Inline `TODO` / `FIXME` comments are allowed only when they are tied to the touched code, brief, actionable, and ticket-linked when possible.
-- For docs process details and examples, see `docs/documentation-rules.md`.
 
 ## Release and versioning rules
 

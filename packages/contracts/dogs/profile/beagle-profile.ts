@@ -48,6 +48,27 @@ export type BeagleDogProfileShowRowDto = {
   heightCm: number | null;
 };
 
+export type BeagleDogProfileOffspringSummaryDto = {
+  litterCount: number;
+  puppyCount: number;
+};
+
+export type BeagleDogProfileOffspringRowDto = {
+  id: string;
+  dogId: string;
+  name: string;
+  registrationNo: string;
+  sex: BeagleDogProfileSex;
+};
+
+export type BeagleDogProfileLitterDto = {
+  id: string;
+  birthDate: string | null;
+  otherParent: BeagleDogProfileParentDto | null;
+  puppyCount: number;
+  puppies: BeagleDogProfileOffspringRowDto[];
+};
+
 export type BeagleDogProfileDto = {
   id: string;
   name: string;
@@ -62,6 +83,8 @@ export type BeagleDogProfileDto = {
   sire: BeagleDogProfileParentDto | null;
   dam: BeagleDogProfileParentDto | null;
   pedigree: BeagleDogProfilePedigreeGenerationDto[];
+  offspringSummary: BeagleDogProfileOffspringSummaryDto;
+  litters: BeagleDogProfileLitterDto[];
   shows: BeagleDogProfileShowRowDto[];
   trials: BeagleDogProfileTrialRowDto[];
 };

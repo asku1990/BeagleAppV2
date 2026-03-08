@@ -64,6 +64,8 @@ describe("BeagleDogProfilePage", () => {
               ],
             },
           ],
+          offspringSummary: { litterCount: 0, puppyCount: 0 },
+          litters: [],
           shows: [
             {
               id: "show1",
@@ -137,6 +139,8 @@ describe("BeagleDogProfilePage", () => {
           pedigree: [
             { generation: 1, cards: [{ id: "g1", sire: null, dam: null }] },
           ],
+          offspringSummary: { litterCount: 0, puppyCount: 0 },
+          litters: [],
           shows: [],
           trials: [],
         },

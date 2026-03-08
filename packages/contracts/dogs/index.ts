@@ -13,6 +13,9 @@ export type {
 
 export type {
   BeagleDogProfileDto,
+  BeagleDogProfileLitterDto,
+  BeagleDogProfileOffspringRowDto,
+  BeagleDogProfileOffspringSummaryDto,
   BeagleDogProfileParentDto,
   BeagleDogProfilePedigreeCardDto,
   BeagleDogProfilePedigreeGenerationDto,

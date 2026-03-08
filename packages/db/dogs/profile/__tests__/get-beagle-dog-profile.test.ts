@@ -24,6 +24,20 @@ function makeRegistration(no: string, dateStr: string) {
   return { registrationNo: no, createdAt: new Date(dateStr) };
 }
 
+function makeParent(
+  id: string,
+  name: string,
+  registrationNo: string,
+  ekNo: number | null = null,
+) {
+  return {
+    id,
+    name,
+    ekNo,
+    registrations: [makeRegistration(registrationNo, "2018-01-01")],
+  };
+}
+
 describe("getBeagleDogProfileDb", () => {
   beforeEach(() => {
     dogFindUniqueMock.mockReset();
@@ -69,6 +83,8 @@ describe("getBeagleDogProfileDb", () => {
         sire: null,
         dam: null,
       },
+      whelpedPuppies: [],
+      siredPuppies: [],
     };
 
     dogFindUniqueMock.mockResolvedValue(mockDog);
@@ -102,8 +118,12 @@ describe("getBeagleDogProfileDb", () => {
     expect(result?.pedigree[0].cards).toHaveLength(1);
     expect(result?.pedigree[1].cards).toHaveLength(2);
     expect(result?.pedigree[2].cards).toHaveLength(4);
+    expect(result?.offspringSummary).toEqual({ litterCount: 0, puppyCount: 0 });
+    expect(result?.litters).toEqual([]);
     expect(queryArgs.include).not.toHaveProperty("showResults");
     expect(queryArgs.include).not.toHaveProperty("trialResults");
+    expect(queryArgs.include).toHaveProperty("whelpedPuppies");
+    expect(queryArgs.include).toHaveProperty("siredPuppies");
   });
 
   it("handles empty fields gracefully", async () => {
@@ -116,6 +136,8 @@ describe("getBeagleDogProfileDb", () => {
       registrations: [],
       sire: null,
       dam: null,
+      whelpedPuppies: [],
+      siredPuppies: [],
     });
 
     const result = await getBeagleDogProfileDb("dog2");
@@ -142,6 +164,8 @@ describe("getBeagleDogProfileDb", () => {
         dam: null,
       },
       dam: null,
+      whelpedPuppies: [],
+      siredPuppies: [],
     });
 
     const result = await getBeagleDogProfileDb("dog4");
@@ -152,5 +176,131 @@ describe("getBeagleDogProfileDb", () => {
       registrationNo: null,
       ekNo: null,
     });
+  });
+
+  it("groups female offspring into litters by birth date and sire", async () => {
+    dogFindUniqueMock.mockResolvedValue({
+      id: "dam-profile",
+      name: "Profile Dam",
+      sex: DogSex.FEMALE,
+      birthDate: new Date("2020-01-01"),
+      ekNo: 44,
+      registrations: [makeRegistration("DAM-REG", "2020-01-01")],
+      sire: null,
+      dam: null,
+      siredPuppies: [],
+      whelpedPuppies: [
+        {
+          id: "puppy-b",
+          name: "B Puppy",
+          sex: DogSex.MALE,
+          birthDate: new Date("2024-06-10"),
+          registrations: [makeRegistration("FI-11/24", "2024-06-10")],
+          sire: makeParent("sire-1", "Co Sire", "SIRE-1"),
+          dam: makeParent("dam-profile", "Profile Dam", "DAM-REG", 44),
+        },
+        {
+          id: "puppy-a",
+          name: "A Puppy",
+          sex: DogSex.FEMALE,
+          birthDate: new Date("2024-06-10"),
+          registrations: [makeRegistration("FI-10/24", "2024-06-10")],
+          sire: makeParent("sire-1", "Co Sire", "SIRE-1"),
+          dam: makeParent("dam-profile", "Profile Dam", "DAM-REG", 44),
+        },
+        {
+          id: "puppy-c",
+          name: "C Puppy",
+          sex: DogSex.FEMALE,
+          birthDate: new Date("2023-05-01"),
+          registrations: [makeRegistration("FI-20/23", "2023-05-01")],
+          sire: makeParent("sire-2", "Older Sire", "SIRE-2"),
+          dam: makeParent("dam-profile", "Profile Dam", "DAM-REG", 44),
+        },
+      ],
+    });
+
+    const result = await getBeagleDogProfileDb("dam-profile");
+
+    expect(result?.offspringSummary).toEqual({ litterCount: 2, puppyCount: 3 });
+    expect(result?.litters).toMatchObject([
+      {
+        birthDate: new Date("2024-06-10"),
+        otherParent: {
+          id: "sire-1",
+          name: "Co Sire",
+          registrationNo: "SIRE-1",
+          ekNo: null,
+        },
+        puppyCount: 2,
+        puppies: [
+          {
+            id: "puppy-a",
+            dogId: "puppy-a",
+            name: "A Puppy",
+            registrationNo: "FI-10/24",
+            sex: "N",
+          },
+          {
+            id: "puppy-b",
+            dogId: "puppy-b",
+            name: "B Puppy",
+            registrationNo: "FI-11/24",
+            sex: "U",
+          },
+        ],
+      },
+      {
+        birthDate: new Date("2023-05-01"),
+        otherParent: {
+          id: "sire-2",
+          name: "Older Sire",
+          registrationNo: "SIRE-2",
+          ekNo: null,
+        },
+        puppyCount: 1,
+      },
+    ]);
+  });
+
+  it("groups male offspring into litters by birth date and dam", async () => {
+    dogFindUniqueMock.mockResolvedValue({
+      id: "sire-profile",
+      name: "Profile Sire",
+      sex: DogSex.MALE,
+      birthDate: new Date("2019-01-01"),
+      ekNo: 55,
+      registrations: [makeRegistration("SIRE-REG", "2019-01-01")],
+      sire: null,
+      dam: null,
+      whelpedPuppies: [],
+      siredPuppies: [
+        {
+          id: "puppy-1",
+          name: "Puppy One",
+          sex: DogSex.MALE,
+          birthDate: new Date("2025-01-02"),
+          registrations: [makeRegistration("FI-1/25", "2025-01-02")],
+          sire: makeParent("sire-profile", "Profile Sire", "SIRE-REG", 55),
+          dam: makeParent("dam-1", "First Dam", "DAM-1"),
+        },
+        {
+          id: "puppy-2",
+          name: "Puppy Two",
+          sex: DogSex.FEMALE,
+          birthDate: new Date("2025-01-02"),
+          registrations: [makeRegistration("FI-2/25", "2025-01-02")],
+          sire: makeParent("sire-profile", "Profile Sire", "SIRE-REG", 55),
+          dam: makeParent("dam-2", "Second Dam", "DAM-2"),
+        },
+      ],
+    });
+
+    const result = await getBeagleDogProfileDb("sire-profile");
+
+    expect(result?.offspringSummary).toEqual({ litterCount: 2, puppyCount: 2 });
+    expect(result?.litters).toHaveLength(2);
+    expect(result?.litters[0]?.otherParent?.name).toBe("First Dam");
+    expect(result?.litters[1]?.otherParent?.name).toBe("Second Dam");
   });
 });
