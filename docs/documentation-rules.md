@@ -1,70 +1,40 @@
 # Documentation Rules
 
-This document defines how to document code and follow-up work in this repository.
+This document defines the default documentation flow for this repository.
 
 ## Goal
 
-Keep documentation practical, local to the behavior being changed, and durable enough that future contributors do not need to rediscover intent from code alone.
+Keep documentation practical, local to the change, and easy for future contributors to find.
+
+## Default decision flow
+
+When you change something, pick the closest durable documentation surface that matches the change:
+
+1. User-visible change: update `CHANGELOG.md`.
+2. If the change also introduces contributor-facing rules or non-obvious behavior, also update the nearest feature or module `README.md`, or add a focused doc under `docs/`.
+3. Non-obvious local code decision: add a concise code comment at the decision point.
+4. Follow-up work not done now: add a note to `docs/tech-debt.md`.
 
 ## Core rules
 
 - If you change how something works, update the nearest durable documentation source.
-- Require documentation updates only for touched areas where behavior, architecture, contracts, operations, or non-obvious implementation intent changes.
-- Prefer short, specific documentation over broad narrative docs.
+- `CHANGELOG.md` is for users. It does not replace developer-facing documentation.
+- If contributors need implementation rules, naming conventions, visibility rules, or operational context, add a nearby `README.md` or a focused doc under `docs/`.
+- When you add or update a feature or module `README.md`, document at least the purpose, main files or components, data flow or state flow, core render/behavior rules, and when the doc should be updated.
+- Prefer short, specific docs over broad narrative docs.
 - Prefer durable docs over long inline comments.
 
-## Where documentation should go
+## When no extra docs are needed
 
-Use the closest document that matches the kind of change:
-
-| Change type                        | Preferred location                                         |
-| ---------------------------------- | ---------------------------------------------------------- |
-| User-visible behavior              | `CHANGELOG.md` and the nearest usage doc                   |
-| Architecture or boundaries         | `ARCHITECTURE.md` or a focused doc in `docs/`              |
-| Feature/domain behavior            | feature or module `README.md`, or a focused doc in `docs/` |
-| Contract or integration semantics  | the relevant contract or API doc in `docs/`                |
-| Operational workflow               | runbook-style docs in `docs/`                              |
-| Non-obvious local code intent      | concise code comment at the mapping or decision site       |
-| Future cleanup or fix not done now | `docs/tech-debt.md`                                        |
-
-## When to document
-
-| Situation                                          | Expected documentation update                                                                                 |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| New feature with user-visible behavior             | Update `CHANGELOG.md` and the nearest feature or usage doc                                                    |
-| Refactor that changes structure or boundaries      | Update architecture or feature-level documentation if the new shape affects maintainability or future changes |
-| Contract or payload change                         | Update the relevant contract or API documentation                                                             |
-| Migration, env, or deployment change               | Update the relevant operational doc                                                                           |
-| Temporary workaround or intentional exclusion      | Add a concise code comment at the decision point and add a tech-debt note if follow-up is needed              |
-| New non-obvious formatter / mapper / use-case file | Add a short file-level responsibility comment if the file name alone is not enough context                    |
-| Small local fix with obvious behavior              | No extra docs needed beyond code and tests                                                                    |
+- Small local fixes with obvious behavior usually do not need extra docs beyond code and tests.
 
 ## Code comments
 
-Use code comments sparingly.
-
-Good reasons to add a comment:
+Use code comments sparingly. Good reasons include:
 
 - non-obvious mapping or normalization
 - intentional field exclusion
 - temporary constraint or compatibility behavior
 - business rule that is not obvious from the code alone
 
-File-level responsibility comments are useful for non-obvious function, mapper, formatter, and use-case files. Keep them to 1-2 lines and describe the file's responsibility, not its syntax.
-
-Avoid comments that only restate the code.
-
-## Future cleanup and fix notes
-
-If you notice cleanup or follow-up work that will not be done in the current change:
-
-- add a short durable note to `docs/tech-debt.md`
-- use inline `TODO` / `FIXME` only when the note must sit next to the touched code to remain understandable
-- keep inline notes brief and ticket-linked when possible
-
-## Default workflow
-
-1. Make the code change.
-2. Decide whether the touched area changed behavior, structure, contracts, operations, or non-obvious intent.
-3. Update the nearest durable documentation source if yes.
-4. Record deferred cleanup or follow-up work in `docs/tech-debt.md` if it will not be handled now.
+For non-obvious function, mapper, formatter, and use-case files, add a brief 1-2 line responsibility comment when the file name alone is not enough context.

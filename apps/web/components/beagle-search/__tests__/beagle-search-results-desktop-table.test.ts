@@ -8,10 +8,6 @@ vi.mock("next/link", () => ({
     React.createElement("a", { href, ...props }, children),
 }));
 
-vi.mock("../beagle-search-row-actions", () => ({
-  BeagleSearchRowActions: () => React.createElement("div", null, "actions"),
-}));
-
 vi.mock("@/hooks/i18n", () => ({
   useI18n: () => ({
     t: (key: string) => key,
@@ -46,8 +42,13 @@ describe("BeagleSearchResultsDesktopTable", () => {
     expect(html).toContain("search.results.col.regAll");
     expect(html).toContain("search.results.sex.male");
     expect(html).toContain("Alpha");
-    expect(html).toContain("actions");
     expect(html).toContain('href="/beagle/dogs/d1"');
+    expect(html.indexOf("search.results.col.reg")).toBeLessThan(
+      html.indexOf("search.results.col.name"),
+    );
+    expect(html.indexOf("search.results.col.name")).toBeLessThan(
+      html.indexOf("search.results.col.ek"),
+    );
   });
 
   it("renders dash fallback for missing ek/unknown sex", () => {
