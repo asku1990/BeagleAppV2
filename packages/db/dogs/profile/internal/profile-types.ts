@@ -33,6 +33,10 @@ export type BeagleDogProfileOffspringRowDb = {
   name: string;
   registrationNo: string;
   sex: BeagleDogProfileSexDb;
+  ekNo: number | null;
+  trialCount: number;
+  showCount: number;
+  litterCount: number;
 };
 
 export type BeagleDogProfileLitterDb = {
@@ -83,7 +87,26 @@ export type OffspringDogNode = {
   name: string;
   sex: DogSex;
   birthDate: Date | null;
+  ekNo?: number | null;
   registrations: RegistrationNode[];
   sire: ParentDogNode | null;
   dam: ParentDogNode | null;
+  whelpedPuppies: OffspringLitterRelationNode[];
+  siredPuppies: OffspringLitterRelationNode[];
+  _count: {
+    showResults: number;
+    trialResults: number;
+  };
+};
+
+export type OffspringLitterParentNode = {
+  id: string;
+  registrations: RegistrationNode[];
+};
+
+export type OffspringLitterRelationNode = {
+  id: string;
+  birthDate: Date | null;
+  sire: OffspringLitterParentNode | null;
+  dam: OffspringLitterParentNode | null;
 };

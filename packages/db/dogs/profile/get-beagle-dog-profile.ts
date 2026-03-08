@@ -77,6 +77,48 @@ export async function getBeagleDogProfileDb(
           registrations: true,
           sire: { include: { registrations: true } },
           dam: { include: { registrations: true } },
+          whelpedPuppies: {
+            select: {
+              id: true,
+              birthDate: true,
+              sire: {
+                select: {
+                  id: true,
+                  registrations: true,
+                },
+              },
+              dam: {
+                select: {
+                  id: true,
+                  registrations: true,
+                },
+              },
+            },
+          },
+          siredPuppies: {
+            select: {
+              id: true,
+              birthDate: true,
+              sire: {
+                select: {
+                  id: true,
+                  registrations: true,
+                },
+              },
+              dam: {
+                select: {
+                  id: true,
+                  registrations: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              showResults: true,
+              trialResults: true,
+            },
+          },
         },
       },
       siredPuppies: {
@@ -84,6 +126,48 @@ export async function getBeagleDogProfileDb(
           registrations: true,
           sire: { include: { registrations: true } },
           dam: { include: { registrations: true } },
+          whelpedPuppies: {
+            select: {
+              id: true,
+              birthDate: true,
+              sire: {
+                select: {
+                  id: true,
+                  registrations: true,
+                },
+              },
+              dam: {
+                select: {
+                  id: true,
+                  registrations: true,
+                },
+              },
+            },
+          },
+          siredPuppies: {
+            select: {
+              id: true,
+              birthDate: true,
+              sire: {
+                select: {
+                  id: true,
+                  registrations: true,
+                },
+              },
+              dam: {
+                select: {
+                  id: true,
+                  registrations: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              showResults: true,
+              trialResults: true,
+            },
+          },
         },
       },
     },

@@ -1,4 +1,8 @@
-import { ListingSectionShell } from "@/components/listing";
+import Link from "next/link";
+import {
+  ListingResponsiveResults,
+  ListingSectionShell,
+} from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
 import type { MessageKey } from "@/lib/i18n";
@@ -11,8 +15,8 @@ import type {
   BeagleDogProfileDto,
   BeagleDogProfileLitterDto,
   BeagleDogProfileParentDto,
+  BeagleDogProfileSex,
 } from "@beagle/contracts";
-import Link from "next/link";
 
 const FALLBACK_VALUE = "-";
 
@@ -50,10 +54,206 @@ function renderParentLink(parent: BeagleDogProfileParentDto | null) {
   return (
     <Link
       href={getDogProfileHref(parent.id)}
-      className={cn("underline underline-offset-2", beagleTheme.inkStrongText)}
+      className={cn(
+        "font-medium underline underline-offset-2",
+        beagleTheme.inkStrongText,
+      )}
     >
       {formatParentLabel(parent)}
     </Link>
+  );
+}
+
+function mapSexLabel(
+  sex: BeagleDogProfileSex,
+  t: (key: MessageKey) => string,
+): string {
+  if (sex === "U") {
+    return t("dog.profile.litters.sex.male");
+  }
+
+  if (sex === "N") {
+    return t("dog.profile.litters.sex.female");
+  }
+
+  return FALLBACK_VALUE;
+}
+
+function formatEkNo(value: number | null): string {
+  return value == null ? FALLBACK_VALUE : String(value);
+}
+
+function formatColorPlaceholder(t: (key: MessageKey) => string): string {
+  return `${FALLBACK_VALUE} ${t("dog.profile.field.comingSoon")}`;
+}
+
+function LitterDesktopTable({
+  litter,
+  t,
+}: {
+  litter: BeagleDogProfileLitterDto;
+  t: (key: MessageKey) => string;
+}) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[760px] border-collapse text-sm">
+        <thead>
+          <tr className={cn("border-b text-left", beagleTheme.border)}>
+            <th className="px-2 py-2 font-semibold">
+              {t("dog.profile.litters.col.registrationNo")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
+              {t("dog.profile.litters.col.name")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
+              {t("dog.profile.litters.col.sex")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
+              {t("dog.profile.litters.col.color")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
+              {t("dog.profile.litters.col.trials")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
+              {t("dog.profile.litters.col.shows")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
+              {t("dog.profile.litters.col.litters")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
+              {t("dog.profile.litters.col.ekNo")}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {litter.puppies.map((puppy) => (
+            <tr
+              key={puppy.id}
+              className={cn("border-b align-top", beagleTheme.border)}
+            >
+              <td className="px-2 py-2">
+                <Link
+                  href={getDogProfileHref(puppy.dogId)}
+                  className={cn(
+                    "font-medium underline underline-offset-2",
+                    beagleTheme.inkStrongText,
+                  )}
+                >
+                  {puppy.registrationNo}
+                </Link>
+              </td>
+              <td className="px-2 py-2">
+                <Link
+                  href={getDogProfileHref(puppy.dogId)}
+                  className={cn(
+                    "font-medium underline underline-offset-2",
+                    beagleTheme.inkStrongText,
+                  )}
+                >
+                  {puppy.name}
+                </Link>
+              </td>
+              <td className="px-2 py-2">{mapSexLabel(puppy.sex, t)}</td>
+              <td className="px-2 py-2">{formatColorPlaceholder(t)}</td>
+              <td className="px-2 py-2">{puppy.trialCount}</td>
+              <td className="px-2 py-2">{puppy.showCount}</td>
+              <td className="px-2 py-2">{puppy.litterCount}</td>
+              <td className="px-2 py-2">{formatEkNo(puppy.ekNo)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function LitterMobileCards({
+  litter,
+  t,
+}: {
+  litter: BeagleDogProfileLitterDto;
+  t: (key: MessageKey) => string;
+}) {
+  return (
+    <div className="space-y-2">
+      {litter.puppies.map((puppy) => (
+        <article
+          key={puppy.id}
+          className={cn(
+            "rounded-lg border p-3",
+            beagleTheme.border,
+            beagleTheme.surface,
+          )}
+        >
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <p className="col-span-2">
+              <span className={beagleTheme.mutedText}>
+                {t("dog.profile.litters.col.registrationNo")}:{" "}
+              </span>
+              <Link
+                href={getDogProfileHref(puppy.dogId)}
+                className={cn(
+                  "font-medium underline underline-offset-2",
+                  beagleTheme.inkStrongText,
+                )}
+              >
+                {puppy.registrationNo}
+              </Link>
+            </p>
+            <p className="col-span-2">
+              <span className={beagleTheme.mutedText}>
+                {t("dog.profile.litters.col.name")}:{" "}
+              </span>
+              <Link
+                href={getDogProfileHref(puppy.dogId)}
+                className={cn(
+                  "font-medium underline underline-offset-2",
+                  beagleTheme.inkStrongText,
+                )}
+              >
+                {puppy.name}
+              </Link>
+            </p>
+            <p>
+              <span className={beagleTheme.mutedText}>
+                {t("dog.profile.litters.col.sex")}:{" "}
+              </span>
+              <span>{mapSexLabel(puppy.sex, t)}</span>
+            </p>
+            <p>
+              <span className={beagleTheme.mutedText}>
+                {t("dog.profile.litters.col.trials")}:{" "}
+              </span>
+              <span>{puppy.trialCount}</span>
+            </p>
+            <p>
+              <span className={beagleTheme.mutedText}>
+                {t("dog.profile.litters.col.shows")}:{" "}
+              </span>
+              <span>{puppy.showCount}</span>
+            </p>
+            <p>
+              <span className={beagleTheme.mutedText}>
+                {t("dog.profile.litters.col.litters")}:{" "}
+              </span>
+              <span>{puppy.litterCount}</span>
+            </p>
+            <p>
+              <span className={beagleTheme.mutedText}>
+                {t("dog.profile.litters.col.ekNo")}:{" "}
+              </span>
+              <span>{formatEkNo(puppy.ekNo)}</span>
+            </p>
+            <p>
+              <span className={beagleTheme.mutedText}>
+                {t("dog.profile.litters.col.color")}:{" "}
+              </span>
+              <span>{formatColorPlaceholder(t)}</span>
+            </p>
+          </div>
+        </article>
+      ))}
+    </div>
   );
 }
 
@@ -74,18 +274,12 @@ function LitterBlock({
         beagleTheme.surface,
       )}
     >
-      <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <h3
-              className={cn("text-sm font-semibold", beagleTheme.inkStrongText)}
-            >
-              {formatDate(litter.birthDate, locale)}
-            </h3>
-            <span className={cn("text-xs", beagleTheme.mutedText)}>
-              {t("dog.profile.litters.count.puppies")}: {litter.puppyCount}
-            </span>
-          </div>
+      <div className="flex flex-wrap items-start justify-between gap-2 border-b pb-3">
+        <div className="space-y-1">
+          <p className={cn("text-sm font-semibold", beagleTheme.inkStrongText)}>
+            {t("dog.profile.litters.meta.birthDate")}:{" "}
+            {formatDate(litter.birthDate, locale)}
+          </p>
           <p className="text-sm">
             <span className={cn("font-semibold", beagleTheme.mutedText)}>
               {t("dog.profile.litters.field.otherParent")}:
@@ -93,29 +287,17 @@ function LitterBlock({
             {renderParentLink(litter.otherParent)}
           </p>
         </div>
+        <p className={cn("text-sm", beagleTheme.mutedText)}>
+          {t("dog.profile.litters.count.puppies")}: {litter.puppyCount}
+        </p>
       </div>
 
-      <ul className="mt-4 space-y-2">
-        {litter.puppies.map((puppy) => (
-          <li
-            key={puppy.id}
-            className={cn(
-              "rounded-lg border px-3 py-2 text-sm",
-              beagleTheme.border,
-            )}
-          >
-            <Link
-              href={getDogProfileHref(puppy.dogId)}
-              className={cn(
-                "font-medium underline underline-offset-2",
-                beagleTheme.inkStrongText,
-              )}
-            >
-              {`${puppy.registrationNo} ${puppy.name}`}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <div className="pt-4">
+        <ListingResponsiveResults
+          desktop={<LitterDesktopTable litter={litter} t={t} />}
+          mobile={<LitterMobileCards litter={litter} t={t} />}
+        />
+      </div>
     </article>
   );
 }

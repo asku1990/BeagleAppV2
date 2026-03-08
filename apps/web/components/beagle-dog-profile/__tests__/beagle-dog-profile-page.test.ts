@@ -83,6 +83,10 @@ describe("BeagleDogProfilePage", () => {
                   name: "Puppy One",
                   registrationNo: "FI-30/24",
                   sex: "U",
+                  ekNo: 301,
+                  trialCount: 4,
+                  showCount: 2,
+                  litterCount: 1,
                 },
                 {
                   id: "puppy_2",
@@ -90,6 +94,10 @@ describe("BeagleDogProfilePage", () => {
                   name: "Puppy Two",
                   registrationNo: "FI-31/24",
                   sex: "N",
+                  ekNo: null,
+                  trialCount: 0,
+                  showCount: 0,
+                  litterCount: 0,
                 },
               ],
             },
@@ -141,9 +149,21 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain("dog.profile.card.trials.title");
     expect(html).toContain("dog.profile.litters.count.litters");
     expect(html).toContain("dog.profile.litters.count.puppies");
+    expect(html).toContain("dog.profile.litters.col.registrationNo");
+    expect(html).toContain("dog.profile.litters.col.name");
+    expect(html).toContain("dog.profile.litters.col.sex");
+    expect(html).toContain("dog.profile.litters.col.color");
+    expect(html).toContain("dog.profile.litters.col.trials");
+    expect(html).toContain("dog.profile.litters.col.shows");
+    expect(html).toContain("dog.profile.litters.col.litters");
+    expect(html).toContain("dog.profile.litters.col.ekNo");
     expect(html).toContain("CO-1 Co Parent");
-    expect(html).toContain("FI-30/24 Puppy One");
-    expect(html).toContain("FI-31/24 Puppy Two");
+    expect(html).toContain("FI-30/24");
+    expect(html).toContain("Puppy One");
+    expect(html).toContain("FI-31/24");
+    expect(html).toContain("Puppy Two");
+    expect(html).toContain("dog.profile.field.comingSoon");
+    expect(html).toContain("301");
     expect(html).toContain("dog.profile.shows.copy.button");
     expect(html).toContain("dog.profile.trials.copy.button");
     expect(html).toContain('href="/beagle/shows/show-route-1"');

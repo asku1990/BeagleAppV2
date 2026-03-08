@@ -44,6 +44,8 @@ Current note:
 
 - grouped litter data is already part of the profile contract and backend mapping
 - the UI renders litters as grouped pentue blocks with summary counts, co-parent links, and puppy profile links
+- each litter uses the shared desktop/mobile listing pattern instead of a custom flat row list
+- puppy rows currently include registration number, name, sex, EK number, trial count, show count, litter count, and a placeholder color column
 
 ## Litter grouping rules
 
@@ -73,6 +75,7 @@ Ordering:
 - parent links should remain the primary navigation path inside pedigree/profile content
 - render offspring as litters, not a flat child list
 - place the litters card after lineage and before shows/trials
+- inside each litter, render puppy rows with the same desktop/mobile responsive result split used elsewhere in the app
 
 ## Error and loading behavior
 

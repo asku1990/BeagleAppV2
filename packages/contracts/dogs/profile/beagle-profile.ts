@@ -59,6 +59,10 @@ export type BeagleDogProfileOffspringRowDto = {
   name: string;
   registrationNo: string;
   sex: BeagleDogProfileSex;
+  ekNo: number | null;
+  trialCount: number;
+  showCount: number;
+  litterCount: number;
 };
 
 export type BeagleDogProfileLitterDto = {

@@ -11,18 +11,41 @@ import type {
   BeagleDogProfileParentDb,
   BeagleDogProfileSexDb,
   OffspringDogNode,
+  OffspringLitterParentNode,
+  OffspringLitterRelationNode,
   ParentDogNode,
 } from "./profile-types";
+
+const BUSINESS_TIME_ZONE = "Europe/Helsinki";
+
+const BUSINESS_DATE_ONLY_FORMATTER = new Intl.DateTimeFormat("en-CA", {
+  timeZone: BUSINESS_TIME_ZONE,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
 
 type OffspringCandidate = {
   puppy: OffspringDogNode;
   otherParent: ParentDogNode | null;
 };
 
+type OffspringLitterCandidate = {
+  puppy: OffspringLitterRelationNode;
+  otherParent: OffspringLitterParentNode | null;
+};
+
 function createOffspringCandidate(
   puppy: OffspringDogNode,
   otherParent: ParentDogNode | null,
 ): OffspringCandidate {
+  return { puppy, otherParent };
+}
+
+function createOffspringLitterCandidate(
+  puppy: OffspringLitterRelationNode,
+  otherParent: OffspringLitterParentNode | null,
+): OffspringLitterCandidate {
   return { puppy, otherParent };
 }
 
@@ -51,6 +74,37 @@ function getOffspringCandidates(
     const existing = deduped.get(puppy.id);
     if (!existing || existing.otherParent == null) {
       deduped.set(puppy.id, createOffspringCandidate(puppy, puppy.dam));
+    }
+  }
+
+  return [...deduped.values()];
+}
+
+function getOffspringLitterCandidates(
+  sex: BeagleDogProfileSexDb,
+  whelpedPuppies: OffspringLitterRelationNode[],
+  siredPuppies: OffspringLitterRelationNode[],
+): OffspringLitterCandidate[] {
+  if (sex === "N") {
+    return whelpedPuppies.map((puppy) =>
+      createOffspringLitterCandidate(puppy, puppy.sire),
+    );
+  }
+
+  if (sex === "U") {
+    return siredPuppies.map((puppy) =>
+      createOffspringLitterCandidate(puppy, puppy.dam),
+    );
+  }
+
+  const deduped = new Map<string, OffspringLitterCandidate>();
+  for (const puppy of whelpedPuppies) {
+    deduped.set(puppy.id, createOffspringLitterCandidate(puppy, puppy.sire));
+  }
+  for (const puppy of siredPuppies) {
+    const existing = deduped.get(puppy.id);
+    if (!existing || existing.otherParent == null) {
+      deduped.set(puppy.id, createOffspringLitterCandidate(puppy, puppy.dam));
     }
   }
 
@@ -86,12 +140,52 @@ function compareOffspringRows(
   return left.name.localeCompare(right.name, "fi", { sensitivity: "base" });
 }
 
+function formatBusinessDateOnly(value: Date): string {
+  const parts = BUSINESS_DATE_ONLY_FORMATTER.formatToParts(value);
+  const year = parts.find((part) => part.type === "year")?.value;
+  const month = parts.find((part) => part.type === "month")?.value;
+  const day = parts.find((part) => part.type === "day")?.value;
+
+  if (!year || !month || !day) {
+    return value.toISOString().slice(0, 10);
+  }
+
+  return `${year}-${month}-${day}`;
+}
+
 function getBirthDateKey(value: Date | null): string {
-  return value ? value.toISOString().slice(0, 10) : "unknown-date";
+  return value ? formatBusinessDateOnly(value) : "unknown-date";
 }
 
 function getOtherParentKey(parent: BeagleDogProfileParentDb | null): string {
   return parent?.id ?? parent?.registrationNo ?? "unknown";
+}
+
+function getOffspringLitterParentKey(
+  parent: OffspringLitterParentNode | null,
+): string {
+  if (!parent) {
+    return "unknown";
+  }
+
+  const registrationNo = getPrimaryRegistrationNo(parent.registrations);
+  return parent.id || (registrationNo !== "-" ? registrationNo : "unknown");
+}
+
+function countOffspringLitters(puppy: OffspringDogNode): number {
+  const litterKeys = new Set<string>();
+
+  for (const candidate of getOffspringLitterCandidates(
+    toSexCode(puppy.sex),
+    puppy.whelpedPuppies,
+    puppy.siredPuppies,
+  )) {
+    litterKeys.add(
+      `${getBirthDateKey(candidate.puppy.birthDate)}:${getOffspringLitterParentKey(candidate.otherParent)}`,
+    );
+  }
+
+  return litterKeys.size;
 }
 
 function mapOffspringRow(
@@ -103,6 +197,10 @@ function mapOffspringRow(
     name: puppy.name,
     registrationNo: getPrimaryRegistrationNo(puppy.registrations),
     sex: toSexCode(puppy.sex),
+    ekNo: puppy.ekNo ?? null,
+    trialCount: puppy._count.trialResults,
+    showCount: puppy._count.showResults,
+    litterCount: countOffspringLitters(puppy),
   };
 }
 

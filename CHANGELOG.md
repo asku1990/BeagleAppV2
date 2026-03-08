@@ -14,7 +14,7 @@ This project uses a user-facing changelog format.
 
 ### Added
 
-- Koiraprofiili näyttää nyt pentueosion, jossa jälkeläiset on ryhmitelty pentueittain ja mukana ovat pentuemäärä-, pentumäärä- ja koirakohtaiset linkit.
+- Koiraprofiili näyttää nyt pentueosion, jossa jälkeläiset on ryhmitelty pentueittain ja mukana ovat pentuemäärät, koirakohtaiset linkit sekä pentukohtaisia tietosarakkeita kuten sukupuoli, koe- ja näyttelymäärä sekä pentuemäärä.
 
 ### Changed
 
