@@ -20,6 +20,7 @@ When you change something, pick the closest durable documentation surface that m
 - If you change how something works, update the nearest durable documentation source.
 - `CHANGELOG.md` is for users. It does not replace developer-facing documentation.
 - If contributors need implementation rules, naming conventions, visibility rules, or operational context, add a nearby `README.md` or a focused doc under `docs/`.
+- When you add or update a feature or module `README.md`, document at least the purpose, main files or components, data flow or state flow, core render/behavior rules, and when the doc should be updated.
 - Prefer short, specific docs over broad narrative docs.
 - Prefer durable docs over long inline comments.
 

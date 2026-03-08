@@ -17,6 +17,7 @@ This project uses a user-facing changelog format.
 ### Changed
 
 - Sivupalkki näyttää nyt vain toimivat kohteet. Keskeneräiset linkit poistettiin päävalikosta, ja näkyvien julkisten osioiden nimet yhtenäistettiin muotoon `Beaglet`, `Koetulokset` ja `Näyttelyt`.
+- Beaglehaun `Viimeisimmät lisäykset` näkyy nyt vain ennen haun suorittamista. Aktiivinen haku näyttää vain varsinaiset hakutulokset, jolloin sivu pysyy selkeämpänä.
 
 ### Fixed
 

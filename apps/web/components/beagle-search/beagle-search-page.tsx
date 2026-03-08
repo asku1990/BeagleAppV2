@@ -55,6 +55,15 @@ export function BeagleSearchPage() {
   const effectiveFormMode =
     localMode === "none" && hasAdvancedFilters ? "combined" : localMode;
   const canSubmit = localMode !== "none" || hasAdvancedFilters;
+  const hasCommittedSearch =
+    urlState.ek.trim().length > 0 ||
+    urlState.reg.trim().length > 0 ||
+    urlState.name.trim().length > 0 ||
+    normalizeBirthYearInput(urlState.birthYearFrom).length > 0 ||
+    normalizeBirthYearInput(urlState.birthYearTo).length > 0 ||
+    urlState.ekOnly ||
+    urlState.sex !== "any" ||
+    urlState.multipleRegsOnly;
 
   const searchQuery = useBeagleSearchQuery(urlState);
   const newestQuery = useBeagleNewestQuery(5);
@@ -107,6 +116,7 @@ export function BeagleSearchPage() {
     : searchResults.mode === "none"
       ? "start"
       : "no-results";
+  const showNewestAdditions = !hasCommittedSearch;
 
   const hasResultItems = searchResults.items.length > 0;
   const handleCopyResults = useCallback(async () => {
@@ -245,25 +255,29 @@ export function BeagleSearchPage() {
         )}
       </ListingSectionShell>
 
-      <ListingSectionShell
-        title={t("search.newest.title")}
-        subtitle={t("search.newest.subtitle")}
-      >
-        {newestQuery.isLoading && !newestQuery.data ? (
-          <BeagleSearchLoadingState />
-        ) : hasNewestError ? (
-          <BeagleSearchEmptyState variant="error" />
-        ) : (
-          <ListingResponsiveResults
-            desktop={
-              <BeagleSearchResultsDesktopTable rows={newestQuery.data ?? []} />
-            }
-            mobile={
-              <BeagleSearchResultsMobileCards rows={newestQuery.data ?? []} />
-            }
-          />
-        )}
-      </ListingSectionShell>
+      {showNewestAdditions ? (
+        <ListingSectionShell
+          title={t("search.newest.title")}
+          subtitle={t("search.newest.subtitle")}
+        >
+          {newestQuery.isLoading && !newestQuery.data ? (
+            <BeagleSearchLoadingState />
+          ) : hasNewestError ? (
+            <BeagleSearchEmptyState variant="error" />
+          ) : (
+            <ListingResponsiveResults
+              desktop={
+                <BeagleSearchResultsDesktopTable
+                  rows={newestQuery.data ?? []}
+                />
+              }
+              mobile={
+                <BeagleSearchResultsMobileCards rows={newestQuery.data ?? []} />
+              }
+            />
+          )}
+        </ListingSectionShell>
+      ) : null}
     </>
   );
 }

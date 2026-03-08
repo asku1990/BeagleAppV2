@@ -78,6 +78,20 @@ function baseUiState() {
   };
 }
 
+function withCommittedSearch(
+  overrides: Partial<ReturnType<typeof baseUiState>> = {},
+) {
+  return {
+    ...baseUiState(),
+    ...overrides,
+    urlState: {
+      ...baseUiState().urlState,
+      name: "Alpha",
+      ...overrides.urlState,
+    },
+  };
+}
+
 describe("BeagleSearchPage", () => {
   beforeEach(() => {
     useBeagleSearchUiStateMock.mockReset();
@@ -98,6 +112,7 @@ describe("BeagleSearchPage", () => {
   });
 
   it("renders loading state while search fetch is pending", () => {
+    useBeagleSearchUiStateMock.mockReturnValue(withCommittedSearch());
     useBeagleSearchQueryMock.mockReturnValue({
       data: null,
       isFetching: true,
@@ -106,9 +121,11 @@ describe("BeagleSearchPage", () => {
 
     const html = renderToStaticMarkup(React.createElement(BeagleSearchPage));
     expect(html).toContain('data-slot="skeleton"');
+    expect(html).not.toContain("search.newest.title");
   });
 
   it("renders error empty state when search fails", () => {
+    useBeagleSearchUiStateMock.mockReturnValue(withCommittedSearch());
     useBeagleSearchQueryMock.mockReturnValue({
       data: null,
       isFetching: false,
@@ -117,6 +134,7 @@ describe("BeagleSearchPage", () => {
 
     const html = renderToStaticMarkup(React.createElement(BeagleSearchPage));
     expect(html).toContain("search.empty.fetchFailed");
+    expect(html).not.toContain("search.newest.title");
   });
 
   it("renders start empty state when mode is none", () => {
@@ -134,9 +152,11 @@ describe("BeagleSearchPage", () => {
 
     const html = renderToStaticMarkup(React.createElement(BeagleSearchPage));
     expect(html).toContain("search.empty.start");
+    expect(html).toContain("search.newest.title");
   });
 
   it("renders results table/cards and pagination when search has items", () => {
+    useBeagleSearchUiStateMock.mockReturnValue(withCommittedSearch());
     useBeagleSearchQueryMock.mockReturnValue({
       data: {
         mode: "name",
@@ -169,5 +189,6 @@ describe("BeagleSearchPage", () => {
     expect(html).toContain("search.pagination.range");
     expect(html).toContain("search.results.count 1");
     expect(html).toContain("search.results.copy.button");
+    expect(html).not.toContain("search.newest.title");
   });
 });
