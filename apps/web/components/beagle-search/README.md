@@ -127,6 +127,8 @@ Developer notes for the public beagle search UI in this folder.
 
 - Result rows link to the dog profile through the primary registration number and name.
 - Desktop table scanning order is `Rekisterinumero`, `Nimi`, `EK-numero`, `Sukupuoli`, `Kokeet`, `Näyttelyt`.
+- The same forward-navigation pattern is used on desktop and mobile for consistency: both `Rekisterinumero` and `Nimi` link to the canonical dog profile.
+- Do not add an extra profile CTA to the same result item while this pattern is in use.
 - The search results view intentionally avoids separate placeholder action buttons. Additional actions should be reintroduced only when they have real destinations or implemented behavior.
 - `handleCopyResults()` in [beagle-search-page.tsx](/Users/akikuivas/personal-projects/beagle/beagle-app-v2/apps/web/components/beagle-search/beagle-search-page.tsx) copies only the currently visible result page.
 - Clipboard formatting is handled by [clipboard.ts](/Users/akikuivas/personal-projects/beagle/beagle-app-v2/apps/web/lib/public/beagle/search/clipboard.ts).
