@@ -73,6 +73,22 @@ export type BeagleDogProfileLitterDto = {
   puppies: BeagleDogProfileOffspringRowDto[];
 };
 
+export type BeagleDogProfileSiblingsSummaryDto = {
+  siblingCount: number;
+};
+
+export type BeagleDogProfileSiblingRowDto = {
+  id: string;
+  dogId: string;
+  name: string;
+  registrationNo: string;
+  sex: BeagleDogProfileSex;
+  ekNo: number | null;
+  trialCount: number;
+  showCount: number;
+  litterCount: number;
+};
+
 export type BeagleDogProfileDto = {
   id: string;
   name: string;
@@ -89,6 +105,8 @@ export type BeagleDogProfileDto = {
   pedigree: BeagleDogProfilePedigreeGenerationDto[];
   offspringSummary: BeagleDogProfileOffspringSummaryDto;
   litters: BeagleDogProfileLitterDto[];
+  siblingsSummary: BeagleDogProfileSiblingsSummaryDto;
+  siblings: BeagleDogProfileSiblingRowDto[];
   shows: BeagleDogProfileShowRowDto[];
   trials: BeagleDogProfileTrialRowDto[];
 };
