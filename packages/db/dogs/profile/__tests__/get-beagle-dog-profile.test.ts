@@ -596,4 +596,66 @@ describe("getBeagleDogProfileDb", () => {
     );
     expect(result?.litters[0]?.puppies[0]?.litterCount).toBe(2);
   });
+
+  it("includes offspring and descendant litter counts even when sex is stale", async () => {
+    dogFindUniqueMock.mockResolvedValue({
+      id: "stale-sex-profile",
+      name: "Stale Sex Profile",
+      sex: DogSex.FEMALE,
+      birthDate: new Date("2020-01-01"),
+      ekNo: null,
+      registrations: [makeRegistration("STALE-REG", "2020-01-01")],
+      sire: null,
+      dam: null,
+      whelpedPuppies: [],
+      siredPuppies: [
+        {
+          id: "stale-puppy-1",
+          name: "Stale Puppy",
+          sex: DogSex.FEMALE,
+          birthDate: new Date("2024-07-01"),
+          ekNo: 88,
+          registrations: [makeRegistration("FI-100/24", "2024-07-01")],
+          sire: makeParent(
+            "stale-sex-profile",
+            "Stale Sex Profile",
+            "STALE-REG",
+          ),
+          dam: makeParent("co-dam-1", "Co Dam", "CO-DAM-1"),
+          whelpedPuppies: [],
+          siredPuppies: [
+            makeOffspringLitterRelation("stale-grandchild-1", "2026-01-01", {
+              dam: makeOffspringLitterParent("stale-gd-dam", "GD-DAM-1"),
+            }),
+            makeOffspringLitterRelation("stale-grandchild-2", "2026-01-01", {
+              dam: makeOffspringLitterParent("stale-gd-dam", "GD-DAM-1"),
+            }),
+          ],
+          _count: makeOffspringCounts({
+            showResults: 2,
+            trialResults: 3,
+          }),
+        },
+      ],
+    });
+
+    const result = await getBeagleDogProfileDb("stale-sex-profile");
+
+    expect(result?.offspringSummary).toEqual({ litterCount: 1, puppyCount: 1 });
+    expect(result?.litters).toHaveLength(1);
+    expect(result?.litters[0]).toMatchObject({
+      puppyCount: 1,
+      otherParent: {
+        id: "co-dam-1",
+        name: "Co Dam",
+        registrationNo: "CO-DAM-1",
+      },
+    });
+    expect(result?.litters[0]?.puppies[0]).toMatchObject({
+      id: "stale-puppy-1",
+      litterCount: 1,
+      trialCount: 3,
+      showCount: 2,
+    });
+  });
 });

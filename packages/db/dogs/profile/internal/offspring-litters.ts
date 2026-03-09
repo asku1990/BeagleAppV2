@@ -42,22 +42,9 @@ function createOffspringLitterCandidate(
 }
 
 function getOffspringCandidates(
-  sex: BeagleDogProfileSexDb,
   whelpedPuppies: OffspringDogNode[],
   siredPuppies: OffspringDogNode[],
 ): OffspringCandidate[] {
-  if (sex === "N") {
-    return whelpedPuppies.map((puppy) =>
-      createOffspringCandidate(puppy, puppy.sire),
-    );
-  }
-
-  if (sex === "U") {
-    return siredPuppies.map((puppy) =>
-      createOffspringCandidate(puppy, puppy.dam),
-    );
-  }
-
   const deduped = new Map<string, OffspringCandidate>();
   for (const puppy of whelpedPuppies) {
     deduped.set(puppy.id, createOffspringCandidate(puppy, puppy.sire));
@@ -73,22 +60,9 @@ function getOffspringCandidates(
 }
 
 function getOffspringLitterCandidates(
-  sex: BeagleDogProfileSexDb,
   whelpedPuppies: OffspringLitterRelationNode[],
   siredPuppies: OffspringLitterRelationNode[],
 ): OffspringLitterCandidate[] {
-  if (sex === "N") {
-    return whelpedPuppies.map((puppy) =>
-      createOffspringLitterCandidate(puppy, puppy.sire),
-    );
-  }
-
-  if (sex === "U") {
-    return siredPuppies.map((puppy) =>
-      createOffspringLitterCandidate(puppy, puppy.dam),
-    );
-  }
-
   const deduped = new Map<string, OffspringLitterCandidate>();
   for (const puppy of whelpedPuppies) {
     deduped.set(puppy.id, createOffspringLitterCandidate(puppy, puppy.sire));
@@ -171,7 +145,6 @@ function countOffspringLitters(puppy: OffspringDogNode): number {
   const litterKeys = new Set<string>();
 
   for (const candidate of getOffspringLitterCandidates(
-    toSexCode(puppy.sex),
     puppy.whelpedPuppies,
     puppy.siredPuppies,
   )) {
@@ -205,7 +178,7 @@ function mapOffspringRow(
 
 export function buildLitters(
   dogId: string,
-  sex: BeagleDogProfileSexDb,
+  _sex: BeagleDogProfileSexDb,
   whelpedPuppies: OffspringDogNode[],
   siredPuppies: OffspringDogNode[],
 ): BeagleDogProfileLitterDb[] {
@@ -219,7 +192,6 @@ export function buildLitters(
   >();
 
   for (const candidate of getOffspringCandidates(
-    sex,
     whelpedPuppies,
     siredPuppies,
   )) {
