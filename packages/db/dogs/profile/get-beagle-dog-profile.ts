@@ -6,6 +6,12 @@ import {
   buildOffspringSummary,
 } from "./internal/offspring-litters";
 import {
+  buildSiblings,
+  buildSiblingsSummary,
+  buildSiblingWhere,
+  createSiblingProfileContext,
+} from "./internal/profile-siblings";
+import {
   createPedigreeCard,
   getPrimaryRegistrationNo,
   mapParent,
@@ -24,6 +30,8 @@ export type {
   BeagleDogProfileParentDb,
   BeagleDogProfilePedigreeCardDb,
   BeagleDogProfilePedigreeGenerationDb,
+  BeagleDogProfileSiblingRowDb,
+  BeagleDogProfileSiblingsSummaryDb,
   BeagleDogProfileSexDb,
 } from "./internal/profile-types";
 
@@ -217,6 +225,65 @@ export async function getBeagleDogProfileDb(
     dog.whelpedPuppies,
     dog.siredPuppies,
   );
+  const siblingContext = createSiblingProfileContext({
+    id: dog.id,
+    birthDate: dog.birthDate,
+    sire: dog.sire,
+    dam: dog.dam,
+  });
+  const siblingCandidates = siblingContext
+    ? await prisma.dog.findMany({
+        where: buildSiblingWhere(siblingContext),
+        include: {
+          registrations: true,
+          sire: { include: { registrations: true } },
+          dam: { include: { registrations: true } },
+          whelpedPuppies: {
+            select: {
+              id: true,
+              birthDate: true,
+              sire: {
+                select: {
+                  id: true,
+                  registrations: true,
+                },
+              },
+              dam: {
+                select: {
+                  id: true,
+                  registrations: true,
+                },
+              },
+            },
+          },
+          siredPuppies: {
+            select: {
+              id: true,
+              birthDate: true,
+              sire: {
+                select: {
+                  id: true,
+                  registrations: true,
+                },
+              },
+              dam: {
+                select: {
+                  id: true,
+                  registrations: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              showResults: true,
+              trialResults: true,
+            },
+          },
+        },
+      })
+    : [];
+  const siblings = buildSiblings(siblingCandidates);
 
   return {
     id: dog.id,
@@ -236,5 +303,7 @@ export async function getBeagleDogProfileDb(
     pedigree,
     offspringSummary: buildOffspringSummary(litters),
     litters,
+    siblingsSummary: buildSiblingsSummary(siblings),
+    siblings,
   };
 }
