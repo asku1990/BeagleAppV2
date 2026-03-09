@@ -15,6 +15,7 @@ Developer notes for the public beagle dog profile feature.
 - `apps/web/components/beagle-dog-profile/dog-profile-lineage-card.tsx`: parent links and pedigree tree
 - `apps/web/components/beagle-dog-profile/dog-profile-shows-card.tsx`: show results
 - `apps/web/components/beagle-dog-profile/dog-profile-trials-card.tsx`: trial results
+- `apps/web/components/beagle-dog-profile/dog-profile-siblings-card.tsx`: sibling list from one birth litter
 - `apps/web/app/actions/public/beagle/dogs/profile/get-dog-profile.ts`: public profile action
 - `packages/server/dogs/profile/get-beagle-dog-profile.ts`: service-level profile mapping
 - `packages/db/dogs/profile/get-beagle-dog-profile.ts`: DB profile assembly entrypoint
@@ -26,8 +27,9 @@ Developer notes for the public beagle dog profile feature.
    - base dog profile data from the dogs DB profile module
    - show rows from the shows domain
    - trial rows from the trials domain
-3. The web page renders the profile as separate cards for details, lineage, shows, and trials.
-4. When offspring data exists, the profile also renders a dedicated litters card between lineage and result sections.
+3. The web page renders the profile as separate cards for details, lineage, siblings, litters, shows, and trials.
+4. Siblings are resolved in DB from one reliable birth litter and rendered after lineage.
+5. Litters are rendered between siblings and result sections.
 
 ## Current contract rules
 
@@ -39,6 +41,8 @@ The public dog profile contract includes:
 - `trials[]`
 - `offspringSummary`
 - `litters[]`
+- `siblingsSummary`
+- `siblings[]`
 
 Current note:
 
@@ -46,6 +50,20 @@ Current note:
 - the UI renders litters as grouped pentue blocks with summary counts, co-parent links, and puppy profile links
 - each litter uses the shared desktop/mobile listing pattern instead of a custom flat row list
 - puppy rows currently include registration number, name, sex, EK number, trial count, show count, litter count, and a placeholder color column
+- siblings use the same row columns/pattern as litter puppy rows, without litter-group blocks
+
+## Sibling resolution rules
+
+Siblings are resolved from the profile dog's own birth litter using:
+
+1. `birthDate + sire.id + dam.id`
+2. fallback when one parent id is missing: parent registration number (same primary registration normalization as litters logic)
+3. if a reliable litter identity cannot be formed, return no siblings
+
+Additional sibling constraints:
+
+- exclude the profile dog itself
+- order siblings by registration number ascending, fallback by name ascending
 
 ## Litter grouping rules
 
@@ -70,11 +88,13 @@ Ordering:
 ## Render rules
 
 - Keep the page header focused on dog identity: name and primary registration number
-- keep details, lineage, litters, shows, and trials as separate cards
+- keep details, lineage, siblings, litters, shows, and trials as separate cards
 - keep unknown/missing data visible as explicit fallback values instead of collapsing the row unpredictably
 - parent links should remain the primary navigation path inside pedigree/profile content
+- render siblings as one flat list card (same columns as litter puppy rows)
 - render offspring as litters, not a flat child list
-- place the litters card after lineage and before shows/trials
+- place the siblings card after lineage
+- place the litters card after siblings and before shows/trials
 - inside each litter, render puppy rows with the same desktop/mobile responsive result split used elsewhere in the app
 
 ## Error and loading behavior
