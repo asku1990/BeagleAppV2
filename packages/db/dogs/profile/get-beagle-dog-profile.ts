@@ -8,9 +8,9 @@ import {
 import {
   buildSiblings,
   buildSiblingsSummary,
-  buildSiblingWhere,
   createSiblingProfileContext,
 } from "./internal/profile-siblings";
+import { getSiblingCandidates } from "./internal/profile-siblings-query";
 import {
   createPedigreeCard,
   getPrimaryRegistrationNo,
@@ -232,56 +232,7 @@ export async function getBeagleDogProfileDb(
     dam: dog.dam,
   });
   const siblingCandidates = siblingContext
-    ? await prisma.dog.findMany({
-        where: buildSiblingWhere(siblingContext),
-        include: {
-          registrations: true,
-          sire: { include: { registrations: true } },
-          dam: { include: { registrations: true } },
-          whelpedPuppies: {
-            select: {
-              id: true,
-              birthDate: true,
-              sire: {
-                select: {
-                  id: true,
-                  registrations: true,
-                },
-              },
-              dam: {
-                select: {
-                  id: true,
-                  registrations: true,
-                },
-              },
-            },
-          },
-          siredPuppies: {
-            select: {
-              id: true,
-              birthDate: true,
-              sire: {
-                select: {
-                  id: true,
-                  registrations: true,
-                },
-              },
-              dam: {
-                select: {
-                  id: true,
-                  registrations: true,
-                },
-              },
-            },
-          },
-          _count: {
-            select: {
-              showResults: true,
-              trialResults: true,
-            },
-          },
-        },
-      })
+    ? await getSiblingCandidates(siblingContext)
     : [];
   const siblings = buildSiblings(siblingCandidates);
 

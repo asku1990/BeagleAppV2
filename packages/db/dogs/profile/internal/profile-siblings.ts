@@ -17,7 +17,7 @@ type ParentRef = {
   registrationNo: string | null;
 };
 
-type SiblingProfileContext = {
+export type SiblingProfileContext = {
   id: string;
   birthDate: Date | null;
   sire: ParentRef;
