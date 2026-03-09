@@ -42,6 +42,14 @@ function mapDogProfileFromDb(
     sire: profile.sire,
     dam: profile.dam,
     pedigree: profile.pedigree,
+    offspringSummary: profile.offspringSummary,
+    litters: profile.litters.map((litter) => ({
+      id: litter.id,
+      birthDate: litter.birthDate ? toBusinessDateOnly(litter.birthDate) : null,
+      otherParent: litter.otherParent,
+      puppyCount: litter.puppyCount,
+      puppies: litter.puppies,
+    })),
     shows: shows.map((show) => {
       const showDate = toBusinessDateOnly(show.date);
       return {

@@ -1,6 +1,9 @@
 export {
   getBeagleDogProfileDb,
   type BeagleDogProfileDb,
+  type BeagleDogProfileLitterDb,
+  type BeagleDogProfileOffspringRowDb,
+  type BeagleDogProfileOffspringSummaryDb,
   type BeagleDogProfileParentDb,
   type BeagleDogProfilePedigreeCardDb,
   type BeagleDogProfilePedigreeGenerationDb,

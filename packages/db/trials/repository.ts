@@ -1,6 +1,7 @@
 // Prisma repository functions for trial search, event details, and dog-centric
 // trial result lookups used by public trial features and dog profile composition.
 import { DogSex, type Prisma } from "@prisma/client";
+import { BUSINESS_TIME_ZONE, toBusinessDateOnly } from "../core/date-only";
 import { prisma } from "../core/prisma";
 
 export type BeagleTrialSearchSortDb = "date-desc" | "date-asc";
@@ -95,25 +96,6 @@ export type BeagleTrialDogRowDb = {
   tja: number | null;
   pin: number | null;
 };
-
-const BUSINESS_TIME_ZONE = "Europe/Helsinki";
-const BUSINESS_DATE_ONLY_FORMATTER = new Intl.DateTimeFormat("en-CA", {
-  timeZone: BUSINESS_TIME_ZONE,
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-});
-
-function formatBusinessDateOnly(value: Date): string {
-  const parts = BUSINESS_DATE_ONLY_FORMATTER.formatToParts(value);
-  const year = parts.find((part) => part.type === "year")?.value;
-  const month = parts.find((part) => part.type === "month")?.value;
-  const day = parts.find((part) => part.type === "day")?.value;
-  if (!year || !month || !day) {
-    return value.toISOString().slice(0, 10);
-  }
-  return `${year}-${month}-${day}`;
-}
 
 function parseIsoDateOnlyParts(
   value: string,
@@ -228,7 +210,7 @@ function addIsoDateDays(isoDate: string, days: number): string | null {
 }
 
 function normalizeUtcDateToBusinessDateStart(value: Date): Date | null {
-  const isoDate = formatBusinessDateOnly(value);
+  const isoDate = toBusinessDateOnly(value);
   return toBusinessDateStartUtc(isoDate);
 }
 
@@ -469,7 +451,7 @@ function compareDetailRows(
 export async function getBeagleTrialDetailsDb(
   input: BeagleTrialDetailsRequestDb,
 ): Promise<BeagleTrialDetailsResponseDb | null> {
-  const eventDateIso = formatBusinessDateOnly(input.eventDate);
+  const eventDateIso = toBusinessDateOnly(input.eventDate);
   const rangeStart = toBusinessDateStartUtc(eventDateIso);
   const nextEventDateIso = addIsoDateDays(eventDateIso, 1);
   const rangeEnd = nextEventDateIso

@@ -278,6 +278,28 @@ describe("dogs service", () => {
       sire: { name: "Sire", registrationNo: "FI-2/18" },
       dam: { name: "Dam", registrationNo: "FI-3/18" },
       pedigree: [],
+      offspringSummary: { litterCount: 1, puppyCount: 2 },
+      litters: [
+        {
+          id: "litter-1",
+          birthDate: new Date("2024-05-01T00:00:00.000Z"),
+          otherParent: { name: "Dam", registrationNo: "FI-3/18" },
+          puppyCount: 2,
+          puppies: [
+            {
+              id: "p1",
+              dogId: "p1",
+              name: "Puppy 1",
+              registrationNo: "FI-10/24",
+              sex: "U",
+              ekNo: 11,
+              trialCount: 4,
+              showCount: 2,
+              litterCount: 1,
+            },
+          ],
+        },
+      ],
     };
     const mockShows = [
       {
@@ -327,6 +349,12 @@ describe("dogs service", () => {
         data: {
           ...mockProfile,
           birthDate: "2020-01-01",
+          litters: [
+            {
+              ...mockProfile.litters[0],
+              birthDate: "2024-05-01",
+            },
+          ],
           shows: [
             {
               ...mockShows[0],
@@ -376,6 +404,8 @@ describe("dogs service", () => {
       sire: null,
       dam: null,
       pedigree: [],
+      offspringSummary: { litterCount: 0, puppyCount: 0 },
+      litters: [],
     };
     const mockShows = [
       {
@@ -470,6 +500,8 @@ describe("dogs service", () => {
       sire: null,
       dam: null,
       pedigree: [],
+      offspringSummary: { litterCount: 0, puppyCount: 0 },
+      litters: [],
     };
     const mockShows = [
       {
@@ -547,6 +579,8 @@ describe("dogs service", () => {
       sire: null,
       dam: null,
       pedigree: [],
+      offspringSummary: { litterCount: 0, puppyCount: 0 },
+      litters: [],
     });
     getBeagleShowsForDogDbMock.mockResolvedValue([]);
     getBeagleTrialsForDogDbMock.mockResolvedValue([]);

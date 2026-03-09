@@ -1,28 +1,24 @@
 # Documentation Rules
 
-This document defines the default documentation flow for this repository.
+This document defines the default documentation placement rules for this repository.
 
-## Goal
+## When docs are required
 
-Keep documentation practical, local to the change, and easy for future contributors to find.
+- Update documentation when you change behavior, contracts, architecture, operations, or other non-obvious implementation intent.
+- `CHANGELOG.md` is for user-visible changes.
+- Developer-facing documentation is still required when contributors need context that is not obvious from code and tests alone.
 
-## Default decision flow
+## Where docs go
 
-When you change something, pick the closest durable documentation surface that matches the change:
+- `docs/features/*` for cross-layer feature behavior.
+- Nearby feature or module `README.md` for folder-local behavior.
+- Other focused docs under `docs/` for broader operational or project-wide topics.
+- Concise code comments only for non-obvious local context.
 
-1. User-visible change: update `CHANGELOG.md`.
-2. If the change also introduces contributor-facing rules or non-obvious behavior, also update the nearest feature or module `README.md`, or add a focused doc under `docs/`.
-3. Non-obvious local code decision: add a concise code comment at the decision point.
-4. Follow-up work not done now: add a note to `docs/tech-debt.md`.
-
-## Core rules
-
-- If you change how something works, update the nearest durable documentation source.
-- `CHANGELOG.md` is for users. It does not replace developer-facing documentation.
-- If contributors need implementation rules, naming conventions, visibility rules, or operational context, add a nearby `README.md` or a focused doc under `docs/`.
-- When you add or update a feature or module `README.md`, document at least the purpose, main files or components, data flow or state flow, core render/behavior rules, and when the doc should be updated.
-- Prefer short, specific docs over broad narrative docs.
-- Prefer durable docs over long inline comments.
+- Keep one source of truth per concern.
+- Do not document the same behavior in both `docs/features/*` and a folder-local `README.md`.
+- If a contract, integration, or workflow changes, update the corresponding doc in the same change when practical.
+- Follow-up work not done now goes in `docs/tech-debt.md`.
 
 ## When no extra docs are needed
 
@@ -37,4 +33,4 @@ Use code comments sparingly. Good reasons include:
 - temporary constraint or compatibility behavior
 - business rule that is not obvious from the code alone
 
-For non-obvious function, mapper, formatter, and use-case files, add a brief 1-2 line responsibility comment when the file name alone is not enough context.
+- For non-obvious function, mapper, formatter, and use-case files, add a brief 1-2 line responsibility comment when the file name alone is not enough context.
