@@ -31,6 +31,8 @@ This project uses a user-facing changelog format.
 
 - Koiraprofiilin perustietokorttiin lisättiin isä- ja emätiedot linkkeinä. Tyhjät toissijaiset osiot (sisarukset, pentueet, näyttelyt, kokeet) piilotetaan, ja pitkissä listoissa näytetään rajattu määrä rivejä `Näytä lisää / Näytä vähemmän` -toiminnolla sekä näkyvien rivien laskurilla.
 - Linkkityylit yhtenäistettiin profiili-, haku-, näyttely- ja koenäkymissä: avauslinkit ja tekstipohjaiset kopiointitoiminnot käyttävät nyt samoja globaaleja linkki-/toimintotyylejä.
+- Etusivun, beaglehaun, näyttelyhaun ja ajokoehaun yläosan logo + otsikko -rakenne yhtenäistettiin ja siirrettiin jaettuun `FeatureHeroHeader`-komponenttiin. Mobiilin otsikkorivi käyttää nyt samaa tiiviimpää asettelua kaikissa näissä näkymissä.
+- Sivupalkki avautuu nyt oletuksena desktopissa, ja sen leveys sekä navigaatio-/profiilirivien mitoitus tiivistettiin, jotta sisältöalueelle jää enemmän tilaa.
 
 ### Fixed
 
