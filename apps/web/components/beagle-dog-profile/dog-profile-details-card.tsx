@@ -1,13 +1,19 @@
+import Link from "next/link";
 import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
-import { parseLocalIsoDate } from "@/lib/public/beagle/dogs/profile";
+import {
+  getDogProfileHref,
+  parseLocalIsoDate,
+} from "@/lib/public/beagle/dogs/profile";
 import type { MessageKey } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type {
   BeagleDogProfileDto,
+  BeagleDogProfileParentDto,
   BeagleDogProfileSex,
 } from "@beagle/contracts";
+import type { ReactNode } from "react";
 
 const FALLBACK_VALUE = "-";
 
@@ -77,6 +83,37 @@ function formatEkNo(value: number | null): string {
   return String(value);
 }
 
+function formatParentLabel(parent: BeagleDogProfileParentDto | null): string {
+  if (!parent) {
+    return FALLBACK_VALUE;
+  }
+
+  if (!parent.registrationNo) {
+    return parent.name;
+  }
+
+  return `${parent.registrationNo} ${parent.name}`;
+}
+
+function renderParentValue(
+  parent: BeagleDogProfileParentDto | null,
+): ReactNode {
+  const label = formatParentLabel(parent);
+
+  if (!parent?.id) {
+    return label;
+  }
+
+  return (
+    <Link
+      href={getDogProfileHref(parent.id)}
+      className={cn("underline underline-offset-2", beagleTheme.inkStrongText)}
+    >
+      {label}
+    </Link>
+  );
+}
+
 function DetailRow({
   label,
   value,
@@ -84,7 +121,7 @@ function DetailRow({
   numeric = false,
 }: {
   label: string;
-  value: string;
+  value: ReactNode;
   emphasized?: boolean;
   numeric?: boolean;
 }) {
@@ -164,6 +201,14 @@ export function DogProfileDetailsCard({
             numeric
           />
         )}
+        <DetailRow
+          label={t("dog.profile.field.sire")}
+          value={renderParentValue(profile.sire)}
+        />
+        <DetailRow
+          label={t("dog.profile.field.dam")}
+          value={renderParentValue(profile.dam)}
+        />
         <DetailRow
           label={t("dog.profile.field.inbreeding")}
           value={
