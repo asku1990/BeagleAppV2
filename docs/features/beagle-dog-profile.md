@@ -56,7 +56,7 @@ Current note:
 
 Siblings are resolved from the profile dog's own birth litter using:
 
-1. `birthDate + sire.id + dam.id`
+1. `Helsinki business date (birthDate day) + sire.id + dam.id`
 2. fallback when one parent id is missing: parent registration number (same primary registration normalization as litters logic)
 3. if a reliable litter identity cannot be formed, return no siblings
 

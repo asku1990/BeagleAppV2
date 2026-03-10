@@ -1,6 +1,9 @@
 // Resolves profile siblings from one reliably identified birth litter and maps
 // sibling rows to the same shape used by litter puppy rows.
-import { toBusinessDateOnly } from "../../../core/date-only";
+import {
+  getBusinessDateUtcRange,
+  toBusinessDateOnly,
+} from "../../../core/date-only";
 import { getPrimaryRegistrationNo, toSexCode } from "./profile-mappers";
 import type {
   BeagleDogProfileSiblingRowDb,
@@ -19,7 +22,7 @@ type ParentRef = {
 
 export type SiblingProfileContext = {
   id: string;
-  birthDate: Date | null;
+  birthDate: Date;
   sire: ParentRef;
   dam: ParentRef;
 };
@@ -70,9 +73,16 @@ export function createSiblingProfileContext(profile: {
 export function buildSiblingWhere(
   context: SiblingProfileContext,
 ): Record<string, unknown> {
+  const birthDateRange = getBusinessDateUtcRange(context.birthDate);
+
   return {
     id: { not: context.id },
-    birthDate: context.birthDate,
+    // Match by Helsinki calendar day to avoid missing siblings with different
+    // legacy timestamp times on the same birth date.
+    birthDate: {
+      gte: birthDateRange.start,
+      lt: birthDateRange.endExclusive,
+    },
     ...(context.sire.id
       ? { sireId: context.sire.id }
       : {
@@ -118,7 +128,7 @@ function getLitterGroupKey(
   otherParentKey: string,
 ): string {
   const birthDateKey = getBirthDateKey(birthDate);
-  if (birthDateKey === "unknown-date") {
+  if (birthDateKey === "unknown-date" || otherParentKey === "unknown") {
     return `unknown-offspring:${otherParentKey}:${puppyId}`;
   }
   return `${birthDateKey}:${otherParentKey}`;
