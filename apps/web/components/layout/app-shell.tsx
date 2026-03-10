@@ -10,7 +10,7 @@ type AppShellProps = {
 
 export function AppShell({ sidebar, header, children }: AppShellProps) {
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen>
       <div className="beagle-shell flex min-h-screen w-full">
         {sidebar}
         <SidebarInset className="min-h-screen">

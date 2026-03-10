@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useMemo } from "react";
 import { toast } from "@/components/ui/sonner";
+import { FeatureHeroHeader } from "@/components/layout";
 import {
   ListingResponsiveResults,
   ListingSectionShell,
@@ -126,32 +126,11 @@ export function BeagleTrialsPage() {
 
   return (
     <>
-      <header className={cn(beagleTheme.panel, "px-5 py-5 md:px-6 md:py-6")}>
-        <div className="flex items-center gap-3 md:gap-4">
-          <Image
-            src="/legacy-v1-assets/v1-root-belogo.png"
-            alt={t("trials.page.logoAlt")}
-            width={132}
-            height={74}
-            className={cn(
-              "h-auto w-[110px] rounded-sm border p-1 md:w-[132px]",
-              beagleTheme.border,
-              beagleTheme.surface,
-            )}
-          />
-          <h1 className={cn(beagleTheme.headingLg, beagleTheme.inkStrongText)}>
-            {t("trials.page.title")}
-          </h1>
-        </div>
-        <p
-          className={cn(
-            "mt-3 max-w-3xl text-sm md:text-base",
-            beagleTheme.mutedText,
-          )}
-        >
-          {t("trials.page.description")}
-        </p>
-      </header>
+      <FeatureHeroHeader
+        logoAlt={t("trials.page.logoAlt")}
+        title={t("trials.page.title")}
+        description={t("trials.page.description")}
+      />
 
       <BeagleTrialsForm
         values={formState}
