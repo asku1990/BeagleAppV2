@@ -71,7 +71,7 @@ export function BeagleSearchForm({
   return (
     <Card className={cn(beagleTheme.panel, "gap-0 py-0")}>
       <CardHeader className="px-5 pt-5 pb-3 md:px-6 md:pt-6 md:pb-4">
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <CardTitle
               className={cn(beagleTheme.headingMd, beagleTheme.inkStrongText)}
@@ -82,7 +82,7 @@ export function BeagleSearchForm({
               {t("search.form.wildcardHelp")}
             </p>
           </div>
-          <label className="space-y-1 text-xs">
+          <label className="space-y-1 text-xs sm:w-auto">
             <span className={cn(beagleTheme.mutedText, "mb-2 block")}>
               {t("search.form.sort.label")}
             </span>
@@ -92,7 +92,7 @@ export function BeagleSearchForm({
                 onSortChange(event.target.value as BeagleSearchSort)
               }
               className={cn(
-                "h-9 rounded-md border bg-white px-2 text-sm",
+                "h-9 w-full min-w-0 rounded-md border bg-white px-2 text-sm sm:w-auto",
                 beagleTheme.border,
                 beagleTheme.focusRing,
               )}
