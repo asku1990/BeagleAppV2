@@ -2,6 +2,11 @@
 
 Developer notes for the app sidebar components in this folder.
 
+## Layout defaults
+
+- Sidebar is expanded by default on desktop layouts.
+- Keep profile block and auth actions compact so navigation remains the visual priority.
+
 ## Main navigation rule
 
 - Show only real, navigable destinations in the main sidebar.

@@ -76,10 +76,7 @@ function CollapsibleReviewText({
       {canCollapse ? (
         <button
           type="button"
-          className={cn(
-            "mt-1 text-xs font-medium underline underline-offset-2",
-            beagleTheme.inkStrongText,
-          )}
+          className={cn("mt-1 text-xs", beagleTheme.actionLinkStrong)}
           onClick={() => setIsExpanded((prev) => !prev)}
         >
           {isExpanded ? showLessLabel : showMoreLabel}
@@ -179,10 +176,7 @@ export function BeagleShowDetailsPage({
                 onClick={() => {
                   void handleCopyAllRows();
                 }}
-                className={cn(
-                  "cursor-pointer text-xs underline underline-offset-2",
-                  beagleTheme.inkStrongText,
-                )}
+                className={cn("text-xs", beagleTheme.actionLink)}
               >
                 {t("shows.details.copy.all")}
               </button>
@@ -234,10 +228,7 @@ export function BeagleShowDetailsPage({
                         <td className="px-2 py-2">
                           <Link
                             href={getDogProfileHref(row.dogId)}
-                            className={cn(
-                              "font-medium underline underline-offset-2",
-                              beagleTheme.inkStrongText,
-                            )}
+                            className={beagleTheme.entityLink}
                           >
                             {row.registrationNo}
                           </Link>
@@ -245,10 +236,7 @@ export function BeagleShowDetailsPage({
                         <td className="px-2 py-2">
                           <Link
                             href={getDogProfileHref(row.dogId)}
-                            className={cn(
-                              "font-medium underline underline-offset-2",
-                              beagleTheme.inkStrongText,
-                            )}
+                            className={beagleTheme.entityLink}
                           >
                             {row.name}
                           </Link>
@@ -271,10 +259,7 @@ export function BeagleShowDetailsPage({
                           <button
                             type="button"
                             onClick={() => void handleCopyRow(row, review.text)}
-                            className={cn(
-                              "cursor-pointer font-medium underline underline-offset-2",
-                              beagleTheme.inkStrongText,
-                            )}
+                            className={beagleTheme.actionLinkStrong}
                           >
                             {t("shows.details.copy.button")}
                           </button>
@@ -307,10 +292,7 @@ export function BeagleShowDetailsPage({
                         </span>
                         <Link
                           href={getDogProfileHref(row.dogId)}
-                          className={cn(
-                            "font-medium underline underline-offset-2",
-                            beagleTheme.inkStrongText,
-                          )}
+                          className={beagleTheme.entityLink}
                         >
                           {row.registrationNo}
                         </Link>
@@ -321,10 +303,7 @@ export function BeagleShowDetailsPage({
                         </span>
                         <Link
                           href={getDogProfileHref(row.dogId)}
-                          className={cn(
-                            "font-medium underline underline-offset-2",
-                            beagleTheme.inkStrongText,
-                          )}
+                          className={beagleTheme.entityLink}
                         >
                           {row.name}
                         </Link>
@@ -368,10 +347,7 @@ export function BeagleShowDetailsPage({
                         <button
                           type="button"
                           onClick={() => void handleCopyRow(row, review.text)}
-                          className={cn(
-                            "cursor-pointer font-medium underline underline-offset-2",
-                            beagleTheme.inkStrongText,
-                          )}
+                          className={beagleTheme.actionLinkStrong}
                         >
                           {t("shows.details.copy.button")}
                         </button>

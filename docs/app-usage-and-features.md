@@ -23,35 +23,18 @@ Routes:
 Can do:
 
 1. View home statistics on `/`.
-2. Search beagles on `/beagle/search` using:
-   - primary fields: EK number, registration number, dog name
-   - advanced filters: sex, birth year range, EK-only, multiple registrations
-   - sorts: `name-asc`, `birth-desc`, `reg-desc`, `created-desc`, `ek-asc`
-3. Search shows on `/beagle/shows`:
-   - year or date range filters
-   - date sorting
-   - pagination
-   - copy the current visible result page as TSV
-4. Open show detail `/beagle/shows/[showId]`:
-   - event summary (date, place, judge, dog count)
-   - dog rows with registration number, name, sex, result, review text placeholder, height, and judge
-   - copy one row or all rows as TSV
-5. Search trials on `/beagle/trials`:
-   - year or date range filters
-   - date sorting
-   - pagination
-   - copy the current visible result page as TSV
-6. Open trial detail `/beagle/trials/[trialId]`:
-   - event summary (date, place, judge, dog count)
-   - dog rows with result details
-   - copy one row or all rows as TSV
-7. Open dog profile `/beagle/dogs/[dogId]`:
-   - basic details (name, registrations, birth date/age, sex, EK number)
-   - lineage cards (parent profile links when available)
-   - show results section
-   - trial results section
-   - not-found state for unknown IDs and error panel for other fetch failures
+2. Search beagles on `/beagle/search`.
+3. Search shows on `/beagle/shows` and open show detail pages.
+4. Search trials on `/beagle/trials` and open trial detail pages.
+5. Open dog profile `/beagle/dogs/[dogId]`.
+6. Use available copy-to-clipboard exports on public result views.
+7. Read privacy information on `/privacy`.
 8. Read release notes on `/whats-new`.
+
+Feature-level behavior is documented in:
+
+- `docs/features/beagle-search.md`
+- `docs/features/beagle-dog-profile.md`
 
 Sidebar:
 

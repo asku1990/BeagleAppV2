@@ -13,10 +13,15 @@ export type {
 
 export type {
   BeagleDogProfileDto,
+  BeagleDogProfileLitterDto,
+  BeagleDogProfileOffspringRowDto,
+  BeagleDogProfileOffspringSummaryDto,
   BeagleDogProfileParentDto,
   BeagleDogProfilePedigreeCardDto,
   BeagleDogProfilePedigreeGenerationDto,
   BeagleDogProfileSex,
   BeagleDogProfileShowRowDto,
+  BeagleDogProfileSiblingRowDto,
+  BeagleDogProfileSiblingsSummaryDto,
   BeagleDogProfileTrialRowDto,
 } from "./profile/beagle-profile";

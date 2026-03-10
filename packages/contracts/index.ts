@@ -94,11 +94,16 @@ export type {
   BeagleSearchSex,
   BeagleSearchSort,
   BeagleDogProfileDto,
+  BeagleDogProfileLitterDto,
+  BeagleDogProfileOffspringRowDto,
+  BeagleDogProfileOffspringSummaryDto,
   BeagleDogProfileParentDto,
   BeagleDogProfilePedigreeCardDto,
   BeagleDogProfilePedigreeGenerationDto,
   BeagleDogProfileSex,
   BeagleDogProfileShowRowDto,
+  BeagleDogProfileSiblingRowDto,
+  BeagleDogProfileSiblingsSummaryDto,
   BeagleDogProfileTrialRowDto,
 } from "./dogs";
 export type {

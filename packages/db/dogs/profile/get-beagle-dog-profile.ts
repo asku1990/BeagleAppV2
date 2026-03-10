@@ -1,183 +1,64 @@
-import { DogSex } from "@prisma/client";
-import { prisma } from "../../core/prisma";
-import { getFirstInsertedRegistrationNo } from "../core/registration";
-
-export type BeagleDogProfileSexDb = "U" | "N" | "-";
-
-export type BeagleDogProfileParentDb = {
-  id: string;
-  name: string;
-  registrationNo: string | null;
-  ekNo: number | null;
-};
-
-export type BeagleDogProfilePedigreeCardDb = {
-  id: string;
-  sire: BeagleDogProfileParentDb | null;
-  dam: BeagleDogProfileParentDb | null;
-};
-
-export type BeagleDogProfilePedigreeGenerationDb = {
-  generation: number;
-  cards: BeagleDogProfilePedigreeCardDb[];
-};
-
-export type BeagleDogProfileDb = {
-  id: string;
-  name: string;
-  title: string | null;
-  registrationNo: string;
-  registrationNos: string[];
-  birthDate: Date | null;
-  sex: BeagleDogProfileSexDb;
-  color: string | null;
-  ekNo: number | null;
-  inbreedingCoefficientPct: number | null;
-  sire: BeagleDogProfileParentDb | null;
-  dam: BeagleDogProfileParentDb | null;
-  pedigree: BeagleDogProfilePedigreeGenerationDb[];
-};
-
-type PedigreeDogNode = {
-  id: string;
-  name: string;
-  ekNo?: number | null;
-  registrations: { registrationNo: string; createdAt: Date }[];
-  sire?: PedigreeDogNode | null;
-  dam?: PedigreeDogNode | null;
-};
-
-function toSexCode(value: DogSex): BeagleDogProfileSexDb {
-  if (value === DogSex.MALE) return "U";
-  if (value === DogSex.FEMALE) return "N";
-  return "-";
-}
-
-function getPrimaryRegistrationNo(
-  registrations: { registrationNo: string; createdAt: Date }[],
-): string {
-  if (registrations.length === 0) return "-";
-  return getFirstInsertedRegistrationNo(registrations) ?? "-";
-}
-
-function mapParent(
-  dog: {
-    id: string;
-    name: string;
-    ekNo?: number | null;
-    registrations: { registrationNo: string; createdAt: Date }[];
-  } | null,
-): BeagleDogProfileParentDb | null {
-  if (!dog) return null;
-  const registrationNo =
-    dog.registrations.length > 0
-      ? getPrimaryRegistrationNo(dog.registrations)
-      : null;
-  return {
-    id: dog.id,
-    name: dog.name,
-    registrationNo,
-    ekNo: dog.ekNo ?? null,
-  };
-}
-
-function createPedigreeCard(
-  dogId: string,
-  generation: number,
-  index: number,
-  parent: PedigreeDogNode | null | undefined,
-): BeagleDogProfilePedigreeCardDb {
-  return {
-    id: `${dogId}-g${String(generation)}-c${String(index + 1)}`,
-    sire: mapParent(parent?.sire ?? null),
-    dam: mapParent(parent?.dam ?? null),
-  };
-}
+// Loads the base dog profile record from Prisma and assembles
+// pedigree plus grouped offspring data for service-level mapping.
+import {
+  buildLitters,
+  buildOffspringSummary,
+} from "./internal/offspring-litters";
+import { getDogProfileBaseRow } from "./internal/profile-base-query";
+import { buildProfilePedigree } from "./internal/profile-pedigree";
+import {
+  buildSiblings,
+  buildSiblingsSummary,
+  createSiblingProfileContext,
+} from "./internal/profile-siblings";
+import { getSiblingCandidates } from "./internal/profile-siblings-query";
+import {
+  getPrimaryRegistrationNo,
+  mapParent,
+  toSexCode,
+} from "./internal/profile-mappers";
+import type { BeagleDogProfileDb } from "./internal/profile-types";
+export type {
+  BeagleDogProfileDb,
+  BeagleDogProfileLitterDb,
+  BeagleDogProfileOffspringRowDb,
+  BeagleDogProfileOffspringSummaryDb,
+  BeagleDogProfileParentDb,
+  BeagleDogProfilePedigreeCardDb,
+  BeagleDogProfilePedigreeGenerationDb,
+  BeagleDogProfileSiblingRowDb,
+  BeagleDogProfileSiblingsSummaryDb,
+  BeagleDogProfileSexDb,
+} from "./internal/profile-types";
 
 export async function getBeagleDogProfileDb(
   dogId: string,
 ): Promise<BeagleDogProfileDb | null> {
-  const dog = await prisma.dog.findUnique({
-    where: { id: dogId },
-    include: {
-      registrations: true,
-      sire: {
-        include: {
-          registrations: true,
-          sire: {
-            include: {
-              registrations: true,
-              sire: { include: { registrations: true } },
-              dam: { include: { registrations: true } },
-            },
-          },
-          dam: {
-            include: {
-              registrations: true,
-              sire: { include: { registrations: true } },
-              dam: { include: { registrations: true } },
-            },
-          },
-        },
-      },
-      dam: {
-        include: {
-          registrations: true,
-          sire: {
-            include: {
-              registrations: true,
-              sire: { include: { registrations: true } },
-              dam: { include: { registrations: true } },
-            },
-          },
-          dam: {
-            include: {
-              registrations: true,
-              sire: { include: { registrations: true } },
-              dam: { include: { registrations: true } },
-            },
-          },
-        },
-      },
-    },
-  });
+  const dog = await getDogProfileBaseRow(dogId);
 
   if (!dog) {
     return null;
   }
 
-  const pedigree: BeagleDogProfilePedigreeGenerationDb[] = [];
+  const pedigree = buildProfilePedigree(dog);
 
-  pedigree.push({
-    generation: 1,
-    cards: [
-      {
-        id: `${dog.id}-g1-c1`,
-        sire: mapParent(dog.sire),
-        dam: mapParent(dog.dam),
-      },
-    ],
+  const sex = toSexCode(dog.sex);
+  const litters = buildLitters(
+    dog.id,
+    sex,
+    dog.whelpedPuppies,
+    dog.siredPuppies,
+  );
+  const siblingContext = createSiblingProfileContext({
+    id: dog.id,
+    birthDate: dog.birthDate,
+    sire: dog.sire,
+    dam: dog.dam,
   });
-
-  const g2Parents: Array<PedigreeDogNode | null | undefined> = [
-    dog.sire,
-    dog.dam,
-  ];
-  const g2Cards = g2Parents.map((parent, index) =>
-    createPedigreeCard(dog.id, 2, index, parent),
-  );
-  pedigree.push({ generation: 2, cards: g2Cards });
-
-  const g3Parents: Array<PedigreeDogNode | null | undefined> = [
-    dog.sire?.sire,
-    dog.sire?.dam,
-    dog.dam?.sire,
-    dog.dam?.dam,
-  ];
-  const g3Cards = g3Parents.map((parent, index) =>
-    createPedigreeCard(dog.id, 3, index, parent),
-  );
-  pedigree.push({ generation: 3, cards: g3Cards });
+  const siblingCandidates = siblingContext
+    ? await getSiblingCandidates(siblingContext)
+    : [];
+  const siblings = buildSiblings(siblingCandidates);
 
   return {
     id: dog.id,
@@ -188,12 +69,16 @@ export async function getBeagleDogProfileDb(
       (registration) => registration.registrationNo,
     ),
     birthDate: dog.birthDate,
-    sex: toSexCode(dog.sex),
+    sex,
     color: null,
     ekNo: dog.ekNo,
     inbreedingCoefficientPct: null,
     sire: mapParent(dog.sire),
     dam: mapParent(dog.dam),
     pedigree,
+    offspringSummary: buildOffspringSummary(litters),
+    litters,
+    siblingsSummary: buildSiblingsSummary(siblings),
+    siblings,
   };
 }
