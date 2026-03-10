@@ -300,6 +300,20 @@ describe("dogs service", () => {
           ],
         },
       ],
+      siblingsSummary: { siblingCount: 1 },
+      siblings: [
+        {
+          id: "s1",
+          dogId: "s1",
+          name: "Sibling 1",
+          registrationNo: "FI-11/20",
+          sex: "N",
+          ekNo: 12,
+          trialCount: 1,
+          showCount: 2,
+          litterCount: 0,
+        },
+      ],
     };
     const mockShows = [
       {
@@ -406,6 +420,8 @@ describe("dogs service", () => {
       pedigree: [],
       offspringSummary: { litterCount: 0, puppyCount: 0 },
       litters: [],
+      siblingsSummary: { siblingCount: 0 },
+      siblings: [],
     };
     const mockShows = [
       {
@@ -502,6 +518,8 @@ describe("dogs service", () => {
       pedigree: [],
       offspringSummary: { litterCount: 0, puppyCount: 0 },
       litters: [],
+      siblingsSummary: { siblingCount: 0 },
+      siblings: [],
     };
     const mockShows = [
       {
@@ -581,6 +599,8 @@ describe("dogs service", () => {
       pedigree: [],
       offspringSummary: { litterCount: 0, puppyCount: 0 },
       litters: [],
+      siblingsSummary: { siblingCount: 0 },
+      siblings: [],
     });
     getBeagleShowsForDogDbMock.mockResolvedValue([]);
     getBeagleTrialsForDogDbMock.mockResolvedValue([]);

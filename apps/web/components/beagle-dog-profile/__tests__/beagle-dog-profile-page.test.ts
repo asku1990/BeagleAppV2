@@ -65,6 +65,20 @@ describe("BeagleDogProfilePage", () => {
             },
           ],
           offspringSummary: { litterCount: 1, puppyCount: 2 },
+          siblingsSummary: { siblingCount: 1 },
+          siblings: [
+            {
+              id: "sibling_1",
+              dogId: "sibling_1",
+              name: "Sibling One",
+              registrationNo: "FI-29/24",
+              sex: "U",
+              ekNo: 211,
+              trialCount: 3,
+              showCount: 1,
+              litterCount: 0,
+            },
+          ],
           litters: [
             {
               id: "litter_1",
@@ -144,6 +158,7 @@ describe("BeagleDogProfilePage", () => {
     expect(html).not.toContain("dog.profile.page.backToSearch");
     expect(html).toContain("dog.profile.card.details.title");
     expect(html).toContain("dog.profile.card.lineage.title");
+    expect(html).toContain("dog.profile.card.siblings.title");
     expect(html).toContain("dog.profile.card.litters.title");
     expect(html).toContain("dog.profile.card.shows.title");
     expect(html).toContain("dog.profile.card.trials.title");
@@ -157,7 +172,10 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain("dog.profile.litters.col.shows");
     expect(html).toContain("dog.profile.litters.col.litters");
     expect(html).toContain("dog.profile.litters.col.ekNo");
+    expect(html).toContain("dog.profile.siblings.count.siblings");
     expect(html).toContain("CO-1 Co Parent");
+    expect(html).toContain("FI-29/24");
+    expect(html).toContain("Sibling One");
     expect(html).toContain("FI-30/24");
     expect(html).toContain("Puppy One");
     expect(html).toContain("FI-31/24");
@@ -171,6 +189,7 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain('href="/beagle/dogs/sire_1"');
     expect(html).toContain('href="/beagle/dogs/dam_1"');
     expect(html).toContain('href="/beagle/dogs/co_parent_1"');
+    expect(html).toContain('href="/beagle/dogs/sibling_1"');
     expect(html).toContain('href="/beagle/dogs/puppy_1"');
     expect(html).toContain('href="/beagle/dogs/puppy_2"');
     expect(html).toContain("(EK: 101)");
@@ -197,6 +216,8 @@ describe("BeagleDogProfilePage", () => {
             { generation: 1, cards: [{ id: "g1", sire: null, dam: null }] },
           ],
           offspringSummary: { litterCount: 0, puppyCount: 0 },
+          siblingsSummary: { siblingCount: 0 },
+          siblings: [],
           litters: [],
           shows: [],
           trials: [],
@@ -207,6 +228,7 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain("dog.profile.empty.trials");
     expect(html).toContain("dog.profile.empty.shows");
     expect(html).toContain("dog.profile.empty.litters");
+    expect(html).toContain("dog.profile.empty.siblings");
     expect(html).toContain("dog.profile.sex.unknown");
     expect(html).not.toContain("dog.profile.shows.copy.button");
     expect(html).not.toContain("dog.profile.trials.copy.button");

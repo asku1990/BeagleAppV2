@@ -47,6 +47,22 @@ export type BeagleDogProfileLitterDb = {
   puppies: BeagleDogProfileOffspringRowDb[];
 };
 
+export type BeagleDogProfileSiblingsSummaryDb = {
+  siblingCount: number;
+};
+
+export type BeagleDogProfileSiblingRowDb = {
+  id: string;
+  dogId: string;
+  name: string;
+  registrationNo: string;
+  sex: BeagleDogProfileSexDb;
+  ekNo: number | null;
+  trialCount: number;
+  showCount: number;
+  litterCount: number;
+};
+
 export type BeagleDogProfileDb = {
   id: string;
   name: string;
@@ -63,6 +79,8 @@ export type BeagleDogProfileDb = {
   pedigree: BeagleDogProfilePedigreeGenerationDb[];
   offspringSummary: BeagleDogProfileOffspringSummaryDb;
   litters: BeagleDogProfileLitterDb[];
+  siblingsSummary: BeagleDogProfileSiblingsSummaryDb;
+  siblings: BeagleDogProfileSiblingRowDb[];
 };
 
 export type RegistrationNode = {

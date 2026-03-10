@@ -1,14 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DogSex } from "@prisma/client";
 
-const { dogFindUniqueMock, prismaMock } = vi.hoisted(() => {
+const { dogFindUniqueMock, dogFindManyMock, prismaMock } = vi.hoisted(() => {
   const dogFindUnique = vi.fn();
+  const dogFindMany = vi.fn();
 
   return {
     dogFindUniqueMock: dogFindUnique,
+    dogFindManyMock: dogFindMany,
     prismaMock: {
       dog: {
         findUnique: dogFindUnique,
+        findMany: dogFindMany,
       },
     },
   };
@@ -81,6 +84,8 @@ function makeOffspringLitterRelation(
 describe("getBeagleDogProfileDb", () => {
   beforeEach(() => {
     dogFindUniqueMock.mockReset();
+    dogFindManyMock.mockReset();
+    dogFindManyMock.mockResolvedValue([]);
   });
 
   it("returns null when dog is not found", async () => {
@@ -160,6 +165,8 @@ describe("getBeagleDogProfileDb", () => {
     expect(result?.pedigree[2].cards).toHaveLength(4);
     expect(result?.offspringSummary).toEqual({ litterCount: 0, puppyCount: 0 });
     expect(result?.litters).toEqual([]);
+    expect(result?.siblingsSummary).toEqual({ siblingCount: 0 });
+    expect(result?.siblings).toEqual([]);
     expect(queryArgs.include).not.toHaveProperty("showResults");
     expect(queryArgs.include).not.toHaveProperty("trialResults");
     expect(queryArgs.include).toHaveProperty("whelpedPuppies");
@@ -537,6 +544,219 @@ describe("getBeagleDogProfileDb", () => {
       true,
     );
     expect(result?.litters[0]?.puppies[0]?.litterCount).toBe(2);
+  });
+
+  it("does not merge same-day litters when the co-parent is unknown", async () => {
+    dogFindUniqueMock.mockResolvedValue({
+      id: "sire-unknown-parent",
+      name: "Unknown Parent Sire",
+      sex: DogSex.MALE,
+      birthDate: new Date("2020-01-01"),
+      ekNo: null,
+      registrations: [makeRegistration("SIRE-UP", "2020-01-01")],
+      sire: null,
+      dam: null,
+      whelpedPuppies: [],
+      siredPuppies: [
+        {
+          id: "puppy-up-1",
+          name: "Unknown Dam Puppy 1",
+          sex: DogSex.FEMALE,
+          birthDate: new Date("2024-08-01"),
+          ekNo: null,
+          registrations: [makeRegistration("FI-50/24", "2024-08-01")],
+          sire: makeParent(
+            "sire-unknown-parent",
+            "Unknown Parent Sire",
+            "SIRE-UP",
+          ),
+          dam: null,
+          whelpedPuppies: [],
+          siredPuppies: [],
+          _count: makeOffspringCounts(),
+        },
+        {
+          id: "puppy-up-2",
+          name: "Unknown Dam Puppy 2",
+          sex: DogSex.MALE,
+          birthDate: new Date("2024-08-01"),
+          ekNo: null,
+          registrations: [makeRegistration("FI-51/24", "2024-08-01")],
+          sire: makeParent(
+            "sire-unknown-parent",
+            "Unknown Parent Sire",
+            "SIRE-UP",
+          ),
+          dam: null,
+          whelpedPuppies: [],
+          siredPuppies: [],
+          _count: makeOffspringCounts(),
+        },
+      ],
+    });
+
+    const result = await getBeagleDogProfileDb("sire-unknown-parent");
+
+    expect(result?.offspringSummary).toEqual({ litterCount: 2, puppyCount: 2 });
+    expect(result?.litters).toHaveLength(2);
+    expect(result?.litters?.every((litter) => litter.puppyCount === 1)).toBe(
+      true,
+    );
+  });
+
+  it("maps siblings from the same litter and excludes the profile dog", async () => {
+    dogFindUniqueMock.mockResolvedValue({
+      id: "profile",
+      name: "Profile Dog",
+      sex: DogSex.FEMALE,
+      birthDate: new Date("2020-04-01"),
+      ekNo: 10,
+      registrations: [makeRegistration("FI-1/20", "2020-04-01")],
+      sire: makeParent("sire-1", "Sire", "SIRE-1"),
+      dam: makeParent("dam-1", "Dam", "DAM-1"),
+      whelpedPuppies: [],
+      siredPuppies: [],
+    });
+    dogFindManyMock.mockResolvedValue([
+      {
+        id: "sib-b",
+        name: "Sibling B",
+        sex: DogSex.MALE,
+        birthDate: new Date("2020-04-01"),
+        ekNo: 22,
+        registrations: [makeRegistration("FI-3/20", "2020-04-01")],
+        sire: makeParent("sire-1", "Sire", "SIRE-1"),
+        dam: makeParent("dam-1", "Dam", "DAM-1"),
+        whelpedPuppies: [],
+        siredPuppies: [],
+        _count: makeOffspringCounts({ showResults: 1, trialResults: 2 }),
+      },
+      {
+        id: "sib-a",
+        name: "Sibling A",
+        sex: DogSex.FEMALE,
+        birthDate: new Date("2020-04-01"),
+        ekNo: 21,
+        registrations: [makeRegistration("FI-2/20", "2020-04-01")],
+        sire: makeParent("sire-1", "Sire", "SIRE-1"),
+        dam: makeParent("dam-1", "Dam", "DAM-1"),
+        whelpedPuppies: [],
+        siredPuppies: [],
+        _count: makeOffspringCounts({ showResults: 3, trialResults: 4 }),
+      },
+    ]);
+
+    const result = await getBeagleDogProfileDb("profile");
+
+    expect(result?.siblingsSummary).toEqual({ siblingCount: 2 });
+    expect(result?.siblings).toMatchObject([
+      {
+        id: "sib-a",
+        registrationNo: "FI-2/20",
+        showCount: 3,
+        trialCount: 4,
+      },
+      {
+        id: "sib-b",
+        registrationNo: "FI-3/20",
+        showCount: 1,
+        trialCount: 2,
+      },
+    ]);
+    expect(dogFindManyMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          id: { not: "profile" },
+          sireId: "sire-1",
+          damId: "dam-1",
+          birthDate: {
+            gte: new Date("2020-03-31T21:00:00.000Z"),
+            lt: new Date("2020-04-01T21:00:00.000Z"),
+          },
+        }),
+      }),
+    );
+  });
+
+  it("counts sibling offspring litters separately when co-parent is unknown", async () => {
+    dogFindUniqueMock.mockResolvedValue({
+      id: "profile-sibling-unknown",
+      name: "Profile Dog",
+      sex: DogSex.FEMALE,
+      birthDate: new Date("2020-04-01"),
+      ekNo: 10,
+      registrations: [makeRegistration("FI-1/20", "2020-04-01")],
+      sire: makeParent("sire-1", "Sire", "SIRE-1"),
+      dam: makeParent("dam-1", "Dam", "DAM-1"),
+      whelpedPuppies: [],
+      siredPuppies: [],
+    });
+    dogFindManyMock.mockResolvedValue([
+      {
+        id: "sib-unknown-litters",
+        name: "Sibling Unknown Litters",
+        sex: DogSex.FEMALE,
+        birthDate: new Date("2020-04-01"),
+        ekNo: 22,
+        registrations: [makeRegistration("FI-9/20", "2020-04-01")],
+        sire: makeParent("sire-1", "Sire", "SIRE-1"),
+        dam: makeParent("dam-1", "Dam", "DAM-1"),
+        whelpedPuppies: [
+          makeOffspringLitterRelation("sib-child-1", "2025-03-01", {
+            sire: null,
+          }),
+          makeOffspringLitterRelation("sib-child-2", "2025-03-01", {
+            sire: null,
+          }),
+        ],
+        siredPuppies: [],
+        _count: makeOffspringCounts(),
+      },
+    ]);
+
+    const result = await getBeagleDogProfileDb("profile-sibling-unknown");
+
+    expect(result?.siblingsSummary).toEqual({ siblingCount: 1 });
+    expect(result?.siblings[0]?.id).toBe("sib-unknown-litters");
+    expect(result?.siblings[0]?.litterCount).toBe(2);
+  });
+
+  it("uses registration fallback when a parent id is missing", async () => {
+    dogFindUniqueMock.mockResolvedValue({
+      id: "profile-reg-fallback",
+      name: "Profile",
+      sex: DogSex.FEMALE,
+      birthDate: new Date("2020-04-01"),
+      ekNo: null,
+      registrations: [makeRegistration("FI-1/20", "2020-04-01")],
+      sire: {
+        id: "",
+        name: "Sire Missing Id",
+        ekNo: null,
+        registrations: [makeRegistration("SIRE-REG", "2018-01-01")],
+      },
+      dam: makeParent("dam-1", "Dam", "DAM-1"),
+      whelpedPuppies: [],
+      siredPuppies: [],
+    });
+    dogFindManyMock.mockResolvedValue([]);
+
+    const result = await getBeagleDogProfileDb("profile-reg-fallback");
+
+    expect(result?.siblingsSummary).toEqual({ siblingCount: 0 });
+    expect(result?.siblings).toEqual([]);
+    expect(dogFindManyMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          damId: "dam-1",
+          sire: {
+            registrations: {
+              some: { registrationNo: "SIRE-REG" },
+            },
+          },
+        }),
+      }),
+    );
   });
 
   it("does not merge missing-date litters that only share the same co-parent", async () => {

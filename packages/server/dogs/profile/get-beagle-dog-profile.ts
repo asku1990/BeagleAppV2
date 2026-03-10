@@ -50,6 +50,8 @@ function mapDogProfileFromDb(
       puppyCount: litter.puppyCount,
       puppies: litter.puppies,
     })),
+    siblingsSummary: profile.siblingsSummary,
+    siblings: profile.siblings,
     shows: shows.map((show) => {
       const showDate = toBusinessDateOnly(show.date);
       return {

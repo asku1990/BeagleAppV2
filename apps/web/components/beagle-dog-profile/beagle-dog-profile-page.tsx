@@ -8,6 +8,7 @@ import { DogProfileDetailsCard } from "./dog-profile-details-card";
 import { DogProfileLittersCard } from "./dog-profile-litters-card";
 import { DogProfileLineageCard } from "./dog-profile-lineage-card";
 import { DogProfileShowsCard } from "./dog-profile-shows-card";
+import { DogProfileSiblingsCard } from "./dog-profile-siblings-card";
 import { DogProfileTrialsCard } from "./dog-profile-trials-card";
 
 type BeagleDogProfilePageProps = {
@@ -30,6 +31,7 @@ export function BeagleDogProfilePage({ profile }: BeagleDogProfilePageProps) {
 
       <DogProfileDetailsCard profile={profile} />
       <DogProfileLineageCard profile={profile} />
+      <DogProfileSiblingsCard profile={profile} />
       <DogProfileLittersCard profile={profile} />
       <DogProfileShowsCard rows={profile.shows} />
       <DogProfileTrialsCard rows={profile.trials} />
