@@ -31,10 +31,18 @@ export function BeagleDogProfilePage({ profile }: BeagleDogProfilePageProps) {
 
       <DogProfileDetailsCard profile={profile} />
       <DogProfileLineageCard profile={profile} />
-      <DogProfileSiblingsCard profile={profile} />
-      <DogProfileLittersCard profile={profile} />
-      <DogProfileShowsCard rows={profile.shows} />
-      <DogProfileTrialsCard rows={profile.trials} />
+      {profile.siblings.length > 0 ? (
+        <DogProfileSiblingsCard profile={profile} />
+      ) : null}
+      {profile.litters.length > 0 ? (
+        <DogProfileLittersCard profile={profile} />
+      ) : null}
+      {profile.shows.length > 0 ? (
+        <DogProfileShowsCard rows={profile.shows} />
+      ) : null}
+      {profile.trials.length > 0 ? (
+        <DogProfileTrialsCard rows={profile.trials} />
+      ) : null}
     </div>
   );
 }

@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { useState } from "react";
+import type { ReactNode } from "react";
 import {
   ListingResponsiveResults,
   ListingSectionShell,
@@ -9,6 +11,7 @@ import type { MessageKey } from "@/lib/i18n";
 import {
   getDogProfileHref,
   parseLocalIsoDate,
+  renderRegistrationNameText,
 } from "@/lib/public/beagle/dogs/profile";
 import { cn } from "@/lib/utils";
 import type {
@@ -34,32 +37,27 @@ function formatDate(value: string | null, locale: "fi" | "sv"): string {
   return new Intl.DateTimeFormat(localeTag).format(parsed);
 }
 
-function formatParentLabel(parent: BeagleDogProfileParentDto | null): string {
-  if (!parent) {
-    return FALLBACK_VALUE;
-  }
-
-  if (!parent.registrationNo) {
-    return parent.name;
-  }
-
-  return `${parent.registrationNo} ${parent.name}`;
+function renderParentLabel(
+  parent: BeagleDogProfileParentDto | null,
+): ReactNode {
+  return renderRegistrationNameText({
+    registrationNo: parent?.registrationNo ?? null,
+    name: parent?.name ?? null,
+    unknownLabel: FALLBACK_VALUE,
+    missingRegistrationPrefix: "",
+  });
 }
 
 function renderParentLink(parent: BeagleDogProfileParentDto | null) {
+  const label = renderParentLabel(parent);
+
   if (!parent?.id) {
-    return <span>{formatParentLabel(parent)}</span>;
+    return <span>{label}</span>;
   }
 
   return (
-    <Link
-      href={getDogProfileHref(parent.id)}
-      className={cn(
-        "font-medium underline underline-offset-2",
-        beagleTheme.inkStrongText,
-      )}
-    >
-      {formatParentLabel(parent)}
+    <Link href={getDogProfileHref(parent.id)} className={beagleTheme.textLink}>
+      {label}
     </Link>
   );
 }
@@ -134,10 +132,7 @@ function LitterDesktopTable({
               <td className="px-2 py-2">
                 <Link
                   href={getDogProfileHref(puppy.dogId)}
-                  className={cn(
-                    "font-medium underline underline-offset-2",
-                    beagleTheme.inkStrongText,
-                  )}
+                  className={beagleTheme.entityLink}
                 >
                   {puppy.registrationNo}
                 </Link>
@@ -145,10 +140,7 @@ function LitterDesktopTable({
               <td className="px-2 py-2">
                 <Link
                   href={getDogProfileHref(puppy.dogId)}
-                  className={cn(
-                    "font-medium underline underline-offset-2",
-                    beagleTheme.inkStrongText,
-                  )}
+                  className={beagleTheme.entityLink}
                 >
                   {puppy.name}
                 </Link>
@@ -192,10 +184,7 @@ function LitterMobileCards({
               </span>
               <Link
                 href={getDogProfileHref(puppy.dogId)}
-                className={cn(
-                  "font-medium underline underline-offset-2",
-                  beagleTheme.inkStrongText,
-                )}
+                className={beagleTheme.entityLink}
               >
                 {puppy.registrationNo}
               </Link>
@@ -206,10 +195,7 @@ function LitterMobileCards({
               </span>
               <Link
                 href={getDogProfileHref(puppy.dogId)}
-                className={cn(
-                  "font-medium underline underline-offset-2",
-                  beagleTheme.inkStrongText,
-                )}
+                className={beagleTheme.entityLink}
               >
                 {puppy.name}
               </Link>
@@ -308,6 +294,11 @@ export function DogProfileLittersCard({
   profile: BeagleDogProfileDto;
 }) {
   const { t, locale } = useI18n();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const canReveal = profile.litters.length > 5;
+  const visibleLitters = isExpanded
+    ? profile.litters
+    : profile.litters.slice(0, 5);
 
   return (
     <ListingSectionShell
@@ -337,7 +328,7 @@ export function DogProfileLittersCard({
         </div>
       ) : (
         <div className="space-y-3">
-          {profile.litters.map((litter) => (
+          {visibleLitters.map((litter) => (
             <LitterBlock
               key={litter.id}
               litter={litter}
@@ -345,6 +336,29 @@ export function DogProfileLittersCard({
               t={t}
             />
           ))}
+          {canReveal ? (
+            <div className="flex items-center justify-between gap-3 pt-1">
+              <p className={cn("text-xs", beagleTheme.mutedText)}>
+                {t("dog.profile.section.showing")} {visibleLitters.length} /{" "}
+                {profile.litters.length}
+              </p>
+              <button
+                type="button"
+                className={cn(
+                  "cursor-pointer rounded-md border px-3 py-1.5 text-xs font-medium",
+                  beagleTheme.border,
+                  beagleTheme.surface,
+                  beagleTheme.inkStrongText,
+                  beagleTheme.interactive,
+                )}
+                onClick={() => setIsExpanded((value) => !value)}
+              >
+                {isExpanded
+                  ? t("dog.profile.section.showLess")
+                  : t("dog.profile.section.showMore")}
+              </button>
+            </div>
+          ) : null}
         </div>
       )}
     </ListingSectionShell>

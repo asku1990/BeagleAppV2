@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useState } from "react";
 import {
   ListingResponsiveResults,
   ListingSectionShell,
@@ -53,6 +54,9 @@ export function DogProfileTrialsCard({
   rows: BeagleDogProfileTrialRowDto[];
 }) {
   const { t, locale } = useI18n();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const canReveal = rows.length > 10;
+  const visibleRows = isExpanded ? rows : rows.slice(0, 10);
 
   const hasWeather = rows.some((r) => r.weather != null);
   const hasAward = rows.some((r) => r.className != null || r.award != null);
@@ -129,10 +133,7 @@ export function DogProfileTrialsCard({
               onClick={() => {
                 void handleCopyRows();
               }}
-              className={cn(
-                "cursor-pointer text-xs underline underline-offset-2",
-                beagleTheme.inkStrongText,
-              )}
+              className={cn("text-xs", beagleTheme.actionLink)}
             >
               {t("dog.profile.trials.copy.button")}
             </button>
@@ -189,7 +190,7 @@ export function DogProfileTrialsCard({
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((row, index) => (
+                  {visibleRows.map((row, index) => (
                     <tr
                       key={row.id}
                       className={cn("border-b align-top", beagleTheme.border)}
@@ -198,10 +199,7 @@ export function DogProfileTrialsCard({
                       <td className="px-2 py-2">
                         <Link
                           href={getBeagleTrialHref(row.trialId)}
-                          className={cn(
-                            "font-medium underline underline-offset-2",
-                            beagleTheme.inkStrongText,
-                          )}
+                          className={beagleTheme.entityLink}
                         >
                           {row.place}
                         </Link>
@@ -235,7 +233,7 @@ export function DogProfileTrialsCard({
           }
           mobile={
             <div className="space-y-2">
-              {rows.map((row, index) => (
+              {visibleRows.map((row, index) => (
                 <article
                   key={row.id}
                   className={cn(
@@ -263,10 +261,7 @@ export function DogProfileTrialsCard({
                       </span>{" "}
                       <Link
                         href={getBeagleTrialHref(row.trialId)}
-                        className={cn(
-                          "font-medium underline underline-offset-2",
-                          beagleTheme.inkStrongText,
-                        )}
+                        className={beagleTheme.entityLink}
                       >
                         {row.place}
                       </Link>
@@ -312,6 +307,29 @@ export function DogProfileTrialsCard({
           }
         />
       )}
+      {canReveal ? (
+        <div className="flex items-center justify-between gap-3 pt-3">
+          <p className={cn("text-xs", beagleTheme.mutedText)}>
+            {t("dog.profile.section.showing")} {visibleRows.length} /{" "}
+            {rows.length}
+          </p>
+          <button
+            type="button"
+            className={cn(
+              "cursor-pointer rounded-md border px-3 py-1.5 text-xs font-medium",
+              beagleTheme.border,
+              beagleTheme.surface,
+              beagleTheme.inkStrongText,
+              beagleTheme.interactive,
+            )}
+            onClick={() => setIsExpanded((value) => !value)}
+          >
+            {isExpanded
+              ? t("dog.profile.section.showLess")
+              : t("dog.profile.section.showMore")}
+          </button>
+        </div>
+      ) : null}
     </ListingSectionShell>
   );
 }

@@ -56,10 +56,7 @@ export function BeagleShowsResultsMobileCards({
             <p className="col-span-2">
               <Link
                 href={getBeagleShowHref(row.showId)}
-                className={cn(
-                  "font-medium underline underline-offset-2",
-                  beagleTheme.inkStrongText,
-                )}
+                className={beagleTheme.entityLink}
               >
                 {t("shows.results.open")}
               </Link>

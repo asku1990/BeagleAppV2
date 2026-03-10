@@ -183,10 +183,7 @@ export function BeagleShowsPage() {
                   onClick={() => {
                     void handleCopyResults();
                   }}
-                  className={cn(
-                    "cursor-pointer text-xs underline underline-offset-2",
-                    beagleTheme.inkStrongText,
-                  )}
+                  className={cn("text-xs", beagleTheme.actionLink)}
                 >
                   {t("shows.results.copy.button")}
                 </button>

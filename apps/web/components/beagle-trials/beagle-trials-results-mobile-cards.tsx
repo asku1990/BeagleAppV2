@@ -56,10 +56,7 @@ export function BeagleTrialsResultsMobileCards({
             <p className="col-span-2">
               <Link
                 href={getBeagleTrialHref(row.trialId)}
-                className={cn(
-                  "font-medium underline underline-offset-2",
-                  beagleTheme.inkStrongText,
-                )}
+                className={beagleTheme.entityLink}
               >
                 {t("trials.results.open")}
               </Link>

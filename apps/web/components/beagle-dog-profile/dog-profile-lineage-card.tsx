@@ -2,7 +2,10 @@ import { ListingSectionShell } from "@/components/listing";
 import Link from "next/link";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
-import { getDogProfileHref } from "@/lib/public/beagle/dogs/profile";
+import {
+  getDogProfileHref,
+  renderRegistrationNameText,
+} from "@/lib/public/beagle/dogs/profile";
 import type {
   BeagleDogProfileDto,
   BeagleDogProfileParentDto,
@@ -48,23 +51,14 @@ function formatPedigreeLine(
 }
 
 function renderPedigreeLineText(line: PedigreeLine): ReactNode {
-  if (!line.name) {
-    return `${line.sexSymbol} ${line.unknownLabel}`;
-  }
-
-  if (!line.registrationNo) {
-    return (
-      <>
-        {`${line.sexSymbol} - `}
-        <span className="font-semibold">{line.name}</span>
-      </>
-    );
-  }
-
   return (
     <>
-      {`${line.sexSymbol} ${line.registrationNo} `}
-      <span className="font-semibold">{line.name}</span>
+      {`${line.sexSymbol} `}
+      {renderRegistrationNameText({
+        registrationNo: line.registrationNo,
+        name: line.name,
+        unknownLabel: line.unknownLabel,
+      })}
     </>
   );
 }
@@ -89,10 +83,7 @@ function renderPedigreeLine(
 
   return (
     <>
-      <Link
-        className="underline-offset-2 hover:underline"
-        href={getDogProfileHref(line.id)}
-      >
+      <Link className={beagleTheme.textLink} href={getDogProfileHref(line.id)}>
         {lineText}
       </Link>
       {ekSuffix}

@@ -74,6 +74,9 @@ export const fiBeagleDogProfileMessages = {
   "dog.profile.lineage.col.sire": "Isän linja",
   "dog.profile.lineage.col.dam": "Emän linja",
   "dog.profile.lineage.generationLabel": "G",
+  "dog.profile.section.showing": "Näytetään",
+  "dog.profile.section.showMore": "Näytä lisää",
+  "dog.profile.section.showLess": "Näytä vähemmän",
   "dog.profile.field.comingSoon": "(tulossa)",
 } as const;
 
@@ -156,5 +159,8 @@ export const svBeagleDogProfileMessages = {
   "dog.profile.lineage.col.sire": "Faderslinje",
   "dog.profile.lineage.col.dam": "Moderslinje",
   "dog.profile.lineage.generationLabel": "G",
+  "dog.profile.section.showing": "Visar",
+  "dog.profile.section.showMore": "Visa mer",
+  "dog.profile.section.showLess": "Visa mindre",
   "dog.profile.field.comingSoon": "(kommer snart)",
 } as const;
