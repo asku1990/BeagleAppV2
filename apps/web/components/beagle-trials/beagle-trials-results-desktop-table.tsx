@@ -52,10 +52,7 @@ export function BeagleTrialsResultsDesktopTable({
               <td className="px-2 py-2">
                 <Link
                   href={getBeagleTrialHref(row.trialId)}
-                  className={cn(
-                    "font-medium underline underline-offset-2",
-                    beagleTheme.inkStrongText,
-                  )}
+                  className={beagleTheme.entityLink}
                 >
                   {t("trials.results.open")}
                 </Link>

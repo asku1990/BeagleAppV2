@@ -173,7 +173,8 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain("dog.profile.litters.col.litters");
     expect(html).toContain("dog.profile.litters.col.ekNo");
     expect(html).toContain("dog.profile.siblings.count.siblings");
-    expect(html).toContain("CO-1 Co Parent");
+    expect(html).toContain("CO-1");
+    expect(html).toContain("Co Parent");
     expect(html).toContain("FI-29/24");
     expect(html).toContain("Sibling One");
     expect(html).toContain("FI-30/24");

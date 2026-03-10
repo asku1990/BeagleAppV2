@@ -27,7 +27,7 @@ Developer notes for the public beagle dog profile feature.
    - base dog profile data from the dogs DB profile module
    - show rows from the shows domain
    - trial rows from the trials domain
-3. The web page renders the profile as separate cards for details, lineage, siblings, litters, shows, and trials.
+3. The web page renders details and lineage always, and renders secondary cards conditionally by data (siblings, litters, shows, trials).
 4. Siblings are resolved in DB from one reliable birth litter and rendered after lineage.
 5. Litters are rendered between siblings and result sections.
 
@@ -88,7 +88,8 @@ Ordering:
 ## Render rules
 
 - Keep the page header focused on dog identity: name and primary registration number
-- keep details, lineage, siblings, litters, shows, and trials as separate cards
+- keep details and lineage always visible as separate cards
+- render siblings/litters/shows/trials only when the corresponding arrays contain rows
 - keep unknown/missing data visible as explicit fallback values instead of collapsing the row unpredictably
 - parent links should remain the primary navigation path inside pedigree/profile content
 - render siblings as one flat list card (same columns as litter puppy rows)
@@ -96,6 +97,10 @@ Ordering:
 - place the siblings card after lineage
 - place the litters card after siblings and before shows/trials
 - inside each litter, render puppy rows with the same desktop/mobile responsive result split used elsewhere in the app
+- apply in-place reveal for long sections: first 5 litters, first 10 shows, first 10 trials, with independent show more/show less state per section
+- keep copy-to-clipboard actions operating on full datasets, not only currently visible rows
+- use global link style tokens from `beagleTheme` (`textLink` and `entityLink`) for entity navigation links
+- use shared identity text composition helper `renderRegistrationNameText` where profile UI renders combined `registration + name` content
 
 ## Error and loading behavior
 

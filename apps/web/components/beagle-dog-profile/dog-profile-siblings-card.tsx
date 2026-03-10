@@ -86,10 +86,7 @@ function SiblingsDesktopTable({
               <td className="px-2 py-2">
                 <Link
                   href={getDogProfileHref(sibling.dogId)}
-                  className={cn(
-                    "font-medium underline underline-offset-2",
-                    beagleTheme.inkStrongText,
-                  )}
+                  className={beagleTheme.entityLink}
                 >
                   {sibling.registrationNo}
                 </Link>
@@ -97,10 +94,7 @@ function SiblingsDesktopTable({
               <td className="px-2 py-2">
                 <Link
                   href={getDogProfileHref(sibling.dogId)}
-                  className={cn(
-                    "font-medium underline underline-offset-2",
-                    beagleTheme.inkStrongText,
-                  )}
+                  className={beagleTheme.entityLink}
                 >
                   {sibling.name}
                 </Link>
@@ -144,10 +138,7 @@ function SiblingsMobileCards({
               </span>
               <Link
                 href={getDogProfileHref(sibling.dogId)}
-                className={cn(
-                  "font-medium underline underline-offset-2",
-                  beagleTheme.inkStrongText,
-                )}
+                className={beagleTheme.entityLink}
               >
                 {sibling.registrationNo}
               </Link>
@@ -158,10 +149,7 @@ function SiblingsMobileCards({
               </span>
               <Link
                 href={getDogProfileHref(sibling.dogId)}
-                className={cn(
-                  "font-medium underline underline-offset-2",
-                  beagleTheme.inkStrongText,
-                )}
+                className={beagleTheme.entityLink}
               >
                 {sibling.name}
               </Link>

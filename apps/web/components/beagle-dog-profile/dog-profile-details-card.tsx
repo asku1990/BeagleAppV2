@@ -5,6 +5,7 @@ import { useI18n } from "@/hooks/i18n";
 import {
   getDogProfileHref,
   parseLocalIsoDate,
+  renderRegistrationNameText,
 } from "@/lib/public/beagle/dogs/profile";
 import type { MessageKey } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -83,32 +84,26 @@ function formatEkNo(value: number | null): string {
   return String(value);
 }
 
-function formatParentLabel(parent: BeagleDogProfileParentDto | null): string {
+function renderParentValue(
+  parent: BeagleDogProfileParentDto | null,
+): ReactNode {
   if (!parent) {
     return FALLBACK_VALUE;
   }
 
-  if (!parent.registrationNo) {
-    return parent.name;
-  }
-
-  return `${parent.registrationNo} ${parent.name}`;
-}
-
-function renderParentValue(
-  parent: BeagleDogProfileParentDto | null,
-): ReactNode {
-  const label = formatParentLabel(parent);
+  const label = renderRegistrationNameText({
+    registrationNo: parent.registrationNo,
+    name: parent.name,
+    unknownLabel: FALLBACK_VALUE,
+    missingRegistrationPrefix: "",
+  });
 
   if (!parent?.id) {
     return label;
   }
 
   return (
-    <Link
-      href={getDogProfileHref(parent.id)}
-      className={cn("underline underline-offset-2", beagleTheme.inkStrongText)}
-    >
+    <Link href={getDogProfileHref(parent.id)} className={beagleTheme.textLink}>
       {label}
     </Link>
   );

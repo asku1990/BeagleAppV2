@@ -215,10 +215,7 @@ export function BeagleSearchPage() {
                   onClick={() => {
                     void handleCopyResults();
                   }}
-                  className={cn(
-                    "cursor-pointer text-xs underline underline-offset-2",
-                    beagleTheme.inkStrongText,
-                  )}
+                  className={cn("text-xs", beagleTheme.actionLink)}
                 >
                   {t("search.results.copy.button")}
                 </button>

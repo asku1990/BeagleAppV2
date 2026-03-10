@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useState } from "react";
+import type { ReactNode } from "react";
 import {
   ListingResponsiveResults,
   ListingSectionShell,
@@ -10,6 +11,7 @@ import type { MessageKey } from "@/lib/i18n";
 import {
   getDogProfileHref,
   parseLocalIsoDate,
+  renderRegistrationNameText,
 } from "@/lib/public/beagle/dogs/profile";
 import { cn } from "@/lib/utils";
 import type {
@@ -35,32 +37,27 @@ function formatDate(value: string | null, locale: "fi" | "sv"): string {
   return new Intl.DateTimeFormat(localeTag).format(parsed);
 }
 
-function formatParentLabel(parent: BeagleDogProfileParentDto | null): string {
-  if (!parent) {
-    return FALLBACK_VALUE;
-  }
-
-  if (!parent.registrationNo) {
-    return parent.name;
-  }
-
-  return `${parent.registrationNo} ${parent.name}`;
+function renderParentLabel(
+  parent: BeagleDogProfileParentDto | null,
+): ReactNode {
+  return renderRegistrationNameText({
+    registrationNo: parent?.registrationNo ?? null,
+    name: parent?.name ?? null,
+    unknownLabel: FALLBACK_VALUE,
+    missingRegistrationPrefix: "",
+  });
 }
 
 function renderParentLink(parent: BeagleDogProfileParentDto | null) {
+  const label = renderParentLabel(parent);
+
   if (!parent?.id) {
-    return <span>{formatParentLabel(parent)}</span>;
+    return <span>{label}</span>;
   }
 
   return (
-    <Link
-      href={getDogProfileHref(parent.id)}
-      className={cn(
-        "font-medium underline underline-offset-2",
-        beagleTheme.inkStrongText,
-      )}
-    >
-      {formatParentLabel(parent)}
+    <Link href={getDogProfileHref(parent.id)} className={beagleTheme.textLink}>
+      {label}
     </Link>
   );
 }
@@ -135,10 +132,7 @@ function LitterDesktopTable({
               <td className="px-2 py-2">
                 <Link
                   href={getDogProfileHref(puppy.dogId)}
-                  className={cn(
-                    "font-medium underline underline-offset-2",
-                    beagleTheme.inkStrongText,
-                  )}
+                  className={beagleTheme.entityLink}
                 >
                   {puppy.registrationNo}
                 </Link>
@@ -146,10 +140,7 @@ function LitterDesktopTable({
               <td className="px-2 py-2">
                 <Link
                   href={getDogProfileHref(puppy.dogId)}
-                  className={cn(
-                    "font-medium underline underline-offset-2",
-                    beagleTheme.inkStrongText,
-                  )}
+                  className={beagleTheme.entityLink}
                 >
                   {puppy.name}
                 </Link>
@@ -193,10 +184,7 @@ function LitterMobileCards({
               </span>
               <Link
                 href={getDogProfileHref(puppy.dogId)}
-                className={cn(
-                  "font-medium underline underline-offset-2",
-                  beagleTheme.inkStrongText,
-                )}
+                className={beagleTheme.entityLink}
               >
                 {puppy.registrationNo}
               </Link>
@@ -207,10 +195,7 @@ function LitterMobileCards({
               </span>
               <Link
                 href={getDogProfileHref(puppy.dogId)}
-                className={cn(
-                  "font-medium underline underline-offset-2",
-                  beagleTheme.inkStrongText,
-                )}
+                className={beagleTheme.entityLink}
               >
                 {puppy.name}
               </Link>

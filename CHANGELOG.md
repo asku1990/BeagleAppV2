@@ -29,6 +29,9 @@ This project uses a user-facing changelog format.
 
 ### Changed
 
+- Koiraprofiilin perustietokorttiin lisättiin isä- ja emätiedot linkkeinä. Tyhjät toissijaiset osiot (sisarukset, pentueet, näyttelyt, kokeet) piilotetaan, ja pitkissä listoissa näytetään rajattu määrä rivejä `Näytä lisää / Näytä vähemmän` -toiminnolla sekä näkyvien rivien laskurilla.
+- Linkkityylit yhtenäistettiin profiili-, haku-, näyttely- ja koenäkymissä: avauslinkit ja tekstipohjaiset kopiointitoiminnot käyttävät nyt samoja globaaleja linkki-/toimintotyylejä.
+
 ### Fixed
 
 ### Removed

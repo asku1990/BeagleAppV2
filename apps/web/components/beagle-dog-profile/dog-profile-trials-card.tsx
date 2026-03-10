@@ -133,10 +133,7 @@ export function DogProfileTrialsCard({
               onClick={() => {
                 void handleCopyRows();
               }}
-              className={cn(
-                "cursor-pointer text-xs underline underline-offset-2",
-                beagleTheme.inkStrongText,
-              )}
+              className={cn("text-xs", beagleTheme.actionLink)}
             >
               {t("dog.profile.trials.copy.button")}
             </button>
@@ -202,10 +199,7 @@ export function DogProfileTrialsCard({
                       <td className="px-2 py-2">
                         <Link
                           href={getBeagleTrialHref(row.trialId)}
-                          className={cn(
-                            "font-medium underline underline-offset-2",
-                            beagleTheme.inkStrongText,
-                          )}
+                          className={beagleTheme.entityLink}
                         >
                           {row.place}
                         </Link>
@@ -267,10 +261,7 @@ export function DogProfileTrialsCard({
                       </span>{" "}
                       <Link
                         href={getBeagleTrialHref(row.trialId)}
-                        className={cn(
-                          "font-medium underline underline-offset-2",
-                          beagleTheme.inkStrongText,
-                        )}
+                        className={beagleTheme.entityLink}
                       >
                         {row.place}
                       </Link>

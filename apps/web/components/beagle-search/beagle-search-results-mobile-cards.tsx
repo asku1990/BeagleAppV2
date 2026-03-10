@@ -45,10 +45,7 @@ export function BeagleSearchResultsMobileCards({
                 </span>
                 <Link
                   href={getDogProfileHref(row.id)}
-                  className={cn(
-                    "font-medium underline underline-offset-2",
-                    beagleTheme.inkStrongText,
-                  )}
+                  className={beagleTheme.entityLink}
                 >
                   {row.registrationNo}
                 </Link>
@@ -80,10 +77,7 @@ export function BeagleSearchResultsMobileCards({
                 <Link
                   href={getDogProfileHref(row.id)}
                   title={`${t("search.results.parents.sire")}: ${row.sire}\n${t("search.results.parents.dam")}: ${row.dam}`}
-                  className={cn(
-                    "font-medium underline underline-offset-2",
-                    beagleTheme.inkStrongText,
-                  )}
+                  className={beagleTheme.entityLink}
                 >
                   {row.name}
                 </Link>

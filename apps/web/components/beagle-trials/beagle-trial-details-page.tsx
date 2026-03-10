@@ -144,10 +144,7 @@ export function BeagleTrialDetailsPage({
                 onClick={() => {
                   void handleCopyAllRows();
                 }}
-                className={cn(
-                  "cursor-pointer text-xs underline underline-offset-2",
-                  beagleTheme.inkStrongText,
-                )}
+                className={cn("text-xs", beagleTheme.actionLink)}
               >
                 {t("trials.details.copy.all")}
               </button>
@@ -203,10 +200,7 @@ export function BeagleTrialDetailsPage({
                       <td className="px-2 py-2">
                         <Link
                           href={getDogProfileHref(row.dogId)}
-                          className={cn(
-                            "font-medium underline underline-offset-2",
-                            beagleTheme.inkStrongText,
-                          )}
+                          className={beagleTheme.entityLink}
                         >
                           {row.registrationNo}
                         </Link>
@@ -214,10 +208,7 @@ export function BeagleTrialDetailsPage({
                       <td className="px-2 py-2">
                         <Link
                           href={getDogProfileHref(row.dogId)}
-                          className={cn(
-                            "font-medium underline underline-offset-2",
-                            beagleTheme.inkStrongText,
-                          )}
+                          className={beagleTheme.entityLink}
                         >
                           {row.name}
                         </Link>
@@ -234,10 +225,7 @@ export function BeagleTrialDetailsPage({
                         <button
                           type="button"
                           onClick={() => void handleCopyRow(row, index + 1)}
-                          className={cn(
-                            "cursor-pointer font-medium underline underline-offset-2",
-                            beagleTheme.inkStrongText,
-                          )}
+                          className={beagleTheme.actionLinkStrong}
                         >
                           {t("trials.details.copy.button")}
                         </button>
@@ -266,10 +254,7 @@ export function BeagleTrialDetailsPage({
                       </span>{" "}
                       <Link
                         href={getDogProfileHref(row.dogId)}
-                        className={cn(
-                          "font-medium underline underline-offset-2",
-                          beagleTheme.inkStrongText,
-                        )}
+                        className={beagleTheme.entityLink}
                       >
                         {row.registrationNo}
                       </Link>
@@ -280,10 +265,7 @@ export function BeagleTrialDetailsPage({
                       </span>{" "}
                       <Link
                         href={getDogProfileHref(row.dogId)}
-                        className={cn(
-                          "font-medium underline underline-offset-2",
-                          beagleTheme.inkStrongText,
-                        )}
+                        className={beagleTheme.entityLink}
                       >
                         {row.name}
                       </Link>
@@ -328,10 +310,7 @@ export function BeagleTrialDetailsPage({
                       <button
                         type="button"
                         onClick={() => void handleCopyRow(row, index + 1)}
-                        className={cn(
-                          "cursor-pointer font-medium underline underline-offset-2",
-                          beagleTheme.inkStrongText,
-                        )}
+                        className={beagleTheme.actionLinkStrong}
                       >
                         {t("trials.details.copy.button")}
                       </button>
