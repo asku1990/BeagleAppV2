@@ -186,7 +186,7 @@ export function AppSidebar() {
           className={
             state === "collapsed"
               ? "flex h-12 items-center justify-center px-0"
-              : "flex h-12 items-center px-4"
+              : "flex h-12 items-center px-2"
           }
         >
           {state === "collapsed" ? (
@@ -236,12 +236,12 @@ export function AppSidebar() {
                       beagleTheme.inkStrongText,
                       beagleTheme.interactive,
                       beagleTheme.focusRing,
-                      "min-h-11 md:min-h-9",
+                      "min-h-9 md:min-h-8",
                       "data-[active=true]:bg-[var(--beagle-accent-soft)]",
                     )}
                   >
                     <Link href={item.href} onClick={closeSidebarOnMobile}>
-                      <item.icon className="size-4" />
+                      <item.icon className="size-3" />
                       <span>{t(item.labelKey)}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -268,7 +268,7 @@ export function AppSidebar() {
                         beagleTheme.inkStrongText,
                         beagleTheme.interactive,
                         beagleTheme.focusRing,
-                        "min-h-11 md:min-h-9",
+                        "min-h-9 md:min-h-8",
                         "data-[active=true]:bg-[var(--beagle-accent-soft)]",
                       )}
                     >
@@ -276,7 +276,7 @@ export function AppSidebar() {
                         href={adminNavItem.href ?? "/admin"}
                         onClick={closeSidebarOnMobile}
                       >
-                        <adminNavItem.icon className="size-4" />
+                        <adminNavItem.icon className="size-3" />
                         <span>{t(adminNavItem.labelKey)}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -291,7 +291,7 @@ export function AppSidebar() {
                           beagleTheme.inkStrongText,
                           beagleTheme.interactive,
                           beagleTheme.focusRing,
-                          "min-h-11 md:min-h-9",
+                          "min-h-9 md:min-h-8",
                           "data-[active=true]:bg-[var(--beagle-accent-soft)]",
                         )}
                       >
@@ -299,7 +299,7 @@ export function AppSidebar() {
                           href={item.href ?? "/admin"}
                           onClick={closeSidebarOnMobile}
                         >
-                          <item.icon className="size-4" />
+                          <item.icon className="size-3" />
                           <span>{t(item.labelKey)}</span>
                         </Link>
                       </SidebarMenuButton>
@@ -322,62 +322,49 @@ export function AppSidebar() {
           <>
             <div
               className={cn(
-                "mx-2 mb-1 rounded-md border px-2 py-2 group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:w-full group-data-[collapsible=icon]:border-transparent group-data-[collapsible=icon]:px-0",
+                "mx-1 mb-1 rounded-md border px-1 py-1 group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:w-full group-data-[collapsible=icon]:border-transparent group-data-[collapsible=icon]:px-0",
                 beagleTheme.border,
               )}
             >
-              <div className="flex items-start gap-2 group-data-[collapsible=icon]:hidden">
-                <span
+              <div className="min-w-0 group-data-[collapsible=icon]:hidden">
+                <Link
+                  href="/account/profile"
+                  onClick={closeSidebarOnMobile}
                   className={cn(
-                    "mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border",
-                    beagleTheme.border,
-                    beagleTheme.softAccent,
+                    "block truncate text-sm font-medium underline-offset-2 hover:underline",
+                    beagleTheme.inkStrongText,
+                    beagleTheme.focusRing,
                   )}
                 >
-                  <User className="size-3.5" />
-                </span>
-                <div className="min-w-0">
-                  <Link
-                    href="/account/profile"
-                    onClick={closeSidebarOnMobile}
-                    className={cn(
-                      "block truncate text-sm font-medium underline-offset-2 hover:underline",
-                      beagleTheme.inkStrongText,
-                      beagleTheme.focusRing,
-                    )}
-                  >
-                    {accountPrimary}
-                  </Link>
-                  {accountSecondary ? (
-                    <p
-                      className={cn("truncate text-xs", beagleTheme.mutedText)}
-                    >
-                      {accountSecondary}
-                    </p>
-                  ) : null}
-                  <p
-                    className={cn(
-                      "mt-0.5 text-[11px] font-semibold",
-                      beagleTheme.mutedText,
-                    )}
-                  >
-                    {accountRole}
+                  {accountPrimary}
+                </Link>
+                {accountSecondary ? (
+                  <p className={cn("truncate text-xs", beagleTheme.mutedText)}>
+                    {accountSecondary}
                   </p>
-                </div>
+                ) : null}
+                <p
+                  className={cn(
+                    "mt-0.5 truncate text-[11px] font-semibold",
+                    beagleTheme.mutedText,
+                  )}
+                >
+                  {accountRole}
+                </p>
               </div>
               <div className="hidden group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
                 <SidebarMenuButton
                   asChild
                   tooltip={`${accountPrimary} (${accountRole})`}
                   className={cn(
-                    "h-7 w-7 justify-center rounded-full border p-0",
+                    "h-4.5 w-4.5 justify-center rounded-full border p-0",
                     beagleTheme.border,
                     beagleTheme.softAccent,
                     beagleTheme.focusRing,
                   )}
                 >
                   <Link href="/account/profile" onClick={closeSidebarOnMobile}>
-                    <User className="size-3.5" />
+                    <User className="size-2" />
                     <span className="sr-only">{`${accountPrimary} (${accountRole})`}</span>
                   </Link>
                 </SidebarMenuButton>
@@ -389,12 +376,12 @@ export function AppSidebar() {
                 beagleTheme.inkStrongText,
                 beagleTheme.interactive,
                 beagleTheme.focusRing,
-                "min-h-11 md:min-h-9",
+                "min-h-9 md:min-h-8",
               )}
               onClick={handleSignOut}
               disabled={isSessionPending}
             >
-              <LogOut className="size-4" />
+              <LogOut className="size-3" />
               <span className="group-data-[collapsible=icon]:hidden">
                 {t("sidebar.signOut")}
               </span>
@@ -409,12 +396,12 @@ export function AppSidebar() {
               beagleTheme.inkStrongText,
               beagleTheme.interactive,
               beagleTheme.focusRing,
-              "min-h-11 md:min-h-9",
+              "min-h-9 md:min-h-8",
               "data-[active=true]:bg-[var(--beagle-accent-soft)]",
             )}
           >
             <Link href="/sign-in" onClick={closeSidebarOnMobile}>
-              <LogIn className="size-4" />
+              <LogIn className="size-3" />
               <span className="group-data-[collapsible=icon]:hidden">
                 {t("sidebar.signIn")}
               </span>
@@ -432,12 +419,12 @@ export function AppSidebar() {
                 beagleTheme.inkStrongText,
                 beagleTheme.interactive,
                 beagleTheme.focusRing,
-                "min-h-11 md:min-h-9",
+                "min-h-9 md:min-h-8",
                 "data-[active=true]:bg-[var(--beagle-accent-soft)]",
               )}
             >
               <Link href="/privacy" onClick={closeSidebarOnMobile}>
-                <FileText className="size-4" />
+                <FileText className="size-3" />
                 <span className="group-data-[collapsible=icon]:hidden">
                   {t("sidebar.footer.privacy")}
                 </span>
