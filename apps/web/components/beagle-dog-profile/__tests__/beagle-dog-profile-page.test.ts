@@ -225,11 +225,12 @@ describe("BeagleDogProfilePage", () => {
       }),
     );
 
-    expect(html).toContain("dog.profile.empty.trials");
-    expect(html).toContain("dog.profile.empty.shows");
-    expect(html).toContain("dog.profile.empty.litters");
-    expect(html).toContain("dog.profile.empty.siblings");
-    expect(html).toContain("dog.profile.sex.unknown");
+    expect(html).toContain("dog.profile.card.details.title");
+    expect(html).toContain("dog.profile.card.lineage.title");
+    expect(html).not.toContain("dog.profile.card.siblings.title");
+    expect(html).not.toContain("dog.profile.card.litters.title");
+    expect(html).not.toContain("dog.profile.card.shows.title");
+    expect(html).not.toContain("dog.profile.card.trials.title");
     expect(html).not.toContain("dog.profile.shows.copy.button");
     expect(html).not.toContain("dog.profile.trials.copy.button");
   });

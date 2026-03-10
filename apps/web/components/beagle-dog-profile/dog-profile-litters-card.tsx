@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useState } from "react";
 import {
   ListingResponsiveResults,
   ListingSectionShell,
@@ -308,6 +309,11 @@ export function DogProfileLittersCard({
   profile: BeagleDogProfileDto;
 }) {
   const { t, locale } = useI18n();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const canReveal = profile.litters.length > 5;
+  const visibleLitters = isExpanded
+    ? profile.litters
+    : profile.litters.slice(0, 5);
 
   return (
     <ListingSectionShell
@@ -337,7 +343,7 @@ export function DogProfileLittersCard({
         </div>
       ) : (
         <div className="space-y-3">
-          {profile.litters.map((litter) => (
+          {visibleLitters.map((litter) => (
             <LitterBlock
               key={litter.id}
               litter={litter}
@@ -345,6 +351,29 @@ export function DogProfileLittersCard({
               t={t}
             />
           ))}
+          {canReveal ? (
+            <div className="flex items-center justify-between gap-3 pt-1">
+              <p className={cn("text-xs", beagleTheme.mutedText)}>
+                {t("dog.profile.section.showing")} {visibleLitters.length} /{" "}
+                {profile.litters.length}
+              </p>
+              <button
+                type="button"
+                className={cn(
+                  "cursor-pointer rounded-md border px-3 py-1.5 text-xs font-medium",
+                  beagleTheme.border,
+                  beagleTheme.surface,
+                  beagleTheme.inkStrongText,
+                  beagleTheme.interactive,
+                )}
+                onClick={() => setIsExpanded((value) => !value)}
+              >
+                {isExpanded
+                  ? t("dog.profile.section.showLess")
+                  : t("dog.profile.section.showMore")}
+              </button>
+            </div>
+          ) : null}
         </div>
       )}
     </ListingSectionShell>
