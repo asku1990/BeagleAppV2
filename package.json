@@ -35,6 +35,9 @@
     "auth:set-password": "pnpm --filter @beagle/server exec tsx scripts/set-user-password.ts",
     "db:push": "pnpm --filter @beagle/db exec prisma db push",
     "import:phase1": "pnpm --filter @beagle/server import:phase1 --",
+    "import:phase2": "pnpm --filter @beagle/server import:phase2 --",
+    "import:phase3": "pnpm --filter @beagle/server import:phase3 --",
+    "import:bootstrap": "pnpm --filter @beagle/server import:bootstrap --",
     "import:issues": "pnpm --filter @beagle/server import:issues --",
     "import:issues:csv": "pnpm --filter @beagle/server import:issues:csv --",
     "prepare": "husky"

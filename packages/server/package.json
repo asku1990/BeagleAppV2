@@ -13,6 +13,9 @@
     "test:unit": "vitest run",
     "test:coverage": "vitest run --coverage",
     "import:phase1": "node --import tsx/esm scripts/run-legacy-phase1.ts",
+    "import:phase2": "node --import tsx/esm scripts/run-legacy-phase2.ts",
+    "import:phase3": "node --import tsx/esm scripts/run-legacy-phase3.ts",
+    "import:bootstrap": "node --import tsx/esm scripts/run-legacy-bootstrap.ts",
     "import:issues": "node --import tsx/esm scripts/list-import-issues.ts",
     "import:issues:csv": "node --import tsx/esm scripts/export-import-issues-csv.ts"
   },
