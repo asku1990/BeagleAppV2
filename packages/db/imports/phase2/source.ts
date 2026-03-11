@@ -1,5 +1,5 @@
 import mariadb from "mariadb";
-import type { LegacyTrialResultRow } from "../../legacy/source";
+import type { LegacyTrialResultRow } from "../types";
 
 function getLegacyDatabaseUrl(): string {
   const value = process.env.LEGACY_DATABASE_URL;
