@@ -7,6 +7,10 @@ This document describes how phase-1 legacy import works in detail: source tables
 - Run import:
   - `pnpm import:phase1`
   - Optional actor id: `pnpm import:phase1 <USER_ID>`
+- Related phase commands:
+  - `pnpm import:phase2`
+  - `pnpm import:phase3`
+  - `pnpm import:bootstrap`
 - Inspect issues:
   - `pnpm import:issues <RUN_ID>`
   - Optional filters: `--stage`, `--code`, `--severity`, `--limit`
