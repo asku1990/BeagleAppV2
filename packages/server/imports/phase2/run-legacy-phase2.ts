@@ -12,8 +12,8 @@ import {
 import type { ImportIssueSeverity } from "@beagle/db";
 import type { ImportRunResponse } from "@beagle/contracts";
 import type { ServiceResult } from "../../core/result";
-import { upsertTrialRows } from "../persistence";
-import { toImportRunResponse } from "../transform";
+import { upsertTrialRows } from "../internal";
+import { toImportRunResponse } from "../runs";
 
 // Runs the legacy phase2 trials-only import using current trial schema.
 export async function runLegacyPhase2(

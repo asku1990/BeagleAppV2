@@ -1,7 +1,7 @@
 import {
   type AuditContextDb,
-  isInvalidImportRunIssuesCursorError,
   getImportRunById,
+  isInvalidImportRunIssuesCursorError,
   listImportRunIssues,
 } from "@beagle/db";
 import type { ImportIssueSeverity } from "@beagle/db";
@@ -9,10 +9,10 @@ import type {
   ImportRunIssuesResponse,
   ImportRunResponse,
 } from "@beagle/contracts";
-import type { ServiceResult } from "../core/result";
-import { runLegacyPhase1 } from "./phase1";
-import { runLegacyPhase2 } from "./phase2";
-import { runLegacyPhase3 } from "./phase3";
+import type { ServiceResult } from "../../core/result";
+import { runLegacyPhase1 } from "../phase1";
+import { runLegacyPhase2 } from "../phase2";
+import { runLegacyPhase3 } from "../phase3";
 import { toImportRunIssueResponse, toImportRunResponse } from "./transform";
 
 export function createImportsService() {

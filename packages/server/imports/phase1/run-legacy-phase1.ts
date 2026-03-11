@@ -13,17 +13,16 @@ import {
 import type { ImportIssueSeverity } from "@beagle/db";
 import type { ImportRunResponse } from "@beagle/contracts";
 import type { ServiceResult } from "../../core/result";
-import { upsertOwner } from "../persistence";
-import { toOwnershipDateKey } from "../date-key";
 import {
-  normalizeBreederKey,
   isValidRegistrationNo,
   mapSex,
+  normalizeBreederKey,
   normalizeNullable,
   normalizeRegistrationNo,
   parseLegacyDate,
-  toImportRunResponse,
-} from "../transform";
+} from "../core";
+import { toOwnershipDateKey, upsertOwner } from "../internal";
+import { toImportRunResponse } from "../runs";
 
 const FINNISH_REGISTRATION_PREFIXES = new Set(["FI", "SF"]);
 

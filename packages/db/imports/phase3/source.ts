@@ -1,13 +1,5 @@
-import mariadb from "mariadb";
+import { connectLegacyDatabase } from "../internal";
 import type { LegacyShowResultRow } from "../types";
-
-function getLegacyDatabaseUrl(): string {
-  const value = process.env.LEGACY_DATABASE_URL;
-  if (!value) {
-    throw new Error("LEGACY_DATABASE_URL is not configured.");
-  }
-  return value;
-}
 
 // Loads legacy show rows for phase3 import.
 export async function fetchLegacyShowRows(options?: {
@@ -16,7 +8,7 @@ export async function fetchLegacyShowRows(options?: {
   const log = options?.log ?? (() => {});
   const startedAt = Date.now();
   log("Connecting to legacy database...");
-  const connection = await mariadb.createConnection(getLegacyDatabaseUrl());
+  const connection = await connectLegacyDatabase();
   try {
     log("Connected to legacy database");
 
