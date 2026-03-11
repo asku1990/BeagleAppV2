@@ -113,7 +113,7 @@ export async function upsertTrialRows(
     if (registrationNo && !isValidRegistrationNo(registrationNo)) {
       errors += 1;
       issues.push({
-        code: "REGISTRATION_INVALID_FORMAT",
+        code: "TRIAL_REGISTRATION_INVALID_FORMAT",
         message: "Event row has invalid registration format.",
         registrationNo,
         sourceTable,
@@ -139,7 +139,7 @@ export async function upsertTrialRows(
     if (!dogId || !eventDate || !eventPlace) {
       errors += 1;
       issues.push({
-        code: "EVENT_MISSING_REQUIRED_FIELDS",
+        code: "TRIAL_EVENT_MISSING_REQUIRED_FIELDS",
         message: "Trial row missing dog, event date, or event place.",
         registrationNo,
         sourceTable,
@@ -243,7 +243,7 @@ export async function upsertShowRows(
     if (registrationNo && !isValidRegistrationNo(registrationNo)) {
       errors += 1;
       issues.push({
-        code: "REGISTRATION_INVALID_FORMAT",
+        code: "SHOW_REGISTRATION_INVALID_FORMAT",
         message: "Show row has invalid registration format.",
         registrationNo,
         sourceTable,
@@ -267,7 +267,7 @@ export async function upsertShowRows(
     if (!dogId || !eventDate || !eventPlace) {
       errors += 1;
       issues.push({
-        code: "EVENT_MISSING_REQUIRED_FIELDS",
+        code: "SHOW_EVENT_MISSING_REQUIRED_FIELDS",
         message: "Show row missing dog, event date, or event place.",
         registrationNo,
         sourceTable,
