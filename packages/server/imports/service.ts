@@ -19,7 +19,9 @@ import type {
   ImportRunResponse,
 } from "@beagle/contracts";
 import type { ServiceResult } from "../core/result";
-import { upsertOwner, upsertShowRows, upsertTrialRows } from "./persistence";
+import { upsertOwner } from "./persistence";
+import { runLegacyPhase2 } from "./phase2";
+import { runLegacyPhase3 } from "./phase3";
 import { toOwnershipDateKey } from "./date-key";
 import {
   normalizeBreederKey,
@@ -245,8 +247,8 @@ export function createImportsService() {
       let dogsUpserted = 0;
       let ownersUpserted = 0;
       let ownershipsUpserted = 0;
-      let trialResultsUpserted = 0;
-      let showResultsUpserted = 0;
+      const trialResultsUpserted = 0;
+      const showResultsUpserted = 0;
       let errorsCount = 0;
       const issueBuffer: Array<{
         stage: string;
@@ -296,7 +298,7 @@ export function createImportsService() {
           log: (message) => log(`[stage:load] ${message}`),
         });
         log(
-          `Loaded legacy rows: dogs=${legacy.dogs.length}, breeders=${legacy.breeders.length}, eks=${legacy.eks.length}, owners=${legacy.owners.length}, trialResults=${legacy.trialResults.length}, showResults=${legacy.showResults.length}, samakoira=${legacy.samakoira.length}`,
+          `Loaded legacy rows: dogs=${legacy.dogs.length}, breeders=${legacy.breeders.length}, eks=${legacy.eks.length}, owners=${legacy.owners.length}, samakoira=${legacy.samakoira.length}`,
         );
         finishStage("load");
 
@@ -1245,58 +1247,6 @@ export function createImportsService() {
         );
         finishStage("owners");
 
-        startStage("trials");
-        const trialResult = await upsertTrialRows(
-          legacy.trialResults,
-          dogIdByRegistration,
-          {
-            onProgress: (processed, total) =>
-              logProgress("trials", processed, total),
-          },
-        );
-        trialResultsUpserted = trialResult.upserted;
-        errorsCount += trialResult.errors;
-        for (const issue of trialResult.issues) {
-          await recordIssue({
-            stage: "trials",
-            code: issue.code,
-            message: issue.message,
-            registrationNo: issue.registrationNo,
-            sourceTable: issue.sourceTable,
-            payloadJson: issue.payloadJson,
-          });
-        }
-        log(
-          `Trial results upserted=${trialResultsUpserted}, trial errors=${trialResult.errors}`,
-        );
-        finishStage("trials");
-
-        startStage("shows");
-        const showResult = await upsertShowRows(
-          legacy.showResults,
-          dogIdByRegistration,
-          {
-            onProgress: (processed, total) =>
-              logProgress("shows", processed, total),
-          },
-        );
-        showResultsUpserted = showResult.upserted;
-        errorsCount += showResult.errors;
-        for (const issue of showResult.issues) {
-          await recordIssue({
-            stage: "shows",
-            code: issue.code,
-            message: issue.message,
-            registrationNo: issue.registrationNo,
-            sourceTable: issue.sourceTable,
-            payloadJson: issue.payloadJson,
-          });
-        }
-        log(
-          `Show results upserted=${showResultsUpserted}, show errors=${showResult.errors}`,
-        );
-        finishStage("shows");
-
         await flushIssueBuffer();
 
         const finished = await markImportRunFinished(
@@ -1370,6 +1320,26 @@ export function createImportsService() {
       } finally {
         log("Import run finished");
       }
+    },
+
+    async runLegacyPhase2(
+      createdByUserId?: string,
+      options?: {
+        log?: (message: string) => void;
+        auditSource?: AuditContextDb["source"];
+      },
+    ): Promise<ServiceResult<ImportRunResponse>> {
+      return runLegacyPhase2(createdByUserId, options);
+    },
+
+    async runLegacyPhase3(
+      createdByUserId?: string,
+      options?: {
+        log?: (message: string) => void;
+        auditSource?: AuditContextDb["source"];
+      },
+    ): Promise<ServiceResult<ImportRunResponse>> {
+      return runLegacyPhase3(createdByUserId, options);
     },
 
     async getImportRun(id: string): Promise<ServiceResult<ImportRunResponse>> {

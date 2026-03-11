@@ -79,8 +79,6 @@ export type LegacyPhase1Rows = {
   breeders: LegacyBreederRow[];
   eks: LegacyEkRow[];
   owners: LegacyOwnerRow[];
-  trialResults: LegacyTrialResultRow[];
-  showResults: LegacyShowResultRow[];
   samakoira: LegacySamakoiraRow[];
 };
 
@@ -154,48 +152,6 @@ export async function fetchLegacyPhase1Rows(options?: {
       `Fetched owner rows: count=${owners.length}, elapsed=${Math.round((Date.now() - ownersStartedAt) / 1000)}s`,
     );
 
-    const trialResultsStartedAt = Date.now();
-    const trialResults = (await connection.query(
-      `SELECT REKNO as registrationNo,
-              TAPPA as eventPlace,
-              TAPPV as eventDateRaw,
-              KENNELPIIRI as kennelDistrict,
-              KENNELPIIRINRO as kennelDistrictNo,
-              KE as ke,
-              LK as lk,
-              PA as pa,
-              PISTE as piste,
-              SIJA as sija,
-              HAKU as haku,
-              HAUK as hauk,
-              YVA as yva,
-              HLO as hlo,
-              ALO as alo,
-              TJA as tja,
-              PIN as pin,
-              TUOM1 as judge,
-              VARA as legacyFlag
-       FROM akoeall`,
-    )) as LegacyTrialResultRow[];
-    log(
-      `Fetched trial rows: count=${trialResults.length}, elapsed=${Math.round((Date.now() - trialResultsStartedAt) / 1000)}s`,
-    );
-
-    const showResultsStartedAt = Date.now();
-    const showResults = (await connection.query(
-      `SELECT REKNO as registrationNo,
-              TAPPV as eventDateRaw,
-              TAPPA as eventPlace,
-              TULNI as resultText,
-              KORK as heightText,
-              TUOM1 as judge,
-              VARA as legacyFlag
-       FROM nay9599`,
-    )) as LegacyShowResultRow[];
-    log(
-      `Fetched show rows: count=${showResults.length}, elapsed=${Math.round((Date.now() - showResultsStartedAt) / 1000)}s`,
-    );
-
     const samakoiraStartedAt = Date.now();
     const samakoira = (await connection.query(
       `SELECT REK_1 as rek1,
@@ -218,8 +174,6 @@ export async function fetchLegacyPhase1Rows(options?: {
       breeders,
       eks,
       owners,
-      trialResults,
-      showResults,
       samakoira,
     };
   } finally {

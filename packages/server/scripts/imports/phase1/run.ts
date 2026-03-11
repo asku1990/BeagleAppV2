@@ -1,5 +1,5 @@
 import { listImportRunIssues, prisma } from "@beagle/db";
-import { importsService } from "../imports/service";
+import { importsService } from "../../../imports/service";
 
 type RunResult = {
   ok: boolean;

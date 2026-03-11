@@ -19,6 +19,8 @@ enum DogSex {
 
 enum ImportKind {
   LEGACY_PHASE1
+  LEGACY_PHASE2
+  LEGACY_PHASE3
 }
 
 enum ImportStatus {

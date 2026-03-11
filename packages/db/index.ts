@@ -23,6 +23,9 @@ export {
   type ImportRunSummary,
 } from "./imports/repository";
 
+export { fetchLegacyTrialRows } from "./imports/phase2";
+export { fetchLegacyShowRows } from "./imports/phase3";
+
 export {
   fetchLegacyPhase1Rows,
   type LegacyBreederRow,
