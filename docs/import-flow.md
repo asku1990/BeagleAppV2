@@ -7,7 +7,8 @@ This document describes the current legacy bootstrap import flow after split-pha
 - Phase 1 (foundation only): `pnpm import:phase1`
 - Phase 2 (trials): `pnpm import:phase2`
 - Phase 3 (shows): `pnpm import:phase3`
-- Optional full bootstrap (phase1 -> phase2 -> phase3): `pnpm import:bootstrap`
+- Show result definition seed (canonical awards): `pnpm --filter @beagle/db seed:show-result-definitions`
+- Optional full bootstrap (`auth:bootstrap-admin` -> `seed:show-result-definitions` -> `phase1` -> `phase2` -> `phase3`): `pnpm import:bootstrap`
 
 Optional actor id for phase commands:
 
@@ -35,6 +36,18 @@ Issue tooling:
 2. `phase2` imports trial rows using current trial schema.
 
 3. `phase3` imports show rows using current show schema (canonical show schema cutover is handled in later tasks).
+
+4. `seed:show-result-definitions` upserts canonical `ShowResultDefinition` rows used by both
+   legacy and Kennelliitto workbook mappings (for example `ROP`, `VSP`, `SERT`, `VASERT`, `CACIB`,
+   `VARACACIB`, `JUN-ROP`, `JUN-VSP`, `VET-ROP`, `VET-VSP`, `SA`, `KP`).
+
+`import:bootstrap` runs the full sequence in this order:
+
+1. `auth:bootstrap-admin`
+2. `seed:show-result-definitions`
+3. `phase1`
+4. `phase2`
+5. `phase3`
 
 ## ImportRun and issues model
 

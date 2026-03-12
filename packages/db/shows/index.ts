@@ -12,3 +12,4 @@ export {
   type BeagleShowSearchRowDb,
   type BeagleShowSearchSortDb,
 } from "./repository";
+export { seedShowResultDefinitions } from "./seed-result-definitions";

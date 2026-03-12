@@ -26,10 +26,38 @@ function runPhase(scriptFile: string, label: string, args: string[]) {
   }
 }
 
+function runScript(scriptFile: string, label: string) {
+  const scriptPath = resolve(__dirname, scriptFile);
+  const result = spawnSync(
+    process.execPath,
+    ["--import", "tsx/esm", scriptPath],
+    {
+      stdio: "inherit",
+    },
+  );
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  if (result.status !== 0) {
+    throw new Error(
+      `${label} failed with exit code ${result.status ?? "unknown"}.`,
+    );
+  }
+}
+
 async function main() {
   const args = process.argv.slice(2).filter((arg) => arg !== "--");
-  console.log("[import:bootstrap] Starting phase1 -> phase2 -> phase3");
+  console.log(
+    "[import:bootstrap] Starting bootstrap-admin -> seed-show-result-definitions -> phase1 -> phase2 -> phase3",
+  );
 
+  runScript("../../bootstrap-admin.ts", "auth:bootstrap-admin");
+  runScript(
+    "../../../../db/scripts/seed-show-result-definitions.ts",
+    "seed:show-result-definitions",
+  );
   runPhase("../phase1/run.ts", "import:phase1", args);
   runPhase("../phase2/run.ts", "import:phase2", args);
   runPhase("../phase3/run.ts", "import:phase3", args);

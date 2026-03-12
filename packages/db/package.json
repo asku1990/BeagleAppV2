@@ -16,6 +16,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "seed:initial-test-data": "node --import tsx/esm scripts/seed-initial-test-data.ts",
+    "seed:show-result-definitions": "node --import tsx/esm scripts/seed-show-result-definitions.ts",
     "audit:prune": "node --import tsx/esm scripts/prune-audit-events.ts"
   },
   "dependencies": {

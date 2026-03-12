@@ -141,7 +141,15 @@ pass-cli run --env-file .env.staging -- pnpm import:phase3
 CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:phase3
 ```
 
-Bootstrap import (phase1 -> phase2 -> phase3):
+Show result definition seed (canonical awards):
+
+```bash
+pass-cli run --env-file .env.local -- pnpm --filter @beagle/db seed:show-result-definitions
+pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db seed:show-result-definitions
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm --filter @beagle/db seed:show-result-definitions
+```
+
+Bootstrap import (`auth:bootstrap-admin` -> `seed:show-result-definitions` -> `phase1` -> `phase2` -> `phase3`):
 
 ```bash
 pass-cli run --env-file .env.local -- pnpm import:bootstrap
