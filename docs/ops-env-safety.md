@@ -125,6 +125,30 @@ pass-cli run --env-file .env.staging -- pnpm import:phase1
 CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:phase1
 ```
 
+Phase-2 import:
+
+```bash
+pass-cli run --env-file .env.local -- pnpm import:phase2
+pass-cli run --env-file .env.staging -- pnpm import:phase2
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:phase2
+```
+
+Phase-3 import:
+
+```bash
+pass-cli run --env-file .env.local -- pnpm import:phase3
+pass-cli run --env-file .env.staging -- pnpm import:phase3
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:phase3
+```
+
+Bootstrap import (phase1 -> phase2 -> phase3):
+
+```bash
+pass-cli run --env-file .env.local -- pnpm import:bootstrap
+pass-cli run --env-file .env.staging -- pnpm import:bootstrap
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:bootstrap
+```
+
 Inspect phase-1 import issues:
 
 ```bash

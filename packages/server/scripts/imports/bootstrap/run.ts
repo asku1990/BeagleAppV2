@@ -30,9 +30,9 @@ async function main() {
   const args = process.argv.slice(2).filter((arg) => arg !== "--");
   console.log("[import:bootstrap] Starting phase1 -> phase2 -> phase3");
 
-  runPhase("run-legacy-phase1.ts", "import:phase1", args);
-  runPhase("run-legacy-phase2.ts", "import:phase2", args);
-  runPhase("run-legacy-phase3.ts", "import:phase3", args);
+  runPhase("../phase1/run.ts", "import:phase1", args);
+  runPhase("../phase2/run.ts", "import:phase2", args);
+  runPhase("../phase3/run.ts", "import:phase3", args);
 
   console.log("[import:bootstrap] Completed all phases");
 }

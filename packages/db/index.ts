@@ -23,8 +23,11 @@ export {
   type ImportRunSummary,
 } from "./imports/repository";
 
+export { fetchLegacyTrialRows } from "./imports/phase2";
+export { fetchLegacyShowRows } from "./imports/phase3";
+export { fetchLegacyPhase1Rows } from "./imports/phase1";
+
 export {
-  fetchLegacyPhase1Rows,
   type LegacyBreederRow,
   type LegacyDogRow,
   type LegacyEkRow,
@@ -33,7 +36,7 @@ export {
   type LegacyShowResultRow,
   type LegacySamakoiraRow,
   type LegacyPhase1Rows,
-} from "./legacy/source";
+} from "./imports/types";
 
 export { getHomeStatisticsSnapshot, type HomeStatisticsSnapshot } from "./home";
 

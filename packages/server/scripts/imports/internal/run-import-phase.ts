@@ -1,5 +1,4 @@
 import { listImportRunIssues, prisma } from "@beagle/db";
-import { importsService } from "../imports/service";
 
 type RunResult = {
   ok: boolean;
@@ -7,29 +6,30 @@ type RunResult = {
   body: unknown;
 };
 
-async function main() {
+type ExecutePhase = (
+  createdByUserId: string | undefined,
+  log: (message: string) => void,
+) => Promise<RunResult>;
+
+export async function runImportPhase(
+  phaseLabel: "phase1" | "phase2" | "phase3",
+  executePhase: ExecutePhase,
+) {
   const args = process.argv.slice(2).filter((arg) => arg !== "--");
   const createdByUserId =
     args[0] && !args[0].startsWith("--") ? args[0] : undefined;
   const start = Date.now();
-  console.log("[import:phase1] Starting import...");
+  console.log(`[import:${phaseLabel}] Starting import...`);
   if (createdByUserId) {
-    console.log(`[import:phase1] createdByUserId=${createdByUserId}`);
+    console.log(`[import:${phaseLabel}] createdByUserId=${createdByUserId}`);
   }
 
-  const result = await importsService.runLegacyPhase1(createdByUserId, {
-    log: (message) => console.log(`[import:phase1] ${message}`),
-    auditSource: "SCRIPT",
-  });
-
-  const output: RunResult = {
-    ok: result.body.ok,
-    status: result.status,
-    body: result.body,
-  };
+  const output = await executePhase(createdByUserId, (message) =>
+    console.log(`[import:${phaseLabel}] ${message}`),
+  );
 
   console.log(
-    `[import:phase1] Completed in ${Math.round((Date.now() - start) / 1000)}s`,
+    `[import:${phaseLabel}] Completed in ${Math.round((Date.now() - start) / 1000)}s`,
   );
   console.log(JSON.stringify(output, null, 2));
 
@@ -91,17 +91,17 @@ async function main() {
     } while (cursor);
 
     if (total > 0) {
-      console.log(`[import:phase1] Issue rows stored: ${total}`);
-      console.log("[import:phase1] Issue groups:");
+      console.log(`[import:${phaseLabel}] Issue rows stored: ${total}`);
+      console.log(`[import:${phaseLabel}] Issue groups:`);
       for (const [key, count] of [...grouped.entries()].sort(
         (a, b) => b[1] - a[1],
       )) {
-        console.log(`[import:phase1]   ${key} = ${count}`);
+        console.log(`[import:${phaseLabel}]   ${key} = ${count}`);
       }
-      console.log("[import:phase1] Issue samples:");
+      console.log(`[import:${phaseLabel}] Issue samples:`);
       for (const sample of samples) {
         console.log(
-          `[import:phase1]   [${sample.stage}/${sample.severity}/${sample.code}] reg=${sample.registrationNo ?? "-"} table=${sample.sourceTable ?? "-"} msg=${sample.message}`,
+          `[import:${phaseLabel}]   [${sample.stage}/${sample.severity}/${sample.code}] reg=${sample.registrationNo ?? "-"} table=${sample.sourceTable ?? "-"} msg=${sample.message}`,
         );
       }
     }
@@ -122,11 +122,6 @@ async function main() {
   }
 }
 
-main()
-  .catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+export async function disconnectImportScriptPrisma() {
+  await prisma.$disconnect();
+}
