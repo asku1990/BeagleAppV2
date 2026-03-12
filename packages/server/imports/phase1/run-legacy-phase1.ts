@@ -22,7 +22,7 @@ import {
   parseLegacyDate,
 } from "../core";
 import { toOwnershipDateKey, upsertOwner } from "../internal";
-import { toImportRunResponse } from "../runs";
+import { toImportRunResponse } from "../runs/transform";
 
 const FINNISH_REGISTRATION_PREFIXES = new Set(["FI", "SF"]);
 

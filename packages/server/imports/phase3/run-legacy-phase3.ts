@@ -13,7 +13,7 @@ import type { ImportIssueSeverity } from "@beagle/db";
 import type { ImportRunResponse } from "@beagle/contracts";
 import type { ServiceResult } from "../../core/result";
 import { upsertShowRows } from "../internal";
-import { toImportRunResponse } from "../runs";
+import { toImportRunResponse } from "../runs/transform";
 
 // Runs the legacy phase3 shows-only import using current show schema.
 export async function runLegacyPhase3(
