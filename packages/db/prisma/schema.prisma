@@ -36,6 +36,21 @@ enum ImportIssueSeverity {
   ERROR
 }
 
+enum ShowSourceTag {
+  LEGACY_NAY9599
+  LEGACY_BEANAY
+  LEGACY_BEANAY_TEXT
+  WORKBOOK_KENNELLIITTO
+  MANUAL_ADMIN
+}
+
+enum ShowResultValueType {
+  FLAG
+  TEXT
+  NUMERIC
+  DATE
+}
+
 enum AuditAction {
   INSERT
   UPDATE
@@ -133,6 +148,7 @@ model Dog {
   ownerships      DogOwnership[]
   trialResults    TrialResult[]
   showResults     ShowResult[]
+  showEntries     ShowEntry[]
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
@@ -251,6 +267,140 @@ model ShowResult {
   @@index([dogId, eventDate])
 }
 
+model ShowEvent {
+  // identity
+  id String @id @default(cuid()) // Tapahtumarivin tekninen tunniste.
+  eventLookupKey String @unique // Yhtenäinen tapahtuman hakutunniste.
+  idempotencyKey String @unique // Uudelleenajoavain: estää duplikaatit.
+
+  // event core
+  sourceTag ShowSourceTag // Lähdejärjestelmän tunniste.
+  eventDate DateTime // Näyttelyn päivä.
+  eventName String? // Näyttelyn nimi.
+  eventPlace String // Näyttelyn paikka.
+  eventType String? // Näyttelytyyppi.
+  organizer String? // Järjestäjä.
+
+  // provenance / import
+  importRunId String? // Viittaus import-ajoon.
+  sourceTable String? // Alkuperäinen lähdetaulu.
+  sourceRef String? // Alkuperäisen lähteen rivitunniste.
+  rawPayloadJson String? @db.Text // Raakalähteen payload JSON-muodossa.
+
+  // relations / timestamps
+  importRun ImportRun? @relation(fields: [importRunId], references: [id], onDelete: SetNull) // Relaatio import-ajoon.
+  entries ShowEntry[] // Tapahtuman osallistumisrivit.
+  createdAt DateTime @default(now()) // Luontiaika.
+  updatedAt DateTime @updatedAt // Päivitysaika.
+
+  @@index([eventDate])
+  @@index([eventPlace, eventDate])
+  @@index([sourceTag, eventDate])
+}
+
+model ShowEntry {
+  // identity
+  id String @id @default(cuid()) // Osallistumisrivin tekninen tunniste.
+  entryLookupKey String @unique // Yhtenäinen osallistumisrivin hakutunniste.
+  idempotencyKey String @unique // Uudelleenajoavain: estää duplikaatit.
+
+  // links
+  showEventId String // Viittaus tapahtumaan.
+  dogId String // Viittaus koiraan.
+
+  // entry core
+  sourceTag ShowSourceTag // Lähdejärjestelmän tunniste.
+  registrationNoSnapshot String // Rekisterinumeron snapshot import-hetkellä.
+  dogNameSnapshot String // Koiran nimen snapshot import-hetkellä.
+  className String? // Näyttelyluokka.
+  qualityGrade String? // Laatuluokka.
+  placement String? // Sijoitus.
+  judge String? // Tuomari.
+  heightText String? // Korkeustieto tekstimuodossa.
+  critiqueText String? @db.Text // Arvosteluteksti.
+
+  // provenance / import
+  importRunId String? // Viittaus import-ajoon.
+  sourceTable String? // Alkuperäinen lähdetaulu.
+  sourceRef String? // Alkuperäisen lähteen rivitunniste.
+  legacyFlag String? // Legacy-lipputieto.
+  rawPayloadJson String? @db.Text // Raakalähteen payload JSON-muodossa.
+
+  // relations / timestamps
+  showEvent ShowEvent @relation(fields: [showEventId], references: [id], onDelete: Cascade) // Relaatio tapahtumaan.
+  dog Dog @relation(fields: [dogId], references: [id], onDelete: Cascade) // Relaatio koiraan.
+  importRun ImportRun? @relation(fields: [importRunId], references: [id], onDelete: SetNull) // Relaatio import-ajoon.
+  resultItems ShowResultItem[] // Joustavat tulosattribuutit/palkinnot.
+  createdAt DateTime @default(now()) // Luontiaika.
+  updatedAt DateTime @updatedAt // Päivitysaika.
+
+  @@index([showEventId])
+  @@index([dogId])
+  @@index([showEventId, dogId])
+  @@index([sourceTag])
+}
+
+model ShowResultDefinition {
+  // identity
+  id String @id @default(cuid()) // Määritelmän tekninen tunniste.
+  code String @unique // Vakioitu koneellinen koodi.
+
+  // labels / behavior
+  labelFi String // Nimi suomeksi.
+  labelSv String? // Nimi ruotsiksi.
+  valueType ShowResultValueType @default(FLAG) // Attribuutin arvotyyppi.
+  defaultImportance Int @default(0) // Oletustärkeys järjestystä varten.
+  defaultSortOrder Int @default(0) // Oletuslajittelujärjestys.
+  displayGroup String? // Esitysryhmä UI:ssa.
+  isVisibleByDefault Boolean @default(true) // Näkyykö oletuksena.
+  isEnabled Boolean @default(true) // Onko määritelmä käytössä.
+
+  // relations / timestamps
+  resultItems ShowResultItem[] // Tähän määritelmään viittaavat tulosrivit.
+  createdAt DateTime @default(now()) // Luontiaika.
+  updatedAt DateTime @updatedAt // Päivitysaika.
+
+  @@index([isEnabled, defaultSortOrder])
+  @@index([defaultImportance])
+}
+
+model ShowResultItem {
+  // identity
+  id String @id @default(cuid()) // Tulosattribuuttirivin tekninen tunniste.
+  idempotencyKey String @unique // Uudelleenajoavain: estää duplikaatit.
+
+  // links
+  showEntryId String // Viittaus osallistumisriviin.
+  definitionId String // Viittaus tulosmääritelmään.
+
+  // value payload
+  sourceTag ShowSourceTag // Lähdejärjestelmän tunniste.
+  valueText String? // Tekstiarvo.
+  valueNumeric Decimal? @db.Decimal(8, 2) // Numeroarvo.
+  valueDate DateTime? // Päivämääräarvo.
+  isAwarded Boolean? // Boolean-lippuarvo.
+  itemImportance Int? // Rivikohtainen tärkeysylikirjoitus.
+  itemSortOrder Int? // Rivikohtainen lajittelujärjestysylikirjoitus.
+
+  // provenance / import
+  importRunId String? // Viittaus import-ajoon.
+  sourceTable String? // Alkuperäinen lähdetaulu.
+  sourceRef String? // Alkuperäisen lähteen rivitunniste.
+  rawPayloadJson String? @db.Text // Raakalähteen payload JSON-muodossa.
+
+  // relations / timestamps
+  showEntry ShowEntry @relation(fields: [showEntryId], references: [id], onDelete: Cascade) // Relaatio osallistumisriviin.
+  definition ShowResultDefinition @relation(fields: [definitionId], references: [id], onDelete: Restrict) // Relaatio tulosmääritelmään.
+  importRun ImportRun? @relation(fields: [importRunId], references: [id], onDelete: SetNull) // Relaatio import-ajoon.
+  createdAt DateTime @default(now()) // Luontiaika.
+  updatedAt DateTime @updatedAt // Päivitysaika.
+
+  @@index([showEntryId])
+  @@index([definitionId])
+  @@index([showEntryId, definitionId])
+  @@index([sourceTag])
+}
+
 model ImportRun {
   id                  String       @id @default(cuid())
   kind                ImportKind
@@ -267,6 +417,9 @@ model ImportRun {
   createdByUserId     String?
   createdByUser       BetterAuthUser? @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
   issues              ImportRunIssue[]
+  showEvents          ShowEvent[]
+  showEntries         ShowEntry[]
+  showResultItems     ShowResultItem[]
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
 
