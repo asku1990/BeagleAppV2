@@ -2,16 +2,157 @@ import { ShowResultValueType } from "@prisma/client";
 import { prisma } from "../core/prisma";
 
 // Seeds canonical show result definitions used by both legacy and workbook imports.
+const SHOW_RESULT_CATEGORIES = [
+  {
+    code: "LUOKKA",
+    labelFi: "Luokka",
+    labelSv: null,
+    descriptionFi: "Nayttelyluokat (esim. JUN, NUO, AVO, KÄY, VAL, VET).",
+    descriptionSv: null,
+    sortOrder: 10,
+  },
+  {
+    code: "LAATUARVOSTELU",
+    labelFi: "Laatuarvostelu",
+    labelSv: null,
+    descriptionFi: "Laatuarvostelukoodit (ERI, EH, H, T, HYL, EVA).",
+    descriptionSv: null,
+    sortOrder: 20,
+  },
+  {
+    code: "ROTUSIJOITUS",
+    labelFi: "Rotusijoitus",
+    labelSv: null,
+    descriptionFi:
+      "Rotusijoitukseen liittyvat merkinnat (ROP, VSP, JUN/VET-variantit).",
+    descriptionSv: null,
+    sortOrder: 30,
+  },
+  {
+    code: "SERTTIMERKINTA",
+    labelFi: "Serttimerkinta",
+    labelSv: null,
+    descriptionFi: "Sertteihin ja palkintomerkintoihin liittyvat tulokset.",
+    descriptionSv: null,
+    sortOrder: 40,
+  },
+  {
+    code: "JUNIORI_VETERAANI",
+    labelFi: "Juniori ja veteraani",
+    labelSv: null,
+    descriptionFi: "Juniori- ja veteraanikohtaiset sertti- ja CACIB-merkinnat.",
+    descriptionSv: null,
+    sortOrder: 50,
+  },
+  {
+    code: "VALIOARVO",
+    labelFi: "Valioarvo",
+    labelSv: null,
+    descriptionFi: "Valioarvomerkinnat (MVA, JMVA, VMVA).",
+    descriptionSv: null,
+    sortOrder: 60,
+  },
+  {
+    code: "SIJOITUS",
+    labelFi: "Sijoitus",
+    labelSv: null,
+    descriptionFi: "Kilpailuluokan sijoitusarvot.",
+    descriptionSv: null,
+    sortOrder: 70,
+  },
+  {
+    code: "PUPN",
+    labelFi: "Paras uros / paras narttu",
+    labelSv: null,
+    descriptionFi: "PU/PN-sijoituskoodit (esim. PU1, PN2).",
+    descriptionSv: null,
+    sortOrder: 80,
+  },
+] as const;
+
+const SHOW_RESULT_DEFINITIONS_LUOKAT = [
+  {
+    code: "BAB", // Baby-luokka
+    labelFi: "Baby-luokka",
+    labelSv: null,
+    valueType: ShowResultValueType.CODE,
+    sortOrder: 10,
+    categoryCode: "LUOKKA",
+    isVisibleByDefault: false,
+  },
+  {
+    code: "PEN", // Pentuluokka
+    labelFi: "Pentuluokka",
+    labelSv: null,
+    valueType: ShowResultValueType.CODE,
+    sortOrder: 20,
+    categoryCode: "LUOKKA",
+    isVisibleByDefault: false,
+  },
+  {
+    code: "JUN", // Junioriluokka
+    labelFi: "Junioriluokka",
+    labelSv: null,
+    valueType: ShowResultValueType.CODE,
+    sortOrder: 30,
+    categoryCode: "LUOKKA",
+    isVisibleByDefault: false,
+  },
+  {
+    code: "NUO", // Nuortenluokka
+    labelFi: "Nuortenluokka",
+    labelSv: null,
+    valueType: ShowResultValueType.CODE,
+    sortOrder: 40,
+    categoryCode: "LUOKKA",
+    isVisibleByDefault: false,
+  },
+  {
+    code: "AVO", // Avoin luokka
+    labelFi: "Avoin luokka",
+    labelSv: null,
+    valueType: ShowResultValueType.CODE,
+    sortOrder: 50,
+    categoryCode: "LUOKKA",
+    isVisibleByDefault: false,
+  },
+  {
+    code: "KÄY", // Käyttöluokka
+    labelFi: "Käyttöluokka",
+    labelSv: null,
+    valueType: ShowResultValueType.CODE,
+    sortOrder: 60,
+    categoryCode: "LUOKKA",
+    isVisibleByDefault: false,
+  },
+  {
+    code: "VAL", // Valioluokka
+    labelFi: "Valioluokka",
+    labelSv: null,
+    valueType: ShowResultValueType.CODE,
+    sortOrder: 70,
+    categoryCode: "LUOKKA",
+    isVisibleByDefault: false,
+  },
+  {
+    code: "VET", // Veteraaniluokka
+    labelFi: "Veteraaniluokka",
+    labelSv: null,
+    valueType: ShowResultValueType.CODE,
+    sortOrder: 80,
+    categoryCode: "LUOKKA",
+    isVisibleByDefault: false,
+  },
+] as const;
+
 const SHOW_RESULT_DEFINITIONS_LAATUARVOSTELU = [
   {
     code: "ERI", // Erinomainen
     labelFi: "ERI",
     labelSv: null,
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 70,
-    defaultSortOrder: 10,
-    groupKey: "LAATUARVOSTELU",
-    kindKey: "TULOS",
+    sortOrder: 10,
+    categoryCode: "LAATUARVOSTELU",
     isVisibleByDefault: true,
   },
   {
@@ -19,10 +160,8 @@ const SHOW_RESULT_DEFINITIONS_LAATUARVOSTELU = [
     labelFi: "EH",
     labelSv: null,
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 60,
-    defaultSortOrder: 20,
-    groupKey: "LAATUARVOSTELU",
-    kindKey: "TULOS",
+    sortOrder: 20,
+    categoryCode: "LAATUARVOSTELU",
     isVisibleByDefault: true,
   },
   {
@@ -30,10 +169,8 @@ const SHOW_RESULT_DEFINITIONS_LAATUARVOSTELU = [
     labelFi: "H",
     labelSv: null,
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 50,
-    defaultSortOrder: 30,
-    groupKey: "LAATUARVOSTELU",
-    kindKey: "TULOS",
+    sortOrder: 30,
+    categoryCode: "LAATUARVOSTELU",
     isVisibleByDefault: true,
   },
   {
@@ -41,10 +178,8 @@ const SHOW_RESULT_DEFINITIONS_LAATUARVOSTELU = [
     labelFi: "T",
     labelSv: null,
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 40,
-    defaultSortOrder: 40,
-    groupKey: "LAATUARVOSTELU",
-    kindKey: "TULOS",
+    sortOrder: 40,
+    categoryCode: "LAATUARVOSTELU",
     isVisibleByDefault: true,
   },
   {
@@ -52,10 +187,8 @@ const SHOW_RESULT_DEFINITIONS_LAATUARVOSTELU = [
     labelFi: "HYL",
     labelSv: null,
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 20,
-    defaultSortOrder: 50,
-    groupKey: "LAATUARVOSTELU",
-    kindKey: "TULOS",
+    sortOrder: 50,
+    categoryCode: "LAATUARVOSTELU",
     isVisibleByDefault: true,
   },
   {
@@ -63,10 +196,8 @@ const SHOW_RESULT_DEFINITIONS_LAATUARVOSTELU = [
     labelFi: "EVA",
     labelSv: null,
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 10,
-    defaultSortOrder: 60,
-    groupKey: "LAATUARVOSTELU",
-    kindKey: "TULOS",
+    sortOrder: 60,
+    categoryCode: "LAATUARVOSTELU",
     isVisibleByDefault: true,
   },
 ] as const;
@@ -77,10 +208,8 @@ const SHOW_RESULT_DEFINITIONS_ROTUSIJOITUS = [
     labelFi: "ROP",
     labelSv: "BIR",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 100,
-    defaultSortOrder: 10,
-    groupKey: "ROTUSIJOITUS",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 10,
+    categoryCode: "ROTUSIJOITUS",
     isVisibleByDefault: true,
   },
   {
@@ -88,10 +217,8 @@ const SHOW_RESULT_DEFINITIONS_ROTUSIJOITUS = [
     labelFi: "VSP",
     labelSv: "BIM",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 95,
-    defaultSortOrder: 20,
-    groupKey: "ROTUSIJOITUS",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 20,
+    categoryCode: "ROTUSIJOITUS",
     isVisibleByDefault: true,
   },
   {
@@ -99,10 +226,8 @@ const SHOW_RESULT_DEFINITIONS_ROTUSIJOITUS = [
     labelFi: "JUN-ROP",
     labelSv: "JUN-BIR",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 76,
-    defaultSortOrder: 130,
-    groupKey: "ROTUSIJOITUS",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 130,
+    categoryCode: "ROTUSIJOITUS",
     isVisibleByDefault: true,
   },
   {
@@ -110,10 +235,8 @@ const SHOW_RESULT_DEFINITIONS_ROTUSIJOITUS = [
     labelFi: "JUN-VSP",
     labelSv: "JUN-BIM",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 75,
-    defaultSortOrder: 140,
-    groupKey: "ROTUSIJOITUS",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 140,
+    categoryCode: "ROTUSIJOITUS",
     isVisibleByDefault: true,
   },
   {
@@ -121,10 +244,8 @@ const SHOW_RESULT_DEFINITIONS_ROTUSIJOITUS = [
     labelFi: "VET-ROP",
     labelSv: "VET-BIR",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 74,
-    defaultSortOrder: 150,
-    groupKey: "ROTUSIJOITUS",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 150,
+    categoryCode: "ROTUSIJOITUS",
     isVisibleByDefault: true,
   },
   {
@@ -132,10 +253,8 @@ const SHOW_RESULT_DEFINITIONS_ROTUSIJOITUS = [
     labelFi: "VET-VSP",
     labelSv: "VET-BIM",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 73,
-    defaultSortOrder: 160,
-    groupKey: "ROTUSIJOITUS",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 160,
+    categoryCode: "ROTUSIJOITUS",
     isVisibleByDefault: true,
   },
 ] as const;
@@ -146,10 +265,8 @@ const SHOW_RESULT_DEFINITIONS_SERTTIMERKINNAT = [
     labelFi: "SERT",
     labelSv: "CERT",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 90,
-    defaultSortOrder: 30,
-    groupKey: "SERTTIMERKINTA",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 30,
+    categoryCode: "SERTTIMERKINTA",
     isVisibleByDefault: true,
   },
   {
@@ -157,10 +274,8 @@ const SHOW_RESULT_DEFINITIONS_SERTTIMERKINNAT = [
     labelFi: "Vara-SERT",
     labelSv: "Reserv-CERT",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 88,
-    defaultSortOrder: 40,
-    groupKey: "SERTTIMERKINTA",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 40,
+    categoryCode: "SERTTIMERKINTA",
     isVisibleByDefault: true,
   },
   {
@@ -168,10 +283,8 @@ const SHOW_RESULT_DEFINITIONS_SERTTIMERKINNAT = [
     labelFi: "NORD-SERT",
     labelSv: "NORD-CERT",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 87,
-    defaultSortOrder: 50,
-    groupKey: "SERTTIMERKINTA",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 50,
+    categoryCode: "SERTTIMERKINTA",
     isVisibleByDefault: true,
   },
   {
@@ -179,10 +292,8 @@ const SHOW_RESULT_DEFINITIONS_SERTTIMERKINNAT = [
     labelFi: "NORD-varaSERT",
     labelSv: "NORD-reserv-CERT",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 85,
-    defaultSortOrder: 60,
-    groupKey: "SERTTIMERKINTA",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 60,
+    categoryCode: "SERTTIMERKINTA",
     isVisibleByDefault: true,
   },
   {
@@ -190,10 +301,8 @@ const SHOW_RESULT_DEFINITIONS_SERTTIMERKINNAT = [
     labelFi: "CACIB",
     labelSv: "CACIB",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 84,
-    defaultSortOrder: 70,
-    groupKey: "SERTTIMERKINTA",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 70,
+    categoryCode: "SERTTIMERKINTA",
     isVisibleByDefault: true,
   },
   {
@@ -201,10 +310,8 @@ const SHOW_RESULT_DEFINITIONS_SERTTIMERKINNAT = [
     labelFi: "Vara-CACIB",
     labelSv: "Reserv-CACIB",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 82,
-    defaultSortOrder: 80,
-    groupKey: "SERTTIMERKINTA",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 80,
+    categoryCode: "SERTTIMERKINTA",
     isVisibleByDefault: true,
   },
   {
@@ -212,10 +319,8 @@ const SHOW_RESULT_DEFINITIONS_SERTTIMERKINNAT = [
     labelFi: "CACIB-J",
     labelSv: "CACIB-J",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 80,
-    defaultSortOrder: 90,
-    groupKey: "JUNIORI_VETERAANI",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 90,
+    categoryCode: "JUNIORI_VETERAANI",
     isVisibleByDefault: true,
   },
   {
@@ -223,10 +328,8 @@ const SHOW_RESULT_DEFINITIONS_SERTTIMERKINNAT = [
     labelFi: "CACIB-V",
     labelSv: "CACIB-V",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 79,
-    defaultSortOrder: 100,
-    groupKey: "JUNIORI_VETERAANI",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 100,
+    categoryCode: "JUNIORI_VETERAANI",
     isVisibleByDefault: true,
   },
   {
@@ -234,10 +337,8 @@ const SHOW_RESULT_DEFINITIONS_SERTTIMERKINNAT = [
     labelFi: "JUN-SERT",
     labelSv: "JUN-CERT",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 78,
-    defaultSortOrder: 110,
-    groupKey: "JUNIORI_VETERAANI",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 110,
+    categoryCode: "JUNIORI_VETERAANI",
     isVisibleByDefault: true,
   },
   {
@@ -245,10 +346,8 @@ const SHOW_RESULT_DEFINITIONS_SERTTIMERKINNAT = [
     labelFi: "VET-SERT",
     labelSv: "VET-CERT",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 77,
-    defaultSortOrder: 120,
-    groupKey: "JUNIORI_VETERAANI",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 120,
+    categoryCode: "JUNIORI_VETERAANI",
     isVisibleByDefault: true,
   },
   {
@@ -256,10 +355,8 @@ const SHOW_RESULT_DEFINITIONS_SERTTIMERKINNAT = [
     labelFi: "SA",
     labelSv: "CK",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 60,
-    defaultSortOrder: 170,
-    groupKey: "SERTTIMERKINTA",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 170,
+    categoryCode: "SERTTIMERKINTA",
     isVisibleByDefault: true,
   },
   {
@@ -267,10 +364,8 @@ const SHOW_RESULT_DEFINITIONS_SERTTIMERKINNAT = [
     labelFi: "KP",
     labelSv: "HP",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 55,
-    defaultSortOrder: 180,
-    groupKey: "SERTTIMERKINTA",
-    kindKey: "PALKINTOMERKINTA",
+    sortOrder: 180,
+    categoryCode: "SERTTIMERKINTA",
     isVisibleByDefault: true,
   },
 ] as const;
@@ -281,10 +376,8 @@ const SHOW_RESULT_DEFINITIONS_VALIOARVOT = [
     labelFi: "MVA",
     labelSv: "UCH",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 50,
-    defaultSortOrder: 190,
-    groupKey: "VALIOARVO",
-    kindKey: "VALIOARVOMERKINTA",
+    sortOrder: 190,
+    categoryCode: "VALIOARVO",
     isVisibleByDefault: true,
   },
   {
@@ -292,10 +385,8 @@ const SHOW_RESULT_DEFINITIONS_VALIOARVOT = [
     labelFi: "JMVA",
     labelSv: "JUCH",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 49,
-    defaultSortOrder: 200,
-    groupKey: "VALIOARVO",
-    kindKey: "VALIOARVOMERKINTA",
+    sortOrder: 200,
+    categoryCode: "VALIOARVO",
     isVisibleByDefault: true,
   },
   {
@@ -303,10 +394,8 @@ const SHOW_RESULT_DEFINITIONS_VALIOARVOT = [
     labelFi: "VMVA",
     labelSv: "VUCH",
     valueType: ShowResultValueType.FLAG,
-    defaultImportance: 48,
-    defaultSortOrder: 210,
-    groupKey: "VALIOARVO",
-    kindKey: "VALIOARVOMERKINTA",
+    sortOrder: 210,
+    categoryCode: "VALIOARVO",
     isVisibleByDefault: true,
   },
 ] as const;
@@ -317,10 +406,8 @@ const SHOW_RESULT_DEFINITIONS_SIJOITUS = [
     labelFi: "Sijoitus",
     labelSv: null,
     valueType: ShowResultValueType.NUMERIC,
-    defaultImportance: 45,
-    defaultSortOrder: 220,
-    groupKey: "SIJOITUS",
-    kindKey: "TULOS",
+    sortOrder: 220,
+    categoryCode: "SIJOITUS",
     isVisibleByDefault: true,
   },
   {
@@ -328,15 +415,14 @@ const SHOW_RESULT_DEFINITIONS_SIJOITUS = [
     labelFi: "Paras uros / paras narttu",
     labelSv: null,
     valueType: ShowResultValueType.CODE,
-    defaultImportance: 45,
-    defaultSortOrder: 230,
-    groupKey: "PUPN",
-    kindKey: "TULOS",
+    sortOrder: 230,
+    categoryCode: "PUPN",
     isVisibleByDefault: true,
   },
 ] as const;
 
 const SHOW_RESULT_DEFINITIONS = [
+  ...SHOW_RESULT_DEFINITIONS_LUOKAT,
   ...SHOW_RESULT_DEFINITIONS_LAATUARVOSTELU,
   ...SHOW_RESULT_DEFINITIONS_ROTUSIJOITUS,
   ...SHOW_RESULT_DEFINITIONS_SERTTIMERKINNAT,
@@ -347,31 +433,64 @@ const SHOW_RESULT_DEFINITIONS = [
 export async function seedShowResultDefinitions(): Promise<{
   upserted: number;
 }> {
+  const categoryIds = new Map<string, string>();
+  for (const category of SHOW_RESULT_CATEGORIES) {
+    const row = await prisma.showResultCategory.upsert({
+      where: { code: category.code },
+      create: {
+        code: category.code,
+        labelFi: category.labelFi,
+        labelSv: category.labelSv,
+        descriptionFi: category.descriptionFi,
+        descriptionSv: category.descriptionSv,
+        sortOrder: category.sortOrder,
+        isEnabled: true,
+      },
+      update: {
+        labelFi: category.labelFi,
+        labelSv: category.labelSv,
+        descriptionFi: category.descriptionFi,
+        descriptionSv: category.descriptionSv,
+        sortOrder: category.sortOrder,
+        isEnabled: true,
+      },
+      select: { id: true },
+    });
+    categoryIds.set(category.code, row.id);
+  }
+
   let upserted = 0;
 
   for (const definition of SHOW_RESULT_DEFINITIONS) {
+    const categoryId = categoryIds.get(definition.categoryCode);
+    if (!categoryId) {
+      throw new Error(
+        `Missing category for definition code=${definition.code}`,
+      );
+    }
+
     await prisma.showResultDefinition.upsert({
       where: { code: definition.code },
       create: {
         code: definition.code,
         labelFi: definition.labelFi,
         labelSv: definition.labelSv,
+        descriptionFi: null,
+        descriptionSv: null,
         valueType: definition.valueType,
-        defaultImportance: definition.defaultImportance,
-        defaultSortOrder: definition.defaultSortOrder,
-        groupKey: definition.groupKey,
-        kindKey: definition.kindKey,
+        categoryId,
+        sortOrder: definition.sortOrder,
         isVisibleByDefault: definition.isVisibleByDefault,
         isEnabled: true,
       },
       update: {
         labelFi: definition.labelFi,
         labelSv: definition.labelSv,
+        descriptionFi: null,
+        descriptionSv: null,
         valueType: definition.valueType,
-        defaultImportance: definition.defaultImportance,
-        defaultSortOrder: definition.defaultSortOrder,
-        groupKey: definition.groupKey,
-        kindKey: definition.kindKey,
+        categoryId,
+        sortOrder: definition.sortOrder,
         isVisibleByDefault: definition.isVisibleByDefault,
         isEnabled: true,
       },
