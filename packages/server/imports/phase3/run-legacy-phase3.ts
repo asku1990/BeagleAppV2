@@ -12,7 +12,10 @@ import {
 import type { ImportIssueSeverity } from "@beagle/db";
 import type { ImportRunResponse } from "@beagle/contracts";
 import type { ServiceResult } from "../../core/result";
-import { upsertShowRows } from "../internal";
+import {
+  getMissingRequiredShowDefinitionCodes,
+  upsertShowRows,
+} from "../internal";
 import { toImportRunResponse } from "../runs/transform";
 
 // Runs the legacy phase3 shows-only import using current show schema.
@@ -89,6 +92,47 @@ export async function runLegacyPhase3(
     await markImportRunRunning(run.id, auditContext);
     log("Marked run as RUNNING");
 
+    startStage("preflight");
+    const missingDefinitionCodes =
+      await getMissingRequiredShowDefinitionCodes();
+    if (missingDefinitionCodes.length > 0) {
+      const missingCodesText = missingDefinitionCodes.join(", ");
+      const message = `Missing required show result definitions: ${missingCodesText}. Run seed:show-result-definitions before phase3.`;
+      await createImportRunIssue(
+        run.id,
+        {
+          stage: "preflight",
+          severity: "ERROR",
+          code: "IMPORT_CONFIGURATION_MISSING_SHOW_DEFINITIONS",
+          message,
+        },
+        auditContext,
+      );
+      const finished = await markImportRunFinished(
+        run.id,
+        {
+          status: "FAILED",
+          dogsUpserted: 0,
+          ownersUpserted: 0,
+          ownershipsUpserted: 0,
+          trialResultsUpserted: 0,
+          showResultsUpserted: 0,
+          errorsCount: 1,
+          errorSummary: message,
+        },
+        auditContext,
+      );
+      return {
+        status: 500,
+        body: {
+          ok: false,
+          code: "IMPORT_FAILED",
+          error: `Import run failed (runId=${finished.id}): ${message}`,
+        },
+      };
+    }
+    finishStage("preflight");
+
     startStage("load");
     const showRows = await fetchLegacyShowRows({
       log: (message) => log(`[stage:load] ${message}`),
@@ -111,6 +155,7 @@ export async function runLegacyPhase3(
 
     startStage("shows");
     const showResult = await upsertShowRows(showRows, dogIdByRegistration, {
+      importRunId: run.id,
       onProgress: (processed, total) => logProgress("shows", processed, total),
     });
     showResultsUpserted = showResult.upserted;

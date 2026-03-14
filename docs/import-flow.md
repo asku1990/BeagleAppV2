@@ -35,7 +35,11 @@ Issue tooling:
 
 2. `phase2` imports trial rows using current trial schema.
 
-3. `phase3` imports show rows using current show schema (canonical show schema cutover is handled in later tasks).
+3. `phase3` imports show rows into canonical show tables (`ShowEvent`, `ShowEntry`,
+   `ShowResultItem`) using merged legacy sources (`nay9599`, `beanay`, optional
+   `nay9599_rd_ud`) plus `beanay_text` critique join.
+   Before loading legacy rows, phase3 runs a preflight check that required canonical
+   `ShowResultDefinition` codes are seeded and enabled.
 
 4. `seed:show-result-definitions` upserts canonical `ShowResultDefinition` rows used by both
    legacy and Kennelliitto workbook mappings (for example `ROP`, `VSP`, `SERT`, `VARASERT`,
@@ -77,6 +81,7 @@ CSV export is per run id. Export separate CSV sets for each phase run id.
 - shows:
   - `SHOW_REGISTRATION_INVALID_FORMAT`
   - `SHOW_EVENT_MISSING_REQUIRED_FIELDS`
+  - `IMPORT_CONFIGURATION_MISSING_SHOW_DEFINITIONS`
 
 ## Idempotency
 

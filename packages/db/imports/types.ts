@@ -59,9 +59,12 @@ export type LegacyShowResultRow = {
   eventDateRaw: string | null;
   eventPlace: string | null;
   resultText: string | null;
+  critiqueText: string | null;
+  dogName: string | null;
   heightText: string | null;
   judge: string | null;
   legacyFlag: string | null;
+  sourceTable: "nay9599" | "beanay" | "nay9599_rd_ud";
 };
 
 export type LegacySamakoiraRow = {
