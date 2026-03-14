@@ -2,7 +2,7 @@
 CREATE TYPE "ShowSourceTag" AS ENUM ('LEGACY_NAY9599', 'LEGACY_BEANAY', 'LEGACY_BEANAY_TEXT', 'WORKBOOK_KENNELLIITTO', 'MANUAL_ADMIN');
 
 -- CreateEnum
-CREATE TYPE "ShowResultValueType" AS ENUM ('FLAG', 'TEXT', 'NUMERIC', 'DATE');
+CREATE TYPE "ShowResultValueType" AS ENUM ('FLAG', 'CODE', 'TEXT', 'NUMERIC', 'DATE');
 
 -- AlterEnum
 -- This migration adds more than one value to an enum.
@@ -19,7 +19,7 @@ ALTER TYPE "ImportKind" ADD VALUE 'LEGACY_PHASE3';
 CREATE TABLE "ShowEvent" (
     "id" TEXT NOT NULL,
     "eventLookupKey" TEXT NOT NULL,
-    "idempotencyKey" TEXT NOT NULL,
+    "sourceRowHash" TEXT,
     "sourceTag" "ShowSourceTag" NOT NULL,
     "eventDate" TIMESTAMP(3) NOT NULL,
     "eventName" TEXT,
@@ -40,7 +40,7 @@ CREATE TABLE "ShowEvent" (
 CREATE TABLE "ShowEntry" (
     "id" TEXT NOT NULL,
     "entryLookupKey" TEXT NOT NULL,
-    "idempotencyKey" TEXT NOT NULL,
+    "sourceRowHash" TEXT,
     "showEventId" TEXT NOT NULL,
     "dogId" TEXT NOT NULL,
     "sourceTag" "ShowSourceTag" NOT NULL,
@@ -72,7 +72,8 @@ CREATE TABLE "ShowResultDefinition" (
     "valueType" "ShowResultValueType" NOT NULL DEFAULT 'FLAG',
     "defaultImportance" INTEGER NOT NULL DEFAULT 0,
     "defaultSortOrder" INTEGER NOT NULL DEFAULT 0,
-    "displayGroup" TEXT,
+    "groupKey" TEXT,
+    "kindKey" TEXT,
     "isVisibleByDefault" BOOLEAN NOT NULL DEFAULT true,
     "isEnabled" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -84,10 +85,12 @@ CREATE TABLE "ShowResultDefinition" (
 -- CreateTable
 CREATE TABLE "ShowResultItem" (
     "id" TEXT NOT NULL,
-    "idempotencyKey" TEXT NOT NULL,
+    "itemLookupKey" TEXT NOT NULL,
+    "sourceRowHash" TEXT,
     "showEntryId" TEXT NOT NULL,
     "definitionId" TEXT NOT NULL,
     "sourceTag" "ShowSourceTag" NOT NULL,
+    "valueCode" TEXT,
     "valueText" TEXT,
     "valueNumeric" DECIMAL(8,2),
     "valueDate" TIMESTAMP(3),
@@ -108,7 +111,7 @@ CREATE TABLE "ShowResultItem" (
 CREATE UNIQUE INDEX "ShowEvent_eventLookupKey_key" ON "ShowEvent"("eventLookupKey");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ShowEvent_idempotencyKey_key" ON "ShowEvent"("idempotencyKey");
+CREATE UNIQUE INDEX "ShowEvent_sourceRowHash_key" ON "ShowEvent"("sourceRowHash");
 
 -- CreateIndex
 CREATE INDEX "ShowEvent_eventDate_idx" ON "ShowEvent"("eventDate");
@@ -123,7 +126,7 @@ CREATE INDEX "ShowEvent_sourceTag_eventDate_idx" ON "ShowEvent"("sourceTag", "ev
 CREATE UNIQUE INDEX "ShowEntry_entryLookupKey_key" ON "ShowEntry"("entryLookupKey");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ShowEntry_idempotencyKey_key" ON "ShowEntry"("idempotencyKey");
+CREATE UNIQUE INDEX "ShowEntry_sourceRowHash_key" ON "ShowEntry"("sourceRowHash");
 
 -- CreateIndex
 CREATE INDEX "ShowEntry_showEventId_idx" ON "ShowEntry"("showEventId");
@@ -147,7 +150,10 @@ CREATE INDEX "ShowResultDefinition_isEnabled_defaultSortOrder_idx" ON "ShowResul
 CREATE INDEX "ShowResultDefinition_defaultImportance_idx" ON "ShowResultDefinition"("defaultImportance");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ShowResultItem_idempotencyKey_key" ON "ShowResultItem"("idempotencyKey");
+CREATE UNIQUE INDEX "ShowResultItem_itemLookupKey_key" ON "ShowResultItem"("itemLookupKey");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ShowResultItem_sourceRowHash_key" ON "ShowResultItem"("sourceRowHash");
 
 -- CreateIndex
 CREATE INDEX "ShowResultItem_showEntryId_idx" ON "ShowResultItem"("showEntryId");
@@ -186,7 +192,7 @@ ALTER TABLE "ShowResultItem" ADD CONSTRAINT "ShowResultItem_importRunId_fkey" FO
 COMMENT ON TABLE "ShowEvent" IS 'Näyttelytapahtuman kanoninen päätaso.';
 COMMENT ON COLUMN "ShowEvent"."id" IS 'Tapahtumarivin tekninen tunniste.';
 COMMENT ON COLUMN "ShowEvent"."eventLookupKey" IS 'Yhtenäinen tapahtuman hakutunniste.';
-COMMENT ON COLUMN "ShowEvent"."idempotencyKey" IS 'Uudelleenajoavain: estää duplikaatit.';
+COMMENT ON COLUMN "ShowEvent"."sourceRowHash" IS 'Lähderivin tiiviste duplikaattisuojaukseen.';
 COMMENT ON COLUMN "ShowEvent"."sourceTag" IS 'Lähdejärjestelmän tunniste.';
 COMMENT ON COLUMN "ShowEvent"."eventDate" IS 'Näyttelyn päivä.';
 COMMENT ON COLUMN "ShowEvent"."eventName" IS 'Näyttelyn nimi.';
@@ -203,7 +209,7 @@ COMMENT ON COLUMN "ShowEvent"."updatedAt" IS 'Päivitysaika.';
 COMMENT ON TABLE "ShowEntry" IS 'Yhden koiran osallistuminen yhteen näyttelytapahtumaan.';
 COMMENT ON COLUMN "ShowEntry"."id" IS 'Osallistumisrivin tekninen tunniste.';
 COMMENT ON COLUMN "ShowEntry"."entryLookupKey" IS 'Yhtenäinen osallistumisrivin hakutunniste.';
-COMMENT ON COLUMN "ShowEntry"."idempotencyKey" IS 'Uudelleenajoavain: estää duplikaatit.';
+COMMENT ON COLUMN "ShowEntry"."sourceRowHash" IS 'Lähderivin tiiviste duplikaattisuojaukseen.';
 COMMENT ON COLUMN "ShowEntry"."showEventId" IS 'Viittaus tapahtumaan.';
 COMMENT ON COLUMN "ShowEntry"."dogId" IS 'Viittaus koiraan.';
 COMMENT ON COLUMN "ShowEntry"."sourceTag" IS 'Lähdejärjestelmän tunniste.';
@@ -231,7 +237,8 @@ COMMENT ON COLUMN "ShowResultDefinition"."labelSv" IS 'Nimi ruotsiksi.';
 COMMENT ON COLUMN "ShowResultDefinition"."valueType" IS 'Attribuutin arvotyyppi.';
 COMMENT ON COLUMN "ShowResultDefinition"."defaultImportance" IS 'Oletustärkeys järjestystä varten.';
 COMMENT ON COLUMN "ShowResultDefinition"."defaultSortOrder" IS 'Oletuslajittelujärjestys.';
-COMMENT ON COLUMN "ShowResultDefinition"."displayGroup" IS 'Esitysryhmä UI:ssa.';
+COMMENT ON COLUMN "ShowResultDefinition"."groupKey" IS 'Ryhmittelyavain.';
+COMMENT ON COLUMN "ShowResultDefinition"."kindKey" IS 'Kategoria-avain.';
 COMMENT ON COLUMN "ShowResultDefinition"."isVisibleByDefault" IS 'Näkyykö oletuksena.';
 COMMENT ON COLUMN "ShowResultDefinition"."isEnabled" IS 'Onko määritelmä käytössä.';
 COMMENT ON COLUMN "ShowResultDefinition"."createdAt" IS 'Luontiaika.';
@@ -239,10 +246,12 @@ COMMENT ON COLUMN "ShowResultDefinition"."updatedAt" IS 'Päivitysaika.';
 
 COMMENT ON TABLE "ShowResultItem" IS 'Joustava tulosattribuutti yksittäiselle osallistumisriville.';
 COMMENT ON COLUMN "ShowResultItem"."id" IS 'Tulosattribuuttirivin tekninen tunniste.';
-COMMENT ON COLUMN "ShowResultItem"."idempotencyKey" IS 'Uudelleenajoavain: estää duplikaatit.';
+COMMENT ON COLUMN "ShowResultItem"."itemLookupKey" IS 'Yhtenäinen tulosattribuuttirivin hakutunniste.';
+COMMENT ON COLUMN "ShowResultItem"."sourceRowHash" IS 'Lähderivin tiiviste duplikaattisuojaukseen.';
 COMMENT ON COLUMN "ShowResultItem"."showEntryId" IS 'Viittaus osallistumisriviin.';
 COMMENT ON COLUMN "ShowResultItem"."definitionId" IS 'Viittaus tulosmääritelmään.';
 COMMENT ON COLUMN "ShowResultItem"."sourceTag" IS 'Lähdejärjestelmän tunniste.';
+COMMENT ON COLUMN "ShowResultItem"."valueCode" IS 'Koodiarvo.';
 COMMENT ON COLUMN "ShowResultItem"."valueText" IS 'Tekstiarvo.';
 COMMENT ON COLUMN "ShowResultItem"."valueNumeric" IS 'Numeroarvo.';
 COMMENT ON COLUMN "ShowResultItem"."valueDate" IS 'Päivämääräarvo.';
