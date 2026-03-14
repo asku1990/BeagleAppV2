@@ -2,6 +2,75 @@ import { ShowResultValueType } from "@prisma/client";
 import { prisma } from "../core/prisma";
 
 // Seeds canonical show result definitions used by both legacy and workbook imports.
+const SHOW_RESULT_DEFINITIONS_LAATUARVOSTELU = [
+  {
+    code: "ERI", // Erinomainen
+    labelFi: "ERI",
+    labelSv: null,
+    valueType: ShowResultValueType.FLAG,
+    defaultImportance: 70,
+    defaultSortOrder: 10,
+    groupKey: "LAATUARVOSTELU",
+    kindKey: "TULOS",
+    isVisibleByDefault: true,
+  },
+  {
+    code: "EH", // Erittain hyva
+    labelFi: "EH",
+    labelSv: null,
+    valueType: ShowResultValueType.FLAG,
+    defaultImportance: 60,
+    defaultSortOrder: 20,
+    groupKey: "LAATUARVOSTELU",
+    kindKey: "TULOS",
+    isVisibleByDefault: true,
+  },
+  {
+    code: "H", // Hyva
+    labelFi: "H",
+    labelSv: null,
+    valueType: ShowResultValueType.FLAG,
+    defaultImportance: 50,
+    defaultSortOrder: 30,
+    groupKey: "LAATUARVOSTELU",
+    kindKey: "TULOS",
+    isVisibleByDefault: true,
+  },
+  {
+    code: "T", // Tyydyttava
+    labelFi: "T",
+    labelSv: null,
+    valueType: ShowResultValueType.FLAG,
+    defaultImportance: 40,
+    defaultSortOrder: 40,
+    groupKey: "LAATUARVOSTELU",
+    kindKey: "TULOS",
+    isVisibleByDefault: true,
+  },
+  {
+    code: "HYL", // Hylatty
+    labelFi: "HYL",
+    labelSv: null,
+    valueType: ShowResultValueType.FLAG,
+    defaultImportance: 20,
+    defaultSortOrder: 50,
+    groupKey: "LAATUARVOSTELU",
+    kindKey: "TULOS",
+    isVisibleByDefault: true,
+  },
+  {
+    code: "EVA", // Ei voida arvostella
+    labelFi: "EVA",
+    labelSv: null,
+    valueType: ShowResultValueType.FLAG,
+    defaultImportance: 10,
+    defaultSortOrder: 60,
+    groupKey: "LAATUARVOSTELU",
+    kindKey: "TULOS",
+    isVisibleByDefault: true,
+  },
+] as const;
+
 const SHOW_RESULT_DEFINITIONS_ROTUSIJOITUS = [
   {
     code: "ROP", // Rotunsa paras
@@ -268,6 +337,7 @@ const SHOW_RESULT_DEFINITIONS_SIJOITUS = [
 ] as const;
 
 const SHOW_RESULT_DEFINITIONS = [
+  ...SHOW_RESULT_DEFINITIONS_LAATUARVOSTELU,
   ...SHOW_RESULT_DEFINITIONS_ROTUSIJOITUS,
   ...SHOW_RESULT_DEFINITIONS_SERTTIMERKINNAT,
   ...SHOW_RESULT_DEFINITIONS_VALIOARVOT,

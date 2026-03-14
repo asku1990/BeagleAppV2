@@ -278,6 +278,7 @@ model ShowEvent {
   sourceTag ShowSourceTag // Lähdejärjestelmän tunniste.
   eventDate DateTime // Näyttelyn päivä.
   eventName String? // Näyttelyn nimi.
+  eventCity String? // Näyttelyn paikkakunta.
   eventPlace String // Näyttelyn paikka.
   eventType String? // Näyttelytyyppi.
   organizer String? // Järjestäjä.
@@ -307,7 +308,7 @@ model ShowEntry {
 
   // links
   showEventId String // Viittaus tapahtumaan.
-  dogId String // Viittaus koiraan.
+  dogId String? // Viittaus koiraan.
 
   // entry core
   sourceTag ShowSourceTag // Lähdejärjestelmän tunniste.
@@ -329,7 +330,7 @@ model ShowEntry {
 
   // relations / timestamps
   showEvent ShowEvent @relation(fields: [showEventId], references: [id], onDelete: Cascade) // Relaatio tapahtumaan.
-  dog Dog @relation(fields: [dogId], references: [id], onDelete: Cascade) // Relaatio koiraan.
+  dog Dog? @relation(fields: [dogId], references: [id], onDelete: SetNull) // Relaatio koiraan.
   importRun ImportRun? @relation(fields: [importRunId], references: [id], onDelete: SetNull) // Relaatio import-ajoon.
   resultItems ShowResultItem[] // Joustavat tulosattribuutit/palkinnot.
   createdAt DateTime @default(now()) // Luontiaika.

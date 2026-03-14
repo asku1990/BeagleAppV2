@@ -23,6 +23,7 @@ CREATE TABLE "ShowEvent" (
     "sourceTag" "ShowSourceTag" NOT NULL,
     "eventDate" TIMESTAMP(3) NOT NULL,
     "eventName" TEXT,
+    "eventCity" TEXT,
     "eventPlace" TEXT NOT NULL,
     "eventType" TEXT,
     "organizer" TEXT,
@@ -42,7 +43,7 @@ CREATE TABLE "ShowEntry" (
     "entryLookupKey" TEXT NOT NULL,
     "sourceRowHash" TEXT,
     "showEventId" TEXT NOT NULL,
-    "dogId" TEXT NOT NULL,
+    "dogId" TEXT,
     "sourceTag" "ShowSourceTag" NOT NULL,
     "registrationNoSnapshot" TEXT NOT NULL,
     "dogNameSnapshot" TEXT NOT NULL,
@@ -174,7 +175,7 @@ ALTER TABLE "ShowEvent" ADD CONSTRAINT "ShowEvent_importRunId_fkey" FOREIGN KEY 
 ALTER TABLE "ShowEntry" ADD CONSTRAINT "ShowEntry_showEventId_fkey" FOREIGN KEY ("showEventId") REFERENCES "ShowEvent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ShowEntry" ADD CONSTRAINT "ShowEntry_dogId_fkey" FOREIGN KEY ("dogId") REFERENCES "Dog"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ShowEntry" ADD CONSTRAINT "ShowEntry_dogId_fkey" FOREIGN KEY ("dogId") REFERENCES "Dog"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ShowEntry" ADD CONSTRAINT "ShowEntry_importRunId_fkey" FOREIGN KEY ("importRunId") REFERENCES "ImportRun"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -196,6 +197,7 @@ COMMENT ON COLUMN "ShowEvent"."sourceRowHash" IS 'Lähderivin tiiviste duplikaat
 COMMENT ON COLUMN "ShowEvent"."sourceTag" IS 'Lähdejärjestelmän tunniste.';
 COMMENT ON COLUMN "ShowEvent"."eventDate" IS 'Näyttelyn päivä.';
 COMMENT ON COLUMN "ShowEvent"."eventName" IS 'Näyttelyn nimi.';
+COMMENT ON COLUMN "ShowEvent"."eventCity" IS 'Näyttelyn paikkakunta.';
 COMMENT ON COLUMN "ShowEvent"."eventPlace" IS 'Näyttelyn paikka.';
 COMMENT ON COLUMN "ShowEvent"."eventType" IS 'Näyttelytyyppi.';
 COMMENT ON COLUMN "ShowEvent"."organizer" IS 'Järjestäjä.';
