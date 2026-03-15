@@ -44,7 +44,15 @@ Before writing canonical rows, phase3 runs source token coverage preflight:
 - no unmapped `TULNI` tokens after normalization and alias mapping
 - no parser-produced definition codes missing from enabled `ShowResultDefinition` rows
 
-Phase3 fails fast with:
+Default behavior:
+
+- preflight writes issue rows and phase3 continues to write canonical rows.
+
+Strict behavior (fail-fast):
+
+- set `IMPORT_PHASE3_STRICT_SOURCE_COVERAGE=1` to fail run on coverage gaps.
+
+Coverage issue code:
 
 - `IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS`
 
@@ -120,8 +128,8 @@ Pattern mappings:
 
 Coverage rule:
 
-- Any remaining unmapped token fails source preflight with `IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS`.
-- On failure, preflight writes:
+- Any remaining unmapped token creates `IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS`.
+- Preflight writes:
   - one aggregate issue (`IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS`)
   - per-token issue rows (`SHOW_RESULT_TOKEN_UNMAPPED`, stage `preflight-source`)
   - per-missing-definition issue rows (`SHOW_RESULT_DEFINITION_NOT_FOUND`, stage `preflight-source`)

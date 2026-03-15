@@ -29,6 +29,8 @@ export async function runLegacyPhase3(
     source: options?.auditSource ?? "SYSTEM",
   };
   const stageStartedAt = new Map<string, number>();
+  const strictSourceCoverage =
+    process.env.IMPORT_PHASE3_STRICT_SOURCE_COVERAGE === "1";
   const startStage = (name: string) => {
     stageStartedAt.set(name, Date.now());
     log(`[stage:${name}] start`);
@@ -103,11 +105,16 @@ export async function runLegacyPhase3(
       coverageReport.missingDefinitionCodes.length > 0
     ) {
       const unmappedTop = coverageReport.unmapped.slice(0, 20);
-      const message = `Show source coverage failed: unmappedDistinctTokens=${coverageReport.unmapped.length}, unmappedOccurrences=${coverageReport.unmappedOccurrences}, missingDefinitionCodes=${coverageReport.missingDefinitionCodes.length}.`;
+      const message = strictSourceCoverage
+        ? `Show source coverage failed: unmappedDistinctTokens=${coverageReport.unmapped.length}, unmappedOccurrences=${coverageReport.unmappedOccurrences}, missingDefinitionCodes=${coverageReport.missingDefinitionCodes.length}.`
+        : `Show source coverage has gaps (continuing): unmappedDistinctTokens=${coverageReport.unmapped.length}, unmappedOccurrences=${coverageReport.unmappedOccurrences}, missingDefinitionCodes=${coverageReport.missingDefinitionCodes.length}.`;
+      const preflightSeverity: ImportIssueSeverity = strictSourceCoverage
+        ? "ERROR"
+        : "WARNING";
       const detailedPreflightIssues = [
         ...coverageReport.unmapped.map((item) => ({
           stage: "preflight-source" as const,
-          severity: "ERROR" as const,
+          severity: preflightSeverity,
           code: "SHOW_RESULT_TOKEN_UNMAPPED",
           message: `Unmapped source token=${item.token}, occurrences=${item.count}.`,
           registrationNo: item.samples[0]?.registrationNo ?? null,
@@ -120,7 +127,7 @@ export async function runLegacyPhase3(
         })),
         ...coverageReport.missingDefinitionCodes.map((code) => ({
           stage: "preflight-source" as const,
-          severity: "ERROR" as const,
+          severity: preflightSeverity,
           code: "SHOW_RESULT_DEFINITION_NOT_FOUND",
           message: `Definition code missing from enabled ShowResultDefinition rows: ${code}.`,
           registrationNo: null,
@@ -139,7 +146,7 @@ export async function runLegacyPhase3(
         run.id,
         {
           stage: "preflight-source",
-          severity: "ERROR",
+          severity: preflightSeverity,
           code: "IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS",
           message,
           payloadJson: JSON.stringify({
@@ -153,28 +160,30 @@ export async function runLegacyPhase3(
         },
         auditContext,
       );
-      const finished = await markImportRunFinished(
-        run.id,
-        {
-          status: "FAILED",
-          dogsUpserted: 0,
-          ownersUpserted: 0,
-          ownershipsUpserted: 0,
-          trialResultsUpserted: 0,
-          showResultsUpserted: 0,
-          errorsCount: 1,
-          errorSummary: message,
-        },
-        auditContext,
-      );
-      return {
-        status: 500,
-        body: {
-          ok: false,
-          code: "IMPORT_FAILED",
-          error: `Import run failed (runId=${finished.id}): ${message}`,
-        },
-      };
+      if (strictSourceCoverage) {
+        const finished = await markImportRunFinished(
+          run.id,
+          {
+            status: "FAILED",
+            dogsUpserted: 0,
+            ownersUpserted: 0,
+            ownershipsUpserted: 0,
+            trialResultsUpserted: 0,
+            showResultsUpserted: 0,
+            errorsCount: 1,
+            errorSummary: message,
+          },
+          auditContext,
+        );
+        return {
+          status: 500,
+          body: {
+            ok: false,
+            code: "IMPORT_FAILED",
+            error: `Import run failed (runId=${finished.id}): ${message}`,
+          },
+        };
+      }
     }
     finishStage("preflight-source");
 
