@@ -157,9 +157,6 @@ export async function upsertShowRows(
         sourceTag,
         registrationNoSnapshot: registrationNo,
         dogNameSnapshot: normalizeNullable(row.dogName) ?? registrationNo,
-        className: parsed.className,
-        qualityGrade: parsed.qualityGrade,
-        placement: parsed.placement,
         judge: normalizeNullable(row.judge),
         heightText: normalizeNullable(row.heightText),
         critiqueText: normalizeNullable(row.critiqueText),
@@ -182,9 +179,6 @@ export async function upsertShowRows(
         dogId,
         sourceTag,
         dogNameSnapshot: normalizeNullable(row.dogName) ?? registrationNo,
-        className: parsed.className,
-        qualityGrade: parsed.qualityGrade,
-        placement: parsed.placement,
         judge: normalizeNullable(row.judge),
         heightText: normalizeNullable(row.heightText),
         critiqueText: normalizeNullable(row.critiqueText),
@@ -210,21 +204,6 @@ export async function upsertShowRows(
       issues.push({
         code: "SHOW_RESULT_TOKEN_UNMAPPED",
         message: `Unmapped show result token=${token}.`,
-        registrationNo,
-        sourceTable: row.sourceTable,
-        payloadJson: JSON.stringify({
-          token,
-          entryLookupKey,
-          resultTextRaw: rawResultText,
-          resultTextNormalized: parsed.normalizedResultText,
-        }),
-      });
-    }
-
-    for (const token of parsed.ignoredTokens) {
-      issues.push({
-        code: "SHOW_RESULT_TOKEN_IGNORED_NON_SHOW",
-        message: `Ignored non-show token=${token}.`,
         registrationNo,
         sourceTable: row.sourceTable,
         payloadJson: JSON.stringify({

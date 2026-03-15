@@ -1,5 +1,4 @@
 export const CLASS_CODES = new Set([
-  "BAB",
   "PEN",
   "JUN",
   "NUO",
@@ -46,7 +45,6 @@ export const QUALITY_BY_DIGIT: Record<string, string> = {
 };
 
 export const CLASS_ALIASES: Record<string, string> = {
-  BAB: "BAB",
   PEN: "PEN",
   JUN: "JUN",
   JU: "JUN",
@@ -104,40 +102,3 @@ export const TOKEN_ALIAS_TO_CANONICAL: Record<string, string> = {
   JCACIB: "CACIB_J",
   JMV: "JMVA",
 };
-
-export const IGNORED_TOKEN_KEYS = new Set([
-  "KK",
-  "S",
-  "KESKIKOK",
-  "JAK",
-  "KOOKAS",
-  "J",
-  "JR",
-  "JV",
-  "VRO",
-  "JSE",
-  "KUK1",
-  "NUJ1",
-  "AVO11",
-  "NU01",
-  "OU1",
-  "OU2",
-  "PN1SA",
-  "CACIT",
-  "YLÄRAJ",
-  "YLARAJ",
-  "PURENTA",
-  "ARKA",
-  "HYVIN",
-  "SUURI",
-  "N",
-  "SERTK",
-  "KUMAK",
-  "KUPI",
-  "ALAPURENTA",
-  "2",
-  "5",
-  "42",
-  "3738",
-  "VETSE",
-]);

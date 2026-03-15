@@ -108,23 +108,26 @@ Alias -> canonical:
 Pattern mappings:
 
 - `PU1`, `PU2`, `PN1`, ... -> definition `PUPN`, `valueCode=<token>`
-- legacy class+quality digit:
-  - `JUN1` -> `className=JUN`, quality `ERI`
-  - `NUO2` -> `className=NUO`, quality `EH`
+- legacy class+quality digit (`JUN1`, `NUO2`, `AVO1`, `KÄY1`, `VAL1`, `VET1`):
+  - parsed only when `eventDate >= 2003-01-01`
+  - produces class + quality items (for example `JUN` + `ERI`)
   - digit map: `1=ERI`, `2=EH`, `3=H`, `4=T`, `5=EVA`, `6=HYL`
+  - for dates before `2003-01-01`, these tokens are left as legacy text and are
+    not converted to quality items
 - class placement with `K`:
   - `JUK1`, `NUK1`, `AVK1`, `KÄK1`, `VEK1`, `VAK1`, `VALK1`, `AVOK1`
-  - sets `className`, `placement`, and creates `SIJOITUS` item (`valueNumeric`)
-- class aliases accepted for `className`:
+  - produces class item + `SIJOITUS` item (`valueNumeric`)
+  - never creates quality item through fallback from these tokens
+- class aliases accepted for class mapping:
   - `JU` -> `JUN`
   - `AVK` -> `AVO`
   - `VEK` -> `VET`
 - class placement without `K` (zero cases):
   - `JUN0`, `NUO0`, `AVO0`, `KÄY0`, `VET0`
-  - sets `className`, `placement=0`, and creates `SIJOITUS` item
+  - produces class item + `SIJOITUS` item (`valueNumeric=0`)
 - quality+placement:
   - `ERI1`, `EH2`, `H3`, `T4`, `EVA5`, `HYL6`
-  - sets quality + placement, and placement also writes `SIJOITUS`
+  - sets quality and writes `SIJOITUS` (`valueNumeric` from suffix)
 
 Coverage rule:
 
@@ -134,23 +137,11 @@ Coverage rule:
   - per-token issue rows (`SHOW_RESULT_TOKEN_UNMAPPED`, stage `preflight-source`)
   - per-missing-definition issue rows (`SHOW_RESULT_DEFINITION_NOT_FOUND`, stage `preflight-source`)
 
-Ignored non-show / unresolved tokens (written as warning issues, not blocking preflight):
-
-- Prefix rules: `AGI*`, `TOKO*`
-- Explicit ignored tokens:
-  - `KK`, `S`, `KESKIKOK`, `JAK`, `KOOKAS`, `J`
-  - `JR`, `JV`, `VRO`, `JSE`
-  - `KUK1`, `NUJ1`, `AVO11`, `NU01`, `OU1`, `OU2`, `PN1SA`
-  - `CACIT`, `YLÄRAJ`, `SERTK`, `KUMAK`, `KUPI`, `VETSE`
-  - `PURENTA`, `ARKA`, `HYVIN`, `SUURI`, `N`
-  - `2`, `5`, `42`, `37-38`
-
 ## Issue codes
 
 - `SHOW_REGISTRATION_INVALID_FORMAT`
 - `SHOW_EVENT_MISSING_REQUIRED_FIELDS`
 - `SHOW_RESULT_TOKEN_UNMAPPED`
-- `SHOW_RESULT_TOKEN_IGNORED_NON_SHOW`
 - `SHOW_RESULT_DEFINITION_NOT_FOUND`
 - `IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS`
 - run-level fallback: `UNEXPECTED_EXCEPTION`

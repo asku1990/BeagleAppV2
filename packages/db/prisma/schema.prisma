@@ -314,9 +314,6 @@ model ShowEntry {
   sourceTag              ShowSourceTag // Lähdejärjestelmän tunniste.
   registrationNoSnapshot String // Rekisterinumeron snapshot import-hetkellä.
   dogNameSnapshot        String // Koiran nimen snapshot import-hetkellä.
-  className              String? // Näyttelyluokka.
-  qualityGrade           String? // Laatuluokka.
-  placement              String? // Sijoitus.
   judge                  String? // Tuomari.
   heightText             String? // Korkeustieto tekstimuodossa.
   critiqueText           String?       @db.Text // Arvosteluteksti.

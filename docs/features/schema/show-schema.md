@@ -54,9 +54,6 @@ erDiagram
 - Snapshot and parsed fields:
   - `registrationNoSnapshot`
   - `dogNameSnapshot`
-  - `className`
-  - `qualityGrade`
-  - `placement`
   - `judge`
   - `heightText`
   - `critiqueText`
@@ -201,9 +198,6 @@ Canonical event + entry + items mapping example:
     "dogId": "cmmqkruyg39zgwdl9hfvn6qq7",
     "registrationNoSnapshot": "FI43443/17",
     "dogNameSnapshot": "VUOPAJAN WONKALE",
-    "className": null,
-    "qualityGrade": null,
-    "placement": null,
     "judge": "TSCHOKKINEN JETTA",
     "sourceTable": "nay9599",
     "sourceRef": "FI43443/17|2023-04-22|Pello",
@@ -222,6 +216,9 @@ Canonical event + entry + items mapping example:
 Notes:
 
 - This concrete row has one item only: definition `H` with `isAwarded=true`.
+- Class and quality are modeled via `ShowResultItem` definitions (for example
+  `JUN`, `NUO`, `AVO`, `KÄY`, `VAL`, `VET`, `ERI`, `EH`) instead of dedicated
+  `ShowEntry` columns.
 - `PUPN` still stays as one definition in this schema, and rank goes to
   `valueCode` (`PU1`, `PN2`) when that result exists in source data.
 - If dog is not found locally, entry is still accepted (`dogId = null`).

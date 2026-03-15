@@ -3,7 +3,6 @@ import {
   CLASS_ALIASES,
   CLASS_CODES,
   FLAG_TOKEN_CODES,
-  IGNORED_TOKEN_KEYS,
   QUALITY_BY_DIGIT,
   QUALITY_CODES,
   TOKEN_ALIAS_TO_CANONICAL,
@@ -25,7 +24,6 @@ export type ParsedShowResult = {
   placement: string | null;
   items: ParsedShowResultItem[];
   unmappedTokens: string[];
-  ignoredTokens: string[];
 };
 
 function stripToken(value: string): string {
@@ -145,15 +143,6 @@ function canonicalizeAwardToken(token: string): string | null {
   return TOKEN_ALIAS_TO_CANONICAL[stripToken(upper)] ?? null;
 }
 
-function isIgnoredToken(token: string): boolean {
-  const upper = token.toUpperCase();
-  const stripped = stripToken(upper);
-  if (stripped.startsWith("AGI")) return true;
-  if (stripped.startsWith("TOKO")) return true;
-  if (/^[A-Z]{2}\d+\/\d{2,4}$/.test(upper)) return true;
-  return IGNORED_TOKEN_KEYS.has(upper) || IGNORED_TOKEN_KEYS.has(stripped);
-}
-
 function dedupeParsedItems(
   items: ParsedShowResultItem[],
 ): ParsedShowResultItem[] {
@@ -172,6 +161,7 @@ export function parseShowResultText(
   rawResultText: string | null,
   eventDateIsoDate: string,
 ): ParsedShowResult {
+  const allowLegacyClassQuality = eventDateIsoDate >= "2003-01-01";
   const normalizedResultText = normalizeShowResult(
     rawResultText,
     eventDateIsoDate,
@@ -182,7 +172,7 @@ export function parseShowResultText(
 
   const classQualityMatch = normalizedResultText
     ? normalizedResultText.match(
-        /\b(BAB|PEN|JUN|NUO|AVO|KÄY|KAY|VAL|VET)[-\s]+(ERI|EH|H|T|EVA|HYL)\b/i,
+        /\b(PEN|JUN|NUO|AVO|KÄY|KAY|VAL|VET)[-\s]+(ERI|EH|H|T|EVA|HYL)\b/i,
       )
     : null;
 
@@ -192,7 +182,6 @@ export function parseShowResultText(
   let qualityGrade = classQualityMatch?.[2]?.toUpperCase() ?? null;
   let placement: string | null = null;
   const unmappedTokens: string[] = [];
-  const ignoredTokens: string[] = [];
   const items: ParsedShowResultItem[] = [];
 
   for (const token of tokens) {
@@ -224,18 +213,20 @@ export function parseShowResultText(
       handled = true;
     }
 
-    const legacyClassQuality = parseLegacyClassQualityToken(upperToken);
-    if (legacyClassQuality) {
-      className = className ?? legacyClassQuality.className;
-      qualityGrade = qualityGrade ?? legacyClassQuality.qualityGrade;
-      items.push({
-        definitionCode: legacyClassQuality.qualityGrade,
-        valueCode: null,
-        valueNumeric: null,
-        isAwarded: true,
-        token: upperToken,
-      });
-      handled = true;
+    if (allowLegacyClassQuality && !classPlacement) {
+      const legacyClassQuality = parseLegacyClassQualityToken(upperToken);
+      if (legacyClassQuality) {
+        className = className ?? legacyClassQuality.className;
+        qualityGrade = qualityGrade ?? legacyClassQuality.qualityGrade;
+        items.push({
+          definitionCode: legacyClassQuality.qualityGrade,
+          valueCode: null,
+          valueNumeric: null,
+          isAwarded: true,
+          token: upperToken,
+        });
+        handled = true;
+      }
     }
 
     const qualityPlacement = parseQualityPlacementToken(upperToken);
@@ -264,11 +255,6 @@ export function parseShowResultText(
       handled = true;
     }
 
-    if (!handled && isIgnoredToken(upperToken)) {
-      ignoredTokens.push(upperToken);
-      handled = true;
-    }
-
     if (!handled) unmappedTokens.push(upperToken);
   }
 
@@ -282,6 +268,26 @@ export function parseShowResultText(
     });
   }
 
+  if (className) {
+    items.push({
+      definitionCode: className,
+      valueCode: null,
+      valueNumeric: null,
+      isAwarded: true,
+      token: "CLASS",
+    });
+  }
+
+  if (qualityGrade) {
+    items.push({
+      definitionCode: qualityGrade,
+      valueCode: null,
+      valueNumeric: null,
+      isAwarded: true,
+      token: "QUALITY",
+    });
+  }
+
   return {
     normalizedResultText,
     tokens,
@@ -290,6 +296,5 @@ export function parseShowResultText(
     placement,
     items: dedupeParsedItems(items),
     unmappedTokens: [...new Set(unmappedTokens)],
-    ignoredTokens: [...new Set(ignoredTokens)],
   };
 }

@@ -47,9 +47,6 @@ CREATE TABLE "ShowEntry" (
     "sourceTag" "ShowSourceTag" NOT NULL,
     "registrationNoSnapshot" TEXT NOT NULL,
     "dogNameSnapshot" TEXT NOT NULL,
-    "className" TEXT,
-    "qualityGrade" TEXT,
-    "placement" TEXT,
     "judge" TEXT,
     "heightText" TEXT,
     "critiqueText" TEXT,
@@ -240,9 +237,6 @@ COMMENT ON COLUMN "ShowEntry"."dogId" IS 'Viittaus koiraan.';
 COMMENT ON COLUMN "ShowEntry"."sourceTag" IS 'Lähdejärjestelmän tunniste.';
 COMMENT ON COLUMN "ShowEntry"."registrationNoSnapshot" IS 'Rekisterinumeron snapshot import-hetkellä.';
 COMMENT ON COLUMN "ShowEntry"."dogNameSnapshot" IS 'Koiran nimen snapshot import-hetkellä.';
-COMMENT ON COLUMN "ShowEntry"."className" IS 'Näyttelyluokka.';
-COMMENT ON COLUMN "ShowEntry"."qualityGrade" IS 'Laatuluokka.';
-COMMENT ON COLUMN "ShowEntry"."placement" IS 'Sijoitus.';
 COMMENT ON COLUMN "ShowEntry"."judge" IS 'Tuomari.';
 COMMENT ON COLUMN "ShowEntry"."heightText" IS 'Korkeustieto tekstimuodossa.';
 COMMENT ON COLUMN "ShowEntry"."critiqueText" IS 'Arvosteluteksti.';

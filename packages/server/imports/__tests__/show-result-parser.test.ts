@@ -44,6 +44,60 @@ describe("parseShowResultText", () => {
     expect(parsed.qualityGrade).toBe("EH");
     expect(parsed.placement).toBe("1");
     expect(parsed.unmappedTokens).toEqual([]);
+    const qualityCodes = parsed.items
+      .filter((item) =>
+        ["ERI", "EH", "H", "T", "EVA", "HYL"].includes(item.definitionCode),
+      )
+      .map((item) => item.definitionCode);
+    expect(qualityCodes).toContain("EH");
+    expect(qualityCodes).not.toContain("ERI");
+  });
+
+  it("parses NUO-EH,NUK1 without creating fallback ERI", () => {
+    const parsed = parseShowResultText("NUO-EH,NUK1", "2023-04-22");
+
+    expect(parsed.className).toBe("NUO");
+    expect(parsed.qualityGrade).toBe("EH");
+    expect(parsed.placement).toBe("1");
+    expect(parsed.unmappedTokens).toEqual([]);
+    const qualityCodes = parsed.items
+      .filter((item) =>
+        ["ERI", "EH", "H", "T", "EVA", "HYL"].includes(item.definitionCode),
+      )
+      .map((item) => item.definitionCode);
+    expect(qualityCodes).toContain("EH");
+    expect(qualityCodes).not.toContain("ERI");
+  });
+
+  it("treats VAK1 and VAKL1 as class placement only", () => {
+    const vak = parseShowResultText("VAK1", "2023-04-22");
+    const vakl = parseShowResultText("VAKL1", "2023-04-22");
+
+    expect(vak.className).toBe("VAL");
+    expect(vak.placement).toBe("1");
+    expect(vak.qualityGrade).toBeNull();
+    expect(vak.items.some((item) => item.definitionCode === "ERI")).toBe(false);
+
+    expect(vakl.className).toBe("VAL");
+    expect(vakl.placement).toBe("1");
+    expect(vakl.qualityGrade).toBeNull();
+    expect(vakl.items.some((item) => item.definitionCode === "ERI")).toBe(
+      false,
+    );
+  });
+
+  it("applies legacy class+digit conversion only from 2003-01-01 onward", () => {
+    const preGate = parseShowResultText("NUO1", "2002-12-31");
+    const postGate = parseShowResultText("NUO1", "2003-01-01");
+
+    expect(preGate.qualityGrade).toBeNull();
+    expect(preGate.items.some((item) => item.definitionCode === "ERI")).toBe(
+      false,
+    );
+    expect(postGate.qualityGrade).toBe("ERI");
+    expect(postGate.items.some((item) => item.definitionCode === "ERI")).toBe(
+      true,
+    );
   });
 
   it("parses class placement starting from zero (AVO0)", () => {
@@ -143,28 +197,25 @@ describe("parseShowResultText", () => {
     expect(defCodes).toContain("KP");
     expect(parsed.className).toBe("JUN");
     expect(parsed.placement).toBe("2");
-    expect(parsed.ignoredTokens).toContain("FI59100/21");
-    expect(parsed.unmappedTokens).toEqual([]);
+    expect(parsed.unmappedTokens).toContain("FI59100/21");
   });
 
-  it("marks configured non-show tokens as ignored", () => {
+  it("reports non-show tokens as unmapped", () => {
     const parsed = parseShowResultText(
       "KK S KESKIKOK JAK KOOKAS J AGI-VOI0 TOKO-ALO3 CACIT YLÄRAJ SERTK KUMAK KUPI AGI-ALO3 ALAPURENTA 2 5 42 37-38 VETSE JR JV VRO JSE KUK1 NUJ1 AVO11 NU01 OU1 OU2 PN1SA PURENTA ARKA HYVIN SUURI N",
       "2023-04-22",
     );
-    expect(parsed.unmappedTokens).toEqual([]);
-    expect(parsed.ignoredTokens.length).toBeGreaterThan(0);
-    expect(parsed.ignoredTokens).toContain("KK");
-    expect(parsed.ignoredTokens).toContain("CACIT");
-    expect(parsed.ignoredTokens).toContain("VETSE");
-    expect(parsed.ignoredTokens).toContain("TOKO-ALO3");
-    expect(parsed.ignoredTokens).toContain("JR");
+    expect(parsed.unmappedTokens.length).toBeGreaterThan(0);
+    expect(parsed.unmappedTokens).toContain("KK");
+    expect(parsed.unmappedTokens).toContain("CACIT");
+    expect(parsed.unmappedTokens).toContain("VETSE");
+    expect(parsed.unmappedTokens).toContain("TOKO-ALO3");
+    expect(parsed.unmappedTokens).toContain("JR");
   });
 
   it("reports unknown tokens as unmapped", () => {
     const parsed = parseShowResultText("FOOBAR SA", "2023-04-22");
     expect(parsed.unmappedTokens).toContain("FOOBAR");
-    expect(parsed.ignoredTokens).toEqual([]);
     expect(parsed.items.some((item) => item.definitionCode === "SA")).toBe(
       true,
     );
