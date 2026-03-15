@@ -72,15 +72,6 @@ const SHOW_RESULT_CATEGORIES = [
 
 const SHOW_RESULT_DEFINITIONS_LUOKAT = [
   {
-    code: "BAB", // Baby-luokka
-    labelFi: "Baby-luokka",
-    labelSv: null,
-    valueType: ShowResultValueType.CODE,
-    sortOrder: 10,
-    categoryCode: "LUOKKA",
-    isVisibleByDefault: false,
-  },
-  {
     code: "PEN", // Pentuluokka
     labelFi: "Pentuluokka",
     labelSv: null,

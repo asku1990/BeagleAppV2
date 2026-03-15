@@ -1,20 +1,17 @@
 import { prisma, type LegacyShowResultRow } from "@beagle/db";
-import { createHash } from "node:crypto";
 import {
   isValidRegistrationNo,
   normalizeNullable,
   normalizeRegistrationNo,
   parseLegacyDate,
 } from "../core";
-import { normalizeShowResult } from "../../shows/core";
+import { parseShowResultText } from "./show-result-parser";
 import { toEventSourceDatePart } from "./date-key";
-
-type ShowSourceTagValue =
-  | "LEGACY_NAY9599"
-  | "LEGACY_BEANAY"
-  | "LEGACY_BEANAY_TEXT"
-  | "WORKBOOK_KENNELLIITTO"
-  | "MANUAL_ADMIN";
+import {
+  normalizePlaceKey,
+  sourceHash,
+  toSourceTag,
+} from "./show-import-helpers";
 
 type EventUpsertResult = {
   upserted: number;
@@ -27,37 +24,6 @@ type EventUpsertResult = {
     payloadJson: string;
   }>;
 };
-
-const REQUIRED_SHOW_DEFINITION_CODES = [
-  "ERI",
-  "EH",
-  "H",
-  "T",
-  "EVA",
-  "HYL",
-  "PUPN",
-  "SIJOITUS",
-  "ROP",
-  "VSP",
-  "SA",
-  "KP",
-  "SERT",
-  "VARASERT",
-  "CACIB",
-  "VARACACIB",
-] as const;
-
-export async function getMissingRequiredShowDefinitionCodes(): Promise<
-  string[]
-> {
-  const requiredCodes = [...REQUIRED_SHOW_DEFINITION_CODES];
-  const existing = await prisma.showResultDefinition.findMany({
-    where: { code: { in: requiredCodes }, isEnabled: true },
-    select: { code: true },
-  });
-  const existingCodes = new Set(existing.map((row) => row.code));
-  return requiredCodes.filter((code) => !existingCodes.has(code));
-}
 
 export async function upsertShowRows(
   rows: LegacyShowResultRow[],
@@ -75,82 +41,11 @@ export async function upsertShowRows(
     definitionRows.map((row) => [row.code.toUpperCase(), row.id]),
   );
 
-  const CLASS_CODES = new Set([
-    "BAB",
-    "PEN",
-    "JUN",
-    "NUO",
-    "AVO",
-    "KÄY",
-    "KAY",
-    "VAL",
-    "VET",
-  ]);
-  const QUALITY_CODES = new Set(["ERI", "EH", "H", "T", "EVA", "HYL"]);
-  const FLAG_TOKEN_CODES = new Set([
-    "ROP",
-    "VSP",
-    "SA",
-    "KP",
-    "SERT",
-    "VARASERT",
-    "CACIB",
-    "VARACACIB",
-    "NORD_SERT",
-    "NORD_VARASERT",
-    "JUN_SERT",
-    "VET_SERT",
-    "CACIB_J",
-    "CACIB_V",
-    "JUN_ROP",
-    "JUN_VSP",
-    "VET_ROP",
-    "VET_VSP",
-    "MVA",
-    "JMVA",
-    "VMVA",
-  ]);
-
-  const normalizePlaceKey = (value: string) =>
-    value.normalize("NFKC").trim().replace(/\s+/g, " ").toUpperCase();
-  const toSourceTag = (
-    table: LegacyShowResultRow["sourceTable"],
-  ): ShowSourceTagValue =>
-    table === "beanay"
-      ? "LEGACY_BEANAY"
-      : table === "nay9599_rd_ud"
-        ? "LEGACY_NAY9599"
-        : "LEGACY_NAY9599";
-  const tokenToDefinitionCode = (token: string): string | null => {
-    const normalized = token.toUpperCase();
-    if (FLAG_TOKEN_CODES.has(normalized)) return normalized;
-    if (QUALITY_CODES.has(normalized)) return normalized;
-    if (/^(PU|PN)\d+$/.test(normalized)) return "PUPN";
-    return null;
-  };
-  const tokenizeResult = (value: string): string[] =>
-    value
-      .replace(/[;]+/g, ",")
-      .split(",")
-      .flatMap((segment) => segment.split(/\s+/))
-      .map((token) =>
-        token.trim().replace(/^[^A-Za-zÅÄÖ0-9]+|[^A-Za-zÅÄÖ0-9]+$/g, ""),
-      )
-      .filter((token) => token.length > 0);
-  const sourceHash = (value: string) =>
-    createHash("sha256").update(value, "utf8").digest("hex");
-
   const total = rows.length;
   let upserted = 0;
   let errors = 0;
   let processed = 0;
-  const issues: Array<{
-    code: string;
-    message: string;
-    registrationNo: string | null;
-    sourceTable: string;
-    payloadJson: string;
-  }> = [];
+  const issues: EventUpsertResult["issues"] = [];
 
   for (const row of rows) {
     processed += 1;
@@ -168,9 +63,7 @@ export async function upsertShowRows(
           eventDateRaw: row.eventDateRaw,
         }),
       });
-      if (processed % 1000 === 0) {
-        options?.onProgress?.(processed, total);
-      }
+      if (processed % 1000 === 0) options?.onProgress?.(processed, total);
       continue;
     }
 
@@ -192,23 +85,17 @@ export async function upsertShowRows(
           eventDateRaw: row.eventDateRaw,
         }),
       });
-      if (processed % 1000 === 0) {
-        options?.onProgress?.(processed, total);
-      }
+      if (processed % 1000 === 0) options?.onProgress?.(processed, total);
       continue;
     }
 
     const normalizedEventDate = toEventSourceDatePart(eventDate);
-    const normalizedEventPlaceKey = normalizePlaceKey(eventPlace);
     const sourceTag = toSourceTag(row.sourceTable);
-    const eventLookupKey = `${normalizedEventDate}|${normalizedEventPlaceKey}`;
+    const eventLookupKey = `${normalizedEventDate}|${normalizePlaceKey(eventPlace)}`;
     const entryLookupKey = `${registrationNo}|${eventLookupKey}`;
     const sourceRef = `${registrationNo}|${normalizedEventDate}|${eventPlace}`;
     const rawResultText = normalizeNullable(row.resultText);
-    const normalizedResultText = normalizeShowResult(
-      rawResultText,
-      normalizedEventDate,
-    );
+    const parsed = parseShowResultText(rawResultText, normalizedEventDate);
     const rowFingerprint = sourceHash(
       JSON.stringify({
         sourceTable: row.sourceTable,
@@ -260,12 +147,6 @@ export async function upsertShowRows(
       select: { id: true },
     });
 
-    const classAndQualityMatch = normalizedResultText
-      ? normalizedResultText.match(/\b([A-ZÅÄÖ]{3})-(ERI|EH|H|T|EVA|HYL)\b/)
-      : null;
-    const className = classAndQualityMatch?.[1]?.toUpperCase() ?? null;
-    const qualityGrade = classAndQualityMatch?.[2]?.toUpperCase() ?? null;
-
     const showEntry = await prisma.showEntry.upsert({
       where: { entryLookupKey },
       create: {
@@ -276,9 +157,9 @@ export async function upsertShowRows(
         sourceTag,
         registrationNoSnapshot: registrationNo,
         dogNameSnapshot: normalizeNullable(row.dogName) ?? registrationNo,
-        className,
-        qualityGrade,
-        placement: null,
+        className: parsed.className,
+        qualityGrade: parsed.qualityGrade,
+        placement: parsed.placement,
         judge: normalizeNullable(row.judge),
         heightText: normalizeNullable(row.heightText),
         critiqueText: normalizeNullable(row.critiqueText),
@@ -292,7 +173,7 @@ export async function upsertShowRows(
           eventDateRaw: row.eventDateRaw,
           eventPlace: row.eventPlace,
           resultTextRaw: rawResultText,
-          resultTextNormalized: normalizedResultText,
+          resultTextNormalized: parsed.normalizedResultText,
           critiqueText: row.critiqueText,
         }),
       },
@@ -301,8 +182,9 @@ export async function upsertShowRows(
         dogId,
         sourceTag,
         dogNameSnapshot: normalizeNullable(row.dogName) ?? registrationNo,
-        className,
-        qualityGrade,
+        className: parsed.className,
+        qualityGrade: parsed.qualityGrade,
+        placement: parsed.placement,
         judge: normalizeNullable(row.judge),
         heightText: normalizeNullable(row.heightText),
         critiqueText: normalizeNullable(row.critiqueText),
@@ -316,49 +198,69 @@ export async function upsertShowRows(
           eventDateRaw: row.eventDateRaw,
           eventPlace: row.eventPlace,
           resultTextRaw: rawResultText,
-          resultTextNormalized: normalizedResultText,
+          resultTextNormalized: parsed.normalizedResultText,
           critiqueText: row.critiqueText,
         }),
       },
       select: { id: true },
     });
 
-    const tokens = normalizedResultText
-      ? tokenizeResult(normalizedResultText)
-      : [];
+    for (const token of parsed.unmappedTokens) {
+      errors += 1;
+      issues.push({
+        code: "SHOW_RESULT_TOKEN_UNMAPPED",
+        message: `Unmapped show result token=${token}.`,
+        registrationNo,
+        sourceTable: row.sourceTable,
+        payloadJson: JSON.stringify({
+          token,
+          entryLookupKey,
+          resultTextRaw: rawResultText,
+          resultTextNormalized: parsed.normalizedResultText,
+        }),
+      });
+    }
+
+    for (const token of parsed.ignoredTokens) {
+      issues.push({
+        code: "SHOW_RESULT_TOKEN_IGNORED_NON_SHOW",
+        message: `Ignored non-show token=${token}.`,
+        registrationNo,
+        sourceTable: row.sourceTable,
+        payloadJson: JSON.stringify({
+          token,
+          entryLookupKey,
+          resultTextRaw: rawResultText,
+          resultTextNormalized: parsed.normalizedResultText,
+        }),
+      });
+    }
+
     let itemIndex = 0;
-    for (const token of tokens) {
-      const upperToken = token.toUpperCase();
-      if (CLASS_CODES.has(upperToken)) {
-        continue;
-      }
-      const hyphenMatch = upperToken.match(
-        /^([A-ZÅÄÖ]{3})-(ERI|EH|H|T|EVA|HYL)$/,
-      );
-      const candidate = hyphenMatch ? hyphenMatch[2] : upperToken;
-      const definitionCode = tokenToDefinitionCode(candidate);
-      if (!definitionCode) {
-        continue;
-      }
-      const definitionId = definitionIdByCode.get(definitionCode);
+    for (const item of parsed.items) {
+      const definitionId = definitionIdByCode.get(item.definitionCode);
       if (!definitionId) {
         errors += 1;
         issues.push({
           code: "SHOW_RESULT_DEFINITION_NOT_FOUND",
-          message: `No ShowResultDefinition found for code=${definitionCode}.`,
+          message: `No ShowResultDefinition found for code=${item.definitionCode}.`,
           registrationNo,
           sourceTable: row.sourceTable,
           payloadJson: JSON.stringify({
-            token: upperToken,
-            definitionCode,
+            token: item.token,
+            definitionCode: item.definitionCode,
             entryLookupKey,
           }),
         });
         continue;
       }
+
       itemIndex += 1;
-      const valueCode = definitionCode === "PUPN" ? upperToken : null;
-      const itemLookupKey = `${entryLookupKey}|${definitionCode}|${valueCode ?? "flag"}|${itemIndex}`;
+      const itemValueKey =
+        item.valueCode ??
+        (item.valueNumeric !== null ? `num:${item.valueNumeric}` : "flag");
+      const itemLookupKey = `${entryLookupKey}|${item.definitionCode}|${itemValueKey}|${itemIndex}`;
+
       await prisma.showResultItem.upsert({
         where: { itemLookupKey },
         create: {
@@ -367,43 +269,42 @@ export async function upsertShowRows(
           showEntryId: showEntry.id,
           definitionId,
           sourceTag,
-          valueCode,
+          valueCode: item.valueCode,
           valueText: null,
-          valueNumeric: null,
+          valueNumeric: item.valueNumeric,
           valueDate: null,
-          isAwarded: definitionCode === "PUPN" ? null : true,
+          isAwarded: item.isAwarded,
           importRunId: options?.importRunId ?? null,
           sourceTable: row.sourceTable,
           sourceRef,
           rawPayloadJson: JSON.stringify({
-            token: upperToken,
-            definitionCode,
+            token: item.token,
+            definitionCode: item.definitionCode,
             resultTextRaw: rawResultText,
-            resultTextNormalized: normalizedResultText,
+            resultTextNormalized: parsed.normalizedResultText,
           }),
         },
         update: {
           definitionId,
           sourceTag,
-          valueCode,
-          isAwarded: definitionCode === "PUPN" ? null : true,
+          valueCode: item.valueCode,
+          valueNumeric: item.valueNumeric,
+          isAwarded: item.isAwarded,
           importRunId: options?.importRunId ?? null,
           sourceTable: row.sourceTable,
           sourceRef,
           rawPayloadJson: JSON.stringify({
-            token: upperToken,
-            definitionCode,
+            token: item.token,
+            definitionCode: item.definitionCode,
             resultTextRaw: rawResultText,
-            resultTextNormalized: normalizedResultText,
+            resultTextNormalized: parsed.normalizedResultText,
           }),
         },
       });
     }
 
     upserted += 1;
-    if (processed % 1000 === 0) {
-      options?.onProgress?.(processed, total);
-    }
+    if (processed % 1000 === 0) options?.onProgress?.(processed, total);
   }
 
   options?.onProgress?.(processed, total);

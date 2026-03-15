@@ -2,6 +2,12 @@
 
 This document describes the current legacy bootstrap import flow after split-phase cutover.
 
+Phase-specific docs:
+
+- `docs/legacy-import/phase1.md`
+- `docs/legacy-import/phase2.md`
+- `docs/legacy-import/phase3.md`
+
 ## Commands
 
 - Phase 1 (foundation only): `pnpm import:phase1`

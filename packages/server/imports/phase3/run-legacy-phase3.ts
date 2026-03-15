@@ -12,10 +12,7 @@ import {
 import type { ImportIssueSeverity } from "@beagle/db";
 import type { ImportRunResponse } from "@beagle/contracts";
 import type { ServiceResult } from "../../core/result";
-import {
-  getMissingRequiredShowDefinitionCodes,
-  upsertShowRows,
-} from "../internal";
+import { getShowTokenCoverageReport, upsertShowRows } from "../internal";
 import { toImportRunResponse } from "../runs/transform";
 
 // Runs the legacy phase3 shows-only import using current show schema.
@@ -92,19 +89,67 @@ export async function runLegacyPhase3(
     await markImportRunRunning(run.id, auditContext);
     log("Marked run as RUNNING");
 
-    startStage("preflight");
-    const missingDefinitionCodes =
-      await getMissingRequiredShowDefinitionCodes();
-    if (missingDefinitionCodes.length > 0) {
-      const missingCodesText = missingDefinitionCodes.join(", ");
-      const message = `Missing required show result definitions: ${missingCodesText}. Run seed:show-result-definitions before phase3.`;
+    startStage("load");
+    const showRows = await fetchLegacyShowRows({
+      log: (message) => log(`[stage:load] ${message}`),
+    });
+    log(`Loaded legacy show rows: showResults=${showRows.length}`);
+    finishStage("load");
+
+    startStage("preflight-source");
+    const coverageReport = await getShowTokenCoverageReport(showRows);
+    if (
+      coverageReport.unmapped.length > 0 ||
+      coverageReport.missingDefinitionCodes.length > 0
+    ) {
+      const unmappedTop = coverageReport.unmapped.slice(0, 20);
+      const message = `Show source coverage failed: unmappedDistinctTokens=${coverageReport.unmapped.length}, unmappedOccurrences=${coverageReport.unmappedOccurrences}, missingDefinitionCodes=${coverageReport.missingDefinitionCodes.length}.`;
+      const detailedPreflightIssues = [
+        ...coverageReport.unmapped.map((item) => ({
+          stage: "preflight-source" as const,
+          severity: "ERROR" as const,
+          code: "SHOW_RESULT_TOKEN_UNMAPPED",
+          message: `Unmapped source token=${item.token}, occurrences=${item.count}.`,
+          registrationNo: item.samples[0]?.registrationNo ?? null,
+          sourceTable: item.samples[0]?.sourceTable ?? null,
+          payloadJson: JSON.stringify({
+            token: item.token,
+            count: item.count,
+            samples: item.samples,
+          }),
+        })),
+        ...coverageReport.missingDefinitionCodes.map((code) => ({
+          stage: "preflight-source" as const,
+          severity: "ERROR" as const,
+          code: "SHOW_RESULT_DEFINITION_NOT_FOUND",
+          message: `Definition code missing from enabled ShowResultDefinition rows: ${code}.`,
+          registrationNo: null,
+          sourceTable: null,
+          payloadJson: JSON.stringify({ definitionCode: code }),
+        })),
+      ];
+      if (detailedPreflightIssues.length > 0) {
+        await createImportRunIssuesBulk(
+          run.id,
+          detailedPreflightIssues,
+          auditContext,
+        );
+      }
       await createImportRunIssue(
         run.id,
         {
-          stage: "preflight",
+          stage: "preflight-source",
           severity: "ERROR",
-          code: "IMPORT_CONFIGURATION_MISSING_SHOW_DEFINITIONS",
+          code: "IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS",
           message,
+          payloadJson: JSON.stringify({
+            totalDistinctTokens: coverageReport.totalDistinctTokens,
+            mappedDistinctTokens: coverageReport.mappedDistinctTokens,
+            unmappedDistinctTokens: coverageReport.unmapped.length,
+            unmappedOccurrences: coverageReport.unmappedOccurrences,
+            unmappedTop,
+            missingDefinitionCodes: coverageReport.missingDefinitionCodes,
+          }),
         },
         auditContext,
       );
@@ -131,14 +176,7 @@ export async function runLegacyPhase3(
         },
       };
     }
-    finishStage("preflight");
-
-    startStage("load");
-    const showRows = await fetchLegacyShowRows({
-      log: (message) => log(`[stage:load] ${message}`),
-    });
-    log(`Loaded legacy show rows: showResults=${showRows.length}`);
-    finishStage("load");
+    finishStage("preflight-source");
 
     startStage("index");
     const registrations = await prisma.dogRegistration.findMany({

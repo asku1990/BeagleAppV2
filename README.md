@@ -10,7 +10,7 @@ Monorepo for a public Beagle database app with auth, admin-ready routing, and a 
 - Tech debt register: [docs/tech-debt.md](docs/tech-debt.md)
 - App usage guide: [docs/app-usage-and-features.md](docs/app-usage-and-features.md)
 - Env safety and runbooks: [docs/ops-env-safety.md](docs/ops-env-safety.md)
-- Import behavior details: [docs/import-flow.md](docs/import-flow.md)
+- Import behavior details: [docs/legacy-import/import-flow.md](docs/legacy-import/import-flow.md)
 - Deployment notes: [docs/vercel-deployment.md](docs/vercel-deployment.md)
 - Changelog: [CHANGELOG.md](CHANGELOG.md)
 
