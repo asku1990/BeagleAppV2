@@ -27,6 +27,10 @@ Issue tooling:
 - Inspect issues: `pnpm import:issues <RUN_ID>`
 - Export CSV files: `pnpm import:issues:csv <RUN_ID>`
 - Optional filters: `--stage`, `--code`, `--severity`, `--limit`, `--out`
+- CSV export output (current behavior):
+  - per-code files: `<ISSUE_CODE>.csv`
+  - index file: `index.csv`
+  - grouped stage summary: `stage-reasons.csv`
 
 ## Phase responsibilities
 
@@ -45,7 +49,8 @@ Issue tooling:
    `ShowResultItem`) using merged legacy sources (`nay9599`, `beanay`, optional
    `nay9599_rd_ud`) plus `beanay_text` critique join.
    Before writing rows, phase3 runs source token coverage preflight and writes
-   aggregate + per-token issues for unmapped source tokens.
+   aggregate + per-token/per-definition preflight issues for unmapped source
+   tokens and missing parser-produced definitions.
    Default mode continues import with warnings; strict mode can fail the run
    (`IMPORT_PHASE3_STRICT_SOURCE_COVERAGE=1`).
 

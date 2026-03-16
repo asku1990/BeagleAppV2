@@ -132,11 +132,28 @@ Pattern mappings:
 
 Coverage rule:
 
-- Any remaining unmapped token creates `IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS`.
+- Any remaining unmapped show-row token creates `SHOW_RESULT_TOKEN_UNMAPPED`
+  (stage `shows`).
+- Preflight coverage gaps create `IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS`
+  (stage `preflight-source`).
 - Preflight writes:
   - one aggregate issue (`IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS`)
   - per-token issue rows (`SHOW_RESULT_TOKEN_UNMAPPED`, stage `preflight-source`)
   - per-missing-definition issue rows (`SHOW_RESULT_DEFINITION_NOT_FOUND`, stage `preflight-source`)
+
+## Definition review checklist
+
+When reviewing parser output against enabled definitions:
+
+- Seed/source of truth:
+  - `packages/db/shows/seed-result-definitions.ts`
+- Verify seed has been run:
+  - `pnpm --filter @beagle/db seed:show-result-definitions`
+- Parser-produced codes to verify especially:
+  - class codes (`PEN`, `JUN`, `NUO`, `AVO`, `KÄY`, `VAL`, `VET`)
+  - quality codes (`ERI`, `EH`, `H`, `T`, `EVA`, `HYL`)
+  - structured values (`SIJOITUS`, `PUPN`)
+  - legacy numeric quality (`LAATU_NUMERO`) for pre-2003 class+digit rows
 
 ## Issue codes
 
