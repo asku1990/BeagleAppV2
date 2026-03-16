@@ -41,4 +41,4 @@ Issue rows are written to `ImportRunIssue` with `kind=LEGACY_PHASE1`.
 ## Operational notes
 
 - Phase 1 should be run before phase2 and phase3.
-- Re-run is duplicate-safe through stable upsert/lookup behavior in current phase1 path.
+- Phase 1 belongs to the initial migration flow.

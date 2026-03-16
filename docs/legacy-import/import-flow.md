@@ -1,6 +1,6 @@
 # Legacy Import Flow (Phases 1-3)
 
-This document describes the current legacy bootstrap import flow after split-phase cutover.
+This document describes the current initial legacy-to-canonical migration flow after split-phase cutover.
 
 Phase-specific docs:
 
@@ -98,9 +98,10 @@ CSV export is per run id. Export separate CSV sets for each phase run id.
   - `SHOW_RESULT_DEFINITION_NOT_FOUND`
   - `IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS`
 
-## Idempotency
+## Execution model
 
-All three phases are duplicate-safe on re-run using stable lookup/upsert keys in current schema paths.
+This import flow is intended for initial migration, run in order (`phase1` -> `phase2` -> `phase3`).
+Treat it as one-time migration flow, not as an ongoing sync pipeline.
 
 ## Implementation references
 

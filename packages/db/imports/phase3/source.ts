@@ -25,10 +25,11 @@ function toLegacyMergeKey(row: {
   registrationNo: string;
   eventDateRaw: string | null;
   eventPlace: string | null;
-}): string {
+}): string | null {
   const registrationKey = normalizeLegacyKeyPart(row.registrationNo);
   const eventDateKey = toLegacyDateKey(row.eventDateRaw);
   const eventPlaceKey = normalizeLegacyKeyPart(row.eventPlace);
+  if (!registrationKey || !eventDateKey || !eventPlaceKey) return null;
   return `${registrationKey}|${eventDateKey}|${eventPlaceKey}`;
 }
 

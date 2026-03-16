@@ -29,4 +29,4 @@ Issue rows are written to `ImportRunIssue` with `kind=LEGACY_PHASE2`.
 ## Operational notes
 
 - Requires phase1 foundation data to maximize dog linking.
-- Re-run is duplicate-safe via stable `sourceKey` upsert behavior in current trial path.
+- Phase 2 belongs to the initial migration flow.

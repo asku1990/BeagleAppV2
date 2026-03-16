@@ -3,6 +3,7 @@
 ## Purpose
 
 Phase 3 imports show rows into canonical show tables.
+Phase 3 belongs to the initial canonical migration flow.
 
 ## Command
 
@@ -36,6 +37,10 @@ Additional behavior:
 - `dogId` is nullable (entries can be imported without matched dog).
 - Uses shared show-result normalization logic (`normalizeShowResult`) for legacy `TULNI` conversion.
 - Stores raw + normalized result context in provenance payload fields.
+
+## Execution assumption
+
+Phase3 is intended for initial canonical migration flow, not ongoing sync usage.
 
 ## Preflight requirement
 
