@@ -139,10 +139,14 @@ export async function fetchLegacyShowRows(options?: {
         priority: number;
       }
     >();
+    const rowsWithoutMergeKey: RawLegacyShowRow[] = [];
 
     for (const row of [...baseRows, ...rdUdRows]) {
       const key = toLegacyMergeKey(row);
-      if (!key) continue;
+      if (!key) {
+        rowsWithoutMergeKey.push(row);
+        continue;
+      }
       const priority = sourcePriority(row.sourceTable);
       const existing = mergedByKey.get(key);
       if (!existing || priority > existing.priority) {
@@ -158,9 +162,16 @@ export async function fetchLegacyShowRows(options?: {
         dogName: item.row.dogName ?? null,
       });
     }
+    for (const row of rowsWithoutMergeKey) {
+      showResults.push({
+        ...row,
+        critiqueText: null,
+        dogName: row.dogName ?? null,
+      });
+    }
 
     log(
-      `Fetched and merged show rows: count=${showResults.length}, elapsed=${Math.round((Date.now() - showResultsStartedAt) / 1000)}s`,
+      `Fetched and merged show rows: count=${showResults.length}, mergedKeys=${mergedByKey.size}, passthroughRowsWithoutMergeKey=${rowsWithoutMergeKey.length}, elapsed=${Math.round((Date.now() - showResultsStartedAt) / 1000)}s`,
     );
 
     log(
