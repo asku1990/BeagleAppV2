@@ -13,6 +13,8 @@ import {
   toSourceTag,
 } from "./show-import-helpers";
 
+// Persists canonical show rows for the phase3 initial-load flow.
+// Reruns are intentionally blocked upstream in runLegacyPhase3.
 type EventUpsertResult = {
   upserted: number;
   errors: number;

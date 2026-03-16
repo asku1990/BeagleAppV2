@@ -41,6 +41,12 @@ Additional behavior:
 ## Execution assumption
 
 Phase3 is intended for initial canonical migration flow, not ongoing sync usage.
+It is explicitly one-shot and non-rerunnable by design.
+
+Runtime guard:
+
+- phase3 fails fast with `LEGACY_PHASE3_ONE_SHOT_ONLY` when canonical show
+  tables (`ShowEvent`, `ShowEntry`, `ShowResultItem`) are not empty
 
 ## Preflight requirement
 
