@@ -86,14 +86,22 @@ describe("parseShowResultText", () => {
     );
   });
 
-  it("applies legacy class+digit conversion only from 2003-01-01 onward", () => {
+  it("keeps pre-2003 class+digit as legacy numeric quality and converts from 2003 onward", () => {
     const preGate = parseShowResultText("NUO1", "2002-12-31");
     const postGate = parseShowResultText("NUO1", "2003-01-01");
 
+    expect(preGate.className).toBe("NUO");
     expect(preGate.qualityGrade).toBeNull();
+    expect(
+      preGate.items.some(
+        (item) =>
+          item.definitionCode === "LAATU_NUMERO" && item.valueNumeric === 1,
+      ),
+    ).toBe(true);
     expect(preGate.items.some((item) => item.definitionCode === "ERI")).toBe(
       false,
     );
+    expect(preGate.unmappedTokens).toEqual([]);
     expect(postGate.qualityGrade).toBe("ERI");
     expect(postGate.items.some((item) => item.definitionCode === "ERI")).toBe(
       true,

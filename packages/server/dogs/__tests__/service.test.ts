@@ -558,6 +558,63 @@ describe("dogs service", () => {
     });
   });
 
+  it("formats pre-2003 class+digit show results as class-digit for display", async () => {
+    const mockProfile = {
+      id: "dog-legacy",
+      name: "Legacy Dog",
+      title: null,
+      registrationNo: "FI-8/90",
+      registrationNos: ["FI-8/90"],
+      birthDate: null,
+      sex: "U",
+      color: null,
+      ekNo: null,
+      inbreedingCoefficientPct: null,
+      sire: null,
+      dam: null,
+      pedigree: [],
+      offspringSummary: { litterCount: 0, puppyCount: 0 },
+      litters: [],
+      siblingsSummary: { siblingCount: 0 },
+      siblings: [],
+    };
+    const mockShows = [
+      {
+        id: "show-legacy",
+        place: "Kajaani",
+        date: new Date("1996-01-06T00:00:00.000Z"),
+        result: "KÄY2",
+        judge: null,
+        heightCm: null,
+      },
+    ];
+    getBeagleDogProfileDbMock.mockResolvedValue(mockProfile);
+    getBeagleShowsForDogDbMock.mockResolvedValue(mockShows);
+    getBeagleTrialsForDogDbMock.mockResolvedValue([]);
+
+    const service = createDogsService();
+    const result = await service.getBeagleDogProfile("dog-legacy");
+
+    expect(result).toEqual({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          ...mockProfile,
+          shows: [
+            {
+              ...mockShows[0],
+              showId: encodeShowId("1996-01-06", "Kajaani"),
+              date: "1996-01-06",
+              result: "KÄY-2",
+            },
+          ],
+          trials: [],
+        },
+      },
+    });
+  });
+
   it("returns 404 when dog profile is missing", async () => {
     getBeagleDogProfileDbMock.mockResolvedValue(null);
 

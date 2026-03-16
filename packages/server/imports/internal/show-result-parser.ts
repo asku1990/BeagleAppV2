@@ -8,6 +8,8 @@ import {
   TOKEN_ALIAS_TO_CANONICAL,
 } from "./show-result-tokens";
 
+const LEGACY_QUALITY_DIGIT_DEFINITION_CODE = "LAATU_NUMERO";
+
 type ParsedShowResultItem = {
   definitionCode: string;
   valueCode: string | null;
@@ -110,13 +112,18 @@ function parseClassPlacementWithoutKToken(token: string): {
 function parseLegacyClassQualityToken(token: string): {
   className: string;
   qualityGrade: string;
+  legacyQualityDigit: number;
 } | null {
   const match = token.toUpperCase().match(/^([A-ZÅÄÖ]{2,4})([1-6])$/);
   if (!match?.[1] || !match?.[2]) return null;
   const className = normalizeClassCode(match[1]);
   const qualityGrade = QUALITY_BY_DIGIT[match[2]];
   if (!className || !qualityGrade) return null;
-  return { className, qualityGrade };
+  return {
+    className,
+    qualityGrade,
+    legacyQualityDigit: Number(match[2]),
+  };
 }
 
 function parseQualityPlacementToken(token: string): {
@@ -223,6 +230,19 @@ export function parseShowResultText(
           valueCode: null,
           valueNumeric: null,
           isAwarded: true,
+          token: upperToken,
+        });
+        handled = true;
+      }
+    } else if (!classPlacement) {
+      const legacyClassQuality = parseLegacyClassQualityToken(upperToken);
+      if (legacyClassQuality) {
+        className = className ?? legacyClassQuality.className;
+        items.push({
+          definitionCode: LEGACY_QUALITY_DIGIT_DEFINITION_CODE,
+          valueCode: null,
+          valueNumeric: legacyClassQuality.legacyQualityDigit,
+          isAwarded: null,
           token: upperToken,
         });
         handled = true;

@@ -209,6 +209,37 @@ describe("shows service", () => {
     expect(result.body.data.items[0]?.result).toBe("JUN-ERI");
   });
 
+  it("formats pre-2003 legacy class+digit for display without grade conversion", async () => {
+    getBeagleShowDetailsDbMock.mockResolvedValue({
+      eventDate: new Date("1996-01-06T00:00:00.000Z"),
+      eventPlace: "Kajaani",
+      judge: "Judge Old",
+      dogCount: 1,
+      items: [
+        {
+          id: "r-old",
+          dogId: "d-old",
+          registrationNo: "FI-8/90",
+          name: "Legacy Dog",
+          sex: "U",
+          result: "KÄY2",
+          heightCm: null,
+          judge: "Judge Old",
+        },
+      ],
+    });
+
+    const service = createShowsService();
+    const showId = encodeShowId("1996-01-06", "Kajaani");
+    const result = await service.getBeagleShowDetails(showId);
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) {
+      throw new Error("Expected ok=true response");
+    }
+    expect(result.body.data.items[0]?.result).toBe("KÄY-2");
+  });
+
   it("returns 500 when db throws in shows search", async () => {
     searchBeagleShowsDbMock.mockRejectedValue(new Error("db fail"));
     const service = createShowsService();

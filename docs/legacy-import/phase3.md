@@ -112,8 +112,9 @@ Pattern mappings:
   - parsed only when `eventDate >= 2003-01-01`
   - produces class + quality items (for example `JUN` + `ERI`)
   - digit map: `1=ERI`, `2=EH`, `3=H`, `4=T`, `5=EVA`, `6=HYL`
-  - for dates before `2003-01-01`, these tokens are left as legacy text and are
-    not converted to quality items
+  - for dates before `2003-01-01`, these tokens are not converted to modern
+    quality flags; parser stores legacy numeric quality as
+    `LAATU_NUMERO(valueNumeric=<digit>)` and keeps class info
 - class placement with `K`:
   - `JUK1`, `NUK1`, `AVK1`, `KÄK1`, `VEK1`, `VAK1`, `VALK1`, `AVOK1`
   - produces class item + `SIJOITUS` item (`valueNumeric`)

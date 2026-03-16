@@ -191,6 +191,15 @@ const SHOW_RESULT_DEFINITIONS_LAATUARVOSTELU = [
     categoryCode: "LAATUARVOSTELU",
     isVisibleByDefault: true,
   },
+  {
+    code: "LAATU_NUMERO", // Legacy laatuarvostelu numeroformaatissa (esim. JUN2)
+    labelFi: "Laatuarvostelu (legacy numero)",
+    labelSv: null,
+    valueType: ShowResultValueType.NUMERIC,
+    sortOrder: 70,
+    categoryCode: "LAATUARVOSTELU",
+    isVisibleByDefault: false,
+  },
 ] as const;
 
 const SHOW_RESULT_DEFINITIONS_ROTUSIJOITUS = [
