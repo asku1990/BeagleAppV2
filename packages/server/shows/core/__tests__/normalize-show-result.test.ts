@@ -8,10 +8,10 @@ describe("normalizeShowResult", () => {
   });
 
   it("formats display mode pre-2003 class+digit values as class-digit", () => {
-    const result = normalizeShowResult("KAY2,KÄY1", "1996-01-06", {
+    const result = normalizeShowResult("PEN1,KAY2,KÄY1", "1996-01-06", {
       mode: "display",
     });
-    expect(result).toBe("KÄY-2,KÄY-1");
+    expect(result).toBe("PEN-1,KÄY-2,KÄY-1");
   });
 
   it("converts post-2003 legacy class+digit values to modern quality labels", () => {

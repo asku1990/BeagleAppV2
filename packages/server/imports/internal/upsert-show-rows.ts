@@ -133,18 +133,9 @@ export async function upsertShowRows(
         }),
       },
       update: {
-        sourceTag,
         eventDate,
         eventPlace,
         importRunId: options?.importRunId ?? null,
-        sourceTable: row.sourceTable,
-        sourceRef,
-        rawPayloadJson: JSON.stringify({
-          sourceTable: row.sourceTable,
-          registrationNo,
-          eventDateRaw: row.eventDateRaw,
-          eventPlace: row.eventPlace,
-        }),
       },
       select: { id: true },
     });

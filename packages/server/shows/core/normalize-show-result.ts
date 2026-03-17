@@ -1,5 +1,5 @@
 const SHOW_GRADE_AWARDS = ["ERI", "EH", "H", "T", "EVA", "HYL"] as const;
-const LEGACY_CLASS_TOKEN = "JUN|NUO|AVO|VAL|VET|KÄY|KAY";
+const LEGACY_CLASS_TOKEN = "PEN|JUN|NUO|AVO|VAL|VET|KÄY|KAY";
 
 type NormalizeShowResultOptions = {
   mode?: "parser" | "display";

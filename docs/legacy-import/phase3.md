@@ -29,6 +29,10 @@ Precedence:
 2. `nay9599`
 3. `beanay`
 
+If multiple rows still collide on the same merge key with equal source priority,
+phase3 uses a deterministic payload-based tie-break (normalized result/height/judge/legacy flag/dog name/source table)
+so row selection does not depend on database return order.
+
 ## Main writes
 
 - `ShowEvent`
@@ -40,6 +44,7 @@ Additional behavior:
 - `dogId` is nullable (entries can be imported without matched dog).
 - Uses shared show-result normalization logic (`normalizeShowResult`) for legacy `TULNI` conversion.
 - Stores raw + normalized result context in provenance payload fields.
+- `ShowEvent` provenance fields (`sourceTag`, `sourceTable`, `sourceRef`, `rawPayloadJson`) are set on create and not overwritten per entry-row updates.
 
 ## Execution assumption
 

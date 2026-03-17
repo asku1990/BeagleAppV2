@@ -47,6 +47,18 @@ function sourcePriority(
   return 1;
 }
 
+function toMergeTieBreakKey(row: RawLegacyShowRow): string {
+  // Deterministic tie-break for equal-priority collisions, independent of DB row order.
+  return [
+    normalizeLegacyKeyPart(row.resultText),
+    normalizeLegacyKeyPart(row.heightText),
+    normalizeLegacyKeyPart(row.judge),
+    normalizeLegacyKeyPart(row.legacyFlag),
+    normalizeLegacyKeyPart(row.dogName),
+    normalizeLegacyKeyPart(row.sourceTable),
+  ].join("|");
+}
+
 async function tableExists(
   connection: Awaited<ReturnType<typeof connectLegacyDatabase>>,
   tableName: string,
@@ -144,6 +156,7 @@ export async function fetchLegacyShowRows(options?: {
       {
         row: RawLegacyShowRow;
         priority: number;
+        tieBreakKey: string;
       }
     >();
     const rowsWithoutMergeKey: RawLegacyShowRow[] = [];
@@ -155,9 +168,14 @@ export async function fetchLegacyShowRows(options?: {
         continue;
       }
       const priority = sourcePriority(row.sourceTable);
+      const tieBreakKey = toMergeTieBreakKey(row);
       const existing = mergedByKey.get(key);
-      if (!existing || priority > existing.priority) {
-        mergedByKey.set(key, { row, priority });
+      const shouldReplace =
+        !existing ||
+        priority > existing.priority ||
+        (priority === existing.priority && tieBreakKey < existing.tieBreakKey);
+      if (shouldReplace) {
+        mergedByKey.set(key, { row, priority, tieBreakKey });
       }
     }
 
