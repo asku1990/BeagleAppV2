@@ -103,24 +103,28 @@ Alias -> canonical:
 Pattern mappings:
 
 - `PU1`, `PU2`, `PN1`, ... -> definition `PUPN`, `valueCode=<token>`
-- legacy class+quality digit (`JUN1`, `NUO2`, `AVO1`, `KÄY1`, `VAL1`, `VET1`):
+
+- class + quality digit (legacy laatuarvostelu, not class placement):
+  - examples: `JUN1`, `NUO2`, `AVO1`, `KÄY1`, `VAL1`, `VET1`
   - parsed only when `eventDate >= 2003-01-01`
   - produces class + quality items (for example `JUN` + `ERI`)
   - digit map: `1=ERI`, `2=EH`, `3=H`, `4=T`, `5=EVA`, `6=HYL`
   - for dates before `2003-01-01`, these tokens are not converted to modern
     quality flags; parser stores legacy numeric quality as
     `LAATU_NUMERO(valueNumeric=<digit>)` and keeps class info
-- class placement with `K`:
-  - `JUK1`, `NUK1`, `AVK1`, `KÄK1`, `VEK1`, `VAK1`, `VALK1`, `AVOK1`
+
+- class placement tokens (luokkasijoitus):
+  - with `K`: `JUK1`, `NUK1`, `AVK1`, `KÄK1`, `VEK1`, `VAK1`, `VALK1`, `AVOK1`
+  - without `K` (zero/no-placement marker): `JUN0`, `NUO0`, `AVO0`, `KÄY0`, `VET0`
   - produces class item + `SIJOITUS` item (`valueNumeric`)
+  - `valueNumeric=0` means no class placement rank
   - never creates quality item through fallback from these tokens
+
 - class aliases accepted for class mapping:
   - `JU` -> `JUN`
   - `AVK` -> `AVO`
   - `VEK` -> `VET`
-- class placement without `K` (zero cases):
-  - `JUN0`, `NUO0`, `AVO0`, `KÄY0`, `VET0`
-  - produces class item + `SIJOITUS` item (`valueNumeric=0`)
+
 - quality+placement:
   - `ERI1`, `EH2`, `H3`, `T4`, `EVA5`, `HYL6`
   - sets quality and writes `SIJOITUS` (`valueNumeric` from suffix)
