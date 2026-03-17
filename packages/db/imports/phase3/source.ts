@@ -36,6 +36,9 @@ function toLegacyMergeKey(row: {
 function sourcePriority(
   sourceTable: LegacyShowResultRow["sourceTable"],
 ): number {
+  // Source precedence when multiple legacy rows share the same merge key.
+  // Prefer `nay9599_rd_ud`, then `nay9599`, then `beanay`.
+  // Local v1 snapshot had no field conflicts on overlaps; this remains a deterministic tie-break.
   if (sourceTable === "nay9599_rd_ud") return 3;
   if (sourceTable === "nay9599") return 2;
   return 1;
