@@ -59,9 +59,7 @@ function mapDogProfileFromDb(
         showId: encodeShowId(showDate, show.place),
         place: show.place,
         date: showDate,
-        result: normalizeShowResult(show.result, showDate, {
-          mode: "display",
-        }),
+        result: normalizeShowResult(show.result, showDate),
         judge: show.judge,
         heightCm: show.heightCm,
       };
