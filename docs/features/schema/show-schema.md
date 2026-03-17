@@ -163,6 +163,32 @@ Strict source-row fingerprint. Use only for dedupe/provenance semantics.
 - Do not use as the primary business identity.
 - Keep `*LookupKey` fields as canonical business keys.
 
+## Provenance fields (why all three exist)
+
+### `sourceTag`
+
+Simple label for where data came from.
+
+- Example sources: legacy table, workbook import, manual entry.
+- Used for filtering and tracing data origin.
+- Not used as a unique key.
+
+### `sourceRef`
+
+Readable pointer back to the original source row.
+
+- Used in debugging and audit logs.
+- Often looks like registration + date + place.
+- Not guaranteed to be unique.
+
+### `sourceRowHash`
+
+Strict fingerprint of one raw source row.
+
+- Used for exact dedupe and source integrity checks.
+- Optional, because not every source gives stable raw input for hashing.
+- Separate from `*LookupKey` on purpose: hash = source row identity, lookup key = business identity.
+
 ## Concrete data example
 
 Legacy source row example:

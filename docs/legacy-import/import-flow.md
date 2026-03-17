@@ -2,6 +2,11 @@
 
 This document describes the current initial legacy-to-canonical migration flow after split-phase cutover.
 
+## Document scope
+
+- This file is the high-level flow overview (order, responsibilities, and shared run/issue model).
+- Detailed phase rules and implementation notes are maintained in phase-specific docs.
+
 Phase-specific docs:
 
 - `docs/legacy-import/phase1.md`
@@ -77,20 +82,13 @@ Issue rows are written to shared `ImportRunIssue` storage per run.
 
 CSV export is per run id. Export separate CSV sets for each phase run id.
 
-## Issue code conventions in split flow
+## Issue code scope
 
-`phase1` keeps foundation-oriented codes (for example `DOG_MISSING_REQUIRED_FIELDS`, `RELATION_*`, `OWNER_*`).
+Issue code details are maintained in phase docs:
 
-`phase2` and `phase3` use phase-specific event codes:
-
-- trials:
-  - `TRIAL_REGISTRATION_INVALID_FORMAT`
-  - `TRIAL_EVENT_MISSING_REQUIRED_FIELDS`
-- shows:
-  - `SHOW_REGISTRATION_INVALID_FORMAT`
-  - `SHOW_EVENT_MISSING_REQUIRED_FIELDS`
-  - `SHOW_RESULT_TOKEN_UNMAPPED`
-  - `SHOW_RESULT_DEFINITION_NOT_FOUND`
+- `docs/legacy-import/phase1.md`
+- `docs/legacy-import/phase2.md`
+- `docs/legacy-import/phase3.md`
 
 ## Execution model
 
@@ -99,21 +97,4 @@ Treat it as one-time migration flow, not as an ongoing sync pipeline.
 
 ## Implementation references
 
-- Server phase use-cases:
-  - `packages/server/imports/phase1/run-legacy-phase1.ts`
-  - `packages/server/imports/phase2/run-legacy-phase2.ts`
-  - `packages/server/imports/phase3/run-legacy-phase3.ts`
-- Shared import run API:
-  - `packages/server/imports/runs/service.ts`
-- Shared helpers:
-  - `packages/server/imports/internal/*`
-  - `packages/server/imports/core/*`
-- Legacy source fetch:
-  - `packages/db/imports/phase1/source.ts`
-  - `packages/db/imports/phase2/source.ts`
-  - `packages/db/imports/phase3/source.ts`
-- Script entrypoints:
-  - `packages/server/scripts/imports/phase1/run.ts`
-  - `packages/server/scripts/imports/phase2/run.ts`
-  - `packages/server/scripts/imports/phase3/run.ts`
-  - `packages/server/scripts/imports/bootstrap/run.ts`
+Code-level implementation references are maintained in phase-specific docs.

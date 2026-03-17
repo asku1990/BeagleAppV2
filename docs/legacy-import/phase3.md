@@ -2,6 +2,9 @@
 
 ## Purpose
 
+This is the detailed implementation reference for phase3.
+For overall flow and ordering, see `docs/legacy-import/import-flow.md`.
+
 Phase 3 imports show rows into canonical show tables.
 Phase 3 belongs to the initial canonical migration flow.
 

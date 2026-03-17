@@ -110,6 +110,13 @@ Optional source dedupe hashes:
 - `ShowEntry.sourceRowHash` unique when present
 - `ShowResultItem.sourceRowHash` unique when present
 
+Clarification:
+
+- `*LookupKey` is the main business key used in upserts.
+- `sourceRowHash` is a fingerprint of the raw source row.
+- `sourceRef` is a readable trace reference for people.
+- `sourceTag` tells which source family the row came from.
+
 ## Index strategy (high level)
 
 - Dog/search indexes: name, sex, birth date, pedigree links.
