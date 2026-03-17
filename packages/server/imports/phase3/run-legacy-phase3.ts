@@ -15,7 +15,8 @@ import type { ServiceResult } from "../../core/result";
 import { upsertShowRows } from "../internal";
 import { toImportRunResponse } from "../runs/transform";
 
-// Runs the legacy phase3 shows-only import using current show schema.
+// Runs one-shot legacy phase3 initial load into canonical show tables.
+// Reruns are intentionally blocked when canonical show rows already exist.
 export async function runLegacyPhase3(
   createdByUserId?: string,
   options?: {
@@ -89,6 +90,58 @@ export async function runLegacyPhase3(
     await markImportRunRunning(run.id, auditContext);
     log("Marked run as RUNNING");
 
+    startStage("preflight-initial-only");
+    const [showEventCount, showEntryCount, showResultItemCount] =
+      await Promise.all([
+        prisma.showEvent.count(),
+        prisma.showEntry.count(),
+        prisma.showResultItem.count(),
+      ]);
+    const hasCanonicalShowData =
+      showEventCount > 0 || showEntryCount > 0 || showResultItemCount > 0;
+    if (hasCanonicalShowData) {
+      const message =
+        "Legacy phase3 initial load is one-shot only: canonical show tables already contain data.";
+      await createImportRunIssue(
+        run.id,
+        {
+          stage: "preflight-initial-only",
+          severity: "ERROR",
+          code: "LEGACY_PHASE3_ONE_SHOT_ONLY",
+          message,
+          payloadJson: JSON.stringify({
+            showEventCount,
+            showEntryCount,
+            showResultItemCount,
+          }),
+        },
+        auditContext,
+      );
+      const finished = await markImportRunFinished(
+        run.id,
+        {
+          status: "FAILED",
+          dogsUpserted: 0,
+          ownersUpserted: 0,
+          ownershipsUpserted: 0,
+          trialResultsUpserted: 0,
+          showResultsUpserted: 0,
+          errorsCount: 1,
+          errorSummary: message,
+        },
+        auditContext,
+      );
+      return {
+        status: 409,
+        body: {
+          ok: false,
+          code: "LEGACY_PHASE3_ONE_SHOT_ONLY",
+          error: `Import run failed (runId=${finished.id}): ${message}`,
+        },
+      };
+    }
+    finishStage("preflight-initial-only");
+
     startStage("load");
     const showRows = await fetchLegacyShowRows({
       log: (message) => log(`[stage:load] ${message}`),
@@ -111,6 +164,7 @@ export async function runLegacyPhase3(
 
     startStage("shows");
     const showResult = await upsertShowRows(showRows, dogIdByRegistration, {
+      importRunId: run.id,
       onProgress: (processed, total) => logProgress("shows", processed, total),
     });
     showResultsUpserted = showResult.upserted;

@@ -271,11 +271,11 @@ model ShowResult {
 model ShowEvent {
   // identity
   id             String  @id @default(cuid()) // Tapahtumarivin tekninen tunniste.
-  eventLookupKey String  @unique // Yhtenäinen tapahtuman hakutunniste.
-  sourceRowHash  String? @unique // Lähderivin tiiviste duplikaattisuojaukseen.
+  eventLookupKey String  @unique // Yhtenäinen avain lisäykseen tai päivitykseen ja rivin yksilöintiin.
+  sourceRowHash  String? @unique // Lähderivin tiiviste duplikaattien poistoon ja jäljitettävyyteen.
 
   // event core
-  sourceTag  ShowSourceTag // Lähdejärjestelmän tunniste.
+  sourceTag  ShowSourceTag // Mistä lähteestä data tuli (legacy/workbook/manual).
   eventDate  DateTime // Näyttelyn päivä.
   eventName  String? // Näyttelyn nimi.
   eventCity  String? // Näyttelyn paikkakunta.
@@ -286,7 +286,7 @@ model ShowEvent {
   // provenance / import
   importRunId    String? // Viittaus import-ajoon.
   sourceTable    String? // Alkuperäinen lähdetaulu.
-  sourceRef      String? // Alkuperäisen lähteen rivitunniste.
+  sourceRef      String? // Ihmiselle luettava viite alkuperäiseen riviin (debug/audit), ei uniikki avain.
   rawPayloadJson String? @db.Text // Raakalähteen payload JSON-muodossa.
 
   // relations / timestamps
@@ -303,20 +303,17 @@ model ShowEvent {
 model ShowEntry {
   // identity
   id             String  @id @default(cuid()) // Osallistumisrivin tekninen tunniste.
-  entryLookupKey String  @unique // Yhtenäinen osallistumisrivin hakutunniste.
-  sourceRowHash  String? @unique // Lähderivin tiiviste duplikaattisuojaukseen.
+  entryLookupKey String  @unique // Yhtenäinen avain lisäykseen tai päivitykseen ja rivin yksilöintiin.
+  sourceRowHash  String? @unique // Lähderivin tiiviste duplikaattien poistoon ja jäljitettävyyteen.
 
   // links
   showEventId String // Viittaus tapahtumaan.
   dogId       String? // Viittaus koiraan.
 
   // entry core
-  sourceTag              ShowSourceTag // Lähdejärjestelmän tunniste.
+  sourceTag              ShowSourceTag // Mistä lähteestä data tuli (legacy/workbook/manual).
   registrationNoSnapshot String // Rekisterinumeron snapshot import-hetkellä.
   dogNameSnapshot        String // Koiran nimen snapshot import-hetkellä.
-  className              String? // Näyttelyluokka.
-  qualityGrade           String? // Laatuluokka.
-  placement              String? // Sijoitus.
   judge                  String? // Tuomari.
   heightText             String? // Korkeustieto tekstimuodossa.
   critiqueText           String?       @db.Text // Arvosteluteksti.
@@ -324,7 +321,7 @@ model ShowEntry {
   // provenance / import
   importRunId    String? // Viittaus import-ajoon.
   sourceTable    String? // Alkuperäinen lähdetaulu.
-  sourceRef      String? // Alkuperäisen lähteen rivitunniste.
+  sourceRef      String? // Ihmiselle luettava viite alkuperäiseen riviin (debug/audit), ei uniikki avain.
   legacyFlag     String? // Legacy-lipputieto.
   rawPayloadJson String? @db.Text // Raakalähteen payload JSON-muodossa.
 
@@ -392,15 +389,15 @@ model ShowResultDefinition {
 model ShowResultItem {
   // identity
   id            String  @id @default(cuid()) // Tulosattribuuttirivin tekninen tunniste.
-  itemLookupKey String  @unique // Yhtenäinen tulosattribuuttirivin hakutunniste.
-  sourceRowHash String? @unique // Lähderivin tiiviste duplikaattisuojaukseen.
+  itemLookupKey String  @unique // Yhtenäinen avain lisäykseen tai päivitykseen ja rivin yksilöintiin.
+  sourceRowHash String? @unique // Lähderivin tiiviste duplikaattien poistoon ja jäljitettävyyteen.
 
   // links
   showEntryId  String // Viittaus osallistumisriviin.
   definitionId String // Viittaus tulosmääritelmään.
 
   // value payload
-  sourceTag    ShowSourceTag // Lähdejärjestelmän tunniste.
+  sourceTag    ShowSourceTag // Mistä lähteestä data tuli (legacy/workbook/manual).
   valueCode    String? // Koodiarvo (esim. PU1, PN2, varaSERT).
   valueText    String? // Tekstiarvo.
   valueNumeric Decimal?      @db.Decimal(8, 2) // Numeroarvo.
@@ -410,7 +407,7 @@ model ShowResultItem {
   // provenance / import
   importRunId    String? // Viittaus import-ajoon.
   sourceTable    String? // Alkuperäinen lähdetaulu.
-  sourceRef      String? // Alkuperäisen lähteen rivitunniste.
+  sourceRef      String? // Ihmiselle luettava viite alkuperäiseen riviin (debug/audit), ei uniikki avain.
   rawPayloadJson String? @db.Text // Raakalähteen payload JSON-muodossa.
 
   // relations / timestamps

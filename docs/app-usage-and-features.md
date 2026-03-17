@@ -129,4 +129,4 @@ Admin-only APIs (not currently surfaced in admin UI):
 
 ## Import workflow (phases 1-3)
 
-Import behavior, commands, and issue handling are documented in [docs/import-flow.md](import-flow.md).
+Import behavior, commands, and issue handling are documented in [docs/legacy-import/import-flow.md](legacy-import/import-flow.md).

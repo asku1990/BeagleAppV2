@@ -72,15 +72,6 @@ const SHOW_RESULT_CATEGORIES = [
 
 const SHOW_RESULT_DEFINITIONS_LUOKAT = [
   {
-    code: "BAB", // Baby-luokka
-    labelFi: "Baby-luokka",
-    labelSv: null,
-    valueType: ShowResultValueType.CODE,
-    sortOrder: 10,
-    categoryCode: "LUOKKA",
-    isVisibleByDefault: false,
-  },
-  {
     code: "PEN", // Pentuluokka
     labelFi: "Pentuluokka",
     labelSv: null,
@@ -199,6 +190,15 @@ const SHOW_RESULT_DEFINITIONS_LAATUARVOSTELU = [
     sortOrder: 60,
     categoryCode: "LAATUARVOSTELU",
     isVisibleByDefault: true,
+  },
+  {
+    code: "LAATU_NUMERO", // Legacy laatuarvostelu numeroformaatissa (esim. JUN2)
+    labelFi: "Laatuarvostelu (legacy numero)",
+    labelSv: null,
+    valueType: ShowResultValueType.NUMERIC,
+    sortOrder: 70,
+    categoryCode: "LAATUARVOSTELU",
+    isVisibleByDefault: false,
   },
 ] as const;
 

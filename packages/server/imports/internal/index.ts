@@ -1,2 +1,4 @@
 export { toEventSourceDatePart, toOwnershipDateKey } from "./date-key";
-export { upsertOwner, upsertShowRows, upsertTrialRows } from "./persistence";
+export { upsertOwner, upsertTrialRows } from "./persistence";
+export { parseShowResultText } from "./show-result-parser";
+export { upsertShowRows } from "./upsert-show-rows";

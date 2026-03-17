@@ -76,7 +76,9 @@ export async function getBeagleShowDetailsService(
         registrationNo: item.registrationNo,
         name: item.name,
         sex: item.sex,
-        result: normalizeShowResult(item.result, eventDate),
+        result: normalizeShowResult(item.result, eventDate, {
+          mode: "display",
+        }),
         heightCm: item.heightCm,
         // Note: ShowResult.eventName exists in DB but is intentionally excluded
         // from the public show contract/clipboard until product requirements need it.

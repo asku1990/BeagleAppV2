@@ -63,6 +63,7 @@ export async function runImportPhase(
       message: string;
       registrationNo: string | null;
       sourceTable: string | null;
+      payloadJson: string | null;
     }> = [];
     let cursor: string | undefined;
     let total = 0;
@@ -84,6 +85,7 @@ export async function runImportPhase(
             message: issue.message,
             registrationNo: issue.registrationNo,
             sourceTable: issue.sourceTable,
+            payloadJson: issue.payloadJson,
           });
         }
       }
@@ -103,6 +105,13 @@ export async function runImportPhase(
         console.log(
           `[import:${phaseLabel}]   [${sample.stage}/${sample.severity}/${sample.code}] reg=${sample.registrationNo ?? "-"} table=${sample.sourceTable ?? "-"} msg=${sample.message}`,
         );
+        if (sample.payloadJson) {
+          const trimmed =
+            sample.payloadJson.length > 500
+              ? `${sample.payloadJson.slice(0, 500)}...`
+              : sample.payloadJson;
+          console.log(`[import:${phaseLabel}]     payload=${trimmed}`);
+        }
       }
     }
   }
