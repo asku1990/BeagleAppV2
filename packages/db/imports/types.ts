@@ -64,6 +64,8 @@ export type LegacyShowResultRow = {
   heightText: string | null;
   judge: string | null;
   legacyFlag: string | null;
+  // Row origin for merged show result rows.
+  // `beanay_text` is excluded because it is joined only as critique text.
   sourceTable: "nay9599" | "beanay" | "nay9599_rd_ud";
 };
 

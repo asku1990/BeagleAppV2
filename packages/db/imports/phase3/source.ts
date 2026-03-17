@@ -5,7 +5,10 @@ type RawLegacyShowRow = Omit<
   LegacyShowResultRow,
   "critiqueText" | "dogName"
 > & {
+  // `TULNI` is the compact legacy result token string (awards/classes/quality),
+  // not the free-text critique (`beanay_text.TEKSTI`).
   critiqueText?: string | null;
+  // Dog name is resolved via `bearek_id.KNIMI` lookup join.
   dogName?: string | null;
 };
 
@@ -70,6 +73,7 @@ export async function fetchLegacyShowRows(options?: {
     log(`Optional source table nay9599_rd_ud exists=${hasRdUdTable}`);
 
     const showResultsStartedAt = Date.now();
+    // `KNIMI` is not in show result tables directly; it comes from `bearek_id`.
     const baseRows = (await connection.query(
       `SELECT n.REKNO as registrationNo,
               n.TAPPV as eventDateRaw,
