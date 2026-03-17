@@ -189,6 +189,19 @@ describe("parseShowResultText", () => {
     expect(parsed.unmappedTokens).toEqual([]);
   });
 
+  it("normalizes mixed Kennelliitto-style award spellings to canonical codes", () => {
+    const parsed = parseShowResultText(
+      "JUN-SERT VSERT NORD-varaSERT",
+      "2023-04-22",
+    );
+    const defCodes = new Set(parsed.items.map((item) => item.definitionCode));
+
+    expect(defCodes.has("JUN_SERT")).toBe(true);
+    expect(defCodes.has("VARASERT")).toBe(true);
+    expect(defCodes.has("NORD_VARASERT")).toBe(true);
+    expect(parsed.unmappedTokens).toEqual([]);
+  });
+
   it("splits sure compound tokens", () => {
     const parsed = parseShowResultText(
       "PN1ROP PU1SA JUK2KP PN4FI59100/21",

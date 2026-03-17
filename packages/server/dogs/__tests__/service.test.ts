@@ -558,7 +558,7 @@ describe("dogs service", () => {
     });
   });
 
-  it("formats pre-2003 class+digit show results as class-digit for display", async () => {
+  it("keeps pre-2003 class+digit show results in default parser mode", async () => {
     const mockProfile = {
       id: "dog-legacy",
       name: "Legacy Dog",
@@ -606,7 +606,7 @@ describe("dogs service", () => {
               ...mockShows[0],
               showId: encodeShowId("1996-01-06", "Kajaani"),
               date: "1996-01-06",
-              result: "KÄY-2",
+              result: "KÄY2",
             },
           ],
           trials: [],
