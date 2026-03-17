@@ -12,7 +12,7 @@ import {
 import type { ImportIssueSeverity } from "@beagle/db";
 import type { ImportRunResponse } from "@beagle/contracts";
 import type { ServiceResult } from "../../core/result";
-import { getShowTokenCoverageReport, upsertShowRows } from "../internal";
+import { upsertShowRows } from "../internal";
 import { toImportRunResponse } from "../runs/transform";
 
 // Runs one-shot legacy phase3 initial load into canonical show tables.
@@ -30,8 +30,6 @@ export async function runLegacyPhase3(
     source: options?.auditSource ?? "SYSTEM",
   };
   const stageStartedAt = new Map<string, number>();
-  const strictSourceCoverage =
-    process.env.IMPORT_PHASE3_STRICT_SOURCE_COVERAGE === "1";
   const startStage = (name: string) => {
     stageStartedAt.set(name, Date.now());
     log(`[stage:${name}] start`);
@@ -150,95 +148,6 @@ export async function runLegacyPhase3(
     });
     log(`Loaded legacy show rows: showResults=${showRows.length}`);
     finishStage("load");
-
-    startStage("preflight-source");
-    const coverageReport = await getShowTokenCoverageReport(showRows);
-    if (
-      coverageReport.unmapped.length > 0 ||
-      coverageReport.missingDefinitionCodes.length > 0
-    ) {
-      const unmappedTop = coverageReport.unmapped.slice(0, 20);
-      const message = strictSourceCoverage
-        ? `Show source coverage failed: unmappedDistinctTokens=${coverageReport.unmapped.length}, unmappedOccurrences=${coverageReport.unmappedOccurrences}, missingDefinitionCodes=${coverageReport.missingDefinitionCodes.length}.`
-        : `Show source coverage has gaps (continuing): unmappedDistinctTokens=${coverageReport.unmapped.length}, unmappedOccurrences=${coverageReport.unmappedOccurrences}, missingDefinitionCodes=${coverageReport.missingDefinitionCodes.length}.`;
-      const preflightSeverity: ImportIssueSeverity = strictSourceCoverage
-        ? "ERROR"
-        : "WARNING";
-      const detailedPreflightIssues = [
-        ...coverageReport.unmapped.map((item) => ({
-          stage: "preflight-source" as const,
-          severity: preflightSeverity,
-          code: "SHOW_RESULT_TOKEN_UNMAPPED",
-          message: `Unmapped source token=${item.token}, occurrences=${item.count}.`,
-          registrationNo: item.samples[0]?.registrationNo ?? null,
-          sourceTable: item.samples[0]?.sourceTable ?? null,
-          payloadJson: JSON.stringify({
-            token: item.token,
-            count: item.count,
-            samples: item.samples,
-          }),
-        })),
-        ...coverageReport.missingDefinitionCodes.map((code) => ({
-          stage: "preflight-source" as const,
-          severity: preflightSeverity,
-          code: "SHOW_RESULT_DEFINITION_NOT_FOUND",
-          message: `Definition code missing from enabled ShowResultDefinition rows: ${code}.`,
-          registrationNo: null,
-          sourceTable: null,
-          payloadJson: JSON.stringify({ definitionCode: code }),
-        })),
-      ];
-      if (detailedPreflightIssues.length > 0) {
-        await createImportRunIssuesBulk(
-          run.id,
-          detailedPreflightIssues,
-          auditContext,
-        );
-      }
-      await createImportRunIssue(
-        run.id,
-        {
-          stage: "preflight-source",
-          severity: preflightSeverity,
-          code: "IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS",
-          message,
-          payloadJson: JSON.stringify({
-            totalDistinctTokens: coverageReport.totalDistinctTokens,
-            mappedDistinctTokens: coverageReport.mappedDistinctTokens,
-            unmappedDistinctTokens: coverageReport.unmapped.length,
-            unmappedOccurrences: coverageReport.unmappedOccurrences,
-            unmappedTop,
-            missingDefinitionCodes: coverageReport.missingDefinitionCodes,
-          }),
-        },
-        auditContext,
-      );
-      if (strictSourceCoverage) {
-        const finished = await markImportRunFinished(
-          run.id,
-          {
-            status: "FAILED",
-            dogsUpserted: 0,
-            ownersUpserted: 0,
-            ownershipsUpserted: 0,
-            trialResultsUpserted: 0,
-            showResultsUpserted: 0,
-            errorsCount: 1,
-            errorSummary: message,
-          },
-          auditContext,
-        );
-        return {
-          status: 500,
-          body: {
-            ok: false,
-            code: "IMPORT_FAILED",
-            error: `Import run failed (runId=${finished.id}): ${message}`,
-          },
-        };
-      }
-    }
-    finishStage("preflight-source");
 
     startStage("index");
     const registrations = await prisma.dogRegistration.findMany({

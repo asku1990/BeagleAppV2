@@ -106,50 +106,11 @@ export async function runImportPhase(
           `[import:${phaseLabel}]   [${sample.stage}/${sample.severity}/${sample.code}] reg=${sample.registrationNo ?? "-"} table=${sample.sourceTable ?? "-"} msg=${sample.message}`,
         );
         if (sample.payloadJson) {
-          try {
-            const payload = JSON.parse(sample.payloadJson) as {
-              totalDistinctTokens?: number;
-              mappedDistinctTokens?: number;
-              unmappedDistinctTokens?: number;
-              unmappedOccurrences?: number;
-              unmappedTop?: Array<{ token: string; count: number }>;
-              missingDefinitionCodes?: string[];
-            };
-            if (
-              sample.code === "IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS" &&
-              typeof payload.unmappedDistinctTokens === "number" &&
-              typeof payload.unmappedOccurrences === "number"
-            ) {
-              console.log(
-                `[import:${phaseLabel}]     coverage=unmappedDistinctTokens:${payload.unmappedDistinctTokens}, unmappedOccurrences:${payload.unmappedOccurrences}, totalDistinctTokens:${payload.totalDistinctTokens ?? "-"}, mappedDistinctTokens:${payload.mappedDistinctTokens ?? "-"}`,
-              );
-            }
-            if (
-              sample.code === "IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS" &&
-              Array.isArray(payload.unmappedTop) &&
-              payload.unmappedTop.length > 0
-            ) {
-              const top = payload.unmappedTop
-                .slice(0, 20)
-                .map((item) => `${item.token}(${item.count})`)
-                .join(", ");
-              console.log(`[import:${phaseLabel}]     unmappedTop=${top}`);
-            }
-            if (
-              Array.isArray(payload.missingDefinitionCodes) &&
-              payload.missingDefinitionCodes.length > 0
-            ) {
-              console.log(
-                `[import:${phaseLabel}]     missingDefinitionCodes=${payload.missingDefinitionCodes.join(", ")}`,
-              );
-            }
-          } catch {
-            const trimmed =
-              sample.payloadJson.length > 500
-                ? `${sample.payloadJson.slice(0, 500)}...`
-                : sample.payloadJson;
-            console.log(`[import:${phaseLabel}]     payload=${trimmed}`);
-          }
+          const trimmed =
+            sample.payloadJson.length > 500
+              ? `${sample.payloadJson.slice(0, 500)}...`
+              : sample.payloadJson;
+          console.log(`[import:${phaseLabel}]     payload=${trimmed}`);
         }
       }
     }

@@ -48,11 +48,6 @@ Issue tooling:
 3. `phase3` imports show rows into canonical show tables (`ShowEvent`, `ShowEntry`,
    `ShowResultItem`) using merged legacy sources (`nay9599`, `beanay`, optional
    `nay9599_rd_ud`) plus `beanay_text` critique join.
-   Before writing rows, phase3 runs source token coverage preflight and writes
-   aggregate + per-token/per-definition preflight issues for unmapped source
-   tokens and missing parser-produced definitions.
-   Default mode continues import with warnings; strict mode can fail the run
-   (`IMPORT_PHASE3_STRICT_SOURCE_COVERAGE=1`).
 
 4. `seed:show-result-definitions` upserts canonical `ShowResultDefinition` rows used by both
    legacy and Kennelliitto workbook mappings (for example `ROP`, `VSP`, `SERT`, `VARASERT`,
@@ -96,7 +91,6 @@ CSV export is per run id. Export separate CSV sets for each phase run id.
   - `SHOW_EVENT_MISSING_REQUIRED_FIELDS`
   - `SHOW_RESULT_TOKEN_UNMAPPED`
   - `SHOW_RESULT_DEFINITION_NOT_FOUND`
-  - `IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS`
 
 ## Execution model
 

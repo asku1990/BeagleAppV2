@@ -48,25 +48,6 @@ Runtime guard:
 - phase3 fails fast with `LEGACY_PHASE3_ONE_SHOT_ONLY` when canonical show
   tables (`ShowEvent`, `ShowEntry`, `ShowResultItem`) are not empty
 
-## Preflight requirement
-
-Before writing canonical rows, phase3 runs source token coverage preflight:
-
-- no unmapped `TULNI` tokens after normalization and alias mapping
-- no parser-produced definition codes missing from enabled `ShowResultDefinition` rows
-
-Default behavior:
-
-- preflight writes issue rows and phase3 continues to write canonical rows.
-
-Strict behavior (fail-fast):
-
-- set `IMPORT_PHASE3_STRICT_SOURCE_COVERAGE=1` to fail run on coverage gaps.
-
-Coverage issue code:
-
-- `IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS`
-
 Run seed first:
 
 `pnpm --filter @beagle/db seed:show-result-definitions`
@@ -145,12 +126,7 @@ Coverage rule:
 
 - Any remaining unmapped show-row token creates `SHOW_RESULT_TOKEN_UNMAPPED`
   (stage `shows`).
-- Preflight coverage gaps create `IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS`
-  (stage `preflight-source`).
-- Preflight writes:
-  - one aggregate issue (`IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS`)
-  - per-token issue rows (`SHOW_RESULT_TOKEN_UNMAPPED`, stage `preflight-source`)
-  - per-missing-definition issue rows (`SHOW_RESULT_DEFINITION_NOT_FOUND`, stage `preflight-source`)
+- Missing definitions create `SHOW_RESULT_DEFINITION_NOT_FOUND` (stage `shows`).
 
 ## Definition review checklist
 
@@ -172,7 +148,6 @@ When reviewing parser output against enabled definitions:
 - `SHOW_EVENT_MISSING_REQUIRED_FIELDS`
 - `SHOW_RESULT_TOKEN_UNMAPPED`
 - `SHOW_RESULT_DEFINITION_NOT_FOUND`
-- `IMPORT_CONFIGURATION_UNMAPPED_SHOW_TOKENS`
 - run-level fallback: `UNEXPECTED_EXCEPTION`
 
 Issue rows are written to `ImportRunIssue` with `kind=LEGACY_PHASE3`.

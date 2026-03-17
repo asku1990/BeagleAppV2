@@ -8,7 +8,6 @@ const {
   createImportRunIssueMock,
   createImportRunIssuesBulkMock,
   fetchLegacyShowRowsMock,
-  getShowTokenCoverageReportMock,
   upsertShowRowsMock,
   showEventCountMock,
   showEntryCountMock,
@@ -20,7 +19,6 @@ const {
   createImportRunIssueMock: vi.fn(),
   createImportRunIssuesBulkMock: vi.fn(),
   fetchLegacyShowRowsMock: vi.fn(),
-  getShowTokenCoverageReportMock: vi.fn(),
   upsertShowRowsMock: vi.fn(),
   showEventCountMock: vi.fn(),
   showEntryCountMock: vi.fn(),
@@ -46,7 +44,6 @@ vi.mock("@beagle/db", () => ({
 }));
 
 vi.mock("../../internal", () => ({
-  getShowTokenCoverageReport: getShowTokenCoverageReportMock,
   upsertShowRows: upsertShowRowsMock,
 }));
 
@@ -58,7 +55,6 @@ describe("runLegacyPhase3", () => {
     createImportRunIssueMock.mockReset();
     createImportRunIssuesBulkMock.mockReset();
     fetchLegacyShowRowsMock.mockReset();
-    getShowTokenCoverageReportMock.mockReset();
     upsertShowRowsMock.mockReset();
     showEventCountMock.mockReset();
     showEntryCountMock.mockReset();
@@ -99,7 +95,6 @@ describe("runLegacyPhase3", () => {
       expect.any(Object),
     );
     expect(fetchLegacyShowRowsMock).not.toHaveBeenCalled();
-    expect(getShowTokenCoverageReportMock).not.toHaveBeenCalled();
     expect(upsertShowRowsMock).not.toHaveBeenCalled();
   });
 });

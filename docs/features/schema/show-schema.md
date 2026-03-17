@@ -222,8 +222,8 @@ Notes:
 - `PUPN` still stays as one definition in this schema, and rank goes to
   `valueCode` (`PU1`, `PN2`) when that result exists in source data.
 - If dog is not found locally, entry is still accepted (`dogId = null`).
-- If a definition code does not exist in `ShowResultDefinition`, import should
-  fail fast in preflight definition check before row upserts.
+- If a definition code does not exist in `ShowResultDefinition`, phase3 writes
+  `SHOW_RESULT_DEFINITION_NOT_FOUND` issue rows during row processing and continues.
 
 ## Delete semantics
 
