@@ -35,6 +35,8 @@ export const FLAG_TOKEN_CODES = new Set([
   "VMVA",
 ]);
 
+// Legacy v1 quality digits (TULNI class+digit form) are mapped as:
+// 1=ERI, 2=EH, 3=H, 4=T, 5=EVA, 6=HYL.
 export const QUALITY_BY_DIGIT: Record<string, string> = {
   "1": "ERI",
   "2": "EH",
