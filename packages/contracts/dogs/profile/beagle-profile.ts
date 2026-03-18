@@ -1,3 +1,5 @@
+import type { BeagleShowStructuredResultDto } from "../../shows/beagle-shows";
+
 export type BeagleDogProfileSex = "U" | "N" | "-";
 
 export type BeagleDogProfileParentDto = {
@@ -38,12 +40,12 @@ export type BeagleDogProfileTrialRowDto = {
   pin: number | null;
 };
 
-export type BeagleDogProfileShowRowDto = {
+export type BeagleDogProfileShowRowDto = BeagleShowStructuredResultDto & {
   id: string;
   showId: string;
   place: string;
   date: string;
-  result: string | null;
+  critiqueText: string | null;
   judge: string | null;
   heightCm: number | null;
 };

@@ -178,7 +178,7 @@ describe("shows service", () => {
     });
   });
 
-  it("maps details and normalizes legacy result codes", async () => {
+  it("maps detail rows to structured canonical show fields", async () => {
     getBeagleShowDetailsDbMock.mockResolvedValue({
       eventDate: new Date("2025-06-01T00:00:00.000Z"),
       eventPlace: "Helsinki",
@@ -191,7 +191,13 @@ describe("shows service", () => {
           registrationNo: "FI-1/20",
           name: "Aatu",
           sex: "U",
-          result: "JUN1",
+          showType: "Ryhmänäyttely",
+          classCode: "JUN",
+          qualityGrade: "ERI",
+          classPlacement: 1,
+          pupn: "PU1",
+          awards: ["SA"],
+          critiqueText: "Excellent dog",
           heightCm: 40,
           judge: "Judge Main",
         },
@@ -206,10 +212,18 @@ describe("shows service", () => {
     if (!result.body.ok) {
       throw new Error("Expected ok=true response");
     }
-    expect(result.body.data.items[0]?.result).toBe("JUN-ERI");
+    expect(result.body.data.items[0]).toMatchObject({
+      showType: "Ryhmänäyttely",
+      classCode: "JUN",
+      qualityGrade: "ERI",
+      classPlacement: 1,
+      pupn: "PU1",
+      awards: ["SA"],
+      critiqueText: "Excellent dog",
+    });
   });
 
-  it("formats pre-2003 legacy class+digit for display without grade conversion", async () => {
+  it("returns structured fields without legacy result normalization", async () => {
     getBeagleShowDetailsDbMock.mockResolvedValue({
       eventDate: new Date("1996-01-06T00:00:00.000Z"),
       eventPlace: "Kajaani",
@@ -222,7 +236,13 @@ describe("shows service", () => {
           registrationNo: "FI-8/90",
           name: "Legacy Dog",
           sex: "U",
-          result: "KÄY2",
+          showType: null,
+          classCode: null,
+          qualityGrade: null,
+          classPlacement: null,
+          pupn: null,
+          awards: [],
+          critiqueText: null,
           heightCm: null,
           judge: "Judge Old",
         },
@@ -237,7 +257,12 @@ describe("shows service", () => {
     if (!result.body.ok) {
       throw new Error("Expected ok=true response");
     }
-    expect(result.body.data.items[0]?.result).toBe("KÄY-2");
+    expect(result.body.data.items[0]).toMatchObject({
+      qualityGrade: null,
+      classCode: null,
+      awards: [],
+      critiqueText: null,
+    });
   });
 
   it("returns 500 when db throws in shows search", async () => {

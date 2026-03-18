@@ -35,13 +35,22 @@ export type BeagleShowDetailsRequestDb = {
   eventPlace: string;
 };
 
-export type BeagleShowDetailsRowDb = {
+export type BeagleShowStructuredResultDb = {
+  showType: string | null;
+  classCode: string | null;
+  qualityGrade: string | null;
+  classPlacement: number | null;
+  pupn: string | null;
+  awards: string[];
+};
+
+export type BeagleShowDetailsRowDb = BeagleShowStructuredResultDb & {
   id: string;
   dogId: string;
   registrationNo: string;
   name: string;
   sex: "U" | "N" | "-";
-  result: string | null;
+  critiqueText: string | null;
   heightCm: number | null;
   judge: string | null;
 };
@@ -54,11 +63,11 @@ export type BeagleShowDetailsResponseDb = {
   items: BeagleShowDetailsRowDb[];
 };
 
-export type BeagleShowDogRowDb = {
+export type BeagleShowDogRowDb = BeagleShowStructuredResultDb & {
   id: string;
   place: string;
   date: Date;
-  result: string | null;
+  critiqueText: string | null;
   judge: string | null;
   heightCm: number | null;
 };

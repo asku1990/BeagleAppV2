@@ -5,6 +5,14 @@ import type {
   BeagleShowDetailsRow,
   BeagleShowSearchRow,
 } from "@beagle/contracts";
+import {
+  formatAwards,
+  formatClassCode,
+  formatClassPlacement,
+  formatPupn,
+  formatQualityGrade,
+  formatShowType,
+} from "./result-display";
 
 type ShowSearchClipboardLabels = {
   date: string;
@@ -17,7 +25,12 @@ type ShowDetailClipboardLabels = {
   registrationNo: string;
   name: string;
   sex: string;
-  result: string;
+  showType: string;
+  className: string;
+  qualityGrade: string;
+  placement: string;
+  pupn: string;
+  awards: string;
   reviewText: string;
   height: string;
   judge: string;
@@ -26,21 +39,31 @@ type ShowDetailClipboardLabels = {
   sexUnknown: string;
 };
 
-type ShowDetailClipboardRow = BeagleShowDetailsRow & {
-  reviewText?: string | null;
-};
+type ShowDetailClipboardRow = BeagleShowDetailsRow;
 
 type DogProfileShowClipboardLabels = {
   no: string;
+  showType: string;
+  className: string;
   place: string;
   date: string;
-  result: string;
+  qualityGrade: string;
+  placement: string;
+  pupn: string;
+  awards: string;
+  reviewText: string;
   height: string;
   judge: string;
 };
 
 type DogProfileShowClipboardColumns = {
-  includeResult: boolean;
+  includeShowType: boolean;
+  includeClassName: boolean;
+  includeQualityGrade: boolean;
+  includeClassPlacement: boolean;
+  includePupn: boolean;
+  includeAwards: boolean;
+  includeReviewText: boolean;
   includeHeight: boolean;
   includeJudge: boolean;
 };
@@ -116,7 +139,12 @@ export function formatShowDetailRowForClipboard(
     labels.registrationNo,
     labels.name,
     labels.sex,
-    labels.result,
+    labels.showType,
+    labels.className,
+    labels.qualityGrade,
+    labels.placement,
+    labels.pupn,
+    labels.awards,
     labels.reviewText,
     labels.height,
     labels.judge,
@@ -125,8 +153,13 @@ export function formatShowDetailRowForClipboard(
     row.registrationNo,
     row.name,
     formatSex(row.sex, labels),
-    formatMaybeString(row.result),
-    formatMaybeString(row.reviewText),
+    formatShowType(row),
+    formatClassCode(row),
+    formatQualityGrade(row),
+    formatClassPlacement(row),
+    formatPupn(row),
+    formatAwards(row),
+    formatMaybeString(row.critiqueText),
     formatHeight(row.heightCm),
     formatMaybeString(row.judge),
   ];
@@ -146,7 +179,12 @@ export function formatShowDetailRowsForClipboard(
     labels.registrationNo,
     labels.name,
     labels.sex,
-    labels.result,
+    labels.showType,
+    labels.className,
+    labels.qualityGrade,
+    labels.placement,
+    labels.pupn,
+    labels.awards,
     labels.reviewText,
     labels.height,
     labels.judge,
@@ -155,8 +193,13 @@ export function formatShowDetailRowsForClipboard(
     row.registrationNo,
     row.name,
     formatSex(row.sex, labels),
-    formatMaybeString(row.result),
-    formatMaybeString(row.reviewText),
+    formatShowType(row),
+    formatClassCode(row),
+    formatQualityGrade(row),
+    formatClassPlacement(row),
+    formatPupn(row),
+    formatAwards(row),
+    formatMaybeString(row.critiqueText),
     formatHeight(row.heightCm),
     formatMaybeString(row.judge),
   ]);
@@ -173,16 +216,32 @@ export function formatDogProfileShowRowsForClipboard(
 ): string {
   if (rows.length === 0) return "";
 
-  const header = [labels.no, labels.place, labels.date];
-  if (columns.includeResult) header.push(labels.result);
+  const header = [labels.no];
+  if (columns.includeShowType) header.push(labels.showType);
+  header.push(labels.place, labels.date);
+  if (columns.includeClassName) header.push(labels.className);
+  if (columns.includeQualityGrade) header.push(labels.qualityGrade);
+  if (columns.includeClassPlacement) header.push(labels.placement);
+  if (columns.includePupn) header.push(labels.pupn);
+  if (columns.includeAwards) header.push(labels.awards);
   if (columns.includeHeight) header.push(labels.height);
   if (columns.includeJudge) header.push(labels.judge);
+  if (columns.includeReviewText) header.push(labels.reviewText);
 
   const body = rows.map((row, index) => {
-    const cells = [String(index + 1), row.place, row.date];
-    if (columns.includeResult) cells.push(formatMaybeString(row.result));
+    const cells = [String(index + 1)];
+    if (columns.includeShowType) cells.push(formatShowType(row));
+    cells.push(row.place, row.date);
+    if (columns.includeClassName) cells.push(formatClassCode(row));
+    if (columns.includeQualityGrade) cells.push(formatQualityGrade(row));
+    if (columns.includeClassPlacement) cells.push(formatClassPlacement(row));
+    if (columns.includePupn) cells.push(formatPupn(row));
+    if (columns.includeAwards) cells.push(formatAwards(row));
     if (columns.includeHeight) cells.push(formatHeight(row.heightCm));
     if (columns.includeJudge) cells.push(formatMaybeString(row.judge));
+    if (columns.includeReviewText) {
+      cells.push(formatMaybeString(row.critiqueText));
+    }
     return cells;
   });
 

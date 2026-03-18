@@ -24,7 +24,12 @@ const detailLabels = {
   registrationNo: "Rek.nro",
   name: "Nimi",
   sex: "Sukupuoli",
-  result: "Tulos",
+  showType: "Tyyppi",
+  className: "Kilpailuluokka",
+  qualityGrade: "Laatuarvostelu",
+  placement: "Sijoitus",
+  pupn: "PU/PN",
+  awards: "Muut merkinnät",
   reviewText: "Arvostelu",
   height: "Korkeus",
   judge: "Tuomari",
@@ -100,8 +105,13 @@ describe("show clipboard actions", () => {
         registrationNo: "FI-1/20",
         name: "Aatu",
         sex: "U",
-        result: "ERI",
-        reviewText: "Pending later",
+        showType: "Ryhmänäyttely",
+        classCode: "JUN",
+        qualityGrade: "ERI",
+        classPlacement: 1,
+        pupn: "PU1",
+        awards: ["SA"],
+        critiqueText: "Pending later",
         heightCm: 40,
         judge: "Judge A",
       },
@@ -113,7 +123,7 @@ describe("show clipboard actions", () => {
 
     expect(result).toBe(false);
     expect(writeText).toHaveBeenCalledWith(
-      "Rek.nro\tNimi\tSukupuoli\tTulos\tArvostelu\tKorkeus\tTuomari\nFI-1/20\tAatu\tUros\tERI\tPending later\t40 cm\tJudge A",
+      "Rek.nro\tNimi\tSukupuoli\tTyyppi\tKilpailuluokka\tLaatuarvostelu\tSijoitus\tPU/PN\tMuut merkinnät\tArvostelu\tKorkeus\tTuomari\nFI-1/20\tAatu\tUros\tRyhmänäyttely\tJUN\tERI\t1\tPU1\tSA\tPending later\t40 cm\tJudge A",
     );
     expect(toast.error).toHaveBeenCalledWith("copy.error");
   });
@@ -129,21 +139,39 @@ describe("show clipboard actions", () => {
           showId: "show-1",
           place: "Helsinki",
           date: "2025-06-01",
-          result: "ERI",
+          showType: "Ryhmänäyttely",
+          classCode: "JUN",
+          qualityGrade: "ERI",
+          classPlacement: 1,
+          pupn: "PU1",
+          awards: ["SA"],
+          critiqueText: "Pending later",
           judge: "Judge A",
           heightCm: 40,
         },
       ],
       labels: {
         no: "N:o",
+        showType: "Tyyppi",
+        className: "Kilpailuluokka",
         place: "Paikka",
         date: "Päivä",
-        result: "Tulos",
+        qualityGrade: "Laatuarvostelu",
+        placement: "Sijoitus",
+        pupn: "PU/PN",
+        awards: "Muut merkinnät",
+        reviewText: "Sanallinen arvostelu",
         height: "Korkeus",
         judge: "Tuomari",
       },
       columns: {
-        includeResult: true,
+        includeShowType: true,
+        includeClassName: true,
+        includeQualityGrade: true,
+        includeClassPlacement: true,
+        includePupn: true,
+        includeAwards: true,
+        includeReviewText: true,
         includeHeight: true,
         includeJudge: true,
       },
@@ -154,7 +182,7 @@ describe("show clipboard actions", () => {
 
     expect(result).toBe(true);
     expect(writeText).toHaveBeenCalledWith(
-      "N:o\tPaikka\tPäivä\tTulos\tKorkeus\tTuomari\n1\tHelsinki\t2025-06-01\tERI\t40 cm\tJudge A",
+      "N:o\tTyyppi\tPaikka\tPäivä\tKilpailuluokka\tLaatuarvostelu\tSijoitus\tPU/PN\tMuut merkinnät\tKorkeus\tTuomari\tSanallinen arvostelu\n1\tRyhmänäyttely\tHelsinki\t2025-06-01\tJUN\tERI\t1\tPU1\tSA\t40 cm\tJudge A\tPending later",
     );
     expect(toast.success).toHaveBeenCalledWith("copy.success");
   });

@@ -9,7 +9,6 @@ import {
   type BeagleTrialDogRowDb,
 } from "@beagle/db";
 import type { BeagleDogProfileDto } from "@beagle/contracts";
-import { normalizeShowResult } from "../../shows/core";
 import { encodeShowId } from "../../shows/internal/show-id";
 import { formatTrialAward } from "../../trials/core";
 import { encodeTrialId } from "../../trials/internal/trial-id";
@@ -59,7 +58,13 @@ function mapDogProfileFromDb(
         showId: encodeShowId(showDate, show.place),
         place: show.place,
         date: showDate,
-        result: normalizeShowResult(show.result, showDate),
+        showType: show.showType,
+        classCode: show.classCode,
+        qualityGrade: show.qualityGrade,
+        classPlacement: show.classPlacement,
+        pupn: show.pupn,
+        awards: show.awards,
+        critiqueText: show.critiqueText,
         judge: show.judge,
         heightCm: show.heightCm,
       };

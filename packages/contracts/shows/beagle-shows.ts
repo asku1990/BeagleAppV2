@@ -47,13 +47,22 @@ export type BeagleShowDetailsEvent = {
   dogCount: number;
 };
 
-export type BeagleShowDetailsRow = {
+export type BeagleShowStructuredResultDto = {
+  showType: string | null;
+  classCode: string | null;
+  qualityGrade: string | null;
+  classPlacement: number | null;
+  pupn: string | null;
+  awards: string[];
+};
+
+export type BeagleShowDetailsRow = BeagleShowStructuredResultDto & {
   id: string;
   dogId: string;
   registrationNo: string;
   name: string;
   sex: "U" | "N" | "-";
-  result: string | null;
+  critiqueText: string | null;
   heightCm: number | null;
   judge: string | null;
 };

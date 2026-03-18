@@ -11,7 +11,13 @@ import { useI18n } from "@/hooks/i18n";
 import {
   copyShowDetailRowToClipboard,
   copyShowDetailRowsToClipboard,
+  formatAwards,
+  formatClassCode,
+  formatClassPlacement,
+  formatPupn,
+  formatQualityGrade,
   formatIsoDateForDisplay,
+  formatShowType,
 } from "@/lib/public/beagle/shows";
 import { getDogProfileHref } from "@/lib/public/beagle/dogs/profile";
 import { cn } from "@/lib/utils";
@@ -38,15 +44,13 @@ function formatHeight(heightCm: number | null): string {
 }
 
 type ShowDetailsRowWithOptionalReview =
-  BeagleShowDetailsResponse["items"][number] & {
-    reviewText?: string | null;
-  };
+  BeagleShowDetailsResponse["items"][number];
 
 function getReviewTextValue(
   row: ShowDetailsRowWithOptionalReview,
   pendingLabel: string,
 ): { text: string; canCollapse: boolean } {
-  const value = row.reviewText?.trim();
+  const value = row.critiqueText?.trim();
   const collapseThreshold = 100;
   if (!value) {
     return {
@@ -99,7 +103,12 @@ export function BeagleShowDetailsPage({
     registrationNo: t("shows.details.col.reg"),
     name: t("shows.details.col.name"),
     sex: t("shows.details.col.sex"),
-    result: t("shows.details.col.result"),
+    showType: t("shows.details.col.showType"),
+    className: t("shows.details.col.className"),
+    qualityGrade: t("shows.details.col.qualityGrade"),
+    placement: t("shows.details.col.placement"),
+    pupn: t("shows.details.col.pupn"),
+    awards: t("shows.details.col.awards"),
     reviewText: t("shows.details.col.reviewText"),
     height: t("shows.details.col.height"),
     judge: t("shows.details.col.judge"),
@@ -113,12 +122,9 @@ export function BeagleShowDetailsPage({
     unsupported: t("shows.details.copy.unsupported"),
   };
 
-  const handleCopyRow = async (
-    row: ShowDetailsRowWithOptionalReview,
-    reviewText: string,
-  ) => {
+  const handleCopyRow = async (row: ShowDetailsRowWithOptionalReview) => {
     await copyShowDetailRowToClipboard({
-      row: { ...row, reviewText },
+      row,
       labels: clipboardLabels,
       messages: clipboardMessages,
       clipboard: globalThis.navigator?.clipboard,
@@ -128,10 +134,7 @@ export function BeagleShowDetailsPage({
 
   const handleCopyAllRows = async () => {
     await copyShowDetailRowsToClipboard({
-      rows: details.items.map((row) => ({
-        ...row,
-        reviewText: getReviewTextValue(row, reviewPendingLabel).text,
-      })),
+      rows: details.items,
       labels: clipboardLabels,
       messages: clipboardMessages,
       clipboard: globalThis.navigator?.clipboard,
@@ -187,7 +190,7 @@ export function BeagleShowDetailsPage({
         <ListingResponsiveResults
           desktop={
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[980px] border-collapse text-sm">
+              <table className="w-full min-w-[1320px] border-collapse text-sm">
                 <thead>
                   <tr className={cn("border-b text-left", beagleTheme.border)}>
                     <th className="px-2 py-2 font-semibold">
@@ -200,7 +203,22 @@ export function BeagleShowDetailsPage({
                       {t("shows.details.col.sex")}
                     </th>
                     <th className="px-2 py-2 font-semibold">
-                      {t("shows.details.col.result")}
+                      {t("shows.details.col.showType")}
+                    </th>
+                    <th className="px-2 py-2 font-semibold">
+                      {t("shows.details.col.className")}
+                    </th>
+                    <th className="px-2 py-2 font-semibold">
+                      {t("shows.details.col.qualityGrade")}
+                    </th>
+                    <th className="px-2 py-2 font-semibold">
+                      {t("shows.details.col.placement")}
+                    </th>
+                    <th className="px-2 py-2 font-semibold">
+                      {t("shows.details.col.pupn")}
+                    </th>
+                    <th className="px-2 py-2 font-semibold">
+                      {t("shows.details.col.awards")}
                     </th>
                     <th className="px-2 py-2 font-semibold">
                       {t("shows.details.col.reviewText")}
@@ -242,7 +260,14 @@ export function BeagleShowDetailsPage({
                           </Link>
                         </td>
                         <td className="px-2 py-2">{mapSexLabel(row.sex, t)}</td>
-                        <td className="px-2 py-2">{row.result ?? "-"}</td>
+                        <td className="px-2 py-2">{formatShowType(row)}</td>
+                        <td className="px-2 py-2">{formatClassCode(row)}</td>
+                        <td className="px-2 py-2">{formatQualityGrade(row)}</td>
+                        <td className="px-2 py-2">
+                          {formatClassPlacement(row)}
+                        </td>
+                        <td className="px-2 py-2">{formatPupn(row)}</td>
+                        <td className="px-2 py-2">{formatAwards(row)}</td>
                         <td className="px-2 py-2">
                           <CollapsibleReviewText
                             text={review.text}
@@ -258,7 +283,7 @@ export function BeagleShowDetailsPage({
                         <td className="px-2 py-2">
                           <button
                             type="button"
-                            onClick={() => void handleCopyRow(row, review.text)}
+                            onClick={() => void handleCopyRow(row)}
                             className={beagleTheme.actionLinkStrong}
                           >
                             {t("shows.details.copy.button")}
@@ -316,9 +341,39 @@ export function BeagleShowDetailsPage({
                       </p>
                       <p>
                         <span className={beagleTheme.mutedText}>
-                          {t("shows.details.col.result")}:
+                          {t("shows.details.col.showType")}:
                         </span>
-                        <span>{row.result ?? "-"}</span>
+                        <span>{formatShowType(row)}</span>
+                      </p>
+                      <p>
+                        <span className={beagleTheme.mutedText}>
+                          {t("shows.details.col.className")}:
+                        </span>
+                        <span>{formatClassCode(row)}</span>
+                      </p>
+                      <p>
+                        <span className={beagleTheme.mutedText}>
+                          {t("shows.details.col.qualityGrade")}:
+                        </span>
+                        <span>{formatQualityGrade(row)}</span>
+                      </p>
+                      <p>
+                        <span className={beagleTheme.mutedText}>
+                          {t("shows.details.col.placement")}:
+                        </span>
+                        <span>{formatClassPlacement(row)}</span>
+                      </p>
+                      <p>
+                        <span className={beagleTheme.mutedText}>
+                          {t("shows.details.col.pupn")}:
+                        </span>
+                        <span>{formatPupn(row)}</span>
+                      </p>
+                      <p className="col-span-2">
+                        <span className={beagleTheme.mutedText}>
+                          {t("shows.details.col.awards")}:
+                        </span>
+                        <span>{formatAwards(row)}</span>
                       </p>
                       <p>
                         <span className={beagleTheme.mutedText}>
@@ -346,7 +401,7 @@ export function BeagleShowDetailsPage({
                       <p className="col-span-2">
                         <button
                           type="button"
-                          onClick={() => void handleCopyRow(row, review.text)}
+                          onClick={() => void handleCopyRow(row)}
                           className={beagleTheme.actionLinkStrong}
                         >
                           {t("shows.details.copy.button")}

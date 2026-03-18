@@ -5,12 +5,31 @@ import {
   ListingSectionShell,
 } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { toast } from "@/components/ui/sonner";
 import { useI18n } from "@/hooks/i18n";
 import { parseLocalIsoDate } from "@/lib/public/beagle/dogs/profile";
 import {
   copyDogProfileShowRowsToClipboard,
+  formatAwards,
+  formatClassCode,
+  formatClassPlacement,
+  formatPupn,
+  formatQualityGrade,
+  formatShowType,
+  hasDogProfileShowClass,
   getBeagleShowHref,
+  hasDogProfileShowAwards,
+  hasDogProfileShowCritique,
+  hasDogProfileShowPlacement,
+  hasDogProfileShowPupn,
+  hasDogProfileShowQuality,
+  hasDogProfileShowType,
 } from "@/lib/public/beagle/shows";
 import { cn } from "@/lib/utils";
 import type { BeagleDogProfileShowRowDto } from "@beagle/contracts";
@@ -42,10 +61,22 @@ export function DogProfileShowsCard({
 }) {
   const { t, locale } = useI18n();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [selectedCritique, setSelectedCritique] = useState<{
+    showId: string;
+    place: string;
+    date: string;
+    text: string;
+  } | null>(null);
   const canReveal = rows.length > 10;
   const visibleRows = isExpanded ? rows : rows.slice(0, 10);
 
-  const hasResult = rows.some((r) => r.result != null);
+  const hasShowType = hasDogProfileShowType(rows);
+  const hasQualityGrade = hasDogProfileShowQuality(rows);
+  const hasClassCode = hasDogProfileShowClass(rows);
+  const hasClassPlacement = hasDogProfileShowPlacement(rows);
+  const hasPupn = hasDogProfileShowPupn(rows);
+  const hasAwards = hasDogProfileShowAwards(rows);
+  const hasReviewText = hasDogProfileShowCritique(rows);
   const hasJudge = rows.some((r) => r.judge != null);
   const hasHeight = rows.some((r) => r.heightCm != null);
 
@@ -54,14 +85,26 @@ export function DogProfileShowsCard({
       rows,
       labels: {
         no: t("dog.profile.shows.col.no"),
+        showType: t("dog.profile.shows.col.showType"),
+        className: t("dog.profile.shows.col.className"),
         place: t("dog.profile.shows.col.place"),
         date: t("dog.profile.shows.col.date"),
-        result: t("dog.profile.shows.col.result"),
+        qualityGrade: t("dog.profile.shows.col.qualityGrade"),
+        placement: t("dog.profile.shows.col.placement"),
+        pupn: t("dog.profile.shows.col.pupn"),
+        awards: t("dog.profile.shows.col.awards"),
+        reviewText: t("dog.profile.shows.col.reviewText"),
         height: t("dog.profile.shows.col.height"),
         judge: t("dog.profile.shows.col.judge"),
       },
       columns: {
-        includeResult: hasResult,
+        includeShowType: hasShowType,
+        includeQualityGrade: hasQualityGrade,
+        includeClassName: hasClassCode,
+        includeClassPlacement: hasClassPlacement,
+        includePupn: hasPupn,
+        includeAwards: hasAwards,
+        includeReviewText: hasReviewText,
         includeHeight: hasHeight,
         includeJudge: hasJudge,
       },
@@ -117,15 +160,40 @@ export function DogProfileShowsCard({
                     <th className="px-2 py-2 font-semibold">
                       {t("dog.profile.shows.col.no")}
                     </th>
+                    {hasShowType && (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("dog.profile.shows.col.showType")}
+                      </th>
+                    )}
                     <th className="px-2 py-2 font-semibold">
                       {t("dog.profile.shows.col.place")}
                     </th>
                     <th className="px-2 py-2 font-semibold">
                       {t("dog.profile.shows.col.date")}
                     </th>
-                    {hasResult && (
+                    {hasQualityGrade && (
                       <th className="px-2 py-2 font-semibold">
-                        {t("dog.profile.shows.col.result")}
+                        {t("dog.profile.shows.col.qualityGrade")}
+                      </th>
+                    )}
+                    {hasClassCode && (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("dog.profile.shows.col.className")}
+                      </th>
+                    )}
+                    {hasClassPlacement && (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("dog.profile.shows.col.placement")}
+                      </th>
+                    )}
+                    {hasPupn && (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("dog.profile.shows.col.pupn")}
+                      </th>
+                    )}
+                    {hasAwards && (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("dog.profile.shows.col.awards")}
                       </th>
                     )}
                     {hasHeight && (
@@ -138,6 +206,11 @@ export function DogProfileShowsCard({
                         {t("dog.profile.shows.col.judge")}
                       </th>
                     )}
+                    {hasReviewText && (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("dog.profile.shows.col.reviewText")}
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -147,6 +220,9 @@ export function DogProfileShowsCard({
                       className={cn("border-b align-top", beagleTheme.border)}
                     >
                       <td className="px-2 py-2">{index + 1}</td>
+                      {hasShowType && (
+                        <td className="px-2 py-2">{formatShowType(row)}</td>
+                      )}
                       <td className="px-2 py-2">
                         <Link
                           href={getBeagleShowHref(row.showId)}
@@ -158,10 +234,22 @@ export function DogProfileShowsCard({
                       <td className="px-2 py-2">
                         {formatDate(row.date, locale)}
                       </td>
-                      {hasResult && (
+                      {hasQualityGrade && (
+                        <td className="px-2 py-2">{formatQualityGrade(row)}</td>
+                      )}
+                      {hasClassCode && (
+                        <td className="px-2 py-2">{formatClassCode(row)}</td>
+                      )}
+                      {hasClassPlacement && (
                         <td className="px-2 py-2">
-                          {row.result ?? FALLBACK_VALUE}
+                          {formatClassPlacement(row)}
                         </td>
+                      )}
+                      {hasPupn && (
+                        <td className="px-2 py-2">{formatPupn(row)}</td>
+                      )}
+                      {hasAwards && (
+                        <td className="px-2 py-2">{formatAwards(row)}</td>
                       )}
                       {hasHeight && (
                         <td className="px-2 py-2">
@@ -171,6 +259,28 @@ export function DogProfileShowsCard({
                       {hasJudge && (
                         <td className="px-2 py-2">
                           {row.judge ?? FALLBACK_VALUE}
+                        </td>
+                      )}
+                      {hasReviewText && (
+                        <td className="px-2 py-2">
+                          {row.critiqueText?.trim() ? (
+                            <button
+                              type="button"
+                              className={beagleTheme.actionLinkStrong}
+                              onClick={() =>
+                                setSelectedCritique({
+                                  showId: row.showId,
+                                  place: row.place,
+                                  date: row.date,
+                                  text: row.critiqueText?.trim() ?? "",
+                                })
+                              }
+                            >
+                              {t("dog.profile.shows.review.open")}
+                            </button>
+                          ) : (
+                            FALLBACK_VALUE
+                          )}
                         </td>
                       )}
                     </tr>
@@ -197,6 +307,14 @@ export function DogProfileShowsCard({
                       </span>{" "}
                       <span>{index + 1}</span>
                     </p>
+                    {hasShowType && (
+                      <p>
+                        <span className={beagleTheme.mutedText}>
+                          {t("dog.profile.shows.col.showType")}:
+                        </span>{" "}
+                        <span>{formatShowType(row)}</span>
+                      </p>
+                    )}
                     <p>
                       <span className={beagleTheme.mutedText}>
                         {t("dog.profile.shows.col.date")}:
@@ -214,12 +332,44 @@ export function DogProfileShowsCard({
                         {row.place}
                       </Link>
                     </p>
-                    {hasResult && (
+                    {hasQualityGrade && (
                       <p className="col-span-2">
                         <span className={beagleTheme.mutedText}>
-                          {t("dog.profile.shows.col.result")}:
+                          {t("dog.profile.shows.col.qualityGrade")}:
                         </span>{" "}
-                        <span>{row.result ?? FALLBACK_VALUE}</span>
+                        <span>{formatQualityGrade(row)}</span>
+                      </p>
+                    )}
+                    {hasClassCode && (
+                      <p className="col-span-2">
+                        <span className={beagleTheme.mutedText}>
+                          {t("dog.profile.shows.col.className")}:
+                        </span>{" "}
+                        <span>{formatClassCode(row)}</span>
+                      </p>
+                    )}
+                    {hasClassPlacement && (
+                      <p className="col-span-2">
+                        <span className={beagleTheme.mutedText}>
+                          {t("dog.profile.shows.col.placement")}:
+                        </span>{" "}
+                        <span>{formatClassPlacement(row)}</span>
+                      </p>
+                    )}
+                    {hasPupn && (
+                      <p className="col-span-2">
+                        <span className={beagleTheme.mutedText}>
+                          {t("dog.profile.shows.col.pupn")}:
+                        </span>{" "}
+                        <span>{formatPupn(row)}</span>
+                      </p>
+                    )}
+                    {hasAwards && (
+                      <p className="col-span-2">
+                        <span className={beagleTheme.mutedText}>
+                          {t("dog.profile.shows.col.awards")}:
+                        </span>{" "}
+                        <span>{formatAwards(row)}</span>
                       </p>
                     )}
                     {hasHeight && (
@@ -238,6 +388,31 @@ export function DogProfileShowsCard({
                         <span>{row.judge ?? FALLBACK_VALUE}</span>
                       </p>
                     )}
+                    {hasReviewText && (
+                      <p className="col-span-2">
+                        <span className={beagleTheme.mutedText}>
+                          {t("dog.profile.shows.col.reviewText")}:
+                        </span>{" "}
+                        {row.critiqueText?.trim() ? (
+                          <button
+                            type="button"
+                            className={beagleTheme.actionLinkStrong}
+                            onClick={() =>
+                              setSelectedCritique({
+                                showId: row.showId,
+                                place: row.place,
+                                date: row.date,
+                                text: row.critiqueText?.trim() ?? "",
+                              })
+                            }
+                          >
+                            {t("dog.profile.shows.review.open")}
+                          </button>
+                        ) : (
+                          <span>{FALLBACK_VALUE}</span>
+                        )}
+                      </p>
+                    )}
                   </div>
                 </article>
               ))}
@@ -245,6 +420,31 @@ export function DogProfileShowsCard({
           }
         />
       )}
+      <Dialog
+        open={Boolean(selectedCritique)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedCritique(null);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-[640px]">
+          <DialogHeader>
+            <DialogTitle>
+              {t("dog.profile.shows.review.modalTitle")}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedCritique ? (
+            <div className="space-y-3 text-sm">
+              <p className={beagleTheme.mutedText}>
+                {selectedCritique.place} •{" "}
+                {formatDate(selectedCritique.date, locale)}
+              </p>
+              <p className="whitespace-pre-wrap">{selectedCritique.text}</p>
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
       {canReveal ? (
         <div className="flex items-center justify-between gap-3 pt-3">
           <p className={cn("text-xs", beagleTheme.mutedText)}>

@@ -27,14 +27,40 @@ export function compareDetailRows(
   const sexComparison = sexOrder[left.sex] - sexOrder[right.sex];
   if (sexComparison !== 0) return sexComparison;
 
-  const resultComparison = (left.result ?? "").localeCompare(
-    right.result ?? "",
+  const showTypeComparison = (left.showType ?? "").localeCompare(
+    right.showType ?? "",
+    "fi",
+    { sensitivity: "base" },
+  );
+  if (showTypeComparison !== 0) return showTypeComparison;
+
+  const qualityComparison = (left.qualityGrade ?? "").localeCompare(
+    right.qualityGrade ?? "",
+    "fi",
+    { sensitivity: "base" },
+  );
+  if (qualityComparison !== 0) return qualityComparison;
+
+  const placementComparison =
+    (left.classPlacement ?? Number.POSITIVE_INFINITY) -
+    (right.classPlacement ?? Number.POSITIVE_INFINITY);
+  if (placementComparison !== 0) return placementComparison;
+
+  const pupnComparison = (left.pupn ?? "").localeCompare(
+    right.pupn ?? "",
     "fi",
     {
       sensitivity: "base",
     },
   );
-  if (resultComparison !== 0) return resultComparison;
+  if (pupnComparison !== 0) return pupnComparison;
+
+  const awardsComparison = left.awards
+    .join(", ")
+    .localeCompare(right.awards.join(", "), "fi", {
+      sensitivity: "base",
+    });
+  if (awardsComparison !== 0) return awardsComparison;
 
   const nameComparison = left.name.localeCompare(right.name, "fi", {
     sensitivity: "base",

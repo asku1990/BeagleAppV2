@@ -111,6 +111,7 @@ export type {
   BeagleShowDetailsRequest,
   BeagleShowDetailsResponse,
   BeagleShowDetailsRow,
+  BeagleShowStructuredResultDto,
   BeagleShowSearchFilters,
   BeagleShowSearchMode,
   BeagleShowSearchRequest,

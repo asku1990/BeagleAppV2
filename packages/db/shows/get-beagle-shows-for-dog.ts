@@ -1,5 +1,5 @@
 import { prisma } from "../core/prisma";
-import { formatCanonicalShowResultText } from "./internal/canonical-result-text";
+import { projectCanonicalShowResult } from "./internal/canonical-result-presentation";
 import { parseHeightCm } from "./internal/show-row-mappers";
 import type { BeagleShowDogRowDb } from "./types";
 
@@ -12,10 +12,12 @@ export async function getBeagleShowsForDogDb(
       id: true,
       judge: true,
       heightText: true,
+      critiqueText: true,
       showEvent: {
         select: {
           eventPlace: true,
           eventDate: true,
+          eventType: true,
         },
       },
       resultItems: {
@@ -27,6 +29,7 @@ export async function getBeagleShowsForDogDb(
             select: {
               code: true,
               sortOrder: true,
+              isVisibleByDefault: true,
               category: {
                 select: {
                   code: true,
@@ -49,10 +52,8 @@ export async function getBeagleShowsForDogDb(
     id: row.id,
     place: row.showEvent.eventPlace,
     date: row.showEvent.eventDate,
-    result: formatCanonicalShowResultText(
-      row.showEvent.eventDate,
-      row.resultItems,
-    ),
+    ...projectCanonicalShowResult(row.showEvent.eventType, row.resultItems),
+    critiqueText: row.critiqueText,
     judge: row.judge,
     heightCm: parseHeightCm(row.heightText),
   }));

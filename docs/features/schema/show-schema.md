@@ -269,3 +269,14 @@ Notes:
 - Legacy table `ShowResult` may still exist during cleanup, but public show
   reads and counters should use the canonical model (`ShowEvent`, `ShowEntry`,
   `ShowResultItem`).
+- Public show presentation should also stay canonical:
+  - `showType` comes from `ShowEvent.eventType`
+  - `qualityGrade` comes from the canonical quality definition code
+  - `classPlacement` comes from `SIJOITUS.valueNumeric`
+  - `classPlacementLabel` is a derived presentation helper such as `AVK1`
+  - `pupn` comes from `PUPN`
+  - `awards` contains the remaining awarded canonical result definitions in
+    canonical sort order
+  - `critiqueText` comes from `ShowEntry.critiqueText`
+- Public UI should not reconstruct one legacy-style `result` string such as
+  `AVO-EH, AVOK1` from canonical rows.

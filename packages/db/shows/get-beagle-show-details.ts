@@ -4,7 +4,7 @@ import {
   toBusinessDateOnly,
 } from "../core/date-only";
 import { prisma } from "../core/prisma";
-import { formatCanonicalShowResultText } from "./internal/canonical-result-text";
+import { projectCanonicalShowResult } from "./internal/canonical-result-presentation";
 import { collapseJudge } from "./internal/show-judge";
 import {
   compareDetailRows,
@@ -41,6 +41,7 @@ export async function getBeagleShowDetailsDb(
     select: {
       eventDate: true,
       eventPlace: true,
+      eventType: true,
       entries: {
         where: {
           dogId: {
@@ -50,6 +51,7 @@ export async function getBeagleShowDetailsDb(
         select: {
           id: true,
           judge: true,
+          critiqueText: true,
           heightText: true,
           dog: {
             select: {
@@ -74,6 +76,7 @@ export async function getBeagleShowDetailsDb(
                 select: {
                   code: true,
                   sortOrder: true,
+                  isVisibleByDefault: true,
                   category: {
                     select: {
                       code: true,
@@ -107,7 +110,8 @@ export async function getBeagleShowDetailsDb(
       registrationNo: row.dog.registrations[0]?.registrationNo ?? "-",
       name: row.dog.name,
       sex: toSexCode(row.dog.sex),
-      result: formatCanonicalShowResultText(event.eventDate, row.resultItems),
+      ...projectCanonicalShowResult(event.eventType, row.resultItems),
+      critiqueText: row.critiqueText,
       heightCm: parseHeightCm(row.heightText),
       judge: row.judge,
     }))

@@ -320,7 +320,13 @@ describe("dogs service", () => {
         id: "show1",
         place: "City",
         date: new Date("2024-01-01T00:00:00.000Z"),
-        result: "JUN1",
+        showType: "Ryhmänäyttely",
+        classCode: "JUN",
+        qualityGrade: "ERI",
+        classPlacement: 1,
+        pupn: "PU1",
+        awards: ["SA"],
+        critiqueText: "Arvostelu",
         judge: "Judge",
         heightCm: 39,
       },
@@ -374,7 +380,6 @@ describe("dogs service", () => {
               ...mockShows[0],
               showId: encodeShowId("2024-01-01", "City"),
               date: "2024-01-01",
-              result: "JUN-ERI",
             },
           ],
           trials: [
@@ -428,7 +433,13 @@ describe("dogs service", () => {
         id: "show2",
         place: "Helsinki",
         date: new Date("2022-03-15T00:00:00+02:00"),
-        result: null,
+        showType: null,
+        classCode: null,
+        qualityGrade: null,
+        classPlacement: null,
+        pupn: null,
+        awards: [],
+        critiqueText: null,
         judge: null,
         heightCm: null,
       },
@@ -501,7 +512,7 @@ describe("dogs service", () => {
     });
   });
 
-  it("preserves non-code casing in show results", async () => {
+  it("passes structured show fields through dog profile mapping", async () => {
     const mockProfile = {
       id: "dog-casing",
       name: "Case Dog",
@@ -526,7 +537,13 @@ describe("dogs service", () => {
         id: "show-case",
         place: "City",
         date: new Date("2024-02-01T00:00:00.000Z"),
-        result: "JUN1 (specialNote)",
+        showType: "Ryhmänäyttely",
+        classCode: "JUN",
+        qualityGrade: "ERI",
+        classPlacement: 1,
+        pupn: null,
+        awards: ["specialNote"],
+        critiqueText: "Special note",
         judge: null,
         heightCm: null,
       },
@@ -549,7 +566,6 @@ describe("dogs service", () => {
               ...mockShows[0],
               showId: encodeShowId("2024-02-01", "City"),
               date: "2024-02-01",
-              result: "JUN-ERI (specialNote)",
             },
           ],
           trials: [],
@@ -558,7 +574,7 @@ describe("dogs service", () => {
     });
   });
 
-  it("keeps pre-2003 class+digit show results in default parser mode", async () => {
+  it("keeps null structured show fields when no canonical result items exist", async () => {
     const mockProfile = {
       id: "dog-legacy",
       name: "Legacy Dog",
@@ -583,7 +599,13 @@ describe("dogs service", () => {
         id: "show-legacy",
         place: "Kajaani",
         date: new Date("1996-01-06T00:00:00.000Z"),
-        result: "KÄY2",
+        showType: null,
+        classCode: null,
+        qualityGrade: null,
+        classPlacement: null,
+        pupn: null,
+        awards: [],
+        critiqueText: null,
         judge: null,
         heightCm: null,
       },
@@ -606,7 +628,6 @@ describe("dogs service", () => {
               ...mockShows[0],
               showId: encodeShowId("1996-01-06", "Kajaani"),
               date: "1996-01-06",
-              result: "KÄY2",
             },
           ],
           trials: [],

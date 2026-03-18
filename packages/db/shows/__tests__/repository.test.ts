@@ -5,16 +5,19 @@ const {
   showEventFindManyMock,
   showEventFindFirstMock,
   showEntryFindManyMock,
+  showResultDefinitionFindManyMock,
   prismaMock,
 } = vi.hoisted(() => {
   const showEventFindMany = vi.fn();
   const showEventFindFirst = vi.fn();
   const showEntryFindMany = vi.fn();
+  const showResultDefinitionFindMany = vi.fn();
 
   return {
     showEventFindManyMock: showEventFindMany,
     showEventFindFirstMock: showEventFindFirst,
     showEntryFindManyMock: showEntryFindMany,
+    showResultDefinitionFindManyMock: showResultDefinitionFindMany,
     prismaMock: {
       showEvent: {
         findMany: showEventFindMany,
@@ -22,6 +25,9 @@ const {
       },
       showEntry: {
         findMany: showEntryFindMany,
+      },
+      showResultDefinition: {
+        findMany: showResultDefinitionFindMany,
       },
     },
   };
@@ -42,10 +48,12 @@ function makeDefinition(
   categoryCode: string,
   categorySortOrder: number,
   sortOrder: number,
+  isVisibleByDefault = true,
 ) {
   return {
     code,
     sortOrder,
+    isVisibleByDefault,
     category: {
       code: categoryCode,
       sortOrder: categorySortOrder,
@@ -58,6 +66,7 @@ describe("searchBeagleShowsDb", () => {
     showEventFindManyMock.mockReset();
     showEventFindFirstMock.mockReset();
     showEntryFindManyMock.mockReset();
+    showResultDefinitionFindManyMock.mockReset();
   });
 
   it("groups canonical events and returns available years", async () => {
@@ -182,6 +191,15 @@ describe("getBeagleShowDetailsDb", () => {
     showEventFindManyMock.mockReset();
     showEventFindFirstMock.mockReset();
     showEntryFindManyMock.mockReset();
+    showResultDefinitionFindManyMock.mockReset();
+    showResultDefinitionFindManyMock.mockResolvedValue([
+      { code: "ERI", sortOrder: 10 },
+      { code: "EH", sortOrder: 20 },
+      { code: "H", sortOrder: 30 },
+      { code: "T", sortOrder: 40 },
+      { code: "EVA", sortOrder: 50 },
+      { code: "HYL", sortOrder: 60 },
+    ]);
   });
 
   it("returns null when show does not exist", async () => {
@@ -195,7 +213,7 @@ describe("getBeagleShowDetailsDb", () => {
     expect(result).toBeNull();
   });
 
-  it("maps detail rows from canonical entries using legacy ordering", async () => {
+  it("maps detail rows from canonical entries into structured fields", async () => {
     showEventFindFirstMock.mockResolvedValue({
       eventDate: new Date("2025-06-01T12:34:00.000Z"),
       eventPlace: "Helsinki",
@@ -210,7 +228,20 @@ describe("getBeagleShowDetailsDb", () => {
             sex: DogSex.UNKNOWN,
             registrations: [{ registrationNo: "FI-300/25" }],
           },
-          resultItems: [],
+          resultItems: [
+            {
+              valueCode: null,
+              valueNumeric: 2,
+              isAwarded: true,
+              definition: makeDefinition(
+                "LEGACY-LAATUARVOSTELU",
+                "LAATUARVOSTELU",
+                20,
+                70,
+                false,
+              ),
+            },
+          ],
         },
         {
           id: "r2",
@@ -321,18 +352,27 @@ describe("getBeagleShowDetailsDb", () => {
     expect(result?.items[0]).toMatchObject({
       sex: "U",
       registrationNo: "FI-100/25",
-      result: "AVO-EH",
+      classCode: "AVO",
+      qualityGrade: "EH",
+      classPlacement: null,
+      awards: [],
       heightCm: 41.5,
     });
     expect(result?.items[1]).toMatchObject({
       sex: "U",
       registrationNo: "FI-050/25",
-      result: "AVO-ERI",
+      classCode: "AVO",
+      qualityGrade: "ERI",
+      classPlacement: null,
+      awards: [],
       heightCm: 40,
     });
     expect(result?.items[3]).toMatchObject({
       sex: "-",
-      result: null,
+      classCode: null,
+      qualityGrade: "2",
+      classPlacement: null,
+      awards: [],
       heightCm: null,
     });
   });
@@ -385,6 +425,15 @@ describe("getBeagleShowsForDogDb", () => {
     showEventFindManyMock.mockReset();
     showEventFindFirstMock.mockReset();
     showEntryFindManyMock.mockReset();
+    showResultDefinitionFindManyMock.mockReset();
+    showResultDefinitionFindManyMock.mockResolvedValue([
+      { code: "ERI", sortOrder: 10 },
+      { code: "EH", sortOrder: 20 },
+      { code: "H", sortOrder: 30 },
+      { code: "T", sortOrder: 40 },
+      { code: "EVA", sortOrder: 50 },
+      { code: "HYL", sortOrder: 60 },
+    ]);
   });
 
   it("maps canonical dog show rows in date-desc order", async () => {
@@ -393,6 +442,7 @@ describe("getBeagleShowsForDogDb", () => {
         id: "s2",
         judge: "Judge B",
         heightText: "39.5",
+        critiqueText: "Excellent",
         showEvent: {
           eventPlace: "Lahti",
           eventDate: new Date("2025-06-02T00:00:00.000Z"),
@@ -416,6 +466,7 @@ describe("getBeagleShowsForDogDb", () => {
         id: "s1",
         judge: null,
         heightText: null,
+        critiqueText: null,
         showEvent: {
           eventPlace: "Helsinki",
           eventDate: new Date("2025-06-01T00:00:00.000Z"),
@@ -440,7 +491,13 @@ describe("getBeagleShowsForDogDb", () => {
         id: "s2",
         place: "Lahti",
         date: new Date("2025-06-02T00:00:00.000Z"),
-        result: "JUN-ERI",
+        showType: null,
+        classCode: "JUN",
+        qualityGrade: "ERI",
+        classPlacement: null,
+        pupn: null,
+        awards: [],
+        critiqueText: "Excellent",
         judge: "Judge B",
         heightCm: 39.5,
       },
@@ -448,7 +505,13 @@ describe("getBeagleShowsForDogDb", () => {
         id: "s1",
         place: "Helsinki",
         date: new Date("2025-06-01T00:00:00.000Z"),
-        result: null,
+        showType: null,
+        classCode: null,
+        qualityGrade: null,
+        classPlacement: null,
+        pupn: null,
+        awards: [],
+        critiqueText: null,
         judge: null,
         heightCm: null,
       },
