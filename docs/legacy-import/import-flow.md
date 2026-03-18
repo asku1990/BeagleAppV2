@@ -55,8 +55,8 @@ Issue tooling:
    `nay9599_rd_ud`) plus `beanay_text` critique join.
 
 4. `seed:show-result-definitions` upserts canonical `ShowResultDefinition` rows used by both
-   legacy and Kennelliitto workbook mappings (for example `ROP`, `VSP`, `SERT`, `VARASERT`,
-   `CACIB`, `VARACACIB`, `PUPN`, `SIJOITUS`, `JUN_ROP`, `JUN_VSP`, `VET_ROP`, `VET_VSP`, `SA`, `KP`).
+   legacy and Kennelliitto workbook mappings (for example `ROP`, `VSP`, `SERT`, `varaSERT`,
+   `CACIB`, `varaCACIB`, `PUPN`, `SIJOITUS`, `JUN-ROP`, `JUN-VSP`, `VET-ROP`, `VET-VSP`, `SA`, `KP`).
 
 `import:bootstrap` runs the full sequence in this order:
 

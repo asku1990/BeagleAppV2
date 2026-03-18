@@ -14,7 +14,8 @@ import {
 } from "./show-import-helpers";
 
 // Persists canonical show rows for the phase3 initial-load flow.
-// Reruns are intentionally blocked upstream in runLegacyPhase3.
+// Reruns are intentionally blocked upstream in runLegacyPhase3, so this path
+// targets a clean canonical schema rather than ongoing mixed old/new imports.
 type EventUpsertResult = {
   upserted: number;
   errors: number;
@@ -26,6 +27,34 @@ type EventUpsertResult = {
     payloadJson: string;
   }>;
 };
+
+// During the naming cutover, review raised the risk that enabled definition
+// rows might still use pre-cutover codes in some environments. Phase3 should
+// normally run only against a clean seeded catalog, but these aliases keep the
+// lookup tolerant if definition naming drifts during the transition.
+const LEGACY_DEFINITION_CODE_ALIASES: Record<string, string[]> = {
+  varaSERT: ["VARASERT"],
+  "NORD-SERT": ["NORD_SERT"],
+  "NORD-varaSERT": ["NORD_VARASERT"],
+  varaCACIB: ["VARACACIB"],
+  "CACIB-J": ["CACIB_J"],
+  "CACIB-V": ["CACIB_V"],
+  "JUN-SERT": ["JUN_SERT"],
+  "VET-SERT": ["VET_SERT"],
+  "LEGACY-LAATUARVOSTELU": ["LAATU_NUMERO"],
+};
+
+function normalizeDefinitionLookupKey(code: string): string {
+  return code.toUpperCase().replace(/[^A-Z0-9ÅÄÖ]/g, "");
+}
+
+function definitionLookupCandidates(code: string): string[] {
+  // Try the parser's canonical code first, then any explicit legacy aliases for
+  // renamed definitions. Separator-insensitive matching below handles workbook
+  // style variants like NORD-SERT vs NORD_SERT.
+  const aliases = LEGACY_DEFINITION_CODE_ALIASES[code] ?? [];
+  return [code, ...aliases];
+}
 
 export async function upsertShowRows(
   rows: LegacyShowResultRow[],
@@ -40,8 +69,22 @@ export async function upsertShowRows(
     select: { id: true, code: true },
   });
   const definitionIdByCode = new Map(
-    definitionRows.map((row) => [row.code.toUpperCase(), row.id]),
+    definitionRows.map((row) => [row.code, row.id]),
   );
+  const definitionIdsByUpperCode = new Map<string, string[]>();
+  const definitionIdsByNormalizedCode = new Map<string, string[]>();
+  for (const row of definitionRows) {
+    const upperCode = row.code.toUpperCase();
+    const upperIds = definitionIdsByUpperCode.get(upperCode) ?? [];
+    upperIds.push(row.id);
+    definitionIdsByUpperCode.set(upperCode, upperIds);
+
+    const normalizedCode = normalizeDefinitionLookupKey(row.code);
+    const normalizedIds =
+      definitionIdsByNormalizedCode.get(normalizedCode) ?? [];
+    normalizedIds.push(row.id);
+    definitionIdsByNormalizedCode.set(normalizedCode, normalizedIds);
+  }
 
   const total = rows.length;
   let upserted = 0;
@@ -210,7 +253,33 @@ export async function upsertShowRows(
 
     let itemIndex = 0;
     for (const item of parsed.items) {
-      const definitionId = definitionIdByCode.get(item.definitionCode);
+      // Definition rows are seeded data, so exact code matches should win.
+      // Fallbacks are only here to avoid losing parsed items if the catalog
+      // contains naming variants during the canonical code cutover.
+      const lookupCandidates = definitionLookupCandidates(item.definitionCode);
+      let definitionId: string | undefined;
+
+      for (const candidate of lookupCandidates) {
+        definitionId = definitionIdByCode.get(candidate);
+        if (definitionId) break;
+
+        const upperCodeMatches = definitionIdsByUpperCode.get(
+          candidate.toUpperCase(),
+        );
+        if (upperCodeMatches?.length === 1) {
+          definitionId = upperCodeMatches[0];
+          break;
+        }
+
+        const normalizedCodeMatches = definitionIdsByNormalizedCode.get(
+          normalizeDefinitionLookupKey(candidate),
+        );
+        if (normalizedCodeMatches?.length === 1) {
+          definitionId = normalizedCodeMatches[0];
+          break;
+        }
+      }
+
       if (!definitionId) {
         errors += 1;
         issues.push({

@@ -72,4 +72,44 @@ describe("upsertShowRows", () => {
     expect(upsertArg?.create).toHaveProperty("sourceRef");
     expect(upsertArg?.create).toHaveProperty("rawPayloadJson");
   });
+
+  it("matches renamed canonical codes against legacy enabled definition rows", async () => {
+    showResultDefinitionFindManyMock.mockResolvedValue([
+      { id: "def-nord-vara", code: "NORD_VARASERT" },
+      { id: "def-laatu-numero", code: "LAATU_NUMERO" },
+      { id: "def-jun", code: "JUN" },
+    ]);
+
+    const rows: LegacyShowResultRow[] = [
+      {
+        registrationNo: "FI-1/20",
+        eventDateRaw: "20020101",
+        eventPlace: "Helsinki",
+        resultText: "NORDVARASERT JUN1",
+        critiqueText: null,
+        dogName: "Dog One",
+        heightText: null,
+        judge: null,
+        legacyFlag: null,
+        sourceTable: "nay9599",
+      },
+    ];
+    const dogIdByRegistration = new Map<string, string>([["FI-1/20", "dog-1"]]);
+
+    const result = await upsertShowRows(rows, dogIdByRegistration, {
+      importRunId: "run-1",
+    });
+
+    expect(result.upserted).toBe(1);
+    expect(result.errors).toBe(0);
+    expect(result.issues).toEqual([]);
+    expect(showResultItemUpsertMock).toHaveBeenCalledTimes(3);
+
+    const definitionIds = showResultItemUpsertMock.mock.calls.map(
+      (call) => call[0]?.create?.definitionId,
+    );
+    expect(definitionIds).toEqual(
+      expect.arrayContaining(["def-nord-vara", "def-laatu-numero", "def-jun"]),
+    );
+  });
 });

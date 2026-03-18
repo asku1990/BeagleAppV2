@@ -80,30 +80,30 @@ Direct canonical tokens accepted as-is:
 - quality: `ERI`, `EH`, `H`, `T`, `EVA`, `HYL`
 - flags/awards:
   - `ROP`, `VSP`, `SA`, `KP`
-  - `SERT`, `VARASERT`
-  - `CACIB`, `VARACACIB`
-  - `NORD_SERT`, `NORD_VARASERT`
-  - `JUN_SERT`, `VET_SERT`
-  - `CACIB_J`, `CACIB_V`
-  - `JUN_ROP`, `JUN_VSP`, `VET_ROP`, `VET_VSP`
+  - `SERT`, `varaSERT`
+  - `CACIB`, `varaCACIB`
+  - `NORD-SERT`, `NORD-varaSERT`
+  - `JUN-SERT`, `VET-SERT`
+  - `CACIB-J`, `CACIB-V`
+  - `JUN-ROP`, `JUN-VSP`, `VET-ROP`, `VET-VSP`
   - `MVA`, `JMVA`, `VMVA`
 
 Alias -> canonical:
 
-- `VASERT`, `VSERT` -> `VARASERT`
-- `VACACIB`, `VCACIB`, `VACA` -> `VARACACIB`
-- `NORDVSERT` -> `NORD_VARASERT`
-- `NORDSERT` -> `NORD_SERT`
-- `JUNSERT`, `JUNS`, `JUNSER`, `JUNSE`, `JSERT` -> `JUN_SERT`
+- `VASERT`, `VSERT` -> `varaSERT`
+- `VACACIB`, `VCACIB`, `VACA` -> `varaCACIB`
+- `NORDVSERT` -> `NORD-varaSERT`
+- `NORDSERT` -> `NORD-SERT`
+- `JUNSERT`, `JUNS`, `JUNSER`, `JUNSE`, `JSERT` -> `JUN-SERT`
 - `KUMA` -> `KP`
-- `VETSERT` -> `VET_SERT`
+- `VETSERT` -> `VET-SERT`
 - `JMV` -> `JMVA`
-- `JUNROP`, `JROP` -> `JUN_ROP`
-- `JUNVSP`, `JVSP` -> `JUN_VSP`
-- `VETROP`, `ROPVET`, `VROP` -> `VET_ROP`
-- `VETVSP`, `VSPVET`, `VVSP` -> `VET_VSP`
-- `CACIBV` -> `CACIB_V`
-- `CACIBJ`, `JCACIB` -> `CACIB_J`
+- `JUNROP`, `JROP` -> `JUN-ROP`
+- `JUNVSP`, `JVSP` -> `JUN-VSP`
+- `VETROP`, `ROPVET`, `VROP` -> `VET-ROP`
+- `VETVSP`, `VSPVET`, `VVSP` -> `VET-VSP`
+- `CACIBV` -> `CACIB-V`
+- `CACIBJ`, `JCACIB` -> `CACIB-J`
 
 Pattern mappings:
 
@@ -116,7 +116,7 @@ Pattern mappings:
   - digit map: `1=ERI`, `2=EH`, `3=H`, `4=T`, `5=EVA`, `6=HYL`
   - for dates before `2003-01-01`, these tokens are not converted to modern
     quality flags; parser stores legacy numeric quality as
-    `LAATU_NUMERO(valueNumeric=<digit>)` and keeps class info
+    `LEGACY-LAATUARVOSTELU(valueNumeric=<digit>)` and keeps class info
 
 - class placement tokens (luokkasijoitus):
   - with `K`: `JUK1`, `NUK1`, `AVK1`, `KÄK1`, `VEK1`, `VAK1`, `VALK1`, `AVOK1`
@@ -152,7 +152,7 @@ When reviewing parser output against enabled definitions:
   - class codes (`PEN`, `JUN`, `NUO`, `AVO`, `KÄY`, `VAL`, `VET`)
   - quality codes (`ERI`, `EH`, `H`, `T`, `EVA`, `HYL`)
   - structured values (`SIJOITUS`, `PUPN`)
-  - legacy numeric quality (`LAATU_NUMERO`) for pre-2003 class+digit rows
+  - legacy numeric quality (`LEGACY-LAATUARVOSTELU`) for pre-2003 class+digit rows
 
 ## Issue codes
 

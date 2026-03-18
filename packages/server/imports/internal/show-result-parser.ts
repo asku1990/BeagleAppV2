@@ -8,7 +8,7 @@ import {
   TOKEN_ALIAS_TO_CANONICAL,
 } from "./show-result-tokens";
 
-const LEGACY_QUALITY_DIGIT_DEFINITION_CODE = "LAATU_NUMERO";
+const LEGACY_QUALITY_DIGIT_DEFINITION_CODE = "LEGACY-LAATUARVOSTELU";
 
 type ParsedShowResultItem = {
   definitionCode: string;
@@ -136,8 +136,12 @@ function parseQualityPlacementToken(token: string): {
 }
 
 function canonicalizeAwardToken(token: string): string | null {
+  const stripped = stripToken(token);
+  for (const canonicalCode of FLAG_TOKEN_CODES) {
+    if (stripToken(canonicalCode) === stripped) return canonicalCode;
+  }
+
   const upper = token.toUpperCase();
-  if (FLAG_TOKEN_CODES.has(upper)) return upper;
   if (QUALITY_CODES.has(upper)) return upper;
   if (/^(PU|PN)\d+$/.test(upper)) return "PUPN";
 
@@ -147,7 +151,7 @@ function canonicalizeAwardToken(token: string): string | null {
   const qualityPlacement = parseQualityPlacementToken(upper);
   if (qualityPlacement) return qualityPlacement.qualityGrade;
 
-  return TOKEN_ALIAS_TO_CANONICAL[stripToken(upper)] ?? null;
+  return TOKEN_ALIAS_TO_CANONICAL[stripped] ?? null;
 }
 
 function dedupeParsedItems(
