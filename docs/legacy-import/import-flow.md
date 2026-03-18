@@ -18,7 +18,7 @@ Phase-specific docs:
 - Phase 1 (foundation only): `pnpm import:phase1`
 - Phase 2 (trials): `pnpm import:phase2`
 - Phase 3 (shows): `pnpm import:phase3`
-- Show result definition seed (canonical awards): `pnpm --filter @beagle/db seed:show-result-definitions`
+- Show result definition seed (canonical awards, one-shot flow): `pnpm --filter @beagle/db seed:show-result-definitions`
 - Optional full bootstrap (`auth:bootstrap-admin` -> `seed:show-result-definitions` -> `phase1` -> `phase2` -> `phase3`): `pnpm import:bootstrap`
 
 Optional actor id for phase commands:
@@ -54,9 +54,17 @@ Issue tooling:
    `ShowResultItem`) using merged legacy sources (`nay9599`, `beanay`, optional
    `nay9599_rd_ud`) plus `beanay_text` critique join.
 
-4. `seed:show-result-definitions` upserts canonical `ShowResultDefinition` rows used by both
+4. `seed:show-result-definitions` bootstraps canonical `ShowResultDefinition` rows used by both
    legacy and Kennelliitto workbook mappings (for example `ROP`, `VSP`, `SERT`, `varaSERT`,
    `CACIB`, `varaCACIB`, `PUPN`, `SIJOITUS`, `JUN-ROP`, `JUN-VSP`, `VET-ROP`, `VET-VSP`, `SA`, `KP`).
+
+Lifecycle note:
+
+- The entire legacy import flow is one-shot: `seed:show-result-definitions`, `phase1`,
+  `phase2`, `phase3`, and `import:bootstrap` all belong to the same initial canonical
+  bootstrap/migration.
+- None of these commands are documented as upgrade, replay, or reconciliation steps for an
+  already bootstrapped legacy-import environment.
 
 `import:bootstrap` runs the full sequence in this order:
 
@@ -92,8 +100,10 @@ Issue code details are maintained in phase docs:
 
 ## Execution model
 
-This import flow is intended for initial migration, run in order (`phase1` -> `phase2` -> `phase3`).
-Treat it as one-time migration flow, not as an ongoing sync pipeline.
+This import flow is intended for initial migration, run in order
+(`seed:show-result-definitions` -> `phase1` -> `phase2` -> `phase3`).
+Treat it as a one-time bootstrap/migration flow, not as an ongoing sync,
+replay, or upgrade pipeline.
 
 ## Implementation references
 

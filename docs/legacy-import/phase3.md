@@ -60,6 +60,10 @@ Run seed first:
 
 `pnpm --filter @beagle/db seed:show-result-definitions`
 
+The seed step above is part of the same one-shot legacy import flow as phase1-3.
+This flow is documented as initial bootstrap/migration only, not as replay or
+upgrade of an already bootstrapped environment.
+
 ## TULNI token mapping (review list)
 
 Source of truth in code:

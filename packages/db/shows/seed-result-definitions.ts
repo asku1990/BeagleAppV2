@@ -1,7 +1,9 @@
 import { ShowResultValueType } from "@prisma/client";
 import { prisma } from "../core/prisma";
 
-// Seeds canonical show result definitions used by both legacy and workbook imports.
+// Seeds canonical show result definitions for the one-shot legacy import flow.
+// This catalog belongs to initial canonical bootstrap, not upgrade/replay of an
+// already bootstrapped legacy-import environment.
 const SHOW_RESULT_CATEGORIES = [
   {
     code: "KILPAILULUOKKA",
