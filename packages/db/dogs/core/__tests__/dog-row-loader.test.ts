@@ -50,7 +50,7 @@ describe("dogs/core/dog-row-loader", () => {
         },
         _count: {
           trialResults: 2,
-          showResults: 3,
+          showEntries: 3,
         },
       },
       {
@@ -73,7 +73,7 @@ describe("dogs/core/dog-row-loader", () => {
         },
         _count: {
           trialResults: 0,
-          showResults: 0,
+          showEntries: 0,
         },
       },
       {
@@ -90,7 +90,7 @@ describe("dogs/core/dog-row-loader", () => {
         dam: null,
         _count: {
           trialResults: 1,
-          showResults: 1,
+          showEntries: 1,
         },
       },
     ]);

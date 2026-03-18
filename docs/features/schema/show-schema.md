@@ -266,5 +266,6 @@ Notes:
   - `ShowEvent`
   - `ShowEntry`
   - `ShowResultItem`
-- Legacy table `ShowResult` may still exist during cutover, but it is not the
-  canonical model for phase3 canonical ingestion.
+- Legacy table `ShowResult` may still exist during cleanup, but public show
+  reads and counters should use the canonical model (`ShowEvent`, `ShowEntry`,
+  `ShowResultItem`).

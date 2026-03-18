@@ -171,7 +171,7 @@ function mapOffspringRow(
     sex: toSexCode(puppy.sex),
     ekNo: puppy.ekNo ?? null,
     trialCount: puppy._count.trialResults,
-    showCount: puppy._count.showResults,
+    showCount: puppy._count.showEntries,
     litterCount: countOffspringLitters(puppy),
   };
 }

@@ -1,6 +1,7 @@
 import { DogSex, type Prisma } from "@prisma/client";
 import { BUSINESS_TIME_ZONE, toBusinessDateOnly } from "../core/date-only";
 import { prisma } from "../core/prisma";
+import { formatCanonicalShowResultText } from "./internal/canonical-result-text";
 
 export type BeagleShowSearchSortDb = "date-desc" | "date-asc";
 export type BeagleShowSearchModeDb = "year" | "range";
@@ -226,7 +227,7 @@ function normalizeSort(
 
 function buildWhere(
   input: BeagleShowSearchRequestDb,
-): Prisma.ShowResultWhereInput {
+): Prisma.ShowEventWhereInput {
   if (input.mode === "year" && Number.isFinite(input.year)) {
     const year = Math.floor(input.year ?? 0);
     const start = toBusinessDateStartUtc(`${year}-01-01`);
@@ -297,15 +298,28 @@ export async function searchBeagleShowsDb(
   const sort = normalizeSort(input.sort);
   const where = buildWhere(input);
 
-  const [yearRows, groupedRows] = await Promise.all([
-    prisma.showResult.groupBy({
-      by: ["eventDate"],
+  const [yearRows, eventRows] = await Promise.all([
+    prisma.showEvent.findMany({
+      select: {
+        eventDate: true,
+      },
     }),
-    prisma.showResult.groupBy({
-      by: ["eventDate", "eventPlace"],
+    prisma.showEvent.findMany({
       where,
-      _count: { _all: true },
-      _max: { judge: true },
+      select: {
+        eventDate: true,
+        eventPlace: true,
+        entries: {
+          select: {
+            judge: true,
+          },
+        },
+        _count: {
+          select: {
+            entries: true,
+          },
+        },
+      },
     }),
   ]);
 
@@ -313,61 +327,18 @@ export async function searchBeagleShowsDb(
     new Set(yearRows.map((row) => toBusinessYear(row.eventDate))),
   ).sort((left, right) => right - left);
 
-  const rows: BeagleShowSearchRowDb[] = groupedRows
+  const rows: BeagleShowSearchRowDb[] = eventRows
     .map((row) => ({
       eventDate: row.eventDate,
       eventPlace: row.eventPlace,
-      judge: row._max.judge ?? null,
-      dogCount: row._count._all,
+      judge: collapseJudge(row.entries),
+      dogCount: row._count.entries,
     }))
     .sort((left, right) => compareRows(left, right, sort));
 
   const total = rows.length;
   const pagination = resolvePagination(total, page, pageSize);
   const pageRows = rows.slice(pagination.start, pagination.start + pageSize);
-
-  const judgeRows =
-    pageRows.length === 0
-      ? []
-      : await prisma.showResult.findMany({
-          where: {
-            OR: pageRows.map((row) => ({
-              eventDate: row.eventDate,
-              eventPlace: row.eventPlace,
-            })),
-          },
-          select: {
-            eventDate: true,
-            eventPlace: true,
-            judge: true,
-          },
-        });
-
-  const judgeByEvent = new Map<string, string | null>();
-  for (const row of judgeRows) {
-    const key = `${row.eventDate.toISOString()}::${row.eventPlace}`;
-    const normalizedJudge = row.judge?.trim() ?? "";
-    if (!normalizedJudge) {
-      continue;
-    }
-    const existing = judgeByEvent.get(key);
-    if (existing == null) {
-      judgeByEvent.set(key, normalizedJudge);
-      continue;
-    }
-    if (existing !== normalizedJudge) {
-      judgeByEvent.set(key, null);
-    }
-  }
-
-  const items = pageRows.map((row) => {
-    const key = `${row.eventDate.toISOString()}::${row.eventPlace}`;
-    const judge = judgeByEvent.get(key);
-    return {
-      ...row,
-      judge: judge === undefined ? null : judge,
-    };
-  });
 
   return {
     mode: input.mode,
@@ -381,7 +352,7 @@ export async function searchBeagleShowsDb(
     total,
     totalPages: pagination.totalPages,
     page: pagination.page,
-    items,
+    items: pageRows,
   };
 }
 
@@ -397,6 +368,28 @@ function parseHeightCm(value: string | null): number | null {
   }
   const parsed = Number.parseFloat(value);
   return Number.isNaN(parsed) ? null : parsed;
+}
+
+function collapseJudge(
+  entries: Array<{ judge: string | null }>,
+): string | null {
+  let resolvedJudge: string | null | undefined;
+
+  for (const entry of entries) {
+    const normalizedJudge = entry.judge?.trim() ?? "";
+    if (!normalizedJudge) {
+      continue;
+    }
+    if (resolvedJudge === undefined) {
+      resolvedJudge = normalizedJudge;
+      continue;
+    }
+    if (resolvedJudge !== normalizedJudge) {
+      return null;
+    }
+  }
+
+  return resolvedJudge ?? null;
 }
 
 function compareDetailRows(
@@ -443,7 +436,7 @@ export async function getBeagleShowDetailsDb(
     return null;
   }
 
-  const rows = await prisma.showResult.findMany({
+  const event = await prisma.showEvent.findFirst({
     where: {
       eventDate: {
         gte: rangeStart,
@@ -451,53 +444,85 @@ export async function getBeagleShowDetailsDb(
       },
       eventPlace: input.eventPlace,
     },
-    include: {
-      dog: {
+    select: {
+      eventDate: true,
+      eventPlace: true,
+      entries: {
+        where: {
+          dogId: {
+            not: null,
+          },
+        },
         select: {
           id: true,
-          name: true,
-          sex: true,
-          registrations: {
+          judge: true,
+          heightText: true,
+          dog: {
             select: {
-              registrationNo: true,
+              id: true,
+              name: true,
+              sex: true,
+              registrations: {
+                select: {
+                  registrationNo: true,
+                },
+                orderBy: [{ createdAt: "asc" }, { registrationNo: "asc" }],
+                take: 1,
+              },
             },
-            orderBy: [{ createdAt: "asc" }, { registrationNo: "asc" }],
-            take: 1,
+          },
+          resultItems: {
+            select: {
+              valueCode: true,
+              valueNumeric: true,
+              isAwarded: true,
+              definition: {
+                select: {
+                  code: true,
+                  sortOrder: true,
+                  category: {
+                    select: {
+                      code: true,
+                      sortOrder: true,
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       },
     },
   });
 
-  if (rows.length === 0) {
+  if (!event || event.entries.length === 0) {
     return null;
   }
 
-  const items: BeagleShowDetailsRowDb[] = rows
+  const items: BeagleShowDetailsRowDb[] = event.entries
+    .filter(
+      (
+        row,
+      ): row is typeof row & {
+        dog: NonNullable<typeof row.dog>;
+      } => row.dog !== null,
+    )
     .map((row) => ({
       id: row.id,
       dogId: row.dog.id,
       registrationNo: row.dog.registrations[0]?.registrationNo ?? "-",
       name: row.dog.name,
       sex: toSexCode(row.dog.sex),
-      result: row.resultText,
+      result: formatCanonicalShowResultText(event.eventDate, row.resultItems),
       heightCm: parseHeightCm(row.heightText),
       judge: row.judge,
     }))
     .sort(compareDetailRows);
 
-  const judges = Array.from(
-    new Set(
-      rows
-        .map((row) => row.judge?.trim())
-        .filter((judge): judge is string => Boolean(judge)),
-    ),
-  );
-
   return {
-    eventDate: rows[0].eventDate,
-    eventPlace: rows[0].eventPlace,
-    judge: judges.length === 1 ? judges[0] : null,
+    eventDate: event.eventDate,
+    eventPlace: event.eventPlace,
+    judge: collapseJudge(event.entries),
     dogCount: items.length,
     items,
   };
@@ -506,24 +531,53 @@ export async function getBeagleShowDetailsDb(
 export async function getBeagleShowsForDogDb(
   dogId: string,
 ): Promise<BeagleShowDogRowDb[]> {
-  const rows = await prisma.showResult.findMany({
+  const rows = await prisma.showEntry.findMany({
     where: { dogId },
     select: {
       id: true,
-      eventPlace: true,
-      eventDate: true,
-      resultText: true,
       judge: true,
       heightText: true,
+      showEvent: {
+        select: {
+          eventPlace: true,
+          eventDate: true,
+        },
+      },
+      resultItems: {
+        select: {
+          valueCode: true,
+          valueNumeric: true,
+          isAwarded: true,
+          definition: {
+            select: {
+              code: true,
+              sortOrder: true,
+              category: {
+                select: {
+                  code: true,
+                  sortOrder: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
-    orderBy: [{ eventDate: "desc" }, { eventPlace: "asc" }, { id: "asc" }],
+    orderBy: [
+      { showEvent: { eventDate: "desc" } },
+      { showEvent: { eventPlace: "asc" } },
+      { id: "asc" },
+    ],
   });
 
   return rows.map((row) => ({
     id: row.id,
-    place: row.eventPlace,
-    date: row.eventDate,
-    result: row.resultText,
+    place: row.showEvent.eventPlace,
+    date: row.showEvent.eventDate,
+    result: formatCanonicalShowResultText(
+      row.showEvent.eventDate,
+      row.resultItems,
+    ),
     judge: row.judge,
     heightCm: parseHeightCm(row.heightText),
   }));

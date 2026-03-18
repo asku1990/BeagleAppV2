@@ -20,6 +20,7 @@ This project uses a user-facing changelog format.
 - Tuonnin virhe- ja huomioraportointi käyttää edelleen yhteistä `ImportRun`/`ImportRunIssue`-mallia, mutta raportointi tehdään nyt vaihekohtaisesti omalla run id:llä. Koe- ja näyttelyvalidointien koodit ovat vaihekohtaiset (`TRIAL_*`, `SHOW_*`), jotta CSV-yhteenvedot ovat selkeämmät.
 - Näyttelytulosten normalisointi erottaa nyt parseri- ja näyttönäkymän: ennen vuotta 2003 legacy-muoto (`JUN1`, `KÄY2`) esitetään käyttöliittymässä muodossa `JUN-1` / `KÄY-2`, kun taas vuodesta 2003 alkaen käytetään modernia muotoa (`JUN-ERI`, `KÄY-H`). Samalla phase3-parseri tallentaa pre-2003 luokka+numero -laadut uuteen `LEGACY-LAATUARVOSTELU`-määritelmään unmapped-tokenien sijaan.
 - Kanonisten näyttelytulosmääritelmien koodit yhdenmukaistettiin Kennelliiton workbook-muotoon (`varaSERT`, `NORD-SERT`, `NORD-varaSERT`, `varaCACIB`, `CACIB-J`, `CACIB-V`, `JUN-SERT`, `VET-SERT`, `JUN-ROP`, `VET-ROP`, `JUN-VSP`, `VET-VSP`), ja sertti-/CACIB-määritelmien ruotsinkieliset nimet asetettiin toistaiseksi tyhjiksi.
+- Julkiset näyttelyhaut, näyttelyn tulossivu, koiraprofiilin näyttelyrivit sekä julkiset näyttelylaskurit lukevat nyt kanonisesta näyttelymallista (`ShowEvent`, `ShowEntry`, `ShowResultItem`) vanhan `ShowResult`-taulun sijaan.
 
 ### Fixed
 
