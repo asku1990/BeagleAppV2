@@ -18,7 +18,7 @@ Phase-specific docs:
 - Phase 1 (foundation only): `pnpm import:phase1`
 - Phase 2 (trials): `pnpm import:phase2`
 - Phase 3 (shows): `pnpm import:phase3`
-- Show result definition seed (canonical awards): `pnpm --filter @beagle/db seed:show-result-definitions`
+- Show result definition seed (canonical awards, one-shot flow): `pnpm --filter @beagle/db seed:show-result-definitions`
 - Optional full bootstrap (`auth:bootstrap-admin` -> `seed:show-result-definitions` -> `phase1` -> `phase2` -> `phase3`): `pnpm import:bootstrap`
 
 Optional actor id for phase commands:
@@ -54,9 +54,28 @@ Issue tooling:
    `ShowResultItem`) using merged legacy sources (`nay9599`, `beanay`, optional
    `nay9599_rd_ud`) plus `beanay_text` critique join.
 
-4. `seed:show-result-definitions` upserts canonical `ShowResultDefinition` rows used by both
-   legacy and Kennelliitto workbook mappings (for example `ROP`, `VSP`, `SERT`, `VARASERT`,
-   `CACIB`, `VARACACIB`, `PUPN`, `SIJOITUS`, `JUN_ROP`, `JUN_VSP`, `VET_ROP`, `VET_VSP`, `SA`, `KP`).
+4. `seed:show-result-definitions` bootstraps canonical `ShowResultDefinition` rows used by both
+   legacy and Kennelliitto workbook mappings (for example `ROP`, `VSP`, `SERT`, `varaSERT`,
+   `CACIB`, `varaCACIB`, `PUPN`, `SIJOITUS`, `JUN-ROP`, `JUN-VSP`, `VET-ROP`, `VET-VSP`, `SA`, `KP`).
+
+Lifecycle note:
+
+- The entire legacy import flow is one-shot: `seed:show-result-definitions`, `phase1`,
+  `phase2`, `phase3`, and `import:bootstrap` all belong to the same initial canonical
+  bootstrap/migration.
+- None of these commands are documented as upgrade, replay, or reconciliation steps for an
+  already bootstrapped legacy-import environment.
+
+Bootstrap invariants:
+
+- Legacy import is one-shot and assumes empty canonical show tables before run:
+  - `showResultCategory`
+  - `showResultDefinition`
+  - `showEvent`
+  - `showEntry`
+  - `showResultItem`
+- `seed:show-result-definitions` is part of that same one-shot bootstrap and is not an ongoing migration/reconciliation step.
+- Backward compatibility with pre-existing legacy `showResultDefinition.code` variants is out of scope unless explicitly requested for a migration task.
 
 `import:bootstrap` runs the full sequence in this order:
 
@@ -92,8 +111,10 @@ Issue code details are maintained in phase docs:
 
 ## Execution model
 
-This import flow is intended for initial migration, run in order (`phase1` -> `phase2` -> `phase3`).
-Treat it as one-time migration flow, not as an ongoing sync pipeline.
+This import flow is intended for initial migration, run in order
+(`seed:show-result-definitions` -> `phase1` -> `phase2` -> `phase3`).
+Treat it as a one-time bootstrap/migration flow, not as an ongoing sync,
+replay, or upgrade pipeline.
 
 ## Implementation references
 

@@ -95,7 +95,8 @@ describe("parseShowResultText", () => {
     expect(
       preGate.items.some(
         (item) =>
-          item.definitionCode === "LAATU_NUMERO" && item.valueNumeric === 1,
+          item.definitionCode === "LEGACY-LAATUARVOSTELU" &&
+          item.valueNumeric === 1,
       ),
     ).toBe(true);
     expect(preGate.items.some((item) => item.definitionCode === "ERI")).toBe(
@@ -132,9 +133,9 @@ describe("parseShowResultText", () => {
     );
 
     const defCodes = new Set(parsed.items.map((item) => item.definitionCode));
-    expect(defCodes.has("VARACACIB")).toBe(true);
-    expect(defCodes.has("CACIB_V")).toBe(true);
-    expect(defCodes.has("CACIB_J")).toBe(true);
+    expect(defCodes.has("varaCACIB")).toBe(true);
+    expect(defCodes.has("CACIB-V")).toBe(true);
+    expect(defCodes.has("CACIB-J")).toBe(true);
     expect(parsed.unmappedTokens).toEqual([]);
   });
 
@@ -142,8 +143,8 @@ describe("parseShowResultText", () => {
     const parsed = parseShowResultText("CACIB-V VACACIB", "2023-04-22");
     const defCodes = parsed.items.map((item) => item.definitionCode);
 
-    expect(defCodes).toContain("CACIB_V");
-    expect(defCodes).toContain("VARACACIB");
+    expect(defCodes).toContain("CACIB-V");
+    expect(defCodes).toContain("varaCACIB");
   });
 
   it("maps KUMA and JUNS to canonical definitions", () => {
@@ -151,7 +152,7 @@ describe("parseShowResultText", () => {
     const defCodes = parsed.items.map((item) => item.definitionCode);
 
     expect(defCodes).toContain("KP");
-    expect(defCodes).toContain("JUN_SERT");
+    expect(defCodes).toContain("JUN-SERT");
     expect(parsed.unmappedTokens).toEqual([]);
   });
 
@@ -185,7 +186,7 @@ describe("parseShowResultText", () => {
     expect(defCodes.has("SERT")).toBe(true);
     expect(defCodes.has("SA")).toBe(true);
     expect(defCodes.has("CACIB")).toBe(true);
-    expect(defCodes.has("VET_SERT")).toBe(true);
+    expect(defCodes.has("VET-SERT")).toBe(true);
     expect(parsed.unmappedTokens).toEqual([]);
   });
 
@@ -196,9 +197,27 @@ describe("parseShowResultText", () => {
     );
     const defCodes = new Set(parsed.items.map((item) => item.definitionCode));
 
-    expect(defCodes.has("JUN_SERT")).toBe(true);
-    expect(defCodes.has("VARASERT")).toBe(true);
-    expect(defCodes.has("NORD_VARASERT")).toBe(true);
+    expect(defCodes.has("JUN-SERT")).toBe(true);
+    expect(defCodes.has("varaSERT")).toBe(true);
+    expect(defCodes.has("NORD-varaSERT")).toBe(true);
+    expect(parsed.unmappedTokens).toEqual([]);
+  });
+
+  it("normalizes junior/veteran ROP aliases to workbook-form canonical codes", () => {
+    const parsed = parseShowResultText("JUNROP VETROP", "2023-04-22");
+    const defCodes = new Set(parsed.items.map((item) => item.definitionCode));
+
+    expect(defCodes.has("JUN-ROP")).toBe(true);
+    expect(defCodes.has("VET-ROP")).toBe(true);
+    expect(parsed.unmappedTokens).toEqual([]);
+  });
+
+  it("normalizes junior/veteran VSP aliases to workbook-form canonical codes", () => {
+    const parsed = parseShowResultText("JUNVSP VETVSP", "2023-04-22");
+    const defCodes = new Set(parsed.items.map((item) => item.definitionCode));
+
+    expect(defCodes.has("JUN-VSP")).toBe(true);
+    expect(defCodes.has("VET-VSP")).toBe(true);
     expect(parsed.unmappedTokens).toEqual([]);
   });
 

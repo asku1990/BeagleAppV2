@@ -14,7 +14,8 @@ import {
 } from "./show-import-helpers";
 
 // Persists canonical show rows for the phase3 initial-load flow.
-// Reruns are intentionally blocked upstream in runLegacyPhase3.
+// Reruns are intentionally blocked upstream in runLegacyPhase3, so this path
+// targets a clean canonical schema rather than ongoing mixed old/new imports.
 type EventUpsertResult = {
   upserted: number;
   errors: number;
@@ -40,7 +41,7 @@ export async function upsertShowRows(
     select: { id: true, code: true },
   });
   const definitionIdByCode = new Map(
-    definitionRows.map((row) => [row.code.toUpperCase(), row.id]),
+    definitionRows.map((row) => [row.code, row.id]),
   );
 
   const total = rows.length;
@@ -211,6 +212,7 @@ export async function upsertShowRows(
     let itemIndex = 0;
     for (const item of parsed.items) {
       const definitionId = definitionIdByCode.get(item.definitionCode);
+
       if (!definitionId) {
         errors += 1;
         issues.push({

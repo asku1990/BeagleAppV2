@@ -31,9 +31,7 @@ export async function getShowTokenCoverageReport(
     where: { isEnabled: true },
     select: { code: true },
   });
-  const enabledDefinitionCodes = new Set(
-    definitionRows.map((row) => row.code.toUpperCase()),
-  );
+  const enabledDefinitionCodes = new Set(definitionRows.map((row) => row.code));
 
   const tokenCounts = new Map<string, number>();
   const unmappedByToken = new Map<string, ShowTokenCoverageIssue>();
@@ -52,8 +50,8 @@ export async function getShowTokenCoverageReport(
     }
 
     for (const item of parsed.items) {
-      if (!enabledDefinitionCodes.has(item.definitionCode.toUpperCase())) {
-        missingDefinitionCodes.add(item.definitionCode.toUpperCase());
+      if (!enabledDefinitionCodes.has(item.definitionCode)) {
+        missingDefinitionCodes.add(item.definitionCode);
       }
     }
 
