@@ -41,6 +41,20 @@ Agent operating rules for this repository.
 - If checks are not run, state that explicitly.
 - CI note: if Turbo task chains include `build` (for example via `test:e2e`), required env vars must be present in CI and forwarded via `turbo.json` `globalEnv`.
 
+## Legacy import invariants
+
+- Legacy import is a one-shot bootstrap flow only.
+- Canonical show tables are expected to be empty before bootstrap:
+  - `showResultCategory`
+  - `showResultDefinition`
+  - `showEvent`
+  - `showEntry`
+  - `showResultItem`
+- `pnpm --filter @beagle/db seed:show-result-definitions` is run once as part of the same one-shot bootstrap flow.
+- Compatibility with pre-existing legacy `showResultDefinition.code` variants is out of scope unless explicitly requested.
+- Do not require replay/upgrade/reconciliation behavior for partially bootstrapped legacy-import environments unless explicitly requested.
+- Code review rule: do not request backward-compat aliasing for old definition codes unless the task explicitly asks for migration compatibility.
+
 ## Documentation rules
 
 - If you change how something works, update the nearest durable documentation source for the touched area.

@@ -66,6 +66,17 @@ Lifecycle note:
 - None of these commands are documented as upgrade, replay, or reconciliation steps for an
   already bootstrapped legacy-import environment.
 
+Bootstrap invariants:
+
+- Legacy import is one-shot and assumes empty canonical show tables before run:
+  - `showResultCategory`
+  - `showResultDefinition`
+  - `showEvent`
+  - `showEntry`
+  - `showResultItem`
+- `seed:show-result-definitions` is part of that same one-shot bootstrap and is not an ongoing migration/reconciliation step.
+- Backward compatibility with pre-existing legacy `showResultDefinition.code` variants is out of scope unless explicitly requested for a migration task.
+
 `import:bootstrap` runs the full sequence in this order:
 
 1. `auth:bootstrap-admin`
