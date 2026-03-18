@@ -9,13 +9,22 @@ type CanonicalResultDefinition = {
 
 type CanonicalResultItem = {
   valueCode: string | null;
-  valueNumeric: number | null;
+  valueNumeric: number | { toNumber(): number } | null;
   isAwarded: boolean | null;
   definition: CanonicalResultDefinition;
 };
 
 const LEGACY_QUALITY_DEFINITION_CODE = "LEGACY-LAATUARVOSTELU";
 const QUALITY_CODES = new Set(["ERI", "EH", "H", "T", "EVA", "HYL"]);
+
+function toNumericValue(
+  value: CanonicalResultItem["valueNumeric"],
+): number | null {
+  if (value == null) {
+    return null;
+  }
+  return typeof value === "number" ? value : value.toNumber();
+}
 
 function compareItems(
   left: CanonicalResultItem,
@@ -31,8 +40,10 @@ function compareItems(
   if (left.definition.sortOrder !== right.definition.sortOrder) {
     return left.definition.sortOrder - right.definition.sortOrder;
   }
-  if ((left.valueNumeric ?? -1) !== (right.valueNumeric ?? -1)) {
-    return (left.valueNumeric ?? -1) - (right.valueNumeric ?? -1);
+  const leftNumeric = toNumericValue(left.valueNumeric) ?? -1;
+  const rightNumeric = toNumericValue(right.valueNumeric) ?? -1;
+  if (leftNumeric !== rightNumeric) {
+    return leftNumeric - rightNumeric;
   }
   return left.definition.code.localeCompare(right.definition.code, "fi", {
     sensitivity: "base",
@@ -78,8 +89,10 @@ export function formatCanonicalShowResultText(
   const eventDateIso = eventDate.toISOString().slice(0, 10);
   const classCode = classItem?.definition.code ?? null;
   const qualityCode = qualityItem?.definition.code ?? null;
-  const placement = placementItem?.valueNumeric ?? null;
-  const legacyQualityDigit = legacyQualityItem?.valueNumeric ?? null;
+  const placement = toNumericValue(placementItem?.valueNumeric ?? null);
+  const legacyQualityDigit = toNumericValue(
+    legacyQualityItem?.valueNumeric ?? null,
+  );
   const tokens: string[] = [];
   const seen = new Set<string>();
 
