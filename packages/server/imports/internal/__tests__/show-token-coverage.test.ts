@@ -18,11 +18,11 @@ describe("getShowTokenCoverageReport", () => {
     showResultDefinitionFindManyMock.mockResolvedValue([]);
   });
 
-  it("accepts renamed canonical parser codes when enabled definitions still use legacy codes", async () => {
+  it("accepts parsed items when canonical definitions are enabled", async () => {
     showResultDefinitionFindManyMock.mockResolvedValue([
-      { id: "def-nord-vara", code: "NORD_VARASERT" },
-      { id: "def-laatu-numero", code: "LAATU_NUMERO" },
-      { id: "def-jun", code: "JUN" },
+      { code: "NORD-varaSERT" },
+      { code: "LEGACY-LAATUARVOSTELU" },
+      { code: "JUN" },
     ]);
 
     const rows: LegacyShowResultRow[] = [

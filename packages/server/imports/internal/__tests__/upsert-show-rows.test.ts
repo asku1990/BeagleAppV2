@@ -73,10 +73,10 @@ describe("upsertShowRows", () => {
     expect(upsertArg?.create).toHaveProperty("rawPayloadJson");
   });
 
-  it("matches renamed canonical codes against legacy enabled definition rows", async () => {
+  it("matches parsed items against canonical enabled definition rows", async () => {
     showResultDefinitionFindManyMock.mockResolvedValue([
-      { id: "def-nord-vara", code: "NORD_VARASERT" },
-      { id: "def-laatu-numero", code: "LAATU_NUMERO" },
+      { id: "def-nord-vara", code: "NORD-varaSERT" },
+      { id: "def-laatu-numero", code: "LEGACY-LAATUARVOSTELU" },
       { id: "def-jun", code: "JUN" },
     ]);
 

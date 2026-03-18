@@ -6,7 +6,6 @@ import {
   parseLegacyDate,
 } from "../core";
 import { parseShowResultText } from "./show-result-parser";
-import { buildDefinitionLookup } from "./show-result-definition-lookup";
 import { toEventSourceDatePart } from "./date-key";
 import {
   normalizePlaceKey,
@@ -41,7 +40,9 @@ export async function upsertShowRows(
     where: { isEnabled: true },
     select: { id: true, code: true },
   });
-  const definitionLookup = buildDefinitionLookup(definitionRows);
+  const definitionIdByCode = new Map(
+    definitionRows.map((row) => [row.code, row.id]),
+  );
 
   const total = rows.length;
   let upserted = 0;
@@ -210,9 +211,7 @@ export async function upsertShowRows(
 
     let itemIndex = 0;
     for (const item of parsed.items) {
-      const definitionId = definitionLookup.findDefinitionId(
-        item.definitionCode,
-      );
+      const definitionId = definitionIdByCode.get(item.definitionCode);
 
       if (!definitionId) {
         errors += 1;

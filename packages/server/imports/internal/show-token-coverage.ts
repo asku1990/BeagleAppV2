@@ -1,7 +1,6 @@
 import { prisma, type LegacyShowResultRow } from "@beagle/db";
 import { normalizeRegistrationNo, parseLegacyDate } from "../core";
 import { toEventSourceDatePart } from "./date-key";
-import { buildDefinitionLookup } from "./show-result-definition-lookup";
 import { parseShowResultText } from "./show-result-parser";
 
 type TokenCoverageSample = {
@@ -30,9 +29,9 @@ export async function getShowTokenCoverageReport(
 ): Promise<ShowTokenCoverageReport> {
   const definitionRows = await prisma.showResultDefinition.findMany({
     where: { isEnabled: true },
-    select: { id: true, code: true },
+    select: { code: true },
   });
-  const definitionLookup = buildDefinitionLookup(definitionRows);
+  const enabledDefinitionCodes = new Set(definitionRows.map((row) => row.code));
 
   const tokenCounts = new Map<string, number>();
   const unmappedByToken = new Map<string, ShowTokenCoverageIssue>();
@@ -51,7 +50,7 @@ export async function getShowTokenCoverageReport(
     }
 
     for (const item of parsed.items) {
-      if (!definitionLookup.findDefinitionId(item.definitionCode)) {
+      if (!enabledDefinitionCodes.has(item.definitionCode)) {
         missingDefinitionCodes.add(item.definitionCode);
       }
     }
