@@ -43,6 +43,18 @@ function formatHeight(heightCm: number | null): string {
   return `${heightCm} cm`;
 }
 
+function renderDogValue(value: string, dogId: string | null) {
+  if (!dogId) {
+    return value;
+  }
+
+  return (
+    <Link href={getDogProfileHref(dogId)} className={beagleTheme.entityLink}>
+      {value}
+    </Link>
+  );
+}
+
 type ShowDetailsRowWithOptionalReview =
   BeagleShowDetailsResponse["items"][number];
 
@@ -124,7 +136,10 @@ export function BeagleShowDetailsPage({
 
   const handleCopyRow = async (row: ShowDetailsRowWithOptionalReview) => {
     await copyShowDetailRowToClipboard({
-      row,
+      row: {
+        ...row,
+        critiqueText: getReviewTextValue(row, reviewPendingLabel).text,
+      },
       labels: clipboardLabels,
       messages: clipboardMessages,
       clipboard: globalThis.navigator?.clipboard,
@@ -134,7 +149,10 @@ export function BeagleShowDetailsPage({
 
   const handleCopyAllRows = async () => {
     await copyShowDetailRowsToClipboard({
-      rows: details.items,
+      rows: details.items.map((row) => ({
+        ...row,
+        critiqueText: getReviewTextValue(row, reviewPendingLabel).text,
+      })),
       labels: clipboardLabels,
       messages: clipboardMessages,
       clipboard: globalThis.navigator?.clipboard,
@@ -244,20 +262,10 @@ export function BeagleShowDetailsPage({
                         className={cn("border-b align-top", beagleTheme.border)}
                       >
                         <td className="px-2 py-2">
-                          <Link
-                            href={getDogProfileHref(row.dogId)}
-                            className={beagleTheme.entityLink}
-                          >
-                            {row.registrationNo}
-                          </Link>
+                          {renderDogValue(row.registrationNo, row.dogId)}
                         </td>
                         <td className="px-2 py-2">
-                          <Link
-                            href={getDogProfileHref(row.dogId)}
-                            className={beagleTheme.entityLink}
-                          >
-                            {row.name}
-                          </Link>
+                          {renderDogValue(row.name, row.dogId)}
                         </td>
                         <td className="px-2 py-2">{mapSexLabel(row.sex, t)}</td>
                         <td className="px-2 py-2">{formatShowType(row)}</td>
@@ -315,23 +323,13 @@ export function BeagleShowDetailsPage({
                         <span className={beagleTheme.mutedText}>
                           {t("shows.details.col.reg")}:
                         </span>
-                        <Link
-                          href={getDogProfileHref(row.dogId)}
-                          className={beagleTheme.entityLink}
-                        >
-                          {row.registrationNo}
-                        </Link>
+                        {renderDogValue(row.registrationNo, row.dogId)}
                       </p>
                       <p className="col-span-2">
                         <span className={beagleTheme.mutedText}>
                           {t("shows.details.col.name")}:
                         </span>
-                        <Link
-                          href={getDogProfileHref(row.dogId)}
-                          className={beagleTheme.entityLink}
-                        >
-                          {row.name}
-                        </Link>
+                        {renderDogValue(row.name, row.dogId)}
                       </p>
                       <p>
                         <span className={beagleTheme.mutedText}>

@@ -137,4 +137,47 @@ describe("BeagleShowDetailsPageContainer", () => {
     expect(html).toContain("shows.details.copy.all");
     expect(html).toContain('href="/beagle/dogs/dog_1"');
   });
+
+  it("renders unlinked entries without dog profile links", () => {
+    useBeagleShowDetailsQueryMock.mockReturnValue({
+      data: {
+        show: {
+          showId: "show_1",
+          eventDate: "2025-06-01",
+          eventPlace: "Helsinki",
+          judge: "Judge Main",
+          dogCount: 1,
+        },
+        items: [
+          {
+            id: "r_2",
+            dogId: null,
+            registrationNo: "FI-9/20",
+            name: "Snapshot Dog",
+            sex: "-",
+            showType: null,
+            classCode: null,
+            qualityGrade: null,
+            classPlacement: null,
+            pupn: null,
+            awards: [],
+            critiqueText: null,
+            heightCm: null,
+            judge: "Judge Main",
+          },
+        ],
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+
+    const html = renderToStaticMarkup(
+      React.createElement(BeagleShowDetailsPageContainer, { showId: "show_1" }),
+    );
+
+    expect(html).toContain("FI-9/20");
+    expect(html).toContain("Snapshot Dog");
+    expect(html).not.toContain('href="/beagle/dogs/null"');
+  });
 });

@@ -43,16 +43,13 @@ export async function getBeagleShowDetailsDb(
       eventPlace: true,
       eventType: true,
       entries: {
-        where: {
-          dogId: {
-            not: null,
-          },
-        },
         select: {
           id: true,
           judge: true,
           critiqueText: true,
           heightText: true,
+          registrationNoSnapshot: true,
+          dogNameSnapshot: true,
           dog: {
             select: {
               id: true,
@@ -97,19 +94,13 @@ export async function getBeagleShowDetailsDb(
   }
 
   const items: BeagleShowDetailsRowDb[] = event.entries
-    .filter(
-      (
-        row,
-      ): row is typeof row & {
-        dog: NonNullable<typeof row.dog>;
-      } => row.dog !== null,
-    )
     .map((row) => ({
       id: row.id,
-      dogId: row.dog.id,
-      registrationNo: row.dog.registrations[0]?.registrationNo ?? "-",
-      name: row.dog.name,
-      sex: toSexCode(row.dog.sex),
+      dogId: row.dog?.id ?? null,
+      registrationNo:
+        row.dog?.registrations[0]?.registrationNo ?? row.registrationNoSnapshot,
+      name: row.dog?.name ?? row.dogNameSnapshot,
+      sex: row.dog ? toSexCode(row.dog.sex) : "-",
       ...projectCanonicalShowResult(event.eventType, row.resultItems),
       critiqueText: row.critiqueText,
       heightCm: parseHeightCm(row.heightText),

@@ -377,7 +377,7 @@ describe("getBeagleShowDetailsDb", () => {
     });
   });
 
-  it("excludes unlinked canonical entries from public detail rows", async () => {
+  it("keeps unlinked canonical entries visible with snapshot identity", async () => {
     showEventFindFirstMock.mockResolvedValue({
       eventDate: new Date("2025-06-01T12:34:00.000Z"),
       eventPlace: "Helsinki",
@@ -386,6 +386,7 @@ describe("getBeagleShowDetailsDb", () => {
           id: "linked",
           judge: "Judge Main",
           heightText: "40",
+          registrationNoSnapshot: "FI-111/25",
           dog: {
             id: "dog-1",
             name: "Linked Dog",
@@ -398,6 +399,8 @@ describe("getBeagleShowDetailsDb", () => {
           id: "unlinked",
           judge: "Judge Main",
           heightText: "41",
+          registrationNoSnapshot: "FI-222/25",
+          dogNameSnapshot: "Snapshot Dog",
           dog: null,
           resultItems: [],
         },
@@ -409,12 +412,20 @@ describe("getBeagleShowDetailsDb", () => {
       eventPlace: "Helsinki",
     });
 
-    expect(result?.dogCount).toBe(1);
+    expect(result?.dogCount).toBe(2);
     expect(result?.items).toEqual([
       expect.objectContaining({
         id: "linked",
         dogId: "dog-1",
         registrationNo: "FI-111/25",
+      }),
+      expect.objectContaining({
+        id: "unlinked",
+        dogId: null,
+        registrationNo: "FI-222/25",
+        name: "Snapshot Dog",
+        sex: "-",
+        heightCm: 41,
       }),
     ]);
   });

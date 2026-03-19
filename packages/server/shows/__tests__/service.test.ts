@@ -223,6 +223,48 @@ describe("shows service", () => {
     });
   });
 
+  it("passes through unlinked entries without a dog profile id", async () => {
+    getBeagleShowDetailsDbMock.mockResolvedValue({
+      eventDate: new Date("2025-06-01T00:00:00.000Z"),
+      eventPlace: "Helsinki",
+      judge: "Judge Main",
+      dogCount: 1,
+      items: [
+        {
+          id: "r-unlinked",
+          dogId: null,
+          registrationNo: "FI-9/20",
+          name: "Snapshot Dog",
+          sex: "-",
+          showType: null,
+          classCode: null,
+          qualityGrade: null,
+          classPlacement: null,
+          pupn: null,
+          awards: [],
+          critiqueText: null,
+          heightCm: null,
+          judge: "Judge Main",
+        },
+      ],
+    });
+
+    const service = createShowsService();
+    const showId = encodeShowId("2025-06-01", "Helsinki");
+    const result = await service.getBeagleShowDetails(showId);
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) {
+      throw new Error("Expected ok=true response");
+    }
+    expect(result.body.data.items[0]).toMatchObject({
+      dogId: null,
+      registrationNo: "FI-9/20",
+      name: "Snapshot Dog",
+      sex: "-",
+    });
+  });
+
   it("returns structured fields without legacy result normalization", async () => {
     getBeagleShowDetailsDbMock.mockResolvedValue({
       eventDate: new Date("1996-01-06T00:00:00.000Z"),

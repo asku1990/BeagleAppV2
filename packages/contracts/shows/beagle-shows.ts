@@ -58,7 +58,7 @@ export type BeagleShowStructuredResultDto = {
 
 export type BeagleShowDetailsRow = BeagleShowStructuredResultDto & {
   id: string;
-  dogId: string;
+  dogId: string | null;
   registrationNo: string;
   name: string;
   sex: "U" | "N" | "-";

@@ -46,7 +46,7 @@ export type BeagleShowStructuredResultDb = {
 
 export type BeagleShowDetailsRowDb = BeagleShowStructuredResultDb & {
   id: string;
-  dogId: string;
+  dogId: string | null;
   registrationNo: string;
   name: string;
   sex: "U" | "N" | "-";
