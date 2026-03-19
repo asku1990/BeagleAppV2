@@ -105,10 +105,10 @@ describe("formatShowDetailRowForClipboard", () => {
 
     const lines = output.split("\n");
     expect(lines[0]).toBe(
-      "Rek.nro\tNimi\tSukupuoli\tTyyppi\tKilpailuluokka\tLaatuarvostelu\tSijoitus\tPU/PN\tMuut merkinnät\tArvostelu\tKorkeus\tTuomari",
+      "Rek.nro\tNimi\tSukupuoli\tTyyppi\tKilpailuluokka\tLaatuarvostelu\tSijoitus\tPU/PN\tMuut merkinnät\tKorkeus\tTuomari\tArvostelu",
     );
     expect(lines[1]).toBe(
-      "FI-1/20\tAatu\tUros\tRyhmänäyttely\tJUN\tERI\t1\tPU1\tSA\tVery good\t40 cm\tJudge A",
+      "FI-1/20\tAatu\tUros\tRyhmänäyttely\tJUN\tERI\t1\tPU1\tSA\t40 cm\tJudge A\tVery good",
     );
   });
 
@@ -182,11 +182,50 @@ describe("formatShowDetailRowsForClipboard", () => {
     const lines = output.split("\n");
     expect(lines).toHaveLength(3);
     expect(lines[1]).toBe(
-      "FI-1/20\tAatu\tUros\tRyhmänäyttely\tJUN\tERI\t1\tPU1\tSA\tReview A\t40 cm\tJudge A",
+      "FI-1/20\tAatu\tUros\tRyhmänäyttely\tJUN\tERI\t1\tPU1\tSA\t40 cm\tJudge A\tReview A",
     );
     expect(lines[2]).toBe(
-      "FI-2/20\tBella\tNarttu\t-\t-\t-\t-\t-\t-\tPending later\t-\t-",
+      "FI-2/20\tBella\tNarttu\t-\t-\t-\t-\t-\t-\t-\t-\tPending later",
     );
+  });
+
+  it("omits optional columns when requested", () => {
+    const output = formatShowDetailRowsForClipboard(
+      [
+        {
+          id: "r1",
+          dogId: "d1",
+          registrationNo: "FI-1/20",
+          name: "Aatu",
+          sex: "U",
+          showType: null,
+          classCode: null,
+          qualityGrade: null,
+          classPlacement: null,
+          pupn: null,
+          awards: [],
+          critiqueText: null,
+          heightCm: null,
+          judge: null,
+        },
+      ],
+      detailLabels,
+      {
+        includeShowType: false,
+        includeClassName: false,
+        includeQualityGrade: false,
+        includeClassPlacement: false,
+        includePupn: false,
+        includeAwards: false,
+        includeHeight: false,
+        includeJudge: false,
+        includeReviewText: false,
+      },
+    );
+
+    const lines = output.split("\n");
+    expect(lines[0]).toBe("Rek.nro\tNimi\tSukupuoli");
+    expect(lines[1]).toBe("FI-1/20\tAatu\tUros");
   });
 });
 

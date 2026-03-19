@@ -123,7 +123,7 @@ describe("show clipboard actions", () => {
 
     expect(result).toBe(false);
     expect(writeText).toHaveBeenCalledWith(
-      "Rek.nro\tNimi\tSukupuoli\tTyyppi\tKilpailuluokka\tLaatuarvostelu\tSijoitus\tPU/PN\tMuut merkinnät\tArvostelu\tKorkeus\tTuomari\nFI-1/20\tAatu\tUros\tRyhmänäyttely\tJUN\tERI\t1\tPU1\tSA\tPending later\t40 cm\tJudge A",
+      "Rek.nro\tNimi\tSukupuoli\tTyyppi\tKilpailuluokka\tLaatuarvostelu\tSijoitus\tPU/PN\tMuut merkinnät\tKorkeus\tTuomari\tArvostelu\nFI-1/20\tAatu\tUros\tRyhmänäyttely\tJUN\tERI\t1\tPU1\tSA\t40 cm\tJudge A\tPending later",
     );
     expect(toast.error).toHaveBeenCalledWith("copy.error");
   });

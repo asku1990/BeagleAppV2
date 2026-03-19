@@ -39,6 +39,18 @@ type ShowDetailClipboardLabels = {
   sexUnknown: string;
 };
 
+type ShowDetailClipboardColumns = {
+  includeShowType?: boolean;
+  includeClassName?: boolean;
+  includeQualityGrade?: boolean;
+  includeClassPlacement?: boolean;
+  includePupn?: boolean;
+  includeAwards?: boolean;
+  includeHeight?: boolean;
+  includeJudge?: boolean;
+  includeReviewText?: boolean;
+};
+
 type ShowDetailClipboardRow = BeagleShowDetailsRow;
 
 type DogProfileShowClipboardLabels = {
@@ -112,6 +124,22 @@ function formatSex(
   return labels.sexUnknown;
 }
 
+function resolveShowDetailClipboardColumns(
+  columns?: ShowDetailClipboardColumns,
+): Required<ShowDetailClipboardColumns> {
+  return {
+    includeShowType: columns?.includeShowType ?? true,
+    includeClassName: columns?.includeClassName ?? true,
+    includeQualityGrade: columns?.includeQualityGrade ?? true,
+    includeClassPlacement: columns?.includeClassPlacement ?? true,
+    includePupn: columns?.includePupn ?? true,
+    includeAwards: columns?.includeAwards ?? true,
+    includeHeight: columns?.includeHeight ?? true,
+    includeJudge: columns?.includeJudge ?? true,
+    includeReviewText: columns?.includeReviewText ?? true,
+  };
+}
+
 export function formatShowSearchRowsForClipboard(
   rows: BeagleShowSearchRow[],
   labels: ShowSearchClipboardLabels,
@@ -134,35 +162,48 @@ export function formatShowSearchRowsForClipboard(
 export function formatShowDetailRowForClipboard(
   row: ShowDetailClipboardRow,
   labels: ShowDetailClipboardLabels,
+  columns?: ShowDetailClipboardColumns,
 ): string {
-  const header = [
-    labels.registrationNo,
-    labels.name,
-    labels.sex,
-    labels.showType,
-    labels.className,
-    labels.qualityGrade,
-    labels.placement,
-    labels.pupn,
-    labels.awards,
-    labels.reviewText,
-    labels.height,
-    labels.judge,
-  ];
-  const body = [
-    row.registrationNo,
-    row.name,
-    formatSex(row.sex, labels),
-    formatShowType(row),
-    formatClassCode(row),
-    formatQualityGrade(row),
-    formatClassPlacement(row),
-    formatPupn(row),
-    formatAwards(row),
-    formatMaybeString(row.critiqueText),
-    formatHeight(row.heightCm),
-    formatMaybeString(row.judge),
-  ];
+  const visibleColumns = resolveShowDetailClipboardColumns(columns);
+  const header = [labels.registrationNo, labels.name, labels.sex];
+  const body = [row.registrationNo, row.name, formatSex(row.sex, labels)];
+
+  if (visibleColumns.includeShowType) {
+    header.push(labels.showType);
+    body.push(formatShowType(row));
+  }
+  if (visibleColumns.includeClassName) {
+    header.push(labels.className);
+    body.push(formatClassCode(row));
+  }
+  if (visibleColumns.includeQualityGrade) {
+    header.push(labels.qualityGrade);
+    body.push(formatQualityGrade(row));
+  }
+  if (visibleColumns.includeClassPlacement) {
+    header.push(labels.placement);
+    body.push(formatClassPlacement(row));
+  }
+  if (visibleColumns.includePupn) {
+    header.push(labels.pupn);
+    body.push(formatPupn(row));
+  }
+  if (visibleColumns.includeAwards) {
+    header.push(labels.awards);
+    body.push(formatAwards(row));
+  }
+  if (visibleColumns.includeHeight) {
+    header.push(labels.height);
+    body.push(formatHeight(row.heightCm));
+  }
+  if (visibleColumns.includeJudge) {
+    header.push(labels.judge);
+    body.push(formatMaybeString(row.judge));
+  }
+  if (visibleColumns.includeReviewText) {
+    header.push(labels.reviewText);
+    body.push(formatMaybeString(row.critiqueText));
+  }
 
   return [header, body]
     .map((cells) => cells.map(sanitizeCell).join("\t"))
@@ -172,37 +213,40 @@ export function formatShowDetailRowForClipboard(
 export function formatShowDetailRowsForClipboard(
   rows: ShowDetailClipboardRow[],
   labels: ShowDetailClipboardLabels,
+  columns?: ShowDetailClipboardColumns,
 ): string {
   if (rows.length === 0) return "";
 
-  const header = [
-    labels.registrationNo,
-    labels.name,
-    labels.sex,
-    labels.showType,
-    labels.className,
-    labels.qualityGrade,
-    labels.placement,
-    labels.pupn,
-    labels.awards,
-    labels.reviewText,
-    labels.height,
-    labels.judge,
-  ];
-  const body = rows.map((row) => [
-    row.registrationNo,
-    row.name,
-    formatSex(row.sex, labels),
-    formatShowType(row),
-    formatClassCode(row),
-    formatQualityGrade(row),
-    formatClassPlacement(row),
-    formatPupn(row),
-    formatAwards(row),
-    formatMaybeString(row.critiqueText),
-    formatHeight(row.heightCm),
-    formatMaybeString(row.judge),
-  ]);
+  const visibleColumns = resolveShowDetailClipboardColumns(columns);
+  const header = [labels.registrationNo, labels.name, labels.sex];
+  if (visibleColumns.includeShowType) header.push(labels.showType);
+  if (visibleColumns.includeClassName) header.push(labels.className);
+  if (visibleColumns.includeQualityGrade) header.push(labels.qualityGrade);
+  if (visibleColumns.includeClassPlacement) header.push(labels.placement);
+  if (visibleColumns.includePupn) header.push(labels.pupn);
+  if (visibleColumns.includeAwards) header.push(labels.awards);
+  if (visibleColumns.includeHeight) header.push(labels.height);
+  if (visibleColumns.includeJudge) header.push(labels.judge);
+  if (visibleColumns.includeReviewText) header.push(labels.reviewText);
+
+  const body = rows.map((row) => {
+    const cells = [row.registrationNo, row.name, formatSex(row.sex, labels)];
+
+    if (visibleColumns.includeShowType) cells.push(formatShowType(row));
+    if (visibleColumns.includeClassName) cells.push(formatClassCode(row));
+    if (visibleColumns.includeQualityGrade) cells.push(formatQualityGrade(row));
+    if (visibleColumns.includeClassPlacement) {
+      cells.push(formatClassPlacement(row));
+    }
+    if (visibleColumns.includePupn) cells.push(formatPupn(row));
+    if (visibleColumns.includeAwards) cells.push(formatAwards(row));
+    if (visibleColumns.includeHeight) cells.push(formatHeight(row.heightCm));
+    if (visibleColumns.includeJudge) cells.push(formatMaybeString(row.judge));
+    if (visibleColumns.includeReviewText) {
+      cells.push(formatMaybeString(row.critiqueText));
+    }
+    return cells;
+  });
 
   return [header, ...body]
     .map((cells) => cells.map(sanitizeCell).join("\t"))
@@ -302,18 +346,20 @@ export async function copyShowSearchRowsToClipboard({
 export async function copyShowDetailRowToClipboard({
   row,
   labels,
+  columns,
   messages,
   clipboard,
   toast,
 }: {
   row: ShowDetailClipboardRow;
   labels: ShowDetailClipboardLabels;
+  columns?: ShowDetailClipboardColumns;
   messages: ClipboardMessages;
   clipboard?: ClipboardLike;
   toast: ClipboardToastHandlers;
 }) {
   return writeClipboardOutput({
-    output: formatShowDetailRowForClipboard(row, labels),
+    output: formatShowDetailRowForClipboard(row, labels, columns),
     clipboard,
     messages,
     toast,
@@ -323,12 +369,14 @@ export async function copyShowDetailRowToClipboard({
 export async function copyShowDetailRowsToClipboard({
   rows,
   labels,
+  columns,
   messages,
   clipboard,
   toast,
 }: {
   rows: ShowDetailClipboardRow[];
   labels: ShowDetailClipboardLabels;
+  columns?: ShowDetailClipboardColumns;
   messages: ClipboardMessages;
   clipboard?: ClipboardLike;
   toast: ClipboardToastHandlers;
@@ -336,7 +384,7 @@ export async function copyShowDetailRowsToClipboard({
   if (rows.length === 0) return false;
 
   return writeClipboardOutput({
-    output: formatShowDetailRowsForClipboard(rows, labels),
+    output: formatShowDetailRowsForClipboard(rows, labels, columns),
     clipboard,
     messages,
     toast,

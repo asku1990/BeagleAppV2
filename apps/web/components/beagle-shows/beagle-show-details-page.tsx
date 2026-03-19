@@ -1,15 +1,20 @@
 import Link from "next/link";
 import { useState } from "react";
-import { toast } from "@/components/ui/sonner";
 import type { BeagleShowDetailsResponse } from "@beagle/contracts";
 import {
   ListingResponsiveResults,
   ListingSectionShell,
 } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { toast } from "@/components/ui/sonner";
 import { useI18n } from "@/hooks/i18n";
 import {
-  copyShowDetailRowToClipboard,
   copyShowDetailRowsToClipboard,
   formatAwards,
   formatClassCode,
@@ -55,62 +60,32 @@ function renderDogValue(value: string, dogId: string | null) {
   );
 }
 
-type ShowDetailsRowWithOptionalReview =
-  BeagleShowDetailsResponse["items"][number];
-
-function getReviewTextValue(
-  row: ShowDetailsRowWithOptionalReview,
-  pendingLabel: string,
-): { text: string; canCollapse: boolean } {
-  const value = row.critiqueText?.trim();
-  const collapseThreshold = 100;
-  if (!value) {
-    return {
-      text: pendingLabel,
-      canCollapse: pendingLabel.length > collapseThreshold,
-    };
-  }
-  return { text: value, canCollapse: value.length > collapseThreshold };
-}
-
-function CollapsibleReviewText({
-  text,
-  canCollapse,
-  showMoreLabel,
-  showLessLabel,
-}: {
-  text: string;
-  canCollapse: boolean;
-  showMoreLabel: string;
-  showLessLabel: string;
-}) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  return (
-    <div className="max-w-[40ch] break-words">
-      <p className={cn(!isExpanded && canCollapse && "line-clamp-2")}>{text}</p>
-      {canCollapse ? (
-        <button
-          type="button"
-          className={cn("mt-1 text-xs", beagleTheme.actionLinkStrong)}
-          onClick={() => setIsExpanded((prev) => !prev)}
-        >
-          {isExpanded ? showLessLabel : showMoreLabel}
-        </button>
-      ) : null}
-    </div>
-  );
-}
-
 export function BeagleShowDetailsPage({
   details,
 }: {
   details: BeagleShowDetailsResponse;
 }) {
   const { t, locale } = useI18n();
-  const reviewPendingLabel = t("shows.details.reviewText.pending");
-  const reviewShowMoreLabel = t("shows.details.reviewText.showMore");
-  const reviewShowLessLabel = t("shows.details.reviewText.showLess");
+  const reviewOpenLabel = t("shows.details.review.open");
+  const reviewModalTitle = t("shows.details.review.modalTitle");
+  const [selectedCritique, setSelectedCritique] = useState<{
+    registrationNo: string;
+    name: string;
+    text: string;
+  } | null>(null);
+  const hasShowType = details.items.some((row) => row.showType != null);
+  const hasClassCode = details.items.some((row) => row.classCode != null);
+  const hasQualityGrade = details.items.some((row) => row.qualityGrade != null);
+  const hasClassPlacement = details.items.some(
+    (row) => row.classPlacement != null,
+  );
+  const hasPupn = details.items.some((row) => row.pupn != null);
+  const hasAwards = details.items.some((row) => row.awards.length > 0);
+  const hasHeight = details.items.some((row) => row.heightCm != null);
+  const hasJudge = details.items.some((row) => row.judge != null);
+  const hasReviewText = details.items.some((row) =>
+    Boolean(row.critiqueText?.trim()),
+  );
   const clipboardLabels = {
     registrationNo: t("shows.details.col.reg"),
     name: t("shows.details.col.name"),
@@ -134,26 +109,21 @@ export function BeagleShowDetailsPage({
     unsupported: t("shows.details.copy.unsupported"),
   };
 
-  const handleCopyRow = async (row: ShowDetailsRowWithOptionalReview) => {
-    await copyShowDetailRowToClipboard({
-      row: {
-        ...row,
-        critiqueText: getReviewTextValue(row, reviewPendingLabel).text,
-      },
-      labels: clipboardLabels,
-      messages: clipboardMessages,
-      clipboard: globalThis.navigator?.clipboard,
-      toast,
-    });
-  };
-
   const handleCopyAllRows = async () => {
     await copyShowDetailRowsToClipboard({
-      rows: details.items.map((row) => ({
-        ...row,
-        critiqueText: getReviewTextValue(row, reviewPendingLabel).text,
-      })),
+      rows: details.items,
       labels: clipboardLabels,
+      columns: {
+        includeShowType: hasShowType,
+        includeClassName: hasClassCode,
+        includeQualityGrade: hasQualityGrade,
+        includeClassPlacement: hasClassPlacement,
+        includePupn: hasPupn,
+        includeAwards: hasAwards,
+        includeHeight: hasHeight,
+        includeJudge: hasJudge,
+        includeReviewText: hasReviewText,
+      },
       messages: clipboardMessages,
       clipboard: globalThis.navigator?.clipboard,
       toast,
@@ -220,41 +190,56 @@ export function BeagleShowDetailsPage({
                     <th className="px-2 py-2 font-semibold">
                       {t("shows.details.col.sex")}
                     </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("shows.details.col.showType")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("shows.details.col.className")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("shows.details.col.qualityGrade")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("shows.details.col.placement")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("shows.details.col.pupn")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("shows.details.col.awards")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("shows.details.col.reviewText")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("shows.details.col.height")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("shows.details.col.judge")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("shows.details.copy.button")}
-                    </th>
+                    {hasShowType ? (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("shows.details.col.showType")}
+                      </th>
+                    ) : null}
+                    {hasClassCode ? (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("shows.details.col.className")}
+                      </th>
+                    ) : null}
+                    {hasQualityGrade ? (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("shows.details.col.qualityGrade")}
+                      </th>
+                    ) : null}
+                    {hasClassPlacement ? (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("shows.details.col.placement")}
+                      </th>
+                    ) : null}
+                    {hasPupn ? (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("shows.details.col.pupn")}
+                      </th>
+                    ) : null}
+                    {hasAwards ? (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("shows.details.col.awards")}
+                      </th>
+                    ) : null}
+                    {hasHeight ? (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("shows.details.col.height")}
+                      </th>
+                    ) : null}
+                    {hasJudge ? (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("shows.details.col.judge")}
+                      </th>
+                    ) : null}
+                    {hasReviewText ? (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("shows.details.col.reviewText")}
+                      </th>
+                    ) : null}
                   </tr>
                 </thead>
                 <tbody>
                   {details.items.map((row) => {
-                    const review = getReviewTextValue(row, reviewPendingLabel);
+                    const critique = row.critiqueText?.trim();
 
                     return (
                       <tr
@@ -268,35 +253,57 @@ export function BeagleShowDetailsPage({
                           {renderDogValue(row.name, row.dogId)}
                         </td>
                         <td className="px-2 py-2">{mapSexLabel(row.sex, t)}</td>
-                        <td className="px-2 py-2">{formatShowType(row)}</td>
-                        <td className="px-2 py-2">{formatClassCode(row)}</td>
-                        <td className="px-2 py-2">{formatQualityGrade(row)}</td>
-                        <td className="px-2 py-2">
-                          {formatClassPlacement(row)}
-                        </td>
-                        <td className="px-2 py-2">{formatPupn(row)}</td>
-                        <td className="px-2 py-2">{formatAwards(row)}</td>
-                        <td className="px-2 py-2">
-                          <CollapsibleReviewText
-                            text={review.text}
-                            canCollapse={review.canCollapse}
-                            showMoreLabel={reviewShowMoreLabel}
-                            showLessLabel={reviewShowLessLabel}
-                          />
-                        </td>
-                        <td className="px-2 py-2">
-                          {formatHeight(row.heightCm)}
-                        </td>
-                        <td className="px-2 py-2">{row.judge ?? "-"}</td>
-                        <td className="px-2 py-2">
-                          <button
-                            type="button"
-                            onClick={() => void handleCopyRow(row)}
-                            className={beagleTheme.actionLinkStrong}
-                          >
-                            {t("shows.details.copy.button")}
-                          </button>
-                        </td>
+                        {hasShowType ? (
+                          <td className="px-2 py-2">{formatShowType(row)}</td>
+                        ) : null}
+                        {hasClassCode ? (
+                          <td className="px-2 py-2">{formatClassCode(row)}</td>
+                        ) : null}
+                        {hasQualityGrade ? (
+                          <td className="px-2 py-2">
+                            {formatQualityGrade(row)}
+                          </td>
+                        ) : null}
+                        {hasClassPlacement ? (
+                          <td className="px-2 py-2">
+                            {formatClassPlacement(row)}
+                          </td>
+                        ) : null}
+                        {hasPupn ? (
+                          <td className="px-2 py-2">{formatPupn(row)}</td>
+                        ) : null}
+                        {hasAwards ? (
+                          <td className="px-2 py-2">{formatAwards(row)}</td>
+                        ) : null}
+                        {hasHeight ? (
+                          <td className="px-2 py-2">
+                            {formatHeight(row.heightCm)}
+                          </td>
+                        ) : null}
+                        {hasJudge ? (
+                          <td className="px-2 py-2">{row.judge ?? "-"}</td>
+                        ) : null}
+                        {hasReviewText ? (
+                          <td className="px-2 py-2">
+                            {critique ? (
+                              <button
+                                type="button"
+                                className={beagleTheme.actionLinkStrong}
+                                onClick={() =>
+                                  setSelectedCritique({
+                                    registrationNo: row.registrationNo,
+                                    name: row.name,
+                                    text: critique,
+                                  })
+                                }
+                              >
+                                {reviewOpenLabel}
+                              </button>
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+                        ) : null}
                       </tr>
                     );
                   })}
@@ -307,7 +314,7 @@ export function BeagleShowDetailsPage({
           mobile={
             <div className="space-y-2">
               {details.items.map((row) => {
-                const review = getReviewTextValue(row, reviewPendingLabel);
+                const critique = row.critiqueText?.trim();
 
                 return (
                   <article
@@ -337,74 +344,94 @@ export function BeagleShowDetailsPage({
                         </span>
                         <span>{mapSexLabel(row.sex, t)}</span>
                       </p>
-                      <p>
-                        <span className={beagleTheme.mutedText}>
-                          {t("shows.details.col.showType")}:
-                        </span>
-                        <span>{formatShowType(row)}</span>
-                      </p>
-                      <p>
-                        <span className={beagleTheme.mutedText}>
-                          {t("shows.details.col.className")}:
-                        </span>
-                        <span>{formatClassCode(row)}</span>
-                      </p>
-                      <p>
-                        <span className={beagleTheme.mutedText}>
-                          {t("shows.details.col.qualityGrade")}:
-                        </span>
-                        <span>{formatQualityGrade(row)}</span>
-                      </p>
-                      <p>
-                        <span className={beagleTheme.mutedText}>
-                          {t("shows.details.col.placement")}:
-                        </span>
-                        <span>{formatClassPlacement(row)}</span>
-                      </p>
-                      <p>
-                        <span className={beagleTheme.mutedText}>
-                          {t("shows.details.col.pupn")}:
-                        </span>
-                        <span>{formatPupn(row)}</span>
-                      </p>
-                      <p className="col-span-2">
-                        <span className={beagleTheme.mutedText}>
-                          {t("shows.details.col.awards")}:
-                        </span>
-                        <span>{formatAwards(row)}</span>
-                      </p>
-                      <p>
-                        <span className={beagleTheme.mutedText}>
-                          {t("shows.details.col.height")}:
-                        </span>
-                        <span>{formatHeight(row.heightCm)}</span>
-                      </p>
-                      <div className="col-span-2">
-                        <span className={beagleTheme.mutedText}>
-                          {t("shows.details.col.reviewText")}:
-                        </span>
-                        <CollapsibleReviewText
-                          text={review.text}
-                          canCollapse={review.canCollapse}
-                          showMoreLabel={reviewShowMoreLabel}
-                          showLessLabel={reviewShowLessLabel}
-                        />
-                      </div>
-                      <p>
-                        <span className={beagleTheme.mutedText}>
-                          {t("shows.details.col.judge")}:
-                        </span>
-                        <span>{row.judge ?? "-"}</span>
-                      </p>
-                      <p className="col-span-2">
-                        <button
-                          type="button"
-                          onClick={() => void handleCopyRow(row)}
-                          className={beagleTheme.actionLinkStrong}
-                        >
-                          {t("shows.details.copy.button")}
-                        </button>
-                      </p>
+                      {hasShowType ? (
+                        <p>
+                          <span className={beagleTheme.mutedText}>
+                            {t("shows.details.col.showType")}:
+                          </span>
+                          <span>{formatShowType(row)}</span>
+                        </p>
+                      ) : null}
+                      {hasClassCode ? (
+                        <p>
+                          <span className={beagleTheme.mutedText}>
+                            {t("shows.details.col.className")}:
+                          </span>
+                          <span>{formatClassCode(row)}</span>
+                        </p>
+                      ) : null}
+                      {hasQualityGrade ? (
+                        <p>
+                          <span className={beagleTheme.mutedText}>
+                            {t("shows.details.col.qualityGrade")}:
+                          </span>
+                          <span>{formatQualityGrade(row)}</span>
+                        </p>
+                      ) : null}
+                      {hasClassPlacement ? (
+                        <p>
+                          <span className={beagleTheme.mutedText}>
+                            {t("shows.details.col.placement")}:
+                          </span>
+                          <span>{formatClassPlacement(row)}</span>
+                        </p>
+                      ) : null}
+                      {hasPupn ? (
+                        <p>
+                          <span className={beagleTheme.mutedText}>
+                            {t("shows.details.col.pupn")}:
+                          </span>
+                          <span>{formatPupn(row)}</span>
+                        </p>
+                      ) : null}
+                      {hasAwards ? (
+                        <p className="col-span-2">
+                          <span className={beagleTheme.mutedText}>
+                            {t("shows.details.col.awards")}:
+                          </span>
+                          <span>{formatAwards(row)}</span>
+                        </p>
+                      ) : null}
+                      {hasHeight ? (
+                        <p>
+                          <span className={beagleTheme.mutedText}>
+                            {t("shows.details.col.height")}:
+                          </span>
+                          <span>{formatHeight(row.heightCm)}</span>
+                        </p>
+                      ) : null}
+                      {hasJudge ? (
+                        <p>
+                          <span className={beagleTheme.mutedText}>
+                            {t("shows.details.col.judge")}:
+                          </span>
+                          <span>{row.judge ?? "-"}</span>
+                        </p>
+                      ) : null}
+                      {hasReviewText ? (
+                        <p className="col-span-2">
+                          <span className={beagleTheme.mutedText}>
+                            {t("shows.details.col.reviewText")}:
+                          </span>
+                          {critique ? (
+                            <button
+                              type="button"
+                              className={beagleTheme.actionLinkStrong}
+                              onClick={() =>
+                                setSelectedCritique({
+                                  registrationNo: row.registrationNo,
+                                  name: row.name,
+                                  text: critique,
+                                })
+                              }
+                            >
+                              {reviewOpenLabel}
+                            </button>
+                          ) : (
+                            "-"
+                          )}
+                        </p>
+                      ) : null}
                     </div>
                   </article>
                 );
@@ -413,6 +440,28 @@ export function BeagleShowDetailsPage({
           }
         />
       </ListingSectionShell>
+      <Dialog
+        open={Boolean(selectedCritique)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedCritique(null);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-[640px]">
+          <DialogHeader>
+            <DialogTitle>{reviewModalTitle}</DialogTitle>
+          </DialogHeader>
+          {selectedCritique ? (
+            <div className="space-y-3 text-sm">
+              <p className={beagleTheme.mutedText}>
+                {selectedCritique.registrationNo} • {selectedCritique.name}
+              </p>
+              <p className="whitespace-pre-wrap">{selectedCritique.text}</p>
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
