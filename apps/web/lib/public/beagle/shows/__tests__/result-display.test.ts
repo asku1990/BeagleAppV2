@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  formatClassResult,
-  formatResultNotes,
-  hasShowClassResult,
-  hasShowResultNotes,
-} from "../result-display";
+import { formatClassResult, hasShowClassResult } from "../result-display";
 
 describe("formatClassResult", () => {
   it("joins class code and placement", () => {
@@ -38,31 +33,5 @@ describe("hasShowClassResult", () => {
     expect(
       hasShowClassResult([{ classCode: null, classPlacement: null }]),
     ).toBe(false);
-  });
-});
-
-describe("formatResultNotes", () => {
-  it("joins pupn and awards when both are present", () => {
-    expect(formatResultNotes({ pupn: "PU1", awards: ["SA", "ERI"] })).toBe(
-      "PU1, SA, ERI",
-    );
-  });
-
-  it("falls back to the available note field", () => {
-    expect(formatResultNotes({ pupn: "PU1", awards: [] })).toBe("PU1");
-    expect(formatResultNotes({ pupn: null, awards: ["SA"] })).toBe("SA");
-    expect(formatResultNotes({ pupn: null, awards: [] })).toBe("-");
-  });
-});
-
-describe("hasShowResultNotes", () => {
-  it("detects either pupn or awards", () => {
-    expect(
-      hasShowResultNotes([
-        { pupn: null, awards: [] },
-        { pupn: "PU1", awards: [] },
-      ]),
-    ).toBe(true);
-    expect(hasShowResultNotes([{ pupn: null, awards: [] }])).toBe(false);
   });
 });

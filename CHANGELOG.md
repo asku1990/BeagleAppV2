@@ -22,7 +22,6 @@ This project uses a user-facing changelog format.
 - Kanonisten näyttelytulosmääritelmien koodit yhdenmukaistettiin Kennelliiton workbook-muotoon (`varaSERT`, `NORD-SERT`, `NORD-varaSERT`, `varaCACIB`, `CACIB-J`, `CACIB-V`, `JUN-SERT`, `VET-SERT`, `JUN-ROP`, `VET-ROP`, `JUN-VSP`, `VET-VSP`), ja sertti-/CACIB-määritelmien ruotsinkieliset nimet asetettiin toistaiseksi tyhjiksi.
 - Julkiset näyttelyhaut, näyttelyn tulossivu, koiraprofiilin näyttelyrivit sekä julkiset näyttelylaskurit lukevat nyt kanonisesta näyttelymallista (`ShowEvent`, `ShowEntry`, `ShowResultItem`) vanhan `ShowResult`-taulun sijaan.
 - Julkinen näyttelyn tulossivu ja koiraprofiilin näyttelykortti näyttävät nyt kanoniset näyttelytiedot rakenteisina kenttinä Kennelliiton tyyliin (`Tyyppi`, `Laatuarvostelu`, `Sijoitus`, `PU/PN`, `Muut merkinnät`, `Sanallinen arvostelu`) yhden legacy-tyylisen tulostekstin sijaan.
-- Julkinen näyttelyn tulossivu ja koiraprofiilin näyttelykortti yhdistävät nyt `PU/PN`- ja `Muut merkinnät`-kentät yhdeksi tulossarakkeeksi ja leikepöytämuotoon, jotta tulostaulukoissa on vähemmän päällekkäisiä sarakkeita.
 
 ### Fixed
 

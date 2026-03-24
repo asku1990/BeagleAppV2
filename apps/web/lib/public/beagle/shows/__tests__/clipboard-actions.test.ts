@@ -28,7 +28,8 @@ const detailLabels = {
   className: "Kilpailuluokka",
   qualityGrade: "Laatuarvostelu",
   placement: "Sijoitus",
-  resultNotes: "PU/PN, Muut merkinnät",
+  pupn: "PU/PN",
+  awards: "Muut merkinnät",
   reviewText: "Arvostelu",
   height: "Korkeus",
   judge: "Tuomari",
@@ -122,7 +123,7 @@ describe("show clipboard actions", () => {
 
     expect(result).toBe(false);
     expect(writeText).toHaveBeenCalledWith(
-      "Rek.nro\tNimi\tSukupuoli\tTyyppi\tLaatuarvostelu\tKilpailuluokka\tSijoitus\tPU/PN, Muut merkinnät\tKorkeus\tTuomari\tArvostelu\nFI-1/20\tAatu\tUros\tRyhmänäyttely\tERI\tJUN\t1\tPU1, SA\t40 cm\tJudge A\tPending later",
+      "Rek.nro\tNimi\tSukupuoli\tTyyppi\tLaatuarvostelu\tKilpailuluokka\tSijoitus\tPU/PN\tMuut merkinnät\tKorkeus\tTuomari\tArvostelu\nFI-1/20\tAatu\tUros\tRyhmänäyttely\tERI\tJUN\t1\tPU1\tSA\t40 cm\tJudge A\tPending later",
     );
     expect(toast.error).toHaveBeenCalledWith("copy.error");
   });
@@ -157,7 +158,8 @@ describe("show clipboard actions", () => {
         date: "Päivä",
         qualityGrade: "Laatuarvostelu",
         placement: "Sijoitus",
-        resultNotes: "PU/PN, Muut merkinnät",
+        pupn: "PU/PN",
+        awards: "Muut merkinnät",
         reviewText: "Sanallinen arvostelu",
         height: "Korkeus",
         judge: "Tuomari",
@@ -180,7 +182,7 @@ describe("show clipboard actions", () => {
 
     expect(result).toBe(true);
     expect(writeText).toHaveBeenCalledWith(
-      "N:o\tTyyppi\tPaikka\tPäivä\tLaatuarvostelu\tKilpailuluokka\tSijoitus\tPU/PN, Muut merkinnät\tKorkeus\tTuomari\tSanallinen arvostelu\n1\tRyhmänäyttely\tHelsinki\t2025-06-01\tERI\tJUN\t1\tPU1, SA\t40 cm\tJudge A\tPending later",
+      "N:o\tTyyppi\tPaikka\tPäivä\tLaatuarvostelu\tKilpailuluokka\tSijoitus\tPU/PN\tMuut merkinnät\tKorkeus\tTuomari\tSanallinen arvostelu\n1\tRyhmänäyttely\tHelsinki\t2025-06-01\tERI\tJUN\t1\tPU1\tSA\t40 cm\tJudge A\tPending later",
     );
     expect(toast.success).toHaveBeenCalledWith("copy.success");
   });

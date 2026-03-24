@@ -16,13 +16,13 @@ import { toast } from "@/components/ui/sonner";
 import { useI18n } from "@/hooks/i18n";
 import {
   copyShowDetailRowsToClipboard,
+  formatAwards,
   formatClassResult,
+  formatPupn,
   formatQualityGrade,
   formatIsoDateForDisplay,
-  formatResultNotes,
   formatShowType,
   hasShowClassResult,
-  hasShowResultNotes,
 } from "@/lib/public/beagle/shows";
 import { getDogProfileHref } from "@/lib/public/beagle/dogs/profile";
 import { cn } from "@/lib/utils";
@@ -80,7 +80,8 @@ export function BeagleShowDetailsPage({
   const hasClassPlacement = details.items.some(
     (row) => row.classPlacement != null,
   );
-  const hasResultNotes = hasShowResultNotes(details.items);
+  const hasPupn = details.items.some((row) => row.pupn != null);
+  const hasAwards = details.items.some((row) => row.awards.length > 0);
   const hasHeight = details.items.some((row) => row.heightCm != null);
   const hasJudge = details.items.some((row) => row.judge != null);
   const hasReviewText = details.items.some((row) =>
@@ -94,7 +95,8 @@ export function BeagleShowDetailsPage({
     className: t("shows.details.col.className"),
     qualityGrade: t("shows.details.col.qualityGrade"),
     placement: t("shows.details.col.placement"),
-    resultNotes: t("shows.details.col.resultNotes"),
+    pupn: t("shows.details.col.pupn"),
+    awards: t("shows.details.col.awards"),
     reviewText: t("shows.details.col.reviewText"),
     height: t("shows.details.col.height"),
     judge: t("shows.details.col.judge"),
@@ -117,8 +119,8 @@ export function BeagleShowDetailsPage({
         includeClassName: hasClassCode,
         includeQualityGrade: hasQualityGrade,
         includeClassPlacement: hasClassPlacement,
-        includePupn: hasResultNotes,
-        includeAwards: hasResultNotes,
+        includePupn: hasPupn,
+        includeAwards: hasAwards,
         includeHeight: hasHeight,
         includeJudge: hasJudge,
         includeReviewText: hasReviewText,
@@ -204,9 +206,14 @@ export function BeagleShowDetailsPage({
                         {t("shows.details.col.classResult")}
                       </th>
                     ) : null}
-                    {hasResultNotes ? (
+                    {hasPupn ? (
                       <th className="px-2 py-2 font-semibold">
-                        {t("shows.details.col.resultNotes")}
+                        {t("shows.details.col.pupn")}
+                      </th>
+                    ) : null}
+                    {hasAwards ? (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("shows.details.col.awards")}
                       </th>
                     ) : null}
                     {hasHeight ? (
@@ -255,10 +262,11 @@ export function BeagleShowDetailsPage({
                             {formatClassResult(row)}
                           </td>
                         ) : null}
-                        {hasResultNotes ? (
-                          <td className="px-2 py-2">
-                            {formatResultNotes(row)}
-                          </td>
+                        {hasPupn ? (
+                          <td className="px-2 py-2">{formatPupn(row)}</td>
+                        ) : null}
+                        {hasAwards ? (
+                          <td className="px-2 py-2">{formatAwards(row)}</td>
                         ) : null}
                         {hasHeight ? (
                           <td className="px-2 py-2">
@@ -353,12 +361,20 @@ export function BeagleShowDetailsPage({
                           <span>{formatClassResult(row)}</span>
                         </p>
                       ) : null}
-                      {hasResultNotes ? (
+                      {hasPupn ? (
                         <p>
                           <span className={beagleTheme.mutedText}>
-                            {t("shows.details.col.resultNotes")}:
+                            {t("shows.details.col.pupn")}:
                           </span>
-                          <span>{formatResultNotes(row)}</span>
+                          <span>{formatPupn(row)}</span>
+                        </p>
+                      ) : null}
+                      {hasAwards ? (
+                        <p className="col-span-2">
+                          <span className={beagleTheme.mutedText}>
+                            {t("shows.details.col.awards")}:
+                          </span>
+                          <span>{formatAwards(row)}</span>
                         </p>
                       ) : null}
                       {hasHeight ? (

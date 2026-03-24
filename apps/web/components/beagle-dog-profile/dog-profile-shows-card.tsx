@@ -16,14 +16,18 @@ import { useI18n } from "@/hooks/i18n";
 import { parseLocalIsoDate } from "@/lib/public/beagle/dogs/profile";
 import {
   copyDogProfileShowRowsToClipboard,
+  formatAwards,
   formatClassResult,
+  formatPupn,
   formatQualityGrade,
-  formatResultNotes,
   formatShowType,
   hasDogProfileShowClass,
+  hasShowClassResult,
   getBeagleShowHref,
+  hasDogProfileShowAwards,
   hasDogProfileShowCritique,
-  hasDogProfileShowResultNotes,
+  hasDogProfileShowPlacement,
+  hasDogProfileShowPupn,
   hasDogProfileShowQuality,
   hasDogProfileShowType,
 } from "@/lib/public/beagle/shows";
@@ -69,10 +73,10 @@ export function DogProfileShowsCard({
   const hasShowType = hasDogProfileShowType(rows);
   const hasQualityGrade = hasDogProfileShowQuality(rows);
   const hasClassCode = hasDogProfileShowClass(rows);
-  const hasClassResult = rows.some(
-    (row) => row.classCode != null || row.classPlacement != null,
-  );
-  const hasResultNotes = hasDogProfileShowResultNotes(rows);
+  const hasClassResult = hasShowClassResult(rows);
+  const hasClassPlacement = hasDogProfileShowPlacement(rows);
+  const hasPupn = hasDogProfileShowPupn(rows);
+  const hasAwards = hasDogProfileShowAwards(rows);
   const hasReviewText = hasDogProfileShowCritique(rows);
   const hasJudge = rows.some((r) => r.judge != null);
   const hasHeight = rows.some((r) => r.heightCm != null);
@@ -88,7 +92,8 @@ export function DogProfileShowsCard({
         date: t("dog.profile.shows.col.date"),
         qualityGrade: t("dog.profile.shows.col.qualityGrade"),
         placement: t("dog.profile.shows.col.placement"),
-        resultNotes: t("dog.profile.shows.col.resultNotes"),
+        pupn: t("dog.profile.shows.col.pupn"),
+        awards: t("dog.profile.shows.col.awards"),
         reviewText: t("dog.profile.shows.col.reviewText"),
         height: t("dog.profile.shows.col.height"),
         judge: t("dog.profile.shows.col.judge"),
@@ -97,9 +102,9 @@ export function DogProfileShowsCard({
         includeShowType: hasShowType,
         includeQualityGrade: hasQualityGrade,
         includeClassName: hasClassCode,
-        includeClassPlacement: hasClassResult,
-        includePupn: hasResultNotes,
-        includeAwards: hasResultNotes,
+        includeClassPlacement: hasClassPlacement,
+        includePupn: hasPupn,
+        includeAwards: hasAwards,
         includeReviewText: hasReviewText,
         includeHeight: hasHeight,
         includeJudge: hasJudge,
@@ -177,9 +182,14 @@ export function DogProfileShowsCard({
                         {t("dog.profile.shows.col.classResult")}
                       </th>
                     )}
-                    {hasResultNotes && (
+                    {hasPupn && (
                       <th className="px-2 py-2 font-semibold">
-                        {t("dog.profile.shows.col.resultNotes")}
+                        {t("dog.profile.shows.col.pupn")}
+                      </th>
+                    )}
+                    {hasAwards && (
+                      <th className="px-2 py-2 font-semibold">
+                        {t("dog.profile.shows.col.awards")}
                       </th>
                     )}
                     {hasHeight && (
@@ -226,8 +236,11 @@ export function DogProfileShowsCard({
                       {hasClassResult && (
                         <td className="px-2 py-2">{formatClassResult(row)}</td>
                       )}
-                      {hasResultNotes && (
-                        <td className="px-2 py-2">{formatResultNotes(row)}</td>
+                      {hasPupn && (
+                        <td className="px-2 py-2">{formatPupn(row)}</td>
+                      )}
+                      {hasAwards && (
+                        <td className="px-2 py-2">{formatAwards(row)}</td>
                       )}
                       {hasHeight && (
                         <td className="px-2 py-2">
@@ -326,12 +339,20 @@ export function DogProfileShowsCard({
                         <span>{formatClassResult(row)}</span>
                       </p>
                     )}
-                    {hasResultNotes && (
+                    {hasPupn && (
                       <p className="col-span-2">
                         <span className={beagleTheme.mutedText}>
-                          {t("dog.profile.shows.col.resultNotes")}:
+                          {t("dog.profile.shows.col.pupn")}:
                         </span>{" "}
-                        <span>{formatResultNotes(row)}</span>
+                        <span>{formatPupn(row)}</span>
+                      </p>
+                    )}
+                    {hasAwards && (
+                      <p className="col-span-2">
+                        <span className={beagleTheme.mutedText}>
+                          {t("dog.profile.shows.col.awards")}:
+                        </span>{" "}
+                        <span>{formatAwards(row)}</span>
                       </p>
                     )}
                     {hasHeight && (
