@@ -1,10 +1,6 @@
-import Link from "next/link";
 import { useState } from "react";
 import type { BeagleShowDetailsResponse } from "@beagle/contracts";
-import {
-  ListingResponsiveResults,
-  ListingSectionShell,
-} from "@/components/listing";
+import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import {
   Dialog,
@@ -16,49 +12,10 @@ import { toast } from "@/components/ui/sonner";
 import { useI18n } from "@/hooks/i18n";
 import {
   copyShowDetailRowsToClipboard,
-  formatAwards,
-  formatClassResult,
-  formatPupn,
-  formatQualityGrade,
   formatIsoDateForDisplay,
-  formatShowType,
-  hasShowClassResult,
 } from "@/lib/public/beagle/shows";
-import { getDogProfileHref } from "@/lib/public/beagle/dogs/profile";
 import { cn } from "@/lib/utils";
-
-function mapSexLabel(
-  value: "U" | "N" | "-",
-  t: (
-    key:
-      | "shows.details.sex.male"
-      | "shows.details.sex.female"
-      | "shows.details.sex.unknown",
-  ) => string,
-): string {
-  if (value === "U") return t("shows.details.sex.male");
-  if (value === "N") return t("shows.details.sex.female");
-  return t("shows.details.sex.unknown");
-}
-
-function formatHeight(heightCm: number | null): string {
-  if (heightCm == null) {
-    return "-";
-  }
-  return `${heightCm} cm`;
-}
-
-function renderDogValue(value: string, dogId: string | null) {
-  if (!dogId) {
-    return value;
-  }
-
-  return (
-    <Link href={getDogProfileHref(dogId)} className={beagleTheme.entityLink}>
-      {value}
-    </Link>
-  );
-}
+import { BeagleShowDetailsResults } from "./beagle-show-details-results";
 
 export function BeagleShowDetailsPage({
   details,
@@ -76,7 +33,6 @@ export function BeagleShowDetailsPage({
   const hasShowType = details.items.some((row) => row.showType != null);
   const hasClassCode = details.items.some((row) => row.classCode != null);
   const hasQualityGrade = details.items.some((row) => row.qualityGrade != null);
-  const hasClassResult = hasShowClassResult(details.items);
   const hasClassPlacement = details.items.some(
     (row) => row.classPlacement != null,
   );
@@ -176,253 +132,11 @@ export function BeagleShowDetailsPage({
           </span>
         }
       >
-        <ListingResponsiveResults
-          desktop={
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[1320px] border-collapse text-sm">
-                <thead>
-                  <tr className={cn("border-b text-left", beagleTheme.border)}>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("shows.details.col.reg")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("shows.details.col.name")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("shows.details.col.sex")}
-                    </th>
-                    {hasShowType ? (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("shows.details.col.showType")}
-                      </th>
-                    ) : null}
-                    {hasQualityGrade ? (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("shows.details.col.qualityGrade")}
-                      </th>
-                    ) : null}
-                    {hasClassResult ? (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("shows.details.col.classResult")}
-                      </th>
-                    ) : null}
-                    {hasPupn ? (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("shows.details.col.pupn")}
-                      </th>
-                    ) : null}
-                    {hasAwards ? (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("shows.details.col.awards")}
-                      </th>
-                    ) : null}
-                    {hasHeight ? (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("shows.details.col.height")}
-                      </th>
-                    ) : null}
-                    {hasJudge ? (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("shows.details.col.judge")}
-                      </th>
-                    ) : null}
-                    {hasReviewText ? (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("shows.details.col.reviewText")}
-                      </th>
-                    ) : null}
-                  </tr>
-                </thead>
-                <tbody>
-                  {details.items.map((row) => {
-                    const critique = row.critiqueText?.trim();
-
-                    return (
-                      <tr
-                        key={row.id}
-                        className={cn("border-b align-top", beagleTheme.border)}
-                      >
-                        <td className="px-2 py-2">
-                          {renderDogValue(row.registrationNo, row.dogId)}
-                        </td>
-                        <td className="px-2 py-2">
-                          {renderDogValue(row.name, row.dogId)}
-                        </td>
-                        <td className="px-2 py-2">{mapSexLabel(row.sex, t)}</td>
-                        {hasShowType ? (
-                          <td className="px-2 py-2">{formatShowType(row)}</td>
-                        ) : null}
-                        {hasQualityGrade ? (
-                          <td className="px-2 py-2">
-                            {formatQualityGrade(row)}
-                          </td>
-                        ) : null}
-                        {hasClassResult ? (
-                          <td className="px-2 py-2">
-                            {formatClassResult(row)}
-                          </td>
-                        ) : null}
-                        {hasPupn ? (
-                          <td className="px-2 py-2">{formatPupn(row)}</td>
-                        ) : null}
-                        {hasAwards ? (
-                          <td className="px-2 py-2">{formatAwards(row)}</td>
-                        ) : null}
-                        {hasHeight ? (
-                          <td className="px-2 py-2">
-                            {formatHeight(row.heightCm)}
-                          </td>
-                        ) : null}
-                        {hasJudge ? (
-                          <td className="px-2 py-2">{row.judge ?? "-"}</td>
-                        ) : null}
-                        {hasReviewText ? (
-                          <td className="px-2 py-2">
-                            {critique ? (
-                              <button
-                                type="button"
-                                className={beagleTheme.actionLinkStrong}
-                                onClick={() =>
-                                  setSelectedCritique({
-                                    registrationNo: row.registrationNo,
-                                    name: row.name,
-                                    text: critique,
-                                  })
-                                }
-                              >
-                                {reviewOpenLabel}
-                              </button>
-                            ) : (
-                              "-"
-                            )}
-                          </td>
-                        ) : null}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          }
-          mobile={
-            <div className="space-y-2">
-              {details.items.map((row) => {
-                const critique = row.critiqueText?.trim();
-
-                return (
-                  <article
-                    key={row.id}
-                    className={cn(
-                      "rounded-lg border p-3",
-                      beagleTheme.border,
-                      beagleTheme.surface,
-                    )}
-                  >
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <p className="col-span-2">
-                        <span className={beagleTheme.mutedText}>
-                          {t("shows.details.col.reg")}:
-                        </span>
-                        {renderDogValue(row.registrationNo, row.dogId)}
-                      </p>
-                      <p className="col-span-2">
-                        <span className={beagleTheme.mutedText}>
-                          {t("shows.details.col.name")}:
-                        </span>
-                        {renderDogValue(row.name, row.dogId)}
-                      </p>
-                      <p>
-                        <span className={beagleTheme.mutedText}>
-                          {t("shows.details.col.sex")}:
-                        </span>
-                        <span>{mapSexLabel(row.sex, t)}</span>
-                      </p>
-                      {hasShowType ? (
-                        <p>
-                          <span className={beagleTheme.mutedText}>
-                            {t("shows.details.col.showType")}:
-                          </span>
-                          <span>{formatShowType(row)}</span>
-                        </p>
-                      ) : null}
-                      {hasQualityGrade ? (
-                        <p>
-                          <span className={beagleTheme.mutedText}>
-                            {t("shows.details.col.qualityGrade")}:
-                          </span>
-                          <span>{formatQualityGrade(row)}</span>
-                        </p>
-                      ) : null}
-                      {hasClassResult ? (
-                        <p>
-                          <span className={beagleTheme.mutedText}>
-                            {t("shows.details.col.classResult")}:
-                          </span>
-                          <span>{formatClassResult(row)}</span>
-                        </p>
-                      ) : null}
-                      {hasPupn ? (
-                        <p>
-                          <span className={beagleTheme.mutedText}>
-                            {t("shows.details.col.pupn")}:
-                          </span>
-                          <span>{formatPupn(row)}</span>
-                        </p>
-                      ) : null}
-                      {hasAwards ? (
-                        <p className="col-span-2">
-                          <span className={beagleTheme.mutedText}>
-                            {t("shows.details.col.awards")}:
-                          </span>
-                          <span>{formatAwards(row)}</span>
-                        </p>
-                      ) : null}
-                      {hasHeight ? (
-                        <p>
-                          <span className={beagleTheme.mutedText}>
-                            {t("shows.details.col.height")}:
-                          </span>
-                          <span>{formatHeight(row.heightCm)}</span>
-                        </p>
-                      ) : null}
-                      {hasJudge ? (
-                        <p>
-                          <span className={beagleTheme.mutedText}>
-                            {t("shows.details.col.judge")}:
-                          </span>
-                          <span>{row.judge ?? "-"}</span>
-                        </p>
-                      ) : null}
-                      {hasReviewText ? (
-                        <p className="col-span-2">
-                          <span className={beagleTheme.mutedText}>
-                            {t("shows.details.col.reviewText")}:
-                          </span>
-                          {critique ? (
-                            <button
-                              type="button"
-                              className={beagleTheme.actionLinkStrong}
-                              onClick={() =>
-                                setSelectedCritique({
-                                  registrationNo: row.registrationNo,
-                                  name: row.name,
-                                  text: critique,
-                                })
-                              }
-                            >
-                              {reviewOpenLabel}
-                            </button>
-                          ) : (
-                            "-"
-                          )}
-                        </p>
-                      ) : null}
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          }
+        <BeagleShowDetailsResults
+          details={details}
+          reviewOpenLabel={reviewOpenLabel}
+          t={t}
+          onOpenCritique={setSelectedCritique}
         />
       </ListingSectionShell>
       <Dialog
