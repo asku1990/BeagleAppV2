@@ -12,6 +12,7 @@ export type BeagleShowSearchRequestDb = {
 };
 
 export type BeagleShowSearchRowDb = {
+  eventKey: string;
   eventDate: Date;
   eventPlace: string;
   judge: string | null;
@@ -31,6 +32,7 @@ export type BeagleShowSearchResponseDb = {
 };
 
 export type BeagleShowDetailsRequestDb = {
+  eventKey?: string | null;
   eventDate: Date;
   eventPlace: string;
 };
@@ -56,6 +58,7 @@ export type BeagleShowDetailsRowDb = BeagleShowStructuredResultDb & {
 };
 
 export type BeagleShowDetailsResponseDb = {
+  eventKey: string;
   eventDate: Date;
   eventPlace: string;
   judge: string | null;
@@ -65,6 +68,7 @@ export type BeagleShowDetailsResponseDb = {
 
 export type BeagleShowDogRowDb = BeagleShowStructuredResultDb & {
   id: string;
+  eventKey: string;
   place: string;
   date: Date;
   critiqueText: string | null;

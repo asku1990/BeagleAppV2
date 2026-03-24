@@ -112,20 +112,27 @@ export async function searchBeagleShowsDb(
 
   const [yearRows, eventRows] = await Promise.all([
     prisma.showEvent.findMany({
+      where: {
+        entries: {
+          some: {},
+        },
+      },
       select: {
         eventDate: true,
       },
     }),
     prisma.showEvent.findMany({
-      where,
+      where: {
+        ...where,
+        entries: {
+          some: {},
+        },
+      },
       select: {
+        id: true,
+        eventLookupKey: true,
         eventDate: true,
         eventPlace: true,
-        entries: {
-          select: {
-            judge: true,
-          },
-        },
         _count: {
           select: {
             entries: true,
@@ -138,12 +145,16 @@ export async function searchBeagleShowsDb(
   const availableYears = Array.from(
     new Set(yearRows.map((row) => toBusinessYear(row.eventDate))),
   ).sort((left, right) => right - left);
+  const eventIdByKey = new Map(
+    eventRows.map((row) => [row.eventLookupKey, row.id] as const),
+  );
 
   const rows: BeagleShowSearchRowDb[] = eventRows
     .map((row) => ({
+      eventKey: row.eventLookupKey,
       eventDate: row.eventDate,
       eventPlace: row.eventPlace,
-      judge: collapseJudge(row.entries),
+      judge: null,
       dogCount: row._count.entries,
     }))
     .sort((left, right) => compareRows(left, right, sort));
@@ -151,6 +162,46 @@ export async function searchBeagleShowsDb(
   const total = rows.length;
   const pagination = resolvePagination(total, page, pageSize);
   const pageRows = rows.slice(pagination.start, pagination.start + pageSize);
+  const pageEventIds = pageRows
+    .map((row) => eventIdByKey.get(row.eventKey))
+    .filter((value): value is string => value != null);
+
+  const judgeRows =
+    pageEventIds.length === 0
+      ? []
+      : await prisma.showEntry.findMany({
+          where: {
+            showEventId: {
+              in: pageEventIds,
+            },
+          },
+          select: {
+            showEventId: true,
+            judge: true,
+          },
+        });
+
+  const judgesByEventId = new Map<string, string | null>();
+  const entriesByEventId = new Map<string, Array<{ judge: string | null }>>();
+  for (const row of judgeRows) {
+    const existing = entriesByEventId.get(row.showEventId) ?? [];
+    existing.push({ judge: row.judge });
+    entriesByEventId.set(row.showEventId, existing);
+  }
+  for (const eventId of pageEventIds) {
+    judgesByEventId.set(
+      eventId,
+      collapseJudge(entriesByEventId.get(eventId) ?? []),
+    );
+  }
+
+  const pageRowsWithJudges = pageRows.map((row) => {
+    const eventId = eventIdByKey.get(row.eventKey);
+    return {
+      ...row,
+      judge: eventId ? (judgesByEventId.get(eventId) ?? null) : null,
+    };
+  });
 
   return {
     mode: input.mode,
@@ -164,6 +215,6 @@ export async function searchBeagleShowsDb(
     total,
     totalPages: pagination.totalPages,
     page: pagination.page,
-    items: pageRows,
+    items: pageRowsWithJudges,
   };
 }

@@ -55,7 +55,7 @@ function mapDogProfileFromDb(
       const showDate = toBusinessDateOnly(show.date);
       return {
         id: show.id,
-        showId: encodeShowId(showDate, show.place),
+        showId: encodeShowId(showDate, show.place, show.eventKey),
         place: show.place,
         date: showDate,
         showType: show.showType,

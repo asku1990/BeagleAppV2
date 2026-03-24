@@ -96,6 +96,7 @@ describe("shows service", () => {
         page: 1,
         items: [
           {
+            eventKey: "show-event-1",
             eventDate: new Date("2025-06-01T00:00:00.000Z"),
             eventPlace: "Helsinki",
             judge: "Judge Main",
@@ -134,6 +135,7 @@ describe("shows service", () => {
       eventDateIsoDate: "2025-06-01",
       eventDate: new Date("2025-06-01T00:00:00.000Z"),
       eventPlace: "Helsinki",
+      eventKey: "show-event-1",
     });
   });
 
@@ -180,6 +182,7 @@ describe("shows service", () => {
 
   it("maps detail rows to structured canonical show fields", async () => {
     getBeagleShowDetailsDbMock.mockResolvedValue({
+      eventKey: "show-event-1",
       eventDate: new Date("2025-06-01T00:00:00.000Z"),
       eventPlace: "Helsinki",
       judge: "Judge Main",
@@ -225,6 +228,7 @@ describe("shows service", () => {
 
   it("passes through unlinked entries without a dog profile id", async () => {
     getBeagleShowDetailsDbMock.mockResolvedValue({
+      eventKey: "show-event-1",
       eventDate: new Date("2025-06-01T00:00:00.000Z"),
       eventPlace: "Helsinki",
       judge: "Judge Main",
@@ -267,6 +271,7 @@ describe("shows service", () => {
 
   it("returns structured fields without legacy result normalization", async () => {
     getBeagleShowDetailsDbMock.mockResolvedValue({
+      eventKey: "show-event-legacy",
       eventDate: new Date("1996-01-06T00:00:00.000Z"),
       eventPlace: "Kajaani",
       judge: "Judge Old",

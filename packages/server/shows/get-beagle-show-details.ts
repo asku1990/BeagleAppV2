@@ -41,6 +41,7 @@ export async function getBeagleShowDetailsService(
 
   try {
     const result = await getBeagleShowDetailsDb({
+      eventKey: parsedShowId.eventKey,
       eventDate: parsedShowId.eventDate,
       eventPlace: parsedShowId.eventPlace,
     });
@@ -63,7 +64,7 @@ export async function getBeagleShowDetailsService(
     const eventDate = toBusinessDateOnly(result.eventDate);
     const data: BeagleShowDetailsResponse = {
       show: {
-        showId: encodeShowId(eventDate, result.eventPlace),
+        showId: encodeShowId(eventDate, result.eventPlace, result.eventKey),
         eventDate,
         eventPlace: result.eventPlace,
         judge: result.judge,

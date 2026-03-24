@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import {
   addBusinessIsoDateDays,
   getBusinessDateStartUtc,
@@ -30,55 +31,66 @@ export async function getBeagleShowDetailsDb(
     return null;
   }
 
-  const event = await prisma.showEvent.findFirst({
-    where: {
-      eventDate: {
-        gte: rangeStart,
-        lt: rangeEnd,
-      },
-      eventPlace: input.eventPlace,
+  const eventWhere = input.eventKey
+    ? {
+        eventLookupKey: input.eventKey,
+      }
+    : {
+        eventDate: {
+          gte: rangeStart,
+          lt: rangeEnd,
+        },
+        eventPlace: input.eventPlace,
+      };
+  const nonEmptyEventWhere = {
+    ...eventWhere,
+    entries: {
+      some: {},
     },
-    select: {
-      eventDate: true,
-      eventPlace: true,
-      eventType: true,
-      entries: {
-        select: {
-          id: true,
-          judge: true,
-          critiqueText: true,
-          heightText: true,
-          registrationNoSnapshot: true,
-          dogNameSnapshot: true,
-          dog: {
-            select: {
-              id: true,
-              name: true,
-              sex: true,
-              registrations: {
-                select: {
-                  registrationNo: true,
-                },
-                orderBy: [{ createdAt: "asc" }, { registrationNo: "asc" }],
-                take: 1,
+  } satisfies Prisma.ShowEventWhereInput;
+  const registrationOrderBy: Prisma.DogRegistrationOrderByWithRelationInput[] =
+    [{ createdAt: "asc" }, { registrationNo: "asc" }];
+  const eventSelect = {
+    eventLookupKey: true,
+    eventDate: true,
+    eventPlace: true,
+    eventType: true,
+    entries: {
+      select: {
+        id: true,
+        judge: true,
+        critiqueText: true,
+        heightText: true,
+        registrationNoSnapshot: true,
+        dogNameSnapshot: true,
+        dog: {
+          select: {
+            id: true,
+            name: true,
+            sex: true,
+            registrations: {
+              select: {
+                registrationNo: true,
               },
+              orderBy: registrationOrderBy,
+              take: 1,
             },
           },
-          resultItems: {
-            select: {
-              valueCode: true,
-              valueNumeric: true,
-              isAwarded: true,
-              definition: {
-                select: {
-                  code: true,
-                  sortOrder: true,
-                  isVisibleByDefault: true,
-                  category: {
-                    select: {
-                      code: true,
-                      sortOrder: true,
-                    },
+        },
+        resultItems: {
+          select: {
+            valueCode: true,
+            valueNumeric: true,
+            isAwarded: true,
+            definition: {
+              select: {
+                code: true,
+                sortOrder: true,
+                isVisibleByDefault: true,
+                category: {
+                  select: {
+                    code: true,
+                    sortOrder: true,
                   },
                 },
               },
@@ -87,7 +99,23 @@ export async function getBeagleShowDetailsDb(
         },
       },
     },
-  });
+  } satisfies Prisma.ShowEventSelect;
+  const eventQuery = {
+    select: eventSelect,
+  } as const;
+
+  const event = input.eventKey
+    ? await prisma.showEvent.findFirst({
+        where: nonEmptyEventWhere,
+        ...eventQuery,
+      })
+    : await prisma.showEvent
+        .findMany({
+          where: nonEmptyEventWhere,
+          take: 2,
+          ...eventQuery,
+        })
+        .then((rows) => (rows.length === 1 ? rows[0] : null));
 
   if (!event || event.entries.length === 0) {
     return null;
@@ -109,6 +137,7 @@ export async function getBeagleShowDetailsDb(
     .sort(compareDetailRows);
 
   return {
+    eventKey: event.eventLookupKey,
     eventDate: event.eventDate,
     eventPlace: event.eventPlace,
     judge: collapseJudge(event.entries),
