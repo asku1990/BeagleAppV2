@@ -14,6 +14,8 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+- Ylläpitoon lisättiin uusi `Näyttelyt`-moduulin aloitussivu (`/admin/shows`), joka varaa erilliset osiot workbook-tuonnille, tuontiajoille sekä tulevalle näyttelyhaulle ja muokkaukselle.
+
 ### Changed
 
 - vanhan datan tuonti on nyt jaettu selkeisiin vaiheisiin: `import:phase1` (perustiedot), `import:phase2` (kokeet), `import:phase3` (näyttelyt) sekä valinnainen `import:bootstrap`-ajo (`phase1 -> phase2 -> phase3`).
