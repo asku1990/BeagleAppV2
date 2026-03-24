@@ -19,6 +19,10 @@ describe("AdminShowsPageClient", () => {
     expect(html).toContain("admin.shows.title");
     expect(html).toContain("admin.shows.description");
     expect(html).toContain("admin.shows.import.title");
+    expect(html).toContain("admin.shows.import.upload.label");
+    expect(html).toContain("admin.shows.import.selected.empty");
+    expect(html).toContain("admin.shows.import.actions.validate");
+    expect(html).toContain("admin.shows.import.actions.preview");
     expect(html).toContain("admin.shows.runs.title");
     expect(html).toContain("admin.shows.search.title");
   });

@@ -15,6 +15,7 @@ This project uses a user-facing changelog format.
 ### Added
 
 - Ylläpitoon lisättiin uusi `Näyttelyt`-moduulin aloitussivu (`/admin/shows`), joka varaa erilliset osiot workbook-tuonnille, tuontiajoille sekä tulevalle näyttelyhaulle ja muokkaukselle.
+- `Näyttelyt`-ylläpitosivulle lisättiin workbook-valinnan UI: `.xlsx`-tiedoston voi valita ja tyhjentää ennen varsinaista validointi- ja tuontivaihetta.
 
 ### Changed
 
