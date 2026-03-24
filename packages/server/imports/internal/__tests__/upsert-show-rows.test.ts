@@ -112,4 +112,43 @@ describe("upsertShowRows", () => {
       expect.arrayContaining(["def-nord-vara", "def-laatu-numero", "def-jun"]),
     );
   });
+
+  it("writes an info issue note when a class+digit result is normalized after the 2003 cutoff", async () => {
+    showResultDefinitionFindManyMock.mockResolvedValue([
+      { id: "def-eri", code: "ERI" },
+      { id: "def-jun", code: "JUN" },
+    ]);
+
+    const rows: LegacyShowResultRow[] = [
+      {
+        registrationNo: "FI-1/20",
+        eventDateRaw: "20030101",
+        eventPlace: "Helsinki",
+        resultText: "JUN1",
+        critiqueText: null,
+        dogName: "Dog One",
+        heightText: null,
+        judge: null,
+        legacyFlag: null,
+        sourceTable: "nay9599",
+      },
+    ];
+    const dogIdByRegistration = new Map<string, string>([["FI-1/20", "dog-1"]]);
+
+    const result = await upsertShowRows(rows, dogIdByRegistration, {
+      importRunId: "run-1",
+    });
+
+    expect(result.upserted).toBe(1);
+    expect(result.errors).toBe(0);
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          severity: "INFO",
+          code: "SHOW_RESULT_LAATUARVOSTELU_FORMAT_CHANGED",
+        }),
+      ]),
+    );
+    expect(showResultItemUpsertMock).toHaveBeenCalledTimes(2);
+  });
 });

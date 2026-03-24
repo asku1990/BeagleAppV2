@@ -20,6 +20,7 @@ type EventUpsertResult = {
   upserted: number;
   errors: number;
   issues: Array<{
+    severity?: "INFO" | "WARNING" | "ERROR";
     code: string;
     message: string;
     registrationNo: string | null;
@@ -202,6 +203,26 @@ export async function upsertShowRows(
         sourceTable: row.sourceTable,
         payloadJson: JSON.stringify({
           token,
+          entryLookupKey,
+          resultTextRaw: rawResultText,
+          resultTextNormalized: parsed.normalizedResultText,
+        }),
+      });
+    }
+
+    for (const note of parsed.formatNotes) {
+      issues.push({
+        severity: "INFO",
+        code: note.code,
+        message: note.message,
+        registrationNo,
+        sourceTable: row.sourceTable,
+        payloadJson: JSON.stringify({
+          token: note.token,
+          eventDateIsoDate: note.eventDateIsoDate,
+          className: note.className,
+          qualityGrade: note.qualityGrade,
+          legacyQualityDigit: note.legacyQualityDigit,
           entryLookupKey,
           resultTextRaw: rawResultText,
           resultTextNormalized: parsed.normalizedResultText,

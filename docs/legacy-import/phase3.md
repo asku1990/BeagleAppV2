@@ -44,6 +44,8 @@ Additional behavior:
 - `dogId` is nullable (entries can be imported without matched dog).
 - Uses shared show-result normalization logic (`normalizeShowResult`) for legacy `TULNI` conversion.
 - Stores raw + normalized result context in provenance payload fields.
+- Emits an informational import issue when a class+digit laatuarvostelu token
+  (for example `JUN1`) is normalized to the post-2003 modern quality form.
 - `ShowEvent` provenance fields (`sourceTag`, `sourceTable`, `sourceRef`, `rawPayloadJson`) are set on create and not overwritten per entry-row updates.
 
 ## Execution assumption
@@ -164,6 +166,7 @@ When reviewing parser output against enabled definitions:
 - `SHOW_EVENT_MISSING_REQUIRED_FIELDS`
 - `SHOW_RESULT_TOKEN_UNMAPPED`
 - `SHOW_RESULT_DEFINITION_NOT_FOUND`
+- `SHOW_RESULT_LAATUARVOSTELU_FORMAT_CHANGED`
 - run-level fallback: `UNEXPECTED_EXCEPTION`
 
 Issue rows are written to `ImportRunIssue` with `kind=LEGACY_PHASE3`.
