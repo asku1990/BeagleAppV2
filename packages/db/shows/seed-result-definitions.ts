@@ -230,7 +230,7 @@ const SHOW_RESULT_DEFINITIONS_ROTUSIJOITUS = [
     labelSv: "BIM",
     descriptionFi: "Vastakkaisen sukupuolen paras.",
     valueType: ShowResultValueType.FLAG,
-    sortOrder: 160,
+    sortOrder: 20,
     categoryCode: "ROTUSIJOITUS",
     isVisibleByDefault: true,
   },

@@ -102,7 +102,13 @@ export function projectCanonicalShowResult(
     sortedItems.find((item) => item.definition.code === "PUPN") ?? null;
 
   const classCode = classItem?.definition.code ?? null;
-  const classPlacement = toNumericValue(placementItem?.valueNumeric ?? null);
+  const classPlacementValue = toNumericValue(
+    placementItem?.valueNumeric ?? null,
+  );
+  const classPlacement =
+    classPlacementValue != null && classPlacementValue > 0
+      ? classPlacementValue
+      : null;
   const legacyQualityNumeric = toNumericValue(
     legacyQualityItem?.valueNumeric ?? null,
   );
@@ -130,7 +136,7 @@ export function projectCanonicalShowResult(
     if (!item.definition.isVisibleByDefault) {
       continue;
     }
-    pushUnique(seenAwards ? awards : awards, seenAwards, code);
+    pushUnique(awards, seenAwards, code);
   }
 
   return {

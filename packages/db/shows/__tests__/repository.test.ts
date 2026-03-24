@@ -341,6 +341,12 @@ describe("getBeagleShowDetailsDb", () => {
               },
               {
                 valueCode: null,
+                valueNumeric: 0,
+                isAwarded: true,
+                definition: makeDefinition("SIJOITUS", "SIJOITUS", 70, 10),
+              },
+              {
+                valueCode: null,
                 valueNumeric: null,
                 isAwarded: true,
                 definition: makeDefinition("EH", "LAATUARVOSTELU", 20, 20),
