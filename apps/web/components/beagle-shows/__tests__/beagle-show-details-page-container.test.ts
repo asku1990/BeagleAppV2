@@ -135,6 +135,7 @@ describe("BeagleShowDetailsPageContainer", () => {
     expect(html).toContain("40 cm");
     expect(html).toContain("shows.details.review.open");
     expect(html).toContain("shows.details.col.classResult");
+    expect(html).toContain("shows.details.col.resultNotes");
     expect(html).toContain("shows.details.copy.all");
     expect(html).toContain('href="/beagle/dogs/dog_1"');
   });
@@ -185,8 +186,7 @@ describe("BeagleShowDetailsPageContainer", () => {
     expect(html).not.toContain("shows.details.col.className");
     expect(html).not.toContain("shows.details.col.qualityGrade");
     expect(html).not.toContain("shows.details.col.placement");
-    expect(html).not.toContain("shows.details.col.pupn");
-    expect(html).not.toContain("shows.details.col.awards");
+    expect(html).not.toContain("shows.details.col.resultNotes");
     expect(html).not.toContain("shows.details.col.height");
     expect(html).not.toContain("shows.details.col.judge");
     expect(html).not.toContain("shows.details.col.reviewText");

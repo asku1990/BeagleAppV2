@@ -6,11 +6,10 @@ import type {
   BeagleShowSearchRow,
 } from "@beagle/contracts";
 import {
-  formatAwards,
   formatClassCode,
   formatClassPlacement,
-  formatPupn,
   formatQualityGrade,
+  formatResultNotes,
   formatShowType,
 } from "./result-display";
 
@@ -29,8 +28,7 @@ type ShowDetailClipboardLabels = {
   className: string;
   qualityGrade: string;
   placement: string;
-  pupn: string;
-  awards: string;
+  resultNotes: string;
   reviewText: string;
   height: string;
   judge: string;
@@ -61,8 +59,7 @@ type DogProfileShowClipboardLabels = {
   date: string;
   qualityGrade: string;
   placement: string;
-  pupn: string;
-  awards: string;
+  resultNotes: string;
   reviewText: string;
   height: string;
   judge: string;
@@ -184,13 +181,9 @@ export function formatShowDetailRowForClipboard(
     header.push(labels.placement);
     body.push(formatClassPlacement(row));
   }
-  if (visibleColumns.includePupn) {
-    header.push(labels.pupn);
-    body.push(formatPupn(row));
-  }
-  if (visibleColumns.includeAwards) {
-    header.push(labels.awards);
-    body.push(formatAwards(row));
+  if (visibleColumns.includePupn || visibleColumns.includeAwards) {
+    header.push(labels.resultNotes);
+    body.push(formatResultNotes(row));
   }
   if (visibleColumns.includeHeight) {
     header.push(labels.height);
@@ -223,8 +216,9 @@ export function formatShowDetailRowsForClipboard(
   if (visibleColumns.includeQualityGrade) header.push(labels.qualityGrade);
   if (visibleColumns.includeClassName) header.push(labels.className);
   if (visibleColumns.includeClassPlacement) header.push(labels.placement);
-  if (visibleColumns.includePupn) header.push(labels.pupn);
-  if (visibleColumns.includeAwards) header.push(labels.awards);
+  if (visibleColumns.includePupn || visibleColumns.includeAwards) {
+    header.push(labels.resultNotes);
+  }
   if (visibleColumns.includeHeight) header.push(labels.height);
   if (visibleColumns.includeJudge) header.push(labels.judge);
   if (visibleColumns.includeReviewText) header.push(labels.reviewText);
@@ -238,8 +232,9 @@ export function formatShowDetailRowsForClipboard(
     if (visibleColumns.includeClassPlacement) {
       cells.push(formatClassPlacement(row));
     }
-    if (visibleColumns.includePupn) cells.push(formatPupn(row));
-    if (visibleColumns.includeAwards) cells.push(formatAwards(row));
+    if (visibleColumns.includePupn || visibleColumns.includeAwards) {
+      cells.push(formatResultNotes(row));
+    }
     if (visibleColumns.includeHeight) cells.push(formatHeight(row.heightCm));
     if (visibleColumns.includeJudge) cells.push(formatMaybeString(row.judge));
     if (visibleColumns.includeReviewText) {
@@ -266,8 +261,9 @@ export function formatDogProfileShowRowsForClipboard(
   if (columns.includeQualityGrade) header.push(labels.qualityGrade);
   if (columns.includeClassName) header.push(labels.className);
   if (columns.includeClassPlacement) header.push(labels.placement);
-  if (columns.includePupn) header.push(labels.pupn);
-  if (columns.includeAwards) header.push(labels.awards);
+  if (columns.includePupn || columns.includeAwards) {
+    header.push(labels.resultNotes);
+  }
   if (columns.includeHeight) header.push(labels.height);
   if (columns.includeJudge) header.push(labels.judge);
   if (columns.includeReviewText) header.push(labels.reviewText);
@@ -279,8 +275,9 @@ export function formatDogProfileShowRowsForClipboard(
     if (columns.includeQualityGrade) cells.push(formatQualityGrade(row));
     if (columns.includeClassName) cells.push(formatClassCode(row));
     if (columns.includeClassPlacement) cells.push(formatClassPlacement(row));
-    if (columns.includePupn) cells.push(formatPupn(row));
-    if (columns.includeAwards) cells.push(formatAwards(row));
+    if (columns.includePupn || columns.includeAwards) {
+      cells.push(formatResultNotes(row));
+    }
     if (columns.includeHeight) cells.push(formatHeight(row.heightCm));
     if (columns.includeJudge) cells.push(formatMaybeString(row.judge));
     if (columns.includeReviewText) {
