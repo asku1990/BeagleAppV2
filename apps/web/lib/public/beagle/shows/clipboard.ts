@@ -172,13 +172,13 @@ export function formatShowDetailRowForClipboard(
     header.push(labels.showType);
     body.push(formatShowType(row));
   }
-  if (visibleColumns.includeClassName) {
-    header.push(labels.className);
-    body.push(formatClassCode(row));
-  }
   if (visibleColumns.includeQualityGrade) {
     header.push(labels.qualityGrade);
     body.push(formatQualityGrade(row));
+  }
+  if (visibleColumns.includeClassName) {
+    header.push(labels.className);
+    body.push(formatClassCode(row));
   }
   if (visibleColumns.includeClassPlacement) {
     header.push(labels.placement);
@@ -220,8 +220,8 @@ export function formatShowDetailRowsForClipboard(
   const visibleColumns = resolveShowDetailClipboardColumns(columns);
   const header = [labels.registrationNo, labels.name, labels.sex];
   if (visibleColumns.includeShowType) header.push(labels.showType);
-  if (visibleColumns.includeClassName) header.push(labels.className);
   if (visibleColumns.includeQualityGrade) header.push(labels.qualityGrade);
+  if (visibleColumns.includeClassName) header.push(labels.className);
   if (visibleColumns.includeClassPlacement) header.push(labels.placement);
   if (visibleColumns.includePupn) header.push(labels.pupn);
   if (visibleColumns.includeAwards) header.push(labels.awards);
@@ -233,8 +233,8 @@ export function formatShowDetailRowsForClipboard(
     const cells = [row.registrationNo, row.name, formatSex(row.sex, labels)];
 
     if (visibleColumns.includeShowType) cells.push(formatShowType(row));
-    if (visibleColumns.includeClassName) cells.push(formatClassCode(row));
     if (visibleColumns.includeQualityGrade) cells.push(formatQualityGrade(row));
+    if (visibleColumns.includeClassName) cells.push(formatClassCode(row));
     if (visibleColumns.includeClassPlacement) {
       cells.push(formatClassPlacement(row));
     }
@@ -263,8 +263,8 @@ export function formatDogProfileShowRowsForClipboard(
   const header = [labels.no];
   if (columns.includeShowType) header.push(labels.showType);
   header.push(labels.place, labels.date);
-  if (columns.includeClassName) header.push(labels.className);
   if (columns.includeQualityGrade) header.push(labels.qualityGrade);
+  if (columns.includeClassName) header.push(labels.className);
   if (columns.includeClassPlacement) header.push(labels.placement);
   if (columns.includePupn) header.push(labels.pupn);
   if (columns.includeAwards) header.push(labels.awards);
@@ -276,8 +276,8 @@ export function formatDogProfileShowRowsForClipboard(
     const cells = [String(index + 1)];
     if (columns.includeShowType) cells.push(formatShowType(row));
     cells.push(row.place, row.date);
-    if (columns.includeClassName) cells.push(formatClassCode(row));
     if (columns.includeQualityGrade) cells.push(formatQualityGrade(row));
+    if (columns.includeClassName) cells.push(formatClassCode(row));
     if (columns.includeClassPlacement) cells.push(formatClassPlacement(row));
     if (columns.includePupn) cells.push(formatPupn(row));
     if (columns.includeAwards) cells.push(formatAwards(row));

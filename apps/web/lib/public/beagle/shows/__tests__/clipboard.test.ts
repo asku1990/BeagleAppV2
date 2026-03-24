@@ -105,10 +105,10 @@ describe("formatShowDetailRowForClipboard", () => {
 
     const lines = output.split("\n");
     expect(lines[0]).toBe(
-      "Rek.nro\tNimi\tSukupuoli\tTyyppi\tKilpailuluokka\tLaatuarvostelu\tSijoitus\tPU/PN\tMuut merkinnät\tKorkeus\tTuomari\tArvostelu",
+      "Rek.nro\tNimi\tSukupuoli\tTyyppi\tLaatuarvostelu\tKilpailuluokka\tSijoitus\tPU/PN\tMuut merkinnät\tKorkeus\tTuomari\tArvostelu",
     );
     expect(lines[1]).toBe(
-      "FI-1/20\tAatu\tUros\tRyhmänäyttely\tJUN\tERI\t1\tPU1\tSA\t40 cm\tJudge A\tVery good",
+      "FI-1/20\tAatu\tUros\tRyhmänäyttely\tERI\tJUN\t1\tPU1\tSA\t40 cm\tJudge A\tVery good",
     );
   });
 
@@ -182,7 +182,7 @@ describe("formatShowDetailRowsForClipboard", () => {
     const lines = output.split("\n");
     expect(lines).toHaveLength(3);
     expect(lines[1]).toBe(
-      "FI-1/20\tAatu\tUros\tRyhmänäyttely\tJUN\tERI\t1\tPU1\tSA\t40 cm\tJudge A\tReview A",
+      "FI-1/20\tAatu\tUros\tRyhmänäyttely\tERI\tJUN\t1\tPU1\tSA\t40 cm\tJudge A\tReview A",
     );
     expect(lines[2]).toBe(
       "FI-2/20\tBella\tNarttu\t-\t-\t-\t-\t-\t-\t-\t-\tPending later",
@@ -293,10 +293,10 @@ describe("formatDogProfileShowRowsForClipboard", () => {
 
     const lines = output.split("\n");
     expect(lines[0]).toBe(
-      "N:o\tTyyppi\tPaikka\tPäivä\tKilpailuluokka\tLaatuarvostelu\tSijoitus\tPU/PN\tMuut merkinnät\tKorkeus\tTuomari\tSanallinen arvostelu",
+      "N:o\tTyyppi\tPaikka\tPäivä\tLaatuarvostelu\tKilpailuluokka\tSijoitus\tPU/PN\tMuut merkinnät\tKorkeus\tTuomari\tSanallinen arvostelu",
     );
     expect(lines[1]).toBe(
-      "1\tRyhmänäyttely\tHelsinki\t2025-06-01\tJUN\tERI\t1\tPU1\tSA\t40 cm\tJudge A\tExcellent",
+      "1\tRyhmänäyttely\tHelsinki\t2025-06-01\tERI\tJUN\t1\tPU1\tSA\t40 cm\tJudge A\tExcellent",
     );
     expect(lines[2]).toBe("2\t-\tTurku\t2025-05-01\t-\t-\t-\t-\t-\t-\t-\t-");
   });

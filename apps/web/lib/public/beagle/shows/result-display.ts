@@ -36,6 +36,20 @@ export function formatClassPlacement(
     : String(row.classPlacement);
 }
 
+export function formatClassResult(
+  row: Pick<BeagleShowStructuredResultDto, "classCode" | "classPlacement">,
+): string {
+  const classCode = row.classCode?.trim() || null;
+  const classPlacement =
+    row.classPlacement == null ? null : String(row.classPlacement);
+
+  if (classCode && classPlacement) {
+    return `${classCode}-${classPlacement}`;
+  }
+
+  return classCode ?? classPlacement ?? FALLBACK_VALUE;
+}
+
 export function formatPupn(
   row: Pick<BeagleShowStructuredResultDto, "pupn">,
 ): string {
@@ -79,6 +93,22 @@ export function hasDogProfileShowClass(
   rows: BeagleDogProfileShowRowDto[],
 ): boolean {
   return rows.some((row) => row.classCode != null);
+}
+
+export function hasShowClassResult(
+  rows: Array<
+    Pick<BeagleShowStructuredResultDto, "classCode" | "classPlacement">
+  >,
+): boolean {
+  return rows.some(
+    (row) => row.classCode != null || row.classPlacement != null,
+  );
+}
+
+export function hasDogProfileShowClassResult(
+  rows: BeagleDogProfileShowRowDto[],
+): boolean {
+  return hasShowClassResult(rows);
 }
 
 export function hasDogProfileShowPupn(

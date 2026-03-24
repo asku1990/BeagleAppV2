@@ -123,7 +123,7 @@ describe("show clipboard actions", () => {
 
     expect(result).toBe(false);
     expect(writeText).toHaveBeenCalledWith(
-      "Rek.nro\tNimi\tSukupuoli\tTyyppi\tKilpailuluokka\tLaatuarvostelu\tSijoitus\tPU/PN\tMuut merkinnät\tKorkeus\tTuomari\tArvostelu\nFI-1/20\tAatu\tUros\tRyhmänäyttely\tJUN\tERI\t1\tPU1\tSA\t40 cm\tJudge A\tPending later",
+      "Rek.nro\tNimi\tSukupuoli\tTyyppi\tLaatuarvostelu\tKilpailuluokka\tSijoitus\tPU/PN\tMuut merkinnät\tKorkeus\tTuomari\tArvostelu\nFI-1/20\tAatu\tUros\tRyhmänäyttely\tERI\tJUN\t1\tPU1\tSA\t40 cm\tJudge A\tPending later",
     );
     expect(toast.error).toHaveBeenCalledWith("copy.error");
   });
@@ -182,7 +182,7 @@ describe("show clipboard actions", () => {
 
     expect(result).toBe(true);
     expect(writeText).toHaveBeenCalledWith(
-      "N:o\tTyyppi\tPaikka\tPäivä\tKilpailuluokka\tLaatuarvostelu\tSijoitus\tPU/PN\tMuut merkinnät\tKorkeus\tTuomari\tSanallinen arvostelu\n1\tRyhmänäyttely\tHelsinki\t2025-06-01\tJUN\tERI\t1\tPU1\tSA\t40 cm\tJudge A\tPending later",
+      "N:o\tTyyppi\tPaikka\tPäivä\tLaatuarvostelu\tKilpailuluokka\tSijoitus\tPU/PN\tMuut merkinnät\tKorkeus\tTuomari\tSanallinen arvostelu\n1\tRyhmänäyttely\tHelsinki\t2025-06-01\tERI\tJUN\t1\tPU1\tSA\t40 cm\tJudge A\tPending later",
     );
     expect(toast.success).toHaveBeenCalledWith("copy.success");
   });

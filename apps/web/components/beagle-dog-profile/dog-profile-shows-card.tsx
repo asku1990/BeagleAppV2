@@ -17,12 +17,12 @@ import { parseLocalIsoDate } from "@/lib/public/beagle/dogs/profile";
 import {
   copyDogProfileShowRowsToClipboard,
   formatAwards,
-  formatClassCode,
-  formatClassPlacement,
+  formatClassResult,
   formatPupn,
   formatQualityGrade,
   formatShowType,
   hasDogProfileShowClass,
+  hasShowClassResult,
   getBeagleShowHref,
   hasDogProfileShowAwards,
   hasDogProfileShowCritique,
@@ -73,6 +73,7 @@ export function DogProfileShowsCard({
   const hasShowType = hasDogProfileShowType(rows);
   const hasQualityGrade = hasDogProfileShowQuality(rows);
   const hasClassCode = hasDogProfileShowClass(rows);
+  const hasClassResult = hasShowClassResult(rows);
   const hasClassPlacement = hasDogProfileShowPlacement(rows);
   const hasPupn = hasDogProfileShowPupn(rows);
   const hasAwards = hasDogProfileShowAwards(rows);
@@ -176,14 +177,9 @@ export function DogProfileShowsCard({
                         {t("dog.profile.shows.col.qualityGrade")}
                       </th>
                     )}
-                    {hasClassCode && (
+                    {hasClassResult && (
                       <th className="px-2 py-2 font-semibold">
-                        {t("dog.profile.shows.col.className")}
-                      </th>
-                    )}
-                    {hasClassPlacement && (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("dog.profile.shows.col.placement")}
+                        {t("dog.profile.shows.col.classResult")}
                       </th>
                     )}
                     {hasPupn && (
@@ -237,13 +233,8 @@ export function DogProfileShowsCard({
                       {hasQualityGrade && (
                         <td className="px-2 py-2">{formatQualityGrade(row)}</td>
                       )}
-                      {hasClassCode && (
-                        <td className="px-2 py-2">{formatClassCode(row)}</td>
-                      )}
-                      {hasClassPlacement && (
-                        <td className="px-2 py-2">
-                          {formatClassPlacement(row)}
-                        </td>
+                      {hasClassResult && (
+                        <td className="px-2 py-2">{formatClassResult(row)}</td>
                       )}
                       {hasPupn && (
                         <td className="px-2 py-2">{formatPupn(row)}</td>
@@ -340,20 +331,12 @@ export function DogProfileShowsCard({
                         <span>{formatQualityGrade(row)}</span>
                       </p>
                     )}
-                    {hasClassCode && (
+                    {hasClassResult && (
                       <p className="col-span-2">
                         <span className={beagleTheme.mutedText}>
-                          {t("dog.profile.shows.col.className")}:
+                          {t("dog.profile.shows.col.classResult")}:
                         </span>{" "}
-                        <span>{formatClassCode(row)}</span>
-                      </p>
-                    )}
-                    {hasClassPlacement && (
-                      <p className="col-span-2">
-                        <span className={beagleTheme.mutedText}>
-                          {t("dog.profile.shows.col.placement")}:
-                        </span>{" "}
-                        <span>{formatClassPlacement(row)}</span>
+                        <span>{formatClassResult(row)}</span>
                       </p>
                     )}
                     {hasPupn && (

@@ -17,12 +17,12 @@ import { useI18n } from "@/hooks/i18n";
 import {
   copyShowDetailRowsToClipboard,
   formatAwards,
-  formatClassCode,
-  formatClassPlacement,
+  formatClassResult,
   formatPupn,
   formatQualityGrade,
   formatIsoDateForDisplay,
   formatShowType,
+  hasShowClassResult,
 } from "@/lib/public/beagle/shows";
 import { getDogProfileHref } from "@/lib/public/beagle/dogs/profile";
 import { cn } from "@/lib/utils";
@@ -76,6 +76,7 @@ export function BeagleShowDetailsPage({
   const hasShowType = details.items.some((row) => row.showType != null);
   const hasClassCode = details.items.some((row) => row.classCode != null);
   const hasQualityGrade = details.items.some((row) => row.qualityGrade != null);
+  const hasClassResult = hasShowClassResult(details.items);
   const hasClassPlacement = details.items.some(
     (row) => row.classPlacement != null,
   );
@@ -195,19 +196,14 @@ export function BeagleShowDetailsPage({
                         {t("shows.details.col.showType")}
                       </th>
                     ) : null}
-                    {hasClassCode ? (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("shows.details.col.className")}
-                      </th>
-                    ) : null}
                     {hasQualityGrade ? (
                       <th className="px-2 py-2 font-semibold">
                         {t("shows.details.col.qualityGrade")}
                       </th>
                     ) : null}
-                    {hasClassPlacement ? (
+                    {hasClassResult ? (
                       <th className="px-2 py-2 font-semibold">
-                        {t("shows.details.col.placement")}
+                        {t("shows.details.col.classResult")}
                       </th>
                     ) : null}
                     {hasPupn ? (
@@ -256,17 +252,14 @@ export function BeagleShowDetailsPage({
                         {hasShowType ? (
                           <td className="px-2 py-2">{formatShowType(row)}</td>
                         ) : null}
-                        {hasClassCode ? (
-                          <td className="px-2 py-2">{formatClassCode(row)}</td>
-                        ) : null}
                         {hasQualityGrade ? (
                           <td className="px-2 py-2">
                             {formatQualityGrade(row)}
                           </td>
                         ) : null}
-                        {hasClassPlacement ? (
+                        {hasClassResult ? (
                           <td className="px-2 py-2">
-                            {formatClassPlacement(row)}
+                            {formatClassResult(row)}
                           </td>
                         ) : null}
                         {hasPupn ? (
@@ -352,14 +345,6 @@ export function BeagleShowDetailsPage({
                           <span>{formatShowType(row)}</span>
                         </p>
                       ) : null}
-                      {hasClassCode ? (
-                        <p>
-                          <span className={beagleTheme.mutedText}>
-                            {t("shows.details.col.className")}:
-                          </span>
-                          <span>{formatClassCode(row)}</span>
-                        </p>
-                      ) : null}
                       {hasQualityGrade ? (
                         <p>
                           <span className={beagleTheme.mutedText}>
@@ -368,12 +353,12 @@ export function BeagleShowDetailsPage({
                           <span>{formatQualityGrade(row)}</span>
                         </p>
                       ) : null}
-                      {hasClassPlacement ? (
+                      {hasClassResult ? (
                         <p>
                           <span className={beagleTheme.mutedText}>
-                            {t("shows.details.col.placement")}:
+                            {t("shows.details.col.classResult")}:
                           </span>
-                          <span>{formatClassPlacement(row)}</span>
+                          <span>{formatClassResult(row)}</span>
                         </p>
                       ) : null}
                       {hasPupn ? (

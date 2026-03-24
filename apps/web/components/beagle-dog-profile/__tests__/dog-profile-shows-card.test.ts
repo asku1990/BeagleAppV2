@@ -40,6 +40,8 @@ describe("DogProfileShowsCard", () => {
     );
 
     expect(html).toContain("dog.profile.shows.copy.button");
+    expect(html).toContain("dog.profile.shows.col.showType");
+    expect(html).toContain("dog.profile.shows.col.classResult");
     expect(html).toContain('href="/beagle/shows/show-route-1"');
   });
 
