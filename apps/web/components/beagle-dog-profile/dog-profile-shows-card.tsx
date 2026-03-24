@@ -1,9 +1,6 @@
-import Link from "next/link";
 import { useState } from "react";
-import {
-  ListingResponsiveResults,
-  ListingSectionShell,
-} from "@/components/listing";
+import type { BeagleDogProfileShowRowDto } from "@beagle/contracts";
+import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import {
   Dialog,
@@ -13,46 +10,23 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/sonner";
 import { useI18n } from "@/hooks/i18n";
-import { parseLocalIsoDate } from "@/lib/public/beagle/dogs/profile";
 import {
   copyDogProfileShowRowsToClipboard,
-  formatAwards,
-  formatClassResult,
-  formatPupn,
-  formatQualityGrade,
-  formatShowType,
-  hasDogProfileShowClass,
-  hasShowClassResult,
-  getBeagleShowHref,
   hasDogProfileShowAwards,
+  hasDogProfileShowClass,
   hasDogProfileShowCritique,
   hasDogProfileShowPlacement,
   hasDogProfileShowPupn,
   hasDogProfileShowQuality,
   hasDogProfileShowType,
+  hasShowClassResult,
 } from "@/lib/public/beagle/shows";
 import { cn } from "@/lib/utils";
-import type { BeagleDogProfileShowRowDto } from "@beagle/contracts";
-
-const FALLBACK_VALUE = "-";
-
-function formatDate(value: string, locale: "fi" | "sv"): string {
-  const parsed = parseLocalIsoDate(value);
-  if (!parsed || Number.isNaN(parsed.getTime())) {
-    return FALLBACK_VALUE;
-  }
-
-  const localeTag = locale === "fi" ? "fi-FI" : "sv-FI";
-  return new Intl.DateTimeFormat(localeTag).format(parsed);
-}
-
-function formatHeight(heightCm: number | null): string {
-  if (heightCm == null) {
-    return FALLBACK_VALUE;
-  }
-
-  return `${heightCm} cm`;
-}
+import { DogProfileShowsResults } from "./dog-profile-shows-results";
+import {
+  formatDogProfileShowDate,
+  type DogProfileShowCritique,
+} from "./dog-profile-shows-core";
 
 export function DogProfileShowsCard({
   rows,
@@ -61,12 +35,8 @@ export function DogProfileShowsCard({
 }) {
   const { t, locale } = useI18n();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [selectedCritique, setSelectedCritique] = useState<{
-    showId: string;
-    place: string;
-    date: string;
-    text: string;
-  } | null>(null);
+  const [selectedCritique, setSelectedCritique] =
+    useState<DogProfileShowCritique | null>(null);
   const canReveal = rows.length > 10;
   const visibleRows = isExpanded ? rows : rows.slice(0, 10);
 
@@ -152,255 +122,19 @@ export function DogProfileShowsCard({
           {t("dog.profile.empty.shows")}
         </div>
       ) : (
-        <ListingResponsiveResults
-          desktop={
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[780px] border-collapse text-sm">
-                <thead>
-                  <tr className={cn("border-b text-left", beagleTheme.border)}>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("dog.profile.shows.col.no")}
-                    </th>
-                    {hasShowType && (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("dog.profile.shows.col.showType")}
-                      </th>
-                    )}
-                    <th className="px-2 py-2 font-semibold">
-                      {t("dog.profile.shows.col.place")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("dog.profile.shows.col.date")}
-                    </th>
-                    {hasQualityGrade && (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("dog.profile.shows.col.qualityGrade")}
-                      </th>
-                    )}
-                    {hasClassResult && (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("dog.profile.shows.col.classResult")}
-                      </th>
-                    )}
-                    {hasPupn && (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("dog.profile.shows.col.pupn")}
-                      </th>
-                    )}
-                    {hasAwards && (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("dog.profile.shows.col.awards")}
-                      </th>
-                    )}
-                    {hasHeight && (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("dog.profile.shows.col.height")}
-                      </th>
-                    )}
-                    {hasJudge && (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("dog.profile.shows.col.judge")}
-                      </th>
-                    )}
-                    {hasReviewText && (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("dog.profile.shows.col.reviewText")}
-                      </th>
-                    )}
-                  </tr>
-                </thead>
-                <tbody>
-                  {visibleRows.map((row, index) => (
-                    <tr
-                      key={row.id}
-                      className={cn("border-b align-top", beagleTheme.border)}
-                    >
-                      <td className="px-2 py-2">{index + 1}</td>
-                      {hasShowType && (
-                        <td className="px-2 py-2">{formatShowType(row)}</td>
-                      )}
-                      <td className="px-2 py-2">
-                        <Link
-                          href={getBeagleShowHref(row.showId)}
-                          className={beagleTheme.entityLink}
-                        >
-                          {row.place}
-                        </Link>
-                      </td>
-                      <td className="px-2 py-2">
-                        {formatDate(row.date, locale)}
-                      </td>
-                      {hasQualityGrade && (
-                        <td className="px-2 py-2">{formatQualityGrade(row)}</td>
-                      )}
-                      {hasClassResult && (
-                        <td className="px-2 py-2">{formatClassResult(row)}</td>
-                      )}
-                      {hasPupn && (
-                        <td className="px-2 py-2">{formatPupn(row)}</td>
-                      )}
-                      {hasAwards && (
-                        <td className="px-2 py-2">{formatAwards(row)}</td>
-                      )}
-                      {hasHeight && (
-                        <td className="px-2 py-2">
-                          {formatHeight(row.heightCm)}
-                        </td>
-                      )}
-                      {hasJudge && (
-                        <td className="px-2 py-2">
-                          {row.judge ?? FALLBACK_VALUE}
-                        </td>
-                      )}
-                      {hasReviewText && (
-                        <td className="px-2 py-2">
-                          {row.critiqueText?.trim() ? (
-                            <button
-                              type="button"
-                              className={beagleTheme.actionLinkStrong}
-                              onClick={() =>
-                                setSelectedCritique({
-                                  showId: row.showId,
-                                  place: row.place,
-                                  date: row.date,
-                                  text: row.critiqueText?.trim() ?? "",
-                                })
-                              }
-                            >
-                              {t("dog.profile.shows.review.open")}
-                            </button>
-                          ) : (
-                            FALLBACK_VALUE
-                          )}
-                        </td>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          }
-          mobile={
-            <div className="space-y-2">
-              {visibleRows.map((row, index) => (
-                <article
-                  key={row.id}
-                  className={cn(
-                    "rounded-lg border p-3",
-                    beagleTheme.border,
-                    beagleTheme.surface,
-                  )}
-                >
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <p>
-                      <span className={beagleTheme.mutedText}>
-                        {t("dog.profile.shows.col.no")}:
-                      </span>{" "}
-                      <span>{index + 1}</span>
-                    </p>
-                    {hasShowType && (
-                      <p>
-                        <span className={beagleTheme.mutedText}>
-                          {t("dog.profile.shows.col.showType")}:
-                        </span>{" "}
-                        <span>{formatShowType(row)}</span>
-                      </p>
-                    )}
-                    <p>
-                      <span className={beagleTheme.mutedText}>
-                        {t("dog.profile.shows.col.date")}:
-                      </span>{" "}
-                      <span>{formatDate(row.date, locale)}</span>
-                    </p>
-                    <p className="col-span-2">
-                      <span className={beagleTheme.mutedText}>
-                        {t("dog.profile.shows.col.place")}:
-                      </span>{" "}
-                      <Link
-                        href={getBeagleShowHref(row.showId)}
-                        className={beagleTheme.entityLink}
-                      >
-                        {row.place}
-                      </Link>
-                    </p>
-                    {hasQualityGrade && (
-                      <p className="col-span-2">
-                        <span className={beagleTheme.mutedText}>
-                          {t("dog.profile.shows.col.qualityGrade")}:
-                        </span>{" "}
-                        <span>{formatQualityGrade(row)}</span>
-                      </p>
-                    )}
-                    {hasClassResult && (
-                      <p className="col-span-2">
-                        <span className={beagleTheme.mutedText}>
-                          {t("dog.profile.shows.col.classResult")}:
-                        </span>{" "}
-                        <span>{formatClassResult(row)}</span>
-                      </p>
-                    )}
-                    {hasPupn && (
-                      <p className="col-span-2">
-                        <span className={beagleTheme.mutedText}>
-                          {t("dog.profile.shows.col.pupn")}:
-                        </span>{" "}
-                        <span>{formatPupn(row)}</span>
-                      </p>
-                    )}
-                    {hasAwards && (
-                      <p className="col-span-2">
-                        <span className={beagleTheme.mutedText}>
-                          {t("dog.profile.shows.col.awards")}:
-                        </span>{" "}
-                        <span>{formatAwards(row)}</span>
-                      </p>
-                    )}
-                    {hasHeight && (
-                      <p className="col-span-2">
-                        <span className={beagleTheme.mutedText}>
-                          {t("dog.profile.shows.col.height")}:
-                        </span>{" "}
-                        <span>{formatHeight(row.heightCm)}</span>
-                      </p>
-                    )}
-                    {hasJudge && (
-                      <p className="col-span-2">
-                        <span className={beagleTheme.mutedText}>
-                          {t("dog.profile.shows.col.judge")}:
-                        </span>{" "}
-                        <span>{row.judge ?? FALLBACK_VALUE}</span>
-                      </p>
-                    )}
-                    {hasReviewText && (
-                      <p className="col-span-2">
-                        <span className={beagleTheme.mutedText}>
-                          {t("dog.profile.shows.col.reviewText")}:
-                        </span>{" "}
-                        {row.critiqueText?.trim() ? (
-                          <button
-                            type="button"
-                            className={beagleTheme.actionLinkStrong}
-                            onClick={() =>
-                              setSelectedCritique({
-                                showId: row.showId,
-                                place: row.place,
-                                date: row.date,
-                                text: row.critiqueText?.trim() ?? "",
-                              })
-                            }
-                          >
-                            {t("dog.profile.shows.review.open")}
-                          </button>
-                        ) : (
-                          <span>{FALLBACK_VALUE}</span>
-                        )}
-                      </p>
-                    )}
-                  </div>
-                </article>
-              ))}
-            </div>
-          }
+        <DogProfileShowsResults
+          visibleRows={visibleRows}
+          hasShowType={hasShowType}
+          hasQualityGrade={hasQualityGrade}
+          hasClassResult={hasClassResult}
+          hasPupn={hasPupn}
+          hasAwards={hasAwards}
+          hasReviewText={hasReviewText}
+          hasJudge={hasJudge}
+          hasHeight={hasHeight}
+          locale={locale}
+          t={t}
+          onOpenCritique={setSelectedCritique}
         />
       )}
       <Dialog
@@ -421,7 +155,7 @@ export function DogProfileShowsCard({
             <div className="space-y-3 text-sm">
               <p className={beagleTheme.mutedText}>
                 {selectedCritique.place} •{" "}
-                {formatDate(selectedCritique.date, locale)}
+                {formatDogProfileShowDate(selectedCritique.date, locale)}
               </p>
               <p className="whitespace-pre-wrap">{selectedCritique.text}</p>
             </div>
