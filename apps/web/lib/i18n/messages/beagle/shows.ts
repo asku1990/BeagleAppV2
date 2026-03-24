@@ -58,7 +58,7 @@ export const fiBeagleShowsMessages = {
   "shows.details.col.name": "Nimi",
   "shows.details.col.sex": "Sukupuoli",
   "shows.details.col.showType": "Tyyppi",
-  "shows.details.col.classResult": "Luokka / Sijoitus",
+  "shows.details.col.classResult": "Sijoitus",
   "shows.details.col.className": "Kilpailuluokka",
   "shows.details.col.qualityGrade": "Laatuarvostelu",
   "shows.details.col.placement": "Luokkasijoitus",

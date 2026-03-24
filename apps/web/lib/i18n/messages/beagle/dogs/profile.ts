@@ -49,7 +49,7 @@ export const fiBeagleDogProfileMessages = {
   "dog.profile.empty.siblings": "Ei sisaruksia.",
   "dog.profile.shows.col.no": "N:o",
   "dog.profile.shows.col.showType": "Tyyppi",
-  "dog.profile.shows.col.classResult": "Luokka / Sijoitus",
+  "dog.profile.shows.col.classResult": "Sijoitus",
   "dog.profile.shows.col.className": "Kilpailuluokka",
   "dog.profile.shows.col.place": "Näyttelypaikka",
   "dog.profile.shows.col.date": "Päivä",
