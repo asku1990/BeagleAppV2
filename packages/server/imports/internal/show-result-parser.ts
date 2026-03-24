@@ -296,6 +296,11 @@ export function parseShowResultText(
   }
 
   for (const token of rawTokens) {
+    if (
+      parseClassPlacementToken(token) ||
+      parseClassPlacementWithoutKToken(token)
+    )
+      continue;
     const legacyClassQuality = parseLegacyClassQualityToken(token);
     if (!allowLegacyClassQuality || !legacyClassQuality) continue;
     formatNotes.push({
