@@ -29,7 +29,7 @@ const SHOW_RESULT_CATEGORIES = [
     descriptionFi:
       "Rotusijoitukseen liittyvät merkinnät (ROP, VSP, JUN/VET-variantit).",
     descriptionSv: null,
-    sortOrder: 30,
+    sortOrder: 50,
   },
   {
     code: "SERTTIMERKINTA",
@@ -46,7 +46,7 @@ const SHOW_RESULT_CATEGORIES = [
     labelSv: null,
     descriptionFi: "Valioarvomerkinnat (MVA, JMVA, VMVA).",
     descriptionSv: null,
-    sortOrder: 60,
+    sortOrder: 30,
   },
   {
     code: "SIJOITUS",

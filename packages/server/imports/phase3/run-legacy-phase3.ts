@@ -172,6 +172,7 @@ export async function runLegacyPhase3(
     for (const issue of showResult.issues) {
       await recordIssue({
         stage: "shows",
+        severity: issue.severity,
         code: issue.code,
         message: issue.message,
         registrationNo: issue.registrationNo,

@@ -146,6 +146,36 @@ function addIsoDateDays(isoDate: string, days: number): string | null {
   return base.toISOString().slice(0, 10);
 }
 
+export function getBusinessDateStartUtc(isoDate: string): Date | null {
+  return toBusinessDateStartUtc(isoDate);
+}
+
+export function addBusinessIsoDateDays(
+  isoDate: string,
+  days: number,
+): string | null {
+  return addIsoDateDays(isoDate, days);
+}
+
+export function normalizeUtcDateToBusinessDateStart(value: Date): Date | null {
+  const isoDate = toBusinessDateOnly(value);
+  return toBusinessDateStartUtc(isoDate);
+}
+
+const BUSINESS_YEAR_FORMATTER = new Intl.DateTimeFormat("en-US", {
+  timeZone: BUSINESS_TIME_ZONE,
+  year: "numeric",
+});
+
+export function toBusinessYear(value: Date): number {
+  const year = BUSINESS_YEAR_FORMATTER.formatToParts(value).find(
+    (part) => part.type === "year",
+  )?.value;
+  if (!year) return value.getUTCFullYear();
+  const parsed = Number.parseInt(year, 10);
+  return Number.isFinite(parsed) ? parsed : value.getUTCFullYear();
+}
+
 export function getBusinessDateUtcRange(value: Date): {
   start: Date;
   endExclusive: Date;

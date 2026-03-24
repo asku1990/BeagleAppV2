@@ -58,15 +58,20 @@ export async function getHomeStatisticsSnapshot(): Promise<HomeStatisticsSnapsho
       _min: { eventDate: true },
       _max: { eventDate: true },
     }),
-    prisma.showResult.count(),
+    prisma.showEntry.count(),
     prisma.dog.count({
       where: {
-        showResults: {
+        showEntries: {
           some: {},
         },
       },
     }),
-    prisma.showResult.aggregate({
+    prisma.showEvent.aggregate({
+      where: {
+        entries: {
+          some: {},
+        },
+      },
       _min: { eventDate: true },
       _max: { eventDate: true },
     }),

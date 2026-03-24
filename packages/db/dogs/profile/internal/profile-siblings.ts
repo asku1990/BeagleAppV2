@@ -188,7 +188,7 @@ function mapSiblingRow(dog: OffspringDogNode): BeagleDogProfileSiblingRowDb {
     sex: toSexCode(dog.sex),
     ekNo: dog.ekNo ?? null,
     trialCount: dog._count.trialResults,
-    showCount: dog._count.showResults,
+    showCount: dog._count.showEntries,
     litterCount: countOffspringLitters(dog),
   };
 }

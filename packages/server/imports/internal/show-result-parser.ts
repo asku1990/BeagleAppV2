@@ -18,6 +18,16 @@ type ParsedShowResultItem = {
   token: string;
 };
 
+export type ParsedShowResultFormatNote = {
+  code: string;
+  message: string;
+  token: string;
+  eventDateIsoDate: string;
+  className: string;
+  qualityGrade: string;
+  legacyQualityDigit: number;
+};
+
 export type ParsedShowResult = {
   normalizedResultText: string | null;
   tokens: string[];
@@ -26,6 +36,7 @@ export type ParsedShowResult = {
   placement: string | null;
   items: ParsedShowResultItem[];
   unmappedTokens: string[];
+  formatNotes: ParsedShowResultFormatNote[];
 };
 
 function stripToken(value: string): string {
@@ -173,6 +184,7 @@ export function parseShowResultText(
   eventDateIsoDate: string,
 ): ParsedShowResult {
   const allowLegacyClassQuality = eventDateIsoDate >= "2003-01-01";
+  const rawTokens = rawResultText ? tokenizeResult(rawResultText) : [];
   const normalizedResultText = normalizeShowResult(
     rawResultText,
     eventDateIsoDate,
@@ -194,6 +206,7 @@ export function parseShowResultText(
   let placement: string | null = null;
   const unmappedTokens: string[] = [];
   const items: ParsedShowResultItem[] = [];
+  const formatNotes: ParsedShowResultFormatNote[] = [];
 
   for (const token of tokens) {
     const upperToken = token.toUpperCase();
@@ -282,6 +295,20 @@ export function parseShowResultText(
     if (!handled) unmappedTokens.push(upperToken);
   }
 
+  for (const token of rawTokens) {
+    const legacyClassQuality = parseLegacyClassQualityToken(token);
+    if (!allowLegacyClassQuality || !legacyClassQuality) continue;
+    formatNotes.push({
+      code: "SHOW_RESULT_LAATUARVOSTELU_FORMAT_CHANGED",
+      message: `Legacy laatuarvostelu token ${token.toUpperCase()} was normalized to modern quality ${legacyClassQuality.qualityGrade} because event date ${eventDateIsoDate} is 2003-01-01 or later.`,
+      token: token.toUpperCase(),
+      eventDateIsoDate,
+      className: legacyClassQuality.className,
+      qualityGrade: legacyClassQuality.qualityGrade,
+      legacyQualityDigit: legacyClassQuality.legacyQualityDigit,
+    });
+  }
+
   if (placement !== null && /^\d+$/.test(placement)) {
     items.push({
       definitionCode: "SIJOITUS",
@@ -320,5 +347,20 @@ export function parseShowResultText(
     placement,
     items: dedupeParsedItems(items),
     unmappedTokens: [...new Set(unmappedTokens)],
+    formatNotes: dedupeFormatNotes(formatNotes),
   };
+}
+
+function dedupeFormatNotes(
+  notes: ParsedShowResultFormatNote[],
+): ParsedShowResultFormatNote[] {
+  const seen = new Set<string>();
+  const deduped: ParsedShowResultFormatNote[] = [];
+  for (const note of notes) {
+    const key = `${note.code}|${note.token}|${note.eventDateIsoDate}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(note);
+  }
+  return deduped;
 }

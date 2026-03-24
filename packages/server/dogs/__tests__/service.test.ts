@@ -318,9 +318,16 @@ describe("dogs service", () => {
     const mockShows = [
       {
         id: "show1",
+        eventKey: "show-event-1",
         place: "City",
         date: new Date("2024-01-01T00:00:00.000Z"),
-        result: "JUN1",
+        showType: "Ryhmänäyttely",
+        classCode: "JUN",
+        qualityGrade: "ERI",
+        classPlacement: 1,
+        pupn: "PU1",
+        awards: ["SA"],
+        critiqueText: "Arvostelu",
         judge: "Judge",
         heightCm: 39,
       },
@@ -356,6 +363,7 @@ describe("dogs service", () => {
     expect(getBeagleDogProfileDbMock).toHaveBeenCalledWith("dog1");
     expect(getBeagleShowsForDogDbMock).toHaveBeenCalledWith("dog1");
     expect(getBeagleTrialsForDogDbMock).toHaveBeenCalledWith("dog1");
+    const { eventKey: _show1EventKey, ...show1 } = mockShows[0];
     expect(result).toEqual({
       status: 200,
       body: {
@@ -371,10 +379,9 @@ describe("dogs service", () => {
           ],
           shows: [
             {
-              ...mockShows[0],
-              showId: encodeShowId("2024-01-01", "City"),
+              ...show1,
+              showId: encodeShowId("2024-01-01", "City", "show-event-1"),
               date: "2024-01-01",
-              result: "JUN-ERI",
             },
           ],
           trials: [
@@ -426,9 +433,16 @@ describe("dogs service", () => {
     const mockShows = [
       {
         id: "show2",
+        eventKey: "show-event-2",
         place: "Helsinki",
         date: new Date("2022-03-15T00:00:00+02:00"),
-        result: null,
+        showType: null,
+        classCode: null,
+        qualityGrade: null,
+        classPlacement: null,
+        pupn: null,
+        awards: [],
+        critiqueText: null,
         judge: null,
         heightCm: null,
       },
@@ -461,6 +475,7 @@ describe("dogs service", () => {
     const service = createDogsService();
     const result = await service.getBeagleDogProfile("dog2");
 
+    const { eventKey: _show2EventKey, ...show2 } = mockShows[0];
     expect(result).toEqual({
       status: 200,
       body: {
@@ -470,8 +485,8 @@ describe("dogs service", () => {
           birthDate: "2020-01-01",
           shows: [
             {
-              ...mockShows[0],
-              showId: encodeShowId("2022-03-15", "Helsinki"),
+              ...show2,
+              showId: encodeShowId("2022-03-15", "Helsinki", "show-event-2"),
               date: "2022-03-15",
             },
           ],
@@ -501,7 +516,7 @@ describe("dogs service", () => {
     });
   });
 
-  it("preserves non-code casing in show results", async () => {
+  it("passes structured show fields through dog profile mapping", async () => {
     const mockProfile = {
       id: "dog-casing",
       name: "Case Dog",
@@ -524,9 +539,16 @@ describe("dogs service", () => {
     const mockShows = [
       {
         id: "show-case",
+        eventKey: "show-event-case",
         place: "City",
         date: new Date("2024-02-01T00:00:00.000Z"),
-        result: "JUN1 (specialNote)",
+        showType: "Ryhmänäyttely",
+        classCode: "JUN",
+        qualityGrade: "ERI",
+        classPlacement: 1,
+        pupn: null,
+        awards: ["specialNote"],
+        critiqueText: "Special note",
         judge: null,
         heightCm: null,
       },
@@ -538,6 +560,7 @@ describe("dogs service", () => {
     const service = createDogsService();
     const result = await service.getBeagleDogProfile("dog-casing");
 
+    const { eventKey: _showCaseEventKey, ...showCase } = mockShows[0];
     expect(result).toEqual({
       status: 200,
       body: {
@@ -546,10 +569,9 @@ describe("dogs service", () => {
           ...mockProfile,
           shows: [
             {
-              ...mockShows[0],
-              showId: encodeShowId("2024-02-01", "City"),
+              ...showCase,
+              showId: encodeShowId("2024-02-01", "City", "show-event-case"),
               date: "2024-02-01",
-              result: "JUN-ERI (specialNote)",
             },
           ],
           trials: [],
@@ -558,7 +580,7 @@ describe("dogs service", () => {
     });
   });
 
-  it("keeps pre-2003 class+digit show results in default parser mode", async () => {
+  it("keeps null structured show fields when no canonical result items exist", async () => {
     const mockProfile = {
       id: "dog-legacy",
       name: "Legacy Dog",
@@ -581,9 +603,16 @@ describe("dogs service", () => {
     const mockShows = [
       {
         id: "show-legacy",
+        eventKey: "show-event-legacy",
         place: "Kajaani",
         date: new Date("1996-01-06T00:00:00.000Z"),
-        result: "KÄY2",
+        showType: null,
+        classCode: null,
+        qualityGrade: null,
+        classPlacement: null,
+        pupn: null,
+        awards: [],
+        critiqueText: null,
         judge: null,
         heightCm: null,
       },
@@ -595,6 +624,7 @@ describe("dogs service", () => {
     const service = createDogsService();
     const result = await service.getBeagleDogProfile("dog-legacy");
 
+    const { eventKey: _showLegacyEventKey, ...showLegacy } = mockShows[0];
     expect(result).toEqual({
       status: 200,
       body: {
@@ -603,10 +633,13 @@ describe("dogs service", () => {
           ...mockProfile,
           shows: [
             {
-              ...mockShows[0],
-              showId: encodeShowId("1996-01-06", "Kajaani"),
+              ...showLegacy,
+              showId: encodeShowId(
+                "1996-01-06",
+                "Kajaani",
+                "show-event-legacy",
+              ),
               date: "1996-01-06",
-              result: "KÄY2",
             },
           ],
           trials: [],

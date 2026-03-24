@@ -112,7 +112,7 @@ export type OffspringDogNode = {
   whelpedPuppies: OffspringLitterRelationNode[];
   siredPuppies: OffspringLitterRelationNode[];
   _count: {
-    showResults: number;
+    showEntries: number;
     trialResults: number;
   };
 };

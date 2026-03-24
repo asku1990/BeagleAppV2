@@ -43,3 +43,12 @@ Use this format for new entries:
 - Suggested fix: Split into `trials/search/*`, `trials/details/*`, and `trials/dog/*` repositories and move shared helpers to `trials/core/*`.
 - Trigger to revisit: Next BEJ trial-domain task that touches query/filter/date logic in this file.
 - Ticket: BEJ-29 follow-up (create dedicated split task key).
+
+## 2026-03-18 - Expand canonical show presentation beyond single judge
+
+- Area: Public show detail and dog-profile show presentation.
+- Issue: Public show pages now use structured canonical result fields, but the event-level judge is still collapsed to a single string or `null` when multiple judges exist.
+- Impact: Canonical result presentation is now cleaner, but events with multiple judges still lose detail at the event summary level.
+- Suggested fix: Add explicit multi-judge support to the public show contract/UI instead of collapsing to one value.
+- Trigger to revisit: Next public show UI/contract redesign or workbook-driven show presentation task.
+- Ticket: BEJ-45 follow-up.

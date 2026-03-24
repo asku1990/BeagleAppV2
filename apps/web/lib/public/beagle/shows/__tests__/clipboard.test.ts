@@ -10,7 +10,12 @@ const detailLabels = {
   registrationNo: "Rek.nro",
   name: "Nimi",
   sex: "Sukupuoli",
-  result: "Tulos",
+  showType: "Tyyppi",
+  className: "Kilpailuluokka",
+  qualityGrade: "Laatuarvostelu",
+  placement: "Sijoitus",
+  pupn: "PU/PN",
+  awards: "Muut merkinnät",
   reviewText: "Arvostelu",
   height: "Korkeus",
   judge: "Tuomari",
@@ -85,8 +90,13 @@ describe("formatShowDetailRowForClipboard", () => {
         registrationNo: "FI-1/20",
         name: "Aatu",
         sex: "U",
-        result: "ERI",
-        reviewText: "Very good",
+        showType: "Ryhmänäyttely",
+        classCode: "JUN",
+        qualityGrade: "ERI",
+        classPlacement: 1,
+        pupn: "PU1",
+        awards: ["SA"],
+        critiqueText: "Very good",
         heightCm: 40,
         judge: "Judge A",
       },
@@ -95,10 +105,10 @@ describe("formatShowDetailRowForClipboard", () => {
 
     const lines = output.split("\n");
     expect(lines[0]).toBe(
-      "Rek.nro\tNimi\tSukupuoli\tTulos\tArvostelu\tKorkeus\tTuomari",
+      "Rek.nro\tNimi\tSukupuoli\tTyyppi\tLaatuarvostelu\tKilpailuluokka\tSijoitus\tPU/PN\tMuut merkinnät\tKorkeus\tTuomari\tArvostelu",
     );
     expect(lines[1]).toBe(
-      "FI-1/20\tAatu\tUros\tERI\tVery good\t40 cm\tJudge A",
+      "FI-1/20\tAatu\tUros\tRyhmänäyttely\tERI\tJUN\t1\tPU1\tSA\t40 cm\tJudge A\tVery good",
     );
   });
 
@@ -110,15 +120,22 @@ describe("formatShowDetailRowForClipboard", () => {
         registrationNo: "FI-2/20",
         name: "Bel\tla\n",
         sex: "-",
-        result: null,
-        reviewText: null,
+        showType: null,
+        classCode: null,
+        qualityGrade: null,
+        classPlacement: null,
+        pupn: null,
+        awards: [],
+        critiqueText: null,
         heightCm: null,
         judge: null,
       },
       detailLabels,
     );
 
-    expect(output.split("\n")[1]).toBe("FI-2/20\tBel la\t-\t-\t-\t-\t-");
+    expect(output.split("\n")[1]).toBe(
+      "FI-2/20\tBel la\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-",
+    );
   });
 });
 
@@ -132,8 +149,13 @@ describe("formatShowDetailRowsForClipboard", () => {
           registrationNo: "FI-1/20",
           name: "Aatu",
           sex: "U",
-          result: "ERI",
-          reviewText: "Review A",
+          showType: "Ryhmänäyttely",
+          classCode: "JUN",
+          qualityGrade: "ERI",
+          classPlacement: 1,
+          pupn: "PU1",
+          awards: ["SA"],
+          critiqueText: "Review A",
           heightCm: 40,
           judge: "Judge A",
         },
@@ -143,8 +165,13 @@ describe("formatShowDetailRowsForClipboard", () => {
           registrationNo: "FI-2/20",
           name: "Bella",
           sex: "N",
-          result: null,
-          reviewText: "Pending later",
+          showType: null,
+          classCode: null,
+          qualityGrade: null,
+          classPlacement: null,
+          pupn: null,
+          awards: [],
+          critiqueText: "Pending later",
           heightCm: null,
           judge: null,
         },
@@ -154,8 +181,51 @@ describe("formatShowDetailRowsForClipboard", () => {
 
     const lines = output.split("\n");
     expect(lines).toHaveLength(3);
-    expect(lines[1]).toBe("FI-1/20\tAatu\tUros\tERI\tReview A\t40 cm\tJudge A");
-    expect(lines[2]).toBe("FI-2/20\tBella\tNarttu\t-\tPending later\t-\t-");
+    expect(lines[1]).toBe(
+      "FI-1/20\tAatu\tUros\tRyhmänäyttely\tERI\tJUN\t1\tPU1\tSA\t40 cm\tJudge A\tReview A",
+    );
+    expect(lines[2]).toBe(
+      "FI-2/20\tBella\tNarttu\t-\t-\t-\t-\t-\t-\t-\t-\tPending later",
+    );
+  });
+
+  it("omits optional columns when requested", () => {
+    const output = formatShowDetailRowsForClipboard(
+      [
+        {
+          id: "r1",
+          dogId: "d1",
+          registrationNo: "FI-1/20",
+          name: "Aatu",
+          sex: "U",
+          showType: null,
+          classCode: null,
+          qualityGrade: null,
+          classPlacement: null,
+          pupn: null,
+          awards: [],
+          critiqueText: null,
+          heightCm: null,
+          judge: null,
+        },
+      ],
+      detailLabels,
+      {
+        includeShowType: false,
+        includeClassName: false,
+        includeQualityGrade: false,
+        includeClassPlacement: false,
+        includePupn: false,
+        includeAwards: false,
+        includeHeight: false,
+        includeJudge: false,
+        includeReviewText: false,
+      },
+    );
+
+    const lines = output.split("\n");
+    expect(lines[0]).toBe("Rek.nro\tNimi\tSukupuoli");
+    expect(lines[1]).toBe("FI-1/20\tAatu\tUros");
   });
 });
 
@@ -168,7 +238,13 @@ describe("formatDogProfileShowRowsForClipboard", () => {
           showId: "show-1",
           place: "Helsinki",
           date: "2025-06-01",
-          result: "ERI",
+          showType: "Ryhmänäyttely",
+          classCode: "JUN",
+          qualityGrade: "ERI",
+          classPlacement: 1,
+          pupn: "PU1",
+          awards: ["SA"],
+          critiqueText: "Excellent",
           judge: "Judge A",
           heightCm: 40,
         },
@@ -177,30 +253,52 @@ describe("formatDogProfileShowRowsForClipboard", () => {
           showId: "show-2",
           place: "Turku",
           date: "2025-05-01",
-          result: null,
+          showType: null,
+          classCode: null,
+          qualityGrade: null,
+          classPlacement: null,
+          pupn: null,
+          awards: [],
+          critiqueText: null,
           judge: null,
           heightCm: null,
         },
       ],
       {
         no: "N:o",
+        showType: "Tyyppi",
+        className: "Kilpailuluokka",
         place: "Paikka",
         date: "Päivä",
-        result: "Tulos",
+        qualityGrade: "Laatuarvostelu",
+        placement: "Sijoitus",
+        pupn: "PU/PN",
+        awards: "Muut merkinnät",
+        reviewText: "Sanallinen arvostelu",
         height: "Korkeus",
         judge: "Tuomari",
       },
       {
-        includeResult: true,
+        includeShowType: true,
+        includeClassName: true,
+        includeQualityGrade: true,
+        includeClassPlacement: true,
+        includePupn: true,
+        includeAwards: true,
+        includeReviewText: true,
         includeHeight: true,
         includeJudge: true,
       },
     );
 
     const lines = output.split("\n");
-    expect(lines[0]).toBe("N:o\tPaikka\tPäivä\tTulos\tKorkeus\tTuomari");
-    expect(lines[1]).toBe("1\tHelsinki\t2025-06-01\tERI\t40 cm\tJudge A");
-    expect(lines[2]).toBe("2\tTurku\t2025-05-01\t-\t-\t-");
+    expect(lines[0]).toBe(
+      "N:o\tTyyppi\tPaikka\tPäivä\tLaatuarvostelu\tKilpailuluokka\tSijoitus\tPU/PN\tMuut merkinnät\tKorkeus\tTuomari\tSanallinen arvostelu",
+    );
+    expect(lines[1]).toBe(
+      "1\tRyhmänäyttely\tHelsinki\t2025-06-01\tERI\tJUN\t1\tPU1\tSA\t40 cm\tJudge A\tExcellent",
+    );
+    expect(lines[2]).toBe("2\t-\tTurku\t2025-05-01\t-\t-\t-\t-\t-\t-\t-\t-");
   });
 
   it("sanitizes tabs/newlines", () => {
@@ -211,21 +309,39 @@ describe("formatDogProfileShowRowsForClipboard", () => {
           showId: "show-3",
           place: "Tam\tpe\nre",
           date: "2025-06-03",
-          result: null,
+          showType: null,
+          classCode: null,
+          qualityGrade: null,
+          classPlacement: null,
+          pupn: null,
+          awards: [],
+          critiqueText: null,
           judge: null,
           heightCm: null,
         },
       ],
       {
         no: "N:o",
+        showType: "Tyyppi",
+        className: "Kilpailuluokka",
         place: "Paikka",
         date: "Päivä",
-        result: "Tulos",
+        qualityGrade: "Laatuarvostelu",
+        placement: "Sijoitus",
+        pupn: "PU/PN",
+        awards: "Muut merkinnät",
+        reviewText: "Sanallinen arvostelu",
         height: "Korkeus",
         judge: "Tuomari",
       },
       {
-        includeResult: false,
+        includeShowType: false,
+        includeClassName: false,
+        includeQualityGrade: false,
+        includeClassPlacement: false,
+        includePupn: false,
+        includeAwards: false,
+        includeReviewText: false,
         includeHeight: false,
         includeJudge: false,
       },

@@ -107,6 +107,18 @@ describe("parseShowResultText", () => {
     expect(postGate.items.some((item) => item.definitionCode === "ERI")).toBe(
       true,
     );
+    expect(preGate.formatNotes).toEqual([]);
+    expect(postGate.formatNotes).toHaveLength(1);
+    expect(postGate.formatNotes[0]).toEqual(
+      expect.objectContaining({
+        code: "SHOW_RESULT_LAATUARVOSTELU_FORMAT_CHANGED",
+        token: "NUO1",
+        eventDateIsoDate: "2003-01-01",
+        className: "NUO",
+        qualityGrade: "ERI",
+        legacyQualityDigit: 1,
+      }),
+    );
   });
 
   it("parses class placement starting from zero (AVO0)", () => {

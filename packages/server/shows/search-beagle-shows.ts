@@ -258,7 +258,7 @@ export async function searchBeagleShowsService(
       items: result.items.map((item) => {
         const eventDate = toBusinessDateOnly(item.eventDate);
         return {
-          showId: encodeShowId(eventDate, item.eventPlace),
+          showId: encodeShowId(eventDate, item.eventPlace, item.eventKey),
           eventDate,
           eventPlace: item.eventPlace,
           judge: item.judge,
