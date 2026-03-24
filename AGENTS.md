@@ -16,6 +16,12 @@ Agent operating rules for this repository.
 - Re-export public module APIs through `index.ts` entrypoints.
 - Keep internal helpers private; do not re-export by default.
 
+## Environment and ops
+
+- Before running commands that depend on app environment variables, secrets, database access, Prisma, imports, or operational scripts, read `docs/ops-env-safety.md` and follow it.
+- Do not guess how `pass://` values are resolved. Use the documented `pass-cli run --env-file ... -- <command>` workflow from `docs/ops-env-safety.md`.
+- For local/staging/prod database inspection and import operations, prefer the documented commands and safety checks in `docs/ops-env-safety.md` over ad hoc shell commands.
+
 ## Server logging rule
 
 - Structured logging standard is `pino`.
