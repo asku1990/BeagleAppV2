@@ -13,6 +13,11 @@ import { ShowWorkbookPreviewResults } from "./show-workbook-preview-results";
 
 type ShowWorkbookPreviewSectionProps = {
   preview: AdminShowWorkbookImportPreviewResponse;
+  acceptedNotesSummary?: {
+    warningCount: number;
+    ignoredColumnCount: number;
+  } | null;
+  onShowNotes?: () => void;
 };
 
 type PreviewTranslationKey =
@@ -43,6 +48,8 @@ function PreviewStat({ label, value }: { label: string; value: string }) {
 
 export function ShowWorkbookPreviewSection({
   preview,
+  acceptedNotesSummary = null,
+  onShowNotes,
 }: ShowWorkbookPreviewSectionProps) {
   const { t, locale } = useI18n();
   const translate: PreviewTranslator = t;
@@ -93,6 +100,32 @@ export function ShowWorkbookPreviewSection({
           </div>
         </div>
       </header>
+
+      {acceptedNotesSummary ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3">
+          <div className="space-y-0.5">
+            <p className="text-sm font-medium text-amber-900">
+              {t("admin.shows.preview.notesAccepted.title")}
+            </p>
+            <p className="text-xs text-amber-800">
+              {formatter.format(acceptedNotesSummary.warningCount)}{" "}
+              {t("admin.shows.preview.notesAccepted.warnings")} ·{" "}
+              {formatter.format(acceptedNotesSummary.ignoredColumnCount)}{" "}
+              {t("admin.shows.preview.notesAccepted.ignored")}
+            </p>
+          </div>
+          {onShowNotes ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onShowNotes}
+            >
+              {t("admin.shows.preview.notesAccepted.showNotes")}
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
 
       {warningRowCount > 0 ? (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-background px-4 py-3">

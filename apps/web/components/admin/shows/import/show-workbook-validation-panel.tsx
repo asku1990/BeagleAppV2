@@ -1,17 +1,25 @@
 "use client";
 
 import React from "react";
-import type {
-  AdminShowWorkbookImportIssueSeverity,
-  AdminShowWorkbookImportPreviewResponse,
-} from "@beagle/contracts";
+import type { AdminShowWorkbookImportPreviewResponse } from "@beagle/contracts";
+import { Button } from "@/components/ui/button";
 import { useI18n } from "@/hooks/i18n";
+import {
+  ShowWorkbookValidationNotesSection,
+  type ValidationIssueFilter,
+} from "./show-workbook-validation-notes-section";
+import { ShowWorkbookValidationSchemaSection } from "./show-workbook-validation-schema-section";
+import { ShowWorkbookValidationSummary } from "./show-workbook-validation-summary";
 
 type ShowWorkbookValidationPanelProps = {
   validation: AdminShowWorkbookImportPreviewResponse | null;
   error: string | null;
   isLoading: boolean;
   mode?: "full" | "summary";
+  showAcceptanceActions?: boolean;
+  notesAccepted?: boolean;
+  onAcceptNotes?: () => void;
+  onShowDetails?: () => void;
 };
 
 function getStatusKey(
@@ -25,7 +33,10 @@ function getStatusKey(
     return "admin.shows.validation.status.blocked";
   }
 
-  if (validation.warningCount > 0) {
+  if (
+    validation.warningCount > 0 ||
+    validation.schema.ignoredColumns.length > 0
+  ) {
     return "admin.shows.validation.status.review";
   }
 
@@ -43,29 +54,14 @@ function getStatusClass(
     return "border-destructive/40 bg-destructive/10 text-destructive";
   }
 
-  if (validation.warningCount > 0) {
+  if (
+    validation.warningCount > 0 ||
+    validation.schema.ignoredColumns.length > 0
+  ) {
     return "border-amber-500/40 bg-amber-500/10 text-amber-700";
   }
 
   return "border-emerald-500/40 bg-emerald-500/10 text-emerald-700";
-}
-
-function getSeverityClass(
-  severity: AdminShowWorkbookImportIssueSeverity,
-): string {
-  if (severity === "ERROR") {
-    return "border-destructive/40 bg-destructive/10 text-destructive";
-  }
-
-  if (severity === "WARNING") {
-    return "border-amber-500/40 bg-amber-500/10 text-amber-700";
-  }
-
-  return "border-sky-500/40 bg-sky-500/10 text-sky-700";
-}
-
-function joinDefinitionCodes(definitionCodes: string[]) {
-  return definitionCodes.join(", ");
 }
 
 export function ShowWorkbookValidationPanel({
@@ -73,10 +69,37 @@ export function ShowWorkbookValidationPanel({
   error,
   isLoading,
   mode = "full",
+  showAcceptanceActions = false,
+  notesAccepted = false,
+  onAcceptNotes,
+  onShowDetails,
 }: ShowWorkbookValidationPanelProps) {
   const { t, locale } = useI18n();
   const formatter = new Intl.NumberFormat(locale);
+  const [issueFilter, setIssueFilter] =
+    React.useState<ValidationIssueFilter>("ALL");
   const isSummaryMode = mode === "summary";
+  const hasReviewNotes =
+    validation !== null &&
+    (validation.warningCount > 0 ||
+      validation.schema.ignoredColumns.length > 0);
+  const acceptedReviewNoteCount =
+    (validation?.warningCount ?? 0) +
+    (validation?.schema.ignoredColumns.length ?? 0);
+  const blockingReasonCount =
+    (validation?.schema.missingStructuralFields.length ?? 0) +
+    (validation?.schema.blockedColumns.length ?? 0);
+
+  React.useEffect(() => {
+    setIssueFilter("ALL");
+  }, [
+    validation?.fileName,
+    validation?.sheetName,
+    validation?.issues.length,
+    validation?.errorCount,
+    validation?.warningCount,
+    validation?.infoCount,
+  ]);
 
   return (
     <div className="space-y-3 rounded-lg border bg-background p-4">
@@ -110,255 +133,87 @@ export function ShowWorkbookValidationPanel({
 
       {validation ? (
         <>
-          <div className="rounded-lg border bg-muted/20 p-3">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  {t("admin.shows.preview.validateTitle")}
-                </p>
-                <p className="truncate text-sm font-medium">
-                  {isSummaryMode ? validation.sheetName : validation.fileName}
-                </p>
-                {isSummaryMode ? null : (
-                  <p className="text-xs text-muted-foreground">
-                    {validation.sheetName}
-                  </p>
-                )}
-              </div>
-              {isSummaryMode ? (
-                <p className="text-xs text-muted-foreground">
-                  {t("admin.shows.validation.summary.previewHint")}
-                </p>
-              ) : null}
-            </div>
-          </div>
+          <ShowWorkbookValidationSummary
+            validation={validation}
+            isSummaryMode={isSummaryMode}
+            hasReviewNotes={hasReviewNotes}
+            notesAccepted={notesAccepted}
+            onShowDetails={onShowDetails}
+          />
 
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            <div className="rounded-lg border bg-muted/30 p-3">
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                {t("admin.shows.validation.summary.rows")}
+          {validation.errorCount > 0 && blockingReasonCount > 0 ? (
+            <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4">
+              <div className="space-y-1">
+                <h4 className="text-sm font-semibold text-destructive">
+                  {t("admin.shows.validation.blocking.title")}
+                </h4>
+                <p className="text-sm text-destructive/90">
+                  {t("admin.shows.validation.blocking.description")}
+                </p>
               </div>
-              <div className="mt-1 text-xl font-semibold">
-                {formatter.format(validation.rowCount)}
-              </div>
+
+              <ul className="mt-3 space-y-2 text-sm text-destructive/90">
+                {validation.schema.missingStructuralFields.map((field) => (
+                  <li key={`missing-${field.fieldKey}`}>
+                    <div className="font-medium">{field.expectedHeader}</div>
+                    <div>
+                      {t("admin.shows.validation.blocking.missingField")}
+                    </div>
+                  </li>
+                ))}
+                {validation.schema.blockedColumns.map((column) => (
+                  <li
+                    key={`blocked-${column.columnIndex}-${column.headerName}`}
+                  >
+                    <div className="font-medium">{column.headerName}</div>
+                    <div>{column.reasonText}</div>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <div className="rounded-lg border bg-muted/30 p-3">
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                {t("admin.shows.validation.summary.errors")}
-              </div>
-              <div className="mt-1 text-xl font-semibold">
-                {formatter.format(validation.errorCount)}
-              </div>
-            </div>
-            <div className="rounded-lg border bg-muted/30 p-3">
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                {t("admin.shows.validation.summary.warnings")}
-              </div>
-              <div className="mt-1 text-xl font-semibold">
-                {formatter.format(validation.warningCount)}
-              </div>
-            </div>
-            <div className="rounded-lg border bg-muted/30 p-3">
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                {t("admin.shows.validation.summary.accepted")}
-              </div>
-              <div className="mt-1 text-xl font-semibold">
-                {formatter.format(validation.acceptedRowCount)}
-              </div>
-            </div>
-            <div className="rounded-lg border bg-muted/30 p-3">
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                {t("admin.shows.validation.summary.rejected")}
-              </div>
-              <div className="mt-1 text-xl font-semibold">
-                {formatter.format(validation.rejectedRowCount)}
-              </div>
-            </div>
-            <div className="rounded-lg border bg-muted/30 p-3">
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                {t("admin.shows.validation.summary.ready")}
-              </div>
-              <div className="mt-1 text-sm font-semibold">
-                {validation.errorCount === 0
-                  ? t("admin.shows.validation.summary.readyYes")
-                  : t("admin.shows.validation.summary.readyNo")}
-              </div>
-            </div>
-          </div>
+          ) : null}
 
           {isSummaryMode ? null : (
             <div className="space-y-3">
-              <div className="space-y-3">
-                <h4 className="text-sm font-semibold">
-                  {t("admin.shows.validation.schema.title")}
-                </h4>
-                <p className="text-xs text-muted-foreground">
-                  {t("admin.shows.validation.schema.coverage")}:{" "}
-                  {formatter.format(
-                    validation.schema.coverage.importedColumnCount,
-                  )}
-                  /
-                  {formatter.format(
-                    validation.schema.coverage.totalWorkbookColumns,
-                  )}{" "}
-                  {t("admin.shows.validation.schema.coverageImported")} ·{" "}
-                  {formatter.format(
-                    validation.schema.coverage.blockedColumnCount,
-                  )}{" "}
-                  {t("admin.shows.validation.schema.coverageBlocked")}
-                </p>
+              <ShowWorkbookValidationSchemaSection validation={validation} />
 
-                <div className="grid gap-3 xl:grid-cols-2">
-                  <div className="rounded-lg border bg-muted/20 p-3">
-                    <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      {t("admin.shows.validation.schema.structural")}
-                    </h5>
-                    {validation.schema.structuralColumns.length === 0 ? (
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        {t("admin.shows.validation.schema.empty")}
-                      </p>
-                    ) : (
-                      <ul className="mt-2 space-y-2 text-sm">
-                        {validation.schema.structuralColumns.map((column) => (
-                          <li key={`${column.fieldKey}-${column.headerName}`}>
-                            <span className="font-medium">
-                              {column.expectedHeader}
-                            </span>{" "}
-                            <span className="text-muted-foreground">
-                              → {column.headerName}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+              {showAcceptanceActions ? (
+                <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-4">
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold text-amber-900">
+                      {t("admin.shows.validation.review.title")}
+                    </h4>
+                    <p className="text-sm text-amber-800">
+                      {t("admin.shows.validation.review.description")}
+                    </p>
+                    <p className="text-xs text-amber-700">
+                      {formatter.format(acceptedReviewNoteCount)}{" "}
+                      {t("admin.shows.validation.notes.countSuffix")} ·{" "}
+                      {formatter.format(validation.warningCount)}{" "}
+                      {t("admin.shows.validation.summary.warnings")} ·{" "}
+                      {formatter.format(
+                        validation.schema.ignoredColumns.length,
+                      )}{" "}
+                      {t("admin.shows.validation.schema.coverageIgnored")}
+                    </p>
                   </div>
-
-                  <div className="rounded-lg border bg-muted/20 p-3">
-                    <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      {t("admin.shows.validation.schema.missing")}
-                    </h5>
-                    {validation.schema.missingStructuralFields.length === 0 ? (
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        {t("admin.shows.validation.schema.none")}
-                      </p>
-                    ) : (
-                      <ul className="mt-2 space-y-2 text-sm">
-                        {validation.schema.missingStructuralFields.map(
-                          (field) => (
-                            <li key={field.fieldKey}>{field.expectedHeader}</li>
-                          ),
-                        )}
-                      </ul>
-                    )}
-                  </div>
-
-                  <div className="rounded-lg border bg-muted/20 p-3">
-                    <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      {t("admin.shows.validation.schema.definitions")}
-                    </h5>
-                    {validation.schema.definitionColumns.length === 0 ? (
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        {t("admin.shows.validation.schema.none")}
-                      </p>
-                    ) : (
-                      <ul className="mt-2 space-y-2 text-sm">
-                        {validation.schema.definitionColumns.map((column) => (
-                          <li
-                            key={`${column.headerName}-${joinDefinitionCodes(column.definitionCodes)}`}
-                          >
-                            <div className="font-medium">
-                              {column.headerName}
-                            </div>
-                            <div className="text-muted-foreground">
-                              {joinDefinitionCodes(column.definitionCodes)} ·{" "}
-                              {column.importMode} ·{" "}
-                              {column.enabled
-                                ? t("admin.shows.validation.schema.enabled")
-                                : t(
-                                    "admin.shows.validation.schema.disabled",
-                                  )}{" "}
-                              ·{" "}
-                              {column.supported
-                                ? t("admin.shows.validation.schema.supported")
-                                : t(
-                                    "admin.shows.validation.schema.unsupported",
-                                  )}
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-
-                  <div className="rounded-lg border bg-muted/20 p-3">
-                    <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      {t("admin.shows.validation.schema.blocked")}
-                    </h5>
-                    {validation.schema.blockedColumns.length === 0 ? (
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        {t("admin.shows.validation.schema.none")}
-                      </p>
-                    ) : (
-                      <ul className="mt-2 space-y-2 text-sm">
-                        {validation.schema.blockedColumns.map((column) => (
-                          <li
-                            key={`${column.columnIndex}-${column.headerName}`}
-                          >
-                            <div className="font-medium">
-                              {column.headerName}
-                            </div>
-                            <div className="text-muted-foreground">
-                              {column.reasonText}
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between gap-3">
-                <h4 className="text-sm font-semibold">
-                  {t("admin.shows.validation.notes.title")}
-                </h4>
-                <p className="text-xs text-muted-foreground">
-                  {formatter.format(validation.issues.length)}{" "}
-                  {t("admin.shows.validation.notes.countSuffix")}
-                </p>
-              </div>
-
-              {validation.issues.length === 0 ? (
-                <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">
-                  {t("admin.shows.validation.notes.empty")}
-                </div>
-              ) : (
-                <ul className="space-y-2">
-                  {validation.issues.map((issue, index) => (
-                    <li
-                      key={`${issue.rowNumber ?? "x"}-${issue.code}-${index}`}
-                      className="rounded-lg border bg-muted/20 p-3"
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      onClick={onAcceptNotes}
+                      disabled={!onAcceptNotes}
                     >
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span
-                          className={`rounded-full border px-2 py-0.5 text-xs font-medium ${getSeverityClass(issue.severity)}`}
-                        >
-                          {issue.severity}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {t("admin.shows.validation.notes.row")}{" "}
-                          {issue.rowNumber ?? "—"}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {t("admin.shows.validation.notes.column")}{" "}
-                          {issue.columnName ?? "—"}
-                        </span>
-                      </div>
-                      <p className="mt-2 text-sm">{issue.message}</p>
-                    </li>
-                  ))}
-                </ul>
-              )}
+                      {t("admin.shows.validation.review.accept")}
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
+
+              <ShowWorkbookValidationNotesSection
+                validation={validation}
+                issueFilter={issueFilter}
+                onIssueFilterChange={setIssueFilter}
+              />
             </div>
           )}
         </>

@@ -88,11 +88,13 @@ describe("ShowWorkbookPreviewSection", () => {
             coverage: {
               totalWorkbookColumns: 0,
               importedColumnCount: 0,
+              ignoredColumnCount: 0,
               blockedColumnCount: 0,
             },
             structuralColumns: [],
             missingStructuralFields: [],
             definitionColumns: [],
+            ignoredColumns: [],
             blockedColumns: [],
           },
           events: [
@@ -158,5 +160,56 @@ describe("ShowWorkbookPreviewSection", () => {
     expect(html).toContain("Test Dog");
     expect(html).not.toContain("Näyttelyt.xlsx");
     expect(html).not.toContain("admin.shows.preview.summary.errors");
+  });
+
+  it("renders an accepted-notes strip when preview was opened after review", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(ShowWorkbookPreviewSection, {
+        acceptedNotesSummary: {
+          warningCount: 1,
+          ignoredColumnCount: 1,
+        },
+        onShowNotes: () => undefined,
+        preview: {
+          fileName: "Näyttelyt.xlsx",
+          sheetName: "Näyttelyt 2024",
+          rowCount: 1,
+          acceptedRowCount: 1,
+          rejectedRowCount: 0,
+          eventCount: 1,
+          entryCount: 1,
+          resultItemCount: 1,
+          infoCount: 1,
+          warningCount: 1,
+          errorCount: 0,
+          schema: {
+            coverage: {
+              totalWorkbookColumns: 1,
+              importedColumnCount: 0,
+              ignoredColumnCount: 1,
+              blockedColumnCount: 0,
+            },
+            structuralColumns: [],
+            missingStructuralFields: [],
+            definitionColumns: [],
+            ignoredColumns: [
+              {
+                headerName: "Rotukoodi",
+                columnIndex: 0,
+                ruleCode: "BREED_CODE",
+                reasonText:
+                  "Workbook column Rotukoodi is allowed by import metadata but ignored by policy.",
+              },
+            ],
+            blockedColumns: [],
+          },
+          events: [],
+          issues: [],
+        },
+      }),
+    );
+
+    expect(html).toContain("admin.shows.preview.notesAccepted.title");
+    expect(html).toContain("admin.shows.preview.notesAccepted.showNotes");
   });
 });

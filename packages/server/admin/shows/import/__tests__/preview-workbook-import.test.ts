@@ -2,11 +2,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as XLSX from "xlsx";
 import { previewAdminShowWorkbookImport } from "../preview-workbook-import";
 
-const { dogRegistrationFindManyMock, showResultDefinitionFindManyMock } =
-  vi.hoisted(() => ({
-    dogRegistrationFindManyMock: vi.fn(),
-    showResultDefinitionFindManyMock: vi.fn(),
-  }));
+const {
+  dogRegistrationFindManyMock,
+  showResultDefinitionFindManyMock,
+  showWorkbookColumnRuleFindManyMock,
+} = vi.hoisted(() => ({
+  dogRegistrationFindManyMock: vi.fn(),
+  showResultDefinitionFindManyMock: vi.fn(),
+  showWorkbookColumnRuleFindManyMock: vi.fn(),
+}));
 
 vi.mock("@beagle/db", () => ({
   prisma: {
@@ -16,106 +20,46 @@ vi.mock("@beagle/db", () => ({
     showResultDefinition: {
       findMany: showResultDefinitionFindManyMock,
     },
+    showWorkbookColumnRule: {
+      findMany: showWorkbookColumnRuleFindManyMock,
+    },
   },
 }));
 
 const SUPPORTED_HEADERS: unknown[] = [
   "Rekisterinumero",
-  null,
-  null,
   "Aika",
-  null,
   "Paikkakunta",
   "Paikka",
   "Näyttelytyyppi",
-  null,
   "Nimi",
   "Luokka",
   "Laatuarvostelu",
   "Sijoitus",
   "PuPn",
-  "ROP",
   "SERT",
-  "NORD-SERT",
-  "JUN-SERT",
-  "VET-SERT",
-  "MVA",
-  "JMVA",
-  "VMVA",
   "CACIB",
-  "CACIB-J",
-  "CACIB-V",
-  "VET-ROP",
-  "JUN-ROP",
   "SA",
-  "KP",
-  "Tuomari",
-  "Arvostelu",
-];
-
-const WITH_ROTUKOODI_HEADERS: unknown[] = [
-  "Rekisterinumero",
-  null,
-  null,
-  "Aika",
-  null,
-  "Paikkakunta",
-  "Paikka",
-  "Näyttelytyyppi",
-  null,
-  "Nimi",
-  "Rotukoodi",
-  "Luokka",
-  "Laatuarvostelu",
-  "Sijoitus",
-  "PuPn",
-  "ROP",
-  "SERT",
-  "NORD-SERT",
-  "JUN-SERT",
-  "VET-SERT",
-  "MVA",
-  "JMVA",
-  "VMVA",
-  "CACIB",
-  "CACIB-J",
-  "CACIB-V",
-  "VET-ROP",
-  "JUN-ROP",
-  "SA",
-  "KP",
   "Tuomari",
   "Arvostelu",
 ];
 
 const IDX = {
   registrationNo: 0,
-  eventDate: 3,
-  eventCity: 5,
-  eventPlace: 6,
-  eventType: 7,
-  dogName: 9,
-  classValue: 10,
-  qualityValue: 11,
-  sijoitus: 12,
-  pupn: 13,
-  rop: 14,
-  sert: 15,
-  nordSert: 16,
-  junSert: 17,
-  vetSert: 18,
-  mva: 19,
-  jmva: 20,
-  vmva: 21,
-  cacib: 22,
-  cacibJ: 23,
-  cacibV: 24,
-  vetRop: 25,
-  junRop: 26,
-  sa: 27,
-  kp: 28,
-  judge: 29,
-  critiqueText: 30,
+  eventDate: 1,
+  eventCity: 2,
+  eventPlace: 3,
+  eventType: 4,
+  dogName: 5,
+  classValue: 6,
+  qualityValue: 7,
+  sijoitus: 8,
+  pupn: 9,
+  sert: 10,
+  cacib: 11,
+  sa: 12,
+  judge: 13,
+  critiqueText: 14,
 } as const;
 
 function buildWorkbookBuffer(
@@ -140,62 +84,220 @@ function createRow(
 }
 
 const sharedDefinitions = [
-  "PEN",
-  "JUN",
-  "NUO",
-  "AVO",
-  "KÄY",
-  "VAL",
-  "VET",
-  "ERI",
-  "EH",
-  "H",
-  "T",
-  "EVA",
-  "HYL",
-  "ROP",
-  "VSP",
-  "SA",
-  "KP",
-  "SERT",
-  "varaSERT",
-  "NORD-SERT",
-  "NORD-varaSERT",
-  "JUN-SERT",
-  "VET-SERT",
-  "MVA",
-  "JMVA",
-  "VMVA",
-  "CACIB",
-  "varaCACIB",
-  "CACIB-J",
-  "CACIB-V",
-  "VET-ROP",
-  "VET-VSP",
-  "JUN-ROP",
-  "JUN-VSP",
-].map((code) => ({ code, isEnabled: true, valueType: "FLAG" as const }));
-
-const numericDefinitions = [
+  { code: "AVO", isEnabled: true, valueType: "FLAG" as const },
+  { code: "JUN", isEnabled: true, valueType: "FLAG" as const },
+  { code: "ERI", isEnabled: true, valueType: "FLAG" as const },
+  { code: "SERT", isEnabled: true, valueType: "FLAG" as const },
+  { code: "varaSERT", isEnabled: true, valueType: "FLAG" as const },
+  { code: "CACIB", isEnabled: true, valueType: "FLAG" as const },
+  { code: "varaCACIB", isEnabled: true, valueType: "FLAG" as const },
+  { code: "SA", isEnabled: true, valueType: "FLAG" as const },
   { code: "SIJOITUS", isEnabled: true, valueType: "NUMERIC" as const },
   { code: "PUPN", isEnabled: true, valueType: "CODE" as const },
 ];
+
+function createColumnRule(overrides: Record<string, unknown>) {
+  return {
+    code: "RULE",
+    headerName: "Header",
+    policy: "IMPORT",
+    destinationKind: "SHOW_ENTRY",
+    targetField: null,
+    parseMode: "TEXT",
+    fixedDefinitionCode: null,
+    headerRequired: false,
+    rowValueRequired: false,
+    sortOrder: 0,
+    isEnabled: true,
+    valueMaps: [] as Array<{
+      workbookValue: string;
+      definitionCode: string;
+      sortOrder: number;
+    }>,
+    ...overrides,
+  };
+}
+
+function buildDefaultColumnRules() {
+  return [
+    createColumnRule({
+      code: "REGISTRATION_NO",
+      headerName: "Rekisterinumero",
+      destinationKind: "SHOW_ENTRY",
+      targetField: "REGISTRATION_NO",
+      parseMode: "TEXT",
+      headerRequired: true,
+      rowValueRequired: true,
+      sortOrder: 10,
+    }),
+    createColumnRule({
+      code: "EVENT_DATE",
+      headerName: "Aika",
+      destinationKind: "SHOW_EVENT",
+      targetField: "EVENT_DATE",
+      parseMode: "DATE",
+      headerRequired: true,
+      rowValueRequired: true,
+      sortOrder: 20,
+    }),
+    createColumnRule({
+      code: "EVENT_CITY",
+      headerName: "Paikkakunta",
+      destinationKind: "SHOW_EVENT",
+      targetField: "EVENT_CITY",
+      parseMode: "TEXT",
+      headerRequired: true,
+      rowValueRequired: true,
+      sortOrder: 30,
+    }),
+    createColumnRule({
+      code: "EVENT_PLACE",
+      headerName: "Paikka",
+      destinationKind: "SHOW_EVENT",
+      targetField: "EVENT_PLACE",
+      parseMode: "TEXT",
+      headerRequired: true,
+      rowValueRequired: true,
+      sortOrder: 40,
+    }),
+    createColumnRule({
+      code: "EVENT_TYPE",
+      headerName: "Näyttelytyyppi",
+      destinationKind: "SHOW_EVENT",
+      targetField: "EVENT_TYPE",
+      parseMode: "TEXT",
+      headerRequired: true,
+      rowValueRequired: true,
+      sortOrder: 50,
+    }),
+    createColumnRule({
+      code: "DOG_NAME",
+      headerName: "Nimi",
+      destinationKind: "SHOW_ENTRY",
+      targetField: "DOG_NAME",
+      parseMode: "TEXT",
+      headerRequired: true,
+      rowValueRequired: true,
+      sortOrder: 60,
+    }),
+    createColumnRule({
+      code: "CLASS_VALUE",
+      headerName: "Luokka",
+      destinationKind: "SHOW_RESULT_ITEM",
+      targetField: "CLASS_VALUE",
+      parseMode: "DEFINITION_FROM_CELL",
+      headerRequired: true,
+      rowValueRequired: true,
+      sortOrder: 70,
+    }),
+    createColumnRule({
+      code: "QUALITY_VALUE",
+      headerName: "Laatuarvostelu",
+      destinationKind: "SHOW_RESULT_ITEM",
+      targetField: "QUALITY_VALUE",
+      parseMode: "DEFINITION_FROM_CELL",
+      headerRequired: true,
+      rowValueRequired: true,
+      sortOrder: 80,
+    }),
+    createColumnRule({
+      code: "BREED_CODE",
+      headerName: "Rotukoodi",
+      policy: "IGNORE",
+      destinationKind: null,
+      targetField: null,
+      parseMode: "TEXT",
+      sortOrder: 90,
+    }),
+    createColumnRule({
+      code: "PLACEMENT",
+      headerName: "Sijoitus",
+      destinationKind: "SHOW_RESULT_ITEM",
+      parseMode: "FIXED_NUMERIC",
+      fixedDefinitionCode: "SIJOITUS",
+      sortOrder: 100,
+    }),
+    createColumnRule({
+      code: "PUPN",
+      headerName: "PuPn",
+      destinationKind: "SHOW_RESULT_ITEM",
+      parseMode: "FIXED_CODE",
+      fixedDefinitionCode: "PUPN",
+      sortOrder: 110,
+    }),
+    createColumnRule({
+      code: "CERT",
+      headerName: "SERT",
+      destinationKind: "SHOW_RESULT_ITEM",
+      parseMode: "VALUE_MAP",
+      sortOrder: 120,
+      valueMaps: [
+        { workbookValue: "SERT", definitionCode: "SERT", sortOrder: 10 },
+        {
+          workbookValue: "varaSERT",
+          definitionCode: "varaSERT",
+          sortOrder: 20,
+        },
+      ],
+    }),
+    createColumnRule({
+      code: "CACIB",
+      headerName: "CACIB",
+      destinationKind: "SHOW_RESULT_ITEM",
+      parseMode: "VALUE_MAP",
+      sortOrder: 130,
+      valueMaps: [
+        { workbookValue: "CACIB", definitionCode: "CACIB", sortOrder: 10 },
+        {
+          workbookValue: "varaCACIB",
+          definitionCode: "varaCACIB",
+          sortOrder: 20,
+        },
+      ],
+    }),
+    createColumnRule({
+      code: "SA",
+      headerName: "SA",
+      destinationKind: "SHOW_RESULT_ITEM",
+      parseMode: "FIXED_FLAG",
+      fixedDefinitionCode: "SA",
+      sortOrder: 140,
+    }),
+    createColumnRule({
+      code: "JUDGE",
+      headerName: "Tuomari",
+      destinationKind: "SHOW_ENTRY",
+      targetField: "JUDGE",
+      parseMode: "TEXT",
+      sortOrder: 150,
+    }),
+    createColumnRule({
+      code: "CRITIQUE_TEXT",
+      headerName: "Arvostelu",
+      destinationKind: "SHOW_ENTRY",
+      targetField: "CRITIQUE_TEXT",
+      parseMode: "TEXT",
+      sortOrder: 160,
+    }),
+  ];
+}
 
 describe("previewAdminShowWorkbookImport", () => {
   beforeEach(() => {
     dogRegistrationFindManyMock.mockReset();
     showResultDefinitionFindManyMock.mockReset();
+    showWorkbookColumnRuleFindManyMock.mockReset();
 
     dogRegistrationFindManyMock.mockResolvedValue([
       { registrationNo: "FI16175/23", dogId: "dog_1" },
     ]);
-    showResultDefinitionFindManyMock.mockResolvedValue([
-      ...sharedDefinitions,
-      ...numericDefinitions,
-    ]);
+    showResultDefinitionFindManyMock.mockResolvedValue(sharedDefinitions);
+    showWorkbookColumnRuleFindManyMock.mockResolvedValue(
+      buildDefaultColumnRules(),
+    );
   });
 
-  it("parses a workbook preview when all workbook columns have persisted destinations", async () => {
+  it("parses a workbook preview when seeded metadata and definitions cover the workbook", async () => {
     const row1 = createRow({
       [IDX.registrationNo]: "FI16175/23",
       [IDX.eventDate]: new Date("2025-01-10T21:59:11.000Z"),
@@ -248,10 +350,12 @@ describe("previewAdminShowWorkbookImport", () => {
       errorCount: 0,
     });
     expect(result.body.data.schema.coverage).toEqual({
-      totalWorkbookColumns: 27,
-      importedColumnCount: 27,
+      totalWorkbookColumns: 15,
+      importedColumnCount: 15,
+      ignoredColumnCount: 0,
       blockedColumnCount: 0,
     });
+    expect(result.body.data.schema.ignoredColumns).toEqual([]);
     expect(result.body.data.schema.blockedColumns).toEqual([]);
     expect(result.body.data.events[0]?.entries[0]?.resultItems).toEqual(
       expect.arrayContaining([
@@ -278,7 +382,7 @@ describe("previewAdminShowWorkbookImport", () => {
     );
   });
 
-  it("accepts headers that only differ by whitespace or punctuation", async () => {
+  it("accepts headers that only differ by whitespace or punctuation after normalization", async () => {
     const workbook = buildWorkbookBuffer(
       [
         createRow({
@@ -300,34 +404,18 @@ describe("previewAdminShowWorkbookImport", () => {
       ],
       [
         "Rekisteri numero",
-        null,
-        null,
         "Aika",
-        null,
         "Paikka kunta",
         "Paikka",
         "Näyttely tyyppi",
-        null,
         "Nimi",
         "Luokka",
         "Laatu arvostelu",
         "Sijoitus",
         "PU/PN",
-        "ROP",
         "SERT",
-        "NORD SERT",
-        "JUN SERT",
-        "VET SERT",
-        "MVA",
-        "JMVA",
-        "VMVA",
         "CACIB",
-        "CACIB J",
-        "CACIB V",
-        "VET ROP",
-        "JUN ROP",
         "SA",
-        "KP",
         "Tuomari",
         "Arvostelu",
       ],
@@ -349,30 +437,31 @@ describe("previewAdminShowWorkbookImport", () => {
     expect(result.body.data.schema.blockedColumns).toHaveLength(0);
   });
 
-  it("rejects unsupported result values", async () => {
-    const workbook = buildWorkbookBuffer([
-      createRow({
-        [IDX.registrationNo]: "FI16175/23",
-        [IDX.eventDate]: new Date("2025-01-11T00:00:00.000Z"),
-        [IDX.eventCity]: "Kajaani",
-        [IDX.eventPlace]: "Kajaanin Pallohalli",
-        [IDX.eventType]: "Kansainvälinen näyttely",
-        [IDX.dogName]: "CARDIEM KIND REGARDS",
-        [IDX.classValue]: "AVO",
-        [IDX.qualityValue]: "ERI",
-        [IDX.sijoitus]: 1,
-        [IDX.pupn]: "PN4",
-        [IDX.sert]: "bogus",
-        [IDX.cacib]: "varaCACIB",
-        [IDX.sa]: "SA",
-        [IDX.judge]: "Laakso Jari",
-        [IDX.critiqueText]: "Nice dog",
-      }),
-    ]);
+  it("treats Rotukoodi as explicitly ignored by policy", async () => {
+    const headers = [...SUPPORTED_HEADERS];
+    headers.splice(6, 0, "Rotukoodi");
+
+    const row = createRow(
+      {
+        0: "FI16175/23",
+        1: new Date("2025-01-10T21:59:11.000Z"),
+        2: "Kajaani",
+        3: "Kajaanin Pallohalli",
+        4: "Kansainvälinen näyttely",
+        5: "CARDIEM KIND REGARDS",
+        6: "161",
+        7: "AVO",
+        8: "ERI",
+        9: 1,
+        10: "PN4",
+        13: "SA",
+      },
+      headers.length,
+    );
 
     const result = await previewAdminShowWorkbookImport({
       fileName: "Näyttelyt.xlsx",
-      workbook,
+      workbook: buildWorkbookBuffer([row], headers),
     });
 
     expect(result.status).toBe(200);
@@ -380,23 +469,32 @@ describe("previewAdminShowWorkbookImport", () => {
       throw new Error("Expected a successful preview response");
     }
 
-    expect(result.body.data.acceptedRowCount).toBe(0);
-    expect(result.body.data.rejectedRowCount).toBe(1);
-    expect(result.body.data.errorCount).toBeGreaterThan(0);
-    expect(result.body.data.events).toHaveLength(1);
+    expect(result.body.data.acceptedRowCount).toBe(1);
+    expect(result.body.data.schema.coverage).toEqual({
+      totalWorkbookColumns: 16,
+      importedColumnCount: 15,
+      ignoredColumnCount: 1,
+      blockedColumnCount: 0,
+    });
+    expect(result.body.data.schema.ignoredColumns).toEqual([
+      expect.objectContaining({
+        headerName: "Rotukoodi",
+        ruleCode: "BREED_CODE",
+      }),
+    ]);
+    expect(result.body.data.schema.blockedColumns).toEqual([]);
     expect(result.body.data.issues).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          code: "SHOW_WORKBOOK_INVALID_RESULT_VALUE",
-          severity: "ERROR",
-          columnName: "SERT",
-          registrationNo: "FI16175/23",
+          code: "SHOW_WORKBOOK_COLUMN_IGNORED",
+          severity: "INFO",
+          columnName: "Rotukoodi",
         }),
       ]),
     );
   });
 
-  it("rejects structural class aliases that are not present in the workbook contract", async () => {
+  it("rejects structural class values that are not defined in the database", async () => {
     const workbook = buildWorkbookBuffer([
       createRow({
         [IDX.registrationNo]: "FI16175/23",
@@ -431,162 +529,6 @@ describe("previewAdminShowWorkbookImport", () => {
           columnName: "Luokka",
           message: "Unsupported class value: JU.",
           registrationNo: "FI16175/23",
-        }),
-      ]),
-    );
-  });
-
-  it("imports a new workbook result column when the header matches a seeded definition", async () => {
-    showResultDefinitionFindManyMock.mockResolvedValue([
-      ...sharedDefinitions,
-      ...numericDefinitions,
-      { code: "NEW-FLAG", isEnabled: true, valueType: "FLAG" as const },
-    ]);
-
-    const headers = [...SUPPORTED_HEADERS, "NEW-FLAG"];
-    const row = createRow(
-      {
-        [IDX.registrationNo]: "FI16175/23",
-        [IDX.eventDate]: new Date("2025-01-10T21:59:11.000Z"),
-        [IDX.eventCity]: "Kajaani",
-        [IDX.eventPlace]: "Kajaanin Pallohalli",
-        [IDX.eventType]: "Kansainvälinen näyttely",
-        [IDX.dogName]: "CARDIEM KIND REGARDS",
-        [IDX.classValue]: "AVO",
-        [IDX.qualityValue]: "ERI",
-        [SUPPORTED_HEADERS.length]: "NEW-FLAG",
-      },
-      headers.length,
-    );
-
-    const result = await previewAdminShowWorkbookImport({
-      fileName: "Näyttelyt.xlsx",
-      workbook: buildWorkbookBuffer([row], headers),
-    });
-
-    expect(result.status).toBe(200);
-    if (!result.body.ok) {
-      throw new Error("Expected a successful preview response");
-    }
-
-    expect(result.body.data.acceptedRowCount).toBe(1);
-    expect(result.body.data.schema.definitionColumns).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          headerName: "NEW-FLAG",
-          definitionCodes: ["NEW-FLAG"],
-          importMode: "DIRECT",
-          enabled: true,
-          supported: true,
-        }),
-      ]),
-    );
-    expect(result.body.data.events[0]?.entries[0]?.resultItems).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          columnName: "NEW-FLAG",
-          definitionCode: "NEW-FLAG",
-        }),
-      ]),
-    );
-  });
-
-  it("blocks preview when a required structural column is missing", async () => {
-    const headers = [
-      "Rekisterinumero",
-      null,
-      null,
-      "Aika",
-      null,
-      "Paikkakunta",
-      "Paikka",
-      null,
-      null,
-      "Nimi",
-      "Luokka",
-      "Laatuarvostelu",
-    ];
-    const workbook = buildWorkbookBuffer(
-      [
-        [
-          "FI16175/23",
-          null,
-          null,
-          new Date("2025-01-10T21:59:11.000Z"),
-          null,
-          "Kajaani",
-          "Kajaanin Pallohalli",
-          null,
-          null,
-          "CARDIEM KIND REGARDS",
-          "AVO",
-          "ERI",
-        ],
-      ],
-      headers,
-    );
-
-    const result = await previewAdminShowWorkbookImport({
-      fileName: "Näyttelyt.xlsx",
-      workbook,
-    });
-
-    expect(result.status).toBe(200);
-    if (!result.body.ok) {
-      throw new Error("Expected a successful preview response");
-    }
-
-    expect(result.body.data.acceptedRowCount).toBe(0);
-    expect(result.body.data.events).toHaveLength(0);
-    expect(result.body.data.schema.missingStructuralFields).toEqual([
-      expect.objectContaining({
-        fieldKey: "eventType",
-        expectedHeader: "Näyttelytyyppi",
-      }),
-    ]);
-  });
-
-  it("blocks workbook columns that have no persisted destination", async () => {
-    const row = createRow(
-      {
-        [0]: "FI16175/23",
-        [3]: new Date("2025-01-10T21:59:11.000Z"),
-        [5]: "Kajaani",
-        [6]: "Kajaanin Pallohalli",
-        [7]: "Kansainvälinen näyttely",
-        [9]: "CARDIEM KIND REGARDS",
-        [10]: "161",
-        [11]: "AVO",
-        [12]: "ERI",
-      },
-      WITH_ROTUKOODI_HEADERS.length,
-    );
-
-    const result = await previewAdminShowWorkbookImport({
-      fileName: "Näyttelyt.xlsx",
-      workbook: buildWorkbookBuffer([row], WITH_ROTUKOODI_HEADERS),
-    });
-
-    expect(result.status).toBe(200);
-    if (!result.body.ok) {
-      throw new Error("Expected a successful preview response");
-    }
-
-    expect(result.body.data.acceptedRowCount).toBe(0);
-    expect(result.body.data.schema.blockedColumns).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          headerName: "Rotukoodi",
-          reasonCode: "UNSUPPORTED_COLUMN",
-        }),
-      ]),
-    );
-    expect(result.body.data.issues).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          code: "SHOW_WORKBOOK_UNSUPPORTED_COLUMN",
-          severity: "ERROR",
-          columnName: "Rotukoodi",
         }),
       ]),
     );
@@ -639,32 +581,73 @@ describe("previewAdminShowWorkbookImport", () => {
     );
   });
 
-  it("blocks preview when a matched definition column is disabled", async () => {
-    showResultDefinitionFindManyMock.mockResolvedValue([
-      ...sharedDefinitions,
-      ...numericDefinitions,
-      { code: "DISABLED-FLAG", isEnabled: false, valueType: "FLAG" as const },
-    ]);
+  it("blocks preview when a required structural column is missing", async () => {
+    const headers = [
+      "Rekisterinumero",
+      "Aika",
+      "Paikkakunta",
+      "Paikka",
+      "Nimi",
+      "Luokka",
+      "Laatuarvostelu",
+    ];
 
-    const headers = [...SUPPORTED_HEADERS, "DISABLED-FLAG"];
-    const row = createRow(
-      {
-        [IDX.registrationNo]: "FI16175/23",
-        [IDX.eventDate]: new Date("2025-01-10T21:59:11.000Z"),
-        [IDX.eventCity]: "Kajaani",
-        [IDX.eventPlace]: "Kajaanin Pallohalli",
-        [IDX.eventType]: "Kansainvälinen näyttely",
-        [IDX.dogName]: "CARDIEM KIND REGARDS",
-        [IDX.classValue]: "AVO",
-        [IDX.qualityValue]: "ERI",
-        [SUPPORTED_HEADERS.length]: "DISABLED-FLAG",
-      },
-      headers.length,
+    const workbook = buildWorkbookBuffer(
+      [
+        [
+          "FI16175/23",
+          new Date("2025-01-10T21:59:11.000Z"),
+          "Kajaani",
+          "Kajaanin Pallohalli",
+          "CARDIEM KIND REGARDS",
+          "AVO",
+          "ERI",
+        ],
+      ],
+      headers,
     );
 
     const result = await previewAdminShowWorkbookImport({
       fileName: "Näyttelyt.xlsx",
-      workbook: buildWorkbookBuffer([row], headers),
+      workbook,
+    });
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) {
+      throw new Error("Expected a successful preview response");
+    }
+
+    expect(result.body.data.acceptedRowCount).toBe(0);
+    expect(result.body.data.events).toHaveLength(0);
+    expect(result.body.data.schema.missingStructuralFields).toEqual([
+      expect.objectContaining({
+        fieldKey: "eventType",
+        expectedHeader: "Näyttelytyyppi",
+      }),
+    ]);
+  });
+
+  it("blocks preview when a metadata-mapped definition is disabled", async () => {
+    showResultDefinitionFindManyMock.mockResolvedValue([
+      ...sharedDefinitions.filter((definition) => definition.code !== "SA"),
+      { code: "SA", isEnabled: false, valueType: "FLAG" as const },
+    ]);
+
+    const result = await previewAdminShowWorkbookImport({
+      fileName: "Näyttelyt.xlsx",
+      workbook: buildWorkbookBuffer([
+        createRow({
+          [IDX.registrationNo]: "FI16175/23",
+          [IDX.eventDate]: new Date("2025-01-10T21:59:11.000Z"),
+          [IDX.eventCity]: "Kajaani",
+          [IDX.eventPlace]: "Kajaanin Pallohalli",
+          [IDX.eventType]: "Kansainvälinen näyttely",
+          [IDX.dogName]: "CARDIEM KIND REGARDS",
+          [IDX.classValue]: "AVO",
+          [IDX.qualityValue]: "ERI",
+          [IDX.sa]: "SA",
+        }),
+      ]),
     });
 
     expect(result.status).toBe(200);
@@ -676,7 +659,7 @@ describe("previewAdminShowWorkbookImport", () => {
     expect(result.body.data.schema.blockedColumns).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          headerName: "DISABLED-FLAG",
+          headerName: "SA",
           reasonCode: "DISABLED_DEFINITION",
         }),
       ]),
@@ -685,7 +668,7 @@ describe("previewAdminShowWorkbookImport", () => {
       expect.arrayContaining([
         expect.objectContaining({
           code: "SHOW_WORKBOOK_DEFINITION_NOT_FOUND",
-          columnName: "DISABLED-FLAG",
+          columnName: "SA",
           severity: "ERROR",
         }),
       ]),
@@ -698,13 +681,9 @@ describe("previewAdminShowWorkbookImport", () => {
       [
         "Rekisterinumero",
         "Rekisterinumero",
-        null,
-        "Aika",
-        null,
         "Paikkakunta",
         "Paikka",
         "Näyttelytyyppi",
-        null,
         "Nimi",
         "Luokka",
         "Laatuarvostelu",
@@ -744,14 +723,10 @@ describe("previewAdminShowWorkbookImport", () => {
       [
         [
           "FI16175/23",
-          null,
-          null,
           new Date("2025-01-10T21:59:11.000Z"),
-          null,
           "Kajaani",
           "Kajaanin Pallohalli",
           "Kansainvälinen näyttely",
-          null,
           "CARDIEM KIND REGARDS",
           "AVO",
           "ERI",
@@ -760,14 +735,10 @@ describe("previewAdminShowWorkbookImport", () => {
       ],
       [
         "Rekisterinumero",
-        null,
-        null,
         "Aika",
-        null,
         "Paikkakunta",
         "Paikka",
         "Näyttelytyyppi",
-        null,
         "Nimi",
         "Luokka",
         "Laatuarvostelu",
@@ -800,5 +771,23 @@ describe("previewAdminShowWorkbookImport", () => {
         }),
       ]),
     );
+  });
+
+  it("fails with a server error when workbook column metadata seed is missing", async () => {
+    showWorkbookColumnRuleFindManyMock.mockResolvedValue([]);
+
+    const result = await previewAdminShowWorkbookImport({
+      fileName: "Näyttelyt.xlsx",
+      workbook: buildWorkbookBuffer([]),
+    });
+
+    expect(result).toEqual({
+      status: 500,
+      body: {
+        ok: false,
+        error: "Show workbook import schema is missing; run the seed first.",
+        code: "SHOW_WORKBOOK_SCHEMA_MISSING",
+      },
+    });
   });
 });

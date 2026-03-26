@@ -173,6 +173,7 @@ export type {
   AdminShowWorkbookImportSchemaBlockedColumnReasonCode,
   AdminShowWorkbookImportSchemaCoverage,
   AdminShowWorkbookImportSchemaDefinitionColumn,
+  AdminShowWorkbookImportSchemaIgnoredColumn,
   AdminShowWorkbookImportSchemaMissingField,
   AdminShowWorkbookImportSchemaStructuralColumn,
   AdminShowWorkbookImportPreviewResponse,

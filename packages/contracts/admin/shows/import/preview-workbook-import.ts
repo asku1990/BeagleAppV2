@@ -67,6 +67,7 @@ export type AdminShowWorkbookImportSchemaBlockedColumnReasonCode =
   | "UNSUPPORTED_COLUMN"
   | "DUPLICATE_HEADER"
   | "UNNAMED_COLUMN_WITH_DATA"
+  | "MISSING_DEFINITION"
   | "DISABLED_DEFINITION"
   | "UNSUPPORTED_VALUE_TYPE";
 
@@ -77,9 +78,17 @@ export type AdminShowWorkbookImportSchemaBlockedColumn = {
   reasonText: string;
 };
 
+export type AdminShowWorkbookImportSchemaIgnoredColumn = {
+  headerName: string;
+  columnIndex: number;
+  ruleCode: string;
+  reasonText: string;
+};
+
 export type AdminShowWorkbookImportSchemaCoverage = {
   totalWorkbookColumns: number;
   importedColumnCount: number;
+  ignoredColumnCount: number;
   blockedColumnCount: number;
 };
 
@@ -87,6 +96,7 @@ export type AdminShowWorkbookImportResolvedSchema = {
   structuralColumns: AdminShowWorkbookImportSchemaStructuralColumn[];
   missingStructuralFields: AdminShowWorkbookImportSchemaMissingField[];
   definitionColumns: AdminShowWorkbookImportSchemaDefinitionColumn[];
+  ignoredColumns: AdminShowWorkbookImportSchemaIgnoredColumn[];
   blockedColumns: AdminShowWorkbookImportSchemaBlockedColumn[];
   coverage: AdminShowWorkbookImportSchemaCoverage;
 };

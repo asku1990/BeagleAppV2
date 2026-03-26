@@ -63,6 +63,7 @@ export {
   getBeagleShowsForDogDb,
   searchBeagleShowsDb,
   seedShowResultDefinitions,
+  seedShowWorkbookImportSchema,
   type BeagleShowDetailsRequestDb,
   type BeagleShowDetailsResponseDb,
   type BeagleShowDetailsRowDb,

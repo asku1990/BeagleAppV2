@@ -258,6 +258,7 @@ export function parseWorkbookRow(
     classValue: classValueText,
     qualityValue: qualityValueText,
     issues,
+    definitionsByCode: options.definitionsByCode,
   });
 
   const dogMatched = options.dogIdByRegistration.has(registrationNo);

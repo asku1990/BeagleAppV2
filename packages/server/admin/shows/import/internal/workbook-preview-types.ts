@@ -32,11 +32,47 @@ export type WorkbookStructuralFieldKey =
   | "judge"
   | "critiqueText";
 
+export type WorkbookColumnRulePolicy = "IMPORT" | "IGNORE";
+export type WorkbookColumnRuleDestinationKind =
+  | "SHOW_EVENT"
+  | "SHOW_ENTRY"
+  | "SHOW_RESULT_ITEM";
+export type WorkbookColumnRuleParseMode =
+  | "TEXT"
+  | "DATE"
+  | "DEFINITION_FROM_CELL"
+  | "FIXED_FLAG"
+  | "FIXED_NUMERIC"
+  | "FIXED_CODE"
+  | "VALUE_MAP";
+
+export type WorkbookColumnRuleValueMap = {
+  workbookValue: string;
+  definitionCode: string;
+  sortOrder: number;
+};
+
+export type WorkbookColumnRuleMeta = {
+  code: string;
+  headerName: string;
+  policy: WorkbookColumnRulePolicy;
+  destinationKind: WorkbookColumnRuleDestinationKind | null;
+  targetField: WorkbookStructuralFieldKey | null;
+  parseMode: WorkbookColumnRuleParseMode;
+  fixedDefinitionCode: string | null;
+  headerRequired: boolean;
+  rowValueRequired: boolean;
+  sortOrder: number;
+  isEnabled: boolean;
+  valueMaps: WorkbookColumnRuleValueMap[];
+};
+
 export type WorkbookResolvedStructuralField = {
   key: WorkbookStructuralFieldKey;
   label: string;
   headerName: string;
   required: boolean;
+  destinationKind: WorkbookColumnRuleDestinationKind;
 };
 
 export type WorkbookResolvedResultColumnImportMode =
@@ -50,12 +86,22 @@ export type WorkbookResolvedBlockedColumnReasonCode =
   | "DUPLICATE_HEADER"
   | "UNNAMED_COLUMN_WITH_DATA"
   | "DISABLED_DEFINITION"
-  | "UNSUPPORTED_VALUE_TYPE";
+  | "UNSUPPORTED_VALUE_TYPE"
+  | "MISSING_DEFINITION";
+
+export type WorkbookResolvedIgnoredColumn = {
+  headerName: string;
+  columnIndex: number;
+  ruleCode: string;
+  reasonText: string;
+};
 
 export type WorkbookResolvedResultColumn =
   | {
+      ruleCode: string;
       headerName: string;
       importMode: "VALUE_MAP";
+      parseMode: "VALUE_MAP";
       definitionCodes: string[];
       valueType: "FLAG";
       enabled: boolean;
@@ -63,25 +109,31 @@ export type WorkbookResolvedResultColumn =
       allowedValues: Record<string, string>;
     }
   | {
+      ruleCode: string;
       headerName: string;
       importMode: "NUMERIC";
+      parseMode: "FIXED_NUMERIC";
       definitionCodes: [string];
       valueType: "NUMERIC";
       enabled: boolean;
       supported: boolean;
     }
   | {
+      ruleCode: string;
       headerName: string;
       importMode: "PUPN";
+      parseMode: "FIXED_CODE";
       definitionCodes: [string];
       valueType: "CODE";
       enabled: boolean;
       supported: boolean;
     }
   | {
+      ruleCode: string;
       headerName: string;
       importMode: "DIRECT";
-      definitionCodes: [string];
+      parseMode: "FIXED_FLAG" | "DEFINITION_FROM_CELL";
+      definitionCodes: string[];
       valueType: WorkbookDefinitionValueType;
       enabled: boolean;
       supported: boolean;
@@ -103,10 +155,12 @@ export type WorkbookResolvedSchema = {
     label: string;
   }>;
   resultColumns: WorkbookResolvedResultColumn[];
+  ignoredColumns: WorkbookResolvedIgnoredColumn[];
   blockedColumns: WorkbookResolvedBlockedColumn[];
   coverage: {
     totalWorkbookColumns: number;
     importedColumnCount: number;
+    ignoredColumnCount: number;
     blockedColumnCount: number;
   };
 };
@@ -116,11 +170,13 @@ export type WorkbookLookupData = {
   enabledDefinitionCodes: Set<string>;
   definitionsByCode: Map<string, WorkbookDefinitionMeta>;
   definitionCount: number;
+  columnRules: WorkbookColumnRuleMeta[];
+  columnRuleCount: number;
 };
 
 export type WorkbookRowLookupData = Pick<
   WorkbookLookupData,
-  "dogIdByRegistration" | "enabledDefinitionCodes"
+  "dogIdByRegistration" | "enabledDefinitionCodes" | "definitionsByCode"
 > & {
   schema: WorkbookResolvedSchema;
 };

@@ -26,17 +26,29 @@ export function AdminShowWorkbookImportPageClient() {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [validationResult, setValidationResult] =
     useState<AdminShowWorkbookImportPreviewResponse | null>(null);
+  const [hasAcceptedNotes, setHasAcceptedNotes] = useState(false);
+  const [showValidationDetails, setShowValidationDetails] = useState(false);
 
   const hasWorkbookFile = selectedWorkbook !== null;
+  const hasReviewNotes =
+    validationResult !== null &&
+    (validationResult.warningCount > 0 ||
+      validationResult.schema.ignoredColumns.length > 0);
+  const hasBlockingErrors =
+    validationResult !== null && validationResult.errorCount > 0;
   const canPreview =
     validationResult !== null &&
-    validationResult.errorCount === 0 &&
-    validationError === null;
-  const validationPanelMode = canPreview ? "summary" : "full";
+    !hasBlockingErrors &&
+    validationError === null &&
+    (!hasReviewNotes || hasAcceptedNotes);
+  const validationPanelMode =
+    canPreview && !showValidationDetails ? "summary" : "full";
 
   function resetValidationState() {
     setValidationError(null);
     setValidationResult(null);
+    setHasAcceptedNotes(false);
+    setShowValidationDetails(false);
   }
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
@@ -76,6 +88,8 @@ export function AdminShowWorkbookImportPageClient() {
     setValidationLoading(true);
     setValidationError(null);
     setValidationResult(null);
+    setHasAcceptedNotes(false);
+    setShowValidationDetails(false);
 
     try {
       const formData = new FormData();
@@ -93,6 +107,15 @@ export function AdminShowWorkbookImportPageClient() {
     } finally {
       setValidationLoading(false);
     }
+  }
+
+  function handleAcceptNotes() {
+    setHasAcceptedNotes(true);
+    setShowValidationDetails(false);
+  }
+
+  function handleShowValidationDetails() {
+    setShowValidationDetails(true);
   }
 
   return (
@@ -194,12 +217,34 @@ export function AdminShowWorkbookImportPageClient() {
             error={validationError}
             isLoading={validationLoading}
             mode={validationPanelMode}
+            showAcceptanceActions={
+              validationResult !== null &&
+              validationError === null &&
+              !hasBlockingErrors &&
+              hasReviewNotes &&
+              !hasAcceptedNotes
+            }
+            notesAccepted={hasAcceptedNotes}
+            onAcceptNotes={handleAcceptNotes}
+            onShowDetails={canPreview ? handleShowValidationDetails : undefined}
           />
         </CardContent>
       </Card>
 
       {canPreview ? (
-        <ShowWorkbookPreviewSection preview={validationResult} />
+        <ShowWorkbookPreviewSection
+          preview={validationResult}
+          acceptedNotesSummary={
+            hasReviewNotes
+              ? {
+                  warningCount: validationResult.warningCount,
+                  ignoredColumnCount:
+                    validationResult.schema.ignoredColumns.length,
+                }
+              : null
+          }
+          onShowNotes={handleShowValidationDetails}
+        />
       ) : null}
     </div>
   );

@@ -54,6 +54,12 @@ function buildSchemaSummary(schema: WorkbookResolvedSchema) {
       enabled: column.enabled,
       supported: column.supported,
     })),
+    ignoredColumns: schema.ignoredColumns.map((column) => ({
+      headerName: column.headerName,
+      columnIndex: column.columnIndex,
+      ruleCode: column.ruleCode,
+      reasonText: column.reasonText,
+    })),
     blockedColumns: schema.blockedColumns.map((column) => ({
       headerName: column.headerName,
       columnIndex: column.columnIndex,
@@ -63,6 +69,7 @@ function buildSchemaSummary(schema: WorkbookResolvedSchema) {
     coverage: {
       totalWorkbookColumns: schema.coverage.totalWorkbookColumns,
       importedColumnCount: schema.coverage.importedColumnCount,
+      ignoredColumnCount: schema.coverage.ignoredColumnCount,
       blockedColumnCount: schema.coverage.blockedColumnCount,
     },
   } satisfies AdminShowWorkbookImportPreviewResponse["schema"];
@@ -94,6 +101,17 @@ export async function previewAdminShowWorkbookImport(input: {
     const previewIssues: AdminShowWorkbookImportIssue[] = [];
 
     const lookupData = await loadLookupData();
+    if (lookupData.columnRuleCount === 0) {
+      return {
+        status: 500,
+        body: {
+          ok: false,
+          error: "Show workbook import schema is missing; run the seed first.",
+          code: ISSUE_CODES.schemaMissing,
+        },
+      };
+    }
+
     if (
       lookupData.definitionCount === 0 ||
       lookupData.enabledDefinitionCodes.size === 0
@@ -146,6 +164,7 @@ export async function previewAdminShowWorkbookImport(input: {
       const parsed = parseWorkbookRow(row, columnMap, rowNumber, {
         dogIdByRegistration: lookupData.dogIdByRegistration,
         enabledDefinitionCodes: lookupData.enabledDefinitionCodes,
+        definitionsByCode: lookupData.definitionsByCode,
         schema,
       });
 

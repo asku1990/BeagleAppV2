@@ -52,6 +52,40 @@ enum ShowResultValueType {
   DATE
 }
 
+enum ShowWorkbookColumnPolicy {
+  IMPORT
+  IGNORE
+}
+
+enum ShowWorkbookColumnDestinationKind {
+  SHOW_EVENT
+  SHOW_ENTRY
+  SHOW_RESULT_ITEM
+}
+
+enum ShowWorkbookTargetField {
+  REGISTRATION_NO
+  EVENT_DATE
+  EVENT_CITY
+  EVENT_PLACE
+  EVENT_TYPE
+  DOG_NAME
+  CLASS_VALUE
+  QUALITY_VALUE
+  JUDGE
+  CRITIQUE_TEXT
+}
+
+enum ShowWorkbookColumnParseMode {
+  TEXT
+  DATE
+  DEFINITION_FROM_CELL
+  FIXED_FLAG
+  FIXED_NUMERIC
+  FIXED_CODE
+  VALUE_MAP
+}
+
 enum AuditAction {
   INSERT
   UPDATE
@@ -384,6 +418,46 @@ model ShowResultDefinition {
 
   @@index([isEnabled, sortOrder])
   @@index([categoryId])
+}
+
+model ShowWorkbookColumnRule {
+  // identity
+  id   String @id @default(cuid())
+  code String @unique
+
+  // workbook matching / behavior
+  headerName       String
+  policy           ShowWorkbookColumnPolicy        @default(IMPORT)
+  destinationKind  ShowWorkbookColumnDestinationKind?
+  targetField      ShowWorkbookTargetField?
+  parseMode        ShowWorkbookColumnParseMode
+  fixedDefinitionCode String?
+  headerRequired   Boolean @default(false)
+  rowValueRequired Boolean @default(false)
+  sortOrder        Int     @default(0)
+  isEnabled        Boolean @default(true)
+
+  // relations / timestamps
+  valueMaps  ShowWorkbookColumnValueMap[]
+  createdAt  DateTime                  @default(now())
+  updatedAt  DateTime                  @updatedAt
+
+  @@index([isEnabled, sortOrder])
+}
+
+model ShowWorkbookColumnValueMap {
+  id             String @id @default(cuid())
+  ruleId         String
+  workbookValue  String
+  definitionCode String
+  sortOrder      Int     @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  rule ShowWorkbookColumnRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@unique([ruleId, workbookValue])
+  @@index([ruleId, sortOrder])
 }
 
 model ShowResultItem {

@@ -6,9 +6,11 @@ import {
   normalizeWorkbookTextCell,
 } from "./cell";
 import type {
+  WorkbookColumnRuleMeta,
   WorkbookColumnMap,
   WorkbookLookupData,
   WorkbookRow,
+  WorkbookStructuralFieldKey,
 } from "./workbook-preview-types";
 
 function normalizeHeaderCell(value: WorkbookRow[number]): string | null {
@@ -89,18 +91,64 @@ export function parseWorkbookBuffer(
 }
 
 export async function loadLookupData(): Promise<WorkbookLookupData> {
-  const [registrations, definitions] = await Promise.all([
+  const [registrations, definitions, columnRules] = await Promise.all([
     prisma.dogRegistration.findMany({
       select: { registrationNo: true, dogId: true },
     }),
     prisma.showResultDefinition.findMany({
       select: { code: true, isEnabled: true, valueType: true },
     }),
+    prisma.showWorkbookColumnRule.findMany({
+      where: { isEnabled: true },
+      include: {
+        valueMaps: {
+          orderBy: [{ sortOrder: "asc" }, { workbookValue: "asc" }],
+        },
+      },
+      orderBy: [{ sortOrder: "asc" }, { headerName: "asc" }],
+    }),
   ]);
 
   const definitionsByCode = new Map(
     definitions.map((definition) => [definition.code, definition]),
   );
+
+  const targetFieldMap: Partial<Record<string, WorkbookStructuralFieldKey>> = {
+    REGISTRATION_NO: "registrationNo",
+    EVENT_DATE: "eventDate",
+    EVENT_CITY: "eventCity",
+    EVENT_PLACE: "eventPlace",
+    EVENT_TYPE: "eventType",
+    DOG_NAME: "dogName",
+    CLASS_VALUE: "classValue",
+    QUALITY_VALUE: "qualityValue",
+    JUDGE: "judge",
+    CRITIQUE_TEXT: "critiqueText",
+  };
+
+  const normalizedColumnRules: WorkbookColumnRuleMeta[] = columnRules.map(
+    (rule) => ({
+      code: rule.code,
+      headerName: rule.headerName,
+      policy: rule.policy,
+      destinationKind: rule.destinationKind,
+      targetField: rule.targetField
+        ? (targetFieldMap[rule.targetField] ?? null)
+        : null,
+      parseMode: rule.parseMode,
+      fixedDefinitionCode: rule.fixedDefinitionCode,
+      headerRequired: rule.headerRequired,
+      rowValueRequired: rule.rowValueRequired,
+      sortOrder: rule.sortOrder,
+      isEnabled: rule.isEnabled,
+      valueMaps: rule.valueMaps.map((valueMap) => ({
+        workbookValue: valueMap.workbookValue,
+        definitionCode: valueMap.definitionCode,
+        sortOrder: valueMap.sortOrder,
+      })),
+    }),
+  );
+
   return {
     dogIdByRegistration: new Map(
       registrations.map((registration) => [
@@ -115,5 +163,7 @@ export async function loadLookupData(): Promise<WorkbookLookupData> {
     ),
     definitionsByCode,
     definitionCount: definitions.length,
+    columnRules: normalizedColumnRules,
+    columnRuleCount: normalizedColumnRules.length,
   };
 }

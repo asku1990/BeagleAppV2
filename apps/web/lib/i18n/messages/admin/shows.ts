@@ -57,6 +57,11 @@ export const fiAdminShowsMessages = {
   "admin.shows.preview.summary.errors": "Virheitä",
   "admin.shows.preview.summary.warnings": "Varoituksia",
   "admin.shows.preview.summary.info": "Infoa",
+  "admin.shows.preview.notesAccepted.title":
+    "Esikatselu avattu hyväksytyillä huomioilla",
+  "admin.shows.preview.notesAccepted.warnings": "varoitusta hyväksytty",
+  "admin.shows.preview.notesAccepted.ignored": "saraketta ohitettu",
+  "admin.shows.preview.notesAccepted.showNotes": "Näytä huomiot",
   "admin.shows.preview.events.title": "Jäsennetyt tapahtumat",
   "admin.shows.preview.events.countSuffix": "tapahtumaa",
   "admin.shows.preview.events.entriesSuffix": "merkintää",
@@ -88,20 +93,35 @@ export const fiAdminShowsMessages = {
   "admin.shows.validation.summary.rows": "Rivejä",
   "admin.shows.validation.summary.errors": "Virheitä",
   "admin.shows.validation.summary.warnings": "Varoituksia",
-  "admin.shows.validation.summary.accepted": "Hyväksyttyjä",
-  "admin.shows.validation.summary.rejected": "Hylättyjä",
+  "admin.shows.validation.summary.notes": "Huomioita",
+  "admin.shows.validation.summary.ignored": "Ohitettuja sarakkeita",
   "admin.shows.validation.summary.ready": "Esikatselu",
   "admin.shows.validation.summary.readyYes": "Sallittu",
   "admin.shows.validation.summary.readyNo": "Estetty",
+  "admin.shows.validation.summary.readyPending": "Vaatii hyväksynnän",
   "admin.shows.validation.summary.previewHint":
     "Esikatselu avautuu alla samaan työtilaan.",
+  "admin.shows.validation.summary.notesAccepted":
+    "Huomiot hyväksytty ennen esikatselua",
+  "admin.shows.validation.summary.warningsAccepted": "varoitusta hyväksytty",
+  "admin.shows.validation.summary.ignoredAccepted":
+    "ohitettua saraketta hyväksytty",
+  "admin.shows.validation.summary.showNotes": "Näytä huomiot",
+  "admin.shows.validation.blocking.title":
+    "Esikatselu estetty estävien syiden vuoksi",
+  "admin.shows.validation.blocking.description":
+    "Workbookissa on estäviä sarake- tai määritelmäongelmia. Korjaa nämä ennen esikatselua.",
+  "admin.shows.validation.blocking.missingField":
+    "Puuttuva pakollinen workbook-sarake.",
   "admin.shows.validation.schema.title": "Saraketulkinta",
   "admin.shows.validation.schema.structural": "Tunnistetut rakennesarakkeet",
   "admin.shows.validation.schema.definitions": "Tunnistetut tulossarakkeet",
   "admin.shows.validation.schema.blocked": "Estetyt sarakkeet",
+  "admin.shows.validation.schema.ignored": "Ohitetut sarakkeet",
   "admin.shows.validation.schema.missing": "Puuttuvat pakolliset sarakkeet",
   "admin.shows.validation.schema.coverage": "Tuontikattavuus",
   "admin.shows.validation.schema.coverageImported": "tuettuna",
+  "admin.shows.validation.schema.coverageIgnored": "ohitettuna",
   "admin.shows.validation.schema.coverageBlocked": "estetty",
   "admin.shows.validation.schema.empty": "Ei saraketietoja.",
   "admin.shows.validation.schema.none": "Ei",
@@ -112,8 +132,19 @@ export const fiAdminShowsMessages = {
   "admin.shows.validation.notes.title": "Huomiot",
   "admin.shows.validation.notes.countSuffix": "huomiota",
   "admin.shows.validation.notes.empty": "Ei huomioita.",
+  "admin.shows.validation.notes.emptyFiltered":
+    "Ei huomioita tässä suodatuksessa.",
+  "admin.shows.validation.notes.filters.all": "Kaikki",
+  "admin.shows.validation.notes.filters.errors": "Virheet",
+  "admin.shows.validation.notes.filters.warnings": "Varoitukset",
+  "admin.shows.validation.notes.filters.info": "Info",
   "admin.shows.validation.notes.row": "Rivi",
   "admin.shows.validation.notes.column": "Sarake",
+  "admin.shows.validation.review.title": "Huomiot ennen esikatselua",
+  "admin.shows.validation.review.description":
+    "Workbookissa on varoituksia tai ohitettuja sarakkeita. Esikatselu avataan vasta, kun hyväksyt nämä huomiot.",
+  "admin.shows.validation.review.accept":
+    "Hyväksyn huomiot ja avaan esikatselun",
 } as const;
 
 export const svAdminShowsMessages = {
@@ -176,6 +207,11 @@ export const svAdminShowsMessages = {
   "admin.shows.preview.summary.errors": "Fel",
   "admin.shows.preview.summary.warnings": "Varningar",
   "admin.shows.preview.summary.info": "Info",
+  "admin.shows.preview.notesAccepted.title":
+    "Forhandsgranskning oppnad med godkanda noteringar",
+  "admin.shows.preview.notesAccepted.warnings": "varningar godkanda",
+  "admin.shows.preview.notesAccepted.ignored": "kolumner ignorerade",
+  "admin.shows.preview.notesAccepted.showNotes": "Visa noteringar",
   "admin.shows.preview.events.title": "Tolkade handelser",
   "admin.shows.preview.events.countSuffix": "handelser",
   "admin.shows.preview.events.entriesSuffix": "poster",
@@ -207,20 +243,35 @@ export const svAdminShowsMessages = {
   "admin.shows.validation.summary.rows": "Rader",
   "admin.shows.validation.summary.errors": "Fel",
   "admin.shows.validation.summary.warnings": "Varningar",
-  "admin.shows.validation.summary.accepted": "Godkanda",
-  "admin.shows.validation.summary.rejected": "Underkanda",
+  "admin.shows.validation.summary.notes": "Noteringar",
+  "admin.shows.validation.summary.ignored": "Ignorerade kolumner",
   "admin.shows.validation.summary.ready": "Forhandsgranskning",
   "admin.shows.validation.summary.readyYes": "Tillaten",
   "admin.shows.validation.summary.readyNo": "Blockerad",
+  "admin.shows.validation.summary.readyPending": "Kräver godkännande",
   "admin.shows.validation.summary.previewHint":
     "Forhandsgranskningen visas nedan i samma arbetsyta.",
+  "admin.shows.validation.summary.notesAccepted":
+    "Noteringar godkanda fore forhandsgranskning",
+  "admin.shows.validation.summary.warningsAccepted": "varningar godkanda",
+  "admin.shows.validation.summary.ignoredAccepted":
+    "ignorerade kolumner godkanda",
+  "admin.shows.validation.summary.showNotes": "Visa noteringar",
+  "admin.shows.validation.blocking.title":
+    "Forhandsgranskning blockerad av stoppande orsaker",
+  "admin.shows.validation.blocking.description":
+    "Workbooken innehåller blockerande kolumn- eller definitionsproblem. Korrigera dem innan forhandsgranskning.",
+  "admin.shows.validation.blocking.missingField":
+    "Saknad obligatorisk workbook-kolumn.",
   "admin.shows.validation.schema.title": "Kolumntolkning",
   "admin.shows.validation.schema.structural": "Identifierade strukturkolumner",
   "admin.shows.validation.schema.definitions": "Identifierade resultatkolumner",
   "admin.shows.validation.schema.blocked": "Blockerade kolumner",
+  "admin.shows.validation.schema.ignored": "Ignorerade kolumner",
   "admin.shows.validation.schema.missing": "Saknade obligatoriska kolumner",
   "admin.shows.validation.schema.coverage": "Importtäckning",
   "admin.shows.validation.schema.coverageImported": "stöds",
+  "admin.shows.validation.schema.coverageIgnored": "ignorerade",
   "admin.shows.validation.schema.coverageBlocked": "blockerade",
   "admin.shows.validation.schema.empty": "Ingen kolumninformation.",
   "admin.shows.validation.schema.none": "Inga",
@@ -231,6 +282,17 @@ export const svAdminShowsMessages = {
   "admin.shows.validation.notes.title": "Noteringar",
   "admin.shows.validation.notes.countSuffix": "noteringar",
   "admin.shows.validation.notes.empty": "Inga noteringar.",
+  "admin.shows.validation.notes.emptyFiltered":
+    "Inga noteringar i detta filter.",
+  "admin.shows.validation.notes.filters.all": "Alla",
+  "admin.shows.validation.notes.filters.errors": "Fel",
+  "admin.shows.validation.notes.filters.warnings": "Varningar",
+  "admin.shows.validation.notes.filters.info": "Info",
   "admin.shows.validation.notes.row": "Rad",
   "admin.shows.validation.notes.column": "Kolumn",
+  "admin.shows.validation.review.title": "Noteringar fore forhandsgranskning",
+  "admin.shows.validation.review.description":
+    "Workbooken innehaller varningar eller ignorerade kolumner. Forhandsgranskningen oppnas forst nar du godkanner dessa noteringar.",
+  "admin.shows.validation.review.accept":
+    "Jag godkanner noteringarna och oppnar forhandsgranskningen",
 } as const;

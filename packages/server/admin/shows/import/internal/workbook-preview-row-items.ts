@@ -6,7 +6,6 @@ import {
 } from "./cell";
 import {
   ISSUE_CODES,
-  STRUCTURAL_FIELD_ALLOWED_VALUE_MAP,
   TRUTHY_WORKBOOK_TOKENS,
 } from "./workbook-preview-constants";
 import {
@@ -17,6 +16,7 @@ import {
 import { getCell } from "./workbook-preview-io";
 import type {
   WorkbookColumnMap,
+  WorkbookDefinitionMeta,
   WorkbookResolvedSchema,
   WorkbookRow,
 } from "./workbook-preview-types";
@@ -31,6 +31,7 @@ type BuildWorkbookPreviewItemsInput = {
   classValue: string;
   qualityValue: string;
   issues: AdminShowWorkbookImportIssue[];
+  definitionsByCode: Map<string, WorkbookDefinitionMeta>;
 };
 
 function isTruthyWorkbookValue(
@@ -53,6 +54,25 @@ function isTruthyWorkbookValue(
   return false;
 }
 
+function resolveDefinitionCodeFromWorkbookValue(
+  definitionsByCode: Map<string, WorkbookDefinitionMeta>,
+  workbookValue: string,
+): string | null {
+  const token = normalizeWorkbookComparisonToken(workbookValue);
+
+  for (const definition of definitionsByCode.values()) {
+    if (!definition.isEnabled) {
+      continue;
+    }
+
+    if (normalizeWorkbookComparisonToken(definition.code) === token) {
+      return definition.code;
+    }
+  }
+
+  return null;
+}
+
 export function buildWorkbookPreviewItems({
   row,
   columnMap,
@@ -63,11 +83,12 @@ export function buildWorkbookPreviewItems({
   classValue,
   qualityValue,
   issues,
+  definitionsByCode,
 }: BuildWorkbookPreviewItemsInput) {
   const resultItems = [];
 
-  const classCode = normalizeAllowedValue(
-    STRUCTURAL_FIELD_ALLOWED_VALUE_MAP.classValue,
+  const classCode = resolveDefinitionCodeFromWorkbookValue(
+    definitionsByCode,
     classValue,
   );
   if (!classCode) {
@@ -88,8 +109,8 @@ export function buildWorkbookPreviewItems({
     });
   }
 
-  const qualityCode = normalizeAllowedValue(
-    STRUCTURAL_FIELD_ALLOWED_VALUE_MAP.qualityValue,
+  const qualityCode = resolveDefinitionCodeFromWorkbookValue(
+    definitionsByCode,
     qualityValue,
   );
   if (!qualityCode) {
@@ -117,7 +138,7 @@ export function buildWorkbookPreviewItems({
       continue;
     }
 
-    if (column.importMode === "NUMERIC") {
+    if (column.parseMode === "FIXED_NUMERIC") {
       const placementValue = normalizeWorkbookInteger(
         getCell(row, columnMap, column.headerName),
       );
@@ -142,7 +163,7 @@ export function buildWorkbookPreviewItems({
       continue;
     }
 
-    if (column.importMode === "PUPN") {
+    if (column.parseMode === "FIXED_CODE") {
       const pupnValue = parsePupnValue(
         getCell(row, columnMap, column.headerName),
       );
@@ -179,7 +200,7 @@ export function buildWorkbookPreviewItems({
       continue;
     }
 
-    if (column.importMode === "VALUE_MAP") {
+    if (column.parseMode === "VALUE_MAP") {
       const definitionCode = normalizeAllowedValue(
         column.allowedValues,
         rawValue,
@@ -205,8 +226,7 @@ export function buildWorkbookPreviewItems({
       continue;
     }
 
-    const definitionCode = column.definitionCodes[0];
-    if (column.valueType === "FLAG") {
+    if (column.parseMode === "FIXED_FLAG") {
       if (
         !isTruthyWorkbookValue(
           getCell(row, columnMap, column.headerName),
@@ -226,44 +246,9 @@ export function buildWorkbookPreviewItems({
 
       resultItems.push({
         columnName: column.headerName,
-        definitionCode,
+        definitionCode: column.definitionCodes[0],
         valueCode: null,
         valueNumeric: null,
-      });
-      continue;
-    }
-
-    if (column.valueType === "CODE") {
-      resultItems.push({
-        columnName: column.headerName,
-        definitionCode,
-        valueCode: rawValue,
-        valueNumeric: null,
-      });
-      continue;
-    }
-
-    const numericValue = normalizeWorkbookInteger(
-      getCell(row, columnMap, column.headerName),
-    );
-    if (numericValue === "INVALID") {
-      addDefinitionIssue(issues, {
-        rowNumber,
-        columnName: column.headerName,
-        code: ISSUE_CODES.invalidResultValue,
-        message: `${column.headerName} must be a non-negative integer.`,
-        registrationNo,
-        eventLookupKey,
-      });
-      continue;
-    }
-
-    if (numericValue !== null) {
-      resultItems.push({
-        columnName: column.headerName,
-        definitionCode,
-        valueCode: null,
-        valueNumeric: numericValue,
       });
     }
   }

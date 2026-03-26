@@ -11,27 +11,17 @@ exists.
 - The importer expects a single `.xlsx` workbook.
 - The first sheet is read as the source workbook grid.
 - The workbook header row is the source of import scope.
-- The importer resolves headers into a semantic schema before any row parsing:
-  - required structural fields:
-    - `Rekisterinumero`
-    - `Aika`
-    - `Paikkakunta`
-    - `Paikka`
-    - `Näyttelytyyppi`
-    - `Nimi`
-    - `Luokka`
-    - `Laatuarvostelu`
-  - optional structural fields:
-    - `Tuomari`
-    - `Arvostelu`
-  - result columns:
-    - known workbook result families such as `SERT`, `ROP`, `CACIB`, `JUN-ROP`,
-      `SA`, `KP`, `Sijoitus`, `PuPn`
-    - direct definition-backed columns whose header matches a seeded
-      `ShowResultDefinition.code` or a code-owned alias
+- The importer resolves headers through DB-backed workbook metadata before any
+  row parsing:
+  - `ShowWorkbookColumnRule` defines each supported workbook header, its
+    import policy, and where it maps in
+    the canonical show model
+  - `ShowResultDefinition` remains the source of truth for canonical result
+    codes and their supported value types
 - Header matching tolerates whitespace and punctuation differences.
-- Every non-empty workbook column must map to a real persisted import
-  destination.
+- Every non-empty workbook column must resolve to one of:
+  - imported to a persisted canonical destination
+  - ignored explicitly by seeded import policy
 - Missing required structural fields remain blocking errors.
 - Unknown extra workbook columns are blocking validation errors.
 - Duplicate non-empty workbook headers are blocking validation errors.
@@ -40,9 +30,10 @@ exists.
 - Result columns are validated against the canonical `ShowResultDefinition`
   catalog. Disabled or unsupported definition-backed columns are blocking
   errors.
-- Structural class and quality values are validated against the exact workbook
-  value set the importer supports. Speculative aliases such as `JU -> JUN` are
-  not normalized silently.
+- `Luokka` and `Laatuarvostelu` are required workbook columns, but their values
+  are validated directly against enabled `ShowResultDefinition.code` rows. The
+  validator no longer uses a hardcoded accepted-value map or speculative alias
+  normalization such as `JU -> JUN`.
 - Preview resolves local dogs by registration number and reports missing dogs as
   warnings, not blocking errors.
 - The admin UI uses a server action to call the preview parser.
@@ -64,9 +55,10 @@ The preview response returns:
 - resolved schema details:
   - matched structural columns
   - matched result-definition columns
+  - ignored workbook columns
   - blocked workbook columns
   - missing required structural fields
-  - coverage counts for imported vs blocked workbook columns
+  - coverage counts for imported vs ignored vs blocked workbook columns
 - structured issues with row, column, severity, and message data
 - parsed preview events with nested entries and result items
 
@@ -76,9 +68,10 @@ The preview response returns:
 - Missing required structural columns are reported before any row-level parsing
   continues.
 - Workbook columns that do not map to a supported persisted structural or
-  result destination block validation.
-- Columns like `Rotukoodi` stay blocked until the canonical write model has a
-  real database destination for them.
+  result destination and do not have explicit ignore metadata block validation.
+- `Rotukoodi` is currently seeded as an explicit ignore-by-policy column in
+  `ShowWorkbookColumnRule`, so it stays visible in validation coverage but does
+  not block preview or produce result items.
 - No canonical show tables are written in this phase.
 - Preview is available only after validation succeeds without blocking errors.
 - The import button exists only as a disabled placeholder; no apply/write logic

@@ -63,7 +63,8 @@ vi.mock("../show-workbook-preview-section", () => ({
 }));
 
 vi.mock("../show-workbook-validation-panel", () => ({
-  ShowWorkbookValidationPanel: () => null,
+  ShowWorkbookValidationPanel: () =>
+    React.createElement("div", null, "admin.shows.validation.title"),
 }));
 
 describe("AdminShowWorkbookImportPageClient", () => {
