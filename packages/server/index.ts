@@ -9,6 +9,7 @@ export {
   listAdminDogs,
   listAdminUsers,
   listAdminOwnerOptions,
+  previewAdminShowWorkbookImport,
   requireAdmin,
   setAdminUserPassword,
   setAdminUserStatus,

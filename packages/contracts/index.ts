@@ -163,6 +163,19 @@ export type {
   AdminBreederLookupResponse,
   AdminOwnerLookupResponse,
   AdminDogParentLookupResponse,
+  AdminShowWorkbookImportIssue,
+  AdminShowWorkbookImportIssueSeverity,
+  AdminShowWorkbookImportPreviewEntry,
+  AdminShowWorkbookImportPreviewEvent,
+  AdminShowWorkbookImportPreviewItem,
+  AdminShowWorkbookImportResolvedSchema,
+  AdminShowWorkbookImportSchemaBlockedColumn,
+  AdminShowWorkbookImportSchemaBlockedColumnReasonCode,
+  AdminShowWorkbookImportSchemaCoverage,
+  AdminShowWorkbookImportSchemaDefinitionColumn,
+  AdminShowWorkbookImportSchemaMissingField,
+  AdminShowWorkbookImportSchemaStructuralColumn,
+  AdminShowWorkbookImportPreviewResponse,
 } from "./admin";
 export type { HomeStatisticsResponse } from "./home";
 export {

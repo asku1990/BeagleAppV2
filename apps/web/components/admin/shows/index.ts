@@ -1,1 +1,2 @@
-export { AdminShowsPageClient } from "./admin-shows-page-client";
+export { AdminShowsHomePageClient } from "./home";
+export { AdminShowWorkbookImportPageClient } from "./import";
