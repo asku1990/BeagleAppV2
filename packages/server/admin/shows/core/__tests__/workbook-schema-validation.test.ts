@@ -97,6 +97,18 @@ describe("validateAdminShowWorkbookSchemaRuleDraft", () => {
     );
   });
 
+  it("allows admin-managed requiredness changes for core fields", () => {
+    const errors = validateAdminShowWorkbookSchemaRuleDraft(
+      createRuleDraft({
+        headerRequired: false,
+        rowValueRequired: false,
+      }),
+      references,
+    );
+
+    expect(errors).toEqual([]);
+  });
+
   it("rejects fixed definitions with an incompatible value type", () => {
     const errors = validateAdminShowWorkbookSchemaRuleDraft(
       createRuleDraft({

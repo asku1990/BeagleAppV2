@@ -47,6 +47,50 @@ exists.
 - The active workbook schema is global and edited in place. The validator and
   future admin settings use the same metadata contract.
 
+## Parser modes
+
+`ShowWorkbookColumnRule.parseMode` is a constrained parser vocabulary. Admin
+settings can edit which existing mode a workbook column uses, but adding a new
+parser mode still requires code changes.
+
+- `TEXT`
+  - imports normalized text into a structural destination field
+- `DATE`
+  - imports a valid workbook date into a structural destination field
+- `DEFINITION_FROM_CELL`
+  - resolves the raw workbook value against enabled `ShowResultDefinition.code`
+  - matching is scoped to the rule's `allowedDefinitionCategoryCode`
+  - used for workbook columns such as `Luokka` and `Laatuarvostelu`
+- `FIXED_FLAG`
+  - writes a fixed definition when the cell contains a truthy workbook token
+  - accepted truthy values are the column header itself after normalization and
+    the shared truthy token list in parser code
+- `FIXED_NUMERIC`
+  - writes a fixed numeric definition and stores the workbook integer as
+    `valueNumeric`
+- `FIXED_CODE`
+  - writes a fixed code definition and parses the workbook value into
+    `valueCode`
+  - current Kennelliitto support is the `PuPn` token form such as `PU1` or
+    `PN4`
+- `VALUE_MAP`
+  - resolves the workbook cell through `ShowWorkbookColumnValueMap`
+  - workbook values must match one of the configured mapped values after the
+    same normalization used elsewhere in the parser
+
+## Admin settings boundary
+
+The backend is prepared for future admin-managed workbook schema editing, but
+that future UI will still operate inside the current parser contract:
+
+- admins can edit headers, requiredness, import/ignore policy, parser mode,
+  fixed definition references, category scope, and value maps
+- admins cannot define arbitrary parser scripts or new parse-mode behavior
+- save-time validation returns structured field-level errors for invalid rule
+  edits
+- duplicate header protection still uses the parser's normalized workbook
+  header comparison rules, not only exact DB text
+
 ## Preview output
 
 The preview response returns:

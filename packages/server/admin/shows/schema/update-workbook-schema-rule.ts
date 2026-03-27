@@ -10,6 +10,9 @@ import type {
 import type { ServiceResult } from "../../../core/result";
 import { validateAdminShowWorkbookSchemaRuleDraft } from "../core/workbook-schema-validation";
 
+// Validates and persists a single workbook schema rule update for future
+// admin-managed workbook import settings.
+
 export async function updateAdminShowWorkbookSchemaRule(
   input: UpdateAdminShowWorkbookSchemaRuleRequest,
 ): Promise<ServiceResult<UpdateAdminShowWorkbookSchemaRuleResponse>> {
@@ -31,6 +34,7 @@ export async function updateAdminShowWorkbookSchemaRule(
         ok: false,
         error: "Workbook schema rule is invalid.",
         code: "INVALID_SHOW_WORKBOOK_SCHEMA_RULE",
+        details: { errors },
       },
     };
   }

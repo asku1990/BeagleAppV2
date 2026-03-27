@@ -9,6 +9,9 @@ import type {
 import type { ServiceResult } from "../../../core/result";
 import { validateAdminShowWorkbookSchemaRuleDraft } from "../core/workbook-schema-validation";
 
+// Runs rule-shape validation for draft workbook schema edits without
+// persisting any changes.
+
 export async function validateAdminShowWorkbookSchemaRule(
   input: ValidateAdminShowWorkbookSchemaRuleRequest,
 ): Promise<ServiceResult<ValidateAdminShowWorkbookSchemaRuleResponse>> {

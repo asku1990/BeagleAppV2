@@ -5,6 +5,9 @@ import type {
 } from "@beagle/contracts";
 import { normalizeWorkbookComparisonToken } from "../import/internal/cell";
 
+// Validates admin-managed workbook schema rules before they are persisted or
+// used by the workbook preview parser.
+
 type DefinitionRef = {
   code: string;
   isEnabled: boolean;
@@ -20,19 +23,6 @@ type CategoryRef = {
 type RuleDraft = AdminShowWorkbookSchemaRuleDraft & {
   code?: string;
 };
-
-const CORE_REQUIRED_TARGET_FIELDS = new Set<
-  AdminShowWorkbookSchemaRuleDraft["targetField"]
->([
-  "REGISTRATION_NO",
-  "EVENT_DATE",
-  "EVENT_CITY",
-  "EVENT_PLACE",
-  "EVENT_TYPE",
-  "DOG_NAME",
-  "CLASS_VALUE",
-  "QUALITY_VALUE",
-] as const);
 
 function addError(
   errors: AdminShowWorkbookSchemaValidationError[],
@@ -122,19 +112,6 @@ export function validateAdminShowWorkbookSchemaRuleDraft(
         "Ignored workbook rules cannot define value maps.",
       );
     }
-  }
-
-  if (
-    input.targetField &&
-    CORE_REQUIRED_TARGET_FIELDS.has(input.targetField) &&
-    (!input.headerRequired || !input.rowValueRequired)
-  ) {
-    addError(
-      errors,
-      "rowValueRequired",
-      "CORE_FIELD_REQUIRED",
-      `Core import field ${input.targetField} must stay required in workbook metadata.`,
-    );
   }
 
   if (input.parseMode === "VALUE_MAP") {

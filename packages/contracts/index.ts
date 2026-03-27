@@ -6,6 +6,7 @@ export type ApiError = {
   ok: false;
   error: string;
   code?: string;
+  details?: unknown;
 };
 
 export type ApiResult<T> = ApiSuccess<T> | ApiError;
