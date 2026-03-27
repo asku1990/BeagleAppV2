@@ -3,8 +3,7 @@
 This document describes the validation and preview steps for the new admin show
 workbook import flow. `/admin/shows` acts as the module hub, and the dedicated
 workflow lives on `/admin/shows/import`, where an operator can validate a
-workbook inline and reveal a parsed preview section before any write phase
-exists.
+workbook inline and apply the import in one safe all-or-nothing write step.
 
 ## Current behavior
 
@@ -39,11 +38,20 @@ exists.
   normalization such as `JU -> JUN`.
 - Preview resolves local dogs by registration number and reports missing dogs as
   warnings, not blocking errors.
+- Preview runs duplicate checks against canonical persisted keys:
+  - blocks existing `ShowEntry.entryLookupKey`
+  - blocks `ShowEvent.eventLookupKey` metadata conflicts (`eventCity` or
+    `eventType`)
+  - allows existing event + compatible metadata + new entries
 - The admin UI uses a server action to call the preview parser.
 - Validation renders inline summary counts, schema resolution details, and
   issue-level notes.
 - Preview renders parsed candidate events, entries, and result items on the
   same page.
+- Apply re-runs parsing and duplicate checks before writing.
+- Apply writes only in one `prisma.$transaction` and uses create-only semantics
+  (`ShowEvent` create-if-missing, `ShowEntry` create-only, `ShowResultItem`
+  create-only).
 - The active workbook schema is global and edited in place. The validator and
   future admin settings use the same metadata contract.
 
@@ -124,16 +132,13 @@ The preview response returns:
 - `Rotukoodi` is currently seeded as an explicit ignore-by-policy column in
   `ShowWorkbookColumnRule`, so it stays visible in validation coverage but does
   not block preview or produce result items.
-- No canonical show tables are written in this phase.
+- Writes happen only after apply passes full revalidation.
+- Any transaction failure or unique conflict rolls back the whole import.
 - Preview is available only after validation succeeds without blocking errors.
   If the workbook still contains warnings or explicitly ignored columns, the
   operator must acknowledge those notes before preview opens.
-- The import button exists only as a disabled placeholder; no apply/write logic
-  exists yet.
 
 ## Next phase
 
-The apply phase can reuse the same parser output, but it must stay separate from
-this preview-only workflow. Future admin settings should update
-`ShowWorkbookColumnRule` and `ShowWorkbookColumnValueMap` rather than adding new
-code-owned header maps.
+Future admin settings should update `ShowWorkbookColumnRule` and
+`ShowWorkbookColumnValueMap` rather than adding new code-owned header maps.

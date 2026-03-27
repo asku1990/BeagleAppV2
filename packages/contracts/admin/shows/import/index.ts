@@ -14,3 +14,4 @@ export type {
   AdminShowWorkbookImportSchemaStructuralColumn,
   AdminShowWorkbookImportPreviewResponse,
 } from "./preview-workbook-import";
+export type { AdminShowWorkbookImportApplyResponse } from "./apply-workbook-import";

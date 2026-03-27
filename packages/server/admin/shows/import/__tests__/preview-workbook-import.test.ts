@@ -7,11 +7,15 @@ const {
   showResultDefinitionFindManyMock,
   showResultCategoryFindManyMock,
   showWorkbookColumnRuleFindManyMock,
+  showEventFindManyMock,
+  showEntryFindManyMock,
 } = vi.hoisted(() => ({
   dogRegistrationFindManyMock: vi.fn(),
   showResultDefinitionFindManyMock: vi.fn(),
   showResultCategoryFindManyMock: vi.fn(),
   showWorkbookColumnRuleFindManyMock: vi.fn(),
+  showEventFindManyMock: vi.fn(),
+  showEntryFindManyMock: vi.fn(),
 }));
 
 vi.mock("@beagle/db", () => ({
@@ -27,6 +31,12 @@ vi.mock("@beagle/db", () => ({
     },
     showWorkbookColumnRule: {
       findMany: showWorkbookColumnRuleFindManyMock,
+    },
+    showEvent: {
+      findMany: showEventFindManyMock,
+    },
+    showEntry: {
+      findMany: showEntryFindManyMock,
     },
   },
 }));
@@ -354,6 +364,8 @@ describe("previewAdminShowWorkbookImport", () => {
     showResultDefinitionFindManyMock.mockReset();
     showResultCategoryFindManyMock.mockReset();
     showWorkbookColumnRuleFindManyMock.mockReset();
+    showEventFindManyMock.mockReset();
+    showEntryFindManyMock.mockReset();
 
     dogRegistrationFindManyMock.mockResolvedValue([
       { registrationNo: "FI16175/23", dogId: "dog_1" },
@@ -363,6 +375,8 @@ describe("previewAdminShowWorkbookImport", () => {
     showWorkbookColumnRuleFindManyMock.mockResolvedValue(
       buildDefaultColumnRules(),
     );
+    showEventFindManyMock.mockResolvedValue([]);
+    showEntryFindManyMock.mockResolvedValue([]);
   });
 
   it("parses a workbook preview when seeded metadata and definitions cover the workbook", async () => {

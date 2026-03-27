@@ -1,37 +1,12 @@
-import type {
-  AdminShowWorkbookImportIssue,
-  AdminShowWorkbookImportPreviewResponse,
-} from "@beagle/contracts";
-import { normalizeWorkbookRegistrationNo } from "./internal/cell";
+import type { AdminShowWorkbookImportPreviewResponse } from "@beagle/contracts";
 import { toErrorLog, withLogContext } from "../../../core/logger";
 import type { ServiceResult } from "../../../core/result";
-import {
-  buildColumnMap,
-  countIssueSeverity,
-  getCell,
-  loadLookupData,
-  parseWorkbookBuffer,
-} from "./internal/workbook-preview-io";
-import { buildPreviewEvents } from "./internal/workbook-preview-events";
-import {
-  buildEventLookupKey,
-  createIssue,
-} from "./internal/workbook-preview-mappers";
-import { parseWorkbookRow } from "./internal/workbook-preview-row";
-import {
-  buildWorkbookSchemaIssues,
-  resolveWorkbookSchema,
-} from "./internal/workbook-preview-schema";
 import {
   ISSUE_CODES,
   WORKBOOK_FILE_PATTERN,
 } from "./internal/workbook-preview-constants";
-import { mapWorkbookStructuralFieldKeyToTargetField } from "./internal/workbook-preview-target-fields";
-import type {
-  WorkbookParsedRow,
-  WorkbookResolvedSchema,
-} from "./internal/workbook-preview-types";
-import { validateAdminShowWorkbookSchemaRules } from "../core/workbook-schema-validation";
+import type { WorkbookResolvedSchema } from "./internal/workbook-preview-types";
+import { evaluateWorkbookImport } from "./internal/workbook-import-runtime";
 
 function buildSchemaSummary(schema: WorkbookResolvedSchema) {
   return {
@@ -96,242 +71,32 @@ export async function previewAdminShowWorkbookImport(input: {
   }
 
   try {
-    const { sheetName, headers, rows } = parseWorkbookBuffer(input.workbook);
-    const columnMap = buildColumnMap(headers);
-    const previewIssues: AdminShowWorkbookImportIssue[] = [];
-
-    const lookupData = await loadLookupData();
-    if (lookupData.columnRuleCount === 0) {
-      return {
-        status: 500,
-        body: {
-          ok: false,
-          error: "Show workbook import schema is missing; run the seed first.",
-          code: ISSUE_CODES.schemaMissing,
-        },
-      };
-    }
-
-    if (
-      lookupData.definitionCount === 0 ||
-      lookupData.enabledDefinitionCodes.size === 0
-    ) {
-      return {
-        status: 500,
-        body: {
-          ok: false,
-          error: "Show result definitions are missing; run the seed first.",
-          code: ISSUE_CODES.definitionsMissing,
-        },
-      };
-    }
-
-    const metadataErrors = validateAdminShowWorkbookSchemaRules(
-      lookupData.columnRules.map((rule) => ({
-        code: rule.code,
-        headerName: rule.headerName,
-        policy: rule.policy,
-        destinationKind: rule.destinationKind,
-        targetField: mapWorkbookStructuralFieldKeyToTargetField(
-          rule.targetField,
-        ),
-        parseMode: rule.parseMode,
-        fixedDefinitionCode: rule.fixedDefinitionCode,
-        allowedDefinitionCategoryCode: rule.allowedDefinitionCategoryCode,
-        headerRequired: rule.headerRequired,
-        rowValueRequired: rule.rowValueRequired,
-        sortOrder: rule.sortOrder,
-        isEnabled: rule.isEnabled,
-        valueMaps: rule.valueMaps.map((valueMap) => ({
-          workbookValue: valueMap.workbookValue,
-          definitionCode: valueMap.definitionCode,
-          sortOrder: valueMap.sortOrder,
-        })),
-      })),
-      {
-        definitions: [...lookupData.definitionsByCode.values()],
-        categories: lookupData.definitionCategories,
-      },
-    );
-    if (metadataErrors.length > 0) {
-      return {
-        status: 500,
-        body: {
-          ok: false,
-          error:
-            metadataErrors[0]?.message ??
-            "Show workbook import schema is invalid.",
-          code: ISSUE_CODES.schemaInvalid,
-        },
-      };
-    }
-
-    const schema = resolveWorkbookSchema(headers, rows, lookupData);
-    previewIssues.push(...buildWorkbookSchemaIssues(schema));
-
-    if (
-      schema.missingRequiredFields.length > 0 ||
-      schema.blockedColumns.length > 0
-    ) {
-      const counts = countIssueSeverity(previewIssues);
-      return {
-        status: 200,
-        body: {
-          ok: true,
-          data: {
-            fileName: input.fileName,
-            sheetName,
-            rowCount: rows.length,
-            acceptedRowCount: 0,
-            rejectedRowCount: rows.length,
-            eventCount: 0,
-            entryCount: 0,
-            resultItemCount: 0,
-            ...counts,
-            schema: buildSchemaSummary(schema),
-            issues: previewIssues,
-            events: [],
-          },
-        },
-      };
-    }
-
-    const previewRows: WorkbookParsedRow[] = [];
-    const rowsByEntryKey = new Set<string>();
-
-    rows.forEach((row, index) => {
-      const rowNumber = index + 2;
-      const parsed = parseWorkbookRow(row, columnMap, rowNumber, {
-        dogIdByRegistration: lookupData.dogIdByRegistration,
-        enabledDefinitionCodes: lookupData.enabledDefinitionCodes,
-        definitionsByCode: lookupData.definitionsByCode,
-        schema,
-      });
-
-      for (const issue of parsed.issues) {
-        previewIssues.push(issue);
-      }
-
-      const derivedEventLookupKey =
-        parsed.eventDateIso &&
-        parsed.eventCity &&
-        parsed.eventPlace &&
-        parsed.eventType
-          ? buildEventLookupKey({
-              eventDateIso: parsed.eventDateIso,
-              eventCity: parsed.eventCity,
-              eventPlace: parsed.eventPlace,
-              eventType: parsed.eventType,
-            })
-          : null;
-      const eventLookupKey =
-        parsed.eventLookupKey ?? derivedEventLookupKey ?? `row-${rowNumber}`;
-      const registrationColumn =
-        schema.structuralFields.registrationNo?.headerName ?? "Rekisterinumero";
-      const registrationNo =
-        parsed.registrationNo ??
-        normalizeWorkbookRegistrationNo(
-          getCell(row, columnMap, registrationColumn),
-        ) ??
-        "";
-      const entryLookupKey = `${registrationNo}|${eventLookupKey}`;
-
-      if (!parsed.accepted) {
-        previewRows.push({
-          rowNumber,
-          eventLookupKey,
-          eventDateIso: parsed.eventDateIso ?? "",
-          eventCity: parsed.eventCity ?? "",
-          eventPlace: parsed.eventPlace ?? "",
-          eventType: parsed.eventType ?? "",
-          accepted: false,
-          issueCount: parsed.issues.length,
-          itemCount: 0,
-          registrationNo: parsed.registrationNo ?? "",
-          dogName: parsed.dogName ?? "",
-          dogMatched: parsed.dogMatched,
-          judge: parsed.judge,
-          critiqueText: parsed.critiqueText,
-          classValue: parsed.classValue ?? "",
-          qualityValue: parsed.qualityValue ?? "",
-          resultItems: [],
-        });
-        return;
-      }
-
-      if (rowsByEntryKey.has(entryLookupKey)) {
-        previewIssues.push(
-          createIssue({
-            rowNumber,
-            columnName: registrationColumn,
-            severity: "WARNING",
-            code: ISSUE_CODES.duplicateRow,
-            message: `Duplicate workbook row for entry ${entryLookupKey}.`,
-            registrationNo,
-            eventLookupKey,
-          }),
-        );
-        previewRows.push({
-          rowNumber,
-          eventLookupKey,
-          eventDateIso: parsed.eventDateIso ?? "",
-          eventCity: parsed.eventCity ?? "",
-          eventPlace: parsed.eventPlace ?? "",
-          eventType: parsed.eventType ?? "",
-          accepted: false,
-          issueCount: 1,
-          itemCount: 0,
-          registrationNo,
-          dogName: parsed.dogName ?? "",
-          dogMatched: parsed.dogMatched,
-          judge: parsed.judge,
-          critiqueText: parsed.critiqueText,
-          classValue: parsed.classValue ?? "",
-          qualityValue: parsed.qualityValue ?? "",
-          resultItems: [],
-        });
-        return;
-      }
-
-      rowsByEntryKey.add(entryLookupKey);
-      previewRows.push({
-        rowNumber,
-        eventLookupKey,
-        eventDateIso: parsed.eventDateIso ?? "",
-        eventCity: parsed.eventCity ?? "",
-        eventPlace: parsed.eventPlace ?? "",
-        eventType: parsed.eventType ?? "",
-        accepted: true,
-        issueCount: parsed.issues.length,
-        itemCount: parsed.itemCount,
-        registrationNo,
-        dogName: parsed.dogName ?? "",
-        dogMatched: parsed.dogMatched,
-        judge: parsed.judge,
-        critiqueText: parsed.critiqueText,
-        classValue: parsed.classValue ?? "",
-        qualityValue: parsed.qualityValue ?? "",
-        resultItems: parsed.resultItems,
-      });
+    const runtime = await evaluateWorkbookImport({
+      workbook: input.workbook,
+      runDuplicateChecks: true,
     });
-
-    const acceptedRowCount = previewRows.filter((row) => row.accepted).length;
-    const rejectedRowCount = rows.length - acceptedRowCount;
-    const resultItemCount = previewRows
-      .filter((row) => row.accepted)
-      .reduce((total, row) => total + row.itemCount, 0);
-    const events = buildPreviewEvents(previewRows);
-    const counts = countIssueSeverity(previewIssues);
+    if (!runtime.ok) {
+      return {
+        status: runtime.status,
+        body: {
+          ok: false,
+          error: runtime.error,
+          code: runtime.code,
+        },
+      };
+    }
 
     log.info(
       {
-        rowCount: rows.length,
-        acceptedRowCount,
-        rejectedRowCount,
-        eventCount: events.length,
-        entryCount: previewRows.length,
-        resultItemCount,
-        ...counts,
+        rowCount: runtime.rowCount,
+        acceptedRowCount: runtime.acceptedRowCount,
+        rejectedRowCount: runtime.rejectedRowCount,
+        eventCount: runtime.eventCount,
+        entryCount: runtime.entryCount,
+        resultItemCount: runtime.resultItemCount,
+        infoCount: runtime.infoCount,
+        warningCount: runtime.warningCount,
+        errorCount: runtime.errorCount,
       },
       "previewed show workbook import",
     );
@@ -342,17 +107,19 @@ export async function previewAdminShowWorkbookImport(input: {
         ok: true,
         data: {
           fileName: input.fileName,
-          sheetName,
-          rowCount: rows.length,
-          acceptedRowCount,
-          rejectedRowCount,
-          eventCount: events.length,
-          entryCount: previewRows.length,
-          resultItemCount,
-          ...counts,
-          schema: buildSchemaSummary(schema),
-          issues: previewIssues,
-          events,
+          sheetName: runtime.sheetName,
+          rowCount: runtime.rowCount,
+          acceptedRowCount: runtime.acceptedRowCount,
+          rejectedRowCount: runtime.rejectedRowCount,
+          eventCount: runtime.eventCount,
+          entryCount: runtime.entryCount,
+          resultItemCount: runtime.resultItemCount,
+          infoCount: runtime.infoCount,
+          warningCount: runtime.warningCount,
+          errorCount: runtime.errorCount,
+          schema: buildSchemaSummary(runtime.schema),
+          issues: runtime.issues,
+          events: runtime.events,
         },
       },
     };

@@ -166,6 +166,7 @@ export type {
   AdminDogParentLookupResponse,
   AdminShowWorkbookImportIssue,
   AdminShowWorkbookImportIssueSeverity,
+  AdminShowWorkbookImportApplyResponse,
   AdminShowWorkbookImportPreviewEntry,
   AdminShowWorkbookImportPreviewEvent,
   AdminShowWorkbookImportPreviewItem,

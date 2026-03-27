@@ -10,6 +10,7 @@ export {
   listAdminUsers,
   listAdminOwnerOptions,
   previewAdminShowWorkbookImport,
+  applyAdminShowWorkbookImport,
   requireAdmin,
   setAdminUserPassword,
   setAdminUserStatus,

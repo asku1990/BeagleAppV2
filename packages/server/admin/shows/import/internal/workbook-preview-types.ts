@@ -15,6 +15,7 @@ export type WorkbookRow = WorkbookCell[];
 export type WorkbookColumnMap = Map<string, number>;
 
 export type WorkbookDefinitionMeta = {
+  id: string;
   code: string;
   isEnabled: boolean;
   valueType: WorkbookDefinitionValueType;

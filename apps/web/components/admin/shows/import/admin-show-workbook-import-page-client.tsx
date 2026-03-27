@@ -3,8 +3,14 @@
 import React from "react";
 import Link from "next/link";
 import { useState, type ChangeEvent } from "react";
-import type { AdminShowWorkbookImportPreviewResponse } from "@beagle/contracts";
-import { previewAdminShowWorkbookImportAction } from "@/app/actions/admin/shows/import";
+import type {
+  AdminShowWorkbookImportApplyResponse,
+  AdminShowWorkbookImportPreviewResponse,
+} from "@beagle/contracts";
+import {
+  applyAdminShowWorkbookImportAction,
+  previewAdminShowWorkbookImportAction,
+} from "@/app/actions/admin/shows/import";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -26,6 +32,10 @@ export function AdminShowWorkbookImportPageClient() {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [validationResult, setValidationResult] =
     useState<AdminShowWorkbookImportPreviewResponse | null>(null);
+  const [applyResult, setApplyResult] =
+    useState<AdminShowWorkbookImportApplyResponse | null>(null);
+  const [applyLoading, setApplyLoading] = useState(false);
+  const [applyError, setApplyError] = useState<string | null>(null);
   const [hasAcceptedNotes, setHasAcceptedNotes] = useState(false);
   const [showValidationDetails, setShowValidationDetails] = useState(false);
 
@@ -41,6 +51,12 @@ export function AdminShowWorkbookImportPageClient() {
     !hasBlockingErrors &&
     validationError === null &&
     (!hasReviewNotes || hasAcceptedNotes);
+  const canImport =
+    canPreview &&
+    !validationLoading &&
+    !applyLoading &&
+    validationResult !== null &&
+    validationResult.errorCount === 0;
   const validationPanelMode =
     canPreview && !showValidationDetails ? "summary" : "full";
 
@@ -49,6 +65,9 @@ export function AdminShowWorkbookImportPageClient() {
     setValidationResult(null);
     setHasAcceptedNotes(false);
     setShowValidationDetails(false);
+    setApplyResult(null);
+    setApplyError(null);
+    setApplyLoading(false);
   }
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
@@ -88,6 +107,8 @@ export function AdminShowWorkbookImportPageClient() {
     setValidationLoading(true);
     setValidationError(null);
     setValidationResult(null);
+    setApplyResult(null);
+    setApplyError(null);
     setHasAcceptedNotes(false);
     setShowValidationDetails(false);
 
@@ -106,6 +127,44 @@ export function AdminShowWorkbookImportPageClient() {
       setValidationError(t("admin.shows.preview.errorGeneric"));
     } finally {
       setValidationLoading(false);
+    }
+  }
+
+  async function handleImport() {
+    if (!selectedWorkbook || !canImport) {
+      return;
+    }
+
+    setApplyLoading(true);
+    setApplyError(null);
+    setApplyResult(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("workbook", selectedWorkbook);
+      const result = await applyAdminShowWorkbookImportAction(formData);
+      if (!result.ok) {
+        setApplyError(result.error.message);
+        return;
+      }
+      setApplyResult(result.data);
+      if (!result.data.success) {
+        setValidationResult((current) =>
+          current
+            ? {
+                ...current,
+                issues: result.data.issues,
+                infoCount: result.data.infoCount,
+                warningCount: result.data.warningCount,
+                errorCount: result.data.errorCount,
+              }
+            : current,
+        );
+      }
+    } catch {
+      setApplyError(t("admin.shows.preview.errorGeneric"));
+    } finally {
+      setApplyLoading(false);
     }
   }
 
@@ -203,14 +262,28 @@ export function AdminShowWorkbookImportPageClient() {
                 ? t("admin.shows.import.actions.revalidate")
                 : t("admin.shows.import.actions.validate")}
             </Button>
-            <Button type="button" variant="outline" disabled>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!canImport}
+              onClick={() => void handleImport()}
+            >
               {t("admin.shows.import.actions.import")}
             </Button>
           </div>
 
-          <p className="text-xs text-muted-foreground">
-            {t("admin.shows.import.actions.placeholder")}
-          </p>
+          {applyError ? (
+            <p className="text-sm text-destructive">{applyError}</p>
+          ) : null}
+          {applyResult ? (
+            <p
+              className={`text-xs ${applyResult.success ? "text-emerald-700" : "text-destructive"}`}
+            >
+              {applyResult.success
+                ? `Imported: ${applyResult.eventsCreated} events, ${applyResult.entriesCreated} entries, ${applyResult.itemsCreated} result items.`
+                : `Import blocked: ${applyResult.errorCount} errors, ${applyResult.warningCount} warnings, ${applyResult.infoCount} info.`}
+            </p>
+          ) : null}
 
           <ShowWorkbookValidationPanel
             validation={validationResult}

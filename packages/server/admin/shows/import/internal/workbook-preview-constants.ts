@@ -28,4 +28,7 @@ export const ISSUE_CODES = {
   schemaMissing: "SHOW_WORKBOOK_SCHEMA_MISSING",
   schemaInvalid: "SHOW_WORKBOOK_SCHEMA_INVALID",
   columnIgnored: "SHOW_WORKBOOK_COLUMN_IGNORED",
+  duplicateExistingEntry: "SHOW_WORKBOOK_ENTRY_ALREADY_EXISTS",
+  eventMetadataConflict: "SHOW_WORKBOOK_EVENT_METADATA_CONFLICT",
+  importWriteFailed: "SHOW_WORKBOOK_IMPORT_WRITE_FAILED",
 } as const;

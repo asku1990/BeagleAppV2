@@ -50,6 +50,7 @@ vi.mock("@/components/ui/input", () => ({
 
 vi.mock("@/app/actions/admin/shows/import", () => ({
   previewAdminShowWorkbookImportAction: vi.fn(),
+  applyAdminShowWorkbookImportAction: vi.fn(),
 }));
 
 vi.mock("@/lib/admin/shows/import/workbook-file", () => ({

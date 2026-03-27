@@ -1,5 +1,5 @@
 import * as XLSX from "xlsx";
-import { prisma } from "@beagle/db";
+import { loadAdminShowWorkbookImportLookupDataDb } from "@beagle/db";
 import {
   isNonEmptyWorkbookRow,
   normalizeWorkbookComparisonToken,
@@ -91,42 +91,21 @@ export function parseWorkbookBuffer(
 }
 
 export async function loadLookupData(): Promise<WorkbookLookupData> {
-  const [registrations, definitions, categories, columnRules] =
-    await Promise.all([
-      prisma.dogRegistration.findMany({
-        select: { registrationNo: true, dogId: true },
-      }),
-      prisma.showResultDefinition.findMany({
-        select: {
-          code: true,
-          isEnabled: true,
-          valueType: true,
-          category: { select: { code: true } },
-        },
-      }),
-      prisma.showResultCategory.findMany({
-        select: { code: true, isEnabled: true },
-        orderBy: [{ sortOrder: "asc" }, { code: "asc" }],
-      }),
-      prisma.showWorkbookColumnRule.findMany({
-        where: { isEnabled: true },
-        include: {
-          valueMaps: {
-            orderBy: [{ sortOrder: "asc" }, { workbookValue: "asc" }],
-          },
-        },
-        orderBy: [{ sortOrder: "asc" }, { headerName: "asc" }],
-      }),
-    ]);
+  const lookupData = await loadAdminShowWorkbookImportLookupDataDb();
+  const registrations = lookupData.dogRegistrations;
+  const definitions = lookupData.definitions;
+  const categories = lookupData.categories;
+  const columnRules = lookupData.columnRules;
 
   const definitionsByCode = new Map(
     definitions.map((definition) => [
       definition.code,
       {
+        id: definition.id,
         code: definition.code,
         isEnabled: definition.isEnabled,
         valueType: definition.valueType,
-        categoryCode: definition.category.code,
+        categoryCode: definition.categoryCode,
       },
     ]),
   );
