@@ -28,7 +28,9 @@ export const fiAdminShowsMessages = {
   "admin.shows.import.actions.validate": "Validoi workbook",
   "admin.shows.import.actions.preview": "Esikatsele tuonti",
   "admin.shows.import.actions.revalidate": "Validoi uudelleen",
-  "admin.shows.import.actions.import": "Tuo workbook",
+  "admin.shows.import.actions.import": "Aloita tuonti",
+  "admin.shows.import.actions.validating": "Validoidaan...",
+  "admin.shows.import.actions.importing": "Tietoja käsitellään...",
   "admin.shows.import.actions.placeholder":
     "Validoi tarkistaa workbookin, esikatselu näkyy validoinnin alla ja tuonti lisätään myöhemmin.",
   "admin.shows.import.invalidFile": "Valitse .xlsx-muotoinen workbook.",
@@ -142,6 +144,17 @@ export const fiAdminShowsMessages = {
     "Workbookissa on varoituksia tai ohitettuja sarakkeita. Esikatselu avataan vasta, kun hyväksyt nämä huomiot.",
   "admin.shows.validation.review.accept":
     "Hyväksyn huomiot ja avaan esikatselun",
+  "admin.shows.import.toast.validationBlocked": "Validointi estetty",
+  "admin.shows.import.toast.validationNotes": "Validointi valmis huomioilla",
+  "admin.shows.import.toast.validationReady":
+    "Validointi valmis. Esikatselu on käytettävissä.",
+  "admin.shows.import.toast.importBlocked":
+    "Tuonti estetty. Avaa huomiot tarkempia tietoja varten.",
+  "admin.shows.import.toast.importDone": "Tuonti valmis",
+  "admin.shows.import.result.done": "Tuonti valmis",
+  "admin.shows.import.result.blocked": "Tuonti estetty",
+  "admin.shows.import.error.writeFailed":
+    "Tuonnin kirjoitus epäonnistui. Validoi uudelleen ja yritä uudestaan.",
 } as const;
 
 export const svAdminShowsMessages = {
@@ -174,7 +187,9 @@ export const svAdminShowsMessages = {
   "admin.shows.import.actions.validate": "Validera workbook",
   "admin.shows.import.actions.preview": "Forhandsgranska import",
   "admin.shows.import.actions.revalidate": "Validera igen",
-  "admin.shows.import.actions.import": "Importera workbook",
+  "admin.shows.import.actions.import": "Starta import",
+  "admin.shows.import.actions.validating": "Validerar...",
+  "admin.shows.import.actions.importing": "Bearbetar uppgifter...",
   "admin.shows.import.actions.placeholder":
     "Validera granskar workbooken, forhandsgranskningen visas under valideringen och import laggs till senare.",
   "admin.shows.import.invalidFile": "Valj en workbook i .xlsx-format.",
@@ -289,4 +304,15 @@ export const svAdminShowsMessages = {
     "Workbooken innehaller varningar eller ignorerade kolumner. Forhandsgranskningen oppnas forst nar du godkanner dessa noteringar.",
   "admin.shows.validation.review.accept":
     "Jag godkanner noteringarna och oppnar forhandsgranskningen",
+  "admin.shows.import.toast.validationBlocked": "Validering blockerad",
+  "admin.shows.import.toast.validationNotes": "Validering klar med noteringar",
+  "admin.shows.import.toast.validationReady":
+    "Validering klar. Forhandsgranskning ar tillganglig.",
+  "admin.shows.import.toast.importBlocked":
+    "Import blockerad. Oppna noteringar for detaljer.",
+  "admin.shows.import.toast.importDone": "Import klar",
+  "admin.shows.import.result.done": "Import klar",
+  "admin.shows.import.result.blocked": "Import blockerad",
+  "admin.shows.import.error.writeFailed":
+    "Skrivningen for importen misslyckades. Validera pa nytt och forsok igen.",
 } as const;

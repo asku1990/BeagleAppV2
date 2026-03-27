@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 import { useState, type ChangeEvent } from "react";
 import type {
   AdminShowWorkbookImportApplyResponse,
@@ -14,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { toast } from "@/components/ui/sonner";
 import { useI18n } from "@/hooks/i18n";
 import {
   formatShowWorkbookFileSize,
@@ -119,12 +121,29 @@ export function AdminShowWorkbookImportPageClient() {
       const result = await previewAdminShowWorkbookImportAction(formData);
       if (!result.ok) {
         setValidationError(result.error.message);
+        toast.error(result.error.message);
         return;
       }
 
       setValidationResult(result.data);
+      if (result.data.errorCount > 0) {
+        toast.error(
+          `${t("admin.shows.import.toast.validationBlocked")}: ${result.data.errorCount} ${t("admin.shows.validation.summary.errors").toLowerCase()}.`,
+        );
+      } else if (
+        result.data.warningCount > 0 ||
+        result.data.schema.ignoredColumns.length > 0
+      ) {
+        toast.warning(
+          `${t("admin.shows.import.toast.validationNotes")}: ${result.data.warningCount} ${t("admin.shows.validation.summary.warnings").toLowerCase()}, ${result.data.schema.ignoredColumns.length} ${t("admin.shows.validation.schema.coverageIgnored")}.`,
+        );
+      } else {
+        toast.success(t("admin.shows.import.toast.validationReady"));
+      }
     } catch {
-      setValidationError(t("admin.shows.preview.errorGeneric"));
+      const message = t("admin.shows.preview.errorGeneric");
+      setValidationError(message);
+      toast.error(message);
     } finally {
       setValidationLoading(false);
     }
@@ -144,7 +163,13 @@ export function AdminShowWorkbookImportPageClient() {
       formData.append("workbook", selectedWorkbook);
       const result = await applyAdminShowWorkbookImportAction(formData);
       if (!result.ok) {
-        setApplyError(result.error.message);
+        const errorMessage =
+          result.error.code === "SHOW_WORKBOOK_IMPORT_WRITE_FAILED"
+            ? t("admin.shows.import.error.writeFailed")
+            : result.error.message;
+        setApplyError(errorMessage);
+        setShowValidationDetails(true);
+        toast.error(errorMessage);
         return;
       }
       setApplyResult(result.data);
@@ -160,9 +185,19 @@ export function AdminShowWorkbookImportPageClient() {
               }
             : current,
         );
+        setShowValidationDetails(true);
+        toast.error(
+          `${t("admin.shows.import.toast.importBlocked")} (${result.data.errorCount} ${t("admin.shows.validation.summary.errors").toLowerCase()}).`,
+        );
+      } else {
+        toast.success(
+          `${t("admin.shows.import.toast.importDone")}: ${result.data.eventsCreated} ${t("admin.shows.preview.summary.events").toLowerCase()}, ${result.data.entriesCreated} ${t("admin.shows.preview.summary.entries").toLowerCase()}, ${result.data.itemsCreated} ${t("admin.shows.preview.summary.resultItems").toLowerCase()}.`,
+        );
       }
     } catch {
-      setApplyError(t("admin.shows.preview.errorGeneric"));
+      const message = t("admin.shows.preview.errorGeneric");
+      setApplyError(message);
+      toast.error(message);
     } finally {
       setApplyLoading(false);
     }
@@ -255,12 +290,19 @@ export function AdminShowWorkbookImportPageClient() {
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
-              disabled={!hasWorkbookFile || validationLoading}
+              disabled={!hasWorkbookFile || validationLoading || applyLoading}
               onClick={() => void handleValidate()}
             >
-              {validationResult
-                ? t("admin.shows.import.actions.revalidate")
-                : t("admin.shows.import.actions.validate")}
+              {validationLoading ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                  {t("admin.shows.import.actions.validating")}
+                </>
+              ) : validationResult ? (
+                t("admin.shows.import.actions.revalidate")
+              ) : (
+                t("admin.shows.import.actions.validate")
+              )}
             </Button>
             <Button
               type="button"
@@ -268,7 +310,14 @@ export function AdminShowWorkbookImportPageClient() {
               disabled={!canImport}
               onClick={() => void handleImport()}
             >
-              {t("admin.shows.import.actions.import")}
+              {applyLoading ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                  {t("admin.shows.import.actions.importing")}
+                </>
+              ) : (
+                t("admin.shows.import.actions.import")
+              )}
             </Button>
           </div>
 
@@ -280,8 +329,8 @@ export function AdminShowWorkbookImportPageClient() {
               className={`text-xs ${applyResult.success ? "text-emerald-700" : "text-destructive"}`}
             >
               {applyResult.success
-                ? `Imported: ${applyResult.eventsCreated} events, ${applyResult.entriesCreated} entries, ${applyResult.itemsCreated} result items.`
-                : `Import blocked: ${applyResult.errorCount} errors, ${applyResult.warningCount} warnings, ${applyResult.infoCount} info.`}
+                ? `${t("admin.shows.import.result.done")}: ${applyResult.eventsCreated} ${t("admin.shows.preview.summary.events").toLowerCase()}, ${applyResult.entriesCreated} ${t("admin.shows.preview.summary.entries").toLowerCase()}, ${applyResult.itemsCreated} ${t("admin.shows.preview.summary.resultItems").toLowerCase()}.`
+                : `${t("admin.shows.import.result.blocked")}: ${applyResult.errorCount} ${t("admin.shows.validation.summary.errors").toLowerCase()}, ${applyResult.warningCount} ${t("admin.shows.validation.summary.warnings").toLowerCase()}, ${applyResult.infoCount} ${t("admin.shows.validation.summary.info").toLowerCase()}.`}
             </p>
           ) : null}
 

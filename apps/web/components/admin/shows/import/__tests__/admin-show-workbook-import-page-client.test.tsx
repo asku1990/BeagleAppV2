@@ -48,6 +48,14 @@ vi.mock("@/components/ui/input", () => ({
     React.createElement("input", props as Record<string, string>),
 }));
 
+vi.mock("@/components/ui/sonner", () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+    warning: vi.fn(),
+  },
+}));
+
 vi.mock("@/app/actions/admin/shows/import", () => ({
   previewAdminShowWorkbookImportAction: vi.fn(),
   applyAdminShowWorkbookImportAction: vi.fn(),
