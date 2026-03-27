@@ -387,9 +387,10 @@ model ShowResultCategory {
   isEnabled     Boolean @default(true) // Onko kategoria käytössä.
 
   // relations / timestamps
-  definitions ShowResultDefinition[] // Kategoriaan kuuluvat määritelmät.
-  createdAt   DateTime               @default(now()) // Luontiaika.
-  updatedAt   DateTime               @updatedAt // Päivitysaika.
+  definitions    ShowResultDefinition[] @relation("ShowResultDefinitionCategory") // Kategoriaan kuuluvat määritelmät.
+  workbookRules  ShowWorkbookColumnRule[] @relation("ShowWorkbookRuleAllowedCategory") // Workbook-säännöt, jotka saavat resolvoida tähän kategoriaan.
+  createdAt      DateTime               @default(now()) // Luontiaika.
+  updatedAt      DateTime               @updatedAt // Päivitysaika.
 
   @@index([isEnabled, sortOrder])
 }
@@ -411,10 +412,12 @@ model ShowResultDefinition {
   isEnabled          Boolean             @default(true) // Onko määritelmä käytössä.
 
   // relations / timestamps
-  category    ShowResultCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict) // Relaatio tuloskategoriaan.
-  resultItems ShowResultItem[] // Tähän määritelmään viittaavat tulosrivit.
-  createdAt   DateTime           @default(now()) // Luontiaika.
-  updatedAt   DateTime           @updatedAt // Päivitysaika.
+  category             ShowResultCategory         @relation("ShowResultDefinitionCategory", fields: [categoryId], references: [id], onDelete: Restrict) // Relaatio tuloskategoriaan.
+  resultItems          ShowResultItem[] // Tähän määritelmään viittaavat tulosrivit.
+  workbookRuleFixedFor ShowWorkbookColumnRule[]   @relation("ShowWorkbookRuleFixedDefinition") // Workbook-säännöt, jotka viittaavat tähän määritelmään suoraan.
+  workbookValueMaps    ShowWorkbookColumnValueMap[] @relation("ShowWorkbookValueMapDefinition") // Workbook-arvomapit, jotka viittaavat tähän määritelmään.
+  createdAt            DateTime                   @default(now()) // Luontiaika.
+  updatedAt            DateTime                   @updatedAt // Päivitysaika.
 
   @@index([isEnabled, sortOrder])
   @@index([categoryId])
@@ -426,22 +429,26 @@ model ShowWorkbookColumnRule {
   code String @unique
 
   // workbook matching / behavior
-  headerName       String
-  policy           ShowWorkbookColumnPolicy        @default(IMPORT)
-  destinationKind  ShowWorkbookColumnDestinationKind?
-  targetField      ShowWorkbookTargetField?
-  parseMode        ShowWorkbookColumnParseMode
-  fixedDefinitionCode String?
-  headerRequired   Boolean @default(false)
-  rowValueRequired Boolean @default(false)
-  sortOrder        Int     @default(0)
-  isEnabled        Boolean @default(true)
+  headerName                 String
+  policy                     ShowWorkbookColumnPolicy          @default(IMPORT)
+  destinationKind            ShowWorkbookColumnDestinationKind?
+  targetField                ShowWorkbookTargetField?
+  parseMode                  ShowWorkbookColumnParseMode
+  fixedDefinitionCode        String?
+  allowedDefinitionCategoryCode String?
+  headerRequired             Boolean @default(false)
+  rowValueRequired           Boolean @default(false)
+  sortOrder                  Int     @default(0)
+  isEnabled                  Boolean @default(true)
 
   // relations / timestamps
-  valueMaps  ShowWorkbookColumnValueMap[]
-  createdAt  DateTime                  @default(now())
-  updatedAt  DateTime                  @updatedAt
+  fixedDefinition        ShowResultDefinition?    @relation("ShowWorkbookRuleFixedDefinition", fields: [fixedDefinitionCode], references: [code], onDelete: Restrict)
+  allowedDefinitionCategory ShowResultCategory?   @relation("ShowWorkbookRuleAllowedCategory", fields: [allowedDefinitionCategoryCode], references: [code], onDelete: Restrict)
+  valueMaps              ShowWorkbookColumnValueMap[]
+  createdAt              DateTime                  @default(now())
+  updatedAt              DateTime                  @updatedAt
 
+  @@unique([headerName])
   @@index([isEnabled, sortOrder])
 }
 
@@ -454,7 +461,8 @@ model ShowWorkbookColumnValueMap {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  rule ShowWorkbookColumnRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  rule       ShowWorkbookColumnRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  definition ShowResultDefinition   @relation("ShowWorkbookValueMapDefinition", fields: [definitionCode], references: [code], onDelete: Restrict)
 
   @@unique([ruleId, workbookValue])
   @@index([ruleId, sortOrder])

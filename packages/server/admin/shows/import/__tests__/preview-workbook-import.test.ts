@@ -5,10 +5,12 @@ import { previewAdminShowWorkbookImport } from "../preview-workbook-import";
 const {
   dogRegistrationFindManyMock,
   showResultDefinitionFindManyMock,
+  showResultCategoryFindManyMock,
   showWorkbookColumnRuleFindManyMock,
 } = vi.hoisted(() => ({
   dogRegistrationFindManyMock: vi.fn(),
   showResultDefinitionFindManyMock: vi.fn(),
+  showResultCategoryFindManyMock: vi.fn(),
   showWorkbookColumnRuleFindManyMock: vi.fn(),
 }));
 
@@ -19,6 +21,9 @@ vi.mock("@beagle/db", () => ({
     },
     showResultDefinition: {
       findMany: showResultDefinitionFindManyMock,
+    },
+    showResultCategory: {
+      findMany: showResultCategoryFindManyMock,
     },
     showWorkbookColumnRule: {
       findMany: showWorkbookColumnRuleFindManyMock,
@@ -84,16 +89,74 @@ function createRow(
 }
 
 const sharedDefinitions = [
-  { code: "AVO", isEnabled: true, valueType: "FLAG" as const },
-  { code: "JUN", isEnabled: true, valueType: "FLAG" as const },
-  { code: "ERI", isEnabled: true, valueType: "FLAG" as const },
-  { code: "SERT", isEnabled: true, valueType: "FLAG" as const },
-  { code: "varaSERT", isEnabled: true, valueType: "FLAG" as const },
-  { code: "CACIB", isEnabled: true, valueType: "FLAG" as const },
-  { code: "varaCACIB", isEnabled: true, valueType: "FLAG" as const },
-  { code: "SA", isEnabled: true, valueType: "FLAG" as const },
-  { code: "SIJOITUS", isEnabled: true, valueType: "NUMERIC" as const },
-  { code: "PUPN", isEnabled: true, valueType: "CODE" as const },
+  {
+    code: "AVO",
+    isEnabled: true,
+    valueType: "FLAG" as const,
+    category: { code: "KILPAILULUOKKA" },
+  },
+  {
+    code: "JUN",
+    isEnabled: true,
+    valueType: "FLAG" as const,
+    category: { code: "KILPAILULUOKKA" },
+  },
+  {
+    code: "ERI",
+    isEnabled: true,
+    valueType: "FLAG" as const,
+    category: { code: "LAATUARVOSTELU" },
+  },
+  {
+    code: "SERT",
+    isEnabled: true,
+    valueType: "FLAG" as const,
+    category: { code: "SERTTIMERKINTA" },
+  },
+  {
+    code: "varaSERT",
+    isEnabled: true,
+    valueType: "FLAG" as const,
+    category: { code: "SERTTIMERKINTA" },
+  },
+  {
+    code: "CACIB",
+    isEnabled: true,
+    valueType: "FLAG" as const,
+    category: { code: "SERTTIMERKINTA" },
+  },
+  {
+    code: "varaCACIB",
+    isEnabled: true,
+    valueType: "FLAG" as const,
+    category: { code: "SERTTIMERKINTA" },
+  },
+  {
+    code: "SA",
+    isEnabled: true,
+    valueType: "FLAG" as const,
+    category: { code: "SERTTIMERKINTA" },
+  },
+  {
+    code: "SIJOITUS",
+    isEnabled: true,
+    valueType: "NUMERIC" as const,
+    category: { code: "SIJOITUS" },
+  },
+  {
+    code: "PUPN",
+    isEnabled: true,
+    valueType: "CODE" as const,
+    category: { code: "PUPN" },
+  },
+];
+
+const sharedCategories = [
+  { code: "KILPAILULUOKKA", isEnabled: true },
+  { code: "LAATUARVOSTELU", isEnabled: true },
+  { code: "SERTTIMERKINTA", isEnabled: true },
+  { code: "SIJOITUS", isEnabled: true },
+  { code: "PUPN", isEnabled: true },
 ];
 
 function createColumnRule(overrides: Record<string, unknown>) {
@@ -105,6 +168,7 @@ function createColumnRule(overrides: Record<string, unknown>) {
     targetField: null,
     parseMode: "TEXT",
     fixedDefinitionCode: null,
+    allowedDefinitionCategoryCode: null,
     headerRequired: false,
     rowValueRequired: false,
     sortOrder: 0,
@@ -186,6 +250,7 @@ function buildDefaultColumnRules() {
       destinationKind: "SHOW_RESULT_ITEM",
       targetField: "CLASS_VALUE",
       parseMode: "DEFINITION_FROM_CELL",
+      allowedDefinitionCategoryCode: "KILPAILULUOKKA",
       headerRequired: true,
       rowValueRequired: true,
       sortOrder: 70,
@@ -196,6 +261,7 @@ function buildDefaultColumnRules() {
       destinationKind: "SHOW_RESULT_ITEM",
       targetField: "QUALITY_VALUE",
       parseMode: "DEFINITION_FROM_CELL",
+      allowedDefinitionCategoryCode: "LAATUARVOSTELU",
       headerRequired: true,
       rowValueRequired: true,
       sortOrder: 80,
@@ -286,12 +352,14 @@ describe("previewAdminShowWorkbookImport", () => {
   beforeEach(() => {
     dogRegistrationFindManyMock.mockReset();
     showResultDefinitionFindManyMock.mockReset();
+    showResultCategoryFindManyMock.mockReset();
     showWorkbookColumnRuleFindManyMock.mockReset();
 
     dogRegistrationFindManyMock.mockResolvedValue([
       { registrationNo: "FI16175/23", dogId: "dog_1" },
     ]);
     showResultDefinitionFindManyMock.mockResolvedValue(sharedDefinitions);
+    showResultCategoryFindManyMock.mockResolvedValue(sharedCategories);
     showWorkbookColumnRuleFindManyMock.mockResolvedValue(
       buildDefaultColumnRules(),
     );
@@ -534,6 +602,89 @@ describe("previewAdminShowWorkbookImport", () => {
     );
   });
 
+  it("uses metadata rowValueRequired for optional structural fields at runtime", async () => {
+    showWorkbookColumnRuleFindManyMock.mockResolvedValue(
+      buildDefaultColumnRules().map((rule) =>
+        rule.code === "JUDGE" ? { ...rule, rowValueRequired: true } : rule,
+      ),
+    );
+
+    const workbook = buildWorkbookBuffer([
+      createRow({
+        [IDX.registrationNo]: "FI16175/23",
+        [IDX.eventDate]: new Date("2025-01-11T00:00:00.000Z"),
+        [IDX.eventCity]: "Kajaani",
+        [IDX.eventPlace]: "Kajaanin Pallohalli",
+        [IDX.eventType]: "Kansainvälinen näyttely",
+        [IDX.dogName]: "CARDIEM KIND REGARDS",
+        [IDX.classValue]: "AVO",
+        [IDX.qualityValue]: "ERI",
+      }),
+    ]);
+
+    const result = await previewAdminShowWorkbookImport({
+      fileName: "Näyttelyt.xlsx",
+      workbook,
+    });
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) {
+      throw new Error("Expected a successful preview response");
+    }
+
+    expect(result.body.data.acceptedRowCount).toBe(0);
+    expect(result.body.data.rejectedRowCount).toBe(1);
+    expect(result.body.data.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "SHOW_WORKBOOK_MISSING_COLUMNS",
+          severity: "ERROR",
+          columnName: "Tuomari",
+          message: "Tuomari is required.",
+        }),
+      ]),
+    );
+  });
+
+  it("scopes DEFINITION_FROM_CELL resolution to the rule category", async () => {
+    const workbook = buildWorkbookBuffer([
+      createRow({
+        [IDX.registrationNo]: "FI16175/23",
+        [IDX.eventDate]: new Date("2025-01-11T00:00:00.000Z"),
+        [IDX.eventCity]: "Kajaani",
+        [IDX.eventPlace]: "Kajaanin Pallohalli",
+        [IDX.eventType]: "Kansainvälinen näyttely",
+        [IDX.dogName]: "CARDIEM KIND REGARDS",
+        [IDX.classValue]: "SERT",
+        [IDX.qualityValue]: "ERI",
+        [IDX.judge]: "Laakso Jari",
+      }),
+    ]);
+
+    const result = await previewAdminShowWorkbookImport({
+      fileName: "Näyttelyt.xlsx",
+      workbook,
+    });
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) {
+      throw new Error("Expected a successful preview response");
+    }
+
+    expect(result.body.data.acceptedRowCount).toBe(0);
+    expect(result.body.data.rejectedRowCount).toBe(1);
+    expect(result.body.data.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "SHOW_WORKBOOK_INVALID_RESULT_VALUE",
+          severity: "ERROR",
+          columnName: "Luokka",
+          message: "Unsupported class value: SERT.",
+        }),
+      ]),
+    );
+  });
+
   it("blocks preview when the workbook contains an unsupported extra column", async () => {
     const headers = [...SUPPORTED_HEADERS, "TuntematonSarake"];
     const row = createRow(
@@ -630,7 +781,12 @@ describe("previewAdminShowWorkbookImport", () => {
   it("blocks preview when a metadata-mapped definition is disabled", async () => {
     showResultDefinitionFindManyMock.mockResolvedValue([
       ...sharedDefinitions.filter((definition) => definition.code !== "SA"),
-      { code: "SA", isEnabled: false, valueType: "FLAG" as const },
+      {
+        code: "SA",
+        isEnabled: false,
+        valueType: "FLAG" as const,
+        category: { code: "SERTTIMERKINTA" },
+      },
     ]);
 
     const result = await previewAdminShowWorkbookImport({
@@ -650,29 +806,44 @@ describe("previewAdminShowWorkbookImport", () => {
       ]),
     });
 
-    expect(result.status).toBe(200);
-    if (!result.body.ok) {
-      throw new Error("Expected a successful preview response");
-    }
+    expect(result).toEqual({
+      status: 500,
+      body: {
+        ok: false,
+        error: "Definition SA is disabled.",
+        code: "SHOW_WORKBOOK_SCHEMA_INVALID",
+      },
+    });
+  });
 
-    expect(result.body.data.acceptedRowCount).toBe(0);
-    expect(result.body.data.schema.blockedColumns).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          headerName: "SA",
-          reasonCode: "DISABLED_DEFINITION",
-        }),
-      ]),
-    );
-    expect(result.body.data.issues).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          code: "SHOW_WORKBOOK_DEFINITION_NOT_FOUND",
-          columnName: "SA",
-          severity: "ERROR",
-        }),
-      ]),
-    );
+  it("fails with a server error when workbook metadata is invalid", async () => {
+    showWorkbookColumnRuleFindManyMock.mockResolvedValue([
+      createColumnRule({
+        code: "CLASS_VALUE",
+        headerName: "Luokka",
+        destinationKind: "SHOW_RESULT_ITEM",
+        targetField: "CLASS_VALUE",
+        parseMode: "DEFINITION_FROM_CELL",
+        allowedDefinitionCategoryCode: null,
+        headerRequired: true,
+        rowValueRequired: true,
+      }),
+    ]);
+
+    const result = await previewAdminShowWorkbookImport({
+      fileName: "Näyttelyt.xlsx",
+      workbook: buildWorkbookBuffer([]),
+    });
+
+    expect(result).toEqual({
+      status: 500,
+      body: {
+        ok: false,
+        error:
+          "DEFINITION_FROM_CELL rules must define an allowed definition category.",
+        code: "SHOW_WORKBOOK_SCHEMA_INVALID",
+      },
+    });
   });
 
   it("blocks preview when the workbook contains a duplicate non-empty header", async () => {

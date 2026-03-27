@@ -157,6 +157,10 @@ pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db seed:show-workb
 CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm --filter @beagle/db seed:show-workbook-import-schema
 ```
 
+This seed is the bootstrap baseline for `ShowWorkbookColumnRule` /
+`ShowWorkbookColumnValueMap` metadata. It is not intended as the long-term
+editing path once admin-managed workbook schema settings exist.
+
 Bootstrap import (`auth:bootstrap-admin` -> `seed:show-result-definitions` -> `seed:show-workbook-import-schema` -> `phase1` -> `phase2` -> `phase3`):
 
 ```bash

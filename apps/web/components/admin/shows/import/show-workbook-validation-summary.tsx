@@ -91,20 +91,10 @@ export function ShowWorkbookValidationSummary({
         </div>
         <div className="rounded-lg border bg-muted/30 p-3">
           <div className="text-xs uppercase tracking-wide text-muted-foreground">
-            {t("admin.shows.validation.summary.notes")}
+            {t("admin.shows.validation.summary.info")}
           </div>
           <div className="mt-1 text-xl font-semibold">
-            {formatter.format(
-              validation.warningCount + validation.schema.ignoredColumns.length,
-            )}
-          </div>
-        </div>
-        <div className="rounded-lg border bg-muted/30 p-3">
-          <div className="text-xs uppercase tracking-wide text-muted-foreground">
-            {t("admin.shows.validation.summary.ignored")}
-          </div>
-          <div className="mt-1 text-xl font-semibold">
-            {formatter.format(validation.schema.ignoredColumns.length)}
+            {formatter.format(validation.infoCount)}
           </div>
         </div>
         <div className="rounded-lg border bg-muted/30 p-3">
@@ -127,8 +117,8 @@ export function ShowWorkbookValidationSummary({
               <p className="text-xs text-muted-foreground">
                 {formatter.format(validation.warningCount)}{" "}
                 {t("admin.shows.validation.summary.warningsAccepted")} ·{" "}
-                {formatter.format(validation.schema.ignoredColumns.length)}{" "}
-                {t("admin.shows.validation.summary.ignoredAccepted")}
+                {formatter.format(validation.infoCount)}{" "}
+                {t("admin.shows.validation.summary.infoAccepted")}
               </p>
             </div>
             {onShowDetails ? (

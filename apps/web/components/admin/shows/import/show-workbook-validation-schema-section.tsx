@@ -92,14 +92,7 @@ export function ShowWorkbookValidationSchemaSection({
                   <div className="font-medium">{column.headerName}</div>
                   <div className="text-muted-foreground">
                     {joinDefinitionCodes(column.definitionCodes)} ·{" "}
-                    {column.importMode} ·{" "}
-                    {column.enabled
-                      ? t("admin.shows.validation.schema.enabled")
-                      : t("admin.shows.validation.schema.disabled")}{" "}
-                    ·{" "}
-                    {column.supported
-                      ? t("admin.shows.validation.schema.supported")
-                      : t("admin.shows.validation.schema.unsupported")}
+                    {column.importMode}
                   </div>
                 </li>
               ))}

@@ -134,7 +134,8 @@ export function ShowWorkbookPreviewSection({
               {t("admin.shows.preview.filters.label")}
             </p>
             <p className="text-xs text-muted-foreground">
-              {warningRowCount} {t("admin.shows.validation.notes.countSuffix")}
+              {warningRowCount}{" "}
+              {t("admin.shows.validation.notes.countSuffixWarnings")}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">

@@ -14,10 +14,13 @@ exists.
 - The importer resolves headers through DB-backed workbook metadata before any
   row parsing:
   - `ShowWorkbookColumnRule` defines each supported workbook header, its
-    import policy, and where it maps in
-    the canonical show model
+    import policy, requiredness, parser mode, and canonical destination in the
+    show model
   - `ShowResultDefinition` remains the source of truth for canonical result
     codes and their supported value types
+  - `ShowResultCategory` scopes `DEFINITION_FROM_CELL` rules so workbook values
+    such as `Luokka` and `Laatuarvostelu` resolve only inside their configured
+    definition category
 - Header matching tolerates whitespace and punctuation differences.
 - Every non-empty workbook column must resolve to one of:
   - imported to a persisted canonical destination
@@ -41,6 +44,8 @@ exists.
   issue-level notes.
 - Preview renders parsed candidate events, entries, and result items on the
   same page.
+- The active workbook schema is global and edited in place. The validator and
+  future admin settings use the same metadata contract.
 
 ## Preview output
 
@@ -74,10 +79,14 @@ The preview response returns:
   not block preview or produce result items.
 - No canonical show tables are written in this phase.
 - Preview is available only after validation succeeds without blocking errors.
+  If the workbook still contains warnings or explicitly ignored columns, the
+  operator must acknowledge those notes before preview opens.
 - The import button exists only as a disabled placeholder; no apply/write logic
   exists yet.
 
 ## Next phase
 
 The apply phase can reuse the same parser output, but it must stay separate from
-this preview-only workflow.
+this preview-only workflow. Future admin settings should update
+`ShowWorkbookColumnRule` and `ShowWorkbookColumnValueMap` rather than adding new
+code-owned header maps.

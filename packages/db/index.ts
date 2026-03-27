@@ -133,4 +133,11 @@ export {
   type UpdatedAdminDogRowDb,
   type DogByIdLookupDb,
   type DogByRegistrationLookupDb,
+  listAdminShowWorkbookSchemaRulesDb,
+  listAdminShowWorkbookSchemaReferenceDataDb,
+  updateAdminShowWorkbookSchemaRuleDb,
+  type AdminShowWorkbookSchemaRuleDb,
+  type AdminShowWorkbookSchemaCategoryRefDb,
+  type AdminShowWorkbookSchemaDefinitionRefDb,
+  type UpdateAdminShowWorkbookSchemaRuleDbInput,
 } from "./admin";

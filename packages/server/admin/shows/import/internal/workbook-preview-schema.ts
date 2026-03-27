@@ -120,8 +120,6 @@ function resolveDefinitionBackedColumn(
       parseMode: "VALUE_MAP",
       definitionCodes,
       valueType: "FLAG",
-      enabled: true,
-      supported: true,
       allowedValues: Object.fromEntries(
         rule.valueMaps.map((valueMap) => [
           valueMap.workbookValue,
@@ -175,8 +173,6 @@ function resolveDefinitionBackedColumn(
       parseMode: "FIXED_NUMERIC",
       definitionCodes: [rule.fixedDefinitionCode],
       valueType: "NUMERIC",
-      enabled: true,
-      supported: true,
     };
   }
 
@@ -188,8 +184,6 @@ function resolveDefinitionBackedColumn(
       parseMode: "FIXED_CODE",
       definitionCodes: [rule.fixedDefinitionCode],
       valueType: "CODE",
-      enabled: true,
-      supported: true,
     };
   }
 
@@ -201,8 +195,7 @@ function resolveDefinitionBackedColumn(
       parseMode: "FIXED_FLAG",
       definitionCodes: [rule.fixedDefinitionCode],
       valueType: "FLAG",
-      enabled: true,
-      supported: true,
+      allowedDefinitionCategoryCode: null,
     };
   }
 
@@ -214,8 +207,7 @@ function resolveDefinitionBackedColumn(
       parseMode: "DEFINITION_FROM_CELL",
       definitionCodes: [],
       valueType: "CODE",
-      enabled: true,
-      supported: true,
+      allowedDefinitionCategoryCode: rule.allowedDefinitionCategoryCode,
     };
   }
 
@@ -310,7 +302,10 @@ export function resolveWorkbookSchema(
           label: rule.headerName,
           headerName,
           required: rule.headerRequired,
+          rowValueRequired: rule.rowValueRequired,
           destinationKind: rule.destinationKind ?? "SHOW_ENTRY",
+          parseMode: rule.parseMode,
+          allowedDefinitionCategoryCode: rule.allowedDefinitionCategoryCode,
         };
       }
       importedColumnCount += 1;

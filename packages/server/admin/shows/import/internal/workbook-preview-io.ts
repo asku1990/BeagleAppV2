@@ -5,12 +5,12 @@ import {
   normalizeWorkbookComparisonToken,
   normalizeWorkbookTextCell,
 } from "./cell";
+import { mapTargetFieldToWorkbookStructuralFieldKey } from "./workbook-preview-target-fields";
 import type {
   WorkbookColumnRuleMeta,
   WorkbookColumnMap,
   WorkbookLookupData,
   WorkbookRow,
-  WorkbookStructuralFieldKey,
 } from "./workbook-preview-types";
 
 function normalizeHeaderCell(value: WorkbookRow[number]): string | null {
@@ -91,40 +91,45 @@ export function parseWorkbookBuffer(
 }
 
 export async function loadLookupData(): Promise<WorkbookLookupData> {
-  const [registrations, definitions, columnRules] = await Promise.all([
-    prisma.dogRegistration.findMany({
-      select: { registrationNo: true, dogId: true },
-    }),
-    prisma.showResultDefinition.findMany({
-      select: { code: true, isEnabled: true, valueType: true },
-    }),
-    prisma.showWorkbookColumnRule.findMany({
-      where: { isEnabled: true },
-      include: {
-        valueMaps: {
-          orderBy: [{ sortOrder: "asc" }, { workbookValue: "asc" }],
+  const [registrations, definitions, categories, columnRules] =
+    await Promise.all([
+      prisma.dogRegistration.findMany({
+        select: { registrationNo: true, dogId: true },
+      }),
+      prisma.showResultDefinition.findMany({
+        select: {
+          code: true,
+          isEnabled: true,
+          valueType: true,
+          category: { select: { code: true } },
         },
-      },
-      orderBy: [{ sortOrder: "asc" }, { headerName: "asc" }],
-    }),
-  ]);
+      }),
+      prisma.showResultCategory.findMany({
+        select: { code: true, isEnabled: true },
+        orderBy: [{ sortOrder: "asc" }, { code: "asc" }],
+      }),
+      prisma.showWorkbookColumnRule.findMany({
+        where: { isEnabled: true },
+        include: {
+          valueMaps: {
+            orderBy: [{ sortOrder: "asc" }, { workbookValue: "asc" }],
+          },
+        },
+        orderBy: [{ sortOrder: "asc" }, { headerName: "asc" }],
+      }),
+    ]);
 
   const definitionsByCode = new Map(
-    definitions.map((definition) => [definition.code, definition]),
+    definitions.map((definition) => [
+      definition.code,
+      {
+        code: definition.code,
+        isEnabled: definition.isEnabled,
+        valueType: definition.valueType,
+        categoryCode: definition.category.code,
+      },
+    ]),
   );
-
-  const targetFieldMap: Partial<Record<string, WorkbookStructuralFieldKey>> = {
-    REGISTRATION_NO: "registrationNo",
-    EVENT_DATE: "eventDate",
-    EVENT_CITY: "eventCity",
-    EVENT_PLACE: "eventPlace",
-    EVENT_TYPE: "eventType",
-    DOG_NAME: "dogName",
-    CLASS_VALUE: "classValue",
-    QUALITY_VALUE: "qualityValue",
-    JUDGE: "judge",
-    CRITIQUE_TEXT: "critiqueText",
-  };
 
   const normalizedColumnRules: WorkbookColumnRuleMeta[] = columnRules.map(
     (rule) => ({
@@ -132,11 +137,10 @@ export async function loadLookupData(): Promise<WorkbookLookupData> {
       headerName: rule.headerName,
       policy: rule.policy,
       destinationKind: rule.destinationKind,
-      targetField: rule.targetField
-        ? (targetFieldMap[rule.targetField] ?? null)
-        : null,
+      targetField: mapTargetFieldToWorkbookStructuralFieldKey(rule.targetField),
       parseMode: rule.parseMode,
       fixedDefinitionCode: rule.fixedDefinitionCode,
+      allowedDefinitionCategoryCode: rule.allowedDefinitionCategoryCode,
       headerRequired: rule.headerRequired,
       rowValueRequired: rule.rowValueRequired,
       sortOrder: rule.sortOrder,
@@ -162,6 +166,7 @@ export async function loadLookupData(): Promise<WorkbookLookupData> {
         .map((definition) => definition.code),
     ),
     definitionsByCode,
+    definitionCategories: categories,
     definitionCount: definitions.length,
     columnRules: normalizedColumnRules,
     columnRuleCount: normalizedColumnRules.length,

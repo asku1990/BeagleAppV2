@@ -18,6 +18,7 @@ export type WorkbookDefinitionMeta = {
   code: string;
   isEnabled: boolean;
   valueType: WorkbookDefinitionValueType;
+  categoryCode: string;
 };
 
 export type WorkbookStructuralFieldKey =
@@ -60,6 +61,7 @@ export type WorkbookColumnRuleMeta = {
   targetField: WorkbookStructuralFieldKey | null;
   parseMode: WorkbookColumnRuleParseMode;
   fixedDefinitionCode: string | null;
+  allowedDefinitionCategoryCode: string | null;
   headerRequired: boolean;
   rowValueRequired: boolean;
   sortOrder: number;
@@ -72,7 +74,10 @@ export type WorkbookResolvedStructuralField = {
   label: string;
   headerName: string;
   required: boolean;
+  rowValueRequired: boolean;
   destinationKind: WorkbookColumnRuleDestinationKind;
+  parseMode: WorkbookColumnRuleParseMode;
+  allowedDefinitionCategoryCode: string | null;
 };
 
 export type WorkbookResolvedResultColumnImportMode =
@@ -104,8 +109,6 @@ export type WorkbookResolvedResultColumn =
       parseMode: "VALUE_MAP";
       definitionCodes: string[];
       valueType: "FLAG";
-      enabled: boolean;
-      supported: boolean;
       allowedValues: Record<string, string>;
     }
   | {
@@ -115,8 +118,6 @@ export type WorkbookResolvedResultColumn =
       parseMode: "FIXED_NUMERIC";
       definitionCodes: [string];
       valueType: "NUMERIC";
-      enabled: boolean;
-      supported: boolean;
     }
   | {
       ruleCode: string;
@@ -125,8 +126,6 @@ export type WorkbookResolvedResultColumn =
       parseMode: "FIXED_CODE";
       definitionCodes: [string];
       valueType: "CODE";
-      enabled: boolean;
-      supported: boolean;
     }
   | {
       ruleCode: string;
@@ -135,8 +134,7 @@ export type WorkbookResolvedResultColumn =
       parseMode: "FIXED_FLAG" | "DEFINITION_FROM_CELL";
       definitionCodes: string[];
       valueType: WorkbookDefinitionValueType;
-      enabled: boolean;
-      supported: boolean;
+      allowedDefinitionCategoryCode: string | null;
     };
 
 export type WorkbookResolvedBlockedColumn = {
@@ -169,6 +167,7 @@ export type WorkbookLookupData = {
   dogIdByRegistration: Map<string, string>;
   enabledDefinitionCodes: Set<string>;
   definitionsByCode: Map<string, WorkbookDefinitionMeta>;
+  definitionCategories: Array<{ code: string; isEnabled: boolean }>;
   definitionCount: number;
   columnRules: WorkbookColumnRuleMeta[];
   columnRuleCount: number;

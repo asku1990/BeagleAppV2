@@ -12,3 +12,6 @@ export { listAdminDogParentOptions } from "./dogs";
 export { listAdminDogs } from "./dogs";
 export { listAdminOwnerOptions } from "./dogs";
 export { previewAdminShowWorkbookImport } from "./shows";
+export { listAdminShowWorkbookSchemaRules } from "./shows";
+export { updateAdminShowWorkbookSchemaRule } from "./shows";
+export { validateAdminShowWorkbookSchemaRule } from "./shows";

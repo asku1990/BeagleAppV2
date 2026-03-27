@@ -26,5 +26,6 @@ export const ISSUE_CODES = {
   duplicateRow: "SHOW_WORKBOOK_DUPLICATE_ROW",
   definitionsMissing: "SHOW_WORKBOOK_DEFINITIONS_MISSING",
   schemaMissing: "SHOW_WORKBOOK_SCHEMA_MISSING",
+  schemaInvalid: "SHOW_WORKBOOK_SCHEMA_INVALID",
   columnIgnored: "SHOW_WORKBOOK_COLUMN_IGNORED",
 } as const;

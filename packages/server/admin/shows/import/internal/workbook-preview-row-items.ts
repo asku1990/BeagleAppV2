@@ -57,11 +57,19 @@ function isTruthyWorkbookValue(
 function resolveDefinitionCodeFromWorkbookValue(
   definitionsByCode: Map<string, WorkbookDefinitionMeta>,
   workbookValue: string,
+  allowedCategoryCode: string | null,
 ): string | null {
   const token = normalizeWorkbookComparisonToken(workbookValue);
 
   for (const definition of definitionsByCode.values()) {
     if (!definition.isEnabled) {
+      continue;
+    }
+
+    if (
+      allowedCategoryCode &&
+      definition.categoryCode !== allowedCategoryCode
+    ) {
       continue;
     }
 
@@ -85,11 +93,17 @@ export function buildWorkbookPreviewItems({
   issues,
   definitionsByCode,
 }: BuildWorkbookPreviewItemsInput) {
-  const resultItems = [];
+  const resultItems: Array<{
+    columnName: string;
+    definitionCode: string;
+    valueCode: string | null;
+    valueNumeric: number | null;
+  }> = [];
 
   const classCode = resolveDefinitionCodeFromWorkbookValue(
     definitionsByCode,
     classValue,
+    schema.structuralFields.classValue?.allowedDefinitionCategoryCode ?? null,
   );
   if (!classCode) {
     addDefinitionIssue(issues, {
@@ -112,6 +126,7 @@ export function buildWorkbookPreviewItems({
   const qualityCode = resolveDefinitionCodeFromWorkbookValue(
     definitionsByCode,
     qualityValue,
+    schema.structuralFields.qualityValue?.allowedDefinitionCategoryCode ?? null,
   );
   if (!qualityCode) {
     addDefinitionIssue(issues, {
@@ -134,10 +149,6 @@ export function buildWorkbookPreviewItems({
   }
 
   for (const column of schema.resultColumns) {
-    if (!column.enabled || !column.supported) {
-      continue;
-    }
-
     if (column.parseMode === "FIXED_NUMERIC") {
       const placementValue = normalizeWorkbookInteger(
         getCell(row, columnMap, column.headerName),

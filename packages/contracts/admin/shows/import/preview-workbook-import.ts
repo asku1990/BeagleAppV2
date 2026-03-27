@@ -59,8 +59,6 @@ export type AdminShowWorkbookImportSchemaDefinitionColumn = {
   definitionCodes: string[];
   importMode: "VALUE_MAP" | "DIRECT" | "NUMERIC" | "PUPN";
   valueType: "FLAG" | "CODE" | "TEXT" | "NUMERIC" | "DATE";
-  enabled: boolean;
-  supported: boolean;
 };
 
 export type AdminShowWorkbookImportSchemaBlockedColumnReasonCode =

@@ -177,6 +177,19 @@ export type {
   AdminShowWorkbookImportSchemaMissingField,
   AdminShowWorkbookImportSchemaStructuralColumn,
   AdminShowWorkbookImportPreviewResponse,
+  AdminShowWorkbookSchemaDestinationKind,
+  AdminShowWorkbookSchemaParseMode,
+  AdminShowWorkbookSchemaRule,
+  AdminShowWorkbookSchemaRuleDraft,
+  AdminShowWorkbookSchemaRulePolicy,
+  AdminShowWorkbookSchemaTargetField,
+  AdminShowWorkbookSchemaValidationError,
+  AdminShowWorkbookSchemaValueMap,
+  ListAdminShowWorkbookSchemaResponse,
+  UpdateAdminShowWorkbookSchemaRuleRequest,
+  UpdateAdminShowWorkbookSchemaRuleResponse,
+  ValidateAdminShowWorkbookSchemaRuleRequest,
+  ValidateAdminShowWorkbookSchemaRuleResponse,
 } from "./admin";
 export type { HomeStatisticsResponse } from "./home";
 export {

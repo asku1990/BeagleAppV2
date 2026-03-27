@@ -26,10 +26,12 @@ import {
   ISSUE_CODES,
   WORKBOOK_FILE_PATTERN,
 } from "./internal/workbook-preview-constants";
+import { mapWorkbookStructuralFieldKeyToTargetField } from "./internal/workbook-preview-target-fields";
 import type {
   WorkbookParsedRow,
   WorkbookResolvedSchema,
 } from "./internal/workbook-preview-types";
+import { validateAdminShowWorkbookSchemaRules } from "../core/workbook-schema-validation";
 
 function buildSchemaSummary(schema: WorkbookResolvedSchema) {
   return {
@@ -51,8 +53,6 @@ function buildSchemaSummary(schema: WorkbookResolvedSchema) {
       definitionCodes: [...column.definitionCodes],
       importMode: column.importMode,
       valueType: column.valueType,
-      enabled: column.enabled,
-      supported: column.supported,
     })),
     ignoredColumns: schema.ignoredColumns.map((column) => ({
       headerName: column.headerName,
@@ -122,6 +122,46 @@ export async function previewAdminShowWorkbookImport(input: {
           ok: false,
           error: "Show result definitions are missing; run the seed first.",
           code: ISSUE_CODES.definitionsMissing,
+        },
+      };
+    }
+
+    const metadataErrors = validateAdminShowWorkbookSchemaRules(
+      lookupData.columnRules.map((rule) => ({
+        code: rule.code,
+        headerName: rule.headerName,
+        policy: rule.policy,
+        destinationKind: rule.destinationKind,
+        targetField: mapWorkbookStructuralFieldKeyToTargetField(
+          rule.targetField,
+        ),
+        parseMode: rule.parseMode,
+        fixedDefinitionCode: rule.fixedDefinitionCode,
+        allowedDefinitionCategoryCode: rule.allowedDefinitionCategoryCode,
+        headerRequired: rule.headerRequired,
+        rowValueRequired: rule.rowValueRequired,
+        sortOrder: rule.sortOrder,
+        isEnabled: rule.isEnabled,
+        valueMaps: rule.valueMaps.map((valueMap) => ({
+          workbookValue: valueMap.workbookValue,
+          definitionCode: valueMap.definitionCode,
+          sortOrder: valueMap.sortOrder,
+        })),
+      })),
+      {
+        definitions: [...lookupData.definitionsByCode.values()],
+        categories: lookupData.definitionCategories,
+      },
+    );
+    if (metadataErrors.length > 0) {
+      return {
+        status: 500,
+        body: {
+          ok: false,
+          error:
+            metadataErrors[0]?.message ??
+            "Show workbook import schema is invalid.",
+          code: ISSUE_CODES.schemaInvalid,
         },
       };
     }

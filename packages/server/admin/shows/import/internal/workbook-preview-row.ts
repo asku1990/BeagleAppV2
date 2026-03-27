@@ -56,6 +56,21 @@ function buildRejectedResult(
   });
 }
 
+function getRequiredMissingValueEntries(
+  schema: WorkbookRowLookupData["schema"],
+  values: Partial<Record<WorkbookStructuralFieldKey, string | null>>,
+): Array<[string, string | null]> {
+  return Object.values(schema.structuralFields)
+    .filter(
+      (field): field is WorkbookResolvedStructuralField =>
+        Boolean(field) &&
+        field.rowValueRequired &&
+        field.key !== "registrationNo" &&
+        field.key !== "eventDate",
+    )
+    .map((field) => [field.headerName, values[field.key] ?? null]);
+}
+
 export function parseWorkbookRow(
   row: WorkbookRow,
   columnMap: WorkbookColumnMap,
@@ -68,17 +83,11 @@ export function parseWorkbookRow(
     "registrationNo",
   );
   const eventDateField = getStructuralField(options.schema, "eventDate");
-  const eventCityField = getStructuralField(options.schema, "eventCity");
-  const eventPlaceField = getStructuralField(options.schema, "eventPlace");
-  const eventTypeField = getStructuralField(options.schema, "eventType");
-  const dogNameField = getStructuralField(options.schema, "dogName");
-  const classField = getStructuralField(options.schema, "classValue");
-  const qualityField = getStructuralField(options.schema, "qualityValue");
 
   const registrationNo = normalizeWorkbookRegistrationNo(
     getStructuralCell(row, columnMap, options.schema, "registrationNo"),
   );
-  if (!registrationNo) {
+  if (!registrationNo && registrationField?.rowValueRequired) {
     issues.push(
       createIssue({
         rowNumber,
@@ -109,7 +118,7 @@ export function parseWorkbookRow(
     });
   }
 
-  if (!isWorkbookRegistrationNoValid(registrationNo)) {
+  if (registrationNo && !isWorkbookRegistrationNoValid(registrationNo)) {
     issues.push(
       createIssue({
         rowNumber,
@@ -143,7 +152,7 @@ export function parseWorkbookRow(
   const eventDateIso = normalizeWorkbookDateIso(
     getStructuralCell(row, columnMap, options.schema, "eventDate"),
   );
-  if (!eventDateIso) {
+  if (!eventDateIso && eventDateField?.rowValueRequired) {
     issues.push(
       createIssue({
         rowNumber,
@@ -196,28 +205,25 @@ export function parseWorkbookRow(
   const critiqueText = normalizeWorkbookTextCell(
     getStructuralCell(row, columnMap, options.schema, "critiqueText"),
   );
+  const structuralValues: Partial<
+    Record<WorkbookStructuralFieldKey, string | null>
+  > = {
+    eventCity,
+    eventPlace,
+    eventType,
+    dogName,
+    classValue,
+    qualityValue,
+    judge,
+    critiqueText,
+  };
 
   issues.push(
-    ...buildMissingValueIssues(rowNumber, registrationNo, [
-      [
-        eventCityField?.headerName ?? eventCityField?.label ?? "Paikkakunta",
-        eventCity,
-      ],
-      [
-        eventPlaceField?.headerName ?? eventPlaceField?.label ?? "Paikka",
-        eventPlace,
-      ],
-      [
-        eventTypeField?.headerName ?? eventTypeField?.label ?? "Näyttelytyyppi",
-        eventType,
-      ],
-      [dogNameField?.headerName ?? dogNameField?.label ?? "Nimi", dogName],
-      [classField?.headerName ?? classField?.label ?? "Luokka", classValue],
-      [
-        qualityField?.headerName ?? qualityField?.label ?? "Laatuarvostelu",
-        qualityValue,
-      ],
-    ]),
+    ...buildMissingValueIssues(
+      rowNumber,
+      registrationNo,
+      getRequiredMissingValueEntries(options.schema, structuralValues),
+    ),
   );
 
   if (issues.some((issue) => issue.severity === "ERROR")) {
@@ -228,6 +234,23 @@ export function parseWorkbookRow(
       eventPlace: eventPlace ?? null,
       eventType: eventType ?? null,
       registrationNo,
+      dogName: dogName ?? null,
+      dogMatched: false,
+      judge,
+      critiqueText,
+      classValue: classValue ?? null,
+      qualityValue: qualityValue ?? null,
+    });
+  }
+
+  if (!registrationNo || !eventDateIso) {
+    return buildRejectedResult(issues, {
+      eventLookupKey: null,
+      eventDateIso: eventDateIso ?? null,
+      eventCity: eventCity ?? null,
+      eventPlace: eventPlace ?? null,
+      eventType: eventType ?? null,
+      registrationNo: registrationNo ?? null,
       dogName: dogName ?? null,
       dogMatched: false,
       judge,

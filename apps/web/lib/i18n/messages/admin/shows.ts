@@ -93,8 +93,7 @@ export const fiAdminShowsMessages = {
   "admin.shows.validation.summary.rows": "Rivejä",
   "admin.shows.validation.summary.errors": "Virheitä",
   "admin.shows.validation.summary.warnings": "Varoituksia",
-  "admin.shows.validation.summary.notes": "Huomioita",
-  "admin.shows.validation.summary.ignored": "Ohitettuja sarakkeita",
+  "admin.shows.validation.summary.info": "Info",
   "admin.shows.validation.summary.ready": "Esikatselu",
   "admin.shows.validation.summary.readyYes": "Sallittu",
   "admin.shows.validation.summary.readyNo": "Estetty",
@@ -104,8 +103,7 @@ export const fiAdminShowsMessages = {
   "admin.shows.validation.summary.notesAccepted":
     "Huomiot hyväksytty ennen esikatselua",
   "admin.shows.validation.summary.warningsAccepted": "varoitusta hyväksytty",
-  "admin.shows.validation.summary.ignoredAccepted":
-    "ohitettua saraketta hyväksytty",
+  "admin.shows.validation.summary.infoAccepted": "infoa hyväksytty",
   "admin.shows.validation.summary.showNotes": "Näytä huomiot",
   "admin.shows.validation.blocking.title":
     "Esikatselu estetty estävien syiden vuoksi",
@@ -125,12 +123,11 @@ export const fiAdminShowsMessages = {
   "admin.shows.validation.schema.coverageBlocked": "estetty",
   "admin.shows.validation.schema.empty": "Ei saraketietoja.",
   "admin.shows.validation.schema.none": "Ei",
-  "admin.shows.validation.schema.enabled": "Käytössä",
-  "admin.shows.validation.schema.disabled": "Pois käytöstä",
-  "admin.shows.validation.schema.supported": "Tuettuna",
-  "admin.shows.validation.schema.unsupported": "Ei tuettu",
   "admin.shows.validation.notes.title": "Huomiot",
-  "admin.shows.validation.notes.countSuffix": "huomiota",
+  "admin.shows.validation.notes.countSuffixAll": "merkintää",
+  "admin.shows.validation.notes.countSuffixErrors": "virhettä",
+  "admin.shows.validation.notes.countSuffixWarnings": "varoitusta",
+  "admin.shows.validation.notes.countSuffixInfo": "infoa",
   "admin.shows.validation.notes.empty": "Ei huomioita.",
   "admin.shows.validation.notes.emptyFiltered":
     "Ei huomioita tässä suodatuksessa.",
@@ -243,8 +240,7 @@ export const svAdminShowsMessages = {
   "admin.shows.validation.summary.rows": "Rader",
   "admin.shows.validation.summary.errors": "Fel",
   "admin.shows.validation.summary.warnings": "Varningar",
-  "admin.shows.validation.summary.notes": "Noteringar",
-  "admin.shows.validation.summary.ignored": "Ignorerade kolumner",
+  "admin.shows.validation.summary.info": "Info",
   "admin.shows.validation.summary.ready": "Forhandsgranskning",
   "admin.shows.validation.summary.readyYes": "Tillaten",
   "admin.shows.validation.summary.readyNo": "Blockerad",
@@ -254,8 +250,7 @@ export const svAdminShowsMessages = {
   "admin.shows.validation.summary.notesAccepted":
     "Noteringar godkanda fore forhandsgranskning",
   "admin.shows.validation.summary.warningsAccepted": "varningar godkanda",
-  "admin.shows.validation.summary.ignoredAccepted":
-    "ignorerade kolumner godkanda",
+  "admin.shows.validation.summary.infoAccepted": "info godkänd",
   "admin.shows.validation.summary.showNotes": "Visa noteringar",
   "admin.shows.validation.blocking.title":
     "Forhandsgranskning blockerad av stoppande orsaker",
@@ -275,12 +270,11 @@ export const svAdminShowsMessages = {
   "admin.shows.validation.schema.coverageBlocked": "blockerade",
   "admin.shows.validation.schema.empty": "Ingen kolumninformation.",
   "admin.shows.validation.schema.none": "Inga",
-  "admin.shows.validation.schema.enabled": "Aktiv",
-  "admin.shows.validation.schema.disabled": "Inaktiv",
-  "admin.shows.validation.schema.supported": "Stödd",
-  "admin.shows.validation.schema.unsupported": "Inte stödd",
   "admin.shows.validation.notes.title": "Noteringar",
-  "admin.shows.validation.notes.countSuffix": "noteringar",
+  "admin.shows.validation.notes.countSuffixAll": "poster",
+  "admin.shows.validation.notes.countSuffixErrors": "fel",
+  "admin.shows.validation.notes.countSuffixWarnings": "varningar",
+  "admin.shows.validation.notes.countSuffixInfo": "info",
   "admin.shows.validation.notes.empty": "Inga noteringar.",
   "admin.shows.validation.notes.emptyFiltered":
     "Inga noteringar i detta filter.",

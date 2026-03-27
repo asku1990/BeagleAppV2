@@ -188,7 +188,7 @@ export function ShowWorkbookValidationPanel({
                     </p>
                     <p className="text-xs text-amber-700">
                       {formatter.format(acceptedReviewNoteCount)}{" "}
-                      {t("admin.shows.validation.notes.countSuffix")} ·{" "}
+                      {t("admin.shows.validation.notes.countSuffixAll")} ·{" "}
                       {formatter.format(validation.warningCount)}{" "}
                       {t("admin.shows.validation.summary.warnings")} ·{" "}
                       {formatter.format(

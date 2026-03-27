@@ -30,6 +30,28 @@ function getSeverityClass(
   return "border-sky-500/40 bg-sky-500/10 text-sky-700";
 }
 
+function getCountSuffixKey(
+  issueFilter: ValidationIssueFilter,
+):
+  | "admin.shows.validation.notes.countSuffixAll"
+  | "admin.shows.validation.notes.countSuffixErrors"
+  | "admin.shows.validation.notes.countSuffixWarnings"
+  | "admin.shows.validation.notes.countSuffixInfo" {
+  if (issueFilter === "ERROR") {
+    return "admin.shows.validation.notes.countSuffixErrors";
+  }
+
+  if (issueFilter === "WARNING") {
+    return "admin.shows.validation.notes.countSuffixWarnings";
+  }
+
+  if (issueFilter === "INFO") {
+    return "admin.shows.validation.notes.countSuffixInfo";
+  }
+
+  return "admin.shows.validation.notes.countSuffixAll";
+}
+
 // Renders validation issues with severity filters so blocking errors stay discoverable.
 export function ShowWorkbookValidationNotesSection({
   validation,
@@ -50,9 +72,8 @@ export function ShowWorkbookValidationNotesSection({
             {t("admin.shows.validation.notes.title")}
           </h4>
           <p className="text-xs text-muted-foreground">
-            {formatter.format(filteredIssues.length)} /{" "}
-            {formatter.format(validation.issues.length)}{" "}
-            {t("admin.shows.validation.notes.countSuffix")}
+            {formatter.format(filteredIssues.length)}{" "}
+            {t(getCountSuffixKey(issueFilter))}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

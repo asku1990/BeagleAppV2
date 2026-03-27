@@ -63,8 +63,6 @@ describe("ShowWorkbookValidationPanel", () => {
                 definitionCodes: ["SERT", "varaSERT"],
                 importMode: "VALUE_MAP",
                 valueType: "FLAG",
-                enabled: true,
-                supported: true,
               },
             ],
             ignoredColumns: [

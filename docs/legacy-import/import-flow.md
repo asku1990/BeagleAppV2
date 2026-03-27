@@ -61,6 +61,8 @@ Issue tooling:
 
 5. `seed:show-workbook-import-schema` bootstraps `ShowWorkbookColumnRule` metadata used by the
    Kennelliitto workbook validator to resolve headers into imported, ignored, or blocked columns.
+   This seed is the bootstrap baseline only; future admin-managed workbook
+   schema edits should update the metadata directly instead of reseeding.
 
 Lifecycle note:
 
