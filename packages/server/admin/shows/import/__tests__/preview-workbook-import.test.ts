@@ -602,6 +602,40 @@ describe("previewAdminShowWorkbookImport", () => {
     );
   });
 
+  it("adds only one missing-value error for required class column", async () => {
+    const workbook = buildWorkbookBuffer([
+      createRow({
+        [IDX.registrationNo]: "FI16175/23",
+        [IDX.eventDate]: new Date("2025-01-11T00:00:00.000Z"),
+        [IDX.eventCity]: "Kajaani",
+        [IDX.eventPlace]: "Kajaanin Pallohalli",
+        [IDX.eventType]: "Kansainvälinen näyttely",
+        [IDX.dogName]: "CARDIEM KIND REGARDS",
+        [IDX.classValue]: null,
+        [IDX.qualityValue]: "ERI",
+        [IDX.judge]: "Laakso Jari",
+      }),
+    ]);
+
+    const result = await previewAdminShowWorkbookImport({
+      fileName: "Näyttelyt.xlsx",
+      workbook,
+    });
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) {
+      throw new Error("Expected a successful preview response");
+    }
+
+    const classMissingIssues = result.body.data.issues.filter(
+      (issue) =>
+        issue.code === "SHOW_WORKBOOK_MISSING_COLUMNS" &&
+        issue.columnName === "Luokka" &&
+        issue.message === "Luokka is required.",
+    );
+    expect(classMissingIssues).toHaveLength(1);
+  });
+
   it("uses metadata rowValueRequired for optional structural fields at runtime", async () => {
     showWorkbookColumnRuleFindManyMock.mockResolvedValue(
       buildDefaultColumnRules().map((rule) =>
@@ -936,6 +970,13 @@ describe("previewAdminShowWorkbookImport", () => {
         }),
       ]),
     );
+    const saMissingIssues = result.body.data.issues.filter(
+      (issue) =>
+        issue.code === "SHOW_WORKBOOK_MISSING_COLUMNS" &&
+        issue.columnName === "SA" &&
+        issue.message === "SA is required.",
+    );
+    expect(saMissingIssues).toHaveLength(1);
   });
 
   it("blocks preview when a metadata-mapped definition is disabled", async () => {

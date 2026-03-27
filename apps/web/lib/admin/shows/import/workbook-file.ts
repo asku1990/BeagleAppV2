@@ -6,7 +6,7 @@ export const SHOW_WORKBOOK_ACCEPT = `.xlsx,${WORKBOOK_MIME_TYPE}`;
 export function isShowWorkbookFile(file: File): boolean {
   const normalizedName = file.name.trim().toLowerCase();
 
-  return normalizedName.endsWith(".xlsx") || file.type === WORKBOOK_MIME_TYPE;
+  return normalizedName.endsWith(".xlsx");
 }
 
 export function formatShowWorkbookFileSize(bytes: number): string {

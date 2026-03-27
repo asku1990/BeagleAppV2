@@ -159,4 +159,127 @@ describe("validateAdminShowWorkbookSchemaRuleDraft", () => {
       ]),
     );
   });
+
+  it("rejects targetField on VALUE_MAP rules", () => {
+    const errors = validateAdminShowWorkbookSchemaRuleDraft(
+      createRuleDraft({
+        headerName: "ROP",
+        parseMode: "VALUE_MAP",
+        destinationKind: "SHOW_RESULT_ITEM",
+        targetField: "CLASS_VALUE",
+        fixedDefinitionCode: null,
+        allowedDefinitionCategoryCode: null,
+        valueMaps: [
+          { workbookValue: "ROP", definitionCode: "SERT", sortOrder: 10 },
+        ],
+      }),
+      references,
+    );
+
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          field: "targetField",
+          code: "TARGET_FIELD_NOT_ALLOWED",
+        }),
+      ]),
+    );
+  });
+
+  it("rejects targetField on FIXED_* rules", () => {
+    const errors = validateAdminShowWorkbookSchemaRuleDraft(
+      createRuleDraft({
+        headerName: "SA",
+        parseMode: "FIXED_FLAG",
+        destinationKind: "SHOW_RESULT_ITEM",
+        targetField: "CLASS_VALUE",
+        fixedDefinitionCode: "SERT",
+        allowedDefinitionCategoryCode: null,
+      }),
+      references,
+    );
+
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          field: "targetField",
+          code: "TARGET_FIELD_NOT_ALLOWED",
+        }),
+      ]),
+    );
+  });
+
+  it("rejects class and quality fields outside DEFINITION_FROM_CELL mode", () => {
+    const errors = validateAdminShowWorkbookSchemaRuleDraft(
+      createRuleDraft({
+        headerName: "Luokka",
+        parseMode: "TEXT",
+        destinationKind: "SHOW_ENTRY",
+        targetField: "CLASS_VALUE",
+        allowedDefinitionCategoryCode: null,
+      }),
+      references,
+    );
+
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          field: "targetField",
+          code: "TARGET_FIELD_PARSE_MODE_MISMATCH",
+        }),
+      ]),
+    );
+  });
+
+  it("rejects DEFINITION_FROM_CELL on non-result target fields", () => {
+    const errors = validateAdminShowWorkbookSchemaRuleDraft(
+      createRuleDraft({
+        headerName: "Tuomari",
+        parseMode: "DEFINITION_FROM_CELL",
+        destinationKind: "SHOW_RESULT_ITEM",
+        targetField: "JUDGE",
+        allowedDefinitionCategoryCode: "KILPAILULUOKKA",
+      }),
+      references,
+    );
+
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          field: "targetField",
+          code: "TARGET_FIELD_PARSE_MODE_MISMATCH",
+        }),
+      ]),
+    );
+  });
+
+  it("rejects non-flag definitions in VALUE_MAP rules", () => {
+    const errors = validateAdminShowWorkbookSchemaRuleDraft(
+      createRuleDraft({
+        headerName: "PuPn",
+        parseMode: "VALUE_MAP",
+        destinationKind: "SHOW_RESULT_ITEM",
+        targetField: null,
+        fixedDefinitionCode: null,
+        allowedDefinitionCategoryCode: null,
+        valueMaps: [
+          {
+            workbookValue: "1",
+            definitionCode: "SIJOITUS",
+            sortOrder: 10,
+          },
+        ],
+      }),
+      references,
+    );
+
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          field: "valueMaps",
+          code: "INVALID_VALUE_TYPE",
+        }),
+      ]),
+    );
+  });
 });

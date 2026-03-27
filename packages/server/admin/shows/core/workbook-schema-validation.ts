@@ -27,6 +27,9 @@ type RuleDraft = AdminShowWorkbookSchemaRuleDraft & {
 const LOOKUP_KEY_TARGET_FIELDS = new Set<
   NonNullable<AdminShowWorkbookSchemaRuleDraft["targetField"]>
 >(["REGISTRATION_NO", "EVENT_DATE", "EVENT_CITY", "EVENT_PLACE", "EVENT_TYPE"]);
+const DEFINITION_FROM_CELL_TARGET_FIELDS = new Set<
+  NonNullable<AdminShowWorkbookSchemaRuleDraft["targetField"]>
+>(["CLASS_VALUE", "QUALITY_VALUE"]);
 
 function addError(
   errors: AdminShowWorkbookSchemaValidationError[],
@@ -156,6 +159,14 @@ export function validateAdminShowWorkbookSchemaRuleDraft(
         "VALUE_MAP rules must target show result items.",
       );
     }
+    if (input.targetField) {
+      addError(
+        errors,
+        "targetField",
+        "TARGET_FIELD_NOT_ALLOWED",
+        "VALUE_MAP rules cannot define a target field.",
+      );
+    }
   } else if (input.valueMaps.length > 0) {
     addError(
       errors,
@@ -186,6 +197,14 @@ export function validateAdminShowWorkbookSchemaRuleDraft(
         `${input.parseMode} rules must target show result items.`,
       );
     }
+    if (input.targetField) {
+      addError(
+        errors,
+        "targetField",
+        "TARGET_FIELD_NOT_ALLOWED",
+        `${input.parseMode} rules cannot define a target field.`,
+      );
+    }
   }
 
   if (
@@ -203,6 +222,19 @@ export function validateAdminShowWorkbookSchemaRuleDraft(
     }
   }
 
+  if (
+    input.parseMode !== "DEFINITION_FROM_CELL" &&
+    input.targetField &&
+    DEFINITION_FROM_CELL_TARGET_FIELDS.has(input.targetField)
+  ) {
+    addError(
+      errors,
+      "targetField",
+      "TARGET_FIELD_PARSE_MODE_MISMATCH",
+      `${input.targetField} must use DEFINITION_FROM_CELL parse mode.`,
+    );
+  }
+
   if (input.parseMode === "DEFINITION_FROM_CELL") {
     if (!input.allowedDefinitionCategoryCode) {
       addError(
@@ -218,6 +250,17 @@ export function validateAdminShowWorkbookSchemaRuleDraft(
         "destinationKind",
         "RESULT_ITEM_DESTINATION_REQUIRED",
         "DEFINITION_FROM_CELL rules must target show result items.",
+      );
+    }
+    if (
+      input.targetField &&
+      !DEFINITION_FROM_CELL_TARGET_FIELDS.has(input.targetField)
+    ) {
+      addError(
+        errors,
+        "targetField",
+        "TARGET_FIELD_PARSE_MODE_MISMATCH",
+        "DEFINITION_FROM_CELL rules must target CLASS_VALUE or QUALITY_VALUE.",
       );
     }
   } else if (input.allowedDefinitionCategoryCode) {
@@ -355,6 +398,15 @@ export function validateAdminShowWorkbookSchemaRuleDraft(
         "valueMaps",
         "UNSUPPORTED_VALUE_TYPE",
         `Definition ${valueMap.definitionCode} uses unsupported value type ${definition.valueType}.`,
+      );
+      continue;
+    }
+    if (input.parseMode === "VALUE_MAP" && definition.valueType !== "FLAG") {
+      addError(
+        errors,
+        "valueMaps",
+        "INVALID_VALUE_TYPE",
+        `Definition ${valueMap.definitionCode} must use FLAG value type for VALUE_MAP.`,
       );
     }
   }

@@ -211,6 +211,44 @@ describe("searchBeagleShowsDb", () => {
 
     expect(result.items[0]?.judge).toBeNull();
   });
+
+  it("orders events deterministically when date and place are the same", async () => {
+    showEventFindManyMock
+      .mockResolvedValueOnce([{ eventDate: new Date("2025-06-01T00:00:00Z") }])
+      .mockResolvedValueOnce([
+        {
+          id: "event-b",
+          eventLookupKey: "show-event-b",
+          eventDate: new Date("2025-06-01T00:00:00.000Z"),
+          eventPlace: "Helsinki",
+          _count: { entries: 1 },
+        },
+        {
+          id: "event-a",
+          eventLookupKey: "show-event-a",
+          eventDate: new Date("2025-06-01T00:00:00.000Z"),
+          eventPlace: "Helsinki",
+          _count: { entries: 1 },
+        },
+      ]);
+    showEntryFindManyMock.mockResolvedValueOnce([
+      { showEventId: "event-b", judge: "Judge B" },
+      { showEventId: "event-a", judge: "Judge A" },
+    ]);
+
+    const result = await searchBeagleShowsDb({
+      mode: "year",
+      year: 2025,
+      sort: "date-desc",
+      page: 1,
+      pageSize: 10,
+    });
+
+    expect(result.items.map((row) => row.eventKey)).toEqual([
+      "show-event-a",
+      "show-event-b",
+    ]);
+  });
 });
 
 describe("getBeagleShowDetailsDb", () => {

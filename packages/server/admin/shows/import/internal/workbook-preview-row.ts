@@ -66,7 +66,11 @@ function getRequiredMissingValueEntries(
         Boolean(field) &&
         field.rowValueRequired &&
         field.key !== "registrationNo" &&
-        field.key !== "eventDate",
+        field.key !== "eventDate" &&
+        !(
+          field.parseMode === "DEFINITION_FROM_CELL" &&
+          (field.key === "classValue" || field.key === "qualityValue")
+        ),
     )
     .map((field) => [field.headerName, values[field.key] ?? null]);
 }
