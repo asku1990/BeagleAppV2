@@ -62,29 +62,23 @@ settings can edit which existing mode a workbook column uses, but adding a new
 parser mode still requires code changes.
 
 - `TEXT`
-  - imports normalized text into a structural destination field
+- - imports normalized text such as `Rekisterinumero`, `Paikkakunta`, or `Paikka` directly into the linked structural field without any definition lookup
 - `DATE`
-  - imports a valid workbook date into a structural destination field
+- - converts a valid workbook date (for example the `Aika` column) into the structural `eventDate` destination
 - `DEFINITION_FROM_CELL`
-  - resolves the raw workbook value against enabled `ShowResultDefinition.code`
+  - normalizes the raw workbook value (e.g., `Luokka`/`Laatuarvostelu`) and matches it only against enabled `ShowResultDefinition.code`
   - matching is scoped to the rule's `allowedDefinitionCategoryCode`
-  - used for workbook columns such as `Luokka` and `Laatuarvostelu`
+  - reports an error when the value does not resolve to an enabled definition; no alias maps are applied
 - `FIXED_FLAG`
-  - writes a fixed definition when the cell contains a truthy workbook token
-  - accepted truthy values are the column header itself after normalization and
-    the shared truthy token list in parser code
+  - writes a fixed definition (such as a `NAP` or `VARA` flag) whenever the cell contains either the normalized header name or an allowed truthy token like `KYLLÄ`
+  - the parser treats the cell as truthy, not as a mapped code value
 - `FIXED_NUMERIC`
-  - writes a fixed numeric definition and stores the workbook integer as
-    `valueNumeric`
+  - writes a fixed numeric definition and stores the workbook integer (e.g., a certificate count) in `valueNumeric`
 - `FIXED_CODE`
-  - writes a fixed code definition and parses the workbook value into
-    `valueCode`
-  - current Kennelliitto support is the `PuPn` token form such as `PU1` or
-    `PN4`
+  - writes a fixed definition and parses the workbook value (currently Kennelliitto `PuPn` tokens, such as `PU1`/`PN4`) into `valueCode`
 - `VALUE_MAP`
-  - resolves the workbook cell through `ShowWorkbookColumnValueMap`
-  - workbook values must match one of the configured mapped values after the
-    same normalization used elsewhere in the parser
+  - resolves the workbook cell through `ShowWorkbookColumnValueMap` entries so legacy rating strings can point to canonical definitions
+  - workbook values must match one of the configured mapped values after the same normalization used elsewhere in the parser
 
 ## Admin settings boundary
 
