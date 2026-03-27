@@ -778,6 +778,110 @@ describe("previewAdminShowWorkbookImport", () => {
     ]);
   });
 
+  it("blocks preview when a required result column header is missing", async () => {
+    showWorkbookColumnRuleFindManyMock.mockResolvedValue(
+      buildDefaultColumnRules().map((rule) =>
+        rule.code === "SA" ? { ...rule, headerRequired: true } : rule,
+      ),
+    );
+
+    const headers = SUPPORTED_HEADERS.filter((header) => header !== "SA");
+    const workbook = buildWorkbookBuffer(
+      [
+        createRow(
+          {
+            [IDX.registrationNo]: "FI16175/23",
+            [IDX.eventDate]: new Date("2025-01-10T21:59:11.000Z"),
+            [IDX.eventCity]: "Kajaani",
+            [IDX.eventPlace]: "Kajaanin Pallohalli",
+            [IDX.eventType]: "Kansainvälinen näyttely",
+            [IDX.dogName]: "CARDIEM KIND REGARDS",
+            [IDX.classValue]: "AVO",
+            [IDX.qualityValue]: "ERI",
+            [IDX.judge]: "Laakso Jari",
+          },
+          headers.length,
+        ),
+      ],
+      headers,
+    );
+
+    const result = await previewAdminShowWorkbookImport({
+      fileName: "Näyttelyt.xlsx",
+      workbook,
+    });
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) {
+      throw new Error("Expected a successful preview response");
+    }
+
+    expect(result.body.data.acceptedRowCount).toBe(0);
+    expect(result.body.data.schema.missingStructuralFields).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          fieldKey: "SA",
+          expectedHeader: "SA",
+        }),
+      ]),
+    );
+    expect(result.body.data.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "SHOW_WORKBOOK_REQUIRED_FIELD_MISSING",
+          severity: "ERROR",
+          columnName: "SA",
+        }),
+      ]),
+    );
+  });
+
+  it("rejects rows when required result-item values are empty", async () => {
+    showWorkbookColumnRuleFindManyMock.mockResolvedValue(
+      buildDefaultColumnRules().map((rule) =>
+        rule.code === "SA" ? { ...rule, rowValueRequired: true } : rule,
+      ),
+    );
+
+    const workbook = buildWorkbookBuffer([
+      createRow({
+        [IDX.registrationNo]: "FI16175/23",
+        [IDX.eventDate]: new Date("2025-01-10T21:59:11.000Z"),
+        [IDX.eventCity]: "Kajaani",
+        [IDX.eventPlace]: "Kajaanin Pallohalli",
+        [IDX.eventType]: "Kansainvälinen näyttely",
+        [IDX.dogName]: "CARDIEM KIND REGARDS",
+        [IDX.classValue]: "AVO",
+        [IDX.qualityValue]: "ERI",
+        [IDX.sa]: null,
+        [IDX.judge]: "Laakso Jari",
+      }),
+    ]);
+
+    const result = await previewAdminShowWorkbookImport({
+      fileName: "Näyttelyt.xlsx",
+      workbook,
+    });
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) {
+      throw new Error("Expected a successful preview response");
+    }
+
+    expect(result.body.data.acceptedRowCount).toBe(0);
+    expect(result.body.data.rejectedRowCount).toBe(1);
+    expect(result.body.data.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "SHOW_WORKBOOK_MISSING_COLUMNS",
+          severity: "ERROR",
+          columnName: "SA",
+          message: "SA is required.",
+        }),
+      ]),
+    );
+  });
+
   it("blocks preview when a metadata-mapped definition is disabled", async () => {
     showResultDefinitionFindManyMock.mockResolvedValue([
       ...sharedDefinitions.filter((definition) => definition.code !== "SA"),

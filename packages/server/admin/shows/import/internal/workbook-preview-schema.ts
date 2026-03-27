@@ -12,7 +12,6 @@ import type {
   WorkbookResolvedIgnoredColumn,
   WorkbookResolvedResultColumn,
   WorkbookResolvedSchema,
-  WorkbookStructuralFieldKey,
   WorkbookRow,
 } from "./workbook-preview-types";
 
@@ -116,6 +115,7 @@ function resolveDefinitionBackedColumn(
     return {
       ruleCode: rule.code,
       headerName: rule.headerName,
+      rowValueRequired: rule.rowValueRequired,
       importMode: "VALUE_MAP",
       parseMode: "VALUE_MAP",
       definitionCodes,
@@ -169,6 +169,7 @@ function resolveDefinitionBackedColumn(
     return {
       ruleCode: rule.code,
       headerName: rule.headerName,
+      rowValueRequired: rule.rowValueRequired,
       importMode: "NUMERIC",
       parseMode: "FIXED_NUMERIC",
       definitionCodes: [rule.fixedDefinitionCode],
@@ -180,6 +181,7 @@ function resolveDefinitionBackedColumn(
     return {
       ruleCode: rule.code,
       headerName: rule.headerName,
+      rowValueRequired: rule.rowValueRequired,
       importMode: "PUPN",
       parseMode: "FIXED_CODE",
       definitionCodes: [rule.fixedDefinitionCode],
@@ -191,6 +193,7 @@ function resolveDefinitionBackedColumn(
     return {
       ruleCode: rule.code,
       headerName: rule.headerName,
+      rowValueRequired: rule.rowValueRequired,
       importMode: "DIRECT",
       parseMode: "FIXED_FLAG",
       definitionCodes: [rule.fixedDefinitionCode],
@@ -203,6 +206,7 @@ function resolveDefinitionBackedColumn(
     return {
       ruleCode: rule.code,
       headerName: rule.headerName,
+      rowValueRequired: rule.rowValueRequired,
       importMode: "DIRECT",
       parseMode: "DEFINITION_FROM_CELL",
       definitionCodes: [],
@@ -230,6 +234,7 @@ export function resolveWorkbookSchema(
   const ignoredColumns: WorkbookResolvedIgnoredColumn[] = [];
   const blockedColumns: WorkbookResolvedBlockedColumn[] = [];
   const ruleMap = buildColumnRuleMap(lookupData.columnRules);
+  const matchedRuleCodes = new Set<string>();
   const seenHeaders = new Map<
     string,
     { headerName: string; columnIndex: number }
@@ -308,6 +313,7 @@ export function resolveWorkbookSchema(
           allowedDefinitionCategoryCode: rule.allowedDefinitionCategoryCode,
         };
       }
+      matchedRuleCodes.add(rule.code);
       importedColumnCount += 1;
       continue;
     }
@@ -321,6 +327,7 @@ export function resolveWorkbookSchema(
       );
       if (resolvedColumn) {
         resultColumns.push(resolvedColumn);
+        matchedRuleCodes.add(rule.code);
         importedColumnCount += 1;
       }
       continue;
@@ -335,18 +342,17 @@ export function resolveWorkbookSchema(
   }
 
   const requiredRules = lookupData.columnRules.filter(
-    (rule) =>
-      rule.policy === "IMPORT" && rule.headerRequired && rule.targetField,
+    (rule) => rule.policy === "IMPORT" && rule.headerRequired,
   );
 
   const missingRequiredFields = requiredRules.flatMap((rule) => {
-    if (structuralFields[rule.targetField!]) {
+    if (matchedRuleCodes.has(rule.code)) {
       return [];
     }
 
     return [
       {
-        key: rule.targetField! as WorkbookStructuralFieldKey,
+        key: rule.targetField ?? rule.code,
         label: rule.headerName,
       },
     ];

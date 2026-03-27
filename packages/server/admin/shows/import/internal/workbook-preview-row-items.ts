@@ -81,6 +81,23 @@ function resolveDefinitionCodeFromWorkbookValue(
   return null;
 }
 
+function addMissingRequiredResultValueIssue(input: {
+  issues: AdminShowWorkbookImportIssue[];
+  rowNumber: number;
+  columnName: string;
+  registrationNo: string;
+  eventLookupKey: string;
+}) {
+  addDefinitionIssue(input.issues, {
+    rowNumber: input.rowNumber,
+    columnName: input.columnName,
+    code: ISSUE_CODES.missingColumns,
+    message: `${input.columnName} is required.`,
+    registrationNo: input.registrationNo,
+    eventLookupKey: input.eventLookupKey,
+  });
+}
+
 export function buildWorkbookPreviewItems({
   row,
   columnMap,
@@ -162,6 +179,14 @@ export function buildWorkbookPreviewItems({
           registrationNo,
           eventLookupKey,
         });
+      } else if (placementValue === null && column.rowValueRequired) {
+        addMissingRequiredResultValueIssue({
+          issues,
+          rowNumber,
+          columnName: column.headerName,
+          registrationNo,
+          eventLookupKey,
+        });
       } else if (placementValue !== null) {
         resultItems.push({
           columnName: column.headerName,
@@ -191,6 +216,14 @@ export function buildWorkbookPreviewItems({
             registrationNo,
             eventLookupKey,
           });
+        } else if (column.rowValueRequired) {
+          addMissingRequiredResultValueIssue({
+            issues,
+            rowNumber,
+            columnName: column.headerName,
+            registrationNo,
+            eventLookupKey,
+          });
         }
       } else {
         resultItems.push({
@@ -208,6 +241,15 @@ export function buildWorkbookPreviewItems({
       getCell(row, columnMap, column.headerName),
     );
     if (!rawValue) {
+      if (column.rowValueRequired) {
+        addMissingRequiredResultValueIssue({
+          issues,
+          rowNumber,
+          columnName: column.headerName,
+          registrationNo,
+          eventLookupKey,
+        });
+      }
       continue;
     }
 

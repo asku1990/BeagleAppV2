@@ -105,6 +105,7 @@ export type WorkbookResolvedResultColumn =
   | {
       ruleCode: string;
       headerName: string;
+      rowValueRequired: boolean;
       importMode: "VALUE_MAP";
       parseMode: "VALUE_MAP";
       definitionCodes: string[];
@@ -114,6 +115,7 @@ export type WorkbookResolvedResultColumn =
   | {
       ruleCode: string;
       headerName: string;
+      rowValueRequired: boolean;
       importMode: "NUMERIC";
       parseMode: "FIXED_NUMERIC";
       definitionCodes: [string];
@@ -122,6 +124,7 @@ export type WorkbookResolvedResultColumn =
   | {
       ruleCode: string;
       headerName: string;
+      rowValueRequired: boolean;
       importMode: "PUPN";
       parseMode: "FIXED_CODE";
       definitionCodes: [string];
@@ -130,6 +133,7 @@ export type WorkbookResolvedResultColumn =
   | {
       ruleCode: string;
       headerName: string;
+      rowValueRequired: boolean;
       importMode: "DIRECT";
       parseMode: "FIXED_FLAG" | "DEFINITION_FROM_CELL";
       definitionCodes: string[];
@@ -149,7 +153,7 @@ export type WorkbookResolvedSchema = {
     Record<WorkbookStructuralFieldKey, WorkbookResolvedStructuralField>
   >;
   missingRequiredFields: Array<{
-    key: WorkbookStructuralFieldKey;
+    key: string;
     label: string;
   }>;
   resultColumns: WorkbookResolvedResultColumn[];
