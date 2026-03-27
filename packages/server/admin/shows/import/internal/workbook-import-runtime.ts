@@ -378,6 +378,16 @@ export async function evaluateWorkbookImport(input: {
     await applyDuplicateChecks({ rows: parsedRows, issues });
   }
 
+  const hasBlockingSchemaIssues =
+    schema.missingRequiredFields.length > 0 || schema.blockedColumns.length > 0;
+  if (hasBlockingSchemaIssues) {
+    for (const row of parsedRows) {
+      row.accepted = false;
+      row.itemCount = 0;
+      row.resultItems = [];
+    }
+  }
+
   const counts = countIssueSeverity(issues);
   const acceptedRows = parsedRows.filter((row) => row.accepted);
   const rejectedRows = parsedRows.length - acceptedRows.length;

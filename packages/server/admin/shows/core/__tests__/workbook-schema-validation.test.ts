@@ -138,6 +138,52 @@ describe("validateAdminShowWorkbookSchemaRuleDraft", () => {
     );
   });
 
+  it("rejects ignored lookup-key fields", () => {
+    const errors = validateAdminShowWorkbookSchemaRuleDraft(
+      createRuleDraft({
+        headerName: "Paikka",
+        targetField: "EVENT_PLACE",
+        parseMode: "TEXT",
+        destinationKind: null,
+        allowedDefinitionCategoryCode: null,
+        policy: "IGNORE",
+      }),
+      references,
+    );
+
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          field: "policy",
+          code: "LOOKUP_KEY_FIELD_IMPORT_REQUIRED",
+        }),
+      ]),
+    );
+  });
+
+  it("rejects disabled lookup-key fields", () => {
+    const errors = validateAdminShowWorkbookSchemaRuleDraft(
+      createRuleDraft({
+        headerName: "Paikkakunta",
+        targetField: "EVENT_CITY",
+        parseMode: "TEXT",
+        destinationKind: "SHOW_EVENT",
+        allowedDefinitionCategoryCode: null,
+        isEnabled: false,
+      }),
+      references,
+    );
+
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          field: "policy",
+          code: "LOOKUP_KEY_FIELD_ENABLED_REQUIRED",
+        }),
+      ]),
+    );
+  });
+
   it("rejects fixed definitions with an incompatible value type", () => {
     const errors = validateAdminShowWorkbookSchemaRuleDraft(
       createRuleDraft({

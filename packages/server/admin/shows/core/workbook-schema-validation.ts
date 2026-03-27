@@ -134,6 +134,32 @@ export function validateAdminShowWorkbookSchemaRuleDraft(
     );
   }
 
+  if (
+    input.targetField &&
+    LOOKUP_KEY_TARGET_FIELDS.has(input.targetField) &&
+    input.policy !== "IMPORT"
+  ) {
+    addError(
+      errors,
+      "policy",
+      "LOOKUP_KEY_FIELD_IMPORT_REQUIRED",
+      `Lookup-key field ${input.targetField} must stay imported in workbook metadata.`,
+    );
+  }
+
+  if (
+    input.targetField &&
+    LOOKUP_KEY_TARGET_FIELDS.has(input.targetField) &&
+    !input.isEnabled
+  ) {
+    addError(
+      errors,
+      "policy",
+      "LOOKUP_KEY_FIELD_ENABLED_REQUIRED",
+      `Lookup-key field ${input.targetField} must stay enabled in workbook metadata.`,
+    );
+  }
+
   if (input.parseMode === "VALUE_MAP") {
     if (input.valueMaps.length === 0) {
       addError(

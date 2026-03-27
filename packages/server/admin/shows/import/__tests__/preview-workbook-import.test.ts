@@ -844,6 +844,13 @@ describe("previewAdminShowWorkbookImport", () => {
         }),
       ]),
     );
+    expect(result.body.data.events).toHaveLength(1);
+    expect(result.body.data.events[0]?.entries[0]).toEqual(
+      expect.objectContaining({
+        status: "REJECTED",
+        resultItems: [],
+      }),
+    );
   });
 
   it("blocks preview when a required structural column is missing", async () => {
@@ -883,6 +890,7 @@ describe("previewAdminShowWorkbookImport", () => {
     }
 
     expect(result.body.data.acceptedRowCount).toBe(0);
+    expect(result.body.data.rejectedRowCount).toBe(1);
     expect(result.body.data.events).toHaveLength(0);
     expect(result.body.data.schema.missingStructuralFields).toEqual([
       expect.objectContaining({
@@ -947,6 +955,49 @@ describe("previewAdminShowWorkbookImport", () => {
           columnName: "SA",
         }),
       ]),
+    );
+  });
+
+  it("forces parsed rows to rejected when schema has blocking header errors", async () => {
+    const headers = [...SUPPORTED_HEADERS, "TuntematonSarake"];
+    const row = createRow(
+      {
+        [IDX.registrationNo]: "FI16175/23",
+        [IDX.eventDate]: new Date("2025-01-10T21:59:11.000Z"),
+        [IDX.eventCity]: "Kajaani",
+        [IDX.eventPlace]: "Kajaanin Pallohalli",
+        [IDX.eventType]: "Kansainvälinen näyttely",
+        [IDX.dogName]: "CARDIEM KIND REGARDS",
+        [IDX.classValue]: "AVO",
+        [IDX.qualityValue]: "ERI",
+        [IDX.sert]: "X",
+        [IDX.judge]: "Laakso Jari",
+        [SUPPORTED_HEADERS.length]: "extra value",
+      },
+      headers.length,
+    );
+
+    const result = await previewAdminShowWorkbookImport({
+      fileName: "Näyttelyt.xlsx",
+      workbook: buildWorkbookBuffer([row], headers),
+    });
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) {
+      throw new Error("Expected a successful preview response");
+    }
+
+    expect(result.body.data.acceptedRowCount).toBe(0);
+    expect(result.body.data.rejectedRowCount).toBe(1);
+    expect(result.body.data.entryCount).toBe(0);
+    expect(result.body.data.eventCount).toBe(0);
+    expect(result.body.data.resultItemCount).toBe(0);
+    expect(result.body.data.events).toHaveLength(1);
+    expect(result.body.data.events[0]?.entries[0]).toEqual(
+      expect.objectContaining({
+        status: "REJECTED",
+        resultItems: [],
+      }),
     );
   });
 
