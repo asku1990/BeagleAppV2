@@ -205,7 +205,24 @@ export async function evaluateWorkbookImport(input: {
   const { sheetName, headers, rows } = parseWorkbookBuffer(input.workbook);
   const columnMap = buildColumnMap(headers);
   const issues: AdminShowWorkbookImportIssue[] = [];
-  const lookupData = await loadLookupData();
+  const registrationColumnIndex = columnMap.get(
+    normalizeWorkbookComparisonToken("Rekisterinumero"),
+  );
+  const workbookRegistrationNos =
+    registrationColumnIndex === undefined
+      ? undefined
+      : [
+          ...new Set(
+            rows
+              .map((row) =>
+                normalizeWorkbookRegistrationNo(row[registrationColumnIndex]),
+              )
+              .filter((value): value is string => Boolean(value)),
+          ),
+        ];
+  const lookupData = await loadLookupData({
+    registrationNos: workbookRegistrationNos,
+  });
 
   if (lookupData.columnRuleCount === 0) {
     return {

@@ -19,26 +19,36 @@ const {
 }));
 
 vi.mock("@beagle/db", () => ({
-  prisma: {
-    dogRegistration: {
-      findMany: dogRegistrationFindManyMock,
-    },
-    showResultDefinition: {
-      findMany: showResultDefinitionFindManyMock,
-    },
-    showResultCategory: {
-      findMany: showResultCategoryFindManyMock,
-    },
-    showWorkbookColumnRule: {
-      findMany: showWorkbookColumnRuleFindManyMock,
-    },
-    showEvent: {
-      findMany: showEventFindManyMock,
-    },
-    showEntry: {
-      findMany: showEntryFindManyMock,
-    },
+  loadAdminShowWorkbookImportLookupDataDb: async () => {
+    const dogRegistrations = await dogRegistrationFindManyMock();
+    const definitions = await showResultDefinitionFindManyMock();
+    const categories = await showResultCategoryFindManyMock();
+    const columnRules = await showWorkbookColumnRuleFindManyMock();
+    return {
+      dogRegistrations,
+      definitions: definitions.map(
+        (definition: {
+          id: string;
+          code: string;
+          isEnabled: boolean;
+          valueType: "FLAG" | "CODE" | "TEXT" | "NUMERIC" | "DATE";
+          category: { code: string };
+        }) => ({
+          id: definition.id,
+          code: definition.code,
+          isEnabled: definition.isEnabled,
+          valueType: definition.valueType,
+          categoryCode: definition.category.code,
+        }),
+      ),
+      categories,
+      columnRules,
+    };
   },
+  listExistingShowImportKeysDb: async () => ({
+    events: await showEventFindManyMock(),
+    entries: await showEntryFindManyMock(),
+  }),
 }));
 
 const SUPPORTED_HEADERS: unknown[] = [

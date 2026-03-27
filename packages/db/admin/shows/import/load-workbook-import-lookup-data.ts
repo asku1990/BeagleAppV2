@@ -50,10 +50,18 @@ export type AdminShowWorkbookImportLookupDataDb = {
   }>;
 };
 
-export async function loadAdminShowWorkbookImportLookupDataDb(): Promise<AdminShowWorkbookImportLookupDataDb> {
+export async function loadAdminShowWorkbookImportLookupDataDb(input?: {
+  registrationNos?: string[];
+}): Promise<AdminShowWorkbookImportLookupDataDb> {
+  const registrationNos = input?.registrationNos;
+  const registrationWhere =
+    registrationNos === undefined
+      ? undefined
+      : { registrationNo: { in: registrationNos } };
   const [dogRegistrations, definitions, categories, columnRules] =
     await Promise.all([
       prisma.dogRegistration.findMany({
+        where: registrationWhere,
         select: { registrationNo: true, dogId: true },
       }),
       prisma.showResultDefinition.findMany({

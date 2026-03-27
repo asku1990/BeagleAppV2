@@ -90,8 +90,12 @@ export function parseWorkbookBuffer(
   return { sheetName, headers, rows };
 }
 
-export async function loadLookupData(): Promise<WorkbookLookupData> {
-  const lookupData = await loadAdminShowWorkbookImportLookupDataDb();
+export async function loadLookupData(input?: {
+  registrationNos?: string[];
+}): Promise<WorkbookLookupData> {
+  const lookupData = await loadAdminShowWorkbookImportLookupDataDb({
+    registrationNos: input?.registrationNos,
+  });
   const registrations = lookupData.dogRegistrations;
   const definitions = lookupData.definitions;
   const categories = lookupData.categories;

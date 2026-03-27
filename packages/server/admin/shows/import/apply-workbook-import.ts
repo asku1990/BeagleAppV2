@@ -28,41 +28,60 @@ export async function applyAdminShowWorkbookImport(input: {
     };
   }
 
+  let runtime;
   try {
-    const runtime = await evaluateWorkbookImport({
+    runtime = await evaluateWorkbookImport({
       workbook: input.workbook,
       runDuplicateChecks: true,
     });
-    if (!runtime.ok) {
-      return {
-        status: runtime.status,
-        body: {
-          ok: false,
-          error: runtime.error,
-          code: runtime.code,
-        },
-      };
-    }
+  } catch (error) {
+    log.error(
+      {
+        ...toErrorLog(error),
+      },
+      "show workbook apply parse failed",
+    );
+    return {
+      status: 400,
+      body: {
+        ok: false,
+        error: "Workbook apply failed.",
+        code: ISSUE_CODES.unreadable,
+      },
+    };
+  }
 
-    if (runtime.errorCount > 0) {
-      return {
-        status: 200,
-        body: {
-          ok: true,
-          data: {
-            success: false,
-            eventsCreated: 0,
-            entriesCreated: 0,
-            itemsCreated: 0,
-            infoCount: runtime.infoCount,
-            warningCount: runtime.warningCount,
-            errorCount: runtime.errorCount,
-            issues: runtime.issues,
-          },
-        },
-      };
-    }
+  if (!runtime.ok) {
+    return {
+      status: runtime.status,
+      body: {
+        ok: false,
+        error: runtime.error,
+        code: runtime.code,
+      },
+    };
+  }
 
+  if (runtime.errorCount > 0) {
+    return {
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          success: false,
+          eventsCreated: 0,
+          entriesCreated: 0,
+          itemsCreated: 0,
+          infoCount: runtime.infoCount,
+          warningCount: runtime.warningCount,
+          errorCount: runtime.errorCount,
+          issues: runtime.issues,
+        },
+      },
+    };
+  }
+
+  try {
     const acceptedRows = runtime.rows.filter((row) => row.accepted);
     const writeResult = await writeAdminShowWorkbookImportDb({
       fileName: input.fileName,
@@ -102,7 +121,7 @@ export async function applyAdminShowWorkbookImport(input: {
       {
         ...toErrorLog(error),
       },
-      "show workbook apply failed",
+      "show workbook apply write failed",
     );
     return {
       status: 409,
