@@ -24,6 +24,10 @@ type RuleDraft = AdminShowWorkbookSchemaRuleDraft & {
   code?: string;
 };
 
+const LOOKUP_KEY_TARGET_FIELDS = new Set<
+  NonNullable<AdminShowWorkbookSchemaRuleDraft["targetField"]>
+>(["REGISTRATION_NO", "EVENT_DATE", "EVENT_CITY", "EVENT_PLACE", "EVENT_TYPE"]);
+
 function addError(
   errors: AdminShowWorkbookSchemaValidationError[],
   field: AdminShowWorkbookSchemaValidationError["field"],
@@ -112,6 +116,19 @@ export function validateAdminShowWorkbookSchemaRuleDraft(
         "Ignored workbook rules cannot define value maps.",
       );
     }
+  }
+
+  if (
+    input.targetField &&
+    LOOKUP_KEY_TARGET_FIELDS.has(input.targetField) &&
+    (!input.headerRequired || !input.rowValueRequired)
+  ) {
+    addError(
+      errors,
+      "rowValueRequired",
+      "LOOKUP_KEY_FIELD_REQUIRED",
+      `Lookup-key field ${input.targetField} must stay required in workbook metadata.`,
+    );
   }
 
   if (input.parseMode === "VALUE_MAP") {

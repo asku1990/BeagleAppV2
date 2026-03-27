@@ -97,9 +97,14 @@ describe("validateAdminShowWorkbookSchemaRuleDraft", () => {
     );
   });
 
-  it("allows admin-managed requiredness changes for core fields", () => {
+  it("allows admin-managed requiredness changes for non-key fields", () => {
     const errors = validateAdminShowWorkbookSchemaRuleDraft(
       createRuleDraft({
+        headerName: "Tuomari",
+        targetField: "JUDGE",
+        parseMode: "TEXT",
+        destinationKind: "SHOW_ENTRY",
+        allowedDefinitionCategoryCode: null,
         headerRequired: false,
         rowValueRequired: false,
       }),
@@ -107,6 +112,30 @@ describe("validateAdminShowWorkbookSchemaRuleDraft", () => {
     );
 
     expect(errors).toEqual([]);
+  });
+
+  it("rejects optional lookup-key fields", () => {
+    const errors = validateAdminShowWorkbookSchemaRuleDraft(
+      createRuleDraft({
+        headerName: "Aika",
+        targetField: "EVENT_DATE",
+        parseMode: "DATE",
+        destinationKind: "SHOW_EVENT",
+        allowedDefinitionCategoryCode: null,
+        headerRequired: false,
+        rowValueRequired: false,
+      }),
+      references,
+    );
+
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          field: "rowValueRequired",
+          code: "LOOKUP_KEY_FIELD_REQUIRED",
+        }),
+      ]),
+    );
   });
 
   it("rejects fixed definitions with an incompatible value type", () => {
