@@ -98,6 +98,70 @@ function addMissingRequiredResultValueIssue(input: {
   });
 }
 
+function addDefinitionFromStructuralField(input: {
+  field:
+    | WorkbookResolvedSchema["structuralFields"]["classValue"]
+    | WorkbookResolvedSchema["structuralFields"]["qualityValue"];
+  value: string;
+  fallbackColumnName: string;
+  invalidValueMessage: string;
+  rowNumber: number;
+  registrationNo: string;
+  eventLookupKey: string;
+  definitionsByCode: Map<string, WorkbookDefinitionMeta>;
+  issues: AdminShowWorkbookImportIssue[];
+  resultItems: Array<{
+    columnName: string;
+    definitionCode: string;
+    valueCode: string | null;
+    valueNumeric: number | null;
+  }>;
+}) {
+  const field = input.field;
+  if (!field || field.parseMode !== "DEFINITION_FROM_CELL") {
+    return;
+  }
+
+  const columnName = field.headerName ?? input.fallbackColumnName;
+  const rawValue = input.value.trim();
+  if (!rawValue) {
+    if (field.rowValueRequired) {
+      addMissingRequiredResultValueIssue({
+        issues: input.issues,
+        rowNumber: input.rowNumber,
+        columnName,
+        registrationNo: input.registrationNo,
+        eventLookupKey: input.eventLookupKey,
+      });
+    }
+    return;
+  }
+
+  const definitionCode = resolveDefinitionCodeFromWorkbookValue(
+    input.definitionsByCode,
+    rawValue,
+    field.allowedDefinitionCategoryCode ?? null,
+  );
+  if (!definitionCode) {
+    addDefinitionIssue(input.issues, {
+      rowNumber: input.rowNumber,
+      columnName,
+      code: ISSUE_CODES.invalidResultValue,
+      message: input.invalidValueMessage,
+      registrationNo: input.registrationNo,
+      eventLookupKey: input.eventLookupKey,
+    });
+    return;
+  }
+
+  input.resultItems.push({
+    columnName,
+    definitionCode,
+    valueCode: null,
+    valueNumeric: null,
+  });
+}
+
 export function buildWorkbookPreviewItems({
   row,
   columnMap,
@@ -117,53 +181,31 @@ export function buildWorkbookPreviewItems({
     valueNumeric: number | null;
   }> = [];
 
-  const classCode = resolveDefinitionCodeFromWorkbookValue(
+  addDefinitionFromStructuralField({
+    field: schema.structuralFields.classValue,
+    value: classValue,
+    fallbackColumnName: "Luokka",
+    invalidValueMessage: `Unsupported class value: ${classValue}.`,
+    rowNumber,
+    registrationNo,
+    eventLookupKey,
     definitionsByCode,
-    classValue,
-    schema.structuralFields.classValue?.allowedDefinitionCategoryCode ?? null,
-  );
-  if (!classCode) {
-    addDefinitionIssue(issues, {
-      rowNumber,
-      columnName: schema.structuralFields.classValue?.headerName ?? "Luokka",
-      code: ISSUE_CODES.invalidResultValue,
-      message: `Unsupported class value: ${classValue}.`,
-      registrationNo,
-      eventLookupKey,
-    });
-  } else {
-    resultItems.push({
-      columnName: schema.structuralFields.classValue?.headerName ?? "Luokka",
-      definitionCode: classCode,
-      valueCode: null,
-      valueNumeric: null,
-    });
-  }
+    issues,
+    resultItems,
+  });
 
-  const qualityCode = resolveDefinitionCodeFromWorkbookValue(
+  addDefinitionFromStructuralField({
+    field: schema.structuralFields.qualityValue,
+    value: qualityValue,
+    fallbackColumnName: "Laatuarvostelu",
+    invalidValueMessage: `Unsupported quality value: ${qualityValue}.`,
+    rowNumber,
+    registrationNo,
+    eventLookupKey,
     definitionsByCode,
-    qualityValue,
-    schema.structuralFields.qualityValue?.allowedDefinitionCategoryCode ?? null,
-  );
-  if (!qualityCode) {
-    addDefinitionIssue(issues, {
-      rowNumber,
-      columnName:
-        schema.structuralFields.qualityValue?.headerName ?? "Laatuarvostelu",
-      code: ISSUE_CODES.invalidResultValue,
-      message: `Unsupported quality value: ${qualityValue}.`,
-      registrationNo,
-      eventLookupKey,
-    });
-  } else {
-    resultItems.push({
-      columnName:
-        schema.structuralFields.qualityValue?.headerName ?? "Laatuarvostelu",
-      definitionCode: qualityCode,
-      valueCode: null,
-      valueNumeric: null,
-    });
-  }
+    issues,
+    resultItems,
+  });
 
   for (const column of schema.resultColumns) {
     if (column.parseMode === "FIXED_NUMERIC") {

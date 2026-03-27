@@ -646,6 +646,62 @@ describe("previewAdminShowWorkbookImport", () => {
     );
   });
 
+  it("respects class and quality metadata when they are optional and non-definition-backed", async () => {
+    showWorkbookColumnRuleFindManyMock.mockResolvedValue(
+      buildDefaultColumnRules().map((rule) => {
+        if (rule.code === "CLASS_VALUE" || rule.code === "QUALITY_VALUE") {
+          return {
+            ...rule,
+            parseMode: "TEXT",
+            destinationKind: "SHOW_ENTRY",
+            allowedDefinitionCategoryCode: null,
+            rowValueRequired: false,
+          };
+        }
+        return rule;
+      }),
+    );
+
+    const workbook = buildWorkbookBuffer([
+      createRow({
+        [IDX.registrationNo]: "FI16175/23",
+        [IDX.eventDate]: new Date("2025-01-11T00:00:00.000Z"),
+        [IDX.eventCity]: "Kajaani",
+        [IDX.eventPlace]: "Kajaanin Pallohalli",
+        [IDX.eventType]: "Kansainvälinen näyttely",
+        [IDX.dogName]: "CARDIEM KIND REGARDS",
+        [IDX.classValue]: null,
+        [IDX.qualityValue]: null,
+        [IDX.judge]: "Laakso Jari",
+      }),
+    ]);
+
+    const result = await previewAdminShowWorkbookImport({
+      fileName: "Näyttelyt.xlsx",
+      workbook,
+    });
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) {
+      throw new Error("Expected a successful preview response");
+    }
+
+    expect(result.body.data.acceptedRowCount).toBe(1);
+    expect(result.body.data.rejectedRowCount).toBe(0);
+    expect(result.body.data.issues).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "SHOW_WORKBOOK_INVALID_RESULT_VALUE",
+          columnName: "Luokka",
+        }),
+        expect.objectContaining({
+          code: "SHOW_WORKBOOK_INVALID_RESULT_VALUE",
+          columnName: "Laatuarvostelu",
+        }),
+      ]),
+    );
+  });
+
   it("scopes DEFINITION_FROM_CELL resolution to the rule category", async () => {
     const workbook = buildWorkbookBuffer([
       createRow({
