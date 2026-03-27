@@ -704,7 +704,7 @@ describe("previewAdminShowWorkbookImport", () => {
     );
   });
 
-  it("respects class and quality metadata when they are optional and non-definition-backed", async () => {
+  it("rejects class and quality metadata in TEXT mode", async () => {
     showWorkbookColumnRuleFindManyMock.mockResolvedValue(
       buildDefaultColumnRules().map((rule) => {
         if (rule.code === "CLASS_VALUE" || rule.code === "QUALITY_VALUE") {
@@ -739,25 +739,12 @@ describe("previewAdminShowWorkbookImport", () => {
       workbook,
     });
 
-    expect(result.status).toBe(200);
-    if (!result.body.ok) {
-      throw new Error("Expected a successful preview response");
-    }
-
-    expect(result.body.data.acceptedRowCount).toBe(1);
-    expect(result.body.data.rejectedRowCount).toBe(0);
-    expect(result.body.data.issues).not.toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          code: "SHOW_WORKBOOK_INVALID_RESULT_VALUE",
-          columnName: "Luokka",
-        }),
-        expect.objectContaining({
-          code: "SHOW_WORKBOOK_INVALID_RESULT_VALUE",
-          columnName: "Laatuarvostelu",
-        }),
-      ]),
-    );
+    expect(result.status).toBe(500);
+    expect(result.body).toEqual({
+      ok: false,
+      error: "CLASS_VALUE must use DEFINITION_FROM_CELL parse mode.",
+      code: "SHOW_WORKBOOK_SCHEMA_INVALID",
+    });
   });
 
   it("scopes DEFINITION_FROM_CELL resolution to the rule category", async () => {
@@ -891,7 +878,12 @@ describe("previewAdminShowWorkbookImport", () => {
 
     expect(result.body.data.acceptedRowCount).toBe(0);
     expect(result.body.data.rejectedRowCount).toBe(1);
-    expect(result.body.data.events).toHaveLength(0);
+    expect(result.body.data.events).toHaveLength(1);
+    expect(result.body.data.events[0]?.entries[0]).toEqual(
+      expect.objectContaining({
+        status: "REJECTED",
+      }),
+    );
     expect(result.body.data.schema.missingStructuralFields).toEqual([
       expect.objectContaining({
         fieldKey: "eventType",
