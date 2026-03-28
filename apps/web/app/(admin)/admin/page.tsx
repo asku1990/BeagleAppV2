@@ -36,6 +36,11 @@ export default function AdminHomePage() {
               <Link href="/admin/dogs">{t("admin.home.modules.openDogs")}</Link>
             </Button>
             <Button asChild variant="outline">
+              <Link href="/admin/shows">
+                {t("admin.home.modules.openShows")}
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
               <Link href="/admin/settings">
                 {t("admin.home.modules.openSettings")}
               </Link>

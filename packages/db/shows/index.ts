@@ -13,3 +13,4 @@ export type {
   BeagleShowSearchSortDb,
 } from "./types";
 export { seedShowResultDefinitions } from "./seed-result-definitions";
+export { seedShowWorkbookImportSchema } from "./seed-workbook-import-schema";

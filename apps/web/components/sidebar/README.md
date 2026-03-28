@@ -23,6 +23,8 @@ Developer notes for the app sidebar components in this folder.
 - Use one naming style for visible sidebar labels.
 - Prefer section-style labels over action-style labels in the sidebar.
 - Example: `Beaglet`, `Koetulokset`, `Näyttelyt` instead of mixing section names with `...haku` labels.
+- Admin sidebar entries should expose real admin destinations only, including
+  module pages such as `Koirat` and `Näyttelyt`.
 
 ## Legacy data testing
 

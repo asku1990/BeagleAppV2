@@ -60,7 +60,8 @@ Runtime guard:
 
 Run seed first:
 
-`pnpm --filter @beagle/db seed:show-result-definitions`
+- `pnpm --filter @beagle/db seed:show-result-definitions`
+- `pnpm --filter @beagle/db seed:show-workbook-import-schema`
 
 The seed step above is part of the same one-shot legacy import flow as phase1-3.
 This flow is documented as initial bootstrap/migration only, not as replay or
@@ -152,8 +153,10 @@ When reviewing parser output against enabled definitions:
 
 - Seed/source of truth:
   - `packages/db/shows/seed-result-definitions.ts`
+  - `packages/db/shows/seed-workbook-import-schema.ts`
 - Verify seed has been run:
   - `pnpm --filter @beagle/db seed:show-result-definitions`
+  - `pnpm --filter @beagle/db seed:show-workbook-import-schema`
 - Parser-produced codes to verify especially:
   - class codes (`PEN`, `JUN`, `NUO`, `AVO`, `KÄY`, `VAL`, `VET`)
   - quality codes (`ERI`, `EH`, `H`, `T`, `EVA`, `HYL`)

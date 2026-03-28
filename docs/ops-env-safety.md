@@ -149,7 +149,19 @@ pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db seed:show-resul
 CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm --filter @beagle/db seed:show-result-definitions
 ```
 
-Bootstrap import (`auth:bootstrap-admin` -> `seed:show-result-definitions` -> `phase1` -> `phase2` -> `phase3`):
+Show workbook import schema seed (Kennelliitto workbook metadata):
+
+```bash
+pass-cli run --env-file .env.local -- pnpm --filter @beagle/db seed:show-workbook-import-schema
+pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db seed:show-workbook-import-schema
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm --filter @beagle/db seed:show-workbook-import-schema
+```
+
+This seed is the bootstrap baseline for `ShowWorkbookColumnRule` /
+`ShowWorkbookColumnValueMap` metadata. It is not intended as the long-term
+editing path once admin-managed workbook schema settings exist.
+
+Bootstrap import (`auth:bootstrap-admin` -> `seed:show-result-definitions` -> `seed:show-workbook-import-schema` -> `phase1` -> `phase2` -> `phase3`):
 
 ```bash
 pass-cli run --env-file .env.local -- pnpm import:bootstrap

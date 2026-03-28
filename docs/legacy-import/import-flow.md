@@ -19,7 +19,8 @@ Phase-specific docs:
 - Phase 2 (trials): `pnpm import:phase2`
 - Phase 3 (shows): `pnpm import:phase3`
 - Show result definition seed (canonical awards, one-shot flow): `pnpm --filter @beagle/db seed:show-result-definitions`
-- Optional full bootstrap (`auth:bootstrap-admin` -> `seed:show-result-definitions` -> `phase1` -> `phase2` -> `phase3`): `pnpm import:bootstrap`
+- Show workbook import schema seed (Kennelliitto workbook metadata, one-shot flow): `pnpm --filter @beagle/db seed:show-workbook-import-schema`
+- Optional full bootstrap (`auth:bootstrap-admin` -> `seed:show-result-definitions` -> `seed:show-workbook-import-schema` -> `phase1` -> `phase2` -> `phase3`): `pnpm import:bootstrap`
 
 Optional actor id for phase commands:
 
@@ -58,10 +59,16 @@ Issue tooling:
    legacy and Kennelliitto workbook mappings (for example `ROP`, `VSP`, `SERT`, `varaSERT`,
    `CACIB`, `varaCACIB`, `PUPN`, `SIJOITUS`, `JUN-ROP`, `JUN-VSP`, `VET-ROP`, `VET-VSP`, `SA`, `KP`).
 
+5. `seed:show-workbook-import-schema` bootstraps `ShowWorkbookColumnRule` metadata used by the
+   Kennelliitto workbook validator to resolve headers into imported, ignored, or blocked columns.
+   This seed is the bootstrap baseline only; future admin-managed workbook
+   schema edits should update the metadata directly instead of reseeding.
+
 Lifecycle note:
 
-- The entire legacy import flow is one-shot: `seed:show-result-definitions`, `phase1`,
-  `phase2`, `phase3`, and `import:bootstrap` all belong to the same initial canonical
+- The entire legacy import flow is one-shot: `seed:show-result-definitions`,
+  `seed:show-workbook-import-schema`, `phase1`, `phase2`, `phase3`, and
+  `import:bootstrap` all belong to the same initial canonical
   bootstrap/migration.
 - None of these commands are documented as upgrade, replay, or reconciliation steps for an
   already bootstrapped legacy-import environment.
@@ -74,16 +81,18 @@ Bootstrap invariants:
   - `showEvent`
   - `showEntry`
   - `showResultItem`
-- `seed:show-result-definitions` is part of that same one-shot bootstrap and is not an ongoing migration/reconciliation step.
+- `seed:show-result-definitions` and `seed:show-workbook-import-schema` are part of that same
+  one-shot bootstrap and are not ongoing migration/reconciliation steps.
 - Backward compatibility with pre-existing legacy `showResultDefinition.code` variants is out of scope unless explicitly requested for a migration task.
 
 `import:bootstrap` runs the full sequence in this order:
 
 1. `auth:bootstrap-admin`
 2. `seed:show-result-definitions`
-3. `phase1`
-4. `phase2`
-5. `phase3`
+3. `seed:show-workbook-import-schema`
+4. `phase1`
+5. `phase2`
+6. `phase3`
 
 ## ImportRun and issues model
 
@@ -112,7 +121,7 @@ Issue code details are maintained in phase docs:
 ## Execution model
 
 This import flow is intended for initial migration, run in order
-(`seed:show-result-definitions` -> `phase1` -> `phase2` -> `phase3`).
+(`seed:show-result-definitions` -> `seed:show-workbook-import-schema` -> `phase1` -> `phase2` -> `phase3`).
 Treat it as a one-time bootstrap/migration flow, not as an ongoing sync,
 replay, or upgrade pipeline.
 

@@ -97,7 +97,16 @@ function compareRows(
       ? left.eventDate.getTime() - right.eventDate.getTime()
       : right.eventDate.getTime() - left.eventDate.getTime();
   if (dateComparison !== 0) return dateComparison;
-  return left.eventPlace.localeCompare(right.eventPlace, "fi", {
+  const placeComparison = left.eventPlace.localeCompare(
+    right.eventPlace,
+    "fi",
+    {
+      sensitivity: "base",
+    },
+  );
+  if (placeComparison !== 0) return placeComparison;
+
+  return left.eventKey.localeCompare(right.eventKey, "fi", {
     sensitivity: "base",
   });
 }

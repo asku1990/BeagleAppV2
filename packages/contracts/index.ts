@@ -6,6 +6,7 @@ export type ApiError = {
   ok: false;
   error: string;
   code?: string;
+  details?: unknown;
 };
 
 export type ApiResult<T> = ApiSuccess<T> | ApiError;
@@ -163,6 +164,34 @@ export type {
   AdminBreederLookupResponse,
   AdminOwnerLookupResponse,
   AdminDogParentLookupResponse,
+  AdminShowWorkbookImportIssue,
+  AdminShowWorkbookImportIssueSeverity,
+  AdminShowWorkbookImportApplyResponse,
+  AdminShowWorkbookImportPreviewEntry,
+  AdminShowWorkbookImportPreviewEvent,
+  AdminShowWorkbookImportPreviewItem,
+  AdminShowWorkbookImportResolvedSchema,
+  AdminShowWorkbookImportSchemaBlockedColumn,
+  AdminShowWorkbookImportSchemaBlockedColumnReasonCode,
+  AdminShowWorkbookImportSchemaCoverage,
+  AdminShowWorkbookImportSchemaDefinitionColumn,
+  AdminShowWorkbookImportSchemaIgnoredColumn,
+  AdminShowWorkbookImportSchemaMissingField,
+  AdminShowWorkbookImportSchemaStructuralColumn,
+  AdminShowWorkbookImportPreviewResponse,
+  AdminShowWorkbookSchemaDestinationKind,
+  AdminShowWorkbookSchemaParseMode,
+  AdminShowWorkbookSchemaRule,
+  AdminShowWorkbookSchemaRuleDraft,
+  AdminShowWorkbookSchemaRulePolicy,
+  AdminShowWorkbookSchemaTargetField,
+  AdminShowWorkbookSchemaValidationError,
+  AdminShowWorkbookSchemaValueMap,
+  ListAdminShowWorkbookSchemaResponse,
+  UpdateAdminShowWorkbookSchemaRuleRequest,
+  UpdateAdminShowWorkbookSchemaRuleResponse,
+  ValidateAdminShowWorkbookSchemaRuleRequest,
+  ValidateAdminShowWorkbookSchemaRuleResponse,
 } from "./admin";
 export type { HomeStatisticsResponse } from "./home";
 export {

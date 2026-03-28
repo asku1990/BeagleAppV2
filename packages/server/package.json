@@ -9,9 +9,9 @@
     "build": "tsc -p tsconfig.json",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run",
-    "test:unit": "vitest run",
-    "test:coverage": "vitest run --coverage",
+    "test": "node ../../node_modules/vitest/vitest.mjs run",
+    "test:unit": "node ../../node_modules/vitest/vitest.mjs run",
+    "test:coverage": "node ../../node_modules/vitest/vitest.mjs run --coverage",
     "import:phase1": "node --import tsx/esm scripts/imports/phase1/run.ts",
     "import:phase2": "node --import tsx/esm scripts/imports/phase2/run.ts",
     "import:phase3": "node --import tsx/esm scripts/imports/phase3/run.ts",
@@ -23,7 +23,8 @@
     "@beagle/contracts": "workspace:*",
     "@beagle/db": "workspace:*",
     "better-auth": "^1.4.18",
-    "pino": "^9.14.0"
+    "pino": "^9.14.0",
+    "xlsx": "0.18.5"
   },
   "devDependencies": {
     "pino-pretty": "^13.1.3"
