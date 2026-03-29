@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { AdminShowWorkbookImportIssue } from "@beagle/contracts";
+import type {
+  AdminShowWorkbookImportIssue,
+  AdminShowWorkbookImportPreviewItem,
+} from "@beagle/contracts";
 import { ISSUE_CODES } from "../../workbook-preview-constants";
 import type { WorkbookParsedRow } from "../../workbook-preview-types";
 import { checkExistingImportConflicts } from "../check-existing-import-conflicts";
@@ -13,6 +16,15 @@ vi.mock("@beagle/db", () => ({
 }));
 
 function createRow(overrides: Partial<WorkbookParsedRow>): WorkbookParsedRow {
+  const resultItems: AdminShowWorkbookImportPreviewItem[] = [
+    {
+      columnName: "Luokka",
+      definitionCode: "AVO",
+      valueCode: "AVO",
+      valueNumeric: null,
+    },
+  ];
+
   return {
     rowNumber: 2,
     eventLookupKey: "2025-05-01|HELSINKI|MESSUKESKUS|ALL BREED",
@@ -30,7 +42,7 @@ function createRow(overrides: Partial<WorkbookParsedRow>): WorkbookParsedRow {
     critiqueText: "Nice dog",
     classValue: "AVO",
     qualityValue: "ERI",
-    resultItems: [{ code: "AVO", label: "Avoin" }],
+    resultItems,
     ...overrides,
   };
 }
@@ -55,7 +67,14 @@ describe("checkExistingImportConflicts", () => {
       accepted: false,
       issueCount: 0,
       itemCount: 1,
-      resultItems: [{ code: "AVO", label: "Avoin" }],
+      resultItems: [
+        {
+          columnName: "Luokka",
+          definitionCode: "AVO",
+          valueCode: "AVO",
+          valueNumeric: null,
+        },
+      ],
     });
     expect(issues).toEqual([]);
   });
@@ -157,7 +176,14 @@ describe("checkExistingImportConflicts", () => {
       accepted: true,
       issueCount: 0,
       itemCount: 1,
-      resultItems: [{ code: "AVO", label: "Avoin" }],
+      resultItems: [
+        {
+          columnName: "Luokka",
+          definitionCode: "AVO",
+          valueCode: "AVO",
+          valueNumeric: null,
+        },
+      ],
     });
     expect(issues).toEqual([]);
   });
