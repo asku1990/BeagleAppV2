@@ -6,15 +6,7 @@ import type {
 } from "@beagle/contracts";
 import { previewAdminShowWorkbookImport } from "@beagle/server";
 import { requireAdminLayoutAccess } from "@/lib/server/admin-guard";
-
-function getWorkbookFile(formData: FormData): File | null {
-  const value = formData.get("workbook");
-  if (!(value instanceof File) || value.size === 0) {
-    return null;
-  }
-
-  return value;
-}
+import { readWorkbookActionFile } from "./workbook-file";
 
 export async function previewAdminShowWorkbookImportAction(
   formData: FormData,
@@ -30,31 +22,14 @@ export async function previewAdminShowWorkbookImportAction(
     };
   }
 
-  const workbook = getWorkbookFile(formData);
-  if (!workbook) {
-    return {
-      ok: false,
-      error: {
-        code: "INVALID_FILE",
-        message: "Workbook file is required.",
-      },
-    };
+  const workbook = await readWorkbookActionFile(formData);
+  if (!workbook.ok) {
+    return workbook.result;
   }
 
-  if (!workbook.name.toLowerCase().endsWith(".xlsx")) {
-    return {
-      ok: false,
-      error: {
-        code: "INVALID_FILE",
-        message: "Workbook file must use the .xlsx extension.",
-      },
-    };
-  }
-
-  const workbookBuffer = Buffer.from(await workbook.arrayBuffer());
   const result = await previewAdminShowWorkbookImport({
-    fileName: workbook.name,
-    workbook: workbookBuffer,
+    fileName: workbook.file.name,
+    workbook: workbook.buffer,
   });
 
   if (!result.body.ok) {

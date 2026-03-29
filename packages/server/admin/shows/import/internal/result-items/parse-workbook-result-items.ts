@@ -3,24 +3,25 @@ import {
   normalizeWorkbookComparisonToken,
   normalizeWorkbookInteger,
   normalizeWorkbookTextCell,
-} from "./cell";
+} from "../cell";
 import {
   ISSUE_CODES,
   TRUTHY_WORKBOOK_TOKENS,
-} from "./workbook-preview-constants";
+} from "../workbook-preview-constants";
 import {
   addDefinitionIssue,
   normalizeAllowedValue,
   parsePupnValue,
-} from "./workbook-preview-mappers";
-import { getCell } from "./workbook-preview-io";
+} from "../workbook-preview-mappers";
+import { getCell } from "../input/get-cell";
 import type {
   WorkbookColumnMap,
   WorkbookDefinitionMeta,
   WorkbookResolvedSchema,
   WorkbookRow,
-} from "./workbook-preview-types";
+} from "../workbook-preview-types";
 
+// Parses definition-backed result items after structural row fields are already normalized.
 type BuildWorkbookPreviewItemsInput = {
   row: WorkbookRow;
   columnMap: WorkbookColumnMap;
@@ -162,7 +163,7 @@ function addDefinitionFromStructuralField(input: {
   });
 }
 
-export function buildWorkbookPreviewItems({
+export function parseWorkbookResultItems({
   row,
   columnMap,
   schema,

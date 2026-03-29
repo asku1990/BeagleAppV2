@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildPreviewEvents } from "../workbook-preview-events";
+import { buildPreviewEvents } from "../preview/build-preview-events";
 import type { WorkbookParsedRow } from "../workbook-preview-types";
 
 function createRow(overrides: Partial<WorkbookParsedRow>): WorkbookParsedRow {

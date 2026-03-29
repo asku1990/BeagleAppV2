@@ -8,7 +8,7 @@ const { evaluateWorkbookImportMock, writeAdminShowWorkbookImportDbMock } =
     writeAdminShowWorkbookImportDbMock: vi.fn(),
   }));
 
-vi.mock("../internal/workbook-import-runtime", () => ({
+vi.mock("../internal/runtime/evaluate-workbook-import", () => ({
   evaluateWorkbookImport: evaluateWorkbookImportMock,
 }));
 

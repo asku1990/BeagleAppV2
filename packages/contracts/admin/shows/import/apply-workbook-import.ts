@@ -1,4 +1,4 @@
-import type { AdminShowWorkbookImportIssue } from "./preview-workbook-import";
+import type { AdminShowWorkbookImportIssue } from "./types";
 
 export type AdminShowWorkbookImportApplyResponse = {
   success: boolean;
