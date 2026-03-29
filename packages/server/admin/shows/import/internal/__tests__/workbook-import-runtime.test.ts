@@ -1,56 +1,65 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ISSUE_CODES } from "../workbook-preview-constants";
-import { evaluateWorkbookImport } from "../workbook-import-runtime";
+import { evaluateWorkbookImport } from "../runtime/evaluate-workbook-import";
 
 const {
-  listExistingShowImportKeysDbMock,
   buildColumnMapMock,
-  countIssueSeverityMock,
+  checkExistingImportConflictsMock,
   getCellMock,
-  loadLookupDataMock,
+  loadWorkbookLookupDataMock,
   parseWorkbookBufferMock,
-  buildPreviewEventsMock,
-  parseWorkbookRowMock,
+  evaluateWorkbookRowMock,
   buildWorkbookSchemaIssuesMock,
   resolveWorkbookSchemaMock,
+  summarizeWorkbookImportMock,
   validateAdminShowWorkbookSchemaRulesMock,
 } = vi.hoisted(() => ({
-  listExistingShowImportKeysDbMock: vi.fn(),
   buildColumnMapMock: vi.fn(),
-  countIssueSeverityMock: vi.fn(),
+  checkExistingImportConflictsMock: vi.fn(),
   getCellMock: vi.fn(),
-  loadLookupDataMock: vi.fn(),
+  loadWorkbookLookupDataMock: vi.fn(),
   parseWorkbookBufferMock: vi.fn(),
-  buildPreviewEventsMock: vi.fn(),
-  parseWorkbookRowMock: vi.fn(),
+  evaluateWorkbookRowMock: vi.fn(),
   buildWorkbookSchemaIssuesMock: vi.fn(),
   resolveWorkbookSchemaMock: vi.fn(),
+  summarizeWorkbookImportMock: vi.fn(),
   validateAdminShowWorkbookSchemaRulesMock: vi.fn(),
 }));
 
-vi.mock("@beagle/db", () => ({
-  listExistingShowImportKeysDb: listExistingShowImportKeysDbMock,
+vi.mock("../input/build-column-map", () => ({
+  buildColumnMap: buildColumnMapMock,
 }));
 
-vi.mock("../workbook-preview-io", () => ({
-  buildColumnMap: buildColumnMapMock,
-  countIssueSeverity: countIssueSeverityMock,
+vi.mock("../input/get-cell", () => ({
   getCell: getCellMock,
-  loadLookupData: loadLookupDataMock,
+}));
+
+vi.mock("../input/load-workbook-lookup-data", () => ({
+  loadWorkbookLookupData: loadWorkbookLookupDataMock,
+}));
+
+vi.mock("../input/parse-workbook-buffer", () => ({
   parseWorkbookBuffer: parseWorkbookBufferMock,
 }));
 
-vi.mock("../workbook-preview-events", () => ({
-  buildPreviewEvents: buildPreviewEventsMock,
+vi.mock("../duplicates/check-existing-import-conflicts", () => ({
+  checkExistingImportConflicts: checkExistingImportConflictsMock,
 }));
 
-vi.mock("../workbook-preview-row", () => ({
-  parseWorkbookRow: parseWorkbookRowMock,
+vi.mock("../rows/evaluate-workbook-row", () => ({
+  evaluateWorkbookRow: evaluateWorkbookRowMock,
 }));
 
-vi.mock("../workbook-preview-schema", () => ({
+vi.mock("../schema/build-workbook-schema-issues", () => ({
   buildWorkbookSchemaIssues: buildWorkbookSchemaIssuesMock,
+}));
+
+vi.mock("../schema/resolve-workbook-schema", () => ({
   resolveWorkbookSchema: resolveWorkbookSchemaMock,
+}));
+
+vi.mock("../runtime/summarize-workbook-import", () => ({
+  summarizeWorkbookImport: summarizeWorkbookImportMock,
 }));
 
 vi.mock("../../../core/workbook-schema-validation", () => ({
@@ -60,16 +69,15 @@ vi.mock("../../../core/workbook-schema-validation", () => ({
 
 describe("evaluateWorkbookImport", () => {
   beforeEach(() => {
-    listExistingShowImportKeysDbMock.mockReset();
     buildColumnMapMock.mockReset();
-    countIssueSeverityMock.mockReset();
+    checkExistingImportConflictsMock.mockReset();
     getCellMock.mockReset();
-    loadLookupDataMock.mockReset();
+    loadWorkbookLookupDataMock.mockReset();
     parseWorkbookBufferMock.mockReset();
-    buildPreviewEventsMock.mockReset();
-    parseWorkbookRowMock.mockReset();
+    evaluateWorkbookRowMock.mockReset();
     buildWorkbookSchemaIssuesMock.mockReset();
     resolveWorkbookSchemaMock.mockReset();
+    summarizeWorkbookImportMock.mockReset();
     validateAdminShowWorkbookSchemaRulesMock.mockReset();
 
     parseWorkbookBufferMock.mockReturnValue({
@@ -79,7 +87,7 @@ describe("evaluateWorkbookImport", () => {
     });
     buildColumnMapMock.mockReturnValue(new Map());
     getCellMock.mockReturnValue(null);
-    loadLookupDataMock.mockResolvedValue({
+    loadWorkbookLookupDataMock.mockResolvedValue({
       dogIdByRegistration: new Map(),
       enabledDefinitionCodes: new Set(["AVO"]),
       definitionsByCode: new Map([
@@ -130,20 +138,41 @@ describe("evaluateWorkbookImport", () => {
       },
     });
     buildWorkbookSchemaIssuesMock.mockReturnValue([]);
-    countIssueSeverityMock.mockImplementation((issues: Array<unknown>) => ({
-      infoCount: 0,
-      warningCount: 0,
-      errorCount: issues.length,
-    }));
-    buildPreviewEventsMock.mockReturnValue([{ eventLookupKey: "preview" }]);
-    listExistingShowImportKeysDbMock.mockResolvedValue({
-      events: [],
-      entries: [],
-    });
+    checkExistingImportConflictsMock.mockResolvedValue(undefined);
+    summarizeWorkbookImportMock.mockImplementation(
+      ({ sheetName, rows, issues, schema }) => ({
+        ok: true,
+        sheetName,
+        rows,
+        issues,
+        schema,
+        rowCount: rows.length,
+        acceptedRowCount: rows.filter(
+          (row: { accepted: boolean }) => row.accepted,
+        ).length,
+        rejectedRowCount: rows.filter(
+          (row: { accepted: boolean }) => !row.accepted,
+        ).length,
+        eventCount: rows.some((row: { accepted: boolean }) => row.accepted)
+          ? 1
+          : 0,
+        entryCount: rows.filter((row: { accepted: boolean }) => row.accepted)
+          .length,
+        resultItemCount: rows.reduce(
+          (sum: number, row: { itemCount: number; accepted: boolean }) =>
+            sum + (row.accepted ? row.itemCount : 0),
+          0,
+        ),
+        infoCount: 0,
+        warningCount: 0,
+        errorCount: issues.length,
+        events: [{ eventLookupKey: "preview" }],
+      }),
+    );
   });
 
   it("returns a schema-missing error when no column rules are configured", async () => {
-    loadLookupDataMock.mockResolvedValue({
+    loadWorkbookLookupDataMock.mockResolvedValue({
       dogIdByRegistration: new Map(),
       enabledDefinitionCodes: new Set(["AVO"]),
       definitionsByCode: new Map(),
@@ -184,8 +213,8 @@ describe("evaluateWorkbookImport", () => {
     });
   });
 
-  it("marks duplicate existing entries and conflicting existing events as rejected", async () => {
-    parseWorkbookRowMock
+  it("passes parsed rows to duplicate checking and runtime summary", async () => {
+    evaluateWorkbookRowMock
       .mockReturnValueOnce({
         accepted: true,
         issues: [],
@@ -222,16 +251,6 @@ describe("evaluateWorkbookImport", () => {
         qualityValue: "ERI",
         resultItems: [{ code: "ERI", label: "Erinomainen" }],
       });
-    listExistingShowImportKeysDbMock.mockResolvedValue({
-      entries: [{ entryLookupKey: "REG-1|event-1" }],
-      events: [
-        {
-          eventLookupKey: "event-2",
-          eventCity: "Lahti",
-          eventType: "All Breed",
-        },
-      ],
-    });
 
     await expect(
       evaluateWorkbookImport({
@@ -241,43 +260,38 @@ describe("evaluateWorkbookImport", () => {
     ).resolves.toEqual(
       expect.objectContaining({
         ok: true,
-        acceptedRowCount: 0,
-        rejectedRowCount: 2,
-        eventCount: 0,
-        entryCount: 0,
-        resultItemCount: 0,
-        errorCount: 2,
-        rows: [
-          expect.objectContaining({
-            registrationNo: "REG-1",
-            accepted: false,
-            issueCount: 1,
-            itemCount: 0,
-            resultItems: [],
-          }),
-          expect.objectContaining({
-            registrationNo: "REG-2",
-            accepted: false,
-            issueCount: 1,
-            itemCount: 0,
-            resultItems: [],
-          }),
-        ],
-        issues: expect.arrayContaining([
-          expect.objectContaining({
-            code: ISSUE_CODES.duplicateExistingEntry,
-            registrationNo: "REG-1",
-            eventLookupKey: "event-1",
-          }),
-          expect.objectContaining({
-            code: ISSUE_CODES.eventMetadataConflict,
-            registrationNo: "REG-2",
-            eventLookupKey: "event-2",
-            message: expect.stringContaining("city differs"),
-          }),
-        ]),
+        acceptedRowCount: 2,
+        rejectedRowCount: 0,
+        eventCount: 1,
+        entryCount: 2,
+        resultItemCount: 3,
+        errorCount: 0,
         events: [{ eventLookupKey: "preview" }],
       }),
     );
+
+    expect(checkExistingImportConflictsMock).toHaveBeenCalledWith({
+      issues: [],
+      rows: expect.arrayContaining([
+        expect.objectContaining({
+          registrationNo: "REG-1",
+          accepted: true,
+          issueCount: 0,
+          itemCount: 2,
+        }),
+        expect.objectContaining({
+          registrationNo: "REG-2",
+          accepted: true,
+          issueCount: 0,
+          itemCount: 1,
+        }),
+      ]),
+    });
+    expect(summarizeWorkbookImportMock).toHaveBeenCalledWith({
+      sheetName: "Sheet1",
+      rows: expect.any(Array),
+      issues: [],
+      schema: expect.any(Object),
+    });
   });
 });

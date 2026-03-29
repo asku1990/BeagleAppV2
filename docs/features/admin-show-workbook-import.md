@@ -55,6 +55,31 @@ workbook inline and apply the import in one safe all-or-nothing write step.
 - The active workbook schema is global and edited in place. The validator and
   future admin settings use the same metadata contract.
 
+## Implementation layout
+
+The server import engine is organized as a stage-based pipeline under
+`packages/server/admin/shows/import/internal/**` so preview and apply can share
+the same evaluation flow without putting all logic into `preview-*` helper
+files.
+
+- `runtime/*`
+  - orchestrates parse -> schema -> row -> duplicate -> summary stages
+- `input/*`
+  - parses the workbook and loads DB-backed lookup metadata
+- `schema/*`
+  - resolves workbook headers and turns schema mismatches into issues
+- `rows/*`
+  - evaluates one workbook row into structural values and row issues
+- `result-items/*`
+  - parses definition-backed result columns after structural row evaluation
+- `duplicates/*`
+  - applies persisted event and entry conflict checks
+- `preview/*`
+  - shapes parsed rows into preview event groups for the UI
+
+Compatibility re-export files may still exist temporarily while tests and call
+sites move to the clearer stage-based modules.
+
 ## Parser modes
 
 `ShowWorkbookColumnRule.parseMode` is a constrained parser vocabulary. Admin

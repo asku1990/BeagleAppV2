@@ -6,7 +6,7 @@ import {
   WORKBOOK_FILE_PATTERN,
 } from "./internal/workbook-preview-constants";
 import type { WorkbookResolvedSchema } from "./internal/workbook-preview-types";
-import { evaluateWorkbookImport } from "./internal/workbook-import-runtime";
+import { evaluateWorkbookImport } from "./internal/runtime/evaluate-workbook-import";
 
 function buildSchemaSummary(schema: WorkbookResolvedSchema) {
   return {

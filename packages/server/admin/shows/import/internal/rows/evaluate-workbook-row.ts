@@ -4,16 +4,16 @@ import {
   normalizeWorkbookDateIso,
   normalizeWorkbookRegistrationNo,
   normalizeWorkbookTextCell,
-} from "./cell";
-import { ISSUE_CODES } from "./workbook-preview-constants";
+} from "../cell";
+import { ISSUE_CODES } from "../workbook-preview-constants";
 import {
   createIssue,
   buildEventLookupKey,
   buildMissingValueIssues,
-} from "./workbook-preview-mappers";
-import { getCell } from "./workbook-preview-io";
-import { buildWorkbookPreviewItems } from "./workbook-preview-row-items";
-import { createWorkbookRowParseResult } from "./workbook-preview-row-result";
+} from "../workbook-preview-mappers";
+import { getCell } from "../input/get-cell";
+import { parseWorkbookResultItems } from "../result-items/parse-workbook-result-items";
+import { createWorkbookRowParseResult } from "../workbook-preview-row-result";
 import type {
   WorkbookColumnMap,
   WorkbookResolvedStructuralField,
@@ -21,8 +21,9 @@ import type {
   WorkbookRow,
   WorkbookRowParseResult,
   WorkbookStructuralFieldKey,
-} from "./workbook-preview-types";
+} from "../workbook-preview-types";
 
+// Evaluates one workbook row into normalized structural data, issues, and parsed result items.
 function getStructuralField(
   schema: WorkbookRowLookupData["schema"],
   key: WorkbookStructuralFieldKey,
@@ -75,7 +76,7 @@ function getRequiredMissingValueEntries(
     .map((field) => [field.headerName, values[field.key] ?? null]);
 }
 
-export function parseWorkbookRow(
+export function evaluateWorkbookRow(
   row: WorkbookRow,
   columnMap: WorkbookColumnMap,
   rowNumber: number,
@@ -275,7 +276,7 @@ export function parseWorkbookRow(
     eventPlace: eventPlaceValue,
     eventType: eventTypeValue,
   });
-  const resultItems = buildWorkbookPreviewItems({
+  const resultItems = parseWorkbookResultItems({
     row,
     columnMap,
     schema: options.schema,

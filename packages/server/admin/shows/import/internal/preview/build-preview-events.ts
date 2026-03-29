@@ -1,6 +1,7 @@
 import type { AdminShowWorkbookImportPreviewEvent } from "@beagle/contracts";
-import type { WorkbookParsedRow } from "./workbook-preview-types";
+import type { WorkbookParsedRow } from "../workbook-preview-types";
 
+// Groups parsed rows into event cards for the admin preview response.
 function buildGroupLabel(row: WorkbookParsedRow): string {
   const parts = [row.eventCity, row.eventPlace].filter(Boolean);
   if (parts.length > 0) {

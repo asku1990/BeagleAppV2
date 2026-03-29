@@ -6,7 +6,7 @@ import {
   ISSUE_CODES,
   WORKBOOK_FILE_PATTERN,
 } from "./internal/workbook-preview-constants";
-import { evaluateWorkbookImport } from "./internal/workbook-import-runtime";
+import { evaluateWorkbookImport } from "./internal/runtime/evaluate-workbook-import";
 
 export async function applyAdminShowWorkbookImport(input: {
   fileName: string;
