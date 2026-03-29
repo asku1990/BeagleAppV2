@@ -26,6 +26,15 @@ Use this format for new entries:
 
 ## Entries
 
+## 2026-03-29 - Clarify historical ShowResult migration artifacts
+
+- Area: Prisma migration history and schema documentation.
+- Issue: Runtime `ShowResult` model/path has been removed, but historical migration files still contain legacy `ShowResult` DDL by design.
+- Impact: New contributors can misread old migration files as active runtime schema intent.
+- Suggested fix: Add a short migration-history note/playbook entry that explicitly separates active schema from historical migration snapshots, and consider migration squashing once release cadence allows it.
+- Trigger to revisit: Next migration-history cleanup/squash task.
+- Ticket: BEJ-47 follow-up.
+
 ## 2026-03-07 - Finalize privacy and consent legal details
 
 - Area: Public privacy page and analytics consent flow (`/privacy`, footer links, consent banner).

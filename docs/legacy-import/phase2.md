@@ -68,4 +68,4 @@ Issue rows are written to `ImportRunIssue` with `kind=LEGACY_PHASE2`.
 ## Operational notes
 
 - Requires phase1 foundation data to maximize dog linking.
-- Phase 2 belongs to the initial migration flow.
+- Phase 2 belongs to the initial migration flow and is included in `import:bootstrap`.

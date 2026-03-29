@@ -260,15 +260,12 @@ Notes:
 - `ShowResultItem -> ShowResultDefinition`: `Restrict`
 - `ShowResultDefinition -> ShowResultCategory`: `Restrict`
 
-## Canonical vs legacy read model
+## Canonical read model
 
 - Canonical show import target:
   - `ShowEvent`
   - `ShowEntry`
   - `ShowResultItem`
-- Legacy table `ShowResult` may still exist during cleanup, but public show
-  reads and counters should use the canonical model (`ShowEvent`, `ShowEntry`,
-  `ShowResultItem`).
 - Public show presentation should also stay canonical:
   - `showType` comes from `ShowEvent.eventType`
   - `qualityGrade` comes from the canonical quality definition code

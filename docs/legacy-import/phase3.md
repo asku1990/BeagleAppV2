@@ -38,6 +38,7 @@ so row selection does not depend on database return order.
 - `ShowEvent`
 - `ShowEntry`
 - `ShowResultItem`
+- No runtime writes to legacy `ShowResult`.
 
 Additional behavior:
 

@@ -54,6 +54,7 @@ Issue tooling:
 3. `phase3` imports show rows into canonical show tables (`ShowEvent`, `ShowEntry`,
    `ShowResultItem`) using merged legacy sources (`nay9599`, `beanay`, optional
    `nay9599_rd_ud`) plus `beanay_text` critique join.
+   The phase3 runtime path does not write legacy `ShowResult`.
 
 4. `seed:show-result-definitions` bootstraps canonical `ShowResultDefinition` rows used by both
    legacy and Kennelliitto workbook mappings (for example `ROP`, `VSP`, `SERT`, `varaSERT`,
@@ -72,6 +73,8 @@ Lifecycle note:
   bootstrap/migration.
 - None of these commands are documented as upgrade, replay, or reconciliation steps for an
   already bootstrapped legacy-import environment.
+- Public and admin production show reads/writes stay on canonical show tables; legacy
+  `ShowResult` is not part of runtime production paths.
 
 Bootstrap invariants:
 

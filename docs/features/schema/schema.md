@@ -31,7 +31,6 @@ erDiagram
   Dog ||--o{ DogOwnership : "ownership history"
   Owner ||--o{ DogOwnership : "owns dogs"
   Dog ||--o{ TrialResult : "trial results"
-  Dog ||--o{ ShowResult : "legacy show results"
   Dog ||--o{ ShowEntry : "canonical show entries (optional)"
 
   ImportRun ||--o{ ImportRunIssue : "issues"
@@ -66,7 +65,6 @@ erDiagram
 ### Results
 
 - `TrialResult`: canonical trial rows keyed by unique `sourceKey`.
-- `ShowResult`: legacy show result table keyed by unique `sourceKey`.
 - `ShowEvent`: canonical show event.
 - `ShowEntry`: canonical show participation row; `dogId` nullable.
 - `ShowResultCategory`: UI/admin managed grouping for show definitions.
@@ -83,7 +81,7 @@ erDiagram
 
 - `BetterAuthUser -> BetterAuthSession/BetterAuthAccount`: `Cascade`
 - `BetterAuthUser -> ImportRun(createdByUser)`: `SetNull`
-- `Dog -> DogRegistration/DogOwnership/TrialResult/ShowResult`: `Cascade`
+- `Dog -> DogRegistration/DogOwnership/TrialResult`: `Cascade`
 - `Dog -> ShowEntry`: `SetNull` (allows show rows without local dog)
 - `ShowEvent -> ShowEntry`: `Cascade`
 - `ShowEntry -> ShowResultItem`: `Cascade`
@@ -97,7 +95,6 @@ erDiagram
 - `Dog.ekNo` unique
 - `DogRegistration.registrationNo` unique
 - `TrialResult.sourceKey` unique
-- `ShowResult.sourceKey` unique (legacy table)
 - `ShowEvent.eventLookupKey` unique
 - `ShowEntry.entryLookupKey` unique
 - `ShowResultItem.itemLookupKey` unique
@@ -128,8 +125,7 @@ Clarification:
   - entries by event/dog/source
   - result items by entry/definition/source
 
-## Legacy and cutover note
+## Show model note
 
-- `ShowResult` exists as legacy read/write model during cutover.
 - Canonical show model is `ShowEvent` + `ShowEntry` + `ShowResultItem`
   with `ShowResultDefinition`/`ShowResultCategory` metadata.

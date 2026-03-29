@@ -163,13 +163,18 @@ export async function runLegacyPhase3(
     finishStage("index");
 
     startStage("shows");
-    const showResult = await upsertShowRows(showRows, dogIdByRegistration, {
-      importRunId: run.id,
-      onProgress: (processed, total) => logProgress("shows", processed, total),
-    });
-    showResultsUpserted = showResult.upserted;
-    errorsCount += showResult.errors;
-    for (const issue of showResult.issues) {
+    const showUpsertResult = await upsertShowRows(
+      showRows,
+      dogIdByRegistration,
+      {
+        importRunId: run.id,
+        onProgress: (processed, total) =>
+          logProgress("shows", processed, total),
+      },
+    );
+    showResultsUpserted = showUpsertResult.upserted;
+    errorsCount += showUpsertResult.errors;
+    for (const issue of showUpsertResult.issues) {
       await recordIssue({
         stage: "shows",
         severity: issue.severity,
@@ -181,7 +186,7 @@ export async function runLegacyPhase3(
       });
     }
     log(
-      `Show results upserted=${showResultsUpserted}, show errors=${showResult.errors}`,
+      `Show results upserted=${showResultsUpserted}, show errors=${showUpsertResult.errors}`,
     );
     finishStage("shows");
 

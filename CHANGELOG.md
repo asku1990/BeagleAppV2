@@ -14,29 +14,34 @@ This project uses a user-facing changelog format.
 
 ### Added
 
-- Ylläpitoon lisättiin uusi `Näyttelyt`-moduulin aloitussivu (`/admin/shows`), joka varaa erilliset osiot workbook-tuonnille, tuontiajoille sekä tulevalle näyttelyhaulle ja muokkaukselle.
-- `Näyttelyt`-ylläpidossa workbook-tuonti siirrettiin omaan työtilaan `/admin/shows/import`, kun taas `/admin/shows` toimii nyt moduulin aloitussivuna. Tuontityötila sisältää inline-validoinnin sekä jäsennetyn preview-osion ennen varsinaista kirjoitusvaihetta.
-
 ### Changed
-
-- vanhan datan tuonti on nyt jaettu selkeisiin vaiheisiin: `import:phase1` (perustiedot), `import:phase2` (kokeet), `import:phase3` (näyttelyt) sekä valinnainen `import:bootstrap`-ajo (`auth:bootstrap-admin -> seed:show-result-definitions -> seed:show-workbook-import-schema -> phase1 -> phase2 -> phase3`).
-- Tuonnin virhe- ja huomioraportointi käyttää edelleen yhteistä `ImportRun`/`ImportRunIssue`-mallia, mutta raportointi tehdään nyt vaihekohtaisesti omalla run id:llä. Koe- ja näyttelyvalidointien koodit ovat vaihekohtaiset (`TRIAL_*`, `SHOW_*`), jotta CSV-yhteenvedot ovat selkeämmät.
-- Näyttelyiden Kennelliitto-workbook-tuonnissa preview käyttää nyt samaa sivua, mutta se avataan vasta kun estävät virheet on ratkaistu ja mahdolliset varoitukset tai eksplisiittisesti ohitetut sarakkeet on hyväksytty. Validointi näyttää schema-kattavuuden, ohitetut sarakkeet ja suodatettavat huomiot ennen preview-vaihetta.
-- Esikatselussa tapahtuman otsikko, metatiedot ja rivit yhdistettiin yhdeksi kortiksi per tapahtuma, jotta preview on helpompi lukea ja siihen mahtuu paremmin koko tapahtumakokonaisuus kerralla.
-- Workbook-tuonnin header-matching on nyt tolerantimpi rivinvaihdolle, ylimääräisille välilyönneille ja välimerkille, mutta edelleen vaatii samat import-kriittiset sarakkeet.
-- Näyttelyiden workbook-preview käyttää nyt tietokantaan siirrettyä Kennelliitto-workbookin sarakemetadataa (`ShowWorkbookColumnRule`), jossa jokainen ei-tyhjä sarake ratkaistaan tuoduksi, eksplisiittisesti ohitetuksi tai estetyksi. Tuntemattomat lisäsarakkeet, duplikaattiheaderit ja nimeämättömät dataa sisältävät sarakkeet estävät validoinnin hiljaisen ohituksen sijaan, kun taas esimerkiksi `Rotukoodi` näkyy nyt ohitettuna metadatapolitiikan kautta.
-- Workbook-tuonnin validatori valmisteltiin tulevia ylläpidon workbook-asetuksia varten: sarakkeiden requiredness, parser mode ja definition-sidonnat tulevat nyt tietokannasta, `DEFINITION_FROM_CELL` rajataan määritelmäkategorian kautta, ja workbook-skeeman metadatalle lisättiin erillinen validointi- sekä päivityspinta admin-käyttöä varten.
-- Workbook-tuonnin apply-vaihe on nyt käytössä: preview tekee duplikaatti-/konfliktitarkistukset kanonisiin avaimiin (`eventLookupKey`, `entryLookupKey`), ja import kirjoittaa vain jos koko aineisto läpäisee tarkistukset. Kirjoitus tehdään yhdessä transaktiossa create-only -politiikalla ilman mergeä tai osittaisia kirjoituksia.
-- Workbook-tuonnin rakenteellisten arvojen normalisointia kiristettiin: `Luokka`- ja `Laatuarvostelu`-kentissä hyväksytään vain tuetut workbook-arvot, eikä parseri enää muuta spekulatiivisia aliasmuotoja kuten `JU` -> `JUN` tai `AVK` -> `AVO`.
-- Näyttelytulosten normalisointi erottaa nyt parseri- ja näyttönäkymän: ennen vuotta 2003 legacy-muoto (`JUN1`, `KÄY2`) esitetään käyttöliittymässä muodossa `JUN-1` / `KÄY-2`, kun taas vuodesta 2003 alkaen käytetään modernia muotoa (`JUN-ERI`, `KÄY-H`). Samalla phase3-parseri tallentaa pre-2003 luokka+numero -laadut uuteen `LEGACY-LAATUARVOSTELU`-määritelmään unmapped-tokenien sijaan.
-- Phase3 lisää nyt informatiivisen `ImportRunIssue`-merkinnän, kun luokka+numero -laatuarvostelu (`JUN1`, `NUO2` jne.) normalisoidaan vuoden 2003 jälkeiseen moderniin muotoon. Tällä näkyy suoraan, milloin parseri käytti 2003-rajauksen yli menevää laatuarvostelun tulkintaa.
-- Kanonisten näyttelytulosmääritelmien koodit yhdenmukaistettiin Kennelliiton workbook-muotoon (`varaSERT`, `NORD-SERT`, `NORD-varaSERT`, `varaCACIB`, `CACIB-J`, `CACIB-V`, `JUN-SERT`, `VET-SERT`, `JUN-ROP`, `VET-ROP`, `JUN-VSP`, `VET-VSP`), ja sertti-/CACIB-määritelmien ruotsinkieliset nimet asetettiin toistaiseksi tyhjiksi.
-- Julkiset näyttelyhaut, näyttelyn tulossivu, koiraprofiilin näyttelyrivit sekä julkiset näyttelylaskurit lukevat nyt kanonisesta näyttelymallista (`ShowEvent`, `ShowEntry`, `ShowResultItem`) vanhan `ShowResult`-taulun sijaan.
-- Julkinen näyttelyn tulossivu ja koiraprofiilin näyttelykortti näyttävät nyt kanoniset näyttelytiedot rakenteisina kenttinä Kennelliiton tyyliin (`Tyyppi`, `Laatuarvostelu`, `Sijoitus`, `PU/PN`, `Muut merkinnät`, `Sanallinen arvostelu`) yhden legacy-tyylisen tulostekstin sijaan.
 
 ### Fixed
 
 ### Removed
+
+## [0.8.0] - 2026-03-29
+
+### Added
+
+- Ylläpitoon lisättiin uusi Näyttelyt-aloitussivu (`/admin/shows`).
+- Ylläpitoon lisättiin uusi Kennelliiton Excel-tuonti (`/admin/shows/import`).
+- Vanhan datan tuonti etenee nyt selkeästi tässä järjestyksessä: koirien ja omistajien tiedot, koetulokset ja lopuksi näyttelytulokset. Halutessa koko tuonnin voi ajaa myös yhdellä komennolla.
+- Tuonnin virheet ja varoitukset näkyvät nyt selkeämmin jokaisesta tuonnin osasta.
+- Uusi Excel-tuonti tarkistaa tiedoston ennen tallennusta ja estää tuonnin, jos sarakkeita puuttuu tai niitä on väärin/ylimääräisiä.
+- Excel-tuonnin säännöt tallennetaan tietokantaan, jotta niitä voidaan jatkossa hallita ylläpidossa ilman koodimuutoksia.
+
+### Changed
+
+- Näyttelysivut ja koiraprofiilin näyttelytiedot käyttävät nyt kaikkialla uutta näyttelydataa.
+- Näyttelytiedot näytetään nyt selkeinä kenttinä yhden pitkän tulostekstin sijaan.
+
+### Fixed
+
+### Removed
+
+- Vanha näyttelytulosten tietopolku poistettiin käytöstä.
+- Vanhaa Kennelliiton Excel-tuonnin yhteensopivuuskoodia poistettiin.
 
 ## [0.7.0] - 2026-03-10
 

@@ -90,4 +90,4 @@ Issue rows are written to `ImportRunIssue` with `kind=LEGACY_PHASE1`.
 ## Operational notes
 
 - Phase 1 should be run before phase2 and phase3.
-- Phase 1 belongs to the initial migration flow.
+- Phase 1 belongs to the initial migration flow and is included in `import:bootstrap`.

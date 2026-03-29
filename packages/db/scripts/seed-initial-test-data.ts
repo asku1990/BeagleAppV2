@@ -1,4 +1,5 @@
 import { DogSex, prisma } from "../index";
+import { seedShowResultDefinitions } from "../shows";
 
 const DEFAULT_MAX_ROWS = 50;
 
@@ -29,9 +30,15 @@ function makeDate(dayOffset: number): Date {
   return base;
 }
 
+function normalizePlaceKey(value: string): string {
+  return value.trim().replace(/\s+/g, " ").toUpperCase();
+}
+
 async function resetSeedTables(): Promise<void> {
+  await prisma.showResultItem.deleteMany();
+  await prisma.showEntry.deleteMany();
+  await prisma.showEvent.deleteMany();
   await prisma.trialResult.deleteMany();
-  await prisma.showResult.deleteMany();
   await prisma.dogOwnership.deleteMany();
   await prisma.dogRegistration.deleteMany();
   // Break self-referential FK links before deleting dog rows.
@@ -203,30 +210,139 @@ async function main(): Promise<void> {
     skipDuplicates: true,
   });
 
+  await seedShowResultDefinitions();
+  const showDefinitions = await prisma.showResultDefinition.findMany({
+    where: { code: { in: ["ERI", "EH"] }, isEnabled: true },
+    select: { id: true, code: true },
+  });
+  const definitionIdByCode = new Map(
+    showDefinitions.map((definition) => [definition.code, definition.id]),
+  );
+  const eriDefinitionId = definitionIdByCode.get("ERI");
+  const ehDefinitionId = definitionIdByCode.get("EH");
+  if (!eriDefinitionId || !ehDefinitionId) {
+    throw new Error(
+      "Missing canonical show definitions for ERI/EH after seedShowResultDefinitions.",
+    );
+  }
+
   const showRows = Array.from({ length: showCount }, (_, index) => {
     const dogIndex = index % createdDogs.length;
     const eventDate = makeDate(220 + index);
     const eventPlace = `Show Place ${((index % 10) + 1).toString()}`;
     const registrationNo = registrationRows[dogIndex]?.registrationNo as string;
-    const sourceKey = `${registrationNo}|${eventDate.toISOString().slice(0, 10)}|${eventPlace}`;
+    const eventDateKey = eventDate.toISOString().slice(0, 10);
+    const eventLookupKey = `${eventDateKey}|${normalizePlaceKey(eventPlace)}`;
+    const entryLookupKey = `${registrationNo}|${eventLookupKey}`;
+    const resultCode = index % 3 === 0 ? "ERI" : "EH";
+    const definitionId =
+      resultCode === "ERI" ? eriDefinitionId : ehDefinitionId;
+    const itemLookupKey = `${entryLookupKey}|${resultCode}|flag|1`;
+    const sourceRef = `${registrationNo}|${eventDateKey}|${eventPlace}`;
 
     return {
       dogId: createdDogs[dogIndex] as string,
+      registrationNo,
       eventDate,
-      eventName: null,
       eventPlace,
-      resultText: index % 3 === 0 ? "ERI" : "EH",
+      eventLookupKey,
+      entryLookupKey,
+      itemLookupKey,
+      sourceRef,
+      sourceTag: "LEGACY_NAY9599" as const,
+      resultCode,
+      definitionId,
       heightText: `${35 + (index % 15)} cm`,
       judge: `Judge ${(index % 9) + 1}`,
       legacyFlag: index % 13 === 0 ? "FLAG" : null,
-      sourceKey,
     };
   });
 
-  await prisma.showResult.createMany({
-    data: showRows,
-    skipDuplicates: true,
-  });
+  for (const row of showRows) {
+    const showEvent = await prisma.showEvent.upsert({
+      where: { eventLookupKey: row.eventLookupKey },
+      create: {
+        eventLookupKey: row.eventLookupKey,
+        sourceTag: row.sourceTag,
+        eventDate: row.eventDate,
+        eventName: null,
+        eventCity: null,
+        eventPlace: row.eventPlace,
+        eventType: null,
+        organizer: null,
+        importRunId: null,
+        sourceTable: "seed:initial-test-data",
+        sourceRef: row.sourceRef,
+        rawPayloadJson: JSON.stringify({
+          registrationNo: row.registrationNo,
+          resultCode: row.resultCode,
+        }),
+      },
+      update: {
+        eventDate: row.eventDate,
+        eventPlace: row.eventPlace,
+      },
+      select: { id: true },
+    });
+
+    const showEntry = await prisma.showEntry.upsert({
+      where: { entryLookupKey: row.entryLookupKey },
+      create: {
+        entryLookupKey: row.entryLookupKey,
+        showEventId: showEvent.id,
+        dogId: row.dogId,
+        sourceTag: row.sourceTag,
+        registrationNoSnapshot: row.registrationNo,
+        dogNameSnapshot: `Seed Dog ${row.registrationNo}`,
+        judge: row.judge,
+        heightText: row.heightText,
+        critiqueText: null,
+        importRunId: null,
+        sourceTable: "seed:initial-test-data",
+        sourceRef: row.sourceRef,
+        legacyFlag: row.legacyFlag,
+        rawPayloadJson: JSON.stringify({
+          registrationNo: row.registrationNo,
+          resultCode: row.resultCode,
+        }),
+      },
+      update: {
+        showEventId: showEvent.id,
+        dogId: row.dogId,
+        judge: row.judge,
+        heightText: row.heightText,
+        legacyFlag: row.legacyFlag,
+      },
+      select: { id: true },
+    });
+
+    await prisma.showResultItem.upsert({
+      where: { itemLookupKey: row.itemLookupKey },
+      create: {
+        itemLookupKey: row.itemLookupKey,
+        showEntryId: showEntry.id,
+        definitionId: row.definitionId,
+        sourceTag: row.sourceTag,
+        valueCode: null,
+        valueText: null,
+        valueNumeric: null,
+        valueDate: null,
+        isAwarded: true,
+        importRunId: null,
+        sourceTable: "seed:initial-test-data",
+        sourceRef: row.sourceRef,
+        rawPayloadJson: JSON.stringify({
+          registrationNo: row.registrationNo,
+          resultCode: row.resultCode,
+        }),
+      },
+      update: {
+        definitionId: row.definitionId,
+        isAwarded: true,
+        sourceRef: row.sourceRef,
+      },
+    });
+  }
 
   const [
     breederTotal,
@@ -243,7 +359,7 @@ async function main(): Promise<void> {
     prisma.owner.count(),
     prisma.dogOwnership.count(),
     prisma.trialResult.count(),
-    prisma.showResult.count(),
+    prisma.showEntry.count(),
   ]);
 
   console.log("[seed] initial test data seeded");

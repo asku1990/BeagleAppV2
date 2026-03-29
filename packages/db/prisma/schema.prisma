@@ -182,7 +182,6 @@ model Dog {
   registrations   DogRegistration[]
   ownerships      DogOwnership[]
   trialResults    TrialResult[]
-  showResults     ShowResult[]
   showEntries     ShowEntry[]
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
@@ -278,25 +277,6 @@ model TrialResult {
   dog              Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-
-  @@index([eventDate])
-  @@index([dogId, eventDate])
-}
-
-model ShowResult {
-  id         String   @id @default(cuid())
-  dogId      String
-  eventDate  DateTime
-  eventName  String?
-  eventPlace String
-  resultText String?
-  heightText String?
-  judge      String?
-  legacyFlag String?
-  sourceKey  String   @unique
-  dog        Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
 
   @@index([eventDate])
   @@index([dogId, eventDate])
