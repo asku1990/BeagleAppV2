@@ -1,9 +1,11 @@
 export type {
   AdminShowWorkbookImportIssue,
   AdminShowWorkbookImportIssueSeverity,
+  AdminShowWorkbookImportPreviewItem,
+} from "./types";
+export type {
   AdminShowWorkbookImportPreviewEntry,
   AdminShowWorkbookImportPreviewEvent,
-  AdminShowWorkbookImportPreviewItem,
   AdminShowWorkbookImportResolvedSchema,
   AdminShowWorkbookImportSchemaBlockedColumn,
   AdminShowWorkbookImportSchemaBlockedColumnReasonCode,

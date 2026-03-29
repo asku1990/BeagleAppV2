@@ -4,6 +4,7 @@ import { normalizeWorkbookComparisonToken } from "../cell";
 import { ISSUE_CODES } from "../workbook-preview-constants";
 import { createIssue } from "../workbook-preview-mappers";
 import type { WorkbookParsedRow } from "../workbook-preview-types";
+import { rejectParsedRow } from "../runtime/reject-parsed-row";
 
 // Applies persisted event and entry conflict checks to already parsed workbook rows.
 function valuesConflict(left: string, right: string): boolean {
@@ -124,10 +125,7 @@ export async function checkExistingImportConflicts(input: {
 
     const entryLookupKey = `${row.registrationNo}|${row.eventLookupKey}`;
     if (existingEntryKeys.has(entryLookupKey)) {
-      row.accepted = false;
-      row.issueCount += 1;
-      row.itemCount = 0;
-      row.resultItems = [];
+      rejectParsedRow(row);
       addEntryAlreadyExistsIssue({ issues: input.issues, row });
       continue;
     }
@@ -137,10 +135,7 @@ export async function checkExistingImportConflicts(input: {
       continue;
     }
 
-    row.accepted = false;
-    row.issueCount += 1;
-    row.itemCount = 0;
-    row.resultItems = [];
+    rejectParsedRow(row);
     addEventConflictIssue({
       issues: input.issues,
       row,

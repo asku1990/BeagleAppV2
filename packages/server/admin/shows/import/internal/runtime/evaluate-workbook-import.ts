@@ -2,22 +2,26 @@ import type { AdminShowWorkbookImportIssue } from "@beagle/contracts";
 import { normalizeWorkbookComparisonToken } from "../cell";
 import { checkExistingImportConflicts } from "../duplicates/check-existing-import-conflicts";
 import { buildColumnMap } from "../input/build-column-map";
-import { getCell } from "../input/get-cell";
 import { loadWorkbookLookupData } from "../input/load-workbook-lookup-data";
 import { parseWorkbookBuffer } from "../input/parse-workbook-buffer";
-import { buildEventLookupKey, createIssue } from "../workbook-preview-mappers";
+import { createIssue } from "../workbook-preview-mappers";
 import { evaluateWorkbookRow } from "../rows/evaluate-workbook-row";
 import { buildWorkbookSchemaIssues } from "../schema/build-workbook-schema-issues";
 import { resolveWorkbookSchema } from "../schema/resolve-workbook-schema";
 import { ISSUE_CODES } from "../workbook-preview-constants";
 import { normalizeWorkbookRegistrationNo } from "../cell";
 import { mapWorkbookStructuralFieldKeyToTargetField } from "../workbook-preview-target-fields";
-import type { WorkbookParsedRow } from "../workbook-preview-types";
+import type {
+  WorkbookColumnRuleMeta,
+  WorkbookParsedRow,
+} from "../workbook-preview-types";
 import {
   summarizeWorkbookImport,
   type WorkbookImportRuntimeSuccess,
 } from "./summarize-workbook-import";
 import { validateAdminShowWorkbookSchemaRules } from "../../../core/workbook-schema-validation";
+import { buildPreviewRow } from "./build-preview-row";
+import { rejectParsedRow } from "./reject-parsed-row";
 
 // Shared workbook evaluation pipeline for preview/apply: parse, validate, de-duplicate, then summarize.
 type WorkbookImportRuntimeFailure = {
@@ -26,6 +30,44 @@ type WorkbookImportRuntimeFailure = {
   code: string;
   error: string;
 };
+
+function toWorkbookSchemaValidationRule(rule: WorkbookColumnRuleMeta) {
+  return {
+    code: rule.code,
+    headerName: rule.headerName,
+    policy: rule.policy,
+    destinationKind: rule.destinationKind,
+    targetField: mapWorkbookStructuralFieldKeyToTargetField(rule.targetField),
+    parseMode: rule.parseMode,
+    fixedDefinitionCode: rule.fixedDefinitionCode,
+    allowedDefinitionCategoryCode: rule.allowedDefinitionCategoryCode,
+    headerRequired: rule.headerRequired,
+    rowValueRequired: rule.rowValueRequired,
+    sortOrder: rule.sortOrder,
+    isEnabled: rule.isEnabled,
+    valueMaps: rule.valueMaps.map((valueMap) => ({
+      workbookValue: valueMap.workbookValue,
+      definitionCode: valueMap.definitionCode,
+      sortOrder: valueMap.sortOrder,
+    })),
+  };
+}
+
+function buildDuplicateWorkbookRowIssue(input: {
+  rowNumber: number;
+  registrationNo: string;
+  eventLookupKey: string;
+}) {
+  return createIssue({
+    rowNumber: input.rowNumber,
+    columnName: "Rekisterinumero",
+    severity: "ERROR",
+    code: ISSUE_CODES.duplicateRow,
+    message: `Duplicate workbook row for ${input.registrationNo} in event ${input.eventLookupKey}.`,
+    registrationNo: input.registrationNo,
+    eventLookupKey: input.eventLookupKey,
+  });
+}
 
 export type WorkbookImportRuntimeResult =
   | WorkbookImportRuntimeSuccess
@@ -79,25 +121,7 @@ export async function evaluateWorkbookImport(input: {
   }
 
   const metadataErrors = validateAdminShowWorkbookSchemaRules(
-    lookupData.columnRules.map((rule) => ({
-      code: rule.code,
-      headerName: rule.headerName,
-      policy: rule.policy,
-      destinationKind: rule.destinationKind,
-      targetField: mapWorkbookStructuralFieldKeyToTargetField(rule.targetField),
-      parseMode: rule.parseMode,
-      fixedDefinitionCode: rule.fixedDefinitionCode,
-      allowedDefinitionCategoryCode: rule.allowedDefinitionCategoryCode,
-      headerRequired: rule.headerRequired,
-      rowValueRequired: rule.rowValueRequired,
-      sortOrder: rule.sortOrder,
-      isEnabled: rule.isEnabled,
-      valueMaps: rule.valueMaps.map((valueMap) => ({
-        workbookValue: valueMap.workbookValue,
-        definitionCode: valueMap.definitionCode,
-        sortOrder: valueMap.sortOrder,
-      })),
-    })),
+    lookupData.columnRules.map(toWorkbookSchemaValidationRule),
     {
       definitions: [...lookupData.definitionsByCode.values()],
       categories: lookupData.definitionCategories,
@@ -131,49 +155,13 @@ export async function evaluateWorkbookImport(input: {
       issues.push(issue);
     }
 
-    const derivedEventLookupKey =
-      parsed.eventDateIso &&
-      parsed.eventCity &&
-      parsed.eventPlace &&
-      parsed.eventType
-        ? buildEventLookupKey({
-            eventDateIso: parsed.eventDateIso,
-            eventCity: parsed.eventCity,
-            eventPlace: parsed.eventPlace,
-            eventType: parsed.eventType,
-          })
-        : null;
-    const eventLookupKey =
-      parsed.eventLookupKey ?? derivedEventLookupKey ?? `row-${rowNumber}`;
-    const registrationColumn =
-      schema.structuralFields.registrationNo?.headerName ?? "Rekisterinumero";
-    const registrationNo =
-      parsed.registrationNo ??
-      normalizeWorkbookRegistrationNo(
-        getCell(row, columnMap, registrationColumn),
-      ) ??
-      "";
-    const entryLookupKey = `${registrationNo}|${eventLookupKey}`;
-
-    const previewRow: WorkbookParsedRow = {
+    const { previewRow, entryLookupKey } = buildPreviewRow({
+      parsed,
+      row,
       rowNumber,
-      eventLookupKey,
-      eventDateIso: parsed.eventDateIso ?? "",
-      eventCity: parsed.eventCity ?? "",
-      eventPlace: parsed.eventPlace ?? "",
-      eventType: parsed.eventType ?? "",
-      accepted: parsed.accepted,
-      issueCount: parsed.issues.length,
-      itemCount: parsed.accepted ? parsed.itemCount : 0,
-      registrationNo: parsed.registrationNo ?? "",
-      dogName: parsed.dogName ?? "",
-      dogMatched: parsed.dogMatched,
-      judge: parsed.judge,
-      critiqueText: parsed.critiqueText,
-      classValue: parsed.classValue ?? "",
-      qualityValue: parsed.qualityValue ?? "",
-      resultItems: parsed.accepted ? parsed.resultItems : [],
-    };
+      columnMap,
+      schema,
+    });
 
     if (!parsed.accepted) {
       parsedRows.push(previewRow);
@@ -181,19 +169,12 @@ export async function evaluateWorkbookImport(input: {
     }
 
     if (rowsByEntryKey.has(entryLookupKey)) {
-      previewRow.accepted = false;
-      previewRow.issueCount += 1;
-      previewRow.itemCount = 0;
-      previewRow.resultItems = [];
+      rejectParsedRow(previewRow);
       issues.push(
-        createIssue({
+        buildDuplicateWorkbookRowIssue({
           rowNumber,
-          columnName: "Rekisterinumero",
-          severity: "ERROR",
-          code: ISSUE_CODES.duplicateRow,
-          message: `Duplicate workbook row for ${registrationNo} in event ${eventLookupKey}.`,
-          registrationNo,
-          eventLookupKey,
+          registrationNo: previewRow.registrationNo,
+          eventLookupKey: previewRow.eventLookupKey,
         }),
       );
     } else {
