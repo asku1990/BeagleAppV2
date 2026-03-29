@@ -77,7 +77,9 @@ export async function evaluateWorkbookImport(input: {
   workbook: Buffer | Uint8Array | ArrayBuffer;
   runDuplicateChecks: boolean;
 }): Promise<WorkbookImportRuntimeResult> {
-  const { sheetName, headers, rows } = parseWorkbookBuffer(input.workbook);
+  const { sheetName, headers, rows, date1904 } = parseWorkbookBuffer(
+    input.workbook,
+  );
   const columnMap = buildColumnMap(headers);
   const issues: AdminShowWorkbookImportIssue[] = [];
   const registrationColumnIndex = columnMap.get(
@@ -149,6 +151,7 @@ export async function evaluateWorkbookImport(input: {
       enabledDefinitionCodes: lookupData.enabledDefinitionCodes,
       definitionsByCode: lookupData.definitionsByCode,
       schema,
+      date1904,
     });
 
     for (const issue of parsed.issues) {

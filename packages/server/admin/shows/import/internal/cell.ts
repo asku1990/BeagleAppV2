@@ -50,18 +50,21 @@ export function isWorkbookRegistrationNoValid(value: string): boolean {
   return /^[\p{L}\p{N}/.-]+$/u.test(value);
 }
 
-function excelSerialToUtcDate(serial: number): Date | null {
+function excelSerialToUtcDate(serial: number, date1904: boolean): Date | null {
   if (!Number.isFinite(serial)) {
     return null;
   }
 
   const wholeDays = Math.floor(serial);
-  const baseDate = Date.UTC(1899, 11, 30);
+  const baseDate = date1904 ? Date.UTC(1904, 0, 1) : Date.UTC(1899, 11, 30);
   const date = new Date(baseDate + wholeDays * 24 * 60 * 60 * 1000);
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
-export function normalizeWorkbookDateIso(value: WorkbookCell): string | null {
+export function normalizeWorkbookDateIso(
+  value: WorkbookCell,
+  options?: { date1904?: boolean },
+): string | null {
   if (value === null || value === undefined) {
     return null;
   }
@@ -73,7 +76,7 @@ export function normalizeWorkbookDateIso(value: WorkbookCell): string | null {
   }
 
   if (typeof value === "number") {
-    const parsed = excelSerialToUtcDate(value);
+    const parsed = excelSerialToUtcDate(value, options?.date1904 === true);
     return parsed ? parsed.toISOString().slice(0, 10) : null;
   }
 

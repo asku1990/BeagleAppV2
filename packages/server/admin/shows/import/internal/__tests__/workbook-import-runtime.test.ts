@@ -84,6 +84,7 @@ describe("evaluateWorkbookImport", () => {
       sheetName: "Sheet1",
       headers: ["Rekisterinumero"],
       rows: [["REG-1"], ["REG-2"]],
+      date1904: false,
     });
     buildColumnMapMock.mockReturnValue(new Map());
     getCellMock.mockReturnValue(null);

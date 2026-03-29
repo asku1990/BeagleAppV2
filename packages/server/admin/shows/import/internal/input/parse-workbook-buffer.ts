@@ -9,8 +9,10 @@ export function parseWorkbookBuffer(
   sheetName: string;
   headers: WorkbookRow;
   rows: WorkbookRow[];
+  date1904: boolean;
 } {
-  const workbook = XLSX.read(buffer, { type: "buffer", cellDates: true });
+  // Keep Excel date cells as numeric serials to avoid timezone shifts.
+  const workbook = XLSX.read(buffer, { type: "buffer", cellDates: false });
   const sheetName = workbook.SheetNames[0];
   if (!sheetName) {
     throw new Error("Workbook does not contain any sheets.");
@@ -29,5 +31,6 @@ export function parseWorkbookBuffer(
 
   const headers = matrix[0] ?? [];
   const rows = matrix.slice(1).filter(isNonEmptyWorkbookRow);
-  return { sheetName, headers, rows };
+  const date1904 = workbook.Workbook?.WBProps?.date1904 === true;
+  return { sheetName, headers, rows, date1904 };
 }

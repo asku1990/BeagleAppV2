@@ -183,6 +183,7 @@ export type WorkbookRowLookupData = Pick<
   "dogIdByRegistration" | "enabledDefinitionCodes" | "definitionsByCode"
 > & {
   schema: WorkbookResolvedSchema;
+  date1904: boolean;
 };
 
 export type WorkbookParsedRow = {

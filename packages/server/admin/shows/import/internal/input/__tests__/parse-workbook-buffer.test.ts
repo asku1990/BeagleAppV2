@@ -26,6 +26,11 @@ describe("parseWorkbookBuffer", () => {
       Sheets: {
         Sheet1: { name: "Sheet1" },
       },
+      Workbook: {
+        WBProps: {
+          date1904: false,
+        },
+      },
     });
     sheetToJsonMock.mockReturnValue([
       ["Rekisterinumero", "Aika"],
@@ -41,11 +46,12 @@ describe("parseWorkbookBuffer", () => {
         ["FI12345/24", "2025-05-01"],
         ["FI54321/24", ""],
       ],
+      date1904: false,
     });
 
     expect(readMock).toHaveBeenCalledWith(Buffer.from("workbook"), {
       type: "buffer",
-      cellDates: true,
+      cellDates: false,
     });
   });
 
@@ -69,5 +75,27 @@ describe("parseWorkbookBuffer", () => {
     expect(() => parseWorkbookBuffer(Buffer.from("workbook"))).toThrow(
       "Workbook sheet is missing.",
     );
+  });
+
+  it("returns date1904 mode from workbook metadata", () => {
+    readMock.mockReturnValue({
+      SheetNames: ["Sheet1"],
+      Sheets: {
+        Sheet1: { name: "Sheet1" },
+      },
+      Workbook: {
+        WBProps: {
+          date1904: true,
+        },
+      },
+    });
+    sheetToJsonMock.mockReturnValue([["Aika"], [44197]]);
+
+    expect(parseWorkbookBuffer(Buffer.from("workbook"))).toEqual({
+      sheetName: "Sheet1",
+      headers: ["Aika"],
+      rows: [[44197]],
+      date1904: true,
+    });
   });
 });

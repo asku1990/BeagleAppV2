@@ -156,6 +156,7 @@ export function evaluateWorkbookRow(
 
   const eventDateIso = normalizeWorkbookDateIso(
     getStructuralCell(row, columnMap, options.schema, "eventDate"),
+    { date1904: options.date1904 },
   );
   if (!eventDateIso && eventDateField?.rowValueRequired) {
     issues.push(
