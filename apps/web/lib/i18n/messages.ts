@@ -21,6 +21,10 @@ import {
   svAdminSettingsMessages,
 } from "@/lib/i18n/messages/admin/settings";
 import {
+  fiAdminShowsMessages,
+  svAdminShowsMessages,
+} from "@/lib/i18n/messages/admin/shows";
+import {
   fiAccountMessages,
   svAccountMessages,
 } from "@/lib/i18n/messages/account";
@@ -53,6 +57,7 @@ const fi = {
   ...fiAdminUsersMessages,
   ...fiAdminDogsMessages,
   ...fiAdminSettingsMessages,
+  ...fiAdminShowsMessages,
   ...fiAccountMessages,
   ...fiCommonMessages,
   ...fiHomeMessages,
@@ -74,6 +79,7 @@ const sv: Messages = {
   ...svAdminUsersMessages,
   ...svAdminDogsMessages,
   ...svAdminSettingsMessages,
+  ...svAdminShowsMessages,
   ...svAccountMessages,
   ...svCommonMessages,
   ...svHomeMessages,

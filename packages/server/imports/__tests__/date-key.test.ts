@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toEventSourceDatePart, toOwnershipDateKey } from "../date-key";
+import { toEventSourceDatePart, toOwnershipDateKey } from "../internal";
 
 describe("imports date keys", () => {
   it("returns __NULL__ for missing ownership date", () => {

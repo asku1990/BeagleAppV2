@@ -96,6 +96,7 @@ describe("shows service", () => {
         page: 1,
         items: [
           {
+            eventKey: "show-event-1",
             eventDate: new Date("2025-06-01T00:00:00.000Z"),
             eventPlace: "Helsinki",
             judge: "Judge Main",
@@ -134,6 +135,7 @@ describe("shows service", () => {
       eventDateIsoDate: "2025-06-01",
       eventDate: new Date("2025-06-01T00:00:00.000Z"),
       eventPlace: "Helsinki",
+      eventKey: "show-event-1",
     });
   });
 
@@ -178,8 +180,9 @@ describe("shows service", () => {
     });
   });
 
-  it("maps details and normalizes legacy result codes", async () => {
+  it("maps detail rows to structured canonical show fields", async () => {
     getBeagleShowDetailsDbMock.mockResolvedValue({
+      eventKey: "show-event-1",
       eventDate: new Date("2025-06-01T00:00:00.000Z"),
       eventPlace: "Helsinki",
       judge: "Judge Main",
@@ -191,7 +194,13 @@ describe("shows service", () => {
           registrationNo: "FI-1/20",
           name: "Aatu",
           sex: "U",
-          result: "JUN1",
+          showType: "Ryhmänäyttely",
+          classCode: "JUN",
+          qualityGrade: "ERI",
+          classPlacement: 1,
+          pupn: "PU1",
+          awards: ["SA"],
+          critiqueText: "Excellent dog",
           heightCm: 40,
           judge: "Judge Main",
         },
@@ -206,7 +215,101 @@ describe("shows service", () => {
     if (!result.body.ok) {
       throw new Error("Expected ok=true response");
     }
-    expect(result.body.data.items[0]?.result).toBe("JUN-ERI");
+    expect(result.body.data.items[0]).toMatchObject({
+      showType: "Ryhmänäyttely",
+      classCode: "JUN",
+      qualityGrade: "ERI",
+      classPlacement: 1,
+      pupn: "PU1",
+      awards: ["SA"],
+      critiqueText: "Excellent dog",
+    });
+  });
+
+  it("passes through unlinked entries without a dog profile id", async () => {
+    getBeagleShowDetailsDbMock.mockResolvedValue({
+      eventKey: "show-event-1",
+      eventDate: new Date("2025-06-01T00:00:00.000Z"),
+      eventPlace: "Helsinki",
+      judge: "Judge Main",
+      dogCount: 1,
+      items: [
+        {
+          id: "r-unlinked",
+          dogId: null,
+          registrationNo: "FI-9/20",
+          name: "Snapshot Dog",
+          sex: "-",
+          showType: null,
+          classCode: null,
+          qualityGrade: null,
+          classPlacement: null,
+          pupn: null,
+          awards: [],
+          critiqueText: null,
+          heightCm: null,
+          judge: "Judge Main",
+        },
+      ],
+    });
+
+    const service = createShowsService();
+    const showId = encodeShowId("2025-06-01", "Helsinki");
+    const result = await service.getBeagleShowDetails(showId);
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) {
+      throw new Error("Expected ok=true response");
+    }
+    expect(result.body.data.items[0]).toMatchObject({
+      dogId: null,
+      registrationNo: "FI-9/20",
+      name: "Snapshot Dog",
+      sex: "-",
+    });
+  });
+
+  it("returns structured fields without legacy result normalization", async () => {
+    getBeagleShowDetailsDbMock.mockResolvedValue({
+      eventKey: "show-event-legacy",
+      eventDate: new Date("1996-01-06T00:00:00.000Z"),
+      eventPlace: "Kajaani",
+      judge: "Judge Old",
+      dogCount: 1,
+      items: [
+        {
+          id: "r-old",
+          dogId: "d-old",
+          registrationNo: "FI-8/90",
+          name: "Legacy Dog",
+          sex: "U",
+          showType: null,
+          classCode: null,
+          qualityGrade: null,
+          classPlacement: null,
+          pupn: null,
+          awards: [],
+          critiqueText: null,
+          heightCm: null,
+          judge: "Judge Old",
+        },
+      ],
+    });
+
+    const service = createShowsService();
+    const showId = encodeShowId("1996-01-06", "Kajaani");
+    const result = await service.getBeagleShowDetails(showId);
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) {
+      throw new Error("Expected ok=true response");
+    }
+    expect(result.body.data.items[0]).toMatchObject({
+      qualityGrade: null,
+      classCode: null,
+      awards: [],
+      critiqueText: null,
+    });
   });
 
   it("returns 500 when db throws in shows search", async () => {

@@ -1,0 +1,36 @@
+export const WORKBOOK_FILE_PATTERN = /\.xlsx$/i;
+
+export const TRUTHY_WORKBOOK_TOKENS = [
+  "1",
+  "TRUE",
+  "X",
+  "KYLLA",
+  "YES",
+  "JA",
+] as const;
+
+export const ISSUE_CODES = {
+  invalidFile: "SHOW_WORKBOOK_INVALID_FILE",
+  unreadable: "SHOW_WORKBOOK_UNREADABLE",
+  missingColumns: "SHOW_WORKBOOK_MISSING_COLUMNS",
+  missingRequiredField: "SHOW_WORKBOOK_REQUIRED_FIELD_MISSING",
+  unsupportedColumn: "SHOW_WORKBOOK_UNSUPPORTED_COLUMN",
+  duplicateHeader: "SHOW_WORKBOOK_DUPLICATE_HEADER",
+  unnamedColumnWithData: "SHOW_WORKBOOK_UNNAMED_COLUMN_WITH_DATA",
+  unsupportedDefinitionColumn: "SHOW_WORKBOOK_UNSUPPORTED_DEFINITION_COLUMN",
+  invalidRegistration: "SHOW_WORKBOOK_INVALID_REGISTRATION_NO",
+  invalidDate: "SHOW_WORKBOOK_INVALID_DATE",
+  invalidResultValue: "SHOW_WORKBOOK_INVALID_RESULT_VALUE",
+  definitionMissing: "SHOW_WORKBOOK_DEFINITION_NOT_FOUND",
+  dogMissing: "SHOW_WORKBOOK_DOG_NOT_FOUND",
+  duplicateRow: "SHOW_WORKBOOK_DUPLICATE_ROW",
+  definitionsMissing: "SHOW_WORKBOOK_DEFINITIONS_MISSING",
+  schemaMissing: "SHOW_WORKBOOK_SCHEMA_MISSING",
+  schemaInvalid: "SHOW_WORKBOOK_SCHEMA_INVALID",
+  columnIgnored: "SHOW_WORKBOOK_COLUMN_IGNORED",
+  duplicateExistingEntry: "SHOW_WORKBOOK_ENTRY_ALREADY_EXISTS",
+  eventMetadataConflict: "SHOW_WORKBOOK_EVENT_METADATA_CONFLICT",
+  sameDayEventExists: "SHOW_WORKBOOK_SAME_DAY_EVENT_EXISTS",
+  importTimeout: "SHOW_WORKBOOK_IMPORT_TIMEOUT",
+  importWriteFailed: "SHOW_WORKBOOK_IMPORT_WRITE_FAILED",
+} as const;

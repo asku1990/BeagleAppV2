@@ -1,39 +1,32 @@
-import Link from "next/link";
 import { useState } from "react";
-import {
-  ListingResponsiveResults,
-  ListingSectionShell,
-} from "@/components/listing";
+import type { BeagleDogProfileShowRowDto } from "@beagle/contracts";
+import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { toast } from "@/components/ui/sonner";
 import { useI18n } from "@/hooks/i18n";
-import { parseLocalIsoDate } from "@/lib/public/beagle/dogs/profile";
 import {
   copyDogProfileShowRowsToClipboard,
-  getBeagleShowHref,
+  hasDogProfileShowAwards,
+  hasDogProfileShowClass,
+  hasDogProfileShowCritique,
+  hasDogProfileShowPlacement,
+  hasDogProfileShowPupn,
+  hasDogProfileShowQuality,
+  hasDogProfileShowType,
+  hasShowClassResult,
 } from "@/lib/public/beagle/shows";
 import { cn } from "@/lib/utils";
-import type { BeagleDogProfileShowRowDto } from "@beagle/contracts";
-
-const FALLBACK_VALUE = "-";
-
-function formatDate(value: string, locale: "fi" | "sv"): string {
-  const parsed = parseLocalIsoDate(value);
-  if (!parsed || Number.isNaN(parsed.getTime())) {
-    return FALLBACK_VALUE;
-  }
-
-  const localeTag = locale === "fi" ? "fi-FI" : "sv-FI";
-  return new Intl.DateTimeFormat(localeTag).format(parsed);
-}
-
-function formatHeight(heightCm: number | null): string {
-  if (heightCm == null) {
-    return FALLBACK_VALUE;
-  }
-
-  return `${heightCm} cm`;
-}
+import { DogProfileShowsResults } from "./dog-profile-shows-results";
+import {
+  formatDogProfileShowDate,
+  type DogProfileShowCritique,
+} from "./dog-profile-shows-core";
 
 export function DogProfileShowsCard({
   rows,
@@ -42,10 +35,19 @@ export function DogProfileShowsCard({
 }) {
   const { t, locale } = useI18n();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [selectedCritique, setSelectedCritique] =
+    useState<DogProfileShowCritique | null>(null);
   const canReveal = rows.length > 10;
   const visibleRows = isExpanded ? rows : rows.slice(0, 10);
 
-  const hasResult = rows.some((r) => r.result != null);
+  const hasShowType = hasDogProfileShowType(rows);
+  const hasQualityGrade = hasDogProfileShowQuality(rows);
+  const hasClassCode = hasDogProfileShowClass(rows);
+  const hasClassResult = hasShowClassResult(rows);
+  const hasClassPlacement = hasDogProfileShowPlacement(rows);
+  const hasPupn = hasDogProfileShowPupn(rows);
+  const hasAwards = hasDogProfileShowAwards(rows);
+  const hasReviewText = hasDogProfileShowCritique(rows);
   const hasJudge = rows.some((r) => r.judge != null);
   const hasHeight = rows.some((r) => r.heightCm != null);
 
@@ -54,14 +56,26 @@ export function DogProfileShowsCard({
       rows,
       labels: {
         no: t("dog.profile.shows.col.no"),
+        showType: t("dog.profile.shows.col.showType"),
+        className: t("dog.profile.shows.col.className"),
         place: t("dog.profile.shows.col.place"),
         date: t("dog.profile.shows.col.date"),
-        result: t("dog.profile.shows.col.result"),
+        qualityGrade: t("dog.profile.shows.col.qualityGrade"),
+        placement: t("dog.profile.shows.col.placement"),
+        pupn: t("dog.profile.shows.col.pupn"),
+        awards: t("dog.profile.shows.col.awards"),
+        reviewText: t("dog.profile.shows.col.reviewText"),
         height: t("dog.profile.shows.col.height"),
         judge: t("dog.profile.shows.col.judge"),
       },
       columns: {
-        includeResult: hasResult,
+        includeShowType: hasShowType,
+        includeQualityGrade: hasQualityGrade,
+        includeClassName: hasClassCode,
+        includeClassPlacement: hasClassPlacement,
+        includePupn: hasPupn,
+        includeAwards: hasAwards,
+        includeReviewText: hasReviewText,
         includeHeight: hasHeight,
         includeJudge: hasJudge,
       },
@@ -108,143 +122,46 @@ export function DogProfileShowsCard({
           {t("dog.profile.empty.shows")}
         </div>
       ) : (
-        <ListingResponsiveResults
-          desktop={
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[780px] border-collapse text-sm">
-                <thead>
-                  <tr className={cn("border-b text-left", beagleTheme.border)}>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("dog.profile.shows.col.no")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("dog.profile.shows.col.place")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("dog.profile.shows.col.date")}
-                    </th>
-                    {hasResult && (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("dog.profile.shows.col.result")}
-                      </th>
-                    )}
-                    {hasHeight && (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("dog.profile.shows.col.height")}
-                      </th>
-                    )}
-                    {hasJudge && (
-                      <th className="px-2 py-2 font-semibold">
-                        {t("dog.profile.shows.col.judge")}
-                      </th>
-                    )}
-                  </tr>
-                </thead>
-                <tbody>
-                  {visibleRows.map((row, index) => (
-                    <tr
-                      key={row.id}
-                      className={cn("border-b align-top", beagleTheme.border)}
-                    >
-                      <td className="px-2 py-2">{index + 1}</td>
-                      <td className="px-2 py-2">
-                        <Link
-                          href={getBeagleShowHref(row.showId)}
-                          className={beagleTheme.entityLink}
-                        >
-                          {row.place}
-                        </Link>
-                      </td>
-                      <td className="px-2 py-2">
-                        {formatDate(row.date, locale)}
-                      </td>
-                      {hasResult && (
-                        <td className="px-2 py-2">
-                          {row.result ?? FALLBACK_VALUE}
-                        </td>
-                      )}
-                      {hasHeight && (
-                        <td className="px-2 py-2">
-                          {formatHeight(row.heightCm)}
-                        </td>
-                      )}
-                      {hasJudge && (
-                        <td className="px-2 py-2">
-                          {row.judge ?? FALLBACK_VALUE}
-                        </td>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          }
-          mobile={
-            <div className="space-y-2">
-              {visibleRows.map((row, index) => (
-                <article
-                  key={row.id}
-                  className={cn(
-                    "rounded-lg border p-3",
-                    beagleTheme.border,
-                    beagleTheme.surface,
-                  )}
-                >
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <p>
-                      <span className={beagleTheme.mutedText}>
-                        {t("dog.profile.shows.col.no")}:
-                      </span>{" "}
-                      <span>{index + 1}</span>
-                    </p>
-                    <p>
-                      <span className={beagleTheme.mutedText}>
-                        {t("dog.profile.shows.col.date")}:
-                      </span>{" "}
-                      <span>{formatDate(row.date, locale)}</span>
-                    </p>
-                    <p className="col-span-2">
-                      <span className={beagleTheme.mutedText}>
-                        {t("dog.profile.shows.col.place")}:
-                      </span>{" "}
-                      <Link
-                        href={getBeagleShowHref(row.showId)}
-                        className={beagleTheme.entityLink}
-                      >
-                        {row.place}
-                      </Link>
-                    </p>
-                    {hasResult && (
-                      <p className="col-span-2">
-                        <span className={beagleTheme.mutedText}>
-                          {t("dog.profile.shows.col.result")}:
-                        </span>{" "}
-                        <span>{row.result ?? FALLBACK_VALUE}</span>
-                      </p>
-                    )}
-                    {hasHeight && (
-                      <p className="col-span-2">
-                        <span className={beagleTheme.mutedText}>
-                          {t("dog.profile.shows.col.height")}:
-                        </span>{" "}
-                        <span>{formatHeight(row.heightCm)}</span>
-                      </p>
-                    )}
-                    {hasJudge && (
-                      <p className="col-span-2">
-                        <span className={beagleTheme.mutedText}>
-                          {t("dog.profile.shows.col.judge")}:
-                        </span>{" "}
-                        <span>{row.judge ?? FALLBACK_VALUE}</span>
-                      </p>
-                    )}
-                  </div>
-                </article>
-              ))}
-            </div>
-          }
+        <DogProfileShowsResults
+          visibleRows={visibleRows}
+          hasShowType={hasShowType}
+          hasQualityGrade={hasQualityGrade}
+          hasClassResult={hasClassResult}
+          hasPupn={hasPupn}
+          hasAwards={hasAwards}
+          hasReviewText={hasReviewText}
+          hasJudge={hasJudge}
+          hasHeight={hasHeight}
+          locale={locale}
+          t={t}
+          onOpenCritique={setSelectedCritique}
         />
       )}
+      <Dialog
+        open={Boolean(selectedCritique)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedCritique(null);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-[640px]">
+          <DialogHeader>
+            <DialogTitle>
+              {t("dog.profile.shows.review.modalTitle")}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedCritique ? (
+            <div className="space-y-3 text-sm">
+              <p className={beagleTheme.mutedText}>
+                {selectedCritique.place} •{" "}
+                {formatDogProfileShowDate(selectedCritique.date, locale)}
+              </p>
+              <p className="whitespace-pre-wrap">{selectedCritique.text}</p>
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
       {canReveal ? (
         <div className="flex items-center justify-between gap-3 pt-3">
           <p className={cn("text-xs", beagleTheme.mutedText)}>

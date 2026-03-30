@@ -25,7 +25,13 @@ describe("DogProfileShowsCard", () => {
             showId: "show-route-1",
             place: "Helsinki",
             date: "2024-01-01",
-            result: "ERI",
+            showType: "Ryhmänäyttely",
+            classCode: "JUN",
+            qualityGrade: "ERI",
+            classPlacement: 1,
+            pupn: null,
+            awards: ["SA"],
+            critiqueText: "Arvostelu",
             judge: "Judge",
             heightCm: 39,
           },
@@ -34,6 +40,8 @@ describe("DogProfileShowsCard", () => {
     );
 
     expect(html).toContain("dog.profile.shows.copy.button");
+    expect(html).toContain("dog.profile.shows.col.showType");
+    expect(html).toContain("dog.profile.shows.col.classResult");
     expect(html).toContain('href="/beagle/shows/show-route-1"');
   });
 

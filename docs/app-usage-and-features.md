@@ -127,6 +127,6 @@ Admin-only APIs (not currently surfaced in admin UI):
 - Better Auth routes are mounted under `/api/auth/*`.
 - `/account/profile` redirects to `/sign-in?returnTo=/account/profile` when unauthenticated.
 
-## Import workflow (phase 1)
+## Import workflow (phases 1-3)
 
-Import behavior, commands, and issue handling are documented in [docs/import-phase1.md](import-phase1.md).
+Import behavior, commands, and issue handling are documented in [docs/legacy-import/import-flow.md](legacy-import/import-flow.md).

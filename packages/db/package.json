@@ -1,6 +1,6 @@
 {
   "name": "@beagle/db",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "type": "module",
   "main": "./index.ts",
@@ -16,6 +16,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "seed:initial-test-data": "node --import tsx/esm scripts/seed-initial-test-data.ts",
+    "seed:show-result-definitions": "node --import tsx/esm scripts/seed-show-result-definitions.ts",
+    "seed:show-workbook-import-schema": "node --import tsx/esm scripts/seed-show-workbook-import-schema.ts",
     "audit:prune": "node --import tsx/esm scripts/prune-audit-events.ts"
   },
   "dependencies": {

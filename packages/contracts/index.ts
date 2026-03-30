@@ -6,6 +6,7 @@ export type ApiError = {
   ok: false;
   error: string;
   code?: string;
+  details?: unknown;
 };
 
 export type ApiResult<T> = ApiSuccess<T> | ApiError;
@@ -40,7 +41,7 @@ export type ImportStatusResponse = {
   info: string;
 };
 
-export type ImportRunKind = "LEGACY_PHASE1";
+export type ImportRunKind = "LEGACY_PHASE1" | "LEGACY_PHASE2" | "LEGACY_PHASE3";
 
 export type ImportRunStatus = "PENDING" | "RUNNING" | "SUCCEEDED" | "FAILED";
 
@@ -111,6 +112,7 @@ export type {
   BeagleShowDetailsRequest,
   BeagleShowDetailsResponse,
   BeagleShowDetailsRow,
+  BeagleShowStructuredResultDto,
   BeagleShowSearchFilters,
   BeagleShowSearchMode,
   BeagleShowSearchRequest,
@@ -162,6 +164,34 @@ export type {
   AdminBreederLookupResponse,
   AdminOwnerLookupResponse,
   AdminDogParentLookupResponse,
+  AdminShowWorkbookImportIssue,
+  AdminShowWorkbookImportIssueSeverity,
+  AdminShowWorkbookImportApplyResponse,
+  AdminShowWorkbookImportPreviewEntry,
+  AdminShowWorkbookImportPreviewEvent,
+  AdminShowWorkbookImportPreviewItem,
+  AdminShowWorkbookImportResolvedSchema,
+  AdminShowWorkbookImportSchemaBlockedColumn,
+  AdminShowWorkbookImportSchemaBlockedColumnReasonCode,
+  AdminShowWorkbookImportSchemaCoverage,
+  AdminShowWorkbookImportSchemaDefinitionColumn,
+  AdminShowWorkbookImportSchemaIgnoredColumn,
+  AdminShowWorkbookImportSchemaMissingField,
+  AdminShowWorkbookImportSchemaStructuralColumn,
+  AdminShowWorkbookImportPreviewResponse,
+  AdminShowWorkbookSchemaDestinationKind,
+  AdminShowWorkbookSchemaParseMode,
+  AdminShowWorkbookSchemaRule,
+  AdminShowWorkbookSchemaRuleDraft,
+  AdminShowWorkbookSchemaRulePolicy,
+  AdminShowWorkbookSchemaTargetField,
+  AdminShowWorkbookSchemaValidationError,
+  AdminShowWorkbookSchemaValueMap,
+  ListAdminShowWorkbookSchemaResponse,
+  UpdateAdminShowWorkbookSchemaRuleRequest,
+  UpdateAdminShowWorkbookSchemaRuleResponse,
+  ValidateAdminShowWorkbookSchemaRuleRequest,
+  ValidateAdminShowWorkbookSchemaRuleResponse,
 } from "./admin";
 export type { HomeStatisticsResponse } from "./home";
 export {
