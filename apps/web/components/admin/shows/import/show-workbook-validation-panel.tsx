@@ -83,9 +83,9 @@ export function ShowWorkbookValidationPanel({
     validation !== null &&
     (validation.warningCount > 0 ||
       validation.schema.ignoredColumns.length > 0);
+  // Keep the acceptance prompt aligned with the summary: INFO issues already include ignored columns.
   const acceptedReviewNoteCount =
-    (validation?.warningCount ?? 0) +
-    (validation?.schema.ignoredColumns.length ?? 0);
+    (validation?.warningCount ?? 0) + (validation?.infoCount ?? 0);
   const blockingReasonCount =
     (validation?.schema.missingStructuralFields.length ?? 0) +
     (validation?.schema.blockedColumns.length ?? 0);
@@ -191,6 +191,8 @@ export function ShowWorkbookValidationPanel({
                       {t("admin.shows.validation.notes.countSuffixAll")} ·{" "}
                       {formatter.format(validation.warningCount)}{" "}
                       {t("admin.shows.validation.summary.warnings")} ·{" "}
+                      {formatter.format(validation.infoCount)}{" "}
+                      {t("admin.shows.validation.summary.info")} ·{" "}
                       {formatter.format(
                         validation.schema.ignoredColumns.length,
                       )}{" "}

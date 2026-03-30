@@ -112,7 +112,8 @@ function buildShowEntryRows(input: {
   return input.entries.map((entry) => ({
     id: entry.id,
     entryLookupKey: entry.entryLookupKey,
-    showEventId: input.eventsByKey.get(entry.row.eventLookupKey) ?? "",
+    // The event ID is guaranteed by buildEntriesToCreate; keep this strict for defense-in-depth.
+    showEventId: input.eventsByKey.get(entry.row.eventLookupKey)!,
     dogId: input.dogIdByRegistrationNo.get(entry.row.registrationNo) ?? null,
     sourceTag: "WORKBOOK_KENNELLIITTO" as const,
     registrationNoSnapshot: entry.row.registrationNo,

@@ -119,12 +119,64 @@ describe("ShowWorkbookValidationPanel", () => {
     expect(html).toContain("Rotukoodi");
     expect(html).toContain("Unsupported value for SERT: bogus.");
     expect(html).toContain("1");
+    expect(html).toContain("admin.shows.validation.summary.info");
     expect(html).toContain("admin.shows.validation.review.title");
     expect(html).toContain("admin.shows.validation.review.accept");
     expect(html).toContain("admin.shows.validation.notes.filters.errors");
     expect(html).toContain("admin.shows.validation.notes.filters.warnings");
     expect(html).toContain("admin.shows.validation.notes.duplicateRisk.title");
     expect(html).toContain("admin.shows.validation.notes.duplicateRisk.badge");
+  });
+
+  it("counts INFO issues without double-counting ignored columns", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(ShowWorkbookValidationPanel, {
+        isLoading: false,
+        error: null,
+        showAcceptanceActions: true,
+        onAcceptNotes: () => undefined,
+        validation: {
+          fileName: "Näyttelyt.xlsx",
+          sheetName: "Näyttelytulokset",
+          rowCount: 1,
+          acceptedRowCount: 1,
+          rejectedRowCount: 0,
+          eventCount: 1,
+          entryCount: 1,
+          resultItemCount: 1,
+          infoCount: 1,
+          warningCount: 1,
+          errorCount: 0,
+          schema: {
+            coverage: {
+              totalWorkbookColumns: 2,
+              importedColumnCount: 1,
+              ignoredColumnCount: 1,
+              blockedColumnCount: 0,
+            },
+            structuralColumns: [],
+            missingStructuralFields: [],
+            definitionColumns: [],
+            ignoredColumns: [
+              {
+                headerName: "Rotukoodi",
+                columnIndex: 1,
+                ruleCode: "BREED_CODE",
+                reasonText:
+                  "Workbook column Rotukoodi is allowed by import metadata but ignored by policy.",
+              },
+            ],
+            blockedColumns: [],
+          },
+          events: [],
+          issues: [],
+        },
+      }),
+    );
+
+    expect(html).toContain(
+      "2 admin.shows.validation.notes.countSuffixAll · 1 admin.shows.validation.summary.warnings · 1 admin.shows.validation.summary.info · 1 admin.shows.validation.schema.coverageIgnored",
+    );
   });
 
   it("renders a compact summary when preview is ready", () => {

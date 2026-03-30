@@ -165,4 +165,83 @@ describe("writeAdminShowWorkbookImportDb", () => {
       }),
     ).rejects.toThrow("write failed");
   });
+
+  it("uses the resolved showEventId when creating entries", async () => {
+    showEventFindManyMock.mockResolvedValue([]);
+    dogRegistrationFindManyMock.mockResolvedValue([
+      { registrationNo: "FI1/24", dogId: "dog-1" },
+    ]);
+    showResultDefinitionFindManyMock.mockResolvedValue([
+      { id: "def-sert", code: "SERT" },
+    ]);
+    showEventCreateManyMock.mockResolvedValue({ count: 1 });
+    showEntryCreateManyMock.mockResolvedValue({ count: 1 });
+    showResultItemCreateManyMock.mockResolvedValue({ count: 1 });
+
+    await writeAdminShowWorkbookImportDb({
+      fileName: "Näyttelyt.xlsx",
+      rows: [
+        {
+          rowNumber: 2,
+          eventLookupKey: "2025-01-01|HELSINKI HALLI",
+          eventDateIso: "2025-01-01",
+          eventCity: "Helsinki",
+          eventPlace: "Helsinki Halli",
+          eventType: "Kansallinen",
+          registrationNo: "FI1/24",
+          dogName: "KOIRA",
+          judge: null,
+          critiqueText: null,
+          resultItems: [],
+        },
+      ],
+    });
+
+    expect(showEntryCreateManyMock).toHaveBeenCalledWith({
+      data: [
+        expect.objectContaining({
+          showEventId: "uuid-fixed",
+          registrationNoSnapshot: "FI1/24",
+        }),
+      ],
+    });
+  });
+
+  it("keeps empty eventPlace values as strings", async () => {
+    showEventFindManyMock.mockResolvedValue([]);
+    dogRegistrationFindManyMock.mockResolvedValue([
+      { registrationNo: "FI1/24", dogId: "dog-1" },
+    ]);
+    showResultDefinitionFindManyMock.mockResolvedValue([]);
+    showEventCreateManyMock.mockResolvedValue({ count: 1 });
+    showEntryCreateManyMock.mockResolvedValue({ count: 1 });
+    showResultItemCreateManyMock.mockResolvedValue({ count: 0 });
+
+    await writeAdminShowWorkbookImportDb({
+      fileName: "Näyttelyt.xlsx",
+      rows: [
+        {
+          rowNumber: 2,
+          eventLookupKey: "2025-01-01|HELSINKI HALLI",
+          eventDateIso: "2025-01-01",
+          eventCity: "Helsinki",
+          eventPlace: "",
+          eventType: "Kansallinen",
+          registrationNo: "FI1/24",
+          dogName: "KOIRA",
+          judge: null,
+          critiqueText: null,
+          resultItems: [],
+        },
+      ],
+    });
+
+    expect(showEventCreateManyMock).toHaveBeenCalledWith({
+      data: [
+        expect.objectContaining({
+          eventPlace: "",
+        }),
+      ],
+    });
+  });
 });

@@ -48,4 +48,24 @@ describe("readWorkbookActionFile", () => {
     expect(result.file.name).toBe("Näyttelyt.xlsx");
     expect(result.buffer).toEqual(Buffer.from("xlsx"));
   });
+
+  it("returns an invalid file error when workbook is too large", async () => {
+    const workbookFile = new File([Buffer.from("xlsx")], "Näyttelyt.xlsx");
+    Object.defineProperty(workbookFile, "size", {
+      value: 50 * 1024 * 1024 + 1,
+    });
+    const formData = new FormData();
+    formData.append("workbook", workbookFile);
+
+    await expect(readWorkbookActionFile(formData)).resolves.toEqual({
+      ok: false,
+      result: {
+        ok: false,
+        error: {
+          code: "INVALID_FILE",
+          message: "Workbook file must be 50 MB or smaller.",
+        },
+      },
+    });
+  });
 });
