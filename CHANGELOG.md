@@ -20,6 +20,29 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.8.0] - 2026-03-29
+
+### Added
+
+- Ylläpitoon lisättiin uusi Näyttelyt-aloitussivu (`/admin/shows`).
+- Ylläpitoon lisättiin uusi Kennelliiton Excel-tuonti (`/admin/shows/import`).
+- Vanhan datan tuonti etenee nyt selkeästi tässä järjestyksessä: koirien ja omistajien tiedot, koetulokset ja lopuksi näyttelytulokset. Halutessa koko tuonnin voi ajaa myös yhdellä komennolla.
+- Tuonnin virheet ja varoitukset näkyvät nyt selkeämmin jokaisesta tuonnin osasta.
+- Uusi Excel-tuonti tarkistaa tiedoston ennen tallennusta ja estää tuonnin, jos sarakkeita puuttuu tai niitä on väärin/ylimääräisiä.
+- Excel-tuonnin säännöt tallennetaan tietokantaan, jotta niitä voidaan jatkossa hallita ylläpidossa ilman koodimuutoksia.
+
+### Changed
+
+- Näyttelysivut ja koiraprofiilin näyttelytiedot käyttävät nyt kaikkialla uutta näyttelydataa.
+- Näyttelytiedot näytetään nyt selkeinä kenttinä yhden pitkän tulostekstin sijaan.
+
+### Fixed
+
+### Removed
+
+- Vanha näyttelytulosten tietopolku poistettiin käytöstä.
+- Vanhaa Kennelliiton Excel-tuonnin yhteensopivuuskoodia poistettiin.
+
 ## [0.7.0] - 2026-03-10
 
 ### Added

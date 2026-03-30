@@ -90,7 +90,7 @@ export async function loadDogs(input: LoadDogsInput): Promise<RawDogRow[]> {
       _count: {
         select: {
           trialResults: true,
-          showResults: true,
+          showEntries: true,
         },
       },
     },
@@ -127,7 +127,7 @@ export async function loadDogs(input: LoadDogsInput): Promise<RawDogRow[]> {
           : null,
       }),
       trialCount: dog._count.trialResults,
-      showCount: dog._count.showResults,
+      showCount: dog._count.showEntries,
     };
   });
 }

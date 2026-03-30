@@ -19,6 +19,8 @@ enum DogSex {
 
 enum ImportKind {
   LEGACY_PHASE1
+  LEGACY_PHASE2
+  LEGACY_PHASE3
 }
 
 enum ImportStatus {
@@ -32,6 +34,56 @@ enum ImportIssueSeverity {
   INFO
   WARNING
   ERROR
+}
+
+enum ShowSourceTag {
+  LEGACY_NAY9599
+  LEGACY_BEANAY
+  LEGACY_BEANAY_TEXT
+  WORKBOOK_KENNELLIITTO
+  MANUAL_ADMIN
+}
+
+enum ShowResultValueType {
+  FLAG
+  CODE
+  TEXT
+  NUMERIC
+  DATE
+}
+
+enum ShowWorkbookColumnPolicy {
+  IMPORT
+  IGNORE
+}
+
+enum ShowWorkbookColumnDestinationKind {
+  SHOW_EVENT
+  SHOW_ENTRY
+  SHOW_RESULT_ITEM
+}
+
+enum ShowWorkbookTargetField {
+  REGISTRATION_NO
+  EVENT_DATE
+  EVENT_CITY
+  EVENT_PLACE
+  EVENT_TYPE
+  DOG_NAME
+  CLASS_VALUE
+  QUALITY_VALUE
+  JUDGE
+  CRITIQUE_TEXT
+}
+
+enum ShowWorkbookColumnParseMode {
+  TEXT
+  DATE
+  DEFINITION_FROM_CELL
+  FIXED_FLAG
+  FIXED_NUMERIC
+  FIXED_CODE
+  VALUE_MAP
 }
 
 enum AuditAction {
@@ -130,7 +182,7 @@ model Dog {
   registrations   DogRegistration[]
   ownerships      DogOwnership[]
   trialResults    TrialResult[]
-  showResults     ShowResult[]
+  showEntries     ShowEntry[]
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
@@ -155,43 +207,43 @@ model DogRegistration {
 }
 
 model Breeder {
-  id             String   @id @default(cuid())
-  name           String   @unique
-  shortCode      String?
-  grantedAtRaw   String?
-  modifiedAtRaw  String?
-  ownerName      String?
-  city           String?
-  legacyFlag     String?
-  detailsSource  String?
-  dogs           Dog[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id            String   @id @default(cuid())
+  name          String   @unique
+  shortCode     String?
+  grantedAtRaw  String?
+  modifiedAtRaw String?
+  ownerName     String?
+  city          String?
+  legacyFlag    String?
+  detailsSource String?
+  dogs          Dog[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Owner {
-  id          String         @id @default(cuid())
-  name        String
-  postalCode  String         @default("")
-  city        String         @default("")
-  ownerships  DogOwnership[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  id         String         @id @default(cuid())
+  name       String
+  postalCode String         @default("")
+  city       String         @default("")
+  ownerships DogOwnership[]
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
 
   @@unique([name, postalCode, city])
   @@index([name])
 }
 
 model DogOwnership {
-  id            String   @id @default(cuid())
-  dogId         String
-  ownerId       String
-  ownershipDate DateTime?
+  id               String    @id @default(cuid())
+  dogId            String
+  ownerId          String
+  ownershipDate    DateTime?
   ownershipDateKey String
-  dog           Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
-  owner         Owner    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  dog              Dog       @relation(fields: [dogId], references: [id], onDelete: Cascade)
+  owner            Owner     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@unique([dogId, ownerId, ownershipDateKey])
   @@index([dogId])
@@ -200,7 +252,7 @@ model DogOwnership {
 }
 
 model TrialResult {
-  id               String    @id @default(cuid())
+  id               String   @id @default(cuid())
   dogId            String
   eventDate        DateTime
   eventName        String?
@@ -210,63 +262,250 @@ model TrialResult {
   ke               String?
   lk               String?
   pa               String?
-  piste            Decimal?  @db.Decimal(6, 2)
+  piste            Decimal? @db.Decimal(6, 2)
   sija             String?
-  haku             Decimal?  @db.Decimal(6, 2)
-  hauk             Decimal?  @db.Decimal(6, 2)
-  yva              Decimal?  @db.Decimal(6, 2)
-  hlo              Decimal?  @db.Decimal(6, 2)
-  alo              Decimal?  @db.Decimal(6, 2)
-  tja              Decimal?  @db.Decimal(6, 2)
-  pin              Decimal?  @db.Decimal(6, 2)
+  haku             Decimal? @db.Decimal(6, 2)
+  hauk             Decimal? @db.Decimal(6, 2)
+  yva              Decimal? @db.Decimal(6, 2)
+  hlo              Decimal? @db.Decimal(6, 2)
+  alo              Decimal? @db.Decimal(6, 2)
+  tja              Decimal? @db.Decimal(6, 2)
+  pin              Decimal? @db.Decimal(6, 2)
   judge            String?
   legacyFlag       String?
-  sourceKey        String    @unique
-  dog              Dog       @relation(fields: [dogId], references: [id], onDelete: Cascade)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  sourceKey        String   @unique
+  dog              Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@index([eventDate])
   @@index([dogId, eventDate])
 }
 
-model ShowResult {
-  id         String   @id @default(cuid())
-  dogId      String
-  eventDate  DateTime
-  eventName  String?
-  eventPlace String
-  resultText String?
-  heightText String?
-  judge      String?
-  legacyFlag String?
-  sourceKey  String   @unique
-  dog        Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+model ShowEvent {
+  // identity
+  id             String  @id @default(cuid()) // Tapahtumarivin tekninen tunniste.
+  eventLookupKey String  @unique // Yhtenäinen avain lisäykseen tai päivitykseen ja rivin yksilöintiin.
+  sourceRowHash  String? @unique // Lähderivin tiiviste duplikaattien poistoon ja jäljitettävyyteen.
+
+  // event core
+  sourceTag  ShowSourceTag // Mistä lähteestä data tuli (legacy/workbook/manual).
+  eventDate  DateTime // Näyttelyn päivä.
+  eventName  String? // Näyttelyn nimi.
+  eventCity  String? // Näyttelyn paikkakunta.
+  eventPlace String // Näyttelyn paikka.
+  eventType  String? // Näyttelytyyppi.
+  organizer  String? // Järjestäjä.
+
+  // provenance / import
+  importRunId    String? // Viittaus import-ajoon.
+  sourceTable    String? // Alkuperäinen lähdetaulu.
+  sourceRef      String? // Ihmiselle luettava viite alkuperäiseen riviin (debug/audit), ei uniikki avain.
+  rawPayloadJson String? @db.Text // Raakalähteen payload JSON-muodossa.
+
+  // relations / timestamps
+  importRun ImportRun?  @relation(fields: [importRunId], references: [id], onDelete: SetNull) // Relaatio import-ajoon.
+  entries   ShowEntry[] // Tapahtuman osallistumisrivit.
+  createdAt DateTime    @default(now()) // Luontiaika.
+  updatedAt DateTime    @updatedAt // Päivitysaika.
 
   @@index([eventDate])
-  @@index([dogId, eventDate])
+  @@index([eventPlace, eventDate])
+  @@index([sourceTag, eventDate])
+}
+
+model ShowEntry {
+  // identity
+  id             String  @id @default(cuid()) // Osallistumisrivin tekninen tunniste.
+  entryLookupKey String  @unique // Yhtenäinen avain lisäykseen tai päivitykseen ja rivin yksilöintiin.
+  sourceRowHash  String? @unique // Lähderivin tiiviste duplikaattien poistoon ja jäljitettävyyteen.
+
+  // links
+  showEventId String // Viittaus tapahtumaan.
+  dogId       String? // Viittaus koiraan.
+
+  // entry core
+  sourceTag              ShowSourceTag // Mistä lähteestä data tuli (legacy/workbook/manual).
+  registrationNoSnapshot String // Rekisterinumeron snapshot import-hetkellä.
+  dogNameSnapshot        String // Koiran nimen snapshot import-hetkellä.
+  judge                  String? // Tuomari.
+  heightText             String? // Korkeustieto tekstimuodossa.
+  critiqueText           String?       @db.Text // Arvosteluteksti.
+
+  // provenance / import
+  importRunId    String? // Viittaus import-ajoon.
+  sourceTable    String? // Alkuperäinen lähdetaulu.
+  sourceRef      String? // Ihmiselle luettava viite alkuperäiseen riviin (debug/audit), ei uniikki avain.
+  legacyFlag     String? // Legacy-lipputieto.
+  rawPayloadJson String? @db.Text // Raakalähteen payload JSON-muodossa.
+
+  // relations / timestamps
+  showEvent   ShowEvent        @relation(fields: [showEventId], references: [id], onDelete: Cascade) // Relaatio tapahtumaan.
+  dog         Dog?             @relation(fields: [dogId], references: [id], onDelete: SetNull) // Relaatio koiraan.
+  importRun   ImportRun?       @relation(fields: [importRunId], references: [id], onDelete: SetNull) // Relaatio import-ajoon.
+  resultItems ShowResultItem[] // Joustavat tulosattribuutit/palkinnot.
+  createdAt   DateTime         @default(now()) // Luontiaika.
+  updatedAt   DateTime         @updatedAt // Päivitysaika.
+
+  @@index([showEventId])
+  @@index([dogId])
+  @@index([showEventId, dogId])
+  @@index([sourceTag])
+}
+
+model ShowResultCategory {
+  // identity
+  id   String @id @default(cuid()) // Kategorian tekninen tunniste.
+  code String @unique // Vakioitu kategoria-avain.
+
+  // labels / behavior
+  labelFi       String // Kategorian nimi suomeksi.
+  labelSv       String? // Kategorian nimi ruotsiksi.
+  descriptionFi String? @db.Text // Kategorian kuvaus suomeksi.
+  descriptionSv String? @db.Text // Kategorian kuvaus ruotsiksi.
+  sortOrder     Int     @default(0) // Kategorian oletusjärjestys.
+  isEnabled     Boolean @default(true) // Onko kategoria käytössä.
+
+  // relations / timestamps
+  definitions    ShowResultDefinition[] @relation("ShowResultDefinitionCategory") // Kategoriaan kuuluvat määritelmät.
+  workbookRules  ShowWorkbookColumnRule[] @relation("ShowWorkbookRuleAllowedCategory") // Workbook-säännöt, jotka saavat resolvoida tähän kategoriaan.
+  createdAt      DateTime               @default(now()) // Luontiaika.
+  updatedAt      DateTime               @updatedAt // Päivitysaika.
+
+  @@index([isEnabled, sortOrder])
+}
+
+model ShowResultDefinition {
+  // identity
+  id   String @id @default(cuid()) // Määritelmän tekninen tunniste.
+  code String @unique // Vakioitu koneellinen koodi.
+
+  // labels / behavior
+  labelFi            String // Nimi suomeksi.
+  labelSv            String? // Nimi ruotsiksi.
+  descriptionFi      String?             @db.Text // Määritelmän kuvaus suomeksi.
+  descriptionSv      String?             @db.Text // Määritelmän kuvaus ruotsiksi.
+  valueType          ShowResultValueType @default(FLAG) // Attribuutin arvotyyppi.
+  categoryId         String // Viittaus tuloskategoriaan.
+  sortOrder          Int                 @default(0) // Määritelmän lajittelujärjestys.
+  isVisibleByDefault Boolean             @default(true) // Näkyykö oletuksena.
+  isEnabled          Boolean             @default(true) // Onko määritelmä käytössä.
+
+  // relations / timestamps
+  category             ShowResultCategory         @relation("ShowResultDefinitionCategory", fields: [categoryId], references: [id], onDelete: Restrict) // Relaatio tuloskategoriaan.
+  resultItems          ShowResultItem[] // Tähän määritelmään viittaavat tulosrivit.
+  workbookRuleFixedFor ShowWorkbookColumnRule[]   @relation("ShowWorkbookRuleFixedDefinition") // Workbook-säännöt, jotka viittaavat tähän määritelmään suoraan.
+  workbookValueMaps    ShowWorkbookColumnValueMap[] @relation("ShowWorkbookValueMapDefinition") // Workbook-arvomapit, jotka viittaavat tähän määritelmään.
+  createdAt            DateTime                   @default(now()) // Luontiaika.
+  updatedAt            DateTime                   @updatedAt // Päivitysaika.
+
+  @@index([isEnabled, sortOrder])
+  @@index([categoryId])
+}
+
+model ShowWorkbookColumnRule {
+  // identity
+  id   String @id @default(cuid())
+  code String @unique
+
+  // workbook matching / behavior
+  headerName                 String
+  policy                     ShowWorkbookColumnPolicy          @default(IMPORT)
+  destinationKind            ShowWorkbookColumnDestinationKind?
+  targetField                ShowWorkbookTargetField?
+  parseMode                  ShowWorkbookColumnParseMode
+  fixedDefinitionCode        String?
+  allowedDefinitionCategoryCode String?
+  headerRequired             Boolean @default(false)
+  rowValueRequired           Boolean @default(false)
+  sortOrder                  Int     @default(0)
+  isEnabled                  Boolean @default(true)
+
+  // relations / timestamps
+  fixedDefinition        ShowResultDefinition?    @relation("ShowWorkbookRuleFixedDefinition", fields: [fixedDefinitionCode], references: [code], onDelete: Restrict)
+  allowedDefinitionCategory ShowResultCategory?   @relation("ShowWorkbookRuleAllowedCategory", fields: [allowedDefinitionCategoryCode], references: [code], onDelete: Restrict)
+  valueMaps              ShowWorkbookColumnValueMap[]
+  createdAt              DateTime                  @default(now())
+  updatedAt              DateTime                  @updatedAt
+
+  @@unique([headerName])
+  @@index([isEnabled, sortOrder])
+}
+
+model ShowWorkbookColumnValueMap {
+  id             String @id @default(cuid())
+  ruleId         String
+  workbookValue  String
+  definitionCode String
+  sortOrder      Int     @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  rule       ShowWorkbookColumnRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  definition ShowResultDefinition   @relation("ShowWorkbookValueMapDefinition", fields: [definitionCode], references: [code], onDelete: Restrict)
+
+  @@unique([ruleId, workbookValue])
+  @@index([ruleId, sortOrder])
+}
+
+model ShowResultItem {
+  // identity
+  id            String  @id @default(cuid()) // Tulosattribuuttirivin tekninen tunniste.
+  itemLookupKey String  @unique // Yhtenäinen avain lisäykseen tai päivitykseen ja rivin yksilöintiin.
+  sourceRowHash String? @unique // Lähderivin tiiviste duplikaattien poistoon ja jäljitettävyyteen.
+
+  // links
+  showEntryId  String // Viittaus osallistumisriviin.
+  definitionId String // Viittaus tulosmääritelmään.
+
+  // value payload
+  sourceTag    ShowSourceTag // Mistä lähteestä data tuli (legacy/workbook/manual).
+  valueCode    String? // Koodiarvo (esim. PU1, PN2, varaSERT).
+  valueText    String? // Tekstiarvo.
+  valueNumeric Decimal?      @db.Decimal(8, 2) // Numeroarvo.
+  valueDate    DateTime? // Päivämääräarvo.
+  isAwarded    Boolean? // Boolean-lippuarvo.
+
+  // provenance / import
+  importRunId    String? // Viittaus import-ajoon.
+  sourceTable    String? // Alkuperäinen lähdetaulu.
+  sourceRef      String? // Ihmiselle luettava viite alkuperäiseen riviin (debug/audit), ei uniikki avain.
+  rawPayloadJson String? @db.Text // Raakalähteen payload JSON-muodossa.
+
+  // relations / timestamps
+  showEntry  ShowEntry            @relation(fields: [showEntryId], references: [id], onDelete: Cascade) // Relaatio osallistumisriviin.
+  definition ShowResultDefinition @relation(fields: [definitionId], references: [id], onDelete: Restrict) // Relaatio tulosmääritelmään.
+  importRun  ImportRun?           @relation(fields: [importRunId], references: [id], onDelete: SetNull) // Relaatio import-ajoon.
+  createdAt  DateTime             @default(now()) // Luontiaika.
+  updatedAt  DateTime             @updatedAt // Päivitysaika.
+
+  @@index([showEntryId])
+  @@index([definitionId])
+  @@index([showEntryId, definitionId])
+  @@index([sourceTag])
 }
 
 model ImportRun {
-  id                  String       @id @default(cuid())
-  kind                ImportKind
-  status              ImportStatus @default(PENDING)
-  dogsUpserted        Int          @default(0)
-  ownersUpserted      Int          @default(0)
-  ownershipsUpserted  Int          @default(0)
-  trialResultsUpserted Int         @default(0)
-  showResultsUpserted Int          @default(0)
-  errorsCount         Int          @default(0)
-  startedAt           DateTime?
-  finishedAt          DateTime?
-  errorSummary        String?
-  createdByUserId     String?
-  createdByUser       BetterAuthUser? @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
-  issues              ImportRunIssue[]
-  createdAt           DateTime     @default(now())
-  updatedAt           DateTime     @updatedAt
+  id                   String           @id @default(cuid())
+  kind                 ImportKind
+  status               ImportStatus     @default(PENDING)
+  dogsUpserted         Int              @default(0)
+  ownersUpserted       Int              @default(0)
+  ownershipsUpserted   Int              @default(0)
+  trialResultsUpserted Int              @default(0)
+  showResultsUpserted  Int              @default(0)
+  errorsCount          Int              @default(0)
+  startedAt            DateTime?
+  finishedAt           DateTime?
+  errorSummary         String?
+  createdByUserId      String?
+  createdByUser        BetterAuthUser?  @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  issues               ImportRunIssue[]
+  showEvents           ShowEvent[]
+  showEntries          ShowEntry[]
+  showResultItems      ShowResultItem[]
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
 
   @@index([kind, status])
   @@index([createdByUserId])

@@ -88,7 +88,7 @@ export async function getDogProfileBaseRow(dogId: string) {
           },
           _count: {
             select: {
-              showResults: true,
+              showEntries: true,
               trialResults: true,
             },
           },
@@ -137,7 +137,7 @@ export async function getDogProfileBaseRow(dogId: string) {
           },
           _count: {
             select: {
-              showResults: true,
+              showEntries: true,
               trialResults: true,
             },
           },

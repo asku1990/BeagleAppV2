@@ -3,7 +3,6 @@ import type { BeagleShowDetailsResponse } from "@beagle/contracts";
 import { toBusinessDateOnly } from "../core/date-only";
 import { toErrorLog, withLogContext } from "../core/logger";
 import type { ServiceResult } from "../core/result";
-import { normalizeShowResult } from "./core";
 import { encodeShowId, parseShowId } from "./internal/show-id";
 import type { ShowsServiceLogContext } from "./types";
 
@@ -42,6 +41,7 @@ export async function getBeagleShowDetailsService(
 
   try {
     const result = await getBeagleShowDetailsDb({
+      eventKey: parsedShowId.eventKey,
       eventDate: parsedShowId.eventDate,
       eventPlace: parsedShowId.eventPlace,
     });
@@ -64,7 +64,7 @@ export async function getBeagleShowDetailsService(
     const eventDate = toBusinessDateOnly(result.eventDate);
     const data: BeagleShowDetailsResponse = {
       show: {
-        showId: encodeShowId(eventDate, result.eventPlace),
+        showId: encodeShowId(eventDate, result.eventPlace, result.eventKey),
         eventDate,
         eventPlace: result.eventPlace,
         judge: result.judge,
@@ -76,10 +76,14 @@ export async function getBeagleShowDetailsService(
         registrationNo: item.registrationNo,
         name: item.name,
         sex: item.sex,
-        result: normalizeShowResult(item.result, eventDate),
+        showType: item.showType,
+        classCode: item.classCode,
+        qualityGrade: item.qualityGrade,
+        classPlacement: item.classPlacement,
+        pupn: item.pupn,
+        awards: item.awards,
+        critiqueText: item.critiqueText,
         heightCm: item.heightCm,
-        // Note: ShowResult.eventName exists in DB but is intentionally excluded
-        // from the public show contract/clipboard until product requirements need it.
         judge: item.judge,
       })),
     };

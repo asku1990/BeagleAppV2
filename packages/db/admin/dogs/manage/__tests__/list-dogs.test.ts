@@ -72,7 +72,7 @@ describe("listAdminDogsDb", () => {
         },
         _count: {
           trialResults: 7,
-          showResults: 4,
+          showEntries: 4,
         },
       },
     ]);

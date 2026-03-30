@@ -16,6 +16,12 @@ Agent operating rules for this repository.
 - Re-export public module APIs through `index.ts` entrypoints.
 - Keep internal helpers private; do not re-export by default.
 
+## Environment and ops
+
+- Before running commands that depend on app environment variables, secrets, database access, Prisma, imports, or operational scripts, read `docs/ops-env-safety.md` and follow it.
+- Do not guess how `pass://` values are resolved. Use the documented `pass-cli run --env-file ... -- <command>` workflow from `docs/ops-env-safety.md`.
+- For local/staging/prod database inspection and import operations, prefer the documented commands and safety checks in `docs/ops-env-safety.md` over ad hoc shell commands.
+
 ## Server logging rule
 
 - Structured logging standard is `pino`.
@@ -40,6 +46,20 @@ Agent operating rules for this repository.
 - Run targeted checks for touched code.
 - If checks are not run, state that explicitly.
 - CI note: if Turbo task chains include `build` (for example via `test:e2e`), required env vars must be present in CI and forwarded via `turbo.json` `globalEnv`.
+
+## Legacy import invariants
+
+- Legacy import is a one-shot bootstrap flow only.
+- Canonical show tables are expected to be empty before bootstrap:
+  - `showResultCategory`
+  - `showResultDefinition`
+  - `showEvent`
+  - `showEntry`
+  - `showResultItem`
+- `pnpm --filter @beagle/db seed:show-result-definitions` is run once as part of the same one-shot bootstrap flow.
+- Compatibility with pre-existing legacy `showResultDefinition.code` variants is out of scope unless explicitly requested.
+- Do not require replay/upgrade/reconciliation behavior for partially bootstrapped legacy-import environments unless explicitly requested.
+- Code review rule: do not request backward-compat aliasing for old definition codes unless the task explicitly asks for migration compatibility.
 
 ## Documentation rules
 

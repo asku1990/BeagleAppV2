@@ -125,6 +125,50 @@ pass-cli run --env-file .env.staging -- pnpm import:phase1
 CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:phase1
 ```
 
+Phase-2 import:
+
+```bash
+pass-cli run --env-file .env.local -- pnpm import:phase2
+pass-cli run --env-file .env.staging -- pnpm import:phase2
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:phase2
+```
+
+Phase-3 import:
+
+```bash
+pass-cli run --env-file .env.local -- pnpm import:phase3
+pass-cli run --env-file .env.staging -- pnpm import:phase3
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:phase3
+```
+
+Show result definition seed (canonical awards):
+
+```bash
+pass-cli run --env-file .env.local -- pnpm --filter @beagle/db seed:show-result-definitions
+pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db seed:show-result-definitions
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm --filter @beagle/db seed:show-result-definitions
+```
+
+Show workbook import schema seed (Kennelliitto workbook metadata):
+
+```bash
+pass-cli run --env-file .env.local -- pnpm --filter @beagle/db seed:show-workbook-import-schema
+pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db seed:show-workbook-import-schema
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm --filter @beagle/db seed:show-workbook-import-schema
+```
+
+This seed is the bootstrap baseline for `ShowWorkbookColumnRule` /
+`ShowWorkbookColumnValueMap` metadata. It is not intended as the long-term
+editing path once admin-managed workbook schema settings exist.
+
+Bootstrap import (`auth:bootstrap-admin` -> `seed:show-result-definitions` -> `seed:show-workbook-import-schema` -> `phase1` -> `phase2` -> `phase3`):
+
+```bash
+pass-cli run --env-file .env.local -- pnpm import:bootstrap
+pass-cli run --env-file .env.staging -- pnpm import:bootstrap
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:bootstrap
+```
+
 Inspect phase-1 import issues:
 
 ```bash

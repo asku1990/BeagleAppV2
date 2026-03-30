@@ -1,6 +1,6 @@
 {
   "name": "@beagle/web",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -11,8 +11,8 @@
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "pnpm test:unit && pnpm test:e2e",
-    "test:unit": "vitest run",
-    "test:coverage": "vitest run --coverage",
+    "test:unit": "node ../../node_modules/vitest/vitest.mjs run",
+    "test:coverage": "node ../../node_modules/vitest/vitest.mjs run --coverage",
     "test:e2e": "pnpm test:playwright",
     "test:playwright": "playwright test"
   },

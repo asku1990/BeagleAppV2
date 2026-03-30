@@ -6,6 +6,7 @@ export const fiAdminHomeMessages = {
   "admin.home.modules.openProfile": "Avaa profiili",
   "admin.home.modules.openUsers": "Avaa käyttäjät",
   "admin.home.modules.openDogs": "Avaa koirat",
+  "admin.home.modules.openShows": "Avaa näyttelyt",
   "admin.home.modules.openSettings": "Avaa asetukset",
 } as const;
 
@@ -17,5 +18,6 @@ export const svAdminHomeMessages = {
   "admin.home.modules.openProfile": "Öppna profil",
   "admin.home.modules.openUsers": "Öppna användare",
   "admin.home.modules.openDogs": "Öppna hundar",
+  "admin.home.modules.openShows": "Öppna utställningar",
   "admin.home.modules.openSettings": "Öppna inställningar",
 } as const;

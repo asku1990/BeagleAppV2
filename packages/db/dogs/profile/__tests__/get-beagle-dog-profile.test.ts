@@ -50,12 +50,12 @@ function makeOffspringLitterParent(id: string, registrationNo: string) {
 
 function makeOffspringCounts(
   overrides?: Partial<{
-    showResults: number;
+    showEntries: number;
     trialResults: number;
   }>,
 ) {
   return {
-    showResults: overrides?.showResults ?? 0,
+    showEntries: overrides?.showEntries ?? 0,
     trialResults: overrides?.trialResults ?? 0,
   };
 }
@@ -259,7 +259,7 @@ describe("getBeagleDogProfileDb", () => {
             }),
           ],
           _count: makeOffspringCounts({
-            showResults: 1,
+            showEntries: 1,
             trialResults: 2,
           }),
         },
@@ -282,7 +282,7 @@ describe("getBeagleDogProfileDb", () => {
           ],
           siredPuppies: [],
           _count: makeOffspringCounts({
-            showResults: 3,
+            showEntries: 3,
             trialResults: 1,
           }),
         },
@@ -384,7 +384,7 @@ describe("getBeagleDogProfileDb", () => {
             }),
           ],
           _count: makeOffspringCounts({
-            showResults: 2,
+            showEntries: 2,
             trialResults: 4,
           }),
         },
@@ -629,7 +629,7 @@ describe("getBeagleDogProfileDb", () => {
         dam: makeParent("dam-1", "Dam", "DAM-1"),
         whelpedPuppies: [],
         siredPuppies: [],
-        _count: makeOffspringCounts({ showResults: 1, trialResults: 2 }),
+        _count: makeOffspringCounts({ showEntries: 1, trialResults: 2 }),
       },
       {
         id: "sib-a",
@@ -642,7 +642,7 @@ describe("getBeagleDogProfileDb", () => {
         dam: makeParent("dam-1", "Dam", "DAM-1"),
         whelpedPuppies: [],
         siredPuppies: [],
-        _count: makeOffspringCounts({ showResults: 3, trialResults: 4 }),
+        _count: makeOffspringCounts({ showEntries: 3, trialResults: 4 }),
       },
     ]);
 
@@ -852,7 +852,7 @@ describe("getBeagleDogProfileDb", () => {
             }),
           ],
           _count: makeOffspringCounts({
-            showResults: 2,
+            showEntries: 2,
             trialResults: 3,
           }),
         },
