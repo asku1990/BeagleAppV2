@@ -80,6 +80,16 @@ describe("ShowWorkbookValidationPanel", () => {
           issues: [
             {
               rowNumber: 1,
+              columnName: "Aika",
+              severity: "WARNING",
+              code: "SHOW_WORKBOOK_SAME_DAY_EVENT_EXISTS",
+              message:
+                "Found 1 existing event on 2025-01-11. Review potential duplicate before importing event key.",
+              registrationNo: "FI123",
+              eventLookupKey: "2025-01-11|KAJAANI|HALLI|TYPE",
+            },
+            {
+              rowNumber: 1,
               columnName: "Rotukoodi",
               severity: "INFO",
               code: "SHOW_WORKBOOK_COLUMN_IGNORED",
@@ -111,6 +121,8 @@ describe("ShowWorkbookValidationPanel", () => {
     expect(html).toContain("admin.shows.validation.review.accept");
     expect(html).toContain("admin.shows.validation.notes.filters.errors");
     expect(html).toContain("admin.shows.validation.notes.filters.warnings");
+    expect(html).toContain("admin.shows.validation.notes.duplicateRisk.title");
+    expect(html).toContain("admin.shows.validation.notes.duplicateRisk.badge");
   });
 
   it("renders a compact summary when preview is ready", () => {

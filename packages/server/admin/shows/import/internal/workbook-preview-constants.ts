@@ -30,5 +30,6 @@ export const ISSUE_CODES = {
   columnIgnored: "SHOW_WORKBOOK_COLUMN_IGNORED",
   duplicateExistingEntry: "SHOW_WORKBOOK_ENTRY_ALREADY_EXISTS",
   eventMetadataConflict: "SHOW_WORKBOOK_EVENT_METADATA_CONFLICT",
+  sameDayEventExists: "SHOW_WORKBOOK_SAME_DAY_EVENT_EXISTS",
   importWriteFailed: "SHOW_WORKBOOK_IMPORT_WRITE_FAILED",
 } as const;

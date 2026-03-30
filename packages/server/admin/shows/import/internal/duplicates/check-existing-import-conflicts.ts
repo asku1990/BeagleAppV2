@@ -70,6 +70,25 @@ function addEventConflictIssue(input: {
   );
 }
 
+function addSameDayEventWarningIssue(input: {
+  issues: AdminShowWorkbookImportIssue[];
+  row: WorkbookParsedRow;
+  existingEventCount: number;
+}) {
+  const eventText = input.existingEventCount === 1 ? "event" : "events";
+  input.issues.push(
+    createIssue({
+      rowNumber: input.row.rowNumber,
+      columnName: "Aika",
+      severity: "WARNING",
+      code: ISSUE_CODES.sameDayEventExists,
+      message: `Found ${input.existingEventCount} existing ${eventText} on ${input.row.eventDateIso}. Review potential duplicate before importing event ${input.row.eventLookupKey}.`,
+      registrationNo: input.row.registrationNo,
+      eventLookupKey: input.row.eventLookupKey,
+    }),
+  );
+}
+
 function hasEventMetadataConflict(
   row: WorkbookParsedRow,
   event: { eventCity: string | null; eventType: string | null },
@@ -101,20 +120,33 @@ export async function checkExistingImportConflicts(input: {
   }
 
   const eventKeys = [...new Set(acceptedRows.map((row) => row.eventLookupKey))];
+  const eventDateIsos = [
+    ...new Set(acceptedRows.map((row) => row.eventDateIso)),
+  ];
   const entryKeys = [
     ...new Set(
       acceptedRows.map((row) => `${row.registrationNo}|${row.eventLookupKey}`),
     ),
   ];
-  const { events: existingEvents, entries: existingEntries } =
-    await listExistingShowImportKeysDb({
-      eventLookupKeys: eventKeys,
-      entryLookupKeys: entryKeys,
-    });
+  const {
+    events: existingEvents,
+    sameDayEvents,
+    entries: existingEntries,
+  } = await listExistingShowImportKeysDb({
+    eventLookupKeys: eventKeys,
+    eventDateIsos,
+    entryLookupKeys: entryKeys,
+  });
 
   const existingEventsByKey = new Map(
     existingEvents.map((event) => [event.eventLookupKey, event]),
   );
+  const existingEventCountByDateIso = new Map<string, number>();
+  for (const event of sameDayEvents) {
+    const eventDateIso = event.eventDate.toISOString().slice(0, 10);
+    const currentCount = existingEventCountByDateIso.get(eventDateIso) ?? 0;
+    existingEventCountByDateIso.set(eventDateIso, currentCount + 1);
+  }
   const existingEntryKeys = new Set(
     existingEntries.map((entry) => entry.entryLookupKey),
   );
@@ -141,6 +173,34 @@ export async function checkExistingImportConflicts(input: {
       row,
       existingCity: existingEvent.eventCity,
       existingType: existingEvent.eventType,
+    });
+  }
+
+  const acceptedEventRowsByEventLookupKey = new Map<
+    string,
+    WorkbookParsedRow
+  >();
+  for (const row of input.rows) {
+    if (!row.accepted) {
+      continue;
+    }
+    if (acceptedEventRowsByEventLookupKey.has(row.eventLookupKey)) {
+      continue;
+    }
+    acceptedEventRowsByEventLookupKey.set(row.eventLookupKey, row);
+  }
+
+  for (const row of acceptedEventRowsByEventLookupKey.values()) {
+    const existingEventCount =
+      existingEventCountByDateIso.get(row.eventDateIso) ?? 0;
+    if (existingEventCount === 0) {
+      continue;
+    }
+
+    addSameDayEventWarningIssue({
+      issues: input.issues,
+      row,
+      existingEventCount,
     });
   }
 }

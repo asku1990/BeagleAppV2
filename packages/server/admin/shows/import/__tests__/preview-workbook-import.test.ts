@@ -8,6 +8,7 @@ const {
   showResultCategoryFindManyMock,
   showWorkbookColumnRuleFindManyMock,
   showEventFindManyMock,
+  showEventFindManyByDateMock,
   showEntryFindManyMock,
 } = vi.hoisted(() => ({
   dogRegistrationFindManyMock: vi.fn(),
@@ -15,6 +16,7 @@ const {
   showResultCategoryFindManyMock: vi.fn(),
   showWorkbookColumnRuleFindManyMock: vi.fn(),
   showEventFindManyMock: vi.fn(),
+  showEventFindManyByDateMock: vi.fn(),
   showEntryFindManyMock: vi.fn(),
 }));
 
@@ -45,10 +47,12 @@ vi.mock("@beagle/db", () => ({
       columnRules,
     };
   },
-  listExistingShowImportKeysDb: async () => ({
-    events: await showEventFindManyMock(),
-    entries: await showEntryFindManyMock(),
-  }),
+  listExistingShowImportKeysDb: async () => {
+    const events = await showEventFindManyMock();
+    const sameDayEvents = await showEventFindManyByDateMock();
+    const entries = await showEntryFindManyMock();
+    return { events, sameDayEvents, entries };
+  },
 }));
 
 const SUPPORTED_HEADERS: unknown[] = [
@@ -375,6 +379,7 @@ describe("previewAdminShowWorkbookImport", () => {
     showResultCategoryFindManyMock.mockReset();
     showWorkbookColumnRuleFindManyMock.mockReset();
     showEventFindManyMock.mockReset();
+    showEventFindManyByDateMock.mockReset();
     showEntryFindManyMock.mockReset();
 
     dogRegistrationFindManyMock.mockResolvedValue([
@@ -386,6 +391,7 @@ describe("previewAdminShowWorkbookImport", () => {
       buildDefaultColumnRules(),
     );
     showEventFindManyMock.mockResolvedValue([]);
+    showEventFindManyByDateMock.mockResolvedValue([]);
     showEntryFindManyMock.mockResolvedValue([]);
   });
 
@@ -472,6 +478,63 @@ describe("previewAdminShowWorkbookImport", () => {
         }),
       ]),
     );
+  });
+
+  it("adds a non-blocking warning when an existing event is found on the same date", async () => {
+    showEventFindManyByDateMock.mockResolvedValue([
+      {
+        eventLookupKey: "2025-01-10|OULU|HALLI|SPECIALTY",
+        eventDate: new Date("2025-01-10T00:00:00.000Z"),
+      },
+      {
+        eventLookupKey: "2025-01-11|OULU|HALLI|SPECIALTY",
+        eventDate: new Date("2025-01-11T00:00:00.000Z"),
+      },
+    ]);
+
+    const row = createRow({
+      [IDX.registrationNo]: "FI16175/23",
+      [IDX.eventDate]: new Date("2025-01-10T21:59:11.000Z"),
+      [IDX.eventCity]: "Kajaani",
+      [IDX.eventPlace]: "Kajaanin Pallohalli",
+      [IDX.eventType]: "Kansainvälinen näyttely",
+      [IDX.dogName]: "CARDIEM KIND REGARDS",
+      [IDX.classValue]: "AVO",
+      [IDX.qualityValue]: "ERI",
+      [IDX.judge]: "Laakso Jari",
+    });
+
+    const result = await previewAdminShowWorkbookImport({
+      fileName: "Näyttelyt.xlsx",
+      workbook: buildWorkbookBuffer([row]),
+    });
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) {
+      throw new Error("Expected a successful preview response");
+    }
+
+    expect(result.body.data).toMatchObject({
+      acceptedRowCount: 1,
+      rejectedRowCount: 0,
+      warningCount: 1,
+      errorCount: 0,
+    });
+    expect(result.body.data.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "SHOW_WORKBOOK_SAME_DAY_EVENT_EXISTS",
+          severity: "WARNING",
+          columnName: "Aika",
+          rowNumber: 2,
+        }),
+      ]),
+    );
+    expect(
+      result.body.data.issues.find(
+        (issue) => issue.code === "SHOW_WORKBOOK_SAME_DAY_EVENT_EXISTS",
+      )?.eventLookupKey,
+    ).toContain("|KAJAANI|KAJAANIN PALLOHALLI|");
   });
 
   it("accepts headers that only differ by whitespace or punctuation after normalization", async () => {

@@ -85,6 +85,7 @@ describe("checkExistingImportConflicts", () => {
 
     listExistingShowImportKeysDbMock.mockResolvedValue({
       events: [],
+      sameDayEvents: [],
       entries: [
         {
           entryLookupKey: `${row.registrationNo}|${row.eventLookupKey}`,
@@ -96,6 +97,7 @@ describe("checkExistingImportConflicts", () => {
 
     expect(listExistingShowImportKeysDbMock).toHaveBeenCalledWith({
       eventLookupKeys: [row.eventLookupKey],
+      eventDateIsos: [row.eventDateIso],
       entryLookupKeys: [`${row.registrationNo}|${row.eventLookupKey}`],
     });
     expect(row).toMatchObject({
@@ -130,6 +132,7 @@ describe("checkExistingImportConflicts", () => {
           eventType: "All Breed",
         },
       ],
+      sameDayEvents: [],
       entries: [],
     });
 
@@ -167,6 +170,7 @@ describe("checkExistingImportConflicts", () => {
           eventType: "All Breed",
         },
       ],
+      sameDayEvents: [],
       entries: [],
     });
 
@@ -186,5 +190,79 @@ describe("checkExistingImportConflicts", () => {
       ],
     });
     expect(issues).toEqual([]);
+  });
+
+  it("adds a warning per accepted imported event when same-day events already exist", async () => {
+    const rowA1 = createRow({
+      rowNumber: 2,
+      registrationNo: "FI12345/24",
+      eventLookupKey: "2025-05-01|HELSINKI|MESSUKESKUS|ALL BREED",
+      eventDateIso: "2025-05-01",
+    });
+    const rowA2 = createRow({
+      rowNumber: 3,
+      registrationNo: "FI54321/24",
+      eventLookupKey: "2025-05-01|HELSINKI|MESSUKESKUS|ALL BREED",
+      eventDateIso: "2025-05-01",
+    });
+    const rowB = createRow({
+      rowNumber: 4,
+      registrationNo: "FI99999/24",
+      eventLookupKey: "2025-05-01|TAMPERE|HALLI|SPECIALTY",
+      eventDateIso: "2025-05-01",
+      eventCity: "Tampere",
+      eventPlace: "Halli",
+      eventType: "Specialty",
+    });
+    const issues: AdminShowWorkbookImportIssue[] = [];
+
+    listExistingShowImportKeysDbMock.mockResolvedValue({
+      events: [],
+      sameDayEvents: [
+        {
+          eventLookupKey: "2025-05-01|OULU|ARENA|SPECIALTY",
+          eventDate: new Date("2025-05-01T00:00:00.000Z"),
+        },
+      ],
+      entries: [],
+    });
+
+    await checkExistingImportConflicts({ rows: [rowA1, rowA2, rowB], issues });
+
+    expect(rowA1).toMatchObject({
+      accepted: true,
+      issueCount: 0,
+      itemCount: 1,
+    });
+    expect(rowA2).toMatchObject({
+      accepted: true,
+      issueCount: 0,
+      itemCount: 1,
+    });
+    expect(rowB).toMatchObject({
+      accepted: true,
+      issueCount: 0,
+      itemCount: 1,
+    });
+    const sameDayIssues = issues.filter(
+      (issue) => issue.code === ISSUE_CODES.sameDayEventExists,
+    );
+    expect(sameDayIssues).toHaveLength(2);
+    expect(sameDayIssues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          severity: "WARNING",
+          rowNumber: 2,
+          columnName: "Aika",
+          eventLookupKey: rowA1.eventLookupKey,
+        }),
+        expect.objectContaining({
+          severity: "WARNING",
+          rowNumber: 4,
+          columnName: "Aika",
+          eventLookupKey: rowB.eventLookupKey,
+        }),
+      ]),
+    );
   });
 });

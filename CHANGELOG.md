@@ -16,6 +16,11 @@ This project uses a user-facing changelog format.
 
 ### Changed
 
+- Kennelliiton näyttely-workbook-tuonti varoittaa nyt mahdollisesta
+  samalle päivälle osuvasta tuplatuonnista tapahtumatasolla. Tuonti voi jatkua,
+  mutta ylläpitäjää pyydetään tarkistamaan mahdollinen duplikaatti ennen
+  etenemistä.
+
 ### Fixed
 
 ### Removed
