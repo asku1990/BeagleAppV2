@@ -42,6 +42,9 @@ workbook inline and apply the import in one safe all-or-nothing write step.
   - blocks existing `ShowEntry.entryLookupKey`
   - blocks `ShowEvent.eventLookupKey` metadata conflicts (`eventCity` or
     `eventType`)
+  - warns (non-blocking) once per imported event when any existing event is
+    already on the same `eventDate` and asks the operator to review potential
+    duplicates
   - allows existing event + compatible metadata + new entries
 - The admin UI uses a server action to call the preview parser.
 - Validation renders inline summary counts, schema resolution details, and

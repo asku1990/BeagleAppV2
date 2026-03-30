@@ -16,6 +16,10 @@ type ShowWorkbookValidationNotesSectionProps = {
   onIssueFilterChange: (filter: ValidationIssueFilter) => void;
 };
 
+const DUPLICATE_WARNING_CODES = new Set([
+  "SHOW_WORKBOOK_SAME_DAY_EVENT_EXISTS",
+]);
+
 function getSeverityClass(
   severity: AdminShowWorkbookImportIssueSeverity,
 ): string {
@@ -60,12 +64,42 @@ export function ShowWorkbookValidationNotesSection({
 }: ShowWorkbookValidationNotesSectionProps) {
   const { t, locale } = useI18n();
   const formatter = new Intl.NumberFormat(locale);
-  const filteredIssues = validation.issues.filter((issue) =>
-    issueFilter === "ALL" ? true : issue.severity === issueFilter,
-  );
+  const duplicateWarningCount = validation.issues.filter((issue) =>
+    DUPLICATE_WARNING_CODES.has(issue.code),
+  ).length;
+  const filteredIssues = validation.issues
+    .filter((issue) =>
+      issueFilter === "ALL" ? true : issue.severity === issueFilter,
+    )
+    .map((issue, index) => ({ issue, index }))
+    .sort((left, right) => {
+      const leftIsDuplicate = DUPLICATE_WARNING_CODES.has(left.issue.code);
+      const rightIsDuplicate = DUPLICATE_WARNING_CODES.has(right.issue.code);
+      if (leftIsDuplicate && !rightIsDuplicate) {
+        return -1;
+      }
+      if (!leftIsDuplicate && rightIsDuplicate) {
+        return 1;
+      }
+      return left.index - right.index;
+    })
+    .map((entry) => entry.issue);
 
   return (
     <div className="space-y-3">
+      {duplicateWarningCount > 0 ? (
+        <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3">
+          <p className="text-sm font-semibold text-amber-900">
+            {t("admin.shows.validation.notes.duplicateRisk.title")}
+          </p>
+          <p className="mt-1 text-xs text-amber-800">
+            {formatter.format(duplicateWarningCount)}{" "}
+            {t("admin.shows.validation.notes.duplicateRisk.count")} ·{" "}
+            {t("admin.shows.validation.notes.duplicateRisk.description")}
+          </p>
+        </div>
+      ) : null}
+
       <div className="flex items-center justify-between gap-3">
         <div className="space-y-1">
           <h4 className="text-sm font-semibold">
@@ -113,6 +147,11 @@ export function ShowWorkbookValidationNotesSection({
               className="rounded-lg border bg-muted/20 p-3"
             >
               <div className="flex flex-wrap items-center gap-2">
+                {DUPLICATE_WARNING_CODES.has(issue.code) ? (
+                  <span className="rounded-full border border-amber-600/40 bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-900">
+                    {t("admin.shows.validation.notes.duplicateRisk.badge")}
+                  </span>
+                ) : null}
                 <span
                   className={`rounded-full border px-2 py-0.5 text-xs font-medium ${getSeverityClass(issue.severity)}`}
                 >

@@ -75,6 +75,14 @@ export function ShowWorkbookValidationSummary({
         </div>
         <div className="rounded-lg border bg-muted/30 p-3">
           <div className="text-xs uppercase tracking-wide text-muted-foreground">
+            {t("admin.shows.validation.summary.events")}
+          </div>
+          <div className="mt-1 text-xl font-semibold">
+            {formatter.format(validation.eventCount)}
+          </div>
+        </div>
+        <div className="rounded-lg border bg-muted/30 p-3">
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">
             {t("admin.shows.validation.summary.errors")}
           </div>
           <div className="mt-1 text-xl font-semibold">

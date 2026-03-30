@@ -93,6 +93,7 @@ export const fiAdminShowsMessages = {
   "admin.shows.validation.status.review": "Tarkista huomiot",
   "admin.shows.validation.status.ready": "Valmis esikatseluun",
   "admin.shows.validation.summary.rows": "Rivejä",
+  "admin.shows.validation.summary.events": "Tapahtumia",
   "admin.shows.validation.summary.errors": "Virheitä",
   "admin.shows.validation.summary.warnings": "Varoituksia",
   "admin.shows.validation.summary.info": "Info",
@@ -139,6 +140,12 @@ export const fiAdminShowsMessages = {
   "admin.shows.validation.notes.filters.info": "Info",
   "admin.shows.validation.notes.row": "Rivi",
   "admin.shows.validation.notes.column": "Sarake",
+  "admin.shows.validation.notes.duplicateRisk.title":
+    "Mahdollinen duplikaattiriski",
+  "admin.shows.validation.notes.duplicateRisk.count": "duplikaattivaroitusta",
+  "admin.shows.validation.notes.duplicateRisk.description":
+    "Tarkista samalle päivälle osuvat tapahtumat ennen jatkamista.",
+  "admin.shows.validation.notes.duplicateRisk.badge": "Duplikaattiriski",
   "admin.shows.validation.review.title": "Huomiot ennen esikatselua",
   "admin.shows.validation.review.description":
     "Workbookissa on varoituksia tai ohitettuja sarakkeita. Esikatselu avataan vasta, kun hyväksyt nämä huomiot.",
@@ -253,6 +260,7 @@ export const svAdminShowsMessages = {
   "admin.shows.validation.status.review": "Granska noteringar",
   "admin.shows.validation.status.ready": "Klar for forhandsgranskning",
   "admin.shows.validation.summary.rows": "Rader",
+  "admin.shows.validation.summary.events": "Händelser",
   "admin.shows.validation.summary.errors": "Fel",
   "admin.shows.validation.summary.warnings": "Varningar",
   "admin.shows.validation.summary.info": "Info",
@@ -299,6 +307,11 @@ export const svAdminShowsMessages = {
   "admin.shows.validation.notes.filters.info": "Info",
   "admin.shows.validation.notes.row": "Rad",
   "admin.shows.validation.notes.column": "Kolumn",
+  "admin.shows.validation.notes.duplicateRisk.title": "Möjlig dubblettrisk",
+  "admin.shows.validation.notes.duplicateRisk.count": "dubblettvarningar",
+  "admin.shows.validation.notes.duplicateRisk.description":
+    "Granska händelser på samma datum innan du fortsätter.",
+  "admin.shows.validation.notes.duplicateRisk.badge": "Dubblettrisk",
   "admin.shows.validation.review.title": "Noteringar fore forhandsgranskning",
   "admin.shows.validation.review.description":
     "Workbooken innehaller varningar eller ignorerade kolumner. Forhandsgranskningen oppnas forst nar du godkanner dessa noteringar.",

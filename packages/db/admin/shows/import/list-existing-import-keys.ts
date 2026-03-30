@@ -4,23 +4,36 @@ import { prisma } from "../../../core/prisma";
 export async function listExistingShowImportKeysDb(input: {
   eventLookupKeys: string[];
   entryLookupKeys: string[];
+  eventDateIsos: string[];
 }): Promise<{
   events: Array<{
     eventLookupKey: string;
     eventCity: string | null;
     eventType: string | null;
   }>;
+  sameDayEvents: Array<{
+    eventLookupKey: string;
+    eventDate: Date;
+  }>;
   entries: Array<{ entryLookupKey: string }>;
 }> {
-  const [events, entries] = await Promise.all([
+  const eventDates = input.eventDateIsos.map(
+    (value) => new Date(`${value}T00:00:00.000Z`),
+  );
+
+  const [events, sameDayEvents, entries] = await Promise.all([
     prisma.showEvent.findMany({
       where: { eventLookupKey: { in: input.eventLookupKeys } },
       select: { eventLookupKey: true, eventCity: true, eventType: true },
+    }),
+    prisma.showEvent.findMany({
+      where: { eventDate: { in: eventDates } },
+      select: { eventLookupKey: true, eventDate: true },
     }),
     prisma.showEntry.findMany({
       where: { entryLookupKey: { in: input.entryLookupKeys } },
       select: { entryLookupKey: true },
     }),
   ]);
-  return { events, entries };
+  return { events, sameDayEvents, entries };
 }

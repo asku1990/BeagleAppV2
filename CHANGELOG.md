@@ -35,6 +35,10 @@ This project uses a user-facing changelog format.
 
 - Näyttelysivut ja koiraprofiilin näyttelytiedot käyttävät nyt kaikkialla uutta näyttelydataa.
 - Näyttelytiedot näytetään nyt selkeinä kenttinä yhden pitkän tulostekstin sijaan.
+- Kennelliiton näyttely-workbook-tuonti varoittaa mahdollisesta
+  samalle päivälle osuvasta tuplatuonnista tapahtumatasolla. Tuonti voi jatkua,
+  mutta ylläpitäjää pyydetään tarkistamaan mahdollinen duplikaatti ennen
+  etenemistä.
 
 ### Fixed
 
