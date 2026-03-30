@@ -56,8 +56,11 @@ function excelSerialToUtcDate(serial: number, date1904: boolean): Date | null {
   }
 
   const wholeDays = Math.floor(serial);
-  const baseDate = date1904 ? Date.UTC(1904, 0, 1) : Date.UTC(1899, 11, 30);
-  const date = new Date(baseDate + wholeDays * 24 * 60 * 60 * 1000);
+  // Excel's 1900 date system has a fake 1900-02-29 at serial 60, so serials
+  // at or after that point need to be shifted back by one day.
+  const adjustedDays = date1904 || wholeDays < 60 ? wholeDays : wholeDays - 1;
+  const baseDate = date1904 ? Date.UTC(1904, 0, 1) : Date.UTC(1899, 11, 31);
+  const date = new Date(baseDate + adjustedDays * 24 * 60 * 60 * 1000);
   return Number.isNaN(date.getTime()) ? null : date;
 }
 

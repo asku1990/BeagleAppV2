@@ -1,12 +1,43 @@
 import type { AdminShowWorkbookImportApplyResponse } from "@beagle/contracts";
-import { writeAdminShowWorkbookImportDb } from "@beagle/db";
+import {
+  WORKBOOK_IMPORT_WRITE_TX_CONFIG,
+  writeAdminShowWorkbookImportDb,
+} from "@beagle/db";
 import { toErrorLog, withLogContext } from "../../../core/logger";
 import type { ServiceResult } from "../../../core/result";
 import {
   ISSUE_CODES,
   WORKBOOK_FILE_PATTERN,
 } from "./internal/workbook-preview-constants";
+import { buildWorkbookIssueLogSummary } from "./internal/workbook-import-log-summary";
 import { evaluateWorkbookImport } from "./internal/runtime/evaluate-workbook-import";
+
+type PrismaLikeError = {
+  code?: unknown;
+  message?: unknown;
+};
+
+function isPrismaTransactionTimeoutError(error: unknown): boolean {
+  if (typeof error !== "object" || error === null) {
+    return false;
+  }
+  const prismaLikeError = error as PrismaLikeError;
+
+  const code =
+    "code" in error && typeof prismaLikeError.code === "string"
+      ? prismaLikeError.code
+      : null;
+  const message =
+    "message" in error && typeof prismaLikeError.message === "string"
+      ? prismaLikeError.message.toLowerCase()
+      : "";
+
+  const matchesTimeoutMessage =
+    /transaction.*expired/i.test(message) ||
+    /unable to start a transaction in the given time/i.test(message);
+
+  return matchesTimeoutMessage;
+}
 
 export async function applyAdminShowWorkbookImport(input: {
   fileName: string;
@@ -52,6 +83,16 @@ export async function applyAdminShowWorkbookImport(input: {
   }
 
   if (!runtime.ok) {
+    const logMethod =
+      runtime.status >= 500 ? log.error.bind(log) : log.warn.bind(log);
+    logMethod(
+      {
+        status: runtime.status,
+        code: runtime.code,
+        errorMessage: runtime.error,
+      },
+      "show workbook apply failed before write",
+    );
     return {
       status: runtime.status,
       body: {
@@ -63,6 +104,21 @@ export async function applyAdminShowWorkbookImport(input: {
   }
 
   if (runtime.errorCount > 0) {
+    log.warn(
+      {
+        rowCount: runtime.rowCount,
+        acceptedRowCount: runtime.acceptedRowCount,
+        rejectedRowCount: runtime.rejectedRowCount,
+        eventCount: runtime.eventCount,
+        entryCount: runtime.entryCount,
+        resultItemCount: runtime.resultItemCount,
+        infoCount: runtime.infoCount,
+        warningCount: runtime.warningCount,
+        errorCount: runtime.errorCount,
+        ...buildWorkbookIssueLogSummary(runtime.issues),
+      },
+      "show workbook apply blocked by validation issues",
+    );
     return {
       status: 200,
       body: {
@@ -100,6 +156,45 @@ export async function applyAdminShowWorkbookImport(input: {
       })),
     });
 
+    if (runtime.warningCount > 0) {
+      log.warn(
+        {
+          eventsCreated: writeResult.eventsCreated,
+          entriesCreated: writeResult.entriesCreated,
+          itemsCreated: writeResult.itemsCreated,
+          rowCount: runtime.rowCount,
+          acceptedRowCount: runtime.acceptedRowCount,
+          rejectedRowCount: runtime.rejectedRowCount,
+          eventCount: runtime.eventCount,
+          entryCount: runtime.entryCount,
+          resultItemCount: runtime.resultItemCount,
+          infoCount: runtime.infoCount,
+          warningCount: runtime.warningCount,
+          errorCount: runtime.errorCount,
+          ...buildWorkbookIssueLogSummary(runtime.issues),
+        },
+        "show workbook apply completed with warnings",
+      );
+    } else {
+      log.info(
+        {
+          eventsCreated: writeResult.eventsCreated,
+          entriesCreated: writeResult.entriesCreated,
+          itemsCreated: writeResult.itemsCreated,
+          rowCount: runtime.rowCount,
+          acceptedRowCount: runtime.acceptedRowCount,
+          rejectedRowCount: runtime.rejectedRowCount,
+          eventCount: runtime.eventCount,
+          entryCount: runtime.entryCount,
+          resultItemCount: runtime.resultItemCount,
+          infoCount: runtime.infoCount,
+          warningCount: runtime.warningCount,
+          errorCount: runtime.errorCount,
+        },
+        "applied show workbook import",
+      );
+    }
+
     return {
       status: 200,
       body: {
@@ -117,9 +212,17 @@ export async function applyAdminShowWorkbookImport(input: {
       },
     };
   } catch (error) {
+    const isTimeout = isPrismaTransactionTimeoutError(error);
     log.error(
       {
         ...toErrorLog(error),
+        acceptedRowCount: runtime.acceptedRowCount,
+        eventCount: runtime.eventCount,
+        entryCount: runtime.entryCount,
+        resultItemCount: runtime.resultItemCount,
+        transactionMaxWaitMs: WORKBOOK_IMPORT_WRITE_TX_CONFIG.maxWait,
+        transactionTimeoutMs: WORKBOOK_IMPORT_WRITE_TX_CONFIG.timeout,
+        isTransactionTimeout: isTimeout,
       },
       "show workbook apply write failed",
     );
@@ -127,9 +230,12 @@ export async function applyAdminShowWorkbookImport(input: {
       status: 409,
       body: {
         ok: false,
-        error:
-          "Workbook import write failed. Retry import preview and try again.",
-        code: ISSUE_CODES.importWriteFailed,
+        error: isTimeout
+          ? "Workbook import timed out before commit. No rows were written. Retry import preview and try again."
+          : "Workbook import write failed. Retry import preview and try again.",
+        code: isTimeout
+          ? ISSUE_CODES.importTimeout
+          : ISSUE_CODES.importWriteFailed,
       },
     };
   }

@@ -10,6 +10,10 @@ const {
   showEventFindManyMock,
   showEventFindManyByDateMock,
   showEntryFindManyMock,
+  loggerInfoMock,
+  loggerWarnMock,
+  loggerErrorMock,
+  withLogContextMock,
 } = vi.hoisted(() => ({
   dogRegistrationFindManyMock: vi.fn(),
   showResultDefinitionFindManyMock: vi.fn(),
@@ -18,6 +22,25 @@ const {
   showEventFindManyMock: vi.fn(),
   showEventFindManyByDateMock: vi.fn(),
   showEntryFindManyMock: vi.fn(),
+  loggerInfoMock: vi.fn(),
+  loggerWarnMock: vi.fn(),
+  loggerErrorMock: vi.fn(),
+  withLogContextMock: vi.fn(),
+}));
+
+vi.mock("../../../../core/logger", () => ({
+  toErrorLog: (error: Error) => ({
+    error: {
+      type: error.name,
+      message: error.message,
+      stack: error.stack,
+    },
+  }),
+  withLogContext: withLogContextMock.mockImplementation(() => ({
+    info: loggerInfoMock,
+    warn: loggerWarnMock,
+    error: loggerErrorMock,
+  })),
 }));
 
 vi.mock("@beagle/db", () => ({
@@ -393,6 +416,15 @@ describe("previewAdminShowWorkbookImport", () => {
     showEventFindManyMock.mockResolvedValue([]);
     showEventFindManyByDateMock.mockResolvedValue([]);
     showEntryFindManyMock.mockResolvedValue([]);
+    loggerInfoMock.mockReset();
+    loggerWarnMock.mockReset();
+    loggerErrorMock.mockReset();
+    withLogContextMock.mockReset();
+    withLogContextMock.mockImplementation(() => ({
+      info: loggerInfoMock,
+      warn: loggerWarnMock,
+      error: loggerErrorMock,
+    }));
   });
 
   it("parses a workbook preview when seeded metadata and definitions cover the workbook", async () => {
@@ -477,6 +509,21 @@ describe("previewAdminShowWorkbookImport", () => {
           registrationNo: "FI15442/24",
         }),
       ]),
+    );
+    expect(loggerInfoMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rowCount: 2,
+        warningCount: 1,
+        errorCount: 0,
+      }),
+      "previewed show workbook import",
+    );
+    expect(loggerWarnMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        issueCount: 1,
+        topIssueCodes: [{ code: "SHOW_WORKBOOK_DOG_NOT_FOUND", count: 1 }],
+      }),
+      "show workbook preview completed with issues",
     );
   });
 
@@ -808,6 +855,14 @@ describe("previewAdminShowWorkbookImport", () => {
       error: "CLASS_VALUE must use DEFINITION_FROM_CELL parse mode.",
       code: "SHOW_WORKBOOK_SCHEMA_INVALID",
     });
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      {
+        status: 500,
+        code: "SHOW_WORKBOOK_SCHEMA_INVALID",
+        errorMessage: "CLASS_VALUE must use DEFINITION_FROM_CELL parse mode.",
+      },
+      "show workbook preview failed",
+    );
   });
 
   it("scopes DEFINITION_FROM_CELL resolution to the rule category", async () => {
@@ -1291,5 +1346,14 @@ describe("previewAdminShowWorkbookImport", () => {
         code: "SHOW_WORKBOOK_SCHEMA_MISSING",
       },
     });
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      {
+        status: 500,
+        code: "SHOW_WORKBOOK_SCHEMA_MISSING",
+        errorMessage:
+          "Show workbook import schema is missing; run the seed first.",
+      },
+      "show workbook preview failed",
+    );
   });
 });

@@ -160,6 +160,8 @@ export const fiAdminShowsMessages = {
   "admin.shows.import.toast.importDone": "Tuonti valmis",
   "admin.shows.import.result.done": "Tuonti valmis",
   "admin.shows.import.result.blocked": "Tuonti estetty",
+  "admin.shows.import.error.timeout":
+    "Tuonti aikakatkaistiin ennen tallennuksen vahvistusta. Tietoja ei kirjoitettu. Validoi uudelleen ja yritä uudestaan.",
   "admin.shows.import.error.writeFailed":
     "Tuonnin kirjoitus epäonnistui. Validoi uudelleen ja yritä uudestaan.",
 } as const;
@@ -326,6 +328,8 @@ export const svAdminShowsMessages = {
   "admin.shows.import.toast.importDone": "Import klar",
   "admin.shows.import.result.done": "Import klar",
   "admin.shows.import.result.blocked": "Import blockerad",
+  "admin.shows.import.error.timeout":
+    "Importen fick timeout innan skrivningen kunde bekräftas. Ingen data skrevs. Validera igen och försök på nytt.",
   "admin.shows.import.error.writeFailed":
     "Skrivningen for importen misslyckades. Validera pa nytt och forsok igen.",
 } as const;
