@@ -1,5 +1,8 @@
 import type { AdminShowWorkbookImportApplyResponse } from "@beagle/contracts";
-import { writeAdminShowWorkbookImportDb } from "@beagle/db";
+import {
+  WORKBOOK_IMPORT_WRITE_TX_CONFIG,
+  writeAdminShowWorkbookImportDb,
+} from "@beagle/db";
 import { toErrorLog, withLogContext } from "../../../core/logger";
 import type { ServiceResult } from "../../../core/result";
 import {
@@ -7,6 +10,37 @@ import {
   WORKBOOK_FILE_PATTERN,
 } from "./internal/workbook-preview-constants";
 import { evaluateWorkbookImport } from "./internal/runtime/evaluate-workbook-import";
+
+type PrismaLikeError = {
+  code?: unknown;
+  message?: unknown;
+};
+
+function isPrismaTransactionTimeoutError(error: unknown): boolean {
+  if (typeof error !== "object" || error === null) {
+    return false;
+  }
+  const prismaLikeError = error as PrismaLikeError;
+
+  const code =
+    "code" in error && typeof prismaLikeError.code === "string"
+      ? prismaLikeError.code
+      : null;
+  const message =
+    "message" in error && typeof prismaLikeError.message === "string"
+      ? prismaLikeError.message.toLowerCase()
+      : "";
+
+  const matchesTimeoutMessage =
+    /transaction.*expired/i.test(message) ||
+    /unable to start a transaction in the given time/i.test(message);
+
+  if (code === "P2028") {
+    return matchesTimeoutMessage;
+  }
+
+  return matchesTimeoutMessage;
+}
 
 export async function applyAdminShowWorkbookImport(input: {
   fileName: string;
@@ -117,9 +151,17 @@ export async function applyAdminShowWorkbookImport(input: {
       },
     };
   } catch (error) {
+    const isTimeout = isPrismaTransactionTimeoutError(error);
     log.error(
       {
         ...toErrorLog(error),
+        acceptedRowCount: runtime.acceptedRowCount,
+        eventCount: runtime.eventCount,
+        entryCount: runtime.entryCount,
+        resultItemCount: runtime.resultItemCount,
+        transactionMaxWaitMs: WORKBOOK_IMPORT_WRITE_TX_CONFIG.maxWait,
+        transactionTimeoutMs: WORKBOOK_IMPORT_WRITE_TX_CONFIG.timeout,
+        isTransactionTimeout: isTimeout,
       },
       "show workbook apply write failed",
     );
@@ -127,9 +169,12 @@ export async function applyAdminShowWorkbookImport(input: {
       status: 409,
       body: {
         ok: false,
-        error:
-          "Workbook import write failed. Retry import preview and try again.",
-        code: ISSUE_CODES.importWriteFailed,
+        error: isTimeout
+          ? "Workbook import timed out before commit. No rows were written. Retry import preview and try again."
+          : "Workbook import write failed. Retry import preview and try again.",
+        code: isTimeout
+          ? ISSUE_CODES.importTimeout
+          : ISSUE_CODES.importWriteFailed,
       },
     };
   }

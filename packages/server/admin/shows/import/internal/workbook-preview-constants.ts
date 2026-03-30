@@ -31,5 +31,6 @@ export const ISSUE_CODES = {
   duplicateExistingEntry: "SHOW_WORKBOOK_ENTRY_ALREADY_EXISTS",
   eventMetadataConflict: "SHOW_WORKBOOK_EVENT_METADATA_CONFLICT",
   sameDayEventExists: "SHOW_WORKBOOK_SAME_DAY_EVENT_EXISTS",
+  importTimeout: "SHOW_WORKBOOK_IMPORT_TIMEOUT",
   importWriteFailed: "SHOW_WORKBOOK_IMPORT_WRITE_FAILED",
 } as const;

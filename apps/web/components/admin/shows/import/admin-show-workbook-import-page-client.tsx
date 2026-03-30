@@ -164,9 +164,11 @@ export function AdminShowWorkbookImportPageClient() {
       const result = await applyAdminShowWorkbookImportAction(formData);
       if (!result.ok) {
         const errorMessage =
-          result.error.code === "SHOW_WORKBOOK_IMPORT_WRITE_FAILED"
-            ? t("admin.shows.import.error.writeFailed")
-            : result.error.message;
+          result.error.code === "SHOW_WORKBOOK_IMPORT_TIMEOUT"
+            ? t("admin.shows.import.error.timeout")
+            : result.error.code === "SHOW_WORKBOOK_IMPORT_WRITE_FAILED"
+              ? t("admin.shows.import.error.writeFailed")
+              : result.error.message;
         setApplyError(errorMessage);
         setShowValidationDetails(true);
         toast.error(errorMessage);

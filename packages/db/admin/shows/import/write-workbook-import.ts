@@ -3,6 +3,11 @@ import { randomUUID } from "node:crypto";
 import type { Prisma } from "@prisma/client";
 
 // Persists accepted workbook rows with create-only semantics in one transaction.
+export const WORKBOOK_IMPORT_WRITE_TX_CONFIG = {
+  maxWait: 10_000,
+  timeout: 20_000,
+} as const;
+
 export type AdminShowWorkbookImportWriteRowDb = {
   rowNumber: number;
   eventLookupKey: string;
@@ -183,20 +188,19 @@ export async function writeAdminShowWorkbookImportDb(input: {
     entriesCreated: 0,
     itemsCreated: 0,
   };
+  const eventKeys = [...new Set(input.rows.map((row) => row.eventLookupKey))];
+  const registrationNos = [
+    ...new Set(input.rows.map((row) => row.registrationNo)),
+  ];
+  const definitionCodes = [
+    ...new Set(
+      input.rows.flatMap((row) =>
+        row.resultItems.map((item) => item.definitionCode),
+      ),
+    ),
+  ];
 
   await prisma.$transaction(async (tx) => {
-    const eventKeys = [...new Set(input.rows.map((row) => row.eventLookupKey))];
-    const registrationNos = [
-      ...new Set(input.rows.map((row) => row.registrationNo)),
-    ];
-    const definitionCodes = [
-      ...new Set(
-        input.rows.flatMap((row) =>
-          row.resultItems.map((item) => item.definitionCode),
-        ),
-      ),
-    ];
-
     const [existingEvents, dogRegistrations, definitions] = await Promise.all([
       tx.showEvent.findMany({
         where: { eventLookupKey: { in: eventKeys } },
@@ -260,7 +264,7 @@ export async function writeAdminShowWorkbookImportDb(input: {
       await tx.showResultItem.createMany({ data: itemsToCreate });
       counts.itemsCreated += itemsToCreate.length;
     }
-  });
+  }, WORKBOOK_IMPORT_WRITE_TX_CONFIG);
 
   return counts;
 }

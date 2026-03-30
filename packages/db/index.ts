@@ -137,6 +137,7 @@ export {
   listAdminShowWorkbookSchemaReferenceDataDb,
   loadAdminShowWorkbookImportLookupDataDb,
   listExistingShowImportKeysDb,
+  WORKBOOK_IMPORT_WRITE_TX_CONFIG,
   writeAdminShowWorkbookImportDb,
   updateAdminShowWorkbookSchemaRuleDb,
   type AdminShowWorkbookSchemaRuleDb,
