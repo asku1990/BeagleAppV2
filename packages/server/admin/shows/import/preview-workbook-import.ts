@@ -5,6 +5,7 @@ import {
   ISSUE_CODES,
   WORKBOOK_FILE_PATTERN,
 } from "./internal/workbook-preview-constants";
+import { buildWorkbookIssueLogSummary } from "./internal/workbook-import-log-summary";
 import type { WorkbookResolvedSchema } from "./internal/workbook-preview-types";
 import { evaluateWorkbookImport } from "./internal/runtime/evaluate-workbook-import";
 
@@ -76,6 +77,16 @@ export async function previewAdminShowWorkbookImport(input: {
       runDuplicateChecks: true,
     });
     if (!runtime.ok) {
+      const logMethod =
+        runtime.status >= 500 ? log.error.bind(log) : log.warn.bind(log);
+      logMethod(
+        {
+          status: runtime.status,
+          code: runtime.code,
+          errorMessage: runtime.error,
+        },
+        "show workbook preview failed",
+      );
       return {
         status: runtime.status,
         body: {
@@ -100,6 +111,23 @@ export async function previewAdminShowWorkbookImport(input: {
       },
       "previewed show workbook import",
     );
+    if (runtime.warningCount > 0 || runtime.errorCount > 0) {
+      log.warn(
+        {
+          rowCount: runtime.rowCount,
+          acceptedRowCount: runtime.acceptedRowCount,
+          rejectedRowCount: runtime.rejectedRowCount,
+          eventCount: runtime.eventCount,
+          entryCount: runtime.entryCount,
+          resultItemCount: runtime.resultItemCount,
+          infoCount: runtime.infoCount,
+          warningCount: runtime.warningCount,
+          errorCount: runtime.errorCount,
+          ...buildWorkbookIssueLogSummary(runtime.issues),
+        },
+        "show workbook preview completed with issues",
+      );
+    }
 
     return {
       status: 200,

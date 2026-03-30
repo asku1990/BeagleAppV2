@@ -9,6 +9,7 @@ import {
   ISSUE_CODES,
   WORKBOOK_FILE_PATTERN,
 } from "./internal/workbook-preview-constants";
+import { buildWorkbookIssueLogSummary } from "./internal/workbook-import-log-summary";
 import { evaluateWorkbookImport } from "./internal/runtime/evaluate-workbook-import";
 
 type PrismaLikeError = {
@@ -34,10 +35,6 @@ function isPrismaTransactionTimeoutError(error: unknown): boolean {
   const matchesTimeoutMessage =
     /transaction.*expired/i.test(message) ||
     /unable to start a transaction in the given time/i.test(message);
-
-  if (code === "P2028") {
-    return matchesTimeoutMessage;
-  }
 
   return matchesTimeoutMessage;
 }
@@ -86,6 +83,16 @@ export async function applyAdminShowWorkbookImport(input: {
   }
 
   if (!runtime.ok) {
+    const logMethod =
+      runtime.status >= 500 ? log.error.bind(log) : log.warn.bind(log);
+    logMethod(
+      {
+        status: runtime.status,
+        code: runtime.code,
+        errorMessage: runtime.error,
+      },
+      "show workbook apply failed before write",
+    );
     return {
       status: runtime.status,
       body: {
@@ -97,6 +104,21 @@ export async function applyAdminShowWorkbookImport(input: {
   }
 
   if (runtime.errorCount > 0) {
+    log.warn(
+      {
+        rowCount: runtime.rowCount,
+        acceptedRowCount: runtime.acceptedRowCount,
+        rejectedRowCount: runtime.rejectedRowCount,
+        eventCount: runtime.eventCount,
+        entryCount: runtime.entryCount,
+        resultItemCount: runtime.resultItemCount,
+        infoCount: runtime.infoCount,
+        warningCount: runtime.warningCount,
+        errorCount: runtime.errorCount,
+        ...buildWorkbookIssueLogSummary(runtime.issues),
+      },
+      "show workbook apply blocked by validation issues",
+    );
     return {
       status: 200,
       body: {
@@ -133,6 +155,45 @@ export async function applyAdminShowWorkbookImport(input: {
         resultItems: row.resultItems,
       })),
     });
+
+    if (runtime.warningCount > 0) {
+      log.warn(
+        {
+          eventsCreated: writeResult.eventsCreated,
+          entriesCreated: writeResult.entriesCreated,
+          itemsCreated: writeResult.itemsCreated,
+          rowCount: runtime.rowCount,
+          acceptedRowCount: runtime.acceptedRowCount,
+          rejectedRowCount: runtime.rejectedRowCount,
+          eventCount: runtime.eventCount,
+          entryCount: runtime.entryCount,
+          resultItemCount: runtime.resultItemCount,
+          infoCount: runtime.infoCount,
+          warningCount: runtime.warningCount,
+          errorCount: runtime.errorCount,
+          ...buildWorkbookIssueLogSummary(runtime.issues),
+        },
+        "show workbook apply completed with warnings",
+      );
+    } else {
+      log.info(
+        {
+          eventsCreated: writeResult.eventsCreated,
+          entriesCreated: writeResult.entriesCreated,
+          itemsCreated: writeResult.itemsCreated,
+          rowCount: runtime.rowCount,
+          acceptedRowCount: runtime.acceptedRowCount,
+          rejectedRowCount: runtime.rejectedRowCount,
+          eventCount: runtime.eventCount,
+          entryCount: runtime.entryCount,
+          resultItemCount: runtime.resultItemCount,
+          infoCount: runtime.infoCount,
+          warningCount: runtime.warningCount,
+          errorCount: runtime.errorCount,
+        },
+        "applied show workbook import",
+      );
+    }
 
     return {
       status: 200,
