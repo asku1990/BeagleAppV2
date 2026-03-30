@@ -265,4 +265,42 @@ describe("checkExistingImportConflicts", () => {
       ]),
     );
   });
+
+  it("does not warn when the only same-day event is the same event key", async () => {
+    const row = createRow({
+      rowNumber: 2,
+      registrationNo: "FI12345/24",
+      eventLookupKey: "2025-05-01|HELSINKI|MESSUKESKUS|ALL BREED",
+      eventDateIso: "2025-05-01",
+    });
+    const issues: AdminShowWorkbookImportIssue[] = [];
+
+    listExistingShowImportKeysDbMock.mockResolvedValue({
+      events: [
+        {
+          eventLookupKey: row.eventLookupKey,
+          eventCity: row.eventCity,
+          eventType: row.eventType,
+        },
+      ],
+      sameDayEvents: [
+        {
+          eventLookupKey: row.eventLookupKey,
+          eventDate: new Date("2025-05-01T00:00:00.000Z"),
+        },
+      ],
+      entries: [],
+    });
+
+    await checkExistingImportConflicts({ rows: [row], issues });
+
+    expect(row).toMatchObject({
+      accepted: true,
+      issueCount: 0,
+      itemCount: 1,
+    });
+    expect(
+      issues.filter((issue) => issue.code === ISSUE_CODES.sameDayEventExists),
+    ).toHaveLength(0);
+  });
 });

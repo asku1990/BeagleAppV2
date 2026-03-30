@@ -141,11 +141,13 @@ export async function checkExistingImportConflicts(input: {
   const existingEventsByKey = new Map(
     existingEvents.map((event) => [event.eventLookupKey, event]),
   );
-  const existingEventCountByDateIso = new Map<string, number>();
+  const sameDayEventLookupKeysByDateIso = new Map<string, Set<string>>();
   for (const event of sameDayEvents) {
     const eventDateIso = event.eventDate.toISOString().slice(0, 10);
-    const currentCount = existingEventCountByDateIso.get(eventDateIso) ?? 0;
-    existingEventCountByDateIso.set(eventDateIso, currentCount + 1);
+    const eventLookupKeys =
+      sameDayEventLookupKeysByDateIso.get(eventDateIso) ?? new Set<string>();
+    eventLookupKeys.add(event.eventLookupKey);
+    sameDayEventLookupKeysByDateIso.set(eventDateIso, eventLookupKeys);
   }
   const existingEntryKeys = new Set(
     existingEntries.map((entry) => entry.entryLookupKey),
@@ -191,9 +193,17 @@ export async function checkExistingImportConflicts(input: {
   }
 
   for (const row of acceptedEventRowsByEventLookupKey.values()) {
-    const existingEventCount =
-      existingEventCountByDateIso.get(row.eventDateIso) ?? 0;
-    if (existingEventCount === 0) {
+    const sameDayEventLookupKeys = sameDayEventLookupKeysByDateIso.get(
+      row.eventDateIso,
+    );
+    if (!sameDayEventLookupKeys) {
+      continue;
+    }
+
+    const existingEventCount = sameDayEventLookupKeys.has(row.eventLookupKey)
+      ? sameDayEventLookupKeys.size - 1
+      : sameDayEventLookupKeys.size;
+    if (existingEventCount <= 0) {
       continue;
     }
 

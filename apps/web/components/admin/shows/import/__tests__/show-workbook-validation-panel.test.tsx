@@ -113,10 +113,12 @@ describe("ShowWorkbookValidationPanel", () => {
     );
 
     expect(html).toContain("admin.shows.validation.title");
+    expect(html).toContain("admin.shows.validation.summary.events");
     expect(html).toContain("admin.shows.validation.summary.errors");
     expect(html).toContain("admin.shows.validation.schema.title");
     expect(html).toContain("Rotukoodi");
     expect(html).toContain("Unsupported value for SERT: bogus.");
+    expect(html).toContain("1");
     expect(html).toContain("admin.shows.validation.review.title");
     expect(html).toContain("admin.shows.validation.review.accept");
     expect(html).toContain("admin.shows.validation.notes.filters.errors");
