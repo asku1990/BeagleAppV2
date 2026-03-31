@@ -27,6 +27,17 @@ Not allowed:
 - business logic in API route handlers
 - `packages/db` importing `packages/contracts`
 
+## Transport Preference
+
+Prefer route handlers or API endpoints for read-heavy client data fetching, and
+prefer Server Actions for mutations and other write flows.
+
+- Reads consumed by React Query should use `app/api/**` or another HTTP
+  transport layer, not Server Actions.
+- Mutations that change persisted state should use Server Actions unless there
+  is a stronger HTTP/API reason to expose them as route handlers.
+- Keep business logic in `packages/server` regardless of transport choice.
+
 ## Canonical Folder Conventions
 
 Use `/<audience>/<domain>/<feature>/` for web transport/query layers.

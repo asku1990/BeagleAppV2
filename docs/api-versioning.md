@@ -4,7 +4,7 @@ This project uses path-based versioning for public API routes.
 
 ## Rule
 
-All new API routes should be created under:
+All new HTTP API routes for client-side reads should be created under:
 
 - `/api/v1/...`
 
@@ -13,7 +13,11 @@ Examples:
 - `GET /api/v1/imports/:id`
 - `GET /api/v1/imports/:id/issues`
 
-Web-only interactions may use Server Actions in `apps/web/app/actions/*` instead of API routes.
+Web-only write interactions may use Server Actions in `apps/web/app/actions/*`
+instead of API routes.
+
+For app features that use React Query or other client-side fetching, prefer
+route handlers for reads and reserve Server Actions for mutations.
 
 ## Why
 
