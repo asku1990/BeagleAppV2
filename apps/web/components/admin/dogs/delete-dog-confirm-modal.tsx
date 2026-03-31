@@ -1,10 +1,4 @@
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { useI18n } from "@/hooks/i18n";
 import type { AdminDogRecord } from "./types";
 
@@ -23,47 +17,24 @@ export function DeleteDogConfirmModal({
 }: DeleteDogConfirmModalProps) {
   const { t } = useI18n();
 
-  return (
-    <Dialog
+  return dog ? (
+    <ConfirmModal
       open={Boolean(dog)}
-      onOpenChange={(nextOpen) => (nextOpen ? null : onCancel())}
-    >
-      <DialogContent
-        className="max-w-md"
-        aria-label={t("admin.dogs.delete.modalAria")}
-      >
-        <DialogHeader>
-          <DialogTitle>{t("admin.dogs.delete.title")}</DialogTitle>
-        </DialogHeader>
-        {dog ? (
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              {t("admin.dogs.delete.descriptionPrefix")}{" "}
-              <strong>{dog.name}</strong> ({dog.registrationNo ?? "-"}).
-            </p>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={onConfirm}
-                disabled={isDeleting}
-              >
-                {isDeleting
-                  ? t("admin.dogs.delete.confirming")
-                  : t("admin.dogs.delete.confirm")}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                disabled={isDeleting}
-              >
-                {t("admin.dogs.delete.cancel")}
-              </Button>
-            </div>
-          </div>
-        ) : null}
-      </DialogContent>
-    </Dialog>
-  );
+      title={t("admin.dogs.delete.title")}
+      description={
+        <>
+          {t("admin.dogs.delete.descriptionPrefix")} <strong>{dog.name}</strong>{" "}
+          ({dog.registrationNo ?? "-"}).
+        </>
+      }
+      confirmLabel={t("admin.dogs.delete.confirm")}
+      cancelLabel={t("admin.dogs.delete.cancel")}
+      confirmVariant="destructive"
+      isConfirming={isDeleting}
+      confirmingLabel={t("admin.dogs.delete.confirming")}
+      ariaLabel={t("admin.dogs.delete.modalAria")}
+      onConfirm={onConfirm}
+      onCancel={onCancel}
+    />
+  ) : null;
 }
