@@ -5,3 +5,5 @@ export {
   updateAdminShowWorkbookSchemaRule,
   validateAdminShowWorkbookSchemaRule,
 } from "./schema";
+export { getAdminShowEvent } from "./manage";
+export { listAdminShowEvents } from "./manage";

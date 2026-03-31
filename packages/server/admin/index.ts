@@ -16,3 +16,5 @@ export { applyAdminShowWorkbookImport } from "./shows";
 export { listAdminShowWorkbookSchemaRules } from "./shows";
 export { updateAdminShowWorkbookSchemaRule } from "./shows";
 export { validateAdminShowWorkbookSchemaRule } from "./shows";
+export { getAdminShowEvent } from "./shows";
+export { listAdminShowEvents } from "./shows";
