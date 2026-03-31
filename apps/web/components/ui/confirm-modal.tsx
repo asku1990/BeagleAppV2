@@ -76,8 +76,9 @@ export function ConfirmModal({
         <div className="flex gap-2 pt-4">
           <button
             type="button"
-            className="inline-flex h-9 cursor-pointer items-center justify-center rounded-md border bg-background px-4 py-2 text-sm shadow-xs hover:bg-accent hover:text-accent-foreground"
+            className="inline-flex h-9 cursor-pointer items-center justify-center rounded-md border bg-background px-4 py-2 text-sm shadow-xs hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:cursor-default disabled:opacity-50"
             onClick={onCancel}
+            disabled={isConfirming}
           >
             {cancelLabel}
           </button>

@@ -57,6 +57,7 @@ describe("AdminShowManagementPageClient", () => {
     );
     expect(html).toContain("Metsapolun Kide");
     expect(html).toContain("Dog evaluations");
-    expect(html).toContain("Save draft");
+    expect(html).not.toContain("Apply event changes");
+    expect(html).not.toContain("Apply entry changes");
   });
 });

@@ -10,6 +10,8 @@ import type { ManageShowEntry, ManageShowEvent } from "./show-management-types";
 
 type ShowManagementEditorPanelProps = {
   selectedEvent: ManageShowEvent | null;
+  isEventDirty: boolean;
+  dirtyEntryIds: string[];
   onEventFieldChange: (
     field: keyof Omit<ManageShowEvent, "id" | "entries">,
     value: string,
@@ -18,19 +20,23 @@ type ShowManagementEditorPanelProps = {
     entryId: string,
     patch: Partial<Omit<ManageShowEntry, "id">>,
   ) => void;
+  onApplyEvent: () => void;
+  onApplyEntry: (entry: ManageShowEntry) => void;
   onRequestRemoveEntry: (entry: ManageShowEntry) => void;
   onResetShell: () => void;
-  onSaveDraft: () => void;
   statusText: string;
 };
 
 export function ShowManagementEditorPanel({
   selectedEvent,
+  isEventDirty,
+  dirtyEntryIds,
   onEventFieldChange,
   onEntryChange,
+  onApplyEvent,
+  onApplyEntry,
   onRequestRemoveEntry,
   onResetShell,
-  onSaveDraft,
   statusText,
 }: ShowManagementEditorPanelProps) {
   if (!selectedEvent) {
@@ -120,6 +126,14 @@ export function ShowManagementEditorPanel({
           </label>
         </div>
 
+        {isEventDirty ? (
+          <div className="flex justify-end">
+            <Button type="button" onClick={onApplyEvent}>
+              Apply event changes
+            </Button>
+          </div>
+        ) : null}
+
         <Separator />
 
         <div className="space-y-3">
@@ -140,8 +154,10 @@ export function ShowManagementEditorPanel({
               <ShowManagementEntryCard
                 key={entry.id}
                 entry={entry}
+                isDirty={dirtyEntryIds.includes(entry.id)}
                 onChange={onEntryChange}
                 onRemove={onRequestRemoveEntry}
+                onApply={onApplyEntry}
               />
             ))}
           </div>
@@ -151,11 +167,8 @@ export function ShowManagementEditorPanel({
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">
-            {statusText || "Draft changes are local."}
+            {statusText || "No unsaved changes."}
           </p>
-          <Button type="button" onClick={onSaveDraft}>
-            Save draft
-          </Button>
         </div>
       </CardContent>
     </Card>

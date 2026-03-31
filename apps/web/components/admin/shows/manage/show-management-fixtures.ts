@@ -116,6 +116,69 @@ export function splitAwards(value: string): string[] {
     .filter(Boolean);
 }
 
+export function cloneShowEvents(events: ManageShowEvent[]): ManageShowEvent[] {
+  return events.map((event) => ({
+    ...event,
+    entries: event.entries.map((entry) => ({
+      ...entry,
+      awards: [...entry.awards],
+    })),
+  }));
+}
+
+export function areShowEntriesEqual(
+  current: ManageShowEntry,
+  applied: ManageShowEntry,
+): boolean {
+  return (
+    current.registrationNo === applied.registrationNo &&
+    current.dogName === applied.dogName &&
+    current.judge === applied.judge &&
+    current.critiqueText === applied.critiqueText &&
+    current.heightCm === applied.heightCm &&
+    current.showType === applied.showType &&
+    current.classCode === applied.classCode &&
+    current.qualityGrade === applied.qualityGrade &&
+    current.classPlacement === applied.classPlacement &&
+    current.pupn === applied.pupn &&
+    current.awards.join("|") === applied.awards.join("|")
+  );
+}
+
+export function areShowEventFieldsEqual(
+  current: ManageShowEvent,
+  applied: ManageShowEvent,
+): boolean {
+  return (
+    current.eventDate === applied.eventDate &&
+    current.eventPlace === applied.eventPlace &&
+    current.eventCity === applied.eventCity &&
+    current.eventName === applied.eventName &&
+    current.eventType === applied.eventType &&
+    current.organizer === applied.organizer &&
+    current.judge === applied.judge
+  );
+}
+
+export function getDirtyEntryIds(
+  current: ManageShowEvent,
+  applied: ManageShowEvent | undefined,
+): string[] {
+  if (!applied) {
+    return current.entries.map((entry) => entry.id);
+  }
+
+  return current.entries
+    .filter(
+      (entry) =>
+        !areShowEntriesEqual(
+          entry,
+          applied.entries.find((item) => item.id === entry.id) ?? entry,
+        ),
+    )
+    .map((entry) => entry.id);
+}
+
 export function updateEntry(
   entries: ManageShowEntry[],
   entryId: string,

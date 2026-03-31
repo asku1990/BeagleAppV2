@@ -12,17 +12,21 @@ import {
 
 type ShowManagementEntryCardProps = {
   entry: ManageShowEntry;
+  isDirty: boolean;
   onChange: (
     entryId: string,
     patch: Partial<Omit<ManageShowEntry, "id">>,
   ) => void;
   onRemove: (entry: ManageShowEntry) => void;
+  onApply: (entry: ManageShowEntry) => void;
 };
 
 export function ShowManagementEntryCard({
   entry,
+  isDirty,
   onChange,
   onRemove,
+  onApply,
 }: ShowManagementEntryCardProps) {
   return (
     <Card>
@@ -153,6 +157,14 @@ export function ShowManagementEntryCard({
             />
           </label>
         </div>
+
+        {isDirty ? (
+          <div className="flex justify-end">
+            <Button type="button" onClick={() => onApply(entry)}>
+              Apply entry changes
+            </Button>
+          </div>
+        ) : null}
       </CardContent>
     </Card>
   );

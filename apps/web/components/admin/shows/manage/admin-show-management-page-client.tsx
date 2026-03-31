@@ -4,11 +4,14 @@
 // Local mock state keeps the search, event editor, and remove flow interactive
 // before the backend read/write layer is wired in.
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ListingSectionShell } from "@/components/listing";
 import { Card } from "@/components/ui/card";
 import {
+  areShowEventFieldsEqual,
+  cloneShowEvents,
   INITIAL_EVENTS,
+  getDirtyEntryIds,
   includesQuery,
   updateEntry,
   updateSelectedEvent,
@@ -24,7 +27,12 @@ import type {
 
 export function AdminShowManagementPageClient() {
   // Local event state keeps the edit shell interactive before API reads/writes exist.
-  const [events, setEvents] = useState<ManageShowEvent[]>(INITIAL_EVENTS);
+  const [events, setEvents] = useState<ManageShowEvent[]>(() =>
+    cloneShowEvents(INITIAL_EVENTS),
+  );
+  const [appliedEvents, setAppliedEvents] = useState<ManageShowEvent[]>(() =>
+    cloneShowEvents(INITIAL_EVENTS),
+  );
   const [query, setQuery] = useState("");
   const [selectedEventId, setSelectedEventId] = useState(INITIAL_EVENTS[0]?.id);
   const [pendingRemovalEntry, setPendingRemovalEntry] =
@@ -68,6 +76,42 @@ export function AdminShowManagementPageClient() {
     filteredEvents[0] ??
     events[0] ??
     null;
+  const appliedSelectedEvent = appliedEvents.find(
+    (event) => event.id === selectedEvent?.id,
+  );
+  const isEventDirty = Boolean(
+    selectedEvent &&
+    appliedSelectedEvent &&
+    !areShowEventFieldsEqual(selectedEvent, appliedSelectedEvent),
+  );
+  const dirtyEntryIds = selectedEvent
+    ? getDirtyEntryIds(selectedEvent, appliedSelectedEvent)
+    : [];
+  const hasUnsavedChanges = events.some((event) => {
+    const appliedEvent = appliedEvents.find((item) => item.id === event.id);
+    if (!appliedEvent) {
+      return true;
+    }
+
+    return (
+      !areShowEventFieldsEqual(event, appliedEvent) ||
+      getDirtyEntryIds(event, appliedEvent).length > 0
+    );
+  });
+
+  useEffect(() => {
+    function onBeforeUnload(event: BeforeUnloadEvent) {
+      if (!hasUnsavedChanges) {
+        return;
+      }
+
+      event.preventDefault();
+      event.returnValue = "";
+    }
+
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [hasUnsavedChanges]);
 
   function handleSelectEvent(eventId: string) {
     setSelectedEventId(eventId);
@@ -106,12 +150,55 @@ export function AdminShowManagementPageClient() {
     );
   }
 
+  function handleApplyEventChanges() {
+    if (!selectedEvent) {
+      return;
+    }
+
+    setAppliedEvents((current) =>
+      updateSelectedEvent(current, selectedEvent.id, (event) => ({
+        ...event,
+        eventDate: selectedEvent.eventDate,
+        eventPlace: selectedEvent.eventPlace,
+        eventCity: selectedEvent.eventCity,
+        eventName: selectedEvent.eventName,
+        eventType: selectedEvent.eventType,
+        organizer: selectedEvent.organizer,
+        judge: selectedEvent.judge,
+      })),
+    );
+    setStatusText(`${selectedEvent.eventPlace} event changes applied locally.`);
+  }
+
+  function handleApplyEntryChanges(entry: ManageShowEntry) {
+    if (!selectedEvent) {
+      return;
+    }
+
+    const { id: _entryId, ...entryPatch } = entry;
+    setAppliedEvents((current) =>
+      updateSelectedEvent(current, selectedEvent.id, (event) => ({
+        ...event,
+        entries: updateEntry(event.entries, entry.id, entryPatch),
+      })),
+    );
+    setStatusText(`${entry.dogName} changes applied locally.`);
+  }
+
   function handleRemoveEntryConfirmed() {
     if (!pendingRemovalEntry) {
       return;
     }
 
     setEvents((current) =>
+      updateSelectedEvent(current, pendingRemovalEntry.eventId, (event) => ({
+        ...event,
+        entries: event.entries.filter(
+          (entry) => entry.id !== pendingRemovalEntry.entryId,
+        ),
+      })),
+    );
+    setAppliedEvents((current) =>
       updateSelectedEvent(current, pendingRemovalEntry.eventId, (event) => ({
         ...event,
         entries: event.entries.filter(
@@ -126,7 +213,12 @@ export function AdminShowManagementPageClient() {
   }
 
   function handleResetShell() {
-    setEvents(INITIAL_EVENTS);
+    if (hasUnsavedChanges && !window.confirm("Discard unsaved changes?")) {
+      return;
+    }
+
+    setEvents(cloneShowEvents(INITIAL_EVENTS));
+    setAppliedEvents(cloneShowEvents(INITIAL_EVENTS));
     setSelectedEventId(INITIAL_EVENTS[0]?.id ?? "");
     setPendingRemovalEntry(null);
     setStatusText("Local draft reset to seeded demo data.");
@@ -161,8 +253,12 @@ export function AdminShowManagementPageClient() {
           {selectedEvent ? (
             <ShowManagementEditorPanel
               selectedEvent={selectedEvent}
+              isEventDirty={isEventDirty}
+              dirtyEntryIds={dirtyEntryIds}
               onEventFieldChange={handleEventFieldChange}
               onEntryChange={handleEntryFieldChange}
+              onApplyEvent={handleApplyEventChanges}
+              onApplyEntry={handleApplyEntryChanges}
               onRequestRemoveEntry={(entry) =>
                 setPendingRemovalEntry({
                   eventId: selectedEvent.id,
@@ -171,7 +267,6 @@ export function AdminShowManagementPageClient() {
                 })
               }
               onResetShell={handleResetShell}
-              onSaveDraft={() => setStatusText("Draft saved locally.")}
               statusText={statusText}
             />
           ) : (
