@@ -1,5 +1,6 @@
 import type {
   EntryPatch,
+  ManageShowAward,
   ManageShowEntry,
   ManageShowEvent,
 } from "@/components/admin/shows/manage/show-management-types";
@@ -18,7 +19,8 @@ export function areShowEntriesEqual(
     current.qualityGrade === applied.qualityGrade &&
     current.classPlacement === applied.classPlacement &&
     current.pupn === applied.pupn &&
-    current.awards.join("|") === applied.awards.join("|")
+    current.awards.map((award) => award.code).join("|") ===
+      applied.awards.map((award) => award.code).join("|")
   );
 }
 
@@ -56,34 +58,52 @@ export function getDirtyEntryIds(
     .map((entry) => entry.id);
 }
 
+export function updateEntryById(
+  entries: ManageShowEntry[],
+  entryId: string,
+  updater: (entry: ManageShowEntry) => ManageShowEntry,
+): ManageShowEntry[] {
+  return entries.map((entry) =>
+    entry.id === entryId ? updater(entry) : entry,
+  );
+}
+
 export function updateEntry(
   entries: ManageShowEntry[],
   entryId: string,
   patch: EntryPatch,
 ): ManageShowEntry[] {
-  return entries.map((entry) =>
-    entry.id === entryId ? { ...entry, ...patch } : entry,
-  );
+  return updateEntryById(entries, entryId, (entry) => ({ ...entry, ...patch }));
 }
 
 export function addEntryAward(
   entries: ManageShowEntry[],
   entryId: string,
-  award: string,
+  award: ManageShowAward,
 ): ManageShowEntry[] {
-  const normalizedAward = award.trim();
-  if (!normalizedAward) {
+  const normalizedAwardCode = award.code.trim();
+  if (!normalizedAwardCode) {
     return entries;
   }
 
-  return entries.map((entry) => {
-    if (entry.id !== entryId || entry.awards.includes(normalizedAward)) {
+  return updateEntryById(entries, entryId, (entry) => {
+    if (
+      entry.awards.some(
+        (currentAward) => currentAward.code === normalizedAwardCode,
+      )
+    ) {
       return entry;
     }
 
     return {
       ...entry,
-      awards: [...entry.awards, normalizedAward],
+      awards: [
+        ...entry.awards,
+        {
+          ...award,
+          code: normalizedAwardCode,
+        },
+      ],
     };
   });
 }
@@ -91,16 +111,20 @@ export function addEntryAward(
 export function removeEntryAward(
   entries: ManageShowEntry[],
   entryId: string,
-  index: number,
+  awardId: string,
 ): ManageShowEntry[] {
-  return entries.map((entry) => {
-    if (entry.id !== entryId) {
-      return entry;
-    }
+  return updateEntryById(entries, entryId, (entry) => ({
+    ...entry,
+    awards: entry.awards.filter((award) => award.id !== awardId),
+  }));
+}
 
-    return {
-      ...entry,
-      awards: entry.awards.filter((_, currentIndex) => currentIndex !== index),
-    };
-  });
+export function createManageShowAward(
+  id: string,
+  code: string,
+): ManageShowAward {
+  return {
+    id,
+    code: code.trim(),
+  };
 }

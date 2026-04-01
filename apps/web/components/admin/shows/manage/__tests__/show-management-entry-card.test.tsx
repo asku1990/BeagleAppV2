@@ -1,6 +1,7 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
+import { createManageShowAward } from "@web/lib/admin/shows/manage";
 import { ShowManagementEntryCard } from "../show-management-entry-card";
 
 vi.mock("@web/components/ui/button", () => ({
@@ -41,16 +42,16 @@ describe("ShowManagementEntryCard", () => {
           qualityGrade: "ERI",
           classPlacement: "8",
           pupn: "PU8",
-          awards: [],
+          awards: [createManageShowAward("award-1", "SERT")],
         },
         resultOptions: {
           classOptions: [{ value: "AVO", label: "AVO - Avoin luokka" }],
-          qualityOptions: [{ value: "ERI", label: "ERI" }],
-          awardOptions: [],
-          pupnOptions: [{ value: "PU8", label: "PU8" }],
+          qualityOptions: [{ value: "ERI", label: "ERI - Erinomainen" }],
+          awardOptions: [{ value: "SERT", label: "SERT - Sertifikaatti" }],
+          pupnOptions: [{ value: "PU8", label: "PU8 - Paras uros 8" }],
         },
         isDirty: false,
-        onChange: () => undefined,
+        onEntryFieldChange: () => undefined,
         onAddAward: () => undefined,
         onRemoveAward: () => undefined,
         onRemove: () => undefined,
@@ -63,5 +64,9 @@ describe("ShowManagementEntryCard", () => {
     expect(html).toContain('value="-"');
     expect(html).toContain("Placement");
     expect(html).toContain("Example: `AVO 8`.");
+    expect(html).toContain("AVO - Avoin luokka 8");
+    expect(html).toContain("ERI - Erinomainen");
+    expect(html).toContain("PU8 - Paras uros 8");
+    expect(html).toContain("SERT - Sertifikaatti");
   });
 });

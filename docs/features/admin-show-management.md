@@ -106,6 +106,9 @@ That value belongs only on the selected event section.
 - PUPN is edited as a `-` / `PU` / `PN` prefix plus integer field so values
   like `PU8` remain supported and `-` clears the value.
 - Awards are edited via multi-select backed by `options`.
+- User-facing summary text and award chips render option labels when available
+  instead of raw result codes. Unknown current values stay visible as
+  `VALUE - Unknown current value`.
 - If result options are unavailable from DB, show an inline warning and keep option-driven controls disabled.
 - Do not show release-style changelog copy for this page unless the feature is actually shipped.
 
@@ -115,9 +118,12 @@ That value belongs only on the selected event section.
   - the editable draft
   - the last applied local snapshot
 - Event-level field edits update the draft copy only.
-- Entry-level edits update the draft copy only.
+- Entry-level scalar fields update the draft copy only through explicit
+  field-based handlers.
 - Award add/remove actions are applied from the parent draft state so quick
   consecutive chip edits do not replace awards from a stale child snapshot.
+- Draft awards use stable local item ids in the web editor so one visible chip
+  maps to one remove action.
 - Apply buttons update the local applied snapshot, not the server.
 - Reset reverts the draft back to the last applied local snapshot.
 - Remove confirmation updates both local copies so the UI stays internally consistent.

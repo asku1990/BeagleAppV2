@@ -21,12 +21,13 @@ type ShowManagementEditorPanelProps = {
     field: keyof Omit<ManageShowEvent, "id" | "entries">,
     value: string,
   ) => void;
-  onEntryChange: (
+  onEntryFieldChange: (
     entryId: string,
-    patch: Partial<Omit<ManageShowEntry, "id">>,
+    field: keyof Omit<ManageShowEntry, "id" | "awards">,
+    value: string,
   ) => void;
   onAddAward: (entryId: string, award: string) => void;
-  onRemoveAward: (entryId: string, index: number) => void;
+  onRemoveAward: (entryId: string, awardId: string) => void;
   onApplyEvent: () => void;
   onApplyEntry: (entry: ManageShowEntry) => void;
   onRequestRemoveEntry: (entry: ManageShowEntry) => void;
@@ -40,7 +41,7 @@ export function ShowManagementEditorPanel({
   isEventDirty,
   dirtyEntryIds,
   onEventFieldChange,
-  onEntryChange,
+  onEntryFieldChange,
   onAddAward,
   onRemoveAward,
   onApplyEvent,
@@ -166,7 +167,7 @@ export function ShowManagementEditorPanel({
                 entry={entry}
                 resultOptions={resultOptions}
                 isDirty={dirtyEntryIds.includes(entry.id)}
-                onChange={onEntryChange}
+                onEntryFieldChange={onEntryFieldChange}
                 onAddAward={onAddAward}
                 onRemoveAward={onRemoveAward}
                 onRemove={onRequestRemoveEntry}

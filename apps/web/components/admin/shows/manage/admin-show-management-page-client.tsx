@@ -15,6 +15,7 @@ import {
   addEntryAward,
   areShowEntriesEqual,
   areShowEventFieldsEqual,
+  createManageShowAward,
   getDirtyEntryIds,
   removeEntryAward,
   updateEntry,
@@ -25,6 +26,7 @@ import { ShowManagementEditorPanel } from "./show-management-editor-panel";
 import { ShowManagementRemovePanel } from "./show-management-remove-panel";
 import { ShowManagementSearchPanel } from "./show-management-search-panel";
 import type {
+  ManageShowAward,
   ManageShowEntry,
   ManageShowEditOptions,
   ManageShowEvent,
@@ -40,6 +42,15 @@ const EMPTY_SHOW_OPTIONS: ManageShowEditOptions = {
   pupnOptions: [],
 };
 
+function mapAwardCodesToDraftAwards(
+  entryId: string,
+  awardCodes: string[],
+): ManageShowAward[] {
+  return awardCodes.map((awardCode, index) =>
+    createManageShowAward(`${entryId}:${awardCode.trim()}:${index}`, awardCode),
+  );
+}
+
 function toManageShowEvent(show: AdminShowDetailsEvent): ManageShowEvent {
   return {
     id: show.showId,
@@ -53,7 +64,7 @@ function toManageShowEvent(show: AdminShowDetailsEvent): ManageShowEvent {
     entries: show.entries.map((entry) => {
       return {
         ...entry,
-        awards: [...entry.awards],
+        awards: mapAwardCodesToDraftAwards(entry.id, entry.awards),
       };
     }),
   };
@@ -64,7 +75,7 @@ function cloneManageShowEvent(event: ManageShowEvent): ManageShowEvent {
     ...event,
     entries: event.entries.map((entry) => ({
       ...entry,
-      awards: [...entry.awards],
+      awards: entry.awards.map((award) => ({ ...award })),
     })),
   };
 }
@@ -140,7 +151,10 @@ function AdminShowManagementSelectedEventPanel({
     entries: draftEvent.entries.map((entry) => ({
       entryId: entry.id,
       dogName: entry.dogName,
-      awards: entry.awards,
+      awards: entry.awards.map((award) => ({
+        awardId: award.id,
+        awardCode: award.code,
+      })),
     })),
   });
 
@@ -196,31 +210,49 @@ function AdminShowManagementSelectedEventPanel({
 
   function handleEntryFieldChange(
     entryId: string,
-    patch: Partial<Omit<ManageShowEntry, "id">>,
+    field: keyof Omit<ManageShowEntry, "id" | "awards">,
+    value: string,
   ) {
     updateSelectedEventState((current) => ({
       ...current,
       draftEvent: {
         ...cloneManageShowEvent(current.draftEvent),
-        entries: updateEntry(current.draftEvent.entries, entryId, patch),
+        entries: updateEntry(current.draftEvent.entries, entryId, {
+          [field]: value,
+        }),
       },
     }));
   }
 
-  function handleAddAward(entryId: string, award: string) {
+  function handleAddAward(entryId: string, awardCode: string) {
     updateSelectedEventState((current) => {
+      const nextAward = createManageShowAward(
+        `${entryId}:${awardCode.trim()}`,
+        awardCode,
+      );
       const nextEntries = addEntryAward(
         current.draftEvent.entries,
         entryId,
-        award,
+        nextAward,
       );
       console.info("[show-manage][parent][handleAddAward]", {
         entryId,
-        award,
+        awardId: nextAward.id,
+        awardCode: nextAward.code,
         before:
-          current.draftEvent.entries.find((entry) => entry.id === entryId)
-            ?.awards ?? [],
-        after: nextEntries.find((entry) => entry.id === entryId)?.awards ?? [],
+          current.draftEvent.entries
+            .find((entry) => entry.id === entryId)
+            ?.awards.map((award) => ({
+              awardId: award.id,
+              awardCode: award.code,
+            })) ?? [],
+        after:
+          nextEntries
+            .find((entry) => entry.id === entryId)
+            ?.awards.map((award) => ({
+              awardId: award.id,
+              awardCode: award.code,
+            })) ?? [],
       });
 
       return {
@@ -233,20 +265,35 @@ function AdminShowManagementSelectedEventPanel({
     });
   }
 
-  function handleRemoveAward(entryId: string, index: number) {
+  function handleRemoveAward(entryId: string, awardId: string) {
     updateSelectedEventState((current) => {
+      const currentAward =
+        current.draftEvent.entries
+          .find((entry) => entry.id === entryId)
+          ?.awards.find((award) => award.id === awardId) ?? null;
       const nextEntries = removeEntryAward(
         current.draftEvent.entries,
         entryId,
-        index,
+        awardId,
       );
       console.info("[show-manage][parent][handleRemoveAward]", {
         entryId,
-        index,
+        awardId,
+        awardCode: currentAward?.code ?? "",
         before:
-          current.draftEvent.entries.find((entry) => entry.id === entryId)
-            ?.awards ?? [],
-        after: nextEntries.find((entry) => entry.id === entryId)?.awards ?? [],
+          current.draftEvent.entries
+            .find((entry) => entry.id === entryId)
+            ?.awards.map((award) => ({
+              awardId: award.id,
+              awardCode: award.code,
+            })) ?? [],
+        after:
+          nextEntries
+            .find((entry) => entry.id === entryId)
+            ?.awards.map((award) => ({
+              awardId: award.id,
+              awardCode: award.code,
+            })) ?? [],
       });
 
       return {
@@ -337,7 +384,7 @@ function AdminShowManagementSelectedEventPanel({
         isEventDirty={isEventDirty}
         dirtyEntryIds={dirtyEntryIds}
         onEventFieldChange={handleEventFieldChange}
-        onEntryChange={handleEntryFieldChange}
+        onEntryFieldChange={handleEntryFieldChange}
         onAddAward={handleAddAward}
         onRemoveAward={handleRemoveAward}
         onApplyEvent={handleApplyEventChanges}

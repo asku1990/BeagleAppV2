@@ -6,6 +6,7 @@ import { Card, CardContent } from "@web/components/ui/card";
 import { Input } from "@web/components/ui/input";
 import type {
   ManageShowEditOptions,
+  ManageShowAward,
   ManageShowEntry,
 } from "./show-management-types";
 
@@ -13,12 +14,13 @@ type ShowManagementEntryCardProps = {
   entry: ManageShowEntry;
   resultOptions: ManageShowEditOptions;
   isDirty: boolean;
-  onChange: (
+  onEntryFieldChange: (
     entryId: string,
-    patch: Partial<Omit<ManageShowEntry, "id">>,
+    field: keyof Omit<ManageShowEntry, "id" | "awards">,
+    value: string,
   ) => void;
   onAddAward: (entryId: string, award: string) => void;
-  onRemoveAward: (entryId: string, index: number) => void;
+  onRemoveAward: (entryId: string, awardId: string) => void;
   onRemove: (entry: ManageShowEntry) => void;
   onApply: (entry: ManageShowEntry) => void;
 };
@@ -45,11 +47,11 @@ function ensureOptionExists(
 
 function getMissingAwardOptions(
   options: ManageShowEditOptions["awardOptions"],
-  values: string[],
+  values: ManageShowAward[],
 ): ManageShowEditOptions["awardOptions"] {
   const knownValues = new Set(options.map((option) => option.value));
   const missingOptions = values
-    .map((value) => value.trim())
+    .map((award) => award.code.trim())
     .filter((value) => value.length > 0)
     .filter((value) => !knownValues.has(value))
     .map((value) => ({
@@ -58,6 +60,28 @@ function getMissingAwardOptions(
     }));
 
   return [...options, ...missingOptions];
+}
+
+function createOptionLabelLookup(
+  options: Array<{ value: string; label: string }>,
+): Map<string, string> {
+  return new Map(
+    options.map((option) => [option.value.trim(), option.label.trim()]),
+  );
+}
+
+function resolveOptionLabel(
+  lookup: Map<string, string>,
+  value: string,
+): string {
+  const normalizedValue = value.trim();
+  if (!normalizedValue) {
+    return "-";
+  }
+
+  return (
+    lookup.get(normalizedValue) ?? `${normalizedValue} - Unknown current value`
+  );
 }
 
 function getPupnParts(value: string): {
@@ -79,7 +103,7 @@ export function ShowManagementEntryCard({
   entry,
   resultOptions,
   isDirty,
-  onChange,
+  onEntryFieldChange,
   onAddAward,
   onRemoveAward,
   onRemove,
@@ -103,12 +127,24 @@ export function ShowManagementEntryCard({
     entry.awards,
   );
   const availableAwardOptions = awardOptions.filter(
-    (option) => !entry.awards.includes(option.value),
+    (option) =>
+      !entry.awards.some((award) => award.code.trim() === option.value.trim()),
   );
   const awardsDisabled = awardOptions.length === 0;
+  const classLabelLookup = createOptionLabelLookup(classOptions);
+  const qualityLabelLookup = createOptionLabelLookup(qualityOptions);
+  const awardLabelLookup = createOptionLabelLookup(awardOptions);
+  const pupnLabelLookup = createOptionLabelLookup(resultOptions.pupnOptions);
   const selectedAwardsText =
-    entry.awards.length > 0 ? entry.awards.join(", ") : "-";
-  const selectedClassText = entry.classCode.trim() || "-";
+    entry.awards.length > 0
+      ? entry.awards
+          .map((award) => resolveOptionLabel(awardLabelLookup, award.code))
+          .join(", ")
+      : "-";
+  const selectedClassText = resolveOptionLabel(
+    classLabelLookup,
+    entry.classCode,
+  );
   const selectedPlacementText = entry.classPlacement.trim();
   const selectedClassResultText =
     selectedClassText === "-"
@@ -116,15 +152,24 @@ export function ShowManagementEntryCard({
       : selectedPlacementText
         ? `${selectedClassText} ${selectedPlacementText}`
         : selectedClassText;
-  const selectedQualityText = entry.qualityGrade.trim() || "-";
-  const selectedPupnText = entry.pupn.trim() || "-";
+  const selectedQualityText = resolveOptionLabel(
+    qualityLabelLookup,
+    entry.qualityGrade,
+  );
+  const selectedPupnText = entry.pupn.trim()
+    ? resolveOptionLabel(pupnLabelLookup, entry.pupn)
+    : "-";
   const pupnParts = getPupnParts(entry.pupn);
   const pupnPrefix = pupnParts.prefix;
 
   console.info("[show-manage][entry-card][render]", {
     entryId: entry.id,
     dogName: entry.dogName,
-    awards: entry.awards,
+    awards: entry.awards.map((award) => ({
+      awardId: award.id,
+      awardCode: award.code,
+      awardLabel: resolveOptionLabel(awardLabelLookup, award.code),
+    })),
   });
 
   return (
@@ -172,7 +217,7 @@ export function ShowManagementEntryCard({
             <Input
               value={entry.judge}
               onChange={(event) =>
-                onChange(entry.id, { judge: event.target.value })
+                onEntryFieldChange(entry.id, "judge", event.target.value)
               }
             />
           </label>
@@ -183,27 +228,35 @@ export function ShowManagementEntryCard({
               inputMode="numeric"
               value={entry.heightCm}
               onChange={(event) =>
-                onChange(entry.id, { heightCm: event.target.value })
+                onEntryFieldChange(entry.id, "heightCm", event.target.value)
               }
             />
           </label>
-          <label className="space-y-1 text-sm md:col-span-2">
-            <span>Critique</span>
-            <textarea
-              value={entry.critiqueText}
+          <label className="block space-y-1 text-sm">
+            <span>Quality</span>
+            <select
+              value={entry.qualityGrade}
               onChange={(event) =>
-                onChange(entry.id, { critiqueText: event.target.value })
+                onEntryFieldChange(entry.id, "qualityGrade", event.target.value)
               }
-              className="min-h-24 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-            />
+              disabled={qualityOptions.length === 0}
+              className="border-input bg-background h-10 w-full rounded-md border px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+            >
+              <option value="">-</option>
+              {qualityOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </label>
-          <label className="space-y-1 text-sm">
+          <label className="block space-y-1 text-sm">
             <span>Class</span>
             <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_120px]">
               <select
                 value={entry.classCode}
                 onChange={(event) =>
-                  onChange(entry.id, { classCode: event.target.value })
+                  onEntryFieldChange(entry.id, "classCode", event.target.value)
                 }
                 disabled={classOptions.length === 0}
                 className="border-input bg-background h-10 w-full rounded-md border px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
@@ -222,7 +275,11 @@ export function ShowManagementEntryCard({
                 step={1}
                 value={entry.classPlacement}
                 onChange={(event) =>
-                  onChange(entry.id, { classPlacement: event.target.value })
+                  onEntryFieldChange(
+                    entry.id,
+                    "classPlacement",
+                    event.target.value,
+                  )
                 }
                 placeholder="Placement"
               />
@@ -230,24 +287,6 @@ export function ShowManagementEntryCard({
             <p className="text-xs text-muted-foreground">
               Example: `AVO 8`. Class and placement stay paired.
             </p>
-          </label>
-          <label className="space-y-1 text-sm">
-            <span>Quality</span>
-            <select
-              value={entry.qualityGrade}
-              onChange={(event) =>
-                onChange(entry.id, { qualityGrade: event.target.value })
-              }
-              disabled={qualityOptions.length === 0}
-              className="border-input bg-background h-10 w-full rounded-md border px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-            >
-              <option value="">-</option>
-              {qualityOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
           </label>
           <label className="space-y-1 text-sm">
             <span>PUPN</span>
@@ -260,13 +299,15 @@ export function ShowManagementEntryCard({
                       ? event.target.value
                       : "-";
                   if (prefix === "-") {
-                    onChange(entry.id, { pupn: "" });
+                    onEntryFieldChange(entry.id, "pupn", "");
                     return;
                   }
                   const rank = pupnParts.rank;
-                  onChange(entry.id, {
-                    pupn: rank ? `${prefix}${rank}` : prefix,
-                  });
+                  onEntryFieldChange(
+                    entry.id,
+                    "pupn",
+                    rank ? `${prefix}${rank}` : prefix,
+                  );
                 }}
                 className="border-input bg-background h-10 w-full rounded-md border px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
               >
@@ -284,14 +325,18 @@ export function ShowManagementEntryCard({
                 onChange={(event) => {
                   const rank = event.target.value;
                   if (!rank) {
-                    onChange(entry.id, {
-                      pupn: pupnPrefix === "-" ? "" : pupnPrefix,
-                    });
+                    onEntryFieldChange(
+                      entry.id,
+                      "pupn",
+                      pupnPrefix === "-" ? "" : pupnPrefix,
+                    );
                     return;
                   }
-                  onChange(entry.id, {
-                    pupn: pupnPrefix === "-" ? "" : `${pupnPrefix}${rank}`,
-                  });
+                  onEntryFieldChange(
+                    entry.id,
+                    "pupn",
+                    pupnPrefix === "-" ? "" : `${pupnPrefix}${rank}`,
+                  );
                 }}
                 placeholder="Rank"
               />
@@ -300,33 +345,42 @@ export function ShowManagementEntryCard({
               Example: `PU8`. Choose `-` to clear the value.
             </p>
           </label>
-          <label className="space-y-1 text-sm md:col-span-2">
-            <span>Awards</span>
+          <div className="space-y-1 text-sm">
+            <span className="block">Awards</span>
             <div className="flex flex-wrap gap-2 rounded-md border border-input p-2">
               {entry.awards.length === 0 ? (
                 <span className="text-xs text-muted-foreground">-</span>
               ) : (
-                entry.awards.map((award, index) => (
+                entry.awards.map((award) => (
                   <span
-                    key={`${award}-${index}`}
+                    key={award.id}
                     className="bg-muted text-foreground inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs"
                   >
-                    <span>{award}</span>
+                    <span>
+                      {resolveOptionLabel(awardLabelLookup, award.code)}
+                    </span>
                     <button
                       type="button"
-                      aria-label={`Remove award ${award}`}
+                      aria-label={`Remove award ${award.code}`}
                       onClick={() => {
                         console.info(
                           "[show-manage][entry-card][remove-award-click]",
                           {
                             entryId: entry.id,
                             dogName: entry.dogName,
-                            award,
-                            index,
-                            awardsBefore: entry.awards,
+                            awardId: award.id,
+                            awardCode: award.code,
+                            awardLabel: resolveOptionLabel(
+                              awardLabelLookup,
+                              award.code,
+                            ),
+                            awardsBefore: entry.awards.map((currentAward) => ({
+                              awardId: currentAward.id,
+                              awardCode: currentAward.code,
+                            })),
                           },
                         );
-                        onRemoveAward(entry.id, index);
+                        onRemoveAward(entry.id, award.id);
                       }}
                       className="hover:bg-muted-foreground/10 rounded-full px-1 leading-none"
                     >
@@ -345,8 +399,14 @@ export function ShowManagementEntryCard({
                 console.info("[show-manage][entry-card][add-award-click]", {
                   entryId: entry.id,
                   dogName: entry.dogName,
-                  award: event.target.value,
-                  awardsBefore: entry.awards,
+                  awardCode: event.target.value,
+                  awardLabel:
+                    awardLabelLookup.get(event.target.value.trim()) ??
+                    event.target.value,
+                  awardsBefore: entry.awards.map((award) => ({
+                    awardId: award.id,
+                    awardCode: award.code,
+                  })),
                 });
                 onAddAward(entry.id, event.target.value);
               }}
@@ -363,6 +423,16 @@ export function ShowManagementEntryCard({
             <p className="text-xs text-muted-foreground">
               Selected awards appear as badges. Use the `x` to remove one.
             </p>
+          </div>
+          <label className="space-y-1 text-sm md:col-span-2">
+            <span>Critique</span>
+            <textarea
+              value={entry.critiqueText}
+              onChange={(event) =>
+                onEntryFieldChange(entry.id, "critiqueText", event.target.value)
+              }
+              className="min-h-24 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+            />
           </label>
         </div>
         {optionsUnavailable ? (
