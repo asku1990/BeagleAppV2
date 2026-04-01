@@ -6,10 +6,15 @@ import { Card, CardContent } from "@web/components/ui/card";
 import { Input } from "@web/components/ui/input";
 import { Separator } from "@web/components/ui/separator";
 import { ShowManagementEntryCard } from "./show-management-entry-card";
-import type { ManageShowEntry, ManageShowEvent } from "./show-management-types";
+import type {
+  ManageShowEditOptions,
+  ManageShowEntry,
+  ManageShowEvent,
+} from "./show-management-types";
 
 type ShowManagementEditorPanelProps = {
   selectedEvent: ManageShowEvent | null;
+  resultOptions: ManageShowEditOptions;
   isEventDirty: boolean;
   dirtyEntryIds: string[];
   onEventFieldChange: (
@@ -29,6 +34,7 @@ type ShowManagementEditorPanelProps = {
 
 export function ShowManagementEditorPanel({
   selectedEvent,
+  resultOptions,
   isEventDirty,
   dirtyEntryIds,
   onEventFieldChange,
@@ -154,6 +160,7 @@ export function ShowManagementEditorPanel({
               <ShowManagementEntryCard
                 key={entry.id}
                 entry={entry}
+                resultOptions={resultOptions}
                 isDirty={dirtyEntryIds.includes(entry.id)}
                 onChange={onEntryChange}
                 onRemove={onRequestRemoveEntry}

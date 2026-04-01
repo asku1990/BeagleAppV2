@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import type {
   AdminShowDetailsEvent,
   AdminShowEventSummary,
+  AdminShowResultOptions,
 } from "@beagle/contracts";
 import { ListingSectionShell } from "@web/components/listing";
 import { Card, CardContent } from "@web/components/ui/card";
@@ -23,12 +24,19 @@ import { ShowManagementRemovePanel } from "./show-management-remove-panel";
 import { ShowManagementSearchPanel } from "./show-management-search-panel";
 import type {
   ManageShowEntry,
+  ManageShowEditOptions,
   ManageShowEvent,
   PendingRemovalEntry,
 } from "./show-management-types";
 
 const DEFAULT_PAGE_SIZE = 20;
 const EMPTY_SHOW_EVENTS: AdminShowEventSummary[] = [];
+const EMPTY_SHOW_OPTIONS: ManageShowEditOptions = {
+  classOptions: [],
+  qualityOptions: [],
+  awardOptions: [],
+  pupnOptions: [],
+};
 
 function toManageShowEvent(show: AdminShowDetailsEvent): ManageShowEvent {
   return {
@@ -59,6 +67,31 @@ function cloneManageShowEvent(event: ManageShowEvent): ManageShowEvent {
   };
 }
 
+function cloneManageShowEditOptions(
+  options: ManageShowEditOptions,
+): ManageShowEditOptions {
+  return {
+    classOptions: options.classOptions.map((option) => ({ ...option })),
+    qualityOptions: options.qualityOptions.map((option) => ({ ...option })),
+    awardOptions: options.awardOptions.map((option) => ({ ...option })),
+    pupnOptions: options.pupnOptions.map((option) => ({ ...option })),
+  };
+}
+
+function toManageShowEditOptions(
+  options: AdminShowResultOptions | null | undefined,
+): ManageShowEditOptions {
+  if (!options) {
+    return cloneManageShowEditOptions(EMPTY_SHOW_OPTIONS);
+  }
+  return cloneManageShowEditOptions({
+    classOptions: options.classOptions,
+    qualityOptions: options.qualityOptions,
+    awardOptions: options.awardOptions,
+    pupnOptions: options.pupnOptions,
+  });
+}
+
 function getAppliedEntry(
   event: ManageShowEvent | null,
   entryId: string,
@@ -84,8 +117,10 @@ function createEventLocalState(event: ManageShowEvent): EventLocalState {
 
 function AdminShowManagementSelectedEventPanel({
   selectedEvent,
+  resultOptions,
 }: {
   selectedEvent: ManageShowEvent;
+  resultOptions: ManageShowEditOptions;
 }) {
   const [eventStateById, setEventStateById] = useState<
     Record<string, EventLocalState>
@@ -235,6 +270,7 @@ function AdminShowManagementSelectedEventPanel({
     <>
       <ShowManagementEditorPanel
         selectedEvent={draftEvent}
+        resultOptions={resultOptions}
         isEventDirty={isEventDirty}
         dirtyEntryIds={dirtyEntryIds}
         onEventFieldChange={handleEventFieldChange}
@@ -295,6 +331,7 @@ export function AdminShowManagementPageClient() {
     enabled: selectedEventId.length > 0,
   });
   const selectedEventFromApi = detailQuery.data?.show ?? null;
+  const resultOptions = toManageShowEditOptions(detailQuery.data?.options);
   const selectedEvent = selectedEventFromApi
     ? toManageShowEvent(selectedEventFromApi)
     : null;
@@ -364,6 +401,7 @@ export function AdminShowManagementPageClient() {
             ) : selectedEvent ? (
               <AdminShowManagementSelectedEventPanel
                 selectedEvent={selectedEvent}
+                resultOptions={resultOptions}
               />
             ) : (
               <Card>

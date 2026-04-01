@@ -80,6 +80,8 @@ export {
   type AdminShowDetailsEntryRowDb,
   type AdminShowDetailsRequestDb,
   type AdminShowDetailsResponseDb,
+  type AdminShowResultOptionDb,
+  type AdminShowResultOptionsDb,
   type AdminShowSearchRequestDb,
   type AdminShowSearchResponseDb,
   type AdminShowSearchRowDb,

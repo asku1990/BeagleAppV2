@@ -95,6 +95,12 @@ describe("getAdminShowEvent", () => {
           awards: ["SA"],
         },
       ],
+      options: {
+        classOptions: [{ value: "JUN", label: "JUN - Junioriluokka" }],
+        qualityOptions: [{ value: "ERI", label: "ERI" }],
+        awardOptions: [{ value: "SA", label: "SA" }],
+        pupnOptions: [{ value: "PU1", label: "PU1" }],
+      },
     } as never);
 
     const showId = encodeShowId("2025-06-01", "Helsinki", "show-event-1");
@@ -139,6 +145,12 @@ describe("getAdminShowEvent", () => {
               },
             ],
           },
+          options: {
+            classOptions: [{ value: "JUN", label: "JUN - Junioriluokka" }],
+            qualityOptions: [{ value: "ERI", label: "ERI" }],
+            awardOptions: [{ value: "SA", label: "SA" }],
+            pupnOptions: [{ value: "PU1", label: "PU1" }],
+          },
         },
       },
     });
@@ -176,6 +188,12 @@ describe("getAdminShowEvent", () => {
           awards: [],
         },
       ],
+      options: {
+        classOptions: [],
+        qualityOptions: [],
+        awardOptions: [],
+        pupnOptions: [],
+      },
     } as never);
 
     const showId = encodeShowId("2025-06-02", "Espoo", "show-event-2");
@@ -223,6 +241,12 @@ describe("getAdminShowEvent", () => {
                 awards: [],
               },
             ],
+          },
+          options: {
+            classOptions: [],
+            qualityOptions: [],
+            awardOptions: [],
+            pupnOptions: [],
           },
         },
       },

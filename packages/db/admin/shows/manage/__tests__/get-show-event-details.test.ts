@@ -1,22 +1,31 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getAdminShowEventDetailsDb } from "../get-show-event-details";
 
-const { showEventFindFirstMock, showEventFindManyMock, prismaMock } =
-  vi.hoisted(() => {
-    const showEventFindFirst = vi.fn();
-    const showEventFindMany = vi.fn();
+const {
+  showEventFindFirstMock,
+  showEventFindManyMock,
+  showResultDefinitionFindManyMock,
+  prismaMock,
+} = vi.hoisted(() => {
+  const showEventFindFirst = vi.fn();
+  const showEventFindMany = vi.fn();
+  const showResultDefinitionFindMany = vi.fn();
 
-    return {
-      showEventFindFirstMock: showEventFindFirst,
-      showEventFindManyMock: showEventFindMany,
-      prismaMock: {
-        showEvent: {
-          findFirst: showEventFindFirst,
-          findMany: showEventFindMany,
-        },
+  return {
+    showEventFindFirstMock: showEventFindFirst,
+    showEventFindManyMock: showEventFindMany,
+    showResultDefinitionFindManyMock: showResultDefinitionFindMany,
+    prismaMock: {
+      showEvent: {
+        findFirst: showEventFindFirst,
+        findMany: showEventFindMany,
       },
-    };
-  });
+      showResultDefinition: {
+        findMany: showResultDefinitionFindMany,
+      },
+    },
+  };
+});
 
 vi.mock("../../../../core/prisma", () => ({
   prisma: prismaMock,
@@ -44,9 +53,42 @@ describe("getAdminShowEventDetailsDb", () => {
   beforeEach(() => {
     showEventFindFirstMock.mockReset();
     showEventFindManyMock.mockReset();
+    showResultDefinitionFindManyMock.mockReset();
+    showResultDefinitionFindManyMock.mockResolvedValue([]);
   });
 
   it("maps the selected event and projects structured entry values", async () => {
+    showResultDefinitionFindManyMock.mockResolvedValueOnce([
+      {
+        code: "AVO",
+        labelFi: "Avoin luokka",
+        sortOrder: 50,
+        isVisibleByDefault: false,
+        category: { code: "KILPAILULUOKKA", sortOrder: 10 },
+      },
+      {
+        code: "ERI",
+        labelFi: "ERI",
+        sortOrder: 10,
+        isVisibleByDefault: true,
+        category: { code: "LAATUARVOSTELU", sortOrder: 20 },
+      },
+      {
+        code: "SERT",
+        labelFi: "Sertifikaatti",
+        sortOrder: 100,
+        isVisibleByDefault: true,
+        category: { code: "SERTTIMERKINTA", sortOrder: 40 },
+      },
+      {
+        code: "PUPN",
+        labelFi: "Paras uros / paras narttu",
+        sortOrder: 230,
+        isVisibleByDefault: true,
+        category: { code: "PUPN", sortOrder: 80 },
+      },
+    ]);
+
     showEventFindFirstMock.mockResolvedValueOnce({
       eventLookupKey: "show-event-1",
       eventDate: new Date("2025-06-01T00:00:00.000Z"),
@@ -130,6 +172,21 @@ describe("getAdminShowEventDetailsDb", () => {
           awards: ["SERT"],
         },
       ],
+      options: {
+        classOptions: [{ value: "AVO", label: "AVO - Avoin luokka" }],
+        qualityOptions: [{ value: "ERI", label: "ERI" }],
+        awardOptions: [{ value: "SERT", label: "SERT - Sertifikaatti" }],
+        pupnOptions: [
+          { value: "PU1", label: "PU1" },
+          { value: "PU2", label: "PU2" },
+          { value: "PU3", label: "PU3" },
+          { value: "PU4", label: "PU4" },
+          { value: "PN1", label: "PN1" },
+          { value: "PN2", label: "PN2" },
+          { value: "PN3", label: "PN3" },
+          { value: "PN4", label: "PN4" },
+        ],
+      },
     });
 
     expect(showEventFindFirstMock).toHaveBeenCalledWith(
@@ -174,6 +231,16 @@ describe("getAdminShowEventDetailsDb", () => {
   });
 
   it("returns an empty event instead of hiding it when all entries are removed", async () => {
+    showResultDefinitionFindManyMock.mockResolvedValueOnce([
+      {
+        code: "PUPN",
+        labelFi: "Paras uros / paras narttu",
+        sortOrder: 230,
+        isVisibleByDefault: true,
+        category: { code: "PUPN", sortOrder: 80 },
+      },
+    ]);
+
     showEventFindFirstMock.mockResolvedValueOnce({
       eventLookupKey: "show-event-empty",
       eventDate: new Date("2025-06-03T00:00:00.000Z"),
@@ -202,6 +269,21 @@ describe("getAdminShowEventDetailsDb", () => {
       judge: null,
       dogCount: 0,
       items: [],
+      options: {
+        classOptions: [],
+        qualityOptions: [],
+        awardOptions: [],
+        pupnOptions: [
+          { value: "PU1", label: "PU1" },
+          { value: "PU2", label: "PU2" },
+          { value: "PU3", label: "PU3" },
+          { value: "PU4", label: "PU4" },
+          { value: "PN1", label: "PN1" },
+          { value: "PN2", label: "PN2" },
+          { value: "PN3", label: "PN3" },
+          { value: "PN4", label: "PN4" },
+        ],
+      },
     });
   });
 });

@@ -168,6 +168,8 @@ export type {
   AdminShowDetailsRequest,
   AdminShowDetailsResponse,
   AdminShowEntry,
+  AdminShowResultOption,
+  AdminShowResultOptions,
   AdminShowEventSummary,
   AdminShowSearchRequest,
   AdminShowSearchResponse,

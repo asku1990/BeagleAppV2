@@ -46,6 +46,18 @@ export type AdminShowDetailsEntryRowDb = {
   awards: string[];
 };
 
+export type AdminShowResultOptionDb = {
+  value: string;
+  label: string;
+};
+
+export type AdminShowResultOptionsDb = {
+  classOptions: AdminShowResultOptionDb[];
+  qualityOptions: AdminShowResultOptionDb[];
+  awardOptions: AdminShowResultOptionDb[];
+  pupnOptions: AdminShowResultOptionDb[];
+};
+
 export type AdminShowDetailsResponseDb = {
   eventKey: string;
   eventDate: Date;
@@ -57,4 +69,5 @@ export type AdminShowDetailsResponseDb = {
   judge: string | null;
   dogCount: number;
   items: AdminShowDetailsEntryRowDb[];
+  options: AdminShowResultOptionsDb;
 };

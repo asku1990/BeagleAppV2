@@ -28,7 +28,7 @@ Developer notes for the admin show management flow.
 1. The page fetches event summaries through `useAdminShowEventsQuery`.
 2. The selected summary drives `useAdminShowEventQuery` for full event details.
 3. The search list renders contract summaries (`showId`, dates, place, city, name, type, organizer, judge, dog count).
-4. The detail panel maps contract entries into the local editor model so the UI can keep a draft copy separate from the loaded data.
+4. The detail panel maps contract entries and DB-driven result options into the local editor model so the UI can keep a draft copy separate from the loaded data.
 5. Apply/remove/reset actions currently only update local draft state.
 
 ## Contract rules
@@ -42,6 +42,7 @@ The admin show read contract is split into two shapes:
   - `items[]` of `AdminShowEventSummary`
 - `AdminShowDetailsResponse`
   - `show` of `AdminShowDetailsEvent`
+  - `options` of `AdminShowResultOptions`
 
 The summary and detail models share the same event identity fields:
 
@@ -67,6 +68,19 @@ The detail response adds `entries[]` with:
 - PUPN
 - awards
 
+The detail response also provides `options` for definition-backed editing:
+
+- `classOptions[]`
+- `qualityOptions[]`
+- `awardOptions[]`
+- `pupnOptions[]`
+
+Option sourcing rules:
+
+- `classOptions`, `qualityOptions`, and `awardOptions` are loaded from enabled `ShowResultDefinition` rows and their categories.
+- `pupnOptions` is token-based (`PU1..PU4`, `PN1..PN4`) and exposed only when the canonical `PUPN` definition/category exists.
+- Awards exclude class, quality, placement, and PUPN definitions.
+
 The entry cards intentionally do not repeat the event-level `eventType` field.
 That value belongs only on the selected event section.
 
@@ -86,6 +100,9 @@ That value belongs only on the selected event section.
 - Show a descriptive error state if either search or detail loading fails.
 - Keep entry edits local until write mutations exist.
 - Keep the remove dialog scoped to the currently selected event entry.
+- Class, quality, and PUPN are edited via single-select controls backed by `options`.
+- Awards are edited via multi-select backed by `options`.
+- If result options are unavailable from DB, show an inline warning and keep option-driven controls disabled.
 - Do not show release-style changelog copy for this page unless the feature is actually shipped.
 
 ## Local draft behavior

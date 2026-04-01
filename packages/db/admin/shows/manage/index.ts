@@ -4,6 +4,8 @@ export type {
   AdminShowDetailsEntryRowDb,
   AdminShowDetailsRequestDb,
   AdminShowDetailsResponseDb,
+  AdminShowResultOptionDb,
+  AdminShowResultOptionsDb,
   AdminShowSearchRequestDb,
   AdminShowSearchResponseDb,
   AdminShowSearchRowDb,

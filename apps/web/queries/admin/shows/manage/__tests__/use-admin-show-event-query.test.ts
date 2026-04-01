@@ -70,6 +70,12 @@ describe("useAdminShowEventQuery", () => {
           dogCount: 1,
           entries: [],
         },
+        options: {
+          classOptions: [],
+          qualityOptions: [],
+          awardOptions: [],
+          pupnOptions: [],
+        },
       },
     });
 
@@ -90,6 +96,12 @@ describe("useAdminShowEventQuery", () => {
         judge: "Judge",
         dogCount: 1,
         entries: [],
+      },
+      options: {
+        classOptions: [],
+        qualityOptions: [],
+        awardOptions: [],
+        pupnOptions: [],
       },
     });
   });

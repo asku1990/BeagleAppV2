@@ -40,6 +40,18 @@ export type AdminShowEntry = {
   awards: string[];
 };
 
+export type AdminShowResultOption = {
+  value: string;
+  label: string;
+};
+
+export type AdminShowResultOptions = {
+  classOptions: AdminShowResultOption[];
+  qualityOptions: AdminShowResultOption[];
+  awardOptions: AdminShowResultOption[];
+  pupnOptions: AdminShowResultOption[];
+};
+
 export type AdminShowDetailsRequest = {
   showId: string;
 };
@@ -50,4 +62,5 @@ export type AdminShowDetailsEvent = AdminShowEventSummary & {
 
 export type AdminShowDetailsResponse = {
   show: AdminShowDetailsEvent;
+  options: AdminShowResultOptions;
 };

@@ -1,3 +1,5 @@
+import type { AdminShowResultOption } from "@beagle/contracts";
+
 export type ManageShowEntry = {
   id: string;
   registrationNo: string;
@@ -10,6 +12,13 @@ export type ManageShowEntry = {
   classPlacement: string;
   pupn: string;
   awards: string[];
+};
+
+export type ManageShowEditOptions = {
+  classOptions: AdminShowResultOption[];
+  qualityOptions: AdminShowResultOption[];
+  awardOptions: AdminShowResultOption[];
+  pupnOptions: AdminShowResultOption[];
 };
 
 export type ManageShowEvent = {

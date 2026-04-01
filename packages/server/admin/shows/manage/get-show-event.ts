@@ -140,6 +140,12 @@ export async function getAdminShowEvent(
           awards: item.awards,
         })),
       },
+      options: {
+        classOptions: result.options.classOptions,
+        qualityOptions: result.options.qualityOptions,
+        awardOptions: result.options.awardOptions,
+        pupnOptions: result.options.pupnOptions,
+      },
     };
 
     log.info(

@@ -112,6 +112,18 @@ describe("AdminShowManagementPageClient", () => {
             },
           ],
         },
+        options: {
+          classOptions: [{ value: "AVO", label: "AVO - Avoin luokka" }],
+          qualityOptions: [{ value: "ERI", label: "ERI" }],
+          awardOptions: [
+            { value: "SERT", label: "SERT - Sertifikaatti" },
+            { value: "VSP", label: "VSP - Vastakkaisen sukupuolen paras" },
+          ],
+          pupnOptions: [
+            { value: "PU1", label: "PU1" },
+            { value: "PN1", label: "PN1" },
+          ],
+        },
       },
       isLoading: false,
       isError: false,
