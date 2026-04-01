@@ -3,28 +3,163 @@ import {
   addBusinessIsoDateDays,
   getBusinessDateStartUtc,
   toBusinessDateOnly,
-} from "../../../core/date-only";
-import { prisma } from "../../../core/prisma";
-import { projectCanonicalShowResult } from "../../../shows/internal/canonical-result-presentation";
-import { collapseJudge } from "../../../shows/internal/show-judge";
-import { parseHeightCm } from "../../../shows/internal/show-row-mappers";
+} from "@db/core/date-only";
+import { prisma } from "@db/core/prisma";
+import { collapseJudge } from "@db/shows/internal/show-judge";
+import { parseHeightCm } from "@db/shows/internal/show-row-mappers";
 import type {
   AdminShowDetailsEntryRowDb,
   AdminShowDetailsRequestDb,
   AdminShowDetailsResponseDb,
-} from "./types";
+} from "@db/admin/shows/manage/types";
+
+type AdminShowResultDefinition = {
+  code: string;
+  sortOrder: number;
+  isVisibleByDefault: boolean;
+  category: {
+    code: string;
+    sortOrder: number;
+  };
+};
+
+type AdminShowResultItem = {
+  valueCode: string | null;
+  valueNumeric: number | { toNumber(): number } | null;
+  isAwarded: boolean | null;
+  definition: AdminShowResultDefinition;
+};
+
+const CATEGORY_CLASS = "KILPAILULUOKKA";
+const CATEGORY_QUALITY = "LAATUARVOSTELU";
+const LEGACY_QUALITY_CODE = "LEGACY-LAATUARVOSTELU";
+
+function toNumericValue(
+  value: AdminShowResultItem["valueNumeric"],
+): number | null {
+  if (value == null) {
+    return null;
+  }
+  return typeof value === "number" ? value : value.toNumber();
+}
+
+function compareItems(
+  left: AdminShowResultItem,
+  right: AdminShowResultItem,
+): number {
+  if (
+    left.definition.category.sortOrder !== right.definition.category.sortOrder
+  ) {
+    return (
+      left.definition.category.sortOrder - right.definition.category.sortOrder
+    );
+  }
+  if (left.definition.sortOrder !== right.definition.sortOrder) {
+    return left.definition.sortOrder - right.definition.sortOrder;
+  }
+  const leftNumeric = toNumericValue(left.valueNumeric) ?? -1;
+  const rightNumeric = toNumericValue(right.valueNumeric) ?? -1;
+  if (leftNumeric !== rightNumeric) {
+    return leftNumeric - rightNumeric;
+  }
+  return left.definition.code.localeCompare(right.definition.code, "fi", {
+    sensitivity: "base",
+  });
+}
+
+function parsePupnLabel(item: AdminShowResultItem): string | null {
+  const code = item.valueCode?.trim() ?? "";
+  const numeric = toNumericValue(item.valueNumeric);
+
+  if (code && numeric !== null && /^(PU|PN)$/i.test(code)) {
+    return `${code.toUpperCase()}${numeric}`;
+  }
+  if (/^(PU|PN)\d+$/i.test(code)) {
+    return code.toUpperCase();
+  }
+  return code || null;
+}
+
+function pushUnique(target: string[], seen: Set<string>, value: string | null) {
+  const normalized = value?.trim() ?? "";
+  if (!normalized || seen.has(normalized)) {
+    return;
+  }
+  seen.add(normalized);
+  target.push(normalized);
+}
+
+function projectAdminShowResult(items: AdminShowResultItem[]) {
+  const sortedItems = [...items].sort(compareItems);
+  const classItem =
+    sortedItems.find(
+      (item) => item.definition.category.code === CATEGORY_CLASS,
+    ) ?? null;
+  const qualityItem =
+    sortedItems.find(
+      (item) =>
+        item.definition.category.code === CATEGORY_QUALITY &&
+        item.definition.isVisibleByDefault,
+    ) ?? null;
+  const legacyQualityItem =
+    sortedItems.find((item) => item.definition.code === LEGACY_QUALITY_CODE) ??
+    null;
+  const placementItem =
+    sortedItems.find((item) => item.definition.code === "SIJOITUS") ?? null;
+  const pupnItem =
+    sortedItems.find((item) => item.definition.code === "PUPN") ?? null;
+
+  const classCode = classItem?.definition.code ?? null;
+  const classPlacementValue = toNumericValue(
+    placementItem?.valueNumeric ?? null,
+  );
+  const classPlacement =
+    classPlacementValue != null && classPlacementValue > 0
+      ? classPlacementValue
+      : null;
+  const legacyQualityNumeric = toNumericValue(
+    legacyQualityItem?.valueNumeric ?? null,
+  );
+  const qualityGrade =
+    qualityItem?.definition.code ??
+    (legacyQualityNumeric !== null ? String(legacyQualityNumeric) : null);
+  const awards: string[] = [];
+  const seenAwards = new Set<string>();
+
+  for (const item of sortedItems) {
+    const code = item.definition.code;
+    if (item.definition.category.code === CATEGORY_CLASS) {
+      continue;
+    }
+    if (
+      code === "SIJOITUS" ||
+      code === "PUPN" ||
+      item.definition.category.code === CATEGORY_QUALITY
+    ) {
+      continue;
+    }
+    if (item.isAwarded === false) {
+      continue;
+    }
+    if (!item.definition.isVisibleByDefault) {
+      continue;
+    }
+    pushUnique(awards, seenAwards, code);
+  }
+
+  return {
+    classCode,
+    qualityGrade,
+    classPlacement,
+    pupn: pupnItem ? parsePupnLabel(pupnItem) : null,
+    awards,
+  };
+}
 
 function compareRows(
   left: AdminShowDetailsEntryRowDb,
   right: AdminShowDetailsEntryRowDb,
 ): number {
-  const showTypeComparison = (left.showType ?? "").localeCompare(
-    right.showType ?? "",
-    "fi",
-    { sensitivity: "base" },
-  );
-  if (showTypeComparison !== 0) return showTypeComparison;
-
   const qualityComparison = (left.qualityGrade ?? "").localeCompare(
     right.qualityGrade ?? "",
     "fi",
@@ -155,7 +290,7 @@ export async function getAdminShowEventDetailsDb(
       judge: row.judge,
       critiqueText: row.critiqueText,
       heightCm: parseHeightCm(row.heightText),
-      ...projectCanonicalShowResult(event.eventType, row.resultItems),
+      ...projectAdminShowResult(row.resultItems as AdminShowResultItem[]),
     }))
     .sort(compareRows);
 

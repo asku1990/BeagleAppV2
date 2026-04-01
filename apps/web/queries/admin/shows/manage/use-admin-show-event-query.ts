@@ -20,11 +20,18 @@ class AdminShowEventQueryError extends Error {
   }
 }
 
-export function useAdminShowEventQuery(input: AdminShowDetailsRequest) {
+type UseAdminShowEventQueryInput = AdminShowDetailsRequest & {
+  enabled?: boolean;
+};
+
+export function useAdminShowEventQuery(input: UseAdminShowEventQueryInput) {
+  const normalizedShowId = input.showId.trim();
   return useQuery<AdminShowDetailsResponse>({
-    queryKey: adminShowEventQueryKey(input.showId),
+    queryKey: adminShowEventQueryKey(normalizedShowId),
     queryFn: async () => {
-      const result = await adminShowsApiClient.getAdminShowEvent(input);
+      const result = await adminShowsApiClient.getAdminShowEvent({
+        showId: normalizedShowId,
+      });
       if (!result.ok) {
         throw new AdminShowEventQueryError(
           result.code === "FORBIDDEN"
@@ -42,5 +49,6 @@ export function useAdminShowEventQuery(input: AdminShowDetailsRequest) {
     },
     staleTime: 30_000,
     refetchOnWindowFocus: true,
+    enabled: input.enabled ?? normalizedShowId.length > 0,
   });
 }

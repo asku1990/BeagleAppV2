@@ -5,7 +5,6 @@ export type ManageShowEntry = {
   judge: string;
   critiqueText: string;
   heightCm: string;
-  showType: string;
   classCode: string;
   qualityGrade: string;
   classPlacement: string;

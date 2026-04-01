@@ -123,7 +123,6 @@ describe("getAdminShowEventDetailsDb", () => {
           judge: "Anna Judge",
           critiqueText: "Erittäin tasapainoinen esiintyminen.",
           heightCm: 39.5,
-          showType: "NAYTTELY",
           classCode: "AVO",
           qualityGrade: "ERI",
           classPlacement: 1,

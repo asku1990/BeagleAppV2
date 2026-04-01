@@ -1,21 +1,23 @@
 "use client";
 
-// Event-first admin show management shell.
-// Local mock state keeps the search, event editor, and remove flow interactive
-// before the backend read/write layer is wired in.
+// Live admin show management shell.
+// Search results and selected event details come from the read API; edits stay local until mutations exist.
 
-import React, { useEffect, useMemo, useState } from "react";
-import { ListingSectionShell } from "@/components/listing";
-import { Card } from "@/components/ui/card";
+import React, { useEffect, useState } from "react";
+import type {
+  AdminShowDetailsEvent,
+  AdminShowEventSummary,
+} from "@beagle/contracts";
+import { ListingSectionShell } from "@web/components/listing";
+import { Card, CardContent } from "@web/components/ui/card";
 import {
+  areShowEntriesEqual,
   areShowEventFieldsEqual,
-  cloneShowEvents,
-  INITIAL_EVENTS,
   getDirtyEntryIds,
-  includesQuery,
   updateEntry,
-  updateSelectedEvent,
-} from "./show-management-fixtures";
+} from "@web/lib/admin/shows/manage";
+import { useAdminShowEventQuery } from "@web/queries/admin/shows/manage/use-admin-show-event-query";
+import { useAdminShowEventsQuery } from "@web/queries/admin/shows/manage/use-admin-show-events-query";
 import { ShowManagementEditorPanel } from "./show-management-editor-panel";
 import { ShowManagementRemovePanel } from "./show-management-remove-panel";
 import { ShowManagementSearchPanel } from "./show-management-search-panel";
@@ -25,79 +27,99 @@ import type {
   PendingRemovalEntry,
 } from "./show-management-types";
 
-export function AdminShowManagementPageClient() {
-  // Local event state keeps the edit shell interactive before API reads/writes exist.
-  const [events, setEvents] = useState<ManageShowEvent[]>(() =>
-    cloneShowEvents(INITIAL_EVENTS),
-  );
-  const [appliedEvents, setAppliedEvents] = useState<ManageShowEvent[]>(() =>
-    cloneShowEvents(INITIAL_EVENTS),
-  );
-  const [query, setQuery] = useState("");
-  const [selectedEventId, setSelectedEventId] = useState(INITIAL_EVENTS[0]?.id);
-  const [pendingRemovalEntry, setPendingRemovalEntry] =
-    useState<PendingRemovalEntry>(null);
-  const [statusText, setStatusText] = useState("");
+const DEFAULT_PAGE_SIZE = 20;
+const EMPTY_SHOW_EVENTS: AdminShowEventSummary[] = [];
 
-  const filteredEvents = useMemo(() => {
-    const normalizedQuery = query.trim();
-    if (!normalizedQuery) {
-      return events;
-    }
+function toManageShowEvent(show: AdminShowDetailsEvent): ManageShowEvent {
+  return {
+    id: show.showId,
+    eventDate: show.eventDate,
+    eventPlace: show.eventPlace,
+    eventCity: show.eventCity,
+    eventName: show.eventName,
+    eventType: show.eventType,
+    organizer: show.organizer,
+    judge: show.judge,
+    entries: show.entries.map((entry) => {
+      return {
+        ...entry,
+        awards: [...entry.awards],
+      };
+    }),
+  };
+}
 
-    return events.filter((event) => {
-      const searchHaystack = [
-        event.eventDate,
-        event.eventPlace,
-        event.eventCity,
-        event.eventName,
-        event.eventType,
-        event.organizer,
-        event.judge,
-        ...event.entries.flatMap((entry) => [
-          entry.registrationNo,
-          entry.dogName,
-          entry.judge,
-          entry.critiqueText,
-          entry.classCode,
-          entry.qualityGrade,
-          entry.showType,
-          entry.pupn,
-          entry.awards.join(", "),
-        ]),
-      ].join(" ");
+function cloneManageShowEvent(event: ManageShowEvent): ManageShowEvent {
+  return {
+    ...event,
+    entries: event.entries.map((entry) => ({
+      ...entry,
+      awards: [...entry.awards],
+    })),
+  };
+}
 
-      return includesQuery(searchHaystack, normalizedQuery);
+function getAppliedEntry(
+  event: ManageShowEvent | null,
+  entryId: string,
+): ManageShowEntry | undefined {
+  return event?.entries.find((item) => item.id === entryId);
+}
+
+type EventLocalState = {
+  draftEvent: ManageShowEvent;
+  appliedEvent: ManageShowEvent;
+  pendingRemovalEntry: PendingRemovalEntry;
+  statusText: string;
+};
+
+function createEventLocalState(event: ManageShowEvent): EventLocalState {
+  return {
+    draftEvent: cloneManageShowEvent(event),
+    appliedEvent: cloneManageShowEvent(event),
+    pendingRemovalEntry: null,
+    statusText: "",
+  };
+}
+
+function AdminShowManagementSelectedEventPanel({
+  selectedEvent,
+}: {
+  selectedEvent: ManageShowEvent;
+}) {
+  const [eventStateById, setEventStateById] = useState<
+    Record<string, EventLocalState>
+  >(() => ({
+    [selectedEvent.id]: createEventLocalState(selectedEvent),
+  }));
+
+  const selectedEventState =
+    eventStateById[selectedEvent.id] ?? createEventLocalState(selectedEvent);
+  const { draftEvent, appliedEvent, pendingRemovalEntry, statusText } =
+    selectedEventState;
+
+  function updateSelectedEventState(
+    update: (current: EventLocalState) => EventLocalState,
+  ) {
+    setEventStateById((current) => {
+      const selectedState =
+        current[selectedEvent.id] ?? createEventLocalState(selectedEvent);
+      return {
+        ...current,
+        [selectedEvent.id]: update(selectedState),
+      };
     });
-  }, [events, query]);
+  }
 
-  const selectedEvent =
-    events.find((event) => event.id === selectedEventId) ??
-    filteredEvents[0] ??
-    events[0] ??
-    null;
-  const appliedSelectedEvent = appliedEvents.find(
-    (event) => event.id === selectedEvent?.id,
-  );
   const isEventDirty = Boolean(
-    selectedEvent &&
-    appliedSelectedEvent &&
-    !areShowEventFieldsEqual(selectedEvent, appliedSelectedEvent),
+    draftEvent &&
+    appliedEvent &&
+    !areShowEventFieldsEqual(draftEvent, appliedEvent),
   );
-  const dirtyEntryIds = selectedEvent
-    ? getDirtyEntryIds(selectedEvent, appliedSelectedEvent)
-    : [];
-  const hasUnsavedChanges = events.some((event) => {
-    const appliedEvent = appliedEvents.find((item) => item.id === event.id);
-    if (!appliedEvent) {
-      return true;
-    }
-
-    return (
-      !areShowEventFieldsEqual(event, appliedEvent) ||
-      getDirtyEntryIds(event, appliedEvent).length > 0
-    );
-  });
+  const dirtyEntryIds = getDirtyEntryIds(draftEvent, appliedEvent ?? undefined);
+  const hasUnsavedChanges =
+    !areShowEventFieldsEqual(draftEvent, appliedEvent) ||
+    dirtyEntryIds.length > 0;
 
   useEffect(() => {
     function onBeforeUnload(event: BeforeUnloadEvent) {
@@ -113,76 +135,64 @@ export function AdminShowManagementPageClient() {
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, [hasUnsavedChanges]);
 
-  function handleSelectEvent(eventId: string) {
-    setSelectedEventId(eventId);
-    setStatusText("");
-  }
-
   function handleEventFieldChange(
     field: keyof Omit<ManageShowEvent, "id" | "entries">,
     value: string,
   ) {
-    if (!selectedEvent) {
-      return;
-    }
-
-    setEvents((current) =>
-      updateSelectedEvent(current, selectedEvent.id, (event) => ({
-        ...event,
+    updateSelectedEventState((current) => ({
+      ...current,
+      draftEvent: {
+        ...cloneManageShowEvent(current.draftEvent),
         [field]: value,
-      })),
-    );
+      },
+    }));
   }
 
   function handleEntryFieldChange(
     entryId: string,
     patch: Partial<Omit<ManageShowEntry, "id">>,
   ) {
-    if (!selectedEvent) {
-      return;
-    }
-
-    setEvents((current) =>
-      updateSelectedEvent(current, selectedEvent.id, (event) => ({
-        ...event,
-        entries: updateEntry(event.entries, entryId, patch),
-      })),
-    );
+    updateSelectedEventState((current) => ({
+      ...current,
+      draftEvent: {
+        ...cloneManageShowEvent(current.draftEvent),
+        entries: updateEntry(current.draftEvent.entries, entryId, patch),
+      },
+    }));
   }
 
   function handleApplyEventChanges() {
-    if (!selectedEvent) {
-      return;
-    }
-
-    setAppliedEvents((current) =>
-      updateSelectedEvent(current, selectedEvent.id, (event) => ({
-        ...event,
-        eventDate: selectedEvent.eventDate,
-        eventPlace: selectedEvent.eventPlace,
-        eventCity: selectedEvent.eventCity,
-        eventName: selectedEvent.eventName,
-        eventType: selectedEvent.eventType,
-        organizer: selectedEvent.organizer,
-        judge: selectedEvent.judge,
-      })),
-    );
-    setStatusText(`${selectedEvent.eventPlace} event changes applied locally.`);
+    updateSelectedEventState((current) => ({
+      ...current,
+      appliedEvent: {
+        ...cloneManageShowEvent(current.appliedEvent),
+        eventDate: current.draftEvent.eventDate,
+        eventPlace: current.draftEvent.eventPlace,
+        eventCity: current.draftEvent.eventCity,
+        eventName: current.draftEvent.eventName,
+        eventType: current.draftEvent.eventType,
+        organizer: current.draftEvent.organizer,
+        judge: current.draftEvent.judge,
+      },
+      statusText: `${current.draftEvent.eventPlace} event changes applied locally.`,
+    }));
   }
 
   function handleApplyEntryChanges(entry: ManageShowEntry) {
-    if (!selectedEvent) {
+    const applied = getAppliedEntry(appliedEvent, entry.id);
+    if (applied && areShowEntriesEqual(entry, applied)) {
       return;
     }
 
-    const { id: _entryId, ...entryPatch } = entry;
-    setAppliedEvents((current) =>
-      updateSelectedEvent(current, selectedEvent.id, (event) => ({
-        ...event,
-        entries: updateEntry(event.entries, entry.id, entryPatch),
-      })),
-    );
-    setStatusText(`${entry.dogName} changes applied locally.`);
+    const { id: entryId, ...entryPatch } = entry;
+    updateSelectedEventState((current) => ({
+      ...current,
+      appliedEvent: {
+        ...cloneManageShowEvent(current.appliedEvent),
+        entries: updateEntry(current.appliedEvent.entries, entryId, entryPatch),
+      },
+      statusText: `${entry.dogName} changes applied locally.`,
+    }));
   }
 
   function handleRemoveEntryConfirmed() {
@@ -190,39 +200,117 @@ export function AdminShowManagementPageClient() {
       return;
     }
 
-    setEvents((current) =>
-      updateSelectedEvent(current, pendingRemovalEntry.eventId, (event) => ({
-        ...event,
-        entries: event.entries.filter(
+    updateSelectedEventState((current) => ({
+      ...current,
+      draftEvent: {
+        ...cloneManageShowEvent(current.draftEvent),
+        entries: current.draftEvent.entries.filter(
           (entry) => entry.id !== pendingRemovalEntry.entryId,
         ),
-      })),
-    );
-    setAppliedEvents((current) =>
-      updateSelectedEvent(current, pendingRemovalEntry.eventId, (event) => ({
-        ...event,
-        entries: event.entries.filter(
+      },
+      appliedEvent: {
+        ...cloneManageShowEvent(current.appliedEvent),
+        entries: current.appliedEvent.entries.filter(
           (entry) => entry.id !== pendingRemovalEntry.entryId,
         ),
-      })),
-    );
-    setStatusText(
-      `${pendingRemovalEntry.dogName} removed from local shell state.`,
-    );
-    setPendingRemovalEntry(null);
+      },
+      statusText: `${pendingRemovalEntry.dogName} removed from the selected event.`,
+      pendingRemovalEntry: null,
+    }));
   }
 
-  function handleResetShell() {
+  function handleResetChanges() {
     if (hasUnsavedChanges && !window.confirm("Discard unsaved changes?")) {
       return;
     }
 
-    setEvents(cloneShowEvents(INITIAL_EVENTS));
-    setAppliedEvents(cloneShowEvents(INITIAL_EVENTS));
-    setSelectedEventId(INITIAL_EVENTS[0]?.id ?? "");
-    setPendingRemovalEntry(null);
-    setStatusText("Local draft reset to seeded demo data.");
+    updateSelectedEventState((current) => ({
+      ...current,
+      draftEvent: cloneManageShowEvent(current.appliedEvent),
+      statusText: "Local draft reset to the loaded event details.",
+    }));
   }
+
+  return (
+    <>
+      <ShowManagementEditorPanel
+        selectedEvent={draftEvent}
+        isEventDirty={isEventDirty}
+        dirtyEntryIds={dirtyEntryIds}
+        onEventFieldChange={handleEventFieldChange}
+        onEntryChange={handleEntryFieldChange}
+        onApplyEvent={handleApplyEventChanges}
+        onApplyEntry={handleApplyEntryChanges}
+        onRequestRemoveEntry={(entry) =>
+          updateSelectedEventState((current) => ({
+            ...current,
+            pendingRemovalEntry: {
+              eventId: selectedEvent.id,
+              entryId: entry.id,
+              dogName: entry.dogName,
+            },
+          }))
+        }
+        onResetShell={handleResetChanges}
+        statusText={statusText}
+      />
+
+      <ShowManagementRemovePanel
+        pendingRemovalEntry={pendingRemovalEntry}
+        onCancel={() =>
+          updateSelectedEventState((current) => ({
+            ...current,
+            pendingRemovalEntry: null,
+          }))
+        }
+        onConfirm={handleRemoveEntryConfirmed}
+      />
+    </>
+  );
+}
+
+export function AdminShowManagementPageClient() {
+  const [query, setQuery] = useState("");
+  const [selectedEventIdInput, setSelectedEventIdInput] = useState("");
+
+  const searchQuery = useAdminShowEventsQuery({
+    query: query.trim() || undefined,
+    page: 1,
+    pageSize: DEFAULT_PAGE_SIZE,
+    sort: "date-desc",
+  });
+
+  const showEvents = searchQuery.data?.items ?? EMPTY_SHOW_EVENTS;
+  const selectedEventId =
+    showEvents.find((event) => event.showId === selectedEventIdInput)?.showId ??
+    showEvents[0]?.showId ??
+    "";
+  const selectedSummary =
+    showEvents.find((event) => event.showId === selectedEventId) ??
+    showEvents[0] ??
+    null;
+
+  const detailQuery = useAdminShowEventQuery({
+    showId: selectedEventId,
+    enabled: selectedEventId.length > 0,
+  });
+  const selectedEventFromApi = detailQuery.data?.show ?? null;
+  const selectedEvent = selectedEventFromApi
+    ? toManageShowEvent(selectedEventFromApi)
+    : null;
+  const isDetailLoading =
+    Boolean(selectedEventId) &&
+    detailQuery.isLoading &&
+    !selectedEvent &&
+    !detailQuery.isError;
+  const searchErrorText =
+    searchQuery.error instanceof Error
+      ? searchQuery.error.message
+      : "Failed to load admin show events.";
+  const detailErrorText =
+    detailQuery.error instanceof Error
+      ? detailQuery.error.message
+      : "Failed to load admin show details.";
 
   return (
     <div className="space-y-4">
@@ -231,59 +319,64 @@ export function AdminShowManagementPageClient() {
           Show management
         </h1>
         <p className="text-sm text-muted-foreground">
-          Search shows, open one event, and edit its entries locally while the
-          backend is still being built.
+          Search shows, open one event, and edit its entries from the live read
+          layer.
         </p>
       </div>
 
       <ListingSectionShell
         title="Event search"
-        subtitle="Search uses event data plus dog names and registration numbers."
-        count={`${filteredEvents.length} events`}
+        subtitle="Search uses live event data plus dog counts from the admin read endpoint."
+        count={`${searchQuery.data?.total ?? showEvents.length} events`}
       >
         <div className="grid gap-3 lg:grid-cols-[1.1fr_1.5fr]">
-          <ShowManagementSearchPanel
-            events={filteredEvents}
-            selectedEventId={selectedEvent?.id}
-            query={query}
-            onQueryChange={setQuery}
-            onSelectEvent={handleSelectEvent}
-          />
+          <div className="space-y-3">
+            {searchQuery.isError && showEvents.length === 0 ? (
+              <Card>
+                <CardContent className="p-5 text-sm text-destructive">
+                  {searchErrorText}
+                </CardContent>
+              </Card>
+            ) : null}
 
-          {selectedEvent ? (
-            <ShowManagementEditorPanel
-              selectedEvent={selectedEvent}
-              isEventDirty={isEventDirty}
-              dirtyEntryIds={dirtyEntryIds}
-              onEventFieldChange={handleEventFieldChange}
-              onEntryChange={handleEntryFieldChange}
-              onApplyEvent={handleApplyEventChanges}
-              onApplyEntry={handleApplyEntryChanges}
-              onRequestRemoveEntry={(entry) =>
-                setPendingRemovalEntry({
-                  eventId: selectedEvent.id,
-                  entryId: entry.id,
-                  dogName: entry.dogName,
-                })
-              }
-              onResetShell={handleResetShell}
-              statusText={statusText}
+            <ShowManagementSearchPanel
+              events={showEvents}
+              selectedEventId={selectedSummary?.showId}
+              query={query}
+              onQueryChange={setQuery}
+              onSelectEvent={(eventId) => setSelectedEventIdInput(eventId)}
             />
-          ) : (
-            <Card>
-              <div className="p-5 text-sm text-muted-foreground">
-                Select an event from the list.
-              </div>
-            </Card>
-          )}
+          </div>
+
+          <div className="space-y-3">
+            {detailQuery.isError ? (
+              <Card>
+                <CardContent className="p-5 text-sm text-destructive">
+                  {detailErrorText}
+                </CardContent>
+              </Card>
+            ) : isDetailLoading ? (
+              <Card>
+                <CardContent className="p-5 text-sm text-muted-foreground">
+                  Loading selected event details...
+                </CardContent>
+              </Card>
+            ) : selectedEvent ? (
+              <AdminShowManagementSelectedEventPanel
+                selectedEvent={selectedEvent}
+              />
+            ) : (
+              <Card>
+                <CardContent className="p-5 text-sm text-muted-foreground">
+                  {showEvents.length === 0
+                    ? "No shows match the current search."
+                    : "Select an event from the list."}
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </div>
       </ListingSectionShell>
-
-      <ShowManagementRemovePanel
-        pendingRemovalEntry={pendingRemovalEntry}
-        onCancel={() => setPendingRemovalEntry(null)}
-        onConfirm={handleRemoveEntryConfirmed}
-      />
     </div>
   );
 }

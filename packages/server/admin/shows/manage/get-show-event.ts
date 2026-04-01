@@ -4,11 +4,11 @@ import {
   type CurrentUserDto,
 } from "@beagle/contracts";
 import { getAdminShowEventDetailsDb } from "@beagle/db";
-import { toBusinessDateOnly } from "../../../core/date-only";
-import { toErrorLog, withLogContext } from "../../../core/logger";
-import type { ServiceResult } from "../../../core/result";
-import { requireAdmin } from "../../core/service";
-import { encodeShowId, parseShowId } from "../../../shows/internal/show-id";
+import { toBusinessDateOnly } from "@server/core/date-only";
+import { toErrorLog, withLogContext } from "@server/core/logger";
+import type { ServiceResult } from "@server/core/result";
+import { requireAdmin } from "@server/admin/core/service";
+import { encodeShowId, parseShowId } from "@server/shows/internal/show-id";
 
 type ServiceLogContext = {
   requestId?: string;
@@ -133,7 +133,6 @@ export async function getAdminShowEvent(
           judge: item.judge ?? "",
           critiqueText: item.critiqueText ?? "",
           heightCm: formatHeight(item.heightCm),
-          showType: item.showType ?? "",
           classCode: item.classCode ?? "",
           qualityGrade: item.qualityGrade ?? "",
           classPlacement: formatPlacement(item.classPlacement),

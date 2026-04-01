@@ -37,6 +37,18 @@ const webConfig = [
   {
     files: ["**/*.{ts,tsx,mts}"],
     rules: {
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector: "ImportDeclaration[source.value=/^(?:\\.\\.\\/){2,}/]",
+          message: "Use @web/ paths instead of deep relative imports.",
+        },
+      ],
+    },
+  },
+  {
+    files: ["**/*.{ts,tsx,mts}"],
+    rules: {
       "no-restricted-imports": serverImportRestriction,
     },
   },

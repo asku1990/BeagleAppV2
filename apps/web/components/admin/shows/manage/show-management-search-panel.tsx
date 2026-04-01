@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import type { ManageShowEvent } from "./show-management-types";
+import { Button } from "@web/components/ui/button";
+import { Input } from "@web/components/ui/input";
+import type { AdminShowEventSummary } from "@beagle/contracts";
 
 type ShowManagementSearchPanelProps = {
-  events: ManageShowEvent[];
+  events: AdminShowEventSummary[];
   selectedEventId: string | undefined;
   query: string;
   onQueryChange: (value: string) => void;
@@ -35,14 +35,14 @@ export function ShowManagementSearchPanel({
           </p>
         ) : (
           events.map((event) => {
-            const isSelected = event.id === selectedEventId;
+            const isSelected = event.showId === selectedEventId;
             return (
               <Button
-                key={event.id}
+                key={event.showId}
                 type="button"
                 variant={isSelected ? "default" : "outline"}
                 className="h-auto w-full justify-start px-4 py-4 text-left"
-                onClick={() => onSelectEvent(event.id)}
+                onClick={() => onSelectEvent(event.showId)}
               >
                 <div className="flex w-full flex-col items-start gap-1">
                   <div className="flex w-full items-start justify-between gap-4">
@@ -53,7 +53,7 @@ export function ShowManagementSearchPanel({
                       </p>
                     </div>
                     <span className="text-xs opacity-80">
-                      {event.entries.length} dogs
+                      {event.dogCount} dogs
                     </span>
                   </div>
                   <p className="text-sm opacity-90">{event.eventName}</p>

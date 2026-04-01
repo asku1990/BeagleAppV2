@@ -39,7 +39,6 @@ export type AdminShowDetailsEntryRowDb = {
   judge: string | null;
   critiqueText: string | null;
   heightCm: number | null;
-  showType: string | null;
   classCode: string | null;
   qualityGrade: string | null;
   classPlacement: number | null;

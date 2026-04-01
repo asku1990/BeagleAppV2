@@ -33,7 +33,6 @@ export type AdminShowEntry = {
   judge: string;
   critiqueText: string;
   heightCm: string;
-  showType: string;
   classCode: string;
   qualityGrade: string;
   classPlacement: string;

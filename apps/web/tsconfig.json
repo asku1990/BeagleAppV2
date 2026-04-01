@@ -6,6 +6,9 @@
     "incremental": true,
     "paths": {
       "@/*": ["./*"],
+      "@web/*": ["./*"],
+      "@server/*": ["../../packages/server/*"],
+      "@db/*": ["../../packages/db/*"],
       "@beagle/api-client": ["../../packages/api-client/index.ts"],
       "@beagle/contracts": ["../../packages/contracts/index.ts"],
       "@beagle/server": ["../../packages/server/index.ts"]

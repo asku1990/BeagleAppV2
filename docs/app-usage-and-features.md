@@ -83,6 +83,9 @@ Limits:
 Routes:
 
 - `/admin`
+- `/admin/shows`
+- `/admin/shows/import`
+- `/admin/shows/manage`
 - `/admin/users`
 - `/admin/dogs`
 - `/admin/settings`
@@ -101,12 +104,17 @@ Can do:
    - edit dog records
    - delete dog records
    - use breeder/owner/parent lookup helpers
-3. Open admin home (`/admin`) for module navigation.
+3. Manage shows (`/admin/shows`, `/admin/shows/import`, `/admin/shows/manage`):
+   - open the shows module hub
+   - validate and apply workbook imports
+   - search show events and inspect selected event entries from the read layer
+4. Open admin home (`/admin`) for module navigation.
 
 Sidebar:
 
 - Users with `ADMIN` role see admin section links:
   - `/admin`
+  - `/admin/shows`
   - `/admin/users`
   - `/admin/dogs`
   - `/admin/settings`
@@ -121,6 +129,11 @@ Admin-only APIs (not currently surfaced in admin UI):
 
 - `GET /api/v1/imports/:id`
 - `GET /api/v1/imports/:id/issues`
+
+Feature-level behavior is documented in:
+
+- `docs/features/admin-show-workbook-import.md`
+- `docs/features/admin-show-management.md`
 
 ## Authentication and auth routes
 

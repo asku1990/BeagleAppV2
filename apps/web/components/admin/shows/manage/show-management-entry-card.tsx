@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Button } from "@web/components/ui/button";
+import { Card, CardContent } from "@web/components/ui/card";
+import { Input } from "@web/components/ui/input";
 import type { ManageShowEntry } from "./show-management-types";
 import {
   CLASS_CODE_OPTIONS,
@@ -77,15 +77,6 @@ export function ShowManagementEntryCard({
                 onChange(entry.id, { critiqueText: event.target.value })
               }
               className="min-h-24 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-            />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span>Show type</span>
-            <Input
-              value={entry.showType}
-              onChange={(event) =>
-                onChange(entry.id, { showType: event.target.value })
-              }
             />
           </label>
           <label className="space-y-1 text-sm">

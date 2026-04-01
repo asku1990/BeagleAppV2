@@ -39,6 +39,20 @@ describe("useAdminShowEventQuery", () => {
     expect(options.refetchOnWindowFocus).toBe(true);
   });
 
+  it("disables the query when the show id is empty", () => {
+    useQueryMock.mockImplementation((options) => options);
+
+    useAdminShowEventQuery({ showId: "   " });
+
+    const options = useQueryMock.mock.calls[0]?.[0] as {
+      enabled: boolean;
+      queryKey: readonly unknown[];
+    };
+
+    expect(options.enabled).toBe(false);
+    expect(options.queryKey).toEqual(adminShowEventQueryKey(""));
+  });
+
   it("returns data when api client succeeds", async () => {
     useQueryMock.mockImplementation((options) => options);
     getAdminShowEventMock.mockResolvedValue({

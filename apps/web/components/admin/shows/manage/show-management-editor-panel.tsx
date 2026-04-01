@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
+import { Button } from "@web/components/ui/button";
+import { Card, CardContent } from "@web/components/ui/card";
+import { Input } from "@web/components/ui/input";
+import { Separator } from "@web/components/ui/separator";
 import { ShowManagementEntryCard } from "./show-management-entry-card";
 import type { ManageShowEntry, ManageShowEvent } from "./show-management-types";
 
@@ -145,7 +145,7 @@ export function ShowManagementEditorPanel({
               </p>
             </div>
             <Button type="button" variant="outline" onClick={onResetShell}>
-              Reset demo
+              Reset changes
             </Button>
           </div>
 
