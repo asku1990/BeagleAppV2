@@ -19,7 +19,7 @@ const { showEventCountMock, showEventFindManyMock, prismaMock } = vi.hoisted(
   },
 );
 
-vi.mock("../../../../core/prisma", () => ({
+vi.mock("@db/core/prisma", () => ({
   prisma: prismaMock,
 }));
 

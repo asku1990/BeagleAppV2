@@ -3,7 +3,6 @@
 import React from "react";
 import type { AdminShowResultOption } from "@beagle/contracts";
 import { getAwardLogEntries } from "@web/lib/admin/shows/manage";
-import type { OptionLabelLookup } from "@web/lib/admin/shows/manage/display";
 import type {
   ManageShowAward,
   ManageShowEntry,
@@ -13,7 +12,6 @@ type ShowManagementAwardsEditorProps = {
   entry: ManageShowEntry;
   availableAwardOptions: AdminShowResultOption[];
   awardsDisabled: boolean;
-  awardLabelLookup: OptionLabelLookup;
   onAddAward: (entryId: string, awardCode: string) => void;
   onRemoveAward: (entryId: string, awardId: string) => void;
   resolveAwardLabel: (value: string) => string;
@@ -23,7 +21,6 @@ export function ShowManagementAwardsEditor({
   entry,
   availableAwardOptions,
   awardsDisabled,
-  awardLabelLookup,
   onAddAward,
   onRemoveAward,
   resolveAwardLabel,
@@ -40,7 +37,6 @@ export function ShowManagementAwardsEditor({
               key={award.id}
               entry={entry}
               award={award}
-              awardLabelLookup={awardLabelLookup}
               onRemoveAward={onRemoveAward}
               resolveAwardLabel={resolveAwardLabel}
             />
@@ -57,9 +53,7 @@ export function ShowManagementAwardsEditor({
             entryId: entry.id,
             dogName: entry.dogName,
             awardCode: event.target.value,
-            awardLabel:
-              awardLabelLookup.get(event.target.value.trim()) ??
-              event.target.value,
+            awardLabel: resolveAwardLabel(event.target.value),
             awardsBefore: getAwardLogEntries(entry.awards),
           });
           onAddAward(entry.id, event.target.value);
@@ -84,13 +78,11 @@ export function ShowManagementAwardsEditor({
 function AwardChip({
   entry,
   award,
-  awardLabelLookup,
   onRemoveAward,
   resolveAwardLabel,
 }: {
   entry: ManageShowEntry;
   award: ManageShowAward;
-  awardLabelLookup: OptionLabelLookup;
   onRemoveAward: (entryId: string, awardId: string) => void;
   resolveAwardLabel: (value: string) => string;
 }) {

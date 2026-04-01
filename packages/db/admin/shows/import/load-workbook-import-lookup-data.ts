@@ -1,4 +1,4 @@
-import { prisma } from "../../../core/prisma";
+import { prisma } from "@db/core/prisma";
 
 // Loads all workbook import lookup datasets in one DB boundary call for server parsing use-cases.
 export type AdminShowWorkbookImportLookupDataDb = {

@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
-import { prisma } from "../../../core/prisma";
-import { collapseJudge } from "../../../shows/internal/show-judge";
+import { prisma } from "@db/core/prisma";
+import { collapseJudge } from "@db/shows/internal/show-judge";
 import type {
   AdminShowSearchRequestDb,
   AdminShowSearchResponseDb,

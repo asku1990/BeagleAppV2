@@ -2,7 +2,7 @@ import type {
   AdminShowSearchRequest,
   AdminShowSearchResponse,
 } from "@beagle/contracts";
-import type { RequestFn } from "../../core/request";
+import type { RequestFn } from "@api-client/core/request";
 
 function toQueryString(input: AdminShowSearchRequest) {
   const params = new URLSearchParams();

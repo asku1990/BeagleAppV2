@@ -2,10 +2,10 @@ import type {
   AdminShowDetailsRequest,
   AdminShowSearchRequest,
 } from "@beagle/contracts";
-import type { ClientOptions } from "../../core/client-options";
-import { createRequest } from "../../core/request";
-import { getAdminShowEvent } from "./get-admin-show-event";
-import { listAdminShowEvents } from "./list-admin-show-events";
+import type { ClientOptions } from "@api-client/core/client-options";
+import { createRequest } from "@api-client/core/request";
+import { getAdminShowEvent } from "@api-client/admin/shows/get-admin-show-event";
+import { listAdminShowEvents } from "@api-client/admin/shows/list-admin-show-events";
 
 export function createAdminShowsApiClient(options: ClientOptions = {}) {
   const request = createRequest(options);

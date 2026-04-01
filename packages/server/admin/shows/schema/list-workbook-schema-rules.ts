@@ -1,6 +1,6 @@
 import { listAdminShowWorkbookSchemaRulesDb } from "@beagle/db";
 import type { ListAdminShowWorkbookSchemaResponse } from "@beagle/contracts";
-import type { ServiceResult } from "../../../core/result";
+import type { ServiceResult } from "@server/core/result";
 
 // Lists the active workbook schema rule set that future admin settings edit in
 // place and the preview validator consumes directly.

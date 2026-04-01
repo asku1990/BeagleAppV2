@@ -27,7 +27,7 @@ const {
   };
 });
 
-vi.mock("../../../../core/prisma", () => ({
+vi.mock("@db/core/prisma", () => ({
   prisma: prismaMock,
 }));
 

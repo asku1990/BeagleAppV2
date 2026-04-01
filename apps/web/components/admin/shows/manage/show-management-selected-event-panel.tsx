@@ -34,7 +34,6 @@ export function ShowManagementSelectedEventPanel({
     handleResetShell,
   } = useShowManagementSelectedEventState({
     selectedEvent,
-    resultOptions,
   });
 
   return (

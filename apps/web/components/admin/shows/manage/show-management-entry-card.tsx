@@ -81,7 +81,6 @@ export function ShowManagementEntryCard({
             entry={entry}
             availableAwardOptions={displayState.availableAwardOptions}
             awardsDisabled={displayState.awardsDisabled}
-            awardLabelLookup={displayState.awardLabelLookup}
             onAddAward={onAddAward}
             onRemoveAward={onRemoveAward}
             resolveAwardLabel={resolveAwardLabel}

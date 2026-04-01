@@ -2,7 +2,7 @@ import type {
   AdminShowDetailsRequest,
   AdminShowDetailsResponse,
 } from "@beagle/contracts";
-import type { RequestFn } from "../../core/request";
+import type { RequestFn } from "@api-client/core/request";
 
 export function getAdminShowEvent(
   request: RequestFn,

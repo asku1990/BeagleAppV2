@@ -17,17 +17,14 @@ import {
   updateEntry,
 } from "@web/lib/admin/shows/manage";
 import type {
-  ManageShowEditOptions,
   ManageShowEntry,
   ManageShowEvent,
 } from "@/components/admin/shows/manage/show-management-types";
 
 export function useShowManagementSelectedEventState({
   selectedEvent,
-  resultOptions,
 }: {
   selectedEvent: ManageShowEvent;
-  resultOptions: ManageShowEditOptions;
 }) {
   const [eventStateById, setEventStateById] = useState(() => ({
     [selectedEvent.id]: createEventLocalState(selectedEvent),
