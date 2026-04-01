@@ -12,9 +12,11 @@ import type {
 import { ListingSectionShell } from "@web/components/listing";
 import { Card, CardContent } from "@web/components/ui/card";
 import {
+  addEntryAward,
   areShowEntriesEqual,
   areShowEventFieldsEqual,
   getDirtyEntryIds,
+  removeEntryAward,
   updateEntry,
 } from "@web/lib/admin/shows/manage";
 import { useAdminShowEventQuery } from "@web/queries/admin/shows/manage/use-admin-show-event-query";
@@ -133,6 +135,15 @@ function AdminShowManagementSelectedEventPanel({
   const { draftEvent, appliedEvent, pendingRemovalEntry, statusText } =
     selectedEventState;
 
+  console.info("[show-manage][parent][render]", {
+    eventId: selectedEvent.id,
+    entries: draftEvent.entries.map((entry) => ({
+      entryId: entry.id,
+      dogName: entry.dogName,
+      awards: entry.awards,
+    })),
+  });
+
   function updateSelectedEventState(
     update: (current: EventLocalState) => EventLocalState,
   ) {
@@ -194,6 +205,58 @@ function AdminShowManagementSelectedEventPanel({
         entries: updateEntry(current.draftEvent.entries, entryId, patch),
       },
     }));
+  }
+
+  function handleAddAward(entryId: string, award: string) {
+    updateSelectedEventState((current) => {
+      const nextEntries = addEntryAward(
+        current.draftEvent.entries,
+        entryId,
+        award,
+      );
+      console.info("[show-manage][parent][handleAddAward]", {
+        entryId,
+        award,
+        before:
+          current.draftEvent.entries.find((entry) => entry.id === entryId)
+            ?.awards ?? [],
+        after: nextEntries.find((entry) => entry.id === entryId)?.awards ?? [],
+      });
+
+      return {
+        ...current,
+        draftEvent: {
+          ...cloneManageShowEvent(current.draftEvent),
+          entries: nextEntries,
+        },
+      };
+    });
+  }
+
+  function handleRemoveAward(entryId: string, index: number) {
+    updateSelectedEventState((current) => {
+      const nextEntries = removeEntryAward(
+        current.draftEvent.entries,
+        entryId,
+        index,
+      );
+      console.info("[show-manage][parent][handleRemoveAward]", {
+        entryId,
+        index,
+        before:
+          current.draftEvent.entries.find((entry) => entry.id === entryId)
+            ?.awards ?? [],
+        after: nextEntries.find((entry) => entry.id === entryId)?.awards ?? [],
+      });
+
+      return {
+        ...current,
+        draftEvent: {
+          ...cloneManageShowEvent(current.draftEvent),
+          entries: nextEntries,
+        },
+      };
+    });
   }
 
   function handleApplyEventChanges() {
@@ -275,6 +338,8 @@ function AdminShowManagementSelectedEventPanel({
         dirtyEntryIds={dirtyEntryIds}
         onEventFieldChange={handleEventFieldChange}
         onEntryChange={handleEntryFieldChange}
+        onAddAward={handleAddAward}
+        onRemoveAward={handleRemoveAward}
         onApplyEvent={handleApplyEventChanges}
         onApplyEntry={handleApplyEntryChanges}
         onRequestRemoveEntry={(entry) =>

@@ -65,3 +65,42 @@ export function updateEntry(
     entry.id === entryId ? { ...entry, ...patch } : entry,
   );
 }
+
+export function addEntryAward(
+  entries: ManageShowEntry[],
+  entryId: string,
+  award: string,
+): ManageShowEntry[] {
+  const normalizedAward = award.trim();
+  if (!normalizedAward) {
+    return entries;
+  }
+
+  return entries.map((entry) => {
+    if (entry.id !== entryId || entry.awards.includes(normalizedAward)) {
+      return entry;
+    }
+
+    return {
+      ...entry,
+      awards: [...entry.awards, normalizedAward],
+    };
+  });
+}
+
+export function removeEntryAward(
+  entries: ManageShowEntry[],
+  entryId: string,
+  index: number,
+): ManageShowEntry[] {
+  return entries.map((entry) => {
+    if (entry.id !== entryId) {
+      return entry;
+    }
+
+    return {
+      ...entry,
+      awards: entry.awards.filter((_, currentIndex) => currentIndex !== index),
+    };
+  });
+}

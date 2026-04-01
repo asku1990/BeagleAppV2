@@ -154,6 +154,10 @@ export async function getAdminShowEvent(
         eventDate,
         eventPlace: data.show.eventPlace,
         dogCount: data.show.dogCount,
+        entries: data.show.entries.map((entry) => ({
+          entryId: entry.id,
+          awards: entry.awards,
+        })),
         durationMs: Date.now() - startedAt,
       },
       "admin show detail fetch succeeded",

@@ -100,7 +100,11 @@ That value belongs only on the selected event section.
 - Show a descriptive error state if either search or detail loading fails.
 - Keep entry edits local until write mutations exist.
 - Keep the remove dialog scoped to the currently selected event entry.
-- Class, quality, and PUPN are edited via single-select controls backed by `options`.
+- Class and placement are edited as a compact paired row.
+- Placement uses a numeric field so values above `4` remain supported.
+- Quality is edited via a single-select control backed by `options`.
+- PUPN is edited as a `-` / `PU` / `PN` prefix plus integer field so values
+  like `PU8` remain supported and `-` clears the value.
 - Awards are edited via multi-select backed by `options`.
 - If result options are unavailable from DB, show an inline warning and keep option-driven controls disabled.
 - Do not show release-style changelog copy for this page unless the feature is actually shipped.
@@ -112,6 +116,8 @@ That value belongs only on the selected event section.
   - the last applied local snapshot
 - Event-level field edits update the draft copy only.
 - Entry-level edits update the draft copy only.
+- Award add/remove actions are applied from the parent draft state so quick
+  consecutive chip edits do not replace awards from a stale child snapshot.
 - Apply buttons update the local applied snapshot, not the server.
 - Reset reverts the draft back to the last applied local snapshot.
 - Remove confirmation updates both local copies so the UI stays internally consistent.
