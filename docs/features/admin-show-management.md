@@ -10,12 +10,15 @@ Developer notes for the admin show management flow.
 ## Main files
 
 - `apps/web/app/(admin)/admin/shows/manage/page.tsx`: route entrypoint for the management page
-- `apps/web/components/admin/shows/manage/admin-show-management-page-client.tsx`: page composition, query wiring, and local draft state
+- `apps/web/components/admin/shows/manage/admin-show-management-page-client.tsx`: page shell, query wiring, and selected-event composition
+- `apps/web/components/admin/shows/manage/show-management-selected-event-panel.tsx`: selected-event presentation/controller wiring
+- `apps/web/hooks/admin/shows/manage/use-show-management-selected-event-state.ts`: selected-event draft state and local apply/reset behavior
 - `apps/web/components/admin/shows/manage/show-management-search-panel.tsx`: event search list
 - `apps/web/components/admin/shows/manage/show-management-editor-panel.tsx`: selected event and entry editor UI
-- `apps/web/components/admin/shows/manage/show-management-entry-card.tsx`: per-entry editing card
+- `apps/web/components/admin/shows/manage/show-management-entry-card.tsx`: per-entry card composition
+- `apps/web/components/admin/shows/manage/internal/*`: entry header, summary, result fields, awards editor, and critique field
 - `apps/web/components/admin/shows/manage/show-management-remove-panel.tsx`: destructive remove confirmation
-- `apps/web/lib/admin/shows/manage/*`: shared change-comparison and entry update helpers
+- `apps/web/lib/admin/shows/manage/*`: shared draft mapping, display formatting, logging payloads, and entry update helpers
 - `apps/web/queries/admin/shows/manage/use-admin-show-events-query.ts`: list query hook
 - `apps/web/queries/admin/shows/manage/use-admin-show-event-query.ts`: detail query hook
 - `packages/api-client/admin/shows/*`: admin show API client helpers
@@ -29,7 +32,8 @@ Developer notes for the admin show management flow.
 2. The selected summary drives `useAdminShowEventQuery` for full event details.
 3. The search list renders contract summaries (`showId`, dates, place, city, name, type, organizer, judge, dog count).
 4. The detail panel maps contract entries and DB-driven result options into the local editor model so the UI can keep a draft copy separate from the loaded data.
-5. Apply/remove/reset actions currently only update local draft state.
+5. Feature-local hook state owns the selected-event draft lifecycle, while feature-local lib helpers own draft cloning, field updates, and label resolution.
+6. Apply/remove/reset actions currently only update local draft state.
 
 ## Contract rules
 
