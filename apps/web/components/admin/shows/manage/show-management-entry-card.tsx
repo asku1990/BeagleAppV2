@@ -5,7 +5,6 @@ import { Button } from "@web/components/ui/button";
 import { Card, CardContent } from "@web/components/ui/card";
 import {
   buildEntryDisplayState,
-  getEntryRenderLog,
   resolveOptionLabel,
 } from "@web/lib/admin/shows/manage";
 import { ShowManagementAwardsEditor } from "./internal/show-management-awards-editor";
@@ -51,11 +50,6 @@ export function ShowManagementEntryCard({
   const displayState = buildEntryDisplayState(entry, resultOptions);
   const resolveAwardLabel = (value: string) =>
     resolveOptionLabel(displayState.awardLabelLookup, value);
-
-  console.info(
-    "[show-manage][entry-card][render]",
-    getEntryRenderLog(entry, displayState.awardLabelLookup),
-  );
 
   return (
     <Card>
