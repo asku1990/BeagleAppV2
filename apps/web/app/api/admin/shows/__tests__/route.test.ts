@@ -92,6 +92,23 @@ describe("admin show api routes", () => {
     });
   });
 
+  it("returns structured errors when session lookup throws", async () => {
+    getSessionCurrentUserMock.mockRejectedValue(new Error("boom"));
+
+    const { GET } = await import("../route");
+    const request = new NextRequest("http://localhost/api/admin/shows", {
+      headers: { origin: "http://localhost:3000" },
+    });
+    const response = await GET(request);
+
+    expect(response.status).toBe(500);
+    await expect(response.json()).resolves.toEqual({
+      ok: false,
+      error: "Failed to load admin show events.",
+      code: "INTERNAL_ERROR",
+    });
+  });
+
   it("passes invalid sort through to the service for validation", async () => {
     getSessionCurrentUserMock.mockResolvedValue({
       id: "a1",
