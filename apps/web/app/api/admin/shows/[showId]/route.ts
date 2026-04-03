@@ -25,7 +25,14 @@ export async function GET(
           role: currentUser.role,
         }
       : null,
-  );
+  ).catch(() => ({
+    status: 500,
+    body: {
+      ok: false,
+      error: "Failed to load admin show details.",
+      code: "INTERNAL_ERROR",
+    },
+  }));
 
   return jsonResponse(result.body, {
     status: result.status,

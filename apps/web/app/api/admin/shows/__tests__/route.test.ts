@@ -67,6 +67,31 @@ describe("admin show api routes", () => {
     );
   });
 
+  it("returns structured errors when search throws", async () => {
+    getSessionCurrentUserMock.mockResolvedValue({
+      id: "a1",
+      email: "admin@example.com",
+      name: "admin",
+      role: "ADMIN",
+      createdAt: null,
+      sessionId: null,
+    });
+    listAdminShowEventsMock.mockRejectedValue(new Error("boom"));
+
+    const { GET } = await import("../route");
+    const request = new NextRequest("http://localhost/api/admin/shows", {
+      headers: { origin: "http://localhost:3000" },
+    });
+    const response = await GET(request);
+
+    expect(response.status).toBe(500);
+    await expect(response.json()).resolves.toEqual({
+      ok: false,
+      error: "Failed to load admin show events.",
+      code: "INTERNAL_ERROR",
+    });
+  });
+
   it("passes invalid sort through to the service for validation", async () => {
     getSessionCurrentUserMock.mockResolvedValue({
       id: "a1",
@@ -139,5 +164,32 @@ describe("admin show api routes", () => {
         role: "ADMIN",
       },
     );
+  });
+
+  it("returns structured errors when detail load throws", async () => {
+    getSessionCurrentUserMock.mockResolvedValue({
+      id: "a1",
+      email: "admin@example.com",
+      name: "admin",
+      role: "ADMIN",
+      createdAt: null,
+      sessionId: null,
+    });
+    getAdminShowEventMock.mockRejectedValue(new Error("boom"));
+
+    const { GET } = await import("../[showId]/route");
+    const request = new NextRequest("http://localhost/api/admin/shows/show-1", {
+      headers: { origin: "http://localhost:3000" },
+    });
+    const response = await GET(request, {
+      params: Promise.resolve({ showId: "show-1" }),
+    });
+
+    expect(response.status).toBe(500);
+    await expect(response.json()).resolves.toEqual({
+      ok: false,
+      error: "Failed to load admin show details.",
+      code: "INTERNAL_ERROR",
+    });
   });
 });
