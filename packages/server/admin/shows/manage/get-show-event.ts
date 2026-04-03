@@ -59,16 +59,6 @@ export async function getAdminShowEvent(
     };
   }
 
-  log.info(
-    {
-      event: "start",
-      eventDate: parsedShowId.eventDateIsoDate,
-      eventPlace: parsedShowId.eventPlace,
-      eventKey: parsedShowId.eventKey,
-    },
-    "admin show detail fetch started",
-  );
-
   const authResult = requireAdmin(currentUser);
   if (!authResult.body.ok) {
     log.warn(
@@ -85,6 +75,16 @@ export async function getAdminShowEvent(
       body: authResult.body,
     };
   }
+
+  log.info(
+    {
+      event: "start",
+      eventDate: parsedShowId.eventDateIsoDate,
+      eventPlace: parsedShowId.eventPlace,
+      eventKey: parsedShowId.eventKey,
+    },
+    "admin show detail fetch started",
+  );
 
   try {
     const result = await getAdminShowEventDetailsDb({

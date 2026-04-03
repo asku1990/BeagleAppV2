@@ -67,7 +67,9 @@ export function projectAdminShowResult(items: AdminShowResultItemDb[]) {
   const sortedItems = [...items].sort(compareItems);
   const classItem =
     sortedItems.find(
-      (item) => item.definition.category.code === CATEGORY_CLASS,
+      (item) =>
+        item.definition.category.code === CATEGORY_CLASS &&
+        item.definition.isVisibleByDefault,
     ) ?? null;
   const qualityItem =
     sortedItems.find(
