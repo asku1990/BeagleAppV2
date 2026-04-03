@@ -17,6 +17,10 @@ export type ManageShowEntry = {
   classPlacement: string;
   pupn: string;
   awards: ManageShowAward[];
+  classDisplay: string;
+  qualityDisplay: string;
+  pupnDisplay: string;
+  awardsDisplay: string[];
 };
 
 export type ManageShowEditOptions = {

@@ -63,7 +63,7 @@ describe("getAdminShowEventDetailsDb", () => {
         code: "AVO",
         labelFi: "Avoin luokka",
         sortOrder: 50,
-        isVisibleByDefault: false,
+        isVisibleByDefault: true,
         category: { code: "KILPAILULUOKKA", sortOrder: 10 },
       },
       {
@@ -173,9 +173,9 @@ describe("getAdminShowEventDetailsDb", () => {
         },
       ],
       options: {
-        classOptions: [{ value: "AVO", label: "AVO - Avoin luokka" }],
+        classOptions: [{ value: "AVO", label: "AVO" }],
         qualityOptions: [{ value: "ERI", label: "ERI" }],
-        awardOptions: [{ value: "SERT", label: "SERT - Sertifikaatti" }],
+        awardOptions: [{ value: "SERT", label: "SERT" }],
         pupnOptions: [
           { value: "PU1", label: "PU1" },
           { value: "PU2", label: "PU2" },
@@ -285,5 +285,91 @@ describe("getAdminShowEventDetailsDb", () => {
         ],
       },
     });
+  });
+
+  it("hides disabled legacy quality from dog rows and options", async () => {
+    showResultDefinitionFindManyMock.mockResolvedValueOnce([
+      {
+        code: "LEGACY-LAATUARVOSTELU",
+        labelFi: "Legacy laatuarvostelu",
+        sortOrder: 70,
+        isVisibleByDefault: false,
+        category: { code: "LAATUARVOSTELU", sortOrder: 20 },
+      },
+      {
+        code: "NUO",
+        labelFi: "Nuortenluokka",
+        sortOrder: 40,
+        isVisibleByDefault: true,
+        category: { code: "KILPAILULUOKKA", sortOrder: 10 },
+      },
+    ]);
+
+    showEventFindFirstMock.mockResolvedValueOnce({
+      eventLookupKey: "show-event-legacy",
+      eventDate: new Date("1995-05-01T00:00:00.000Z"),
+      eventPlace: "Rovaniemi",
+      eventCity: "Rovaniemi",
+      eventName: "Vanha näyttely",
+      eventType: "NAYTTELY",
+      organizer: "Legacy Club",
+      entries: [
+        {
+          id: "entry-legacy",
+          judge: "Legacy Judge",
+          critiqueText: null,
+          heightText: null,
+          registrationNoSnapshot: "FIN41334/97",
+          dogNameSnapshot: "Legacy Dog",
+          resultItems: [
+            {
+              valueCode: null,
+              valueNumeric: 1,
+              isAwarded: null,
+              definition: makeDefinition(
+                "LEGACY-LAATUARVOSTELU",
+                "LAATUARVOSTELU",
+                2,
+                70,
+                false,
+              ),
+            },
+            {
+              valueCode: null,
+              valueNumeric: null,
+              isAwarded: true,
+              definition: makeDefinition("NUO", "KILPAILULUOKKA", 1, 40, true),
+            },
+            {
+              valueCode: null,
+              valueNumeric: 2,
+              isAwarded: null,
+              definition: makeDefinition("SIJOITUS", "SIJOITUS", 7, 220, true),
+            },
+          ],
+        },
+      ],
+    });
+
+    const result = await getAdminShowEventDetailsDb({
+      eventDate: new Date("1995-05-01T00:00:00.000Z"),
+      eventPlace: "Rovaniemi",
+      eventKey: "show-event-legacy",
+    });
+
+    expect(result?.items[0]).toEqual({
+      id: "entry-legacy",
+      registrationNo: "FIN41334/97",
+      dogName: "Legacy Dog",
+      judge: "Legacy Judge",
+      critiqueText: null,
+      heightCm: null,
+      classCode: "NUO",
+      qualityGrade: null,
+      classPlacement: 2,
+      pupn: null,
+      awards: [],
+    });
+    expect(result?.options.qualityOptions).toEqual([]);
   });
 });

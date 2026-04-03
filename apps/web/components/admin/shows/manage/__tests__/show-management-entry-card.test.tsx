@@ -43,12 +43,16 @@ describe("ShowManagementEntryCard", () => {
           classPlacement: "8",
           pupn: "PU8",
           awards: [createManageShowAward("award-1", "SERT")],
+          classDisplay: "AVO 8",
+          qualityDisplay: "ERI",
+          pupnDisplay: "PU8",
+          awardsDisplay: ["SERT"],
         },
         resultOptions: {
-          classOptions: [{ value: "AVO", label: "AVO - Avoin luokka" }],
-          qualityOptions: [{ value: "ERI", label: "ERI - Erinomainen" }],
-          awardOptions: [{ value: "SERT", label: "SERT - Sertifikaatti" }],
-          pupnOptions: [{ value: "PU8", label: "PU8 - Paras uros 8" }],
+          classOptions: [{ value: "AVO", label: "AVO" }],
+          qualityOptions: [{ value: "ERI", label: "ERI" }],
+          awardOptions: [{ value: "SERT", label: "SERT" }],
+          pupnOptions: [{ value: "PU8", label: "PU8" }],
         },
         isDirty: false,
         onEntryFieldChange: () => undefined,
@@ -64,9 +68,48 @@ describe("ShowManagementEntryCard", () => {
     expect(html).toContain('value="-"');
     expect(html).toContain("Placement");
     expect(html).toContain("Example: `AVO 8`.");
-    expect(html).toContain("AVO - Avoin luokka 8");
-    expect(html).toContain("ERI - Erinomainen");
-    expect(html).toContain("PU8 - Paras uros 8");
-    expect(html).toContain("SERT - Sertifikaatti");
+    expect(html).toContain("AVO 8");
+    expect(html).toContain("ERI");
+    expect(html).toContain("PU8");
+    expect(html).toContain("SERT");
+  });
+
+  it("keeps unknown class and quality values selectable", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(ShowManagementEntryCard, {
+        entry: {
+          id: "entry-2",
+          registrationNo: "FI54321/20",
+          dogName: "Retired Value Dog",
+          judge: "Judge",
+          critiqueText: "",
+          heightCm: "",
+          classCode: "LEGACY-CLASS",
+          qualityGrade: "LEGACY-QUALITY",
+          classPlacement: "",
+          pupn: "",
+          awards: [],
+          classDisplay: "-",
+          qualityDisplay: "-",
+          pupnDisplay: "-",
+          awardsDisplay: [],
+        },
+        resultOptions: {
+          classOptions: [{ value: "AVO", label: "AVO" }],
+          qualityOptions: [{ value: "ERI", label: "ERI" }],
+          awardOptions: [],
+          pupnOptions: [],
+        },
+        isDirty: false,
+        onEntryFieldChange: () => undefined,
+        onAddAward: () => undefined,
+        onRemoveAward: () => undefined,
+        onRemove: () => undefined,
+        onApply: () => undefined,
+      }),
+    );
+
+    expect(html).toContain(">LEGACY-CLASS<");
+    expect(html).toContain(">LEGACY-QUALITY<");
   });
 });

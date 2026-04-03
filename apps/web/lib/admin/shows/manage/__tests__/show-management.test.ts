@@ -19,6 +19,10 @@ function makeEntry(): ManageShowEntry {
     classPlacement: "1",
     pupn: "PU1",
     awards: [],
+    classDisplay: "AVO 1",
+    qualityDisplay: "ERI",
+    pupnDisplay: "PU1",
+    awardsDisplay: [],
   };
 }
 
