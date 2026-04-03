@@ -25,4 +25,3 @@ export {
   updateDraftEntryField,
   updateDraftEventField,
 } from "./event-local-state";
-export { getAwardLogEntries, getEntryRenderLog } from "./logging";
