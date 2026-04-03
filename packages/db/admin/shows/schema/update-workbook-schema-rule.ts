@@ -1,5 +1,5 @@
 import type { Prisma } from "@prisma/client";
-import { prisma } from "../../../core/prisma";
+import { prisma } from "@db/core/prisma";
 import type { AdminShowWorkbookSchemaRuleDb } from "./list-workbook-schema-rules";
 
 export type UpdateAdminShowWorkbookSchemaRuleDbInput = {

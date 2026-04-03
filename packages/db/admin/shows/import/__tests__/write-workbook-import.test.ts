@@ -36,7 +36,7 @@ vi.mock("node:crypto", () => ({
   randomUUID: vi.fn(() => "uuid-fixed"),
 }));
 
-vi.mock("../../../../core/prisma", () => ({
+vi.mock("@db/core/prisma", () => ({
   prisma: prismaMock,
 }));
 

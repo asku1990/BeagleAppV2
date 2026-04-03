@@ -19,7 +19,7 @@ import {
   summarizeWorkbookImport,
   type WorkbookImportRuntimeSuccess,
 } from "./summarize-workbook-import";
-import { validateAdminShowWorkbookSchemaRules } from "../../../core/workbook-schema-validation";
+import { validateAdminShowWorkbookSchemaRules } from "@server/admin/shows/core/workbook-schema-validation";
 import { buildPreviewRow } from "./build-preview-row";
 import { rejectParsedRow } from "./reject-parsed-row";
 

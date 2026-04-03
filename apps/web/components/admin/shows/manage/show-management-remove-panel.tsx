@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ConfirmModal } from "../../../ui/confirm-modal";
+import { ConfirmModal } from "@web/components/ui/confirm-modal";
 import type { PendingRemovalEntry } from "./show-management-types";
 
 type ShowManagementRemovePanelProps = {

@@ -62,7 +62,7 @@ vi.mock("../runtime/summarize-workbook-import", () => ({
   summarizeWorkbookImport: summarizeWorkbookImportMock,
 }));
 
-vi.mock("../../../core/workbook-schema-validation", () => ({
+vi.mock("@server/admin/shows/core/workbook-schema-validation", () => ({
   validateAdminShowWorkbookSchemaRules:
     validateAdminShowWorkbookSchemaRulesMock,
 }));

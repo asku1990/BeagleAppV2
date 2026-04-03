@@ -1,25 +1,33 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
+import { Button } from "@web/components/ui/button";
+import { Card, CardContent } from "@web/components/ui/card";
+import { Input } from "@web/components/ui/input";
+import { Separator } from "@web/components/ui/separator";
 import { ShowManagementEntryCard } from "./show-management-entry-card";
-import type { ManageShowEntry, ManageShowEvent } from "./show-management-types";
+import type {
+  ManageShowEditOptions,
+  ManageShowEntry,
+  ManageShowEvent,
+} from "./show-management-types";
 
 type ShowManagementEditorPanelProps = {
   selectedEvent: ManageShowEvent | null;
+  resultOptions: ManageShowEditOptions;
   isEventDirty: boolean;
   dirtyEntryIds: string[];
   onEventFieldChange: (
     field: keyof Omit<ManageShowEvent, "id" | "entries">,
     value: string,
   ) => void;
-  onEntryChange: (
+  onEntryFieldChange: (
     entryId: string,
-    patch: Partial<Omit<ManageShowEntry, "id">>,
+    field: keyof Omit<ManageShowEntry, "id" | "awards">,
+    value: string,
   ) => void;
+  onAddAward: (entryId: string, award: string) => void;
+  onRemoveAward: (entryId: string, awardId: string) => void;
   onApplyEvent: () => void;
   onApplyEntry: (entry: ManageShowEntry) => void;
   onRequestRemoveEntry: (entry: ManageShowEntry) => void;
@@ -29,10 +37,13 @@ type ShowManagementEditorPanelProps = {
 
 export function ShowManagementEditorPanel({
   selectedEvent,
+  resultOptions,
   isEventDirty,
   dirtyEntryIds,
   onEventFieldChange,
-  onEntryChange,
+  onEntryFieldChange,
+  onAddAward,
+  onRemoveAward,
   onApplyEvent,
   onApplyEntry,
   onRequestRemoveEntry,
@@ -145,7 +156,7 @@ export function ShowManagementEditorPanel({
               </p>
             </div>
             <Button type="button" variant="outline" onClick={onResetShell}>
-              Reset demo
+              Reset changes
             </Button>
           </div>
 
@@ -154,8 +165,11 @@ export function ShowManagementEditorPanel({
               <ShowManagementEntryCard
                 key={entry.id}
                 entry={entry}
+                resultOptions={resultOptions}
                 isDirty={dirtyEntryIds.includes(entry.id)}
-                onChange={onEntryChange}
+                onEntryFieldChange={onEntryFieldChange}
+                onAddAward={onAddAward}
+                onRemoveAward={onRemoveAward}
                 onRemove={onRequestRemoveEntry}
                 onApply={onApplyEntry}
               />

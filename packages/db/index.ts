@@ -75,6 +75,19 @@ export {
   type BeagleShowSearchSortDb,
 } from "./shows";
 export {
+  getAdminShowEventDetailsDb,
+  searchAdminShowEventsDb,
+  type AdminShowDetailsEntryRowDb,
+  type AdminShowDetailsRequestDb,
+  type AdminShowDetailsResponseDb,
+  type AdminShowResultOptionDb,
+  type AdminShowResultOptionsDb,
+  type AdminShowSearchRequestDb,
+  type AdminShowSearchResponseDb,
+  type AdminShowSearchRowDb,
+  type AdminShowSearchSortDb,
+} from "./admin/shows/manage";
+export {
   getBeagleTrialDetailsDb,
   getBeagleTrialsForDogDb,
   searchBeagleTrialsDb,

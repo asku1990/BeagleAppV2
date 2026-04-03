@@ -9,6 +9,8 @@ export {
   listAdminDogs,
   listAdminUsers,
   listAdminOwnerOptions,
+  getAdminShowEvent,
+  listAdminShowEvents,
   previewAdminShowWorkbookImport,
   applyAdminShowWorkbookImport,
   requireAdmin,

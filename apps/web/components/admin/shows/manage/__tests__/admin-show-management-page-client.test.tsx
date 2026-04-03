@@ -1,14 +1,27 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AdminShowManagementPageClient } from "../admin-show-management-page-client";
 
-vi.mock("@/components/listing", () => ({
+const { searchQueryMock, detailQueryMock } = vi.hoisted(() => ({
+  searchQueryMock: vi.fn(),
+  detailQueryMock: vi.fn(),
+}));
+
+vi.mock("@web/queries/admin/shows/manage/use-admin-show-events-query", () => ({
+  useAdminShowEventsQuery: searchQueryMock,
+}));
+
+vi.mock("@web/queries/admin/shows/manage/use-admin-show-event-query", () => ({
+  useAdminShowEventQuery: detailQueryMock,
+}));
+
+vi.mock("@web/components/listing", () => ({
   ListingSectionShell: ({ children }: { children: React.ReactNode }) =>
     React.createElement("section", null, children),
 }));
 
-vi.mock("@/components/ui/button", () => ({
+vi.mock("@web/components/ui/button", () => ({
   Button: ({
     children,
     asChild,
@@ -26,35 +39,109 @@ vi.mock("@/components/ui/button", () => ({
         ),
 }));
 
-vi.mock("@/components/ui/card", () => ({
+vi.mock("@web/components/ui/card", () => ({
   Card: ({ children }: { children: React.ReactNode }) =>
     React.createElement("section", null, children),
   CardContent: ({ children }: { children: React.ReactNode }) =>
     React.createElement("div", null, children),
 }));
 
-vi.mock("@/components/ui/input", () => ({
+vi.mock("@web/components/ui/input", () => ({
   Input: (props: Record<string, unknown>) =>
     React.createElement("input", props as Record<string, string>),
 }));
 
-vi.mock("@/components/ui/separator", () => ({
+vi.mock("@web/components/ui/separator", () => ({
   Separator: () => React.createElement("hr", null),
 }));
 
 describe("AdminShowManagementPageClient", () => {
-  it("renders the event-first show management shell", () => {
+  beforeEach(() => {
+    searchQueryMock.mockReset();
+    detailQueryMock.mockReset();
+
+    searchQueryMock.mockReturnValue({
+      data: {
+        total: 1,
+        totalPages: 1,
+        page: 1,
+        items: [
+          {
+            showId: "show-1",
+            eventDate: "2025-06-01",
+            eventPlace: "Helsinki",
+            eventCity: "Helsinki",
+            eventName: "Summer Show",
+            eventType: "A",
+            organizer: "Beagle Club",
+            judge: "Judge",
+            dogCount: 1,
+          },
+        ],
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+
+    detailQueryMock.mockReturnValue({
+      data: {
+        show: {
+          showId: "show-1",
+          eventDate: "2025-06-01",
+          eventPlace: "Helsinki",
+          eventCity: "Helsinki",
+          eventName: "Summer Show",
+          eventType: "A",
+          organizer: "Beagle Club",
+          judge: "Judge",
+          dogCount: 1,
+          entries: [
+            {
+              id: "entry-1",
+              registrationNo: "FI12345/21",
+              dogName: "Metsapolun Kide",
+              judge: "Judge",
+              critiqueText: "Erittäin tasapainoinen esiintyminen.",
+              heightCm: "38",
+              classCode: "AVO",
+              qualityGrade: "ERI",
+              classPlacement: "1",
+              pupn: "PU1",
+              awards: ["SERT", "VSP"],
+            },
+          ],
+        },
+        options: {
+          classOptions: [{ value: "AVO", label: "AVO - Avoin luokka" }],
+          qualityOptions: [{ value: "ERI", label: "ERI" }],
+          awardOptions: [
+            { value: "SERT", label: "SERT - Sertifikaatti" },
+            { value: "VSP", label: "VSP - Vastakkaisen sukupuolen paras" },
+          ],
+          pupnOptions: [
+            { value: "PU1", label: "PU1" },
+            { value: "PN1", label: "PN1" },
+          ],
+        },
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+  });
+
+  it("renders the live show management shell", () => {
     const html = renderToStaticMarkup(
       React.createElement(AdminShowManagementPageClient),
     );
 
     expect(html).toContain("Show management");
     expect(html).toContain(
-      "Search shows, open one event, and edit its entries locally while the backend is still being built.",
+      "Search shows, open one event, and edit its entries from the live read layer.",
     );
-    expect(html).toContain(
-      "Search by place, dog, registration number, or judge",
-    );
+    expect(html).toContain("Summer Show");
+    expect(html).toContain("Helsinki");
     expect(html).toContain("Metsapolun Kide");
     expect(html).toContain("Dog evaluations");
     expect(html).not.toContain("Apply event changes");

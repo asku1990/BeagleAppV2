@@ -1,6 +1,6 @@
 import type { AdminShowWorkbookImportPreviewResponse } from "@beagle/contracts";
-import { toErrorLog, withLogContext } from "../../../core/logger";
-import type { ServiceResult } from "../../../core/result";
+import { toErrorLog, withLogContext } from "@server/core/logger";
+import type { ServiceResult } from "@server/core/result";
 import {
   ISSUE_CODES,
   WORKBOOK_FILE_PATTERN,

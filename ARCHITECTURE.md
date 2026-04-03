@@ -27,6 +27,12 @@ Not allowed:
 - business logic in API route handlers
 - `packages/db` importing `packages/contracts`
 
+`packages/api-client` usage rule:
+
+- `apps/web` UI/client may import feature clients or feature request helpers from `packages/api-client`.
+- Prefer feature-scoped clients over one large shared client surface.
+- When a query or component uses a feature client, create it once at module scope or in a thin feature-local module, not inside each render.
+
 ## Transport Preference
 
 Prefer route handlers or API endpoints for read-heavy client data fetching, and
@@ -49,6 +55,12 @@ Use `/<domain>/<feature>/` for contracts/server/db, with `admin/<domain>/<featur
 - Queries: `queries/<audience>/<domain>/<feature>/**`
 - Hooks: `hooks/<audience>/<domain>/<feature>/**` (or feature-scoped non-audience folders where appropriate)
 - Non-hook utilities: `lib/<audience>/<domain>/<feature>/**`
+
+Client HTTP access:
+
+- React Query hooks may import feature-scoped clients directly from `packages/api-client`.
+- Do not import `packages/api-client` into `app/api/**` route handlers; handlers should call `packages/server` directly.
+- If a web-side wrapper is needed, keep it feature-local and thin.
 
 Audience values:
 
