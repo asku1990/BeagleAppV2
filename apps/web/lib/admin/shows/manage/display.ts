@@ -5,6 +5,8 @@ import type {
   ManageShowEntry,
 } from "@/components/admin/shows/manage/show-management-types";
 
+// Builds option-safe display state for the admin show editor so persisted
+// values remain visible even when definitions are missing or have changed.
 export type OptionLabelLookup = Map<string, string>;
 
 export function ensureOptionExists(

@@ -9,7 +9,6 @@ import {
   createEventLocalState,
   createManageShowAward,
   getAppliedEntry,
-  getAwardLogEntries,
   getDirtyEntryIds,
   removeEntryAward,
   updateDraftEntryField,
@@ -34,15 +33,6 @@ export function useShowManagementSelectedEventState({
     eventStateById[selectedEvent.id] ?? createEventLocalState(selectedEvent);
   const { draftEvent, appliedEvent, pendingRemovalEntry, statusText } =
     selectedEventState;
-
-  console.info("[show-manage][parent][render]", {
-    eventId: selectedEvent.id,
-    entries: draftEvent.entries.map((entry) => ({
-      entryId: entry.id,
-      dogName: entry.dogName,
-      awards: getAwardLogEntries(entry.awards),
-    })),
-  });
 
   function updateSelectedEventState(
     update: (current: typeof selectedEventState) => typeof selectedEventState,
@@ -106,19 +96,6 @@ export function useShowManagementSelectedEventState({
         nextAward,
       );
 
-      console.info("[show-manage][parent][handleAddAward]", {
-        entryId,
-        awardId: nextAward.id,
-        awardCode: nextAward.code,
-        before: getAwardLogEntries(
-          current.draftEvent.entries.find((entry) => entry.id === entryId)
-            ?.awards ?? [],
-        ),
-        after: getAwardLogEntries(
-          nextEntries.find((entry) => entry.id === entryId)?.awards ?? [],
-        ),
-      });
-
       return {
         ...current,
         draftEvent: {
@@ -131,28 +108,11 @@ export function useShowManagementSelectedEventState({
 
   function handleRemoveAward(entryId: string, awardId: string) {
     updateSelectedEventState((current) => {
-      const currentAward =
-        current.draftEvent.entries
-          .find((entry) => entry.id === entryId)
-          ?.awards.find((award) => award.id === awardId) ?? null;
       const nextEntries = removeEntryAward(
         current.draftEvent.entries,
         entryId,
         awardId,
       );
-
-      console.info("[show-manage][parent][handleRemoveAward]", {
-        entryId,
-        awardId,
-        awardCode: currentAward?.code ?? "",
-        before: getAwardLogEntries(
-          current.draftEvent.entries.find((entry) => entry.id === entryId)
-            ?.awards ?? [],
-        ),
-        after: getAwardLogEntries(
-          nextEntries.find((entry) => entry.id === entryId)?.awards ?? [],
-        ),
-      });
 
       return {
         ...current,

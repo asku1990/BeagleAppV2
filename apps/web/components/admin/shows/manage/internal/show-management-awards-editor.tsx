@@ -2,7 +2,6 @@
 
 import React from "react";
 import type { AdminShowResultOption } from "@beagle/contracts";
-import { getAwardLogEntries } from "@web/lib/admin/shows/manage";
 import type {
   ManageShowAward,
   ManageShowEntry,
@@ -49,13 +48,6 @@ export function ShowManagementAwardsEditor({
           if (!event.target.value) {
             return;
           }
-          console.info("[show-manage][entry-card][add-award-click]", {
-            entryId: entry.id,
-            dogName: entry.dogName,
-            awardCode: event.target.value,
-            awardLabel: resolveAwardLabel(event.target.value),
-            awardsBefore: getAwardLogEntries(entry.awards),
-          });
           onAddAward(entry.id, event.target.value);
         }}
         disabled={awardsDisabled || availableAwardOptions.length === 0}
@@ -92,17 +84,7 @@ function AwardChip({
       <button
         type="button"
         aria-label={`Remove award ${award.code}`}
-        onClick={() => {
-          console.info("[show-manage][entry-card][remove-award-click]", {
-            entryId: entry.id,
-            dogName: entry.dogName,
-            awardId: award.id,
-            awardCode: award.code,
-            awardLabel: resolveAwardLabel(award.code),
-            awardsBefore: getAwardLogEntries(entry.awards),
-          });
-          onRemoveAward(entry.id, award.id);
-        }}
+        onClick={() => onRemoveAward(entry.id, award.id)}
         className="hover:bg-muted-foreground/10 rounded-full px-1 leading-none"
       >
         ×
