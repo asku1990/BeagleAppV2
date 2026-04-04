@@ -8,6 +8,8 @@ export default defineConfig([
   {
     rules: {
       "@next/next/no-html-link-for-pages": "off",
+      "import/export": "error",
+      "import/no-duplicates": "error",
     },
   },
   globalIgnores([".next/**", "out/**", "build/**", "dist/**", "next-env.d.ts"]),
