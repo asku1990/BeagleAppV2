@@ -123,3 +123,14 @@ export type UpdateAdminShowEntryWriteResultDb =
   | { status: "invalid_award_code"; awardCode: string }
   | { status: "missing_placement_definition" }
   | { status: "missing_pupn_definition" };
+
+export type DeleteAdminShowEntryWriteRequestDb = {
+  eventKey?: string | null;
+  eventDate: Date;
+  eventPlace: string;
+  entryId: string;
+};
+
+export type DeleteAdminShowEntryWriteResultDb =
+  | { status: "deleted"; entryId: string }
+  | { status: "not_found" };

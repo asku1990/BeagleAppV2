@@ -6,9 +6,9 @@ Developer notes for the admin show management flow.
 
 - The page is an admin-facing event search and detail workflow.
 - The main user task is to find a show event, inspect its entries, and prepare edits from the read layer.
-- Backend mutation foundations now exist for event and entry updates, even though
-  the page UI still runs local apply/remove behavior until mutation wiring is
-  completed.
+- Backend mutation foundations now exist for event update, entry update, and
+  entry delete, even though the page UI still runs local apply/remove behavior
+  until mutation wiring is completed.
 
 ## Main files
 
@@ -30,8 +30,10 @@ Developer notes for the admin show management flow.
 - `packages/db/admin/shows/manage/*`: DB search and detail mapping
 - `packages/server/admin/shows/manage/update-show-event.ts`: event mutation use-case
 - `packages/server/admin/shows/manage/update-show-entry.ts`: entry mutation use-case
+- `packages/server/admin/shows/manage/delete-show-entry.ts`: entry delete mutation use-case
 - `packages/db/admin/shows/manage/update-show-event.ts`: event write + lookup key sync
 - `packages/db/admin/shows/manage/update-show-entry.ts`: entry write + result item sync
+- `packages/db/admin/shows/manage/delete-show-entry.ts`: entry delete write
 
 ## Data flow
 
@@ -48,6 +50,7 @@ Implemented backend mutation contracts and use-cases:
 
 - `UpdateAdminShowEventRequest` / `UpdateAdminShowEventResponse`
 - `UpdateAdminShowEntryRequest` / `UpdateAdminShowEntryResponse`
+- `DeleteAdminShowEntryRequest` / `DeleteAdminShowEntryResponse`
 
 Mutation behavior currently implemented in server/db layers:
 
@@ -60,7 +63,13 @@ Mutation behavior currently implemented in server/db layers:
 - Entry update validates admin access, normalizes editor values, updates entry
   scalar fields (`judge`, `critiqueText`, `heightText`) and synchronizes
   editable definition-backed result items for class/quality/placement/pupn/awards.
+- Entry delete validates admin access and deletes one selected entry within the
+  selected show scope.
 - Entry result-item sync is scoped to the selected show event and entry.
+- Entry delete relies on DB cascade rules to remove dependent `ShowResultItem`
+  rows in the same transactional write.
+- Entry update write validation expects class placement as a positive integer
+  and PUPN rank in the supported `PU1..PU4` / `PN1..PN4` range.
 
 Not yet implemented in web layer:
 
@@ -181,11 +190,13 @@ That value belongs only on the selected event section.
 - Service behavior: `packages/server/admin/shows/manage/__tests__/*`
 - Event mutation behavior: `packages/server/admin/shows/manage/__tests__/update-show-event.test.ts`
 - Entry mutation behavior: `packages/server/admin/shows/manage/__tests__/update-show-entry.test.ts`
+- Entry delete mutation behavior: `packages/server/admin/shows/manage/__tests__/delete-show-entry.test.ts`
 - Event write behavior: `packages/db/admin/shows/manage/__tests__/update-show-event.test.ts`
 - Entry write behavior: `packages/db/admin/shows/manage/__tests__/update-show-entry.test.ts`
+- Entry delete write behavior: `packages/db/admin/shows/manage/__tests__/delete-show-entry.test.ts`
 
 ## When to update this doc
 
 - Update this file when the admin show search or detail contract changes.
 - Update this file when the read flow changes from query-driven to action-driven.
-- Update this file when write mutations are introduced for event or entry edits.
+- Update this file when write mutations are introduced for event or entry edits/deletes.

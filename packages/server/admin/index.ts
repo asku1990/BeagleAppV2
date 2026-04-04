@@ -20,3 +20,4 @@ export { getAdminShowEvent } from "./shows";
 export { listAdminShowEvents } from "./shows";
 export { updateAdminShowEvent } from "./shows";
 export { updateAdminShowEntry } from "./shows";
+export { deleteAdminShowEntry } from "./shows";

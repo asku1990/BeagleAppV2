@@ -178,6 +178,8 @@ export type {
   UpdateAdminShowEventResponse,
   UpdateAdminShowEntryRequest,
   UpdateAdminShowEntryResponse,
+  DeleteAdminShowEntryRequest,
+  DeleteAdminShowEntryResponse,
   AdminShowWorkbookImportIssue,
   AdminShowWorkbookImportIssueSeverity,
   AdminShowWorkbookImportApplyResponse,

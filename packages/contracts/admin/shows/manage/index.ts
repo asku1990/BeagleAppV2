@@ -18,3 +18,7 @@ export type {
   UpdateAdminShowEntryRequest,
   UpdateAdminShowEntryResponse,
 } from "./update-admin-show-entry";
+export type {
+  DeleteAdminShowEntryRequest,
+  DeleteAdminShowEntryResponse,
+} from "./delete-admin-show-entry";
