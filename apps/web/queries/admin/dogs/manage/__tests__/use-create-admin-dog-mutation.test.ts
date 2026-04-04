@@ -4,7 +4,7 @@ import {
   beagleSearchQueryKeyRoot,
 } from "@/queries/public/beagle/search/query-keys";
 import { homeStatisticsQueryKey } from "@/queries/public/home/statistics/query-keys";
-import { AdminMutationError } from "@/queries/admin/dogs/manage/mutation-error";
+import { AdminMutationError } from "@/queries/admin/mutation-error";
 import {
   adminDogBreederOptionsQueryKeyRoot,
   adminDogOwnerOptionsQueryKeyRoot,

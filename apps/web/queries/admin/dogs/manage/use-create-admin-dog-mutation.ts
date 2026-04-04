@@ -6,7 +6,7 @@ import type {
 } from "@beagle/contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createAdminDogAction } from "@/app/actions/admin/dogs/manage/create-admin-dog";
-import { AdminMutationError } from "@/queries/admin/dogs/manage/mutation-error";
+import { AdminMutationError } from "@/queries/admin/mutation-error";
 import {
   adminDogBreederOptionsQueryKeyRoot,
   adminDogOwnerOptionsQueryKeyRoot,

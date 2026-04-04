@@ -24,6 +24,8 @@ Developer notes for the admin show management flow.
 - `apps/web/lib/admin/shows/manage/*`: shared draft mapping, display formatting, logging payloads, and entry update helpers
 - `apps/web/queries/admin/shows/manage/use-admin-show-events-query.ts`: list query hook
 - `apps/web/queries/admin/shows/manage/use-admin-show-event-query.ts`: detail query hook
+- `apps/web/app/actions/admin/shows/manage/*`: admin show mutation server actions
+- `apps/web/queries/admin/shows/manage/use-*-mutation.ts`: admin show mutation hooks
 - `packages/api-client/admin/shows/*`: admin show API client helpers
 - `packages/contracts/admin/shows/manage/*`: admin show search and detail contracts
 - `packages/server/admin/shows/manage/*`: service-layer search and detail implementations
@@ -71,11 +73,11 @@ Mutation behavior currently implemented in server/db layers:
 - Entry update write validation expects class placement as a positive integer
   and PUPN rank in the supported `PU1..PU4` / `PN1..PN4` range.
 
-Not yet implemented in web layer:
+Web layer status:
 
-- Server actions for these mutations
-- React Query mutation hooks for show management
-- UI wiring from apply/remove buttons to backend mutations
+- Server actions exist for event update, entry update, and entry delete.
+- React Query mutation hooks exist for event update, entry update, and entry delete.
+- UI wiring from apply/remove buttons to backend mutations is still pending.
 
 ## Contract rules
 
