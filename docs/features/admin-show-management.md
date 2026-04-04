@@ -84,6 +84,11 @@ Option sourcing rules:
 - `classOptions`, `qualityOptions`, and `awardOptions` are loaded from enabled `ShowResultDefinition` rows and their categories.
 - `pupnOptions` is token-based (`PU1..PU4`, `PN1..PN4`) and exposed only when the canonical `PUPN` definition/category exists.
 - Awards exclude class, quality, placement, and PUPN definitions.
+- The meaning of `isVisibleByDefault` and `isEnabled` is defined in
+  `docs/features/schema/show-schema.md`; follow that contract when adding new
+  definition-backed UI or projection logic.
+- Until the compatibility cleanup lands, entry projection may still preserve
+  historical values for disabled definitions so old shows remain readable.
 
 The entry cards intentionally do not repeat the event-level `eventType` field.
 That value belongs only on the selected event section.

@@ -94,6 +94,15 @@ erDiagram
   - `sortOrder`
   - `isVisibleByDefault`
   - `isEnabled`
+  - `isEnabled` means the definition is active in the canonical system and may
+    be fetched for reads, projections, and option building.
+  - `isVisibleByDefault` means an enabled definition should appear as a normal
+    selectable option in admin/UI lists.
+  - Disabled definitions should be treated as inactive metadata. Readers may
+    still need to preserve historical values when projecting old entries, but
+    they should not expose the definition as an active choice.
+  - If code needs to keep a historical value visible, that should be an
+    explicit compatibility path, not the default behavior for active reads.
 - Category link:
   - `categoryId` (required FK to `ShowResultCategory`)
 - Relations:
