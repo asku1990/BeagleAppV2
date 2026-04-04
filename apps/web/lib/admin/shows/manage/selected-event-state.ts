@@ -9,13 +9,6 @@ export type PendingServerSync = {
   clearPendingRemoval: boolean;
 };
 
-type InteractionFlags = {
-  isApplyingEvent: boolean;
-  isSyncingAfterSave: boolean;
-  applyingEntryId: string | null;
-  isRemovingEntry: boolean;
-};
-
 export function toMutationErrorMessage(
   error: unknown,
   fallback: string,
@@ -27,27 +20,6 @@ export function toMutationErrorMessage(
     return error.message;
   }
   return fallback;
-}
-
-export function isEventInteractionBlocked(flags: InteractionFlags): boolean {
-  return (
-    flags.isApplyingEvent ||
-    flags.isSyncingAfterSave ||
-    Boolean(flags.applyingEntryId) ||
-    flags.isRemovingEntry
-  );
-}
-
-export function isEntryInteractionBlocked(
-  flags: InteractionFlags,
-  entryId: string,
-): boolean {
-  return (
-    flags.isApplyingEvent ||
-    flags.isRemovingEntry ||
-    flags.isSyncingAfterSave ||
-    flags.applyingEntryId === entryId
-  );
 }
 
 export function createEventSavedSyncPayload(input: {

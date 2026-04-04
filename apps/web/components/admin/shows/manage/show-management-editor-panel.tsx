@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { buildEntryDisplayState } from "@/lib/admin/shows/manage";
@@ -19,23 +18,9 @@ import type {
 type ShowManagementEditorPanelProps = {
   selectedEvent: ManageShowEvent | null;
   resultOptions: ManageShowEditOptions;
-  isEventDirty: boolean;
-  dirtyEntryIds: string[];
-  onEventFieldChange: (
-    field: keyof Omit<ManageShowEvent, "id" | "entries">,
-    value: string,
-  ) => void;
-  onEntryFieldChange: (
-    entryId: string,
-    field: keyof Omit<ManageShowEntry, "id" | "awards">,
-    value: string,
-  ) => void;
-  onAddAward: (entryId: string, award: string) => void;
-  onRemoveAward: (entryId: string, awardId: string) => void;
-  onApplyEvent: () => void;
-  onApplyEntry: (entry: ManageShowEntry) => void;
+  onApplyEvent: (event: ManageShowEvent) => Promise<boolean>;
+  onApplyEntry: (entry: ManageShowEntry) => Promise<boolean>;
   onRequestRemoveEntry: (entry: ManageShowEntry) => void;
-  onResetShell: () => void;
   statusText: string;
   isApplyingEvent: boolean;
   applyingEntryId: string | null;
@@ -45,23 +30,19 @@ type ShowManagementEditorPanelProps = {
 export function ShowManagementEditorPanel({
   selectedEvent,
   resultOptions,
-  isEventDirty,
-  dirtyEntryIds,
-  onEventFieldChange,
-  onEntryFieldChange,
-  onAddAward,
-  onRemoveAward,
   onApplyEvent,
   onApplyEntry,
   onRequestRemoveEntry,
-  onResetShell,
   statusText,
   isApplyingEvent,
   applyingEntryId,
   isRemovingEntry,
 }: ShowManagementEditorPanelProps) {
   const [isEventModalOpen, setEventModalOpen] = useState(false);
-  const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
+  const [editingEventSnapshot, setEditingEventSnapshot] =
+    useState<ManageShowEvent | null>(null);
+  const [editingEntrySnapshot, setEditingEntrySnapshot] =
+    useState<ManageShowEntry | null>(null);
 
   if (!selectedEvent) {
     return (
@@ -74,13 +55,6 @@ export function ShowManagementEditorPanel({
   }
 
   const isEventInputsDisabled = isApplyingEvent;
-  const isResetDisabled =
-    isApplyingEvent || Boolean(applyingEntryId) || isRemovingEntry;
-  const editingEntry =
-    selectedEvent.entries.find((entry) => entry.id === editingEntryId) ?? null;
-  const isEditingEntryDirty = editingEntry
-    ? dirtyEntryIds.includes(editingEntry.id)
-    : false;
   const entryDisplayStates = selectedEvent.entries.reduce<
     Record<
       string,
@@ -106,7 +80,27 @@ export function ShowManagementEditorPanel({
     if (isApplyingEvent || isRemovingEntry || Boolean(applyingEntryId)) {
       return;
     }
-    setEditingEntryId(entryId);
+    const currentEvent = selectedEvent;
+    if (!currentEvent) {
+      return;
+    }
+
+    const entry = currentEvent.entries.find((item) => item.id === entryId);
+    if (!entry) {
+      return;
+    }
+    setEditingEntrySnapshot(entry);
+  }
+
+  function openEventEditor() {
+    if (isApplyingEvent || Boolean(applyingEntryId) || isRemovingEntry) {
+      return;
+    }
+    if (!selectedEvent) {
+      return;
+    }
+    setEditingEventSnapshot(selectedEvent);
+    setEventModalOpen(true);
   }
 
   return (
@@ -114,9 +108,8 @@ export function ShowManagementEditorPanel({
       <CardContent className="space-y-4 pt-5">
         <ShowManagementSelectedEventHeader
           selectedEvent={selectedEvent}
-          isEventDirty={isEventDirty}
           isEditDisabled={isEventInputsDisabled || Boolean(applyingEntryId)}
-          onEdit={() => setEventModalOpen(true)}
+          onEdit={openEventEditor}
         />
 
         <Separator />
@@ -129,20 +122,11 @@ export function ShowManagementEditorPanel({
                 {selectedEvent.entries.length} dogs
               </p>
             </div>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onResetShell}
-              disabled={isResetDisabled}
-            >
-              Reset changes
-            </Button>
           </div>
 
           <ShowManagementEntryResults
             entries={selectedEvent.entries}
             entryDisplayStates={entryDisplayStates}
-            dirtyEntryIds={dirtyEntryIds}
             isApplyingEvent={isApplyingEvent}
             isRemovingEntry={isRemovingEntry}
             applyingEntryId={applyingEntryId}
@@ -155,28 +139,31 @@ export function ShowManagementEditorPanel({
 
         <ShowManagementStatusFooter statusText={statusText} />
 
-        <ShowManagementEventModal
-          open={isEventModalOpen}
-          selectedEvent={selectedEvent}
-          isDirty={isEventDirty}
-          isApplying={isApplyingEvent}
-          onClose={() => setEventModalOpen(false)}
-          onEventFieldChange={onEventFieldChange}
-          onApplyEvent={onApplyEvent}
-        />
+        {isEventModalOpen && editingEventSnapshot ? (
+          <ShowManagementEventModal
+            open={isEventModalOpen}
+            selectedEvent={editingEventSnapshot}
+            isApplying={isApplyingEvent}
+            onClose={() => {
+              setEventModalOpen(false);
+              setEditingEventSnapshot(null);
+            }}
+            onApplyEvent={onApplyEvent}
+          />
+        ) : null}
 
-        <ShowManagementEntryModal
-          open={Boolean(editingEntry)}
-          entry={editingEntry}
-          resultOptions={resultOptions}
-          isDirty={isEditingEntryDirty}
-          isApplying={isApplyingEvent || applyingEntryId === editingEntry?.id}
-          onClose={() => setEditingEntryId(null)}
-          onEntryFieldChange={onEntryFieldChange}
-          onAddAward={onAddAward}
-          onRemoveAward={onRemoveAward}
-          onApplyEntry={onApplyEntry}
-        />
+        {editingEntrySnapshot ? (
+          <ShowManagementEntryModal
+            open={Boolean(editingEntrySnapshot)}
+            entry={editingEntrySnapshot}
+            resultOptions={resultOptions}
+            isApplying={
+              isApplyingEvent || applyingEntryId === editingEntrySnapshot.id
+            }
+            onClose={() => setEditingEntrySnapshot(null)}
+            onApplyEntry={onApplyEntry}
+          />
+        ) : null}
       </CardContent>
     </Card>
   );

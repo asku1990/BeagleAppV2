@@ -15,20 +15,15 @@ export {
 } from "./display";
 export {
   cloneManageShowEvent,
-  createEventLocalState,
-  getAppliedEntry,
+  cloneManageShowEntry,
   mapAwardCodesToDraftAwards,
   toManageShowEditOptions,
   toManageShowEvent,
-  updateDraftEntryField,
-  updateDraftEventField,
 } from "./event-local-state";
 export {
   createEntryRemovedSyncPayload,
   createEntrySavedSyncPayload,
   createEventSavedSyncPayload,
-  isEntryInteractionBlocked,
-  isEventInteractionBlocked,
   toMutationErrorMessage,
   type PendingServerSync,
 } from "./selected-event-state";

@@ -3,28 +3,31 @@
 import { AdminFormModalShell } from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  areShowEventFieldsEqual,
+  cloneManageShowEvent,
+} from "@/lib/admin/shows/manage";
+import { useModalDraftState } from "@/hooks/admin/shows/manage/use-modal-draft-state";
 import type { ManageShowEvent } from "./show-management-types";
 
 export function ShowManagementEventModal({
   open,
   selectedEvent,
-  isDirty,
   isApplying,
   onClose,
-  onEventFieldChange,
   onApplyEvent,
 }: {
   open: boolean;
-  selectedEvent: ManageShowEvent | null;
-  isDirty: boolean;
+  selectedEvent: ManageShowEvent;
   isApplying: boolean;
   onClose: () => void;
-  onEventFieldChange: (
-    field: keyof Omit<ManageShowEvent, "id" | "entries">,
-    value: string,
-  ) => void;
-  onApplyEvent: () => void;
+  onApplyEvent: (draftEvent: ManageShowEvent) => Promise<boolean>;
 }) {
+  const { draft: draftEvent, setDraft: setDraftEvent } = useModalDraftState(
+    () => cloneManageShowEvent(selectedEvent),
+  );
+  const isDirty = !areShowEventFieldsEqual(draftEvent, selectedEvent);
+
   return (
     <AdminFormModalShell
       open={open}
@@ -39,7 +42,13 @@ export function ShowManagementEventModal({
           </Button>
           <Button
             type="button"
-            onClick={onApplyEvent}
+            onClick={() =>
+              void (async () => {
+                if (await onApplyEvent(draftEvent)) {
+                  onClose();
+                }
+              })()
+            }
             disabled={isApplying || !isDirty}
           >
             {isApplying ? "Saving event..." : "Save event"}
@@ -47,80 +56,99 @@ export function ShowManagementEventModal({
         </>
       }
     >
-      {!selectedEvent ? null : (
-        <div className="grid gap-3 md:grid-cols-2">
-          <label className="space-y-1 text-sm">
-            <span>Date</span>
-            <Input
-              value={selectedEvent.eventDate}
-              disabled={isApplying}
-              onChange={(event) =>
-                onEventFieldChange("eventDate", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span>Place</span>
-            <Input
-              value={selectedEvent.eventPlace}
-              disabled={isApplying}
-              onChange={(event) =>
-                onEventFieldChange("eventPlace", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span>City</span>
-            <Input
-              value={selectedEvent.eventCity}
-              disabled={isApplying}
-              onChange={(event) =>
-                onEventFieldChange("eventCity", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span>Type</span>
-            <Input
-              value={selectedEvent.eventType}
-              disabled={isApplying}
-              onChange={(event) =>
-                onEventFieldChange("eventType", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span>Name</span>
-            <Input
-              value={selectedEvent.eventName}
-              disabled={isApplying}
-              onChange={(event) =>
-                onEventFieldChange("eventName", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span>Organizer</span>
-            <Input
-              value={selectedEvent.organizer}
-              disabled={isApplying}
-              onChange={(event) =>
-                onEventFieldChange("organizer", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm md:col-span-2">
-            <span>Judge</span>
-            <Input
-              value={selectedEvent.judge}
-              disabled={isApplying}
-              onChange={(event) =>
-                onEventFieldChange("judge", event.target.value)
-              }
-            />
-          </label>
-        </div>
-      )}
+      <div className="grid gap-3 md:grid-cols-2">
+        <label className="space-y-1 text-sm">
+          <span>Date</span>
+          <Input
+            value={draftEvent.eventDate}
+            disabled={isApplying}
+            onChange={(event) =>
+              setDraftEvent((current) => ({
+                ...current,
+                eventDate: event.target.value,
+              }))
+            }
+          />
+        </label>
+        <label className="space-y-1 text-sm">
+          <span>Place</span>
+          <Input
+            value={draftEvent.eventPlace}
+            disabled={isApplying}
+            onChange={(event) =>
+              setDraftEvent((current) => ({
+                ...current,
+                eventPlace: event.target.value,
+              }))
+            }
+          />
+        </label>
+        <label className="space-y-1 text-sm">
+          <span>City</span>
+          <Input
+            value={draftEvent.eventCity}
+            disabled={isApplying}
+            onChange={(event) =>
+              setDraftEvent((current) => ({
+                ...current,
+                eventCity: event.target.value,
+              }))
+            }
+          />
+        </label>
+        <label className="space-y-1 text-sm">
+          <span>Type</span>
+          <Input
+            value={draftEvent.eventType}
+            disabled={isApplying}
+            onChange={(event) =>
+              setDraftEvent((current) => ({
+                ...current,
+                eventType: event.target.value,
+              }))
+            }
+          />
+        </label>
+        <label className="space-y-1 text-sm">
+          <span>Name</span>
+          <Input
+            value={draftEvent.eventName}
+            disabled={isApplying}
+            onChange={(event) =>
+              setDraftEvent((current) => ({
+                ...current,
+                eventName: event.target.value,
+              }))
+            }
+          />
+        </label>
+        <label className="space-y-1 text-sm">
+          <span>Organizer</span>
+          <Input
+            value={draftEvent.organizer}
+            disabled={isApplying}
+            onChange={(event) =>
+              setDraftEvent((current) => ({
+                ...current,
+                organizer: event.target.value,
+              }))
+            }
+          />
+        </label>
+        <label className="space-y-1 text-sm md:col-span-2">
+          <span>Judge</span>
+          <Input
+            value={draftEvent.judge}
+            disabled={isApplying}
+            onChange={(event) =>
+              setDraftEvent((current) => ({
+                ...current,
+                judge: event.target.value,
+              }))
+            }
+          />
+        </label>
+      </div>
     </AdminFormModalShell>
   );
 }

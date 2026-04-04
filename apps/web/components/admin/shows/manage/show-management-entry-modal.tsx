@@ -3,9 +3,12 @@
 import { AdminFormModalShell } from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import {
+  areShowEntriesEqual,
+  cloneManageShowEntry,
   buildEntryDisplayState,
   resolveOptionLabel,
 } from "@/lib/admin/shows/manage";
+import { useModalDraftState } from "@/hooks/admin/shows/manage/use-modal-draft-state";
 import { ShowManagementAwardsEditor } from "./internal/show-management-awards-editor";
 import { ShowManagementCritiqueField } from "./internal/show-management-critique-field";
 import { ShowManagementResultFieldsGrid } from "./internal/show-management-result-fields-grid";
@@ -18,34 +21,22 @@ export function ShowManagementEntryModal({
   open,
   entry,
   resultOptions,
-  isDirty,
   isApplying,
   onClose,
-  onEntryFieldChange,
-  onAddAward,
-  onRemoveAward,
   onApplyEntry,
 }: {
   open: boolean;
-  entry: ManageShowEntry | null;
+  entry: ManageShowEntry;
   resultOptions: ManageShowEditOptions;
-  isDirty: boolean;
   isApplying: boolean;
   onClose: () => void;
-  onEntryFieldChange: (
-    entryId: string,
-    field: keyof Omit<ManageShowEntry, "id" | "awards">,
-    value: string,
-  ) => void;
-  onAddAward: (entryId: string, awardCode: string) => void;
-  onRemoveAward: (entryId: string, awardId: string) => void;
-  onApplyEntry: (entry: ManageShowEntry) => void;
+  onApplyEntry: (entry: ManageShowEntry) => Promise<boolean>;
 }) {
-  if (!entry) {
-    return null;
-  }
-
-  const displayState = buildEntryDisplayState(entry, resultOptions);
+  const { draft: draftEntry, setDraft: setDraftEntry } = useModalDraftState(
+    () => cloneManageShowEntry(entry),
+  );
+  const displayState = buildEntryDisplayState(draftEntry, resultOptions);
+  const isDirty = !areShowEntriesEqual(draftEntry, entry);
   const optionsUnavailable =
     resultOptions.classOptions.length === 0 &&
     resultOptions.qualityOptions.length === 0 &&
@@ -68,7 +59,13 @@ export function ShowManagementEntryModal({
           </Button>
           <Button
             type="button"
-            onClick={() => onApplyEntry(entry)}
+            onClick={() =>
+              void (async () => {
+                if (await onApplyEntry(draftEntry)) {
+                  onClose();
+                }
+              })()
+            }
             disabled={isApplying || !isDirty}
           >
             {isApplying ? "Saving entry..." : "Save entry"}
@@ -91,27 +88,62 @@ export function ShowManagementEntryModal({
 
       <div className="grid gap-3 md:grid-cols-2">
         <ShowManagementResultFieldsGrid
-          entry={entry}
+          entry={draftEntry}
           classOptions={displayState.classOptions}
           qualityOptions={displayState.qualityOptions}
           isDisabled={isApplying}
-          onEntryFieldChange={onEntryFieldChange}
+          onEntryFieldChange={(_, field, value) =>
+            setDraftEntry((current) => ({ ...current, [field]: value }))
+          }
         />
 
         <ShowManagementAwardsEditor
-          entry={entry}
+          entry={draftEntry}
           availableAwardOptions={displayState.availableAwardOptions}
           awardsDisabled={displayState.awardsDisabled}
           isDisabled={isApplying}
-          onAddAward={onAddAward}
-          onRemoveAward={onRemoveAward}
+          onAddAward={(_, awardCode) =>
+            setDraftEntry((current) => {
+              const normalizedAwardCode = awardCode.trim();
+              if (!normalizedAwardCode) {
+                return current;
+              }
+
+              if (
+                current.awards.some(
+                  (award) => award.code === normalizedAwardCode,
+                )
+              ) {
+                return current;
+              }
+
+              return {
+                ...current,
+                awards: [
+                  ...current.awards,
+                  {
+                    id: `${current.id}:${normalizedAwardCode}`,
+                    code: normalizedAwardCode,
+                  },
+                ],
+              };
+            })
+          }
+          onRemoveAward={(_, awardId) =>
+            setDraftEntry((current) => ({
+              ...current,
+              awards: current.awards.filter((award) => award.id !== awardId),
+            }))
+          }
           resolveAwardLabel={resolveAwardLabel}
         />
 
         <ShowManagementCritiqueField
-          entry={entry}
+          entry={draftEntry}
           isDisabled={isApplying}
-          onEntryFieldChange={onEntryFieldChange}
+          onEntryFieldChange={(_, field, value) =>
+            setDraftEntry((current) => ({ ...current, [field]: value }))
+          }
         />
       </div>
 

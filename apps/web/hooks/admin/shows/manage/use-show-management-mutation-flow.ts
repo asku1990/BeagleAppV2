@@ -1,17 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "@/components/ui/sonner";
 import {
-  areShowEntriesEqual,
   createEntryRemovedSyncPayload,
   createEntrySavedSyncPayload,
   createEventSavedSyncPayload,
-  getAppliedEntry,
-  isEventInteractionBlocked,
-  type PendingServerSync,
   toMutationErrorMessage,
+  type PendingServerSync,
 } from "@/lib/admin/shows/manage";
-import { toast } from "@/components/ui/sonner";
 import {
   useDeleteAdminShowEntryMutation,
   useUpdateAdminShowEntryMutation,
@@ -26,28 +23,14 @@ export function useShowManagementMutationFlow({
   selectedEvent,
   selectedEventUpdatedAt,
   onSelectedEventIdChange,
-  draftEvent,
-  appliedEvent,
-  pendingRemovalEntry,
-  applyServerSnapshot,
-  setStatusText,
+  onStatusTextChange,
+  onRemoveConfirmed,
 }: {
   selectedEvent: ManageShowEvent;
   selectedEventUpdatedAt: number;
   onSelectedEventIdChange: (nextShowId: string) => void;
-  draftEvent: ManageShowEvent;
-  appliedEvent: ManageShowEvent;
-  pendingRemovalEntry: {
-    eventId: string;
-    entryId: string;
-    dogName: string;
-  } | null;
-  applyServerSnapshot: (input: {
-    selectedEventFromServer: ManageShowEvent;
-    statusTextFromOperation: string;
-    clearPendingRemoval: boolean;
-  }) => void;
-  setStatusText: (nextStatusText: string) => void;
+  onStatusTextChange: (nextStatusText: string) => void;
+  onRemoveConfirmed: () => void;
 }) {
   const [applyingEntryId, setApplyingEntryId] = useState<string | null>(null);
   const [isRemovingEntry, setIsRemovingEntry] = useState(false);
@@ -66,36 +49,37 @@ export function useShowManagementMutationFlow({
       return;
     }
     if (pendingServerSync.targetShowId !== selectedEvent.id) {
+      // The user switched selection before the original save sync resolved.
+      // Clear stale sync state so the new selection is not blocked.
+      setPendingServerSync(null);
       return;
     }
     if (selectedEventUpdatedAt <= pendingServerSync.baselineUpdatedAt) {
       return;
     }
 
-    applyServerSnapshot({
-      selectedEventFromServer: selectedEvent,
-      clearPendingRemoval: pendingServerSync.clearPendingRemoval,
-      statusTextFromOperation: pendingServerSync.statusText,
-    });
+    onStatusTextChange(pendingServerSync.statusText);
     toast.success(pendingServerSync.successToast);
+    if (pendingServerSync.clearPendingRemoval) {
+      onRemoveConfirmed();
+    }
     setPendingServerSync(null);
   }, [
-    applyServerSnapshot,
+    onRemoveConfirmed,
+    onStatusTextChange,
     pendingServerSync,
-    selectedEvent,
+    selectedEvent.id,
     selectedEventUpdatedAt,
   ]);
 
-  async function applyEventChanges() {
+  async function applyEventChanges(draftEvent: ManageShowEvent) {
     if (
-      isEventInteractionBlocked({
-        isApplyingEvent,
-        isSyncingAfterSave,
-        applyingEntryId,
-        isRemovingEntry,
-      })
+      isApplyingEvent ||
+      isSyncingAfterSave ||
+      Boolean(applyingEntryId) ||
+      isRemovingEntry
     ) {
-      return;
+      return false;
     }
 
     try {
@@ -121,37 +105,32 @@ export function useShowManagementMutationFlow({
           selectedEventUpdatedAt,
         }),
       );
+      return true;
     } catch (error) {
       const message = toMutationErrorMessage(
         error,
         "Failed to save event changes.",
       );
       toast.error(message);
-      setStatusText(message);
+      onStatusTextChange(message);
+      return false;
     }
   }
 
   async function applyEntryChanges(entry: ManageShowEntry) {
     if (
-      isEventInteractionBlocked({
-        isApplyingEvent,
-        isSyncingAfterSave,
-        applyingEntryId,
-        isRemovingEntry,
-      })
+      isApplyingEvent ||
+      isSyncingAfterSave ||
+      Boolean(applyingEntryId) ||
+      isRemovingEntry
     ) {
-      return;
-    }
-
-    const applied = getAppliedEntry(appliedEvent, entry.id);
-    if (applied && areShowEntriesEqual(entry, applied)) {
-      return;
+      return false;
     }
 
     setApplyingEntryId(entry.id);
     try {
       await updateEntryMutation.mutateAsync({
-        showId: draftEvent.id,
+        showId: selectedEvent.id,
         entryId: entry.id,
         judge: entry.judge,
         critiqueText: entry.critiqueText,
@@ -165,57 +144,66 @@ export function useShowManagementMutationFlow({
 
       setPendingServerSync(
         createEntrySavedSyncPayload({
-          showId: draftEvent.id,
+          showId: selectedEvent.id,
           entry,
           selectedEventUpdatedAt,
         }),
       );
+      return true;
     } catch (error) {
       const message = toMutationErrorMessage(
         error,
         `Failed to save ${entry.dogName} changes.`,
       );
       toast.error(message);
-      setStatusText(message);
+      onStatusTextChange(message);
+      return false;
     } finally {
       setApplyingEntryId(null);
     }
   }
 
-  async function confirmRemoveEntry() {
+  async function confirmRemoveEntry(
+    pendingRemovalEntry: {
+      eventId: string;
+      entryId: string;
+      dogName: string;
+    } | null,
+  ) {
     if (
       !pendingRemovalEntry ||
-      isEventInteractionBlocked({
-        isApplyingEvent,
-        isSyncingAfterSave,
-        applyingEntryId,
-        isRemovingEntry,
-      })
+      isApplyingEvent ||
+      isSyncingAfterSave ||
+      Boolean(applyingEntryId) ||
+      isRemovingEntry
     ) {
-      return;
+      return false;
     }
 
     setIsRemovingEntry(true);
     try {
       await deleteEntryMutation.mutateAsync({
-        showId: draftEvent.id,
+        showId: selectedEvent.id,
         entryId: pendingRemovalEntry.entryId,
       });
 
+      onRemoveConfirmed();
       setPendingServerSync(
         createEntryRemovedSyncPayload({
-          showId: draftEvent.id,
+          showId: selectedEvent.id,
           dogName: pendingRemovalEntry.dogName,
           selectedEventUpdatedAt,
         }),
       );
+      return true;
     } catch (error) {
       const message = toMutationErrorMessage(
         error,
         `Failed to remove ${pendingRemovalEntry.dogName} from the event.`,
       );
       toast.error(message);
-      setStatusText(message);
+      onStatusTextChange(message);
+      return false;
     } finally {
       setIsRemovingEntry(false);
     }

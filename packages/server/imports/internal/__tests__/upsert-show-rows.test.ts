@@ -151,4 +151,47 @@ describe("upsertShowRows", () => {
     );
     expect(showResultItemUpsertMock).toHaveBeenCalledTimes(2);
   });
+
+  it("writes legacy numeric quality item fields compatible with admin manual updates", async () => {
+    showResultDefinitionFindManyMock.mockResolvedValue([
+      { id: "def-legacy-quality", code: "LEGACY-LAATUARVOSTELU" },
+      { id: "def-avo", code: "AVO" },
+    ]);
+
+    const rows: LegacyShowResultRow[] = [
+      {
+        registrationNo: "FI-1/20",
+        eventDateRaw: "20020101",
+        eventPlace: "Helsinki",
+        resultText: "AVO4",
+        critiqueText: null,
+        dogName: "Dog One",
+        heightText: null,
+        judge: null,
+        legacyFlag: null,
+        sourceTable: "nay9599",
+      },
+    ];
+    const dogIdByRegistration = new Map<string, string>([["FI-1/20", "dog-1"]]);
+
+    const result = await upsertShowRows(rows, dogIdByRegistration, {
+      importRunId: "run-1",
+    });
+
+    expect(result.upserted).toBe(1);
+    expect(result.errors).toBe(0);
+
+    const legacyQualityCreate = showResultItemUpsertMock.mock.calls
+      .map((call) => call[0]?.create)
+      .find((create) => create?.definitionId === "def-legacy-quality");
+
+    expect(legacyQualityCreate).toEqual(
+      expect.objectContaining({
+        definitionId: "def-legacy-quality",
+        valueCode: null,
+        valueNumeric: 4,
+        isAwarded: null,
+      }),
+    );
+  });
 });

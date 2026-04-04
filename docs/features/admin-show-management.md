@@ -22,10 +22,9 @@ Developer notes for the admin show management flow.
 - `apps/web/components/admin/shows/manage/show-management-remove-panel.tsx`: destructive remove confirmation
 - `apps/web/components/admin/shows/manage/internal/*`: feature-internal editor sections and entry form subcomponents
 - `apps/web/hooks/admin/shows/manage/use-show-management-selected-event-state.ts`: thin composer hook
-- `apps/web/hooks/admin/shows/manage/use-show-management-draft-state.ts`: draft state + dirty tracking
+- `apps/web/hooks/admin/shows/manage/use-modal-draft-state.ts`: reusable modal-local draft state helper
 - `apps/web/hooks/admin/shows/manage/use-show-management-mutation-flow.ts`: mutation orchestration + server-sync reconciliation
-- `apps/web/hooks/admin/shows/manage/use-unsaved-changes-unload-guard.ts`: beforeunload protection
-- `apps/web/lib/admin/shows/manage/*`: pure draft mapping, display formatting, and mutation-state helper utilities
+- `apps/web/lib/admin/shows/manage/*`: pure mapping, display formatting, and mutation-state helper utilities
 - `apps/web/components/admin/index.ts`: shared admin UI helper exports (`AdminFormModalShell`, `AdminRowActionsMenu`)
 - `apps/web/queries/admin/shows/manage/use-admin-show-events-query.ts`: list query hook
 - `apps/web/queries/admin/shows/manage/use-admin-show-event-query.ts`: detail query hook
@@ -48,9 +47,9 @@ Developer notes for the admin show management flow.
 2. The selected summary drives `useAdminShowEventQuery` for full event details.
 3. The page renders event results as a row-centric table/cards flow with action menus.
 4. Event and entry edits happen in modals; remove remains a scoped confirm modal.
-5. The detail panel maps contract entries and DB-driven result options into a local draft model (draft + applied snapshot).
-6. Draft state, mutation flow, and unload guard are separated into focused hooks; pure helper logic stays in feature lib helpers.
-7. Apply/remove actions persist through mutations, then refetch selected event details and reconcile local state from server data.
+5. Modal drafts live only while the modal is open. Closing the modal discards the local draft, and reopening seeds from the latest selected server snapshot.
+6. Mutation flow stays in focused hooks; pure helper logic stays in feature lib helpers.
+7. Apply/remove actions persist through mutations, then refetch selected event details and reconcile the visible page from server data.
 
 ## Write foundations (backend)
 
@@ -180,16 +179,15 @@ That value belongs only on the selected event section.
 
 ## Local draft behavior
 
-- The page keeps an editable draft plus an applied snapshot for the selected event.
-- Event-level and entry-level field edits update only the draft until apply.
-- Award add/remove actions are applied from parent draft state so quick
-  consecutive chip edits do not replace awards from a stale child snapshot.
+- Event and entry modals own their draft state while open.
+- Event-level and entry-level field edits stay local to the modal until apply.
+- Award add/remove actions update the modal-local draft so quick consecutive chip edits do not overwrite newer changes.
 - Draft awards use stable local item ids in the web editor so one visible chip
   maps to one remove action.
 - Apply event/apply entry/remove entry call admin show mutation actions.
 - Mutation success invalidates show queries and refreshes selected event state
   from server-normalized data.
-- Reset reverts draft back to the latest server-synced applied snapshot.
+- Closing a modal discards its draft and the next open starts from the selected event snapshot.
 
 ## Tests
 

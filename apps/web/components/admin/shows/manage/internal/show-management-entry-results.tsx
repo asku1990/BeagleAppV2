@@ -15,7 +15,6 @@ type EntryDisplayState = {
 export function ShowManagementEntryResults({
   entries,
   entryDisplayStates,
-  dirtyEntryIds,
   isApplyingEvent,
   isRemovingEntry,
   applyingEntryId,
@@ -24,7 +23,6 @@ export function ShowManagementEntryResults({
 }: {
   entries: ManageShowEntry[];
   entryDisplayStates: Record<string, EntryDisplayState>;
-  dirtyEntryIds: string[];
   isApplyingEvent: boolean;
   isRemovingEntry: boolean;
   applyingEntryId: string | null;
@@ -88,9 +86,7 @@ export function ShowManagementEntryResults({
                     actions={[
                       {
                         id: "edit",
-                        label: dirtyEntryIds.includes(entry.id)
-                          ? "Edit entry (unsaved)"
-                          : "Edit entry",
+                        label: "Edit entry",
                         onSelect: () => onEditEntry(entry.id),
                         disabled: areActionsDisabled,
                       },
@@ -143,9 +139,7 @@ export function ShowManagementEntryResults({
               actions={[
                 {
                   id: "edit",
-                  label: dirtyEntryIds.includes(entry.id)
-                    ? "Edit entry (unsaved)"
-                    : "Edit entry",
+                  label: "Edit entry",
                   onSelect: () => onEditEntry(entry.id),
                   disabled: areActionsDisabled,
                 },

@@ -2,21 +2,13 @@ import type {
   AdminShowDetailsEvent,
   AdminShowResultOptions,
 } from "@beagle/contracts";
-import { createManageShowAward, updateEntry } from "./show-management";
+import { createManageShowAward } from "./show-management";
 import type {
   ManageShowAward,
   ManageShowEditOptions,
   ManageShowEntry,
   ManageShowEvent,
-  PendingRemovalEntry,
 } from "@/components/admin/shows/manage/show-management-types";
-
-export type EventLocalState = {
-  draftEvent: ManageShowEvent;
-  appliedEvent: ManageShowEvent;
-  pendingRemovalEntry: PendingRemovalEntry;
-  statusText: string;
-};
 
 const EMPTY_SHOW_OPTIONS: ManageShowEditOptions = {
   classOptions: [],
@@ -64,6 +56,13 @@ export function cloneManageShowEvent(event: ManageShowEvent): ManageShowEvent {
   };
 }
 
+export function cloneManageShowEntry(entry: ManageShowEntry): ManageShowEntry {
+  return {
+    ...entry,
+    awards: entry.awards.map((award) => ({ ...award })),
+  };
+}
+
 export function toManageShowEditOptions(
   options: AdminShowResultOptions | null | undefined,
 ): ManageShowEditOptions {
@@ -75,51 +74,4 @@ export function toManageShowEditOptions(
     awardOptions: source.awardOptions.map((option) => ({ ...option })),
     pupnOptions: source.pupnOptions.map((option) => ({ ...option })),
   };
-}
-
-export function createEventLocalState(event: ManageShowEvent): EventLocalState {
-  return {
-    draftEvent: cloneManageShowEvent(event),
-    appliedEvent: cloneManageShowEvent(event),
-    pendingRemovalEntry: null,
-    statusText: "",
-  };
-}
-
-export function updateDraftEventField(
-  current: EventLocalState,
-  field: keyof Omit<ManageShowEvent, "id" | "entries">,
-  value: string,
-): EventLocalState {
-  return {
-    ...current,
-    draftEvent: {
-      ...cloneManageShowEvent(current.draftEvent),
-      [field]: value,
-    },
-  };
-}
-
-export function updateDraftEntryField(
-  current: EventLocalState,
-  entryId: string,
-  field: keyof Omit<ManageShowEntry, "id" | "awards">,
-  value: string,
-): EventLocalState {
-  return {
-    ...current,
-    draftEvent: {
-      ...cloneManageShowEvent(current.draftEvent),
-      entries: updateEntry(current.draftEvent.entries, entryId, {
-        [field]: value,
-      }),
-    },
-  };
-}
-
-export function getAppliedEntry(
-  event: ManageShowEvent | null,
-  entryId: string,
-): ManageShowEntry | undefined {
-  return event?.entries.find((item) => item.id === entryId);
 }

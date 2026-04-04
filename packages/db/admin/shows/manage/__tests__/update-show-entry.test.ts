@@ -353,4 +353,53 @@ describe("updateAdminShowEntryWriteDb", () => {
       }),
     );
   });
+
+  it("writes legacy numeric quality item fields compatible with workbook import", async () => {
+    showEventFindFirstMock.mockResolvedValue({ id: "event-1" });
+    showEntryFindFirstMock.mockResolvedValue({
+      id: "entry-1",
+      entryLookupKey: "FI123/21|2025-06-01|HELSINKI",
+    });
+    showResultDefinitionFindManyMock.mockResolvedValue([
+      {
+        id: "def-legacy-quality",
+        code: "LEGACY-LAATUARVOSTELU",
+        isVisibleByDefault: true,
+        category: { code: "LAATUARVOSTELU" },
+      },
+    ]);
+
+    const result = await updateAdminShowEntryWriteDb({
+      eventKey: "2025-06-01|HELSINKI",
+      eventDate: new Date("2025-06-01T00:00:00.000Z"),
+      eventPlace: "Helsinki",
+      entryId: "entry-1",
+      judge: null,
+      critiqueText: null,
+      heightText: null,
+      classCode: null,
+      qualityGrade: "4",
+      classPlacement: null,
+      pupn: null,
+      awards: [],
+    });
+
+    expect(result).toEqual({
+      status: "updated",
+      entryId: "entry-1",
+    });
+
+    const legacyQualityCreate = showResultItemCreateManyMock.mock.calls
+      .flatMap((call) => call[0]?.data ?? [])
+      .find((item) => item.definitionId === "def-legacy-quality");
+
+    expect(legacyQualityCreate).toEqual(
+      expect.objectContaining({
+        definitionId: "def-legacy-quality",
+        valueCode: null,
+        valueNumeric: 4,
+        isAwarded: null,
+      }),
+    );
+  });
 });

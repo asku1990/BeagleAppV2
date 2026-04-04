@@ -5,12 +5,10 @@ import type { ManageShowEvent } from "../show-management-types";
 
 export function ShowManagementSelectedEventHeader({
   selectedEvent,
-  isEventDirty,
   isEditDisabled,
   onEdit,
 }: {
   selectedEvent: ManageShowEvent;
-  isEventDirty: boolean;
   isEditDisabled: boolean;
   onEdit: () => void;
 }) {
@@ -26,7 +24,7 @@ export function ShowManagementSelectedEventHeader({
 
       <div className="flex justify-end">
         <Button type="button" onClick={onEdit} disabled={isEditDisabled}>
-          {isEventDirty ? "Edit event (unsaved)" : "Edit event"}
+          Edit event
         </Button>
       </div>
     </>

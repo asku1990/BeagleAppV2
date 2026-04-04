@@ -21,21 +21,13 @@ export function ShowManagementSelectedEventPanel({
   onSelectedEventIdChange: (nextShowId: string) => void;
 }) {
   const {
-    draftEvent,
     pendingRemovalEntry,
     statusText,
-    dirtyEntryIds,
-    isEventDirty,
-    handleEventFieldChange,
-    handleEntryFieldChange,
-    handleAddAward,
-    handleRemoveAward,
     handleApplyEvent,
     handleApplyEntry,
     handleRequestRemoveEntry,
     handleCancelRemove,
     handleConfirmRemove,
-    handleResetShell,
     isApplyingEvent,
     isSyncingAfterSave,
     applyingEntryId,
@@ -49,18 +41,11 @@ export function ShowManagementSelectedEventPanel({
   return (
     <>
       <ShowManagementEditorPanel
-        selectedEvent={draftEvent}
+        selectedEvent={selectedEvent}
         resultOptions={resultOptions}
-        isEventDirty={isEventDirty}
-        dirtyEntryIds={dirtyEntryIds}
-        onEventFieldChange={handleEventFieldChange}
-        onEntryFieldChange={handleEntryFieldChange}
-        onAddAward={handleAddAward}
-        onRemoveAward={handleRemoveAward}
         onApplyEvent={handleApplyEvent}
         onApplyEntry={handleApplyEntry}
         onRequestRemoveEntry={handleRequestRemoveEntry}
-        onResetShell={handleResetShell}
         statusText={statusText}
         isApplyingEvent={isApplyingEvent || isSyncingAfterSave}
         applyingEntryId={applyingEntryId}
@@ -70,7 +55,7 @@ export function ShowManagementSelectedEventPanel({
       <ShowManagementRemovePanel
         pendingRemovalEntry={pendingRemovalEntry}
         onCancel={handleCancelRemove}
-        onConfirm={handleConfirmRemove}
+        onConfirm={() => void handleConfirmRemove()}
         isConfirming={isRemovingEntry}
       />
     </>
