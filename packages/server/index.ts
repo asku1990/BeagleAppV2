@@ -11,6 +11,7 @@ export {
   listAdminOwnerOptions,
   getAdminShowEvent,
   listAdminShowEvents,
+  updateAdminShowEvent,
   previewAdminShowWorkbookImport,
   applyAdminShowWorkbookImport,
   requireAdmin,

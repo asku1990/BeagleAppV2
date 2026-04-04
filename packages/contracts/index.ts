@@ -174,6 +174,8 @@ export type {
   AdminShowSearchRequest,
   AdminShowSearchResponse,
   AdminShowSearchSort,
+  UpdateAdminShowEventRequest,
+  UpdateAdminShowEventResponse,
   AdminShowWorkbookImportIssue,
   AdminShowWorkbookImportIssueSeverity,
   AdminShowWorkbookImportApplyResponse,

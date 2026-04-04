@@ -71,3 +71,31 @@ export type AdminShowDetailsResponseDb = {
   items: AdminShowDetailsEntryRowDb[];
   options: AdminShowResultOptionsDb;
 };
+
+export type UpdateAdminShowEventWriteRequestDb = {
+  eventKey?: string | null;
+  eventDate: Date;
+  eventPlace: string;
+  nextEventLookupKey: string;
+  nextEventDate: Date;
+  nextEventPlace: string;
+  nextEventCity: string | null;
+  nextEventName: string | null;
+  nextEventType: string | null;
+  nextOrganizer: string | null;
+};
+
+export type UpdatedAdminShowEventRowDb = {
+  eventKey: string;
+  eventDate: Date;
+  eventPlace: string;
+  eventCity: string | null;
+  eventName: string | null;
+  eventType: string | null;
+  organizer: string | null;
+};
+
+export type UpdateAdminShowEventWriteResultDb =
+  | { status: "updated"; row: UpdatedAdminShowEventRowDb }
+  | { status: "not_found" }
+  | { status: "event_lookup_conflict" };

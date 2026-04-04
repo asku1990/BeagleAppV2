@@ -1,0 +1,218 @@
+import type { Prisma } from "@prisma/client";
+import {
+  addBusinessIsoDateDays,
+  getBusinessDateStartUtc,
+  toBusinessDateOnly,
+} from "@db/core/date-only";
+import { prisma } from "@db/core/prisma";
+import type {
+  UpdatedAdminShowEventRowDb,
+  UpdateAdminShowEventWriteRequestDb,
+  UpdateAdminShowEventWriteResultDb,
+} from "./types";
+
+// Updates one show event and, when identity changes, rewrites dependent
+// entry/item lookup keys so canonical lookup key invariants stay consistent.
+function toEventWhere(
+  input: Pick<
+    UpdateAdminShowEventWriteRequestDb,
+    "eventKey" | "eventDate" | "eventPlace"
+  >,
+): Prisma.ShowEventWhereInput | null {
+  if (input.eventKey) {
+    return {
+      eventLookupKey: input.eventKey,
+    };
+  }
+
+  const eventDateIso = toBusinessDateOnly(input.eventDate);
+  const rangeStart = getBusinessDateStartUtc(eventDateIso);
+  const nextEventDateIso = addBusinessIsoDateDays(eventDateIso, 1);
+  const rangeEnd = nextEventDateIso
+    ? getBusinessDateStartUtc(nextEventDateIso)
+    : null;
+
+  if (!rangeStart || !rangeEnd) {
+    return null;
+  }
+
+  return {
+    eventDate: {
+      gte: rangeStart,
+      lt: rangeEnd,
+    },
+    eventPlace: input.eventPlace,
+  };
+}
+
+async function resolveTargetEvent(
+  tx: Prisma.TransactionClient,
+  input: Pick<
+    UpdateAdminShowEventWriteRequestDb,
+    "eventKey" | "eventDate" | "eventPlace"
+  >,
+) {
+  const where = toEventWhere(input);
+  if (!where) {
+    return null;
+  }
+
+  const select = {
+    id: true,
+    eventLookupKey: true,
+    entries: {
+      select: {
+        id: true,
+        entryLookupKey: true,
+        registrationNoSnapshot: true,
+        resultItems: {
+          select: {
+            id: true,
+            itemLookupKey: true,
+          },
+        },
+      },
+    },
+  } satisfies Prisma.ShowEventSelect;
+
+  if (input.eventKey) {
+    return tx.showEvent.findFirst({
+      where,
+      select,
+    });
+  }
+
+  const rows = await tx.showEvent.findMany({
+    where,
+    take: 2,
+    select,
+  });
+
+  return rows.length === 1 ? rows[0] : null;
+}
+
+function replaceLookupPrefix(
+  currentLookupKey: string,
+  currentPrefix: string,
+  nextPrefix: string,
+): string {
+  const expectedPrefix = `${currentPrefix}|`;
+  if (!currentLookupKey.startsWith(expectedPrefix)) {
+    return currentLookupKey;
+  }
+
+  return `${nextPrefix}|${currentLookupKey.slice(expectedPrefix.length)}`;
+}
+
+async function syncLookupKeysAfterEventMove(
+  tx: Prisma.TransactionClient,
+  input: {
+    currentEventLookupKey: string;
+    nextEventLookupKey: string;
+    entries: Array<{
+      id: string;
+      entryLookupKey: string;
+      registrationNoSnapshot: string;
+      resultItems: Array<{
+        id: string;
+        itemLookupKey: string;
+      }>;
+    }>;
+  },
+): Promise<void> {
+  if (input.currentEventLookupKey === input.nextEventLookupKey) {
+    return;
+  }
+
+  for (const entry of input.entries) {
+    const nextEntryLookupKey = `${entry.registrationNoSnapshot}|${input.nextEventLookupKey}`;
+    if (entry.entryLookupKey !== nextEntryLookupKey) {
+      await tx.showEntry.update({
+        where: { id: entry.id },
+        data: { entryLookupKey: nextEntryLookupKey },
+      });
+    }
+
+    for (const resultItem of entry.resultItems) {
+      const nextItemLookupKey = replaceLookupPrefix(
+        resultItem.itemLookupKey,
+        entry.entryLookupKey,
+        nextEntryLookupKey,
+      );
+      if (resultItem.itemLookupKey === nextItemLookupKey) {
+        continue;
+      }
+
+      await tx.showResultItem.update({
+        where: { id: resultItem.id },
+        data: { itemLookupKey: nextItemLookupKey },
+      });
+    }
+  }
+}
+
+export async function updateAdminShowEventWriteDb(
+  input: UpdateAdminShowEventWriteRequestDb,
+): Promise<UpdateAdminShowEventWriteResultDb> {
+  return prisma.$transaction(async (tx) => {
+    const targetEvent = await resolveTargetEvent(tx, {
+      eventKey: input.eventKey,
+      eventDate: input.eventDate,
+      eventPlace: input.eventPlace,
+    });
+    if (!targetEvent) {
+      return { status: "not_found" };
+    }
+
+    if (targetEvent.eventLookupKey !== input.nextEventLookupKey) {
+      const conflictingEvent = await tx.showEvent.findUnique({
+        where: { eventLookupKey: input.nextEventLookupKey },
+        select: { id: true },
+      });
+
+      if (conflictingEvent && conflictingEvent.id !== targetEvent.id) {
+        return { status: "event_lookup_conflict" };
+      }
+    }
+
+    const updatedEvent = await tx.showEvent.update({
+      where: { id: targetEvent.id },
+      data: {
+        eventLookupKey: input.nextEventLookupKey,
+        eventDate: input.nextEventDate,
+        eventPlace: input.nextEventPlace,
+        eventCity: input.nextEventCity,
+        eventName: input.nextEventName,
+        eventType: input.nextEventType,
+        organizer: input.nextOrganizer,
+      },
+      select: {
+        eventLookupKey: true,
+        eventDate: true,
+        eventPlace: true,
+        eventCity: true,
+        eventName: true,
+        eventType: true,
+        organizer: true,
+      },
+    });
+
+    await syncLookupKeysAfterEventMove(tx, {
+      currentEventLookupKey: targetEvent.eventLookupKey,
+      nextEventLookupKey: input.nextEventLookupKey,
+      entries: targetEvent.entries,
+    });
+
+    const row: UpdatedAdminShowEventRowDb = {
+      eventKey: updatedEvent.eventLookupKey,
+      eventDate: updatedEvent.eventDate,
+      eventPlace: updatedEvent.eventPlace,
+      eventCity: updatedEvent.eventCity,
+      eventName: updatedEvent.eventName,
+      eventType: updatedEvent.eventType,
+      organizer: updatedEvent.organizer,
+    };
+
+    return { status: "updated", row };
+  });
+}

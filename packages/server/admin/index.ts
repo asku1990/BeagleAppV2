@@ -18,3 +18,4 @@ export { updateAdminShowWorkbookSchemaRule } from "./shows";
 export { validateAdminShowWorkbookSchemaRule } from "./shows";
 export { getAdminShowEvent } from "./shows";
 export { listAdminShowEvents } from "./shows";
+export { updateAdminShowEvent } from "./shows";

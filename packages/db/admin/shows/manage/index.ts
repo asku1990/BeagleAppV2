@@ -1,5 +1,6 @@
 export { getAdminShowEventDetailsDb } from "./get-show-event-details";
 export { searchAdminShowEventsDb } from "./search-show-events";
+export { updateAdminShowEventWriteDb } from "./update-show-event";
 export type {
   AdminShowDetailsEntryRowDb,
   AdminShowDetailsRequestDb,
@@ -10,4 +11,7 @@ export type {
   AdminShowSearchResponseDb,
   AdminShowSearchRowDb,
   AdminShowSearchSortDb,
+  UpdatedAdminShowEventRowDb,
+  UpdateAdminShowEventWriteRequestDb,
+  UpdateAdminShowEventWriteResultDb,
 } from "./types";
