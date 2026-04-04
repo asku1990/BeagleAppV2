@@ -78,6 +78,7 @@ export {
   getAdminShowEventDetailsDb,
   searchAdminShowEventsDb,
   updateAdminShowEventWriteDb,
+  updateAdminShowEntryWriteDb,
   type AdminShowDetailsEntryRowDb,
   type AdminShowDetailsRequestDb,
   type AdminShowDetailsResponseDb,
@@ -90,6 +91,8 @@ export {
   type UpdatedAdminShowEventRowDb,
   type UpdateAdminShowEventWriteRequestDb,
   type UpdateAdminShowEventWriteResultDb,
+  type UpdateAdminShowEntryWriteRequestDb,
+  type UpdateAdminShowEntryWriteResultDb,
 } from "./admin/shows/manage";
 export {
   getBeagleTrialDetailsDb,

@@ -14,3 +14,7 @@ export type {
   UpdateAdminShowEventRequest,
   UpdateAdminShowEventResponse,
 } from "./update-admin-show-event";
+export type {
+  UpdateAdminShowEntryRequest,
+  UpdateAdminShowEntryResponse,
+} from "./update-admin-show-entry";

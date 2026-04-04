@@ -12,6 +12,7 @@ export {
   getAdminShowEvent,
   listAdminShowEvents,
   updateAdminShowEvent,
+  updateAdminShowEntry,
   previewAdminShowWorkbookImport,
   applyAdminShowWorkbookImport,
   requireAdmin,

@@ -1,10 +1,6 @@
 import type { Prisma } from "@prisma/client";
-import {
-  addBusinessIsoDateDays,
-  getBusinessDateStartUtc,
-  toBusinessDateOnly,
-} from "@db/core/date-only";
 import { prisma } from "@db/core/prisma";
+import { resolveAdminShowEventTargetDb } from "./internal/event-target";
 import type {
   UpdatedAdminShowEventRowDb,
   UpdateAdminShowEventWriteRequestDb,
@@ -13,38 +9,6 @@ import type {
 
 // Updates one show event and, when identity changes, rewrites dependent
 // entry/item lookup keys so canonical lookup key invariants stay consistent.
-function toEventWhere(
-  input: Pick<
-    UpdateAdminShowEventWriteRequestDb,
-    "eventKey" | "eventDate" | "eventPlace"
-  >,
-): Prisma.ShowEventWhereInput | null {
-  if (input.eventKey) {
-    return {
-      eventLookupKey: input.eventKey,
-    };
-  }
-
-  const eventDateIso = toBusinessDateOnly(input.eventDate);
-  const rangeStart = getBusinessDateStartUtc(eventDateIso);
-  const nextEventDateIso = addBusinessIsoDateDays(eventDateIso, 1);
-  const rangeEnd = nextEventDateIso
-    ? getBusinessDateStartUtc(nextEventDateIso)
-    : null;
-
-  if (!rangeStart || !rangeEnd) {
-    return null;
-  }
-
-  return {
-    eventDate: {
-      gte: rangeStart,
-      lt: rangeEnd,
-    },
-    eventPlace: input.eventPlace,
-  };
-}
-
 async function resolveTargetEvent(
   tx: Prisma.TransactionClient,
   input: Pick<
@@ -52,11 +16,6 @@ async function resolveTargetEvent(
     "eventKey" | "eventDate" | "eventPlace"
   >,
 ) {
-  const where = toEventWhere(input);
-  if (!where) {
-    return null;
-  }
-
   const select = {
     id: true,
     eventLookupKey: true,
@@ -75,20 +34,19 @@ async function resolveTargetEvent(
     },
   } satisfies Prisma.ShowEventSelect;
 
-  if (input.eventKey) {
-    return tx.showEvent.findFirst({
-      where,
-      select,
-    });
-  }
-
-  const rows = await tx.showEvent.findMany({
-    where,
-    take: 2,
-    select,
-  });
-
-  return rows.length === 1 ? rows[0] : null;
+  return resolveAdminShowEventTargetDb<{
+    id: string;
+    eventLookupKey: string;
+    entries: Array<{
+      id: string;
+      entryLookupKey: string;
+      registrationNoSnapshot: string;
+      resultItems: Array<{
+        id: string;
+        itemLookupKey: string;
+      }>;
+    }>;
+  }>(tx, input, select);
 }
 
 function replaceLookupPrefix(

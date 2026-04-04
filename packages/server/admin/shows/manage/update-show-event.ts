@@ -10,22 +10,15 @@ import type { ServiceResult } from "@server/core/result";
 import { requireAdmin } from "@server/admin/core/service";
 import { parseIsoDateOnlyToUtcDate } from "@server/shows/internal/iso-date";
 import { encodeShowId, parseShowId } from "@server/shows/internal/show-id";
+import {
+  normalizeOptionalText,
+  normalizeRequiredText,
+} from "./internal/input-normalization";
 
 type ServiceLogContext = {
   requestId?: string;
   actorUserId?: string;
 };
-
-// Validates and persists admin event-level show edits, returning a refreshed
-// encoded showId when date/place changes move the canonical event identity.
-function normalizeRequiredText(value: string): string {
-  return value.normalize("NFKC").trim().replace(/\s+/g, " ");
-}
-
-function normalizeOptionalText(value: string): string | null {
-  const normalized = normalizeRequiredText(value);
-  return normalized.length > 0 ? normalized : null;
-}
 
 function normalizePlaceKey(value: string): string {
   return value.normalize("NFKC").trim().replace(/\s+/g, " ").toUpperCase();

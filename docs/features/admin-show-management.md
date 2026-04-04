@@ -6,6 +6,9 @@ Developer notes for the admin show management flow.
 
 - The page is an admin-facing event search and detail workflow.
 - The main user task is to find a show event, inspect its entries, and prepare edits from the read layer.
+- Backend mutation foundations now exist for event and entry updates, even though
+  the page UI still runs local apply/remove behavior until mutation wiring is
+  completed.
 
 ## Main files
 
@@ -25,6 +28,10 @@ Developer notes for the admin show management flow.
 - `packages/contracts/admin/shows/manage/*`: admin show search and detail contracts
 - `packages/server/admin/shows/manage/*`: service-layer search and detail implementations
 - `packages/db/admin/shows/manage/*`: DB search and detail mapping
+- `packages/server/admin/shows/manage/update-show-event.ts`: event mutation use-case
+- `packages/server/admin/shows/manage/update-show-entry.ts`: entry mutation use-case
+- `packages/db/admin/shows/manage/update-show-event.ts`: event write + lookup key sync
+- `packages/db/admin/shows/manage/update-show-entry.ts`: entry write + result item sync
 
 ## Data flow
 
@@ -34,6 +41,32 @@ Developer notes for the admin show management flow.
 4. The detail panel maps contract entries and DB-driven result options into the local editor model so the UI can keep a draft copy separate from the loaded data.
 5. Feature-local hook state owns the selected-event draft lifecycle, while feature-local lib helpers own draft cloning, field updates, and label resolution.
 6. Apply/remove/reset actions currently only update local draft state.
+
+## Write foundations (backend)
+
+Implemented backend mutation contracts and use-cases:
+
+- `UpdateAdminShowEventRequest` / `UpdateAdminShowEventResponse`
+- `UpdateAdminShowEntryRequest` / `UpdateAdminShowEntryResponse`
+
+Mutation behavior currently implemented in server/db layers:
+
+- Event update validates admin access, normalizes input, persists event fields,
+  and returns refreshed `showId` when date/place changes update canonical event
+  identity.
+- Event identity updates synchronize dependent lookup keys
+  (`ShowEvent.eventLookupKey`, `ShowEntry.entryLookupKey`,
+  `ShowResultItem.itemLookupKey`) in one transaction.
+- Entry update validates admin access, normalizes editor values, updates entry
+  scalar fields (`judge`, `critiqueText`, `heightText`) and synchronizes
+  editable definition-backed result items for class/quality/placement/pupn/awards.
+- Entry result-item sync is scoped to the selected show event and entry.
+
+Not yet implemented in web layer:
+
+- Server actions for these mutations
+- React Query mutation hooks for show management
+- UI wiring from apply/remove buttons to backend mutations
 
 ## Contract rules
 
@@ -136,6 +169,8 @@ That value belongs only on the selected event section.
 - Apply buttons update the local applied snapshot, not the server.
 - Reset reverts the draft back to the last applied local snapshot.
 - Remove confirmation updates both local copies so the UI stays internally consistent.
+- This local-only apply behavior is transitional and will be replaced once web
+  mutation actions/hooks are connected to the backend write use-cases.
 
 ## Tests
 
@@ -144,6 +179,10 @@ That value belongs only on the selected event section.
 - Search query behavior: `apps/web/queries/admin/shows/manage/__tests__/use-admin-show-events-query.test.ts`
 - API client helpers: `packages/api-client/admin/shows/__tests__/admin-shows.test.ts`
 - Service behavior: `packages/server/admin/shows/manage/__tests__/*`
+- Event mutation behavior: `packages/server/admin/shows/manage/__tests__/update-show-event.test.ts`
+- Entry mutation behavior: `packages/server/admin/shows/manage/__tests__/update-show-entry.test.ts`
+- Event write behavior: `packages/db/admin/shows/manage/__tests__/update-show-event.test.ts`
+- Entry write behavior: `packages/db/admin/shows/manage/__tests__/update-show-entry.test.ts`
 
 ## When to update this doc
 

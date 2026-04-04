@@ -99,3 +99,27 @@ export type UpdateAdminShowEventWriteResultDb =
   | { status: "updated"; row: UpdatedAdminShowEventRowDb }
   | { status: "not_found" }
   | { status: "event_lookup_conflict" };
+
+export type UpdateAdminShowEntryWriteRequestDb = {
+  eventKey?: string | null;
+  eventDate: Date;
+  eventPlace: string;
+  entryId: string;
+  judge: string | null;
+  critiqueText: string | null;
+  heightText: string | null;
+  classCode: string | null;
+  qualityGrade: string | null;
+  classPlacement: number | null;
+  pupn: string | null;
+  awards: string[];
+};
+
+export type UpdateAdminShowEntryWriteResultDb =
+  | { status: "updated"; entryId: string }
+  | { status: "not_found" }
+  | { status: "invalid_class_code" }
+  | { status: "invalid_quality_grade" }
+  | { status: "invalid_award_code"; awardCode: string }
+  | { status: "missing_placement_definition" }
+  | { status: "missing_pupn_definition" };
