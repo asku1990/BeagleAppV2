@@ -14,15 +14,13 @@ import {
 } from "./result-types";
 
 const PUPN_MAX_RANK = 4;
+const LEGACY_QUALITY_MIN = 1;
+const LEGACY_QUALITY_MAX = 6;
 
 function buildDefinitionOptionLabel(
   definition: AdminShowResultDefinitionOptionRow,
 ): string {
-  const label = definition.labelFi.trim();
-  if (!label || label.localeCompare(definition.code, "fi") === 0) {
-    return definition.code;
-  }
-  return `${definition.code} - ${label}`;
+  return definition.code;
 }
 
 function toDefinitionOption(
@@ -45,6 +43,19 @@ function buildPupnValueOptions(): AdminShowResultOptionDb[] {
   return options;
 }
 
+function buildLegacyQualityValueOptions(): AdminShowResultOptionDb[] {
+  const options: AdminShowResultOptionDb[] = [];
+  for (
+    let value = LEGACY_QUALITY_MIN;
+    value <= LEGACY_QUALITY_MAX;
+    value += 1
+  ) {
+    const text = String(value);
+    options.push({ value: text, label: text });
+  }
+  return options;
+}
+
 export function buildAdminShowOptions(
   definitions: AdminShowResultDefinitionOptionRow[],
 ): AdminShowResultOptionsDb {
@@ -52,17 +63,27 @@ export function buildAdminShowOptions(
     .filter(
       (definition) =>
         definition.category.code === CATEGORY_CLASS &&
-        definition.code !== PUPN_CODE,
+        definition.code !== PUPN_CODE &&
+        definition.isVisibleByDefault,
     )
     .map(toDefinitionOption);
-  const qualityOptions = definitions
-    .filter(
-      (definition) =>
-        definition.category.code === CATEGORY_QUALITY &&
-        definition.isVisibleByDefault &&
-        definition.code !== LEGACY_QUALITY_CODE,
-    )
-    .map(toDefinitionOption);
+
+  const showLegacyQualityValues = definitions.some(
+    (definition) =>
+      definition.code === LEGACY_QUALITY_CODE && definition.isVisibleByDefault,
+  );
+  const qualityOptions = [
+    ...definitions
+      .filter(
+        (definition) =>
+          definition.category.code === CATEGORY_QUALITY &&
+          definition.isVisibleByDefault &&
+          definition.code !== LEGACY_QUALITY_CODE,
+      )
+      .map(toDefinitionOption),
+    ...(showLegacyQualityValues ? buildLegacyQualityValueOptions() : []),
+  ];
+
   const awardOptions = definitions
     .filter((definition) => {
       if (!definition.isVisibleByDefault) {
@@ -80,7 +101,11 @@ export function buildAdminShowOptions(
       if (definition.category.code === CATEGORY_PUPN) {
         return false;
       }
-      if (definition.code === PLACEMENT_CODE || definition.code === PUPN_CODE) {
+      if (
+        definition.code === PLACEMENT_CODE ||
+        definition.code === PUPN_CODE ||
+        definition.code === LEGACY_QUALITY_CODE
+      ) {
         return false;
       }
       return true;
@@ -89,8 +114,9 @@ export function buildAdminShowOptions(
 
   const hasPupnDefinition = definitions.some(
     (definition) =>
-      definition.code === PUPN_CODE ||
-      definition.category.code === CATEGORY_PUPN,
+      (definition.code === PUPN_CODE ||
+        definition.category.code === CATEGORY_PUPN) &&
+      definition.isVisibleByDefault,
   );
   const pupnOptions = hasPupnDefinition ? buildPupnValueOptions() : [];
 

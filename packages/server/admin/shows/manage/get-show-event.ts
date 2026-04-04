@@ -27,6 +27,32 @@ function formatPlacement(value: number | null): string {
   return value == null ? "" : String(value);
 }
 
+function resolveCodeDisplay(value: string): string {
+  const normalizedValue = value.trim();
+  if (!normalizedValue) {
+    return "-";
+  }
+  return normalizedValue;
+}
+
+function formatClassDisplay(classCode: string, classPlacement: string): string {
+  const classText = resolveCodeDisplay(classCode);
+  if (classText === "-") {
+    return "-";
+  }
+
+  const normalizedPlacement = classPlacement.trim();
+  return normalizedPlacement
+    ? `${classText} ${normalizedPlacement}`
+    : classText;
+}
+
+function formatAwardsDisplay(awards: string[]): string[] {
+  return awards
+    .map((award) => award.trim())
+    .filter((award) => award.length > 0);
+}
+
 export async function getAdminShowEvent(
   input: AdminShowDetailsRequest,
   currentUser: CurrentUserDto | null,
@@ -126,19 +152,29 @@ export async function getAdminShowEvent(
         organizer: result.organizer ?? "",
         judge: result.judge ?? "",
         dogCount: result.dogCount,
-        entries: result.items.map((item) => ({
-          id: item.id,
-          registrationNo: item.registrationNo,
-          dogName: item.dogName,
-          judge: item.judge ?? "",
-          critiqueText: item.critiqueText ?? "",
-          heightCm: formatHeight(item.heightCm),
-          classCode: item.classCode ?? "",
-          qualityGrade: item.qualityGrade ?? "",
-          classPlacement: formatPlacement(item.classPlacement),
-          pupn: item.pupn ?? "",
-          awards: item.awards,
-        })),
+        entries: result.items.map((item) => {
+          const classCode = item.classCode ?? "";
+          const qualityGrade = item.qualityGrade ?? "";
+          const classPlacement = formatPlacement(item.classPlacement);
+          const pupn = item.pupn ?? "";
+          return {
+            id: item.id,
+            registrationNo: item.registrationNo,
+            dogName: item.dogName,
+            judge: item.judge ?? "",
+            critiqueText: item.critiqueText ?? "",
+            heightCm: formatHeight(item.heightCm),
+            classCode,
+            qualityGrade,
+            classPlacement,
+            pupn,
+            awards: item.awards,
+            classDisplay: formatClassDisplay(classCode, classPlacement),
+            qualityDisplay: resolveCodeDisplay(qualityGrade),
+            pupnDisplay: resolveCodeDisplay(pupn),
+            awardsDisplay: formatAwardsDisplay(item.awards),
+          };
+        }),
       },
       options: {
         classOptions: result.options.classOptions,

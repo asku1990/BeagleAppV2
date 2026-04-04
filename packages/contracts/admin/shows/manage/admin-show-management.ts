@@ -38,6 +38,10 @@ export type AdminShowEntry = {
   classPlacement: string;
   pupn: string;
   awards: string[];
+  classDisplay: string;
+  qualityDisplay: string;
+  pupnDisplay: string;
+  awardsDisplay: string[];
 };
 
 export type AdminShowResultOption = {

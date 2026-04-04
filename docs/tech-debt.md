@@ -26,6 +26,15 @@ Use this format for new entries:
 
 ## Entries
 
+## 2026-04-04 - Align show-definition visibility semantics
+
+- Area: `ShowResultDefinition` reads, projections, and admin UI option building.
+- Issue: The intended contract is that `isEnabled` controls whether a definition is active/fetchable and `isVisibleByDefault` only controls whether an enabled definition is shown by default, but parts of the current admin show projection still preserve historical values as a compatibility path.
+- Impact: The flags are easy to misread as overlapping behavior, which makes future edits risk reintroducing hidden definitions into option lists or dropping historical values unexpectedly.
+- Suggested fix: Normalize the active-read path so `isEnabled` is the primary gate for fetch/projection logic, keep `isVisibleByDefault` as UI-only default visibility, and document any historical-value compatibility behavior explicitly at the reader boundary.
+- Trigger to revisit: Next change touching admin show projection, option building, or show-definition seed semantics.
+- Ticket: BEJ-63 follow-up.
+
 ## 2026-03-29 - Clarify historical ShowResult migration artifacts
 
 - Area: Prisma migration history and schema documentation.

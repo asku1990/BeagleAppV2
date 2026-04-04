@@ -1,15 +1,12 @@
 import type { AdminShowResultOption } from "@beagle/contracts";
 import type {
-  ManageShowAward,
   ManageShowEditOptions,
   ManageShowEntry,
 } from "@/components/admin/shows/manage/show-management-types";
 
-// Builds option-safe display state for the admin show editor so persisted
-// values remain visible even when definitions are missing or have changed.
 export type OptionLabelLookup = Map<string, string>;
 
-export function ensureOptionExists(
+function ensureOptionExists(
   options: AdminShowResultOption[],
   value: string,
 ): AdminShowResultOption[] {
@@ -17,7 +14,7 @@ export function ensureOptionExists(
   if (!normalizedValue) {
     return options;
   }
-  if (options.some((option) => option.value === normalizedValue)) {
+  if (options.some((option) => option.value.trim() === normalizedValue)) {
     return options;
   }
 
@@ -25,26 +22,9 @@ export function ensureOptionExists(
     ...options,
     {
       value: normalizedValue,
-      label: `${normalizedValue} - Unknown current value`,
+      label: normalizedValue,
     },
   ];
-}
-
-export function getMissingAwardOptions(
-  options: AdminShowResultOption[],
-  awards: ManageShowAward[],
-): AdminShowResultOption[] {
-  const knownValues = new Set(options.map((option) => option.value));
-  const missingOptions = awards
-    .map((award) => award.code.trim())
-    .filter((value) => value.length > 0)
-    .filter((value) => !knownValues.has(value))
-    .map((value) => ({
-      value,
-      label: `${value} - Unknown current value`,
-    }));
-
-  return [...options, ...missingOptions];
 }
 
 export function createOptionLabelLookup(
@@ -64,9 +44,7 @@ export function resolveOptionLabel(
     return "-";
   }
 
-  return (
-    lookup.get(normalizedValue) ?? `${normalizedValue} - Unknown current value`
-  );
+  return lookup.get(normalizedValue) ?? normalizedValue;
 }
 
 export function buildEntryDisplayState(
@@ -81,10 +59,7 @@ export function buildEntryDisplayState(
     resultOptions.qualityOptions,
     entry.qualityGrade,
   );
-  const awardOptions = getMissingAwardOptions(
-    resultOptions.awardOptions,
-    entry.awards,
-  );
+  const awardOptions = resultOptions.awardOptions;
   const availableAwardOptions = awardOptions.filter(
     (option) =>
       !entry.awards.some((award) => award.code.trim() === option.value.trim()),

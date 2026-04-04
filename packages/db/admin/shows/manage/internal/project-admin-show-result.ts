@@ -8,6 +8,16 @@ import {
   type AdminShowResultItemDb,
 } from "./result-types";
 
+type AdminShowDetailSortRow = Pick<
+  AdminShowDetailsEntryRowDb,
+  | "qualityGrade"
+  | "classPlacement"
+  | "pupn"
+  | "awards"
+  | "dogName"
+  | "registrationNo"
+>;
+
 function toNumericValue(
   value: AdminShowResultItemDb["valueNumeric"],
 ): number | null {
@@ -75,15 +85,27 @@ export function projectAdminShowResult(items: AdminShowResultItemDb[]) {
     sortedItems.find(
       (item) =>
         item.definition.category.code === CATEGORY_QUALITY &&
-        item.definition.isVisibleByDefault,
+        item.definition.isVisibleByDefault &&
+        item.definition.code !== LEGACY_QUALITY_CODE,
     ) ?? null;
   const legacyQualityItem =
-    sortedItems.find((item) => item.definition.code === LEGACY_QUALITY_CODE) ??
-    null;
+    sortedItems.find(
+      (item) =>
+        item.definition.code === LEGACY_QUALITY_CODE &&
+        item.definition.isVisibleByDefault,
+    ) ?? null;
   const placementItem =
-    sortedItems.find((item) => item.definition.code === PLACEMENT_CODE) ?? null;
+    sortedItems.find(
+      (item) =>
+        item.definition.code === PLACEMENT_CODE &&
+        item.definition.isVisibleByDefault,
+    ) ?? null;
   const pupnItem =
-    sortedItems.find((item) => item.definition.code === PUPN_CODE) ?? null;
+    sortedItems.find(
+      (item) =>
+        item.definition.code === PUPN_CODE &&
+        item.definition.isVisibleByDefault,
+    ) ?? null;
 
   const classCode = classItem?.definition.code ?? null;
   const classPlacementValue = toNumericValue(
@@ -133,8 +155,8 @@ export function projectAdminShowResult(items: AdminShowResultItemDb[]) {
 }
 
 export function compareAdminShowDetailRows(
-  left: AdminShowDetailsEntryRowDb,
-  right: AdminShowDetailsEntryRowDb,
+  left: AdminShowDetailSortRow,
+  right: AdminShowDetailSortRow,
 ): number {
   const qualityComparison = (left.qualityGrade ?? "").localeCompare(
     right.qualityGrade ?? "",

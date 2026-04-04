@@ -6,7 +6,6 @@ import {
 } from "@db/core/date-only";
 import { prisma } from "@db/core/prisma";
 import type {
-  AdminShowDetailsEntryRowDb,
   AdminShowDetailsRequestDb,
   AdminShowDetailsResponseDb,
 } from "@db/admin/shows/manage/types";
@@ -113,7 +112,7 @@ export async function getAdminShowEventDetailsDb(
     return null;
   }
 
-  const items: AdminShowDetailsEntryRowDb[] = event.entries
+  const items = event.entries
     .map((row) => ({
       id: row.id,
       registrationNo: row.registrationNoSnapshot,

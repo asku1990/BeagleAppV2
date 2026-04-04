@@ -11,8 +11,6 @@ export {
 export {
   buildEntryDisplayState,
   createOptionLabelLookup,
-  ensureOptionExists,
-  getMissingAwardOptions,
   resolveOptionLabel,
 } from "./display";
 export {
