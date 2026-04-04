@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import {
   type AuditContextDb,
+  type ImportIssueSeverity,
   ImportKind,
   createImportRunIssue,
   createImportRunIssuesBulk,
@@ -10,7 +11,6 @@ import {
   markImportRunRunning,
   prisma,
 } from "@beagle/db";
-import type { ImportIssueSeverity } from "@beagle/db";
 import type { ImportRunResponse } from "@beagle/contracts";
 import type { ServiceResult } from "../../core/result";
 import {

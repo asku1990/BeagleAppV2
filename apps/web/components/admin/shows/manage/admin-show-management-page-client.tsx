@@ -2,15 +2,16 @@
 
 import React, { useState } from "react";
 import type { AdminShowEventSummary } from "@beagle/contracts";
-import { ListingSectionShell } from "@web/components/listing";
-import { Card, CardContent } from "@web/components/ui/card";
+import { ListingSectionShell } from "@/components/listing";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   toManageShowEditOptions,
   toManageShowEvent,
-} from "@web/lib/admin/shows/manage";
-import { useAdminShowEventQuery } from "@web/queries/admin/shows/manage/use-admin-show-event-query";
-import { useAdminShowEventsQuery } from "@web/queries/admin/shows/manage/use-admin-show-events-query";
-import { ShowManagementSearchPanel } from "./show-management-search-panel";
+} from "@/lib/admin/shows/manage";
+import { useAdminShowEventQuery } from "@/queries/admin/shows/manage/use-admin-show-event-query";
+import { useAdminShowEventsQuery } from "@/queries/admin/shows/manage/use-admin-show-events-query";
+import { ShowManagementFilters } from "./show-management-filters";
+import { ShowManagementResults } from "./show-management-results";
 import { ShowManagementSelectedEventPanel } from "./show-management-selected-event-panel";
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -74,64 +75,67 @@ export function AdminShowManagementPageClient() {
       </div>
 
       <ListingSectionShell
-        title="Event search"
-        subtitle="Search uses live event data plus dog counts from the admin read endpoint."
+        title="Events"
+        subtitle="Search and select a show event from the live admin read endpoint."
         count={`${searchQuery.data?.total ?? showEvents.length} events`}
       >
-        <div className="grid gap-3 lg:grid-cols-[1.1fr_1.5fr]">
-          <div className="space-y-3">
-            {searchQuery.isError && showEvents.length === 0 ? (
-              <Card>
-                <CardContent className="p-5 text-sm text-destructive">
-                  {searchErrorText}
-                </CardContent>
-              </Card>
-            ) : null}
+        <div className="space-y-3">
+          {searchQuery.isError && showEvents.length === 0 ? (
+            <Card>
+              <CardContent className="p-5 text-sm text-destructive">
+                {searchErrorText}
+              </CardContent>
+            </Card>
+          ) : null}
 
-            <ShowManagementSearchPanel
-              events={showEvents}
-              selectedEventId={selectedSummary?.showId}
-              query={query}
-              onQueryChange={setQuery}
-              onSelectEvent={(eventId) => setSelectedEventIdInput(eventId)}
+          <ShowManagementFilters query={query} onQueryChange={setQuery} />
+          <ShowManagementResults
+            events={showEvents}
+            selectedEventId={selectedSummary?.showId}
+            onSelectEvent={(eventId) => setSelectedEventIdInput(eventId)}
+          />
+        </div>
+      </ListingSectionShell>
+
+      <ListingSectionShell
+        title="Selected event details"
+        subtitle="Edit event-level fields and dog entries for the selected show event."
+      >
+        <div className="space-y-3">
+          {!shouldRenderInteractiveDetail ? (
+            <Card>
+              <CardContent className="p-5 text-sm text-muted-foreground">
+                Loading selected event details...
+              </CardContent>
+            </Card>
+          ) : detailQuery.isError ? (
+            <Card>
+              <CardContent className="p-5 text-sm text-destructive">
+                {detailErrorText}
+              </CardContent>
+            </Card>
+          ) : isDetailLoading ? (
+            <Card>
+              <CardContent className="p-5 text-sm text-muted-foreground">
+                Loading selected event details...
+              </CardContent>
+            </Card>
+          ) : selectedEvent ? (
+            <ShowManagementSelectedEventPanel
+              key={selectedEvent.id}
+              selectedEvent={selectedEvent}
+              selectedEventUpdatedAt={detailQuery.dataUpdatedAt}
+              resultOptions={resultOptions}
+              onSelectedEventIdChange={setSelectedEventIdInput}
             />
-          </div>
-
-          <div className="space-y-3">
-            {!shouldRenderInteractiveDetail ? (
-              <Card>
-                <CardContent className="p-5 text-sm text-muted-foreground">
-                  Loading selected event details...
-                </CardContent>
-              </Card>
-            ) : detailQuery.isError ? (
-              <Card>
-                <CardContent className="p-5 text-sm text-destructive">
-                  {detailErrorText}
-                </CardContent>
-              </Card>
-            ) : isDetailLoading ? (
-              <Card>
-                <CardContent className="p-5 text-sm text-muted-foreground">
-                  Loading selected event details...
-                </CardContent>
-              </Card>
-            ) : selectedEvent ? (
-              <ShowManagementSelectedEventPanel
-                selectedEvent={selectedEvent}
-                selectedEventUpdatedAt={detailQuery.dataUpdatedAt}
-                resultOptions={resultOptions}
-                onSelectedEventIdChange={setSelectedEventIdInput}
-              />
-            ) : (
-              <Card>
-                <CardContent className="p-5 text-sm text-muted-foreground">
-                  Search for an event and pick one from the results to inspect
-                  its entries.
-                </CardContent>
-              </Card>
-            )}
-          </div>
+          ) : (
+            <Card>
+              <CardContent className="p-5 text-sm text-muted-foreground">
+                Search for an event and pick one from the results to inspect its
+                entries.
+              </CardContent>
+            </Card>
+          )}
         </div>
       </ListingSectionShell>
     </div>

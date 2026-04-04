@@ -1,5 +1,8 @@
 import type { AdminShowWorkbookImportIssue } from "@beagle/contracts";
-import { normalizeWorkbookComparisonToken } from "../cell";
+import {
+  normalizeWorkbookComparisonToken,
+  normalizeWorkbookRegistrationNo,
+} from "../cell";
 import { checkExistingImportConflicts } from "../duplicates/check-existing-import-conflicts";
 import { buildColumnMap } from "../input/build-column-map";
 import { loadWorkbookLookupData } from "../input/load-workbook-lookup-data";
@@ -9,7 +12,6 @@ import { evaluateWorkbookRow } from "../rows/evaluate-workbook-row";
 import { buildWorkbookSchemaIssues } from "../schema/build-workbook-schema-issues";
 import { resolveWorkbookSchema } from "../schema/resolve-workbook-schema";
 import { ISSUE_CODES } from "../workbook-preview-constants";
-import { normalizeWorkbookRegistrationNo } from "../cell";
 import { mapWorkbookStructuralFieldKeyToTargetField } from "../workbook-preview-target-fields";
 import type {
   WorkbookColumnRuleMeta,

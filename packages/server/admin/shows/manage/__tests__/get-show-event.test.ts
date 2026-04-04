@@ -83,6 +83,7 @@ describe("getAdminShowEvent", () => {
       items: [
         {
           id: "entry-1",
+          dogId: "dog-1",
           registrationNo: "FI12345/21",
           dogName: "Aatu",
           judge: "Judge Main",
@@ -132,6 +133,7 @@ describe("getAdminShowEvent", () => {
             entries: [
               {
                 id: "entry-1",
+                dogId: "dog-1",
                 registrationNo: "FI12345/21",
                 dogName: "Aatu",
                 judge: "Judge Main",
@@ -180,6 +182,7 @@ describe("getAdminShowEvent", () => {
       items: [
         {
           id: "entry-2",
+          dogId: null,
           registrationNo: "FI99999/21",
           dogName: "Beta",
           judge: null,
@@ -233,6 +236,7 @@ describe("getAdminShowEvent", () => {
             entries: [
               {
                 id: "entry-2",
+                dogId: null,
                 registrationNo: "FI99999/21",
                 dogName: "Beta",
                 judge: "",

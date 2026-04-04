@@ -14,13 +14,19 @@ Developer notes for the admin show management flow.
 - `apps/web/app/(admin)/admin/shows/manage/page.tsx`: route entrypoint for the management page
 - `apps/web/components/admin/shows/manage/admin-show-management-page-client.tsx`: page shell, query wiring, and selected-event composition
 - `apps/web/components/admin/shows/manage/show-management-selected-event-panel.tsx`: selected-event presentation/controller wiring
-- `apps/web/hooks/admin/shows/manage/use-show-management-selected-event-state.ts`: selected-event draft state and local apply/reset behavior
-- `apps/web/components/admin/shows/manage/show-management-search-panel.tsx`: event search list
-- `apps/web/components/admin/shows/manage/show-management-editor-panel.tsx`: selected event and entry editor UI
-- `apps/web/components/admin/shows/manage/show-management-entry-card.tsx`: per-entry card composition
-- `apps/web/components/admin/shows/manage/internal/*`: entry header, summary, result fields, awards editor, and critique field
+- `apps/web/components/admin/shows/manage/show-management-filters.tsx`: search input
+- `apps/web/components/admin/shows/manage/show-management-results.tsx`: event result table/cards
+- `apps/web/components/admin/shows/manage/show-management-editor-panel.tsx`: selected-event editor composition
+- `apps/web/components/admin/shows/manage/show-management-event-modal.tsx`: event edit modal
+- `apps/web/components/admin/shows/manage/show-management-entry-modal.tsx`: entry edit modal
 - `apps/web/components/admin/shows/manage/show-management-remove-panel.tsx`: destructive remove confirmation
-- `apps/web/lib/admin/shows/manage/*`: shared draft mapping, display formatting, logging payloads, and entry update helpers
+- `apps/web/components/admin/shows/manage/internal/*`: feature-internal editor sections and entry form subcomponents
+- `apps/web/hooks/admin/shows/manage/use-show-management-selected-event-state.ts`: thin composer hook
+- `apps/web/hooks/admin/shows/manage/use-show-management-draft-state.ts`: draft state + dirty tracking
+- `apps/web/hooks/admin/shows/manage/use-show-management-mutation-flow.ts`: mutation orchestration + server-sync reconciliation
+- `apps/web/hooks/admin/shows/manage/use-unsaved-changes-unload-guard.ts`: beforeunload protection
+- `apps/web/lib/admin/shows/manage/*`: pure draft mapping, display formatting, and mutation-state helper utilities
+- `apps/web/components/admin/index.ts`: shared admin UI helper exports (`AdminFormModalShell`, `AdminRowActionsMenu`)
 - `apps/web/queries/admin/shows/manage/use-admin-show-events-query.ts`: list query hook
 - `apps/web/queries/admin/shows/manage/use-admin-show-event-query.ts`: detail query hook
 - `apps/web/app/actions/admin/shows/manage/*`: admin show mutation server actions
@@ -40,10 +46,11 @@ Developer notes for the admin show management flow.
 
 1. The page fetches event summaries through `useAdminShowEventsQuery`.
 2. The selected summary drives `useAdminShowEventQuery` for full event details.
-3. The search list renders contract summaries (`showId`, dates, place, city, name, type, organizer, judge, dog count).
-4. The detail panel maps contract entries and DB-driven result options into the local editor model so the UI can keep a draft copy separate from the loaded data.
-5. Feature-local hook state owns the selected-event draft lifecycle, while feature-local lib helpers own draft cloning, field updates, and label resolution.
-6. Apply/remove actions persist through mutations, then refetch selected event details and reconcile local draft state from server data.
+3. The page renders event results as a row-centric table/cards flow with action menus.
+4. Event and entry edits happen in modals; remove remains a scoped confirm modal.
+5. The detail panel maps contract entries and DB-driven result options into a local draft model (draft + applied snapshot).
+6. Draft state, mutation flow, and unload guard are separated into focused hooks; pure helper logic stays in feature lib helpers.
+7. Apply/remove actions persist through mutations, then refetch selected event details and reconcile local state from server data.
 
 ## Write foundations (backend)
 
@@ -106,6 +113,7 @@ The summary and detail models share the same event identity fields:
 
 The detail response adds `entries[]` with:
 
+- optional `dogId` (linked dog record id when available)
 - registration number
 - dog name
 - judge
@@ -145,15 +153,18 @@ That value belongs only on the selected event section.
 - The selected detail query is disabled until a non-empty `showId` exists.
 - The detail query trims the input `showId` before sending it to the API client.
 - Both queries use React Query with a 30 second stale time.
+- Admin show mutations invalidate admin show query roots.
+- Admin dog mutations also invalidate public show query roots to keep show pages fresh after dog identity edits.
 
 ## Render rules
 
-- Keep the search list and editor side by side on wide screens.
+- Keep event search/results and selected-event editing on the same page.
 - Show an empty message when there are no search results.
 - Show a loading state while the selected event details are still loading.
 - Show a descriptive error state if either search or detail loading fails.
 - Keep entry edits local until the user applies them through write mutations.
 - Keep the remove dialog scoped to the currently selected event entry.
+- Event and entry edits use modal forms.
 - Class and placement are edited as a compact paired row.
 - Placement uses a numeric field so values above `4` remain supported.
 - Quality is edited via a single-select control backed by `options`.
@@ -164,11 +175,12 @@ That value belongs only on the selected event section.
   instead of raw result codes. Unknown current values stay visible as
   `VALUE - Unknown current value`.
 - If result options are unavailable from DB, show an inline warning and keep option-driven controls disabled.
+- Each entry shows whether it is linked to a live dog record (`dogId`) or falls back to snapshot values.
 - Do not show release-style changelog copy for this page unless the feature is actually shipped.
 
 ## Local draft behavior
 
-- The page keeps an editable draft plus an applied snapshot per selected event.
+- The page keeps an editable draft plus an applied snapshot for the selected event.
 - Event-level and entry-level field edits update only the draft until apply.
 - Award add/remove actions are applied from parent draft state so quick
   consecutive chip edits do not replace awards from a stale child snapshot.
@@ -192,6 +204,7 @@ That value belongs only on the selected event section.
 - Event write behavior: `packages/db/admin/shows/manage/__tests__/update-show-event.test.ts`
 - Entry write behavior: `packages/db/admin/shows/manage/__tests__/update-show-entry.test.ts`
 - Entry delete write behavior: `packages/db/admin/shows/manage/__tests__/delete-show-entry.test.ts`
+- Dog mutation invalidation behavior: `apps/web/queries/admin/dogs/manage/__tests__/use-*-admin-dog-mutation.test.ts`
 
 ## When to update this doc
 

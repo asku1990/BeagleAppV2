@@ -48,6 +48,7 @@ export function toManageShowEvent(
     judge: show.judge,
     entries: show.entries.map((entry) => ({
       ...entry,
+      dogId: entry.dogId ?? null,
       awards: mapAwardCodesToDraftAwards(entry.id, entry.awards),
     })),
   };

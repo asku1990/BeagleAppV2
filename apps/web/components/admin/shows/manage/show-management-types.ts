@@ -7,6 +7,7 @@ export type ManageShowAward = {
 
 export type ManageShowEntry = {
   id: string;
+  dogId?: string | null;
   registrationNo: string;
   dogName: string;
   judge: string;

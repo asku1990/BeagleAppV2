@@ -16,11 +16,11 @@ const {
   deleteEntryMutationMock: vi.fn(),
 }));
 
-vi.mock("@web/queries/admin/shows/manage/use-admin-show-events-query", () => ({
+vi.mock("@/queries/admin/shows/manage/use-admin-show-events-query", () => ({
   useAdminShowEventsQuery: searchQueryMock,
 }));
 
-vi.mock("@web/queries/admin/shows/manage/use-admin-show-event-query", () => ({
+vi.mock("@/queries/admin/shows/manage/use-admin-show-event-query", () => ({
   useAdminShowEventQuery: detailQueryMock,
 }));
 
@@ -30,12 +30,19 @@ vi.mock("@/queries/admin/shows", () => ({
   useDeleteAdminShowEntryMutation: deleteEntryMutationMock,
 }));
 
-vi.mock("@web/components/listing", () => ({
+vi.mock("@/components/listing", () => ({
   ListingSectionShell: ({ children }: { children: React.ReactNode }) =>
     React.createElement("section", null, children),
+  ListingResponsiveResults: ({
+    desktop,
+    mobile,
+  }: {
+    desktop: React.ReactNode;
+    mobile: React.ReactNode;
+  }) => React.createElement(React.Fragment, null, desktop, mobile),
 }));
 
-vi.mock("@web/components/ui/button", () => ({
+vi.mock("@/components/ui/button", () => ({
   Button: ({
     children,
     asChild,
@@ -53,19 +60,19 @@ vi.mock("@web/components/ui/button", () => ({
         ),
 }));
 
-vi.mock("@web/components/ui/card", () => ({
+vi.mock("@/components/ui/card", () => ({
   Card: ({ children }: { children: React.ReactNode }) =>
     React.createElement("section", null, children),
   CardContent: ({ children }: { children: React.ReactNode }) =>
     React.createElement("div", null, children),
 }));
 
-vi.mock("@web/components/ui/input", () => ({
+vi.mock("@/components/ui/input", () => ({
   Input: (props: Record<string, unknown>) =>
     React.createElement("input", props as Record<string, string>),
 }));
 
-vi.mock("@web/components/ui/separator", () => ({
+vi.mock("@/components/ui/separator", () => ({
   Separator: () => React.createElement("hr", null),
 }));
 

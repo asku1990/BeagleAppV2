@@ -34,6 +34,7 @@ export type AdminShowDetailsRequestDb = {
 
 export type AdminShowDetailsEntryRowDb = {
   id: string;
+  dogId: string | null;
   registrationNo: string;
   dogName: string;
   judge: string | null;

@@ -100,11 +100,16 @@ describe("getAdminShowEventDetailsDb", () => {
       entries: [
         {
           id: "entry-1",
+          dogId: "dog-1",
           judge: "Anna Judge",
           critiqueText: "Erittäin tasapainoinen esiintyminen.",
           heightText: "39.5 cm",
           registrationNoSnapshot: "FI12345/21",
           dogNameSnapshot: "Metsapolun Kide",
+          dog: {
+            name: "Updated Kide",
+            registrations: [{ registrationNo: "FI12345/21" }],
+          },
           resultItems: [
             {
               valueCode: "PU",
@@ -160,8 +165,9 @@ describe("getAdminShowEventDetailsDb", () => {
       items: [
         {
           id: "entry-1",
+          dogId: "dog-1",
           registrationNo: "FI12345/21",
-          dogName: "Metsapolun Kide",
+          dogName: "Updated Kide",
           judge: "Anna Judge",
           critiqueText: "Erittäin tasapainoinen esiintyminen.",
           heightCm: 39.5,
@@ -316,11 +322,13 @@ describe("getAdminShowEventDetailsDb", () => {
       entries: [
         {
           id: "entry-legacy",
+          dogId: null,
           judge: "Legacy Judge",
           critiqueText: null,
           heightText: null,
           registrationNoSnapshot: "FIN41334/97",
           dogNameSnapshot: "Legacy Dog",
+          dog: null,
           resultItems: [
             {
               valueCode: null,
@@ -359,6 +367,7 @@ describe("getAdminShowEventDetailsDb", () => {
 
     expect(result?.items[0]).toEqual({
       id: "entry-legacy",
+      dogId: null,
       registrationNo: "FIN41334/97",
       dogName: "Legacy Dog",
       judge: "Legacy Judge",

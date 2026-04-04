@@ -17,6 +17,10 @@ import {
   beagleNewestQueryKeyRoot,
   beagleSearchQueryKeyRoot,
 } from "@/queries/public/beagle/search/query-keys";
+import {
+  beagleShowDetailsQueryKeyRoot,
+  beagleShowSearchQueryKeyRoot,
+} from "@/queries/public/beagle/shows/query-keys";
 import { homeStatisticsQueryKey } from "@/queries/public/home/statistics/query-keys";
 
 export function useDeleteAdminDogMutation() {
@@ -54,6 +58,12 @@ export function useDeleteAdminDogMutation() {
       });
       await queryClient.invalidateQueries({
         queryKey: beagleNewestQueryKeyRoot,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: beagleShowSearchQueryKeyRoot,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: beagleShowDetailsQueryKeyRoot,
       });
       await queryClient.invalidateQueries({
         queryKey: homeStatisticsQueryKey,

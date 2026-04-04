@@ -1,11 +1,15 @@
 "use client";
 
-import React from "react";
-import { Button } from "@web/components/ui/button";
-import { Card, CardContent } from "@web/components/ui/card";
-import { Input } from "@web/components/ui/input";
-import { Separator } from "@web/components/ui/separator";
-import { ShowManagementEntryCard } from "./show-management-entry-card";
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { buildEntryDisplayState } from "@/lib/admin/shows/manage";
+import { ShowManagementEntryResults } from "./internal/show-management-entry-results";
+import { ShowManagementSelectedEventHeader } from "./internal/show-management-selected-event-header";
+import { ShowManagementStatusFooter } from "./internal/show-management-status-footer";
+import { ShowManagementEntryModal } from "./show-management-entry-modal";
+import { ShowManagementEventModal } from "./show-management-event-modal";
 import type {
   ManageShowEditOptions,
   ManageShowEntry,
@@ -56,6 +60,9 @@ export function ShowManagementEditorPanel({
   applyingEntryId,
   isRemovingEntry,
 }: ShowManagementEditorPanelProps) {
+  const [isEventModalOpen, setEventModalOpen] = useState(false);
+  const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
+
   if (!selectedEvent) {
     return (
       <Card>
@@ -69,102 +76,48 @@ export function ShowManagementEditorPanel({
   const isEventInputsDisabled = isApplyingEvent;
   const isResetDisabled =
     isApplyingEvent || Boolean(applyingEntryId) || isRemovingEntry;
+  const editingEntry =
+    selectedEvent.entries.find((entry) => entry.id === editingEntryId) ?? null;
+  const isEditingEntryDirty = editingEntry
+    ? dirtyEntryIds.includes(editingEntry.id)
+    : false;
+  const entryDisplayStates = selectedEvent.entries.reduce<
+    Record<
+      string,
+      {
+        classResultText: string;
+        qualityText: string;
+        pupnText: string;
+        awardsText: string;
+      }
+    >
+  >((accumulator, entry) => {
+    const displayState = buildEntryDisplayState(entry, resultOptions);
+    accumulator[entry.id] = {
+      classResultText: displayState.selectedClassResultText,
+      qualityText: displayState.selectedQualityText,
+      pupnText: displayState.selectedPupnText,
+      awardsText: displayState.selectedAwardsText,
+    };
+    return accumulator;
+  }, {});
+
+  function openEntryEditor(entryId: string) {
+    if (isApplyingEvent || isRemovingEntry || Boolean(applyingEntryId)) {
+      return;
+    }
+    setEditingEntryId(entryId);
+  }
 
   return (
     <Card>
       <CardContent className="space-y-4 pt-5">
-        <div className="space-y-1">
-          <p className="text-sm text-muted-foreground">Selected event</p>
-          <h2 className="text-lg font-semibold">{selectedEvent.eventPlace}</h2>
-          <p className="text-sm text-muted-foreground">
-            {selectedEvent.eventDate} · {selectedEvent.eventName}
-          </p>
-        </div>
-
-        <div className="grid gap-3 md:grid-cols-2">
-          <label className="space-y-1 text-sm">
-            <span>Date</span>
-            <Input
-              value={selectedEvent.eventDate}
-              disabled={isEventInputsDisabled}
-              onChange={(event) =>
-                onEventFieldChange("eventDate", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span>Place</span>
-            <Input
-              value={selectedEvent.eventPlace}
-              disabled={isEventInputsDisabled}
-              onChange={(event) =>
-                onEventFieldChange("eventPlace", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span>City</span>
-            <Input
-              value={selectedEvent.eventCity}
-              disabled={isEventInputsDisabled}
-              onChange={(event) =>
-                onEventFieldChange("eventCity", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span>Type</span>
-            <Input
-              value={selectedEvent.eventType}
-              disabled={isEventInputsDisabled}
-              onChange={(event) =>
-                onEventFieldChange("eventType", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span>Name</span>
-            <Input
-              value={selectedEvent.eventName}
-              disabled={isEventInputsDisabled}
-              onChange={(event) =>
-                onEventFieldChange("eventName", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span>Organizer</span>
-            <Input
-              value={selectedEvent.organizer}
-              disabled={isEventInputsDisabled}
-              onChange={(event) =>
-                onEventFieldChange("organizer", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm md:col-span-2">
-            <span>Judge</span>
-            <Input
-              value={selectedEvent.judge}
-              disabled={isEventInputsDisabled}
-              onChange={(event) =>
-                onEventFieldChange("judge", event.target.value)
-              }
-            />
-          </label>
-        </div>
-
-        {isEventDirty ? (
-          <div className="flex justify-end">
-            <Button
-              type="button"
-              onClick={onApplyEvent}
-              disabled={isApplyingEvent}
-            >
-              {isApplyingEvent ? "Saving event..." : "Apply event changes"}
-            </Button>
-          </div>
-        ) : null}
+        <ShowManagementSelectedEventHeader
+          selectedEvent={selectedEvent}
+          isEventDirty={isEventDirty}
+          isEditDisabled={isEventInputsDisabled || Boolean(applyingEntryId)}
+          onEdit={() => setEventModalOpen(true)}
+        />
 
         <Separator />
 
@@ -186,32 +139,44 @@ export function ShowManagementEditorPanel({
             </Button>
           </div>
 
-          <div className="space-y-3">
-            {selectedEvent.entries.map((entry) => (
-              <ShowManagementEntryCard
-                key={entry.id}
-                entry={entry}
-                resultOptions={resultOptions}
-                isDirty={dirtyEntryIds.includes(entry.id)}
-                onEntryFieldChange={onEntryFieldChange}
-                onAddAward={onAddAward}
-                onRemoveAward={onRemoveAward}
-                onRemove={onRequestRemoveEntry}
-                onApply={onApplyEntry}
-                isApplying={isApplyingEvent || applyingEntryId === entry.id}
-                isRemovingDisabled={isApplyingEvent || isRemovingEntry}
-              />
-            ))}
-          </div>
+          <ShowManagementEntryResults
+            entries={selectedEvent.entries}
+            entryDisplayStates={entryDisplayStates}
+            dirtyEntryIds={dirtyEntryIds}
+            isApplyingEvent={isApplyingEvent}
+            isRemovingEntry={isRemovingEntry}
+            applyingEntryId={applyingEntryId}
+            onEditEntry={openEntryEditor}
+            onRemoveEntry={onRequestRemoveEntry}
+          />
         </div>
 
         <Separator />
 
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-muted-foreground">
-            {statusText || "No unsaved changes."}
-          </p>
-        </div>
+        <ShowManagementStatusFooter statusText={statusText} />
+
+        <ShowManagementEventModal
+          open={isEventModalOpen}
+          selectedEvent={selectedEvent}
+          isDirty={isEventDirty}
+          isApplying={isApplyingEvent}
+          onClose={() => setEventModalOpen(false)}
+          onEventFieldChange={onEventFieldChange}
+          onApplyEvent={onApplyEvent}
+        />
+
+        <ShowManagementEntryModal
+          open={Boolean(editingEntry)}
+          entry={editingEntry}
+          resultOptions={resultOptions}
+          isDirty={isEditingEntryDirty}
+          isApplying={isApplyingEvent || applyingEntryId === editingEntry?.id}
+          onClose={() => setEditingEntryId(null)}
+          onEntryFieldChange={onEntryFieldChange}
+          onAddAward={onAddAward}
+          onRemoveAward={onRemoveAward}
+          onApplyEntry={onApplyEntry}
+        />
       </CardContent>
     </Card>
   );

@@ -159,6 +159,7 @@ export async function getAdminShowEvent(
           const pupn = item.pupn ?? "";
           return {
             id: item.id,
+            dogId: item.dogId,
             registrationNo: item.registrationNo,
             dogName: item.dogName,
             judge: item.judge ?? "",

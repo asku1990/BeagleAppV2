@@ -28,6 +28,7 @@ export type AdminShowSearchResponse = {
 
 export type AdminShowEntry = {
   id: string;
+  dogId?: string | null;
   registrationNo: string;
   dogName: string;
   judge: string;
