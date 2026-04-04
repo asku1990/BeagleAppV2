@@ -22,6 +22,7 @@ async function resolveTargetEvent(
     entries: {
       select: {
         id: true,
+        judge: true,
         entryLookupKey: true,
         registrationNoSnapshot: true,
         resultItems: {
@@ -39,6 +40,7 @@ async function resolveTargetEvent(
     eventLookupKey: string;
     entries: Array<{
       id: string;
+      judge: string | null;
       entryLookupKey: string;
       registrationNoSnapshot: string;
       resultItems: Array<{
@@ -109,6 +111,28 @@ async function syncLookupKeysAfterEventMove(
   }
 }
 
+async function syncEntryJudgeAfterEventUpdate(
+  tx: Prisma.TransactionClient,
+  input: {
+    targetJudge: string | null;
+    entries: Array<{
+      id: string;
+      judge: string | null;
+    }>;
+  },
+): Promise<void> {
+  for (const entry of input.entries) {
+    if (entry.judge === input.targetJudge) {
+      continue;
+    }
+
+    await tx.showEntry.update({
+      where: { id: entry.id },
+      data: { judge: input.targetJudge },
+    });
+  }
+}
+
 export async function updateAdminShowEventWriteDb(
   input: UpdateAdminShowEventWriteRequestDb,
 ): Promise<UpdateAdminShowEventWriteResultDb> {
@@ -160,6 +184,10 @@ export async function updateAdminShowEventWriteDb(
       nextEventLookupKey: input.nextEventLookupKey,
       entries: targetEvent.entries,
     });
+    await syncEntryJudgeAfterEventUpdate(tx, {
+      targetJudge: input.nextJudge,
+      entries: targetEvent.entries,
+    });
 
     const row: UpdatedAdminShowEventRowDb = {
       eventKey: updatedEvent.eventLookupKey,
@@ -169,6 +197,7 @@ export async function updateAdminShowEventWriteDb(
       eventName: updatedEvent.eventName,
       eventType: updatedEvent.eventType,
       organizer: updatedEvent.organizer,
+      judge: input.nextJudge,
     };
 
     return { status: "updated", row };

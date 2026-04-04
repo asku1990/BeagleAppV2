@@ -33,6 +33,9 @@ type ShowManagementEditorPanelProps = {
   onRequestRemoveEntry: (entry: ManageShowEntry) => void;
   onResetShell: () => void;
   statusText: string;
+  isApplyingEvent: boolean;
+  applyingEntryId: string | null;
+  isRemovingEntry: boolean;
 };
 
 export function ShowManagementEditorPanel({
@@ -49,6 +52,9 @@ export function ShowManagementEditorPanel({
   onRequestRemoveEntry,
   onResetShell,
   statusText,
+  isApplyingEvent,
+  applyingEntryId,
+  isRemovingEntry,
 }: ShowManagementEditorPanelProps) {
   if (!selectedEvent) {
     return (
@@ -59,6 +65,10 @@ export function ShowManagementEditorPanel({
       </Card>
     );
   }
+
+  const isEventInputsDisabled = isApplyingEvent;
+  const isResetDisabled =
+    isApplyingEvent || Boolean(applyingEntryId) || isRemovingEntry;
 
   return (
     <Card>
@@ -76,6 +86,7 @@ export function ShowManagementEditorPanel({
             <span>Date</span>
             <Input
               value={selectedEvent.eventDate}
+              disabled={isEventInputsDisabled}
               onChange={(event) =>
                 onEventFieldChange("eventDate", event.target.value)
               }
@@ -85,6 +96,7 @@ export function ShowManagementEditorPanel({
             <span>Place</span>
             <Input
               value={selectedEvent.eventPlace}
+              disabled={isEventInputsDisabled}
               onChange={(event) =>
                 onEventFieldChange("eventPlace", event.target.value)
               }
@@ -94,6 +106,7 @@ export function ShowManagementEditorPanel({
             <span>City</span>
             <Input
               value={selectedEvent.eventCity}
+              disabled={isEventInputsDisabled}
               onChange={(event) =>
                 onEventFieldChange("eventCity", event.target.value)
               }
@@ -103,6 +116,7 @@ export function ShowManagementEditorPanel({
             <span>Type</span>
             <Input
               value={selectedEvent.eventType}
+              disabled={isEventInputsDisabled}
               onChange={(event) =>
                 onEventFieldChange("eventType", event.target.value)
               }
@@ -112,6 +126,7 @@ export function ShowManagementEditorPanel({
             <span>Name</span>
             <Input
               value={selectedEvent.eventName}
+              disabled={isEventInputsDisabled}
               onChange={(event) =>
                 onEventFieldChange("eventName", event.target.value)
               }
@@ -121,6 +136,7 @@ export function ShowManagementEditorPanel({
             <span>Organizer</span>
             <Input
               value={selectedEvent.organizer}
+              disabled={isEventInputsDisabled}
               onChange={(event) =>
                 onEventFieldChange("organizer", event.target.value)
               }
@@ -130,6 +146,7 @@ export function ShowManagementEditorPanel({
             <span>Judge</span>
             <Input
               value={selectedEvent.judge}
+              disabled={isEventInputsDisabled}
               onChange={(event) =>
                 onEventFieldChange("judge", event.target.value)
               }
@@ -139,8 +156,12 @@ export function ShowManagementEditorPanel({
 
         {isEventDirty ? (
           <div className="flex justify-end">
-            <Button type="button" onClick={onApplyEvent}>
-              Apply event changes
+            <Button
+              type="button"
+              onClick={onApplyEvent}
+              disabled={isApplyingEvent}
+            >
+              {isApplyingEvent ? "Saving event..." : "Apply event changes"}
             </Button>
           </div>
         ) : null}
@@ -155,7 +176,12 @@ export function ShowManagementEditorPanel({
                 {selectedEvent.entries.length} dogs
               </p>
             </div>
-            <Button type="button" variant="outline" onClick={onResetShell}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onResetShell}
+              disabled={isResetDisabled}
+            >
               Reset changes
             </Button>
           </div>
@@ -172,6 +198,8 @@ export function ShowManagementEditorPanel({
                 onRemoveAward={onRemoveAward}
                 onRemove={onRequestRemoveEntry}
                 onApply={onApplyEntry}
+                isApplying={isApplyingEvent || applyingEntryId === entry.id}
+                isRemovingDisabled={isApplyingEvent || isRemovingEntry}
               />
             ))}
           </div>

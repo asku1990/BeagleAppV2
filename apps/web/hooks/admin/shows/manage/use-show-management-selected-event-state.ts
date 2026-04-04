@@ -13,21 +13,46 @@ import {
   removeEntryAward,
   updateDraftEntryField,
   updateDraftEventField,
-  updateEntry,
 } from "@web/lib/admin/shows/manage";
+import { toast } from "@/components/ui/sonner";
+import { AdminMutationError } from "@/queries/admin/mutation-error";
+import {
+  useDeleteAdminShowEntryMutation,
+  useUpdateAdminShowEntryMutation,
+  useUpdateAdminShowEventMutation,
+} from "@/queries/admin/shows";
 import type {
   ManageShowEntry,
   ManageShowEvent,
 } from "@/components/admin/shows/manage/show-management-types";
 
+type PendingServerSync = {
+  targetShowId: string;
+  baselineUpdatedAt: number;
+  statusText: string;
+  successToast: string;
+  clearPendingRemoval: boolean;
+};
+
 export function useShowManagementSelectedEventState({
   selectedEvent,
+  selectedEventUpdatedAt,
+  onSelectedEventIdChange,
 }: {
   selectedEvent: ManageShowEvent;
+  selectedEventUpdatedAt: number;
+  onSelectedEventIdChange: (nextShowId: string) => void;
 }) {
   const [eventStateById, setEventStateById] = useState(() => ({
     [selectedEvent.id]: createEventLocalState(selectedEvent),
   }));
+  const [applyingEntryId, setApplyingEntryId] = useState<string | null>(null);
+  const [isRemovingEntry, setIsRemovingEntry] = useState(false);
+  const [pendingServerSync, setPendingServerSync] =
+    useState<PendingServerSync | null>(null);
+  const updateEventMutation = useUpdateAdminShowEventMutation();
+  const updateEntryMutation = useUpdateAdminShowEntryMutation();
+  const deleteEntryMutation = useDeleteAdminShowEntryMutation();
 
   const selectedEventState =
     eventStateById[selectedEvent.id] ?? createEventLocalState(selectedEvent);
@@ -49,7 +74,56 @@ export function useShowManagementSelectedEventState({
 
   const dirtyEntryIds = getDirtyEntryIds(draftEvent, appliedEvent);
   const isEventDirty = !areShowEventFieldsEqual(draftEvent, appliedEvent);
+  const isApplyingEvent = updateEventMutation.isPending;
+  const isSyncingAfterSave = pendingServerSync !== null;
   const hasUnsavedChanges = isEventDirty || dirtyEntryIds.length > 0;
+
+  function toMutationErrorMessage(error: unknown, fallback: string): string {
+    if (error instanceof AdminMutationError) {
+      return error.message || fallback;
+    }
+    if (error instanceof Error && error.message) {
+      return error.message;
+    }
+    return fallback;
+  }
+
+  useEffect(() => {
+    setEventStateById((current) => {
+      if (current[selectedEvent.id]) {
+        return current;
+      }
+      return {
+        ...current,
+        [selectedEvent.id]: createEventLocalState(selectedEvent),
+      };
+    });
+  }, [selectedEvent]);
+
+  useEffect(() => {
+    if (!pendingServerSync) {
+      return;
+    }
+    if (pendingServerSync.targetShowId !== selectedEvent.id) {
+      return;
+    }
+    if (selectedEventUpdatedAt <= pendingServerSync.baselineUpdatedAt) {
+      return;
+    }
+
+    setEventStateById((current) => ({
+      ...current,
+      [selectedEvent.id]: {
+        ...createEventLocalState(selectedEvent),
+        pendingRemovalEntry: pendingServerSync.clearPendingRemoval
+          ? null
+          : (current[selectedEvent.id]?.pendingRemovalEntry ?? null),
+        statusText: pendingServerSync.statusText,
+      },
+    }));
+    toast.success(pendingServerSync.successToast);
+    setPendingServerSync(null);
+  }, [pendingServerSync, selectedEvent, selectedEventUpdatedAt]);
 
   useEffect(() => {
     function onBeforeUnload(event: BeforeUnloadEvent) {
@@ -69,6 +143,9 @@ export function useShowManagementSelectedEventState({
     field: keyof Omit<ManageShowEvent, "id" | "entries">,
     value: string,
   ) {
+    if (isApplyingEvent || isSyncingAfterSave) {
+      return;
+    }
     updateSelectedEventState((current) =>
       updateDraftEventField(current, field, value),
     );
@@ -79,12 +156,28 @@ export function useShowManagementSelectedEventState({
     field: keyof Omit<ManageShowEntry, "id" | "awards">,
     value: string,
   ) {
+    if (
+      isApplyingEvent ||
+      isRemovingEntry ||
+      isSyncingAfterSave ||
+      applyingEntryId === entryId
+    ) {
+      return;
+    }
     updateSelectedEventState((current) =>
       updateDraftEntryField(current, entryId, field, value),
     );
   }
 
   function handleAddAward(entryId: string, awardCode: string) {
+    if (
+      isApplyingEvent ||
+      isRemovingEntry ||
+      isSyncingAfterSave ||
+      applyingEntryId === entryId
+    ) {
+      return;
+    }
     updateSelectedEventState((current) => {
       const nextAward = createManageShowAward(
         `${entryId}:${awardCode.trim()}`,
@@ -107,6 +200,14 @@ export function useShowManagementSelectedEventState({
   }
 
   function handleRemoveAward(entryId: string, awardId: string) {
+    if (
+      isApplyingEvent ||
+      isRemovingEntry ||
+      isSyncingAfterSave ||
+      applyingEntryId === entryId
+    ) {
+      return;
+    }
     updateSelectedEventState((current) => {
       const nextEntries = removeEntryAward(
         current.draftEvent.entries,
@@ -124,38 +225,108 @@ export function useShowManagementSelectedEventState({
     });
   }
 
-  function handleApplyEvent() {
-    updateSelectedEventState((current) => ({
-      ...current,
-      appliedEvent: {
-        ...cloneManageShowEvent(current.appliedEvent),
-        eventDate: current.draftEvent.eventDate,
-        eventPlace: current.draftEvent.eventPlace,
-        eventCity: current.draftEvent.eventCity,
-        eventName: current.draftEvent.eventName,
-        eventType: current.draftEvent.eventType,
-        organizer: current.draftEvent.organizer,
-        judge: current.draftEvent.judge,
-      },
-      statusText: `${current.draftEvent.eventPlace} event changes applied locally.`,
-    }));
+  async function handleApplyEvent() {
+    if (
+      isApplyingEvent ||
+      isSyncingAfterSave ||
+      applyingEntryId ||
+      isRemovingEntry
+    ) {
+      return;
+    }
+
+    const eventSnapshot = selectedEventState.draftEvent;
+    try {
+      const response = await updateEventMutation.mutateAsync({
+        showId: eventSnapshot.id,
+        eventDate: eventSnapshot.eventDate,
+        eventPlace: eventSnapshot.eventPlace,
+        eventCity: eventSnapshot.eventCity,
+        eventName: eventSnapshot.eventName,
+        eventType: eventSnapshot.eventType,
+        organizer: eventSnapshot.organizer,
+        judge: eventSnapshot.judge,
+      });
+
+      if (response.showId !== eventSnapshot.id) {
+        onSelectedEventIdChange(response.showId);
+      }
+      setPendingServerSync({
+        targetShowId: response.showId,
+        baselineUpdatedAt: selectedEventUpdatedAt,
+        statusText: `${response.eventPlace} event changes saved.`,
+        successToast: "Event changes saved.",
+        clearPendingRemoval: false,
+      });
+    } catch (error) {
+      toast.error(
+        toMutationErrorMessage(error, "Failed to save event changes."),
+      );
+      updateSelectedEventState((current) => ({
+        ...current,
+        statusText: toMutationErrorMessage(
+          error,
+          "Failed to save event changes.",
+        ),
+      }));
+    }
   }
 
-  function handleApplyEntry(entry: ManageShowEntry) {
+  async function handleApplyEntry(entry: ManageShowEntry) {
+    if (
+      isApplyingEvent ||
+      isSyncingAfterSave ||
+      isRemovingEntry ||
+      applyingEntryId
+    ) {
+      return;
+    }
+
     const applied = getAppliedEntry(appliedEvent, entry.id);
     if (applied && areShowEntriesEqual(entry, applied)) {
       return;
     }
 
-    const { id: entryId, ...entryPatch } = entry;
-    updateSelectedEventState((current) => ({
-      ...current,
-      appliedEvent: {
-        ...cloneManageShowEvent(current.appliedEvent),
-        entries: updateEntry(current.appliedEvent.entries, entryId, entryPatch),
-      },
-      statusText: `${entry.dogName} changes applied locally.`,
-    }));
+    const eventSnapshot = selectedEventState.draftEvent;
+    setApplyingEntryId(entry.id);
+    try {
+      await updateEntryMutation.mutateAsync({
+        showId: eventSnapshot.id,
+        entryId: entry.id,
+        judge: entry.judge,
+        critiqueText: entry.critiqueText,
+        heightCm: entry.heightCm,
+        classCode: entry.classCode,
+        qualityGrade: entry.qualityGrade,
+        classPlacement: entry.classPlacement,
+        pupn: entry.pupn,
+        awards: entry.awards.map((award) => award.code),
+      });
+
+      setPendingServerSync({
+        targetShowId: eventSnapshot.id,
+        baselineUpdatedAt: selectedEventUpdatedAt,
+        statusText: `${entry.dogName} changes saved.`,
+        successToast: `${entry.dogName} changes saved.`,
+        clearPendingRemoval: false,
+      });
+    } catch (error) {
+      toast.error(
+        toMutationErrorMessage(
+          error,
+          `Failed to save ${entry.dogName} changes.`,
+        ),
+      );
+      updateSelectedEventState((current) => ({
+        ...current,
+        statusText: toMutationErrorMessage(
+          error,
+          `Failed to save ${entry.dogName} changes.`,
+        ),
+      }));
+    } finally {
+      setApplyingEntryId(null);
+    }
   }
 
   function handleRequestRemoveEntry(entry: ManageShowEntry) {
@@ -176,28 +347,49 @@ export function useShowManagementSelectedEventState({
     }));
   }
 
-  function handleConfirmRemove() {
-    if (!pendingRemovalEntry) {
+  async function handleConfirmRemove() {
+    if (
+      !pendingRemovalEntry ||
+      isApplyingEvent ||
+      isSyncingAfterSave ||
+      isRemovingEntry ||
+      applyingEntryId
+    ) {
       return;
     }
 
-    updateSelectedEventState((current) => ({
-      ...current,
-      draftEvent: {
-        ...cloneManageShowEvent(current.draftEvent),
-        entries: current.draftEvent.entries.filter(
-          (entry) => entry.id !== pendingRemovalEntry.entryId,
+    const eventSnapshot = selectedEventState.draftEvent;
+    const pendingSnapshot = pendingRemovalEntry;
+    setIsRemovingEntry(true);
+    try {
+      await deleteEntryMutation.mutateAsync({
+        showId: eventSnapshot.id,
+        entryId: pendingSnapshot.entryId,
+      });
+      setPendingServerSync({
+        targetShowId: eventSnapshot.id,
+        baselineUpdatedAt: selectedEventUpdatedAt,
+        statusText: `${pendingSnapshot.dogName} removed from the selected event.`,
+        successToast: `${pendingSnapshot.dogName} removed from the selected event.`,
+        clearPendingRemoval: true,
+      });
+    } catch (error) {
+      toast.error(
+        toMutationErrorMessage(
+          error,
+          `Failed to remove ${pendingSnapshot.dogName} from the event.`,
         ),
-      },
-      appliedEvent: {
-        ...cloneManageShowEvent(current.appliedEvent),
-        entries: current.appliedEvent.entries.filter(
-          (entry) => entry.id !== pendingRemovalEntry.entryId,
+      );
+      updateSelectedEventState((current) => ({
+        ...current,
+        statusText: toMutationErrorMessage(
+          error,
+          `Failed to remove ${pendingSnapshot.dogName} from the event.`,
         ),
-      },
-      statusText: `${pendingRemovalEntry.dogName} removed from the selected event.`,
-      pendingRemovalEntry: null,
-    }));
+      }));
+    } finally {
+      setIsRemovingEntry(false);
+    }
   }
 
   function handleResetShell() {
@@ -218,6 +410,10 @@ export function useShowManagementSelectedEventState({
     statusText,
     dirtyEntryIds,
     isEventDirty,
+    isApplyingEvent,
+    isSyncingAfterSave,
+    applyingEntryId,
+    isRemovingEntry,
     handleEventFieldChange,
     handleEntryFieldChange,
     handleAddAward,

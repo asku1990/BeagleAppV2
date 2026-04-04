@@ -1,11 +1,19 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AdminShowManagementPageClient } from "../admin-show-management-page-client";
 
-const { searchQueryMock, detailQueryMock } = vi.hoisted(() => ({
+const {
+  searchQueryMock,
+  detailQueryMock,
+  updateEventMutationMock,
+  updateEntryMutationMock,
+  deleteEntryMutationMock,
+} = vi.hoisted(() => ({
   searchQueryMock: vi.fn(),
   detailQueryMock: vi.fn(),
+  updateEventMutationMock: vi.fn(),
+  updateEntryMutationMock: vi.fn(),
+  deleteEntryMutationMock: vi.fn(),
 }));
 
 vi.mock("@web/queries/admin/shows/manage/use-admin-show-events-query", () => ({
@@ -14,6 +22,12 @@ vi.mock("@web/queries/admin/shows/manage/use-admin-show-events-query", () => ({
 
 vi.mock("@web/queries/admin/shows/manage/use-admin-show-event-query", () => ({
   useAdminShowEventQuery: detailQueryMock,
+}));
+
+vi.mock("@/queries/admin/shows", () => ({
+  useUpdateAdminShowEventMutation: updateEventMutationMock,
+  useUpdateAdminShowEntryMutation: updateEntryMutationMock,
+  useDeleteAdminShowEntryMutation: deleteEntryMutationMock,
 }));
 
 vi.mock("@web/components/listing", () => ({
@@ -55,10 +69,23 @@ vi.mock("@web/components/ui/separator", () => ({
   Separator: () => React.createElement("hr", null),
 }));
 
+import { AdminShowManagementPageClient } from "../admin-show-management-page-client";
+
 describe("AdminShowManagementPageClient", () => {
   beforeEach(() => {
     searchQueryMock.mockReset();
     detailQueryMock.mockReset();
+    updateEventMutationMock.mockReset();
+    updateEntryMutationMock.mockReset();
+    deleteEntryMutationMock.mockReset();
+
+    const emptyMutationState = {
+      isPending: false,
+      mutateAsync: vi.fn(),
+    };
+    updateEventMutationMock.mockReturnValue(emptyMutationState);
+    updateEntryMutationMock.mockReturnValue(emptyMutationState);
+    deleteEntryMutationMock.mockReturnValue(emptyMutationState);
 
     searchQueryMock.mockReturnValue({
       data: {
@@ -146,8 +173,9 @@ describe("AdminShowManagementPageClient", () => {
     );
     expect(html).toContain("Summer Show");
     expect(html).toContain("Helsinki");
-    expect(html).toContain("Metsapolun Kide");
-    expect(html).toContain("Dog evaluations");
+    expect(html).toContain("Loading selected event details...");
+    expect(html).not.toContain("Metsapolun Kide");
+    expect(html).not.toContain("Dog evaluations");
     expect(html).not.toContain("Apply event changes");
     expect(html).not.toContain("Apply entry changes");
   });

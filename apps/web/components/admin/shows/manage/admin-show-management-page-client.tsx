@@ -33,14 +33,10 @@ export function AdminShowManagementPageClient() {
   });
 
   const showEvents = searchQuery.data?.items ?? EMPTY_SHOW_EVENTS;
-  const selectedEventId =
-    showEvents.find((event) => event.showId === selectedEventIdInput)?.showId ??
-    showEvents[0]?.showId ??
-    "";
+  const selectedEventId = selectedEventIdInput || showEvents[0]?.showId || "";
   const selectedSummary =
-    showEvents.find((event) => event.showId === selectedEventId) ??
-    showEvents[0] ??
-    null;
+    showEvents.find((event) => event.showId === selectedEventId) ||
+    (!selectedEventIdInput ? showEvents[0] : null);
 
   const detailQuery = useAdminShowEventQuery({
     showId: selectedEventId,
@@ -123,7 +119,9 @@ export function AdminShowManagementPageClient() {
             ) : selectedEvent ? (
               <ShowManagementSelectedEventPanel
                 selectedEvent={selectedEvent}
+                selectedEventUpdatedAt={detailQuery.dataUpdatedAt}
                 resultOptions={resultOptions}
+                onSelectedEventIdChange={setSelectedEventIdInput}
               />
             ) : (
               <Card>

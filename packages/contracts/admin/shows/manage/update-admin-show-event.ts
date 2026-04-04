@@ -6,6 +6,7 @@ export type UpdateAdminShowEventRequest = {
   eventName: string;
   eventType: string;
   organizer: string;
+  judge: string;
 };
 
 export type UpdateAdminShowEventResponse = {
@@ -16,4 +17,5 @@ export type UpdateAdminShowEventResponse = {
   eventName: string;
   eventType: string;
   organizer: string;
+  judge: string;
 };

@@ -83,6 +83,7 @@ export type UpdateAdminShowEventWriteRequestDb = {
   nextEventName: string | null;
   nextEventType: string | null;
   nextOrganizer: string | null;
+  nextJudge: string | null;
 };
 
 export type UpdatedAdminShowEventRowDb = {
@@ -93,6 +94,7 @@ export type UpdatedAdminShowEventRowDb = {
   eventName: string | null;
   eventType: string | null;
   organizer: string | null;
+  judge: string | null;
 };
 
 export type UpdateAdminShowEventWriteResultDb =

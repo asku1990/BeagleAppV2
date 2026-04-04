@@ -30,6 +30,8 @@ type ShowManagementEntryCardProps = {
   onRemoveAward: (entryId: string, awardId: string) => void;
   onRemove: (entry: ManageShowEntry) => void;
   onApply: (entry: ManageShowEntry) => void;
+  isApplying?: boolean;
+  isRemovingDisabled?: boolean;
 };
 
 export function ShowManagementEntryCard({
@@ -41,6 +43,8 @@ export function ShowManagementEntryCard({
   onRemoveAward,
   onRemove,
   onApply,
+  isApplying = false,
+  isRemovingDisabled = false,
 }: ShowManagementEntryCardProps) {
   const optionsUnavailable =
     resultOptions.classOptions.length === 0 &&
@@ -50,11 +54,16 @@ export function ShowManagementEntryCard({
   const displayState = buildEntryDisplayState(entry, resultOptions);
   const resolveAwardLabel = (value: string) =>
     resolveOptionLabel(displayState.awardLabelLookup, value);
+  const isEntryInputsDisabled = isApplying || isRemovingDisabled;
 
   return (
     <Card>
       <CardContent className="space-y-4 pt-4">
-        <ShowManagementEntryHeader entry={entry} onRemove={onRemove} />
+        <ShowManagementEntryHeader
+          entry={entry}
+          onRemove={onRemove}
+          isRemoveDisabled={isApplying || isRemovingDisabled}
+        />
 
         <ShowManagementEntrySummary
           classResultText={displayState.selectedClassResultText}
@@ -68,6 +77,7 @@ export function ShowManagementEntryCard({
             entry={entry}
             classOptions={displayState.classOptions}
             qualityOptions={displayState.qualityOptions}
+            isDisabled={isEntryInputsDisabled}
             onEntryFieldChange={onEntryFieldChange}
           />
 
@@ -75,6 +85,7 @@ export function ShowManagementEntryCard({
             entry={entry}
             availableAwardOptions={displayState.availableAwardOptions}
             awardsDisabled={displayState.awardsDisabled}
+            isDisabled={isEntryInputsDisabled}
             onAddAward={onAddAward}
             onRemoveAward={onRemoveAward}
             resolveAwardLabel={resolveAwardLabel}
@@ -82,6 +93,7 @@ export function ShowManagementEntryCard({
 
           <ShowManagementCritiqueField
             entry={entry}
+            isDisabled={isEntryInputsDisabled}
             onEntryFieldChange={onEntryFieldChange}
           />
         </div>
@@ -94,8 +106,12 @@ export function ShowManagementEntryCard({
 
         {isDirty ? (
           <div className="flex justify-end">
-            <Button type="button" onClick={() => onApply(entry)}>
-              Apply entry changes
+            <Button
+              type="button"
+              onClick={() => onApply(entry)}
+              disabled={isApplying}
+            >
+              {isApplying ? "Saving entry..." : "Apply entry changes"}
             </Button>
           </div>
         ) : null}

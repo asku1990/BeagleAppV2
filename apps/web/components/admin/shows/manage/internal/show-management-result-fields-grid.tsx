@@ -9,6 +9,7 @@ type ShowManagementResultFieldsGridProps = {
   entry: ManageShowEntry;
   classOptions: AdminShowResultOption[];
   qualityOptions: AdminShowResultOption[];
+  isDisabled?: boolean;
   onEntryFieldChange: (
     entryId: string,
     field: keyof Omit<ManageShowEntry, "id" | "awards">,
@@ -35,6 +36,7 @@ export function ShowManagementResultFieldsGrid({
   entry,
   classOptions,
   qualityOptions,
+  isDisabled = false,
   onEntryFieldChange,
 }: ShowManagementResultFieldsGridProps) {
   const pupnParts = getPupnParts(entry.pupn);
@@ -46,6 +48,7 @@ export function ShowManagementResultFieldsGrid({
         <span>Judge</span>
         <Input
           value={entry.judge}
+          disabled={isDisabled}
           onChange={(event) =>
             onEntryFieldChange(entry.id, "judge", event.target.value)
           }
@@ -56,6 +59,7 @@ export function ShowManagementResultFieldsGrid({
         <Input
           type="number"
           inputMode="numeric"
+          disabled={isDisabled}
           value={entry.heightCm}
           onChange={(event) =>
             onEntryFieldChange(entry.id, "heightCm", event.target.value)
@@ -69,7 +73,7 @@ export function ShowManagementResultFieldsGrid({
           onChange={(event) =>
             onEntryFieldChange(entry.id, "qualityGrade", event.target.value)
           }
-          disabled={qualityOptions.length === 0}
+          disabled={isDisabled || qualityOptions.length === 0}
           className="border-input bg-background h-10 w-full rounded-md border px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
         >
           <option value="">-</option>
@@ -88,7 +92,7 @@ export function ShowManagementResultFieldsGrid({
             onChange={(event) =>
               onEntryFieldChange(entry.id, "classCode", event.target.value)
             }
-            disabled={classOptions.length === 0}
+            disabled={isDisabled || classOptions.length === 0}
             className="border-input bg-background h-10 w-full rounded-md border px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
           >
             <option value="">-</option>
@@ -103,6 +107,7 @@ export function ShowManagementResultFieldsGrid({
             inputMode="numeric"
             min={0}
             step={1}
+            disabled={isDisabled}
             value={entry.classPlacement}
             onChange={(event) =>
               onEntryFieldChange(entry.id, "classPlacement", event.target.value)
@@ -119,6 +124,7 @@ export function ShowManagementResultFieldsGrid({
         <div className="grid gap-2 sm:grid-cols-[88px_minmax(0,1fr)]">
           <select
             value={pupnPrefix}
+            disabled={isDisabled}
             onChange={(event) => {
               const prefix =
                 event.target.value === "PU" || event.target.value === "PN"
@@ -147,7 +153,7 @@ export function ShowManagementResultFieldsGrid({
             min={1}
             step={1}
             value={pupnParts.rank}
-            disabled={pupnPrefix === "-"}
+            disabled={isDisabled || pupnPrefix === "-"}
             onChange={(event) => {
               const rank = event.target.value;
               if (!rank) {

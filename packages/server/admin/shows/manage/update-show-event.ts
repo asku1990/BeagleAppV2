@@ -113,6 +113,7 @@ export async function updateAdminShowEvent(
   const eventName = normalizeOptionalText(input.eventName);
   const eventType = normalizeOptionalText(input.eventType);
   const organizer = normalizeOptionalText(input.organizer);
+  const judge = normalizeOptionalText(input.judge);
 
   log.info(
     {
@@ -139,6 +140,7 @@ export async function updateAdminShowEvent(
       nextEventName: eventName,
       nextEventType: eventType,
       nextOrganizer: organizer,
+      nextJudge: judge,
     });
 
     if (result.status === "not_found") {
@@ -192,6 +194,7 @@ export async function updateAdminShowEvent(
       eventName: result.row.eventName ?? "",
       eventType: result.row.eventType ?? "",
       organizer: result.row.organizer ?? "",
+      judge: result.row.judge ?? "",
     };
 
     log.info(

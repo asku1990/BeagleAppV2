@@ -13,11 +13,14 @@ export default defineConfig({
         new URL("../../packages/server", import.meta.url),
       ),
       "@db": fileURLToPath(new URL("../../packages/db", import.meta.url)),
+      "@api-client": fileURLToPath(
+        new URL("../../packages/api-client", import.meta.url),
+      ),
     },
   },
   test: {
     environment: "node",
-    include: ["**/__tests__/**/*.test.ts"],
+    include: ["**/__tests__/**/*.test.ts", "**/__tests__/**/*.test.tsx"],
     coverage: {
       include: [
         "app/actions/admin/**/*.ts",

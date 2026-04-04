@@ -5,6 +5,7 @@ import type { ManageShowEntry } from "../show-management-types";
 
 type ShowManagementCritiqueFieldProps = {
   entry: ManageShowEntry;
+  isDisabled?: boolean;
   onEntryFieldChange: (
     entryId: string,
     field: keyof Omit<ManageShowEntry, "id" | "awards">,
@@ -14,6 +15,7 @@ type ShowManagementCritiqueFieldProps = {
 
 export function ShowManagementCritiqueField({
   entry,
+  isDisabled = false,
   onEntryFieldChange,
 }: ShowManagementCritiqueFieldProps) {
   return (
@@ -21,6 +23,7 @@ export function ShowManagementCritiqueField({
       <span>Critique</span>
       <textarea
         value={entry.critiqueText}
+        disabled={isDisabled}
         onChange={(event) =>
           onEntryFieldChange(entry.id, "critiqueText", event.target.value)
         }

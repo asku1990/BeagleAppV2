@@ -7,8 +7,7 @@ Developer notes for the admin show management flow.
 - The page is an admin-facing event search and detail workflow.
 - The main user task is to find a show event, inspect its entries, and prepare edits from the read layer.
 - Backend mutation foundations now exist for event update, entry update, and
-  entry delete, even though the page UI still runs local apply/remove behavior
-  until mutation wiring is completed.
+  entry delete, and the page now wires apply/remove actions to those mutations.
 
 ## Main files
 
@@ -44,7 +43,7 @@ Developer notes for the admin show management flow.
 3. The search list renders contract summaries (`showId`, dates, place, city, name, type, organizer, judge, dog count).
 4. The detail panel maps contract entries and DB-driven result options into the local editor model so the UI can keep a draft copy separate from the loaded data.
 5. Feature-local hook state owns the selected-event draft lifecycle, while feature-local lib helpers own draft cloning, field updates, and label resolution.
-6. Apply/remove/reset actions currently only update local draft state.
+6. Apply/remove actions persist through mutations, then refetch selected event details and reconcile local draft state from server data.
 
 ## Write foundations (backend)
 
@@ -77,7 +76,9 @@ Web layer status:
 
 - Server actions exist for event update, entry update, and entry delete.
 - React Query mutation hooks exist for event update, entry update, and entry delete.
-- UI wiring from apply/remove buttons to backend mutations is still pending.
+- Apply event, apply entry, and remove entry actions call backend mutations.
+- Mutation success invalidates admin show query roots and keeps selected event
+  state synchronized, including show id changes after event identity updates.
 
 ## Contract rules
 
@@ -151,7 +152,7 @@ That value belongs only on the selected event section.
 - Show an empty message when there are no search results.
 - Show a loading state while the selected event details are still loading.
 - Show a descriptive error state if either search or detail loading fails.
-- Keep entry edits local until write mutations exist.
+- Keep entry edits local until the user applies them through write mutations.
 - Keep the remove dialog scoped to the currently selected event entry.
 - Class and placement are edited as a compact paired row.
 - Placement uses a numeric field so values above `4` remain supported.
@@ -167,21 +168,16 @@ That value belongs only on the selected event section.
 
 ## Local draft behavior
 
-- The page keeps two local copies of the selected event:
-  - the editable draft
-  - the last applied local snapshot
-- Event-level field edits update the draft copy only.
-- Entry-level scalar fields update the draft copy only through explicit
-  field-based handlers.
-- Award add/remove actions are applied from the parent draft state so quick
+- The page keeps an editable draft plus an applied snapshot per selected event.
+- Event-level and entry-level field edits update only the draft until apply.
+- Award add/remove actions are applied from parent draft state so quick
   consecutive chip edits do not replace awards from a stale child snapshot.
 - Draft awards use stable local item ids in the web editor so one visible chip
   maps to one remove action.
-- Apply buttons update the local applied snapshot, not the server.
-- Reset reverts the draft back to the last applied local snapshot.
-- Remove confirmation updates both local copies so the UI stays internally consistent.
-- This local-only apply behavior is transitional and will be replaced once web
-  mutation actions/hooks are connected to the backend write use-cases.
+- Apply event/apply entry/remove entry call admin show mutation actions.
+- Mutation success invalidates show queries and refreshes selected event state
+  from server-normalized data.
+- Reset reverts draft back to the latest server-synced applied snapshot.
 
 ## Tests
 

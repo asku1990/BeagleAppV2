@@ -7,11 +7,13 @@ import type { ManageShowEntry } from "../show-management-types";
 type ShowManagementEntryHeaderProps = {
   entry: ManageShowEntry;
   onRemove: (entry: ManageShowEntry) => void;
+  isRemoveDisabled?: boolean;
 };
 
 export function ShowManagementEntryHeader({
   entry,
   onRemove,
+  isRemoveDisabled = false,
 }: ShowManagementEntryHeaderProps) {
   return (
     <div className="flex items-start justify-between gap-4">
@@ -24,6 +26,7 @@ export function ShowManagementEntryHeader({
         variant="destructive"
         size="sm"
         onClick={() => onRemove(entry)}
+        disabled={isRemoveDisabled}
       >
         Remove dog
       </Button>

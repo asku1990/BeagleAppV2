@@ -75,6 +75,7 @@ describe("updateAdminShowEventWriteDb", () => {
         nextEventName: "Show",
         nextEventType: "All Breed",
         nextOrganizer: "Club",
+        nextJudge: "Judge A",
       }),
     ).resolves.toEqual({ status: "not_found" });
 
@@ -103,6 +104,7 @@ describe("updateAdminShowEventWriteDb", () => {
         nextEventName: "Show",
         nextEventType: "Specialty",
         nextOrganizer: "Club",
+        nextJudge: "Judge A",
       }),
     ).resolves.toEqual({ status: "event_lookup_conflict" });
 
@@ -136,6 +138,7 @@ describe("updateAdminShowEventWriteDb", () => {
       eventName: "Updated",
       eventType: "Specialty",
       organizer: "Club",
+      judge: "Judge A",
     });
 
     const result = await updateAdminShowEventWriteDb({
@@ -149,6 +152,7 @@ describe("updateAdminShowEventWriteDb", () => {
       nextEventName: "Updated",
       nextEventType: "Specialty",
       nextOrganizer: "Club",
+      nextJudge: "Judge A",
     });
 
     expect(result).toEqual({
@@ -161,6 +165,7 @@ describe("updateAdminShowEventWriteDb", () => {
         eventName: "Updated",
         eventType: "Specialty",
         organizer: "Club",
+        judge: "Judge A",
       },
     });
     expect(showEventUpdateMock).toHaveBeenCalledWith(
@@ -200,6 +205,7 @@ describe("updateAdminShowEventWriteDb", () => {
       eventName: null,
       eventType: null,
       organizer: null,
+      judge: null,
     });
 
     const result = await updateAdminShowEventWriteDb({
@@ -213,6 +219,7 @@ describe("updateAdminShowEventWriteDb", () => {
       nextEventName: null,
       nextEventType: null,
       nextOrganizer: null,
+      nextJudge: null,
     });
 
     expect(result).toEqual({
@@ -225,6 +232,7 @@ describe("updateAdminShowEventWriteDb", () => {
         eventName: null,
         eventType: null,
         organizer: null,
+        judge: null,
       },
     });
     expect(showEventFindManyMock).toHaveBeenCalledWith(

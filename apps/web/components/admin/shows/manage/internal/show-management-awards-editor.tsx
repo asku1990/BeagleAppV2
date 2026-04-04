@@ -11,6 +11,7 @@ type ShowManagementAwardsEditorProps = {
   entry: ManageShowEntry;
   availableAwardOptions: AdminShowResultOption[];
   awardsDisabled: boolean;
+  isDisabled?: boolean;
   onAddAward: (entryId: string, awardCode: string) => void;
   onRemoveAward: (entryId: string, awardId: string) => void;
   resolveAwardLabel: (value: string) => string;
@@ -20,6 +21,7 @@ export function ShowManagementAwardsEditor({
   entry,
   availableAwardOptions,
   awardsDisabled,
+  isDisabled = false,
   onAddAward,
   onRemoveAward,
   resolveAwardLabel,
@@ -36,6 +38,7 @@ export function ShowManagementAwardsEditor({
               key={award.id}
               entry={entry}
               award={award}
+              isDisabled={isDisabled}
               onRemoveAward={onRemoveAward}
               resolveAwardLabel={resolveAwardLabel}
             />
@@ -50,7 +53,9 @@ export function ShowManagementAwardsEditor({
           }
           onAddAward(entry.id, event.target.value);
         }}
-        disabled={awardsDisabled || availableAwardOptions.length === 0}
+        disabled={
+          isDisabled || awardsDisabled || availableAwardOptions.length === 0
+        }
         className="border-input bg-background h-10 w-full rounded-md border px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
       >
         <option value="">-</option>
@@ -70,11 +75,13 @@ export function ShowManagementAwardsEditor({
 function AwardChip({
   entry,
   award,
+  isDisabled,
   onRemoveAward,
   resolveAwardLabel,
 }: {
   entry: ManageShowEntry;
   award: ManageShowAward;
+  isDisabled: boolean;
   onRemoveAward: (entryId: string, awardId: string) => void;
   resolveAwardLabel: (value: string) => string;
 }) {
@@ -84,6 +91,7 @@ function AwardChip({
       <button
         type="button"
         aria-label={`Remove award ${award.code}`}
+        disabled={isDisabled}
         onClick={() => onRemoveAward(entry.id, award.id)}
         className="hover:bg-muted-foreground/10 rounded-full px-1 leading-none"
       >

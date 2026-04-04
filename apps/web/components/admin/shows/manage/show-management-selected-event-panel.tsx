@@ -11,10 +11,14 @@ import type {
 
 export function ShowManagementSelectedEventPanel({
   selectedEvent,
+  selectedEventUpdatedAt,
   resultOptions,
+  onSelectedEventIdChange,
 }: {
   selectedEvent: ManageShowEvent;
+  selectedEventUpdatedAt: number;
   resultOptions: ManageShowEditOptions;
+  onSelectedEventIdChange: (nextShowId: string) => void;
 }) {
   const {
     draftEvent,
@@ -32,8 +36,14 @@ export function ShowManagementSelectedEventPanel({
     handleCancelRemove,
     handleConfirmRemove,
     handleResetShell,
+    isApplyingEvent,
+    isSyncingAfterSave,
+    applyingEntryId,
+    isRemovingEntry,
   } = useShowManagementSelectedEventState({
     selectedEvent,
+    selectedEventUpdatedAt,
+    onSelectedEventIdChange,
   });
 
   return (
@@ -52,12 +62,16 @@ export function ShowManagementSelectedEventPanel({
         onRequestRemoveEntry={handleRequestRemoveEntry}
         onResetShell={handleResetShell}
         statusText={statusText}
+        isApplyingEvent={isApplyingEvent || isSyncingAfterSave}
+        applyingEntryId={applyingEntryId}
+        isRemovingEntry={isRemovingEntry}
       />
 
       <ShowManagementRemovePanel
         pendingRemovalEntry={pendingRemovalEntry}
         onCancel={handleCancelRemove}
         onConfirm={handleConfirmRemove}
+        isConfirming={isRemovingEntry}
       />
     </>
   );

@@ -26,6 +26,7 @@ describe("updateAdminShowEvent", () => {
           eventName: "Summer Show",
           eventType: "All Breed",
           organizer: "Club",
+          judge: "Judge A",
         },
         {
           id: "u_1",
@@ -58,6 +59,7 @@ describe("updateAdminShowEvent", () => {
           eventName: "Summer Show",
           eventType: "All Breed",
           organizer: "Club",
+          judge: "Judge A",
         },
         null,
       ),
@@ -85,6 +87,7 @@ describe("updateAdminShowEvent", () => {
           eventName: "Summer Show",
           eventType: "All Breed",
           organizer: "Club",
+          judge: "Judge A",
         },
         {
           id: "u_1",
@@ -117,6 +120,7 @@ describe("updateAdminShowEvent", () => {
           eventName: "Summer Show",
           eventType: "All Breed",
           organizer: "Club",
+          judge: "Judge A",
         },
         {
           id: "u_1",
@@ -150,6 +154,7 @@ describe("updateAdminShowEvent", () => {
           eventName: "",
           eventType: "",
           organizer: "",
+          judge: "",
         },
         {
           id: "u_1",
@@ -184,6 +189,7 @@ describe("updateAdminShowEvent", () => {
           eventName: "Summer Show",
           eventType: "All Breed",
           organizer: "Club",
+          judge: "Judge A",
         },
         {
           id: "u_1",
@@ -213,6 +219,7 @@ describe("updateAdminShowEvent", () => {
         eventName: "Summer Show Updated",
         eventType: "Specialty",
         organizer: "Beagle Club",
+        judge: "Judge A",
       },
     });
     const showId = encodeShowId(
@@ -230,6 +237,7 @@ describe("updateAdminShowEvent", () => {
         eventName: " Summer Show Updated ",
         eventType: " Specialty ",
         organizer: " Beagle Club ",
+        judge: " Judge A ",
       },
       {
         id: "u_1",
@@ -253,6 +261,7 @@ describe("updateAdminShowEvent", () => {
       eventName: "Summer Show Updated",
       eventType: "Specialty",
       organizer: "Beagle Club",
+      judge: "Judge A",
     });
 
     expect(parseShowId(result.body.data.showId)).toEqual({
@@ -272,6 +281,7 @@ describe("updateAdminShowEvent", () => {
       nextEventName: "Summer Show Updated",
       nextEventType: "Specialty",
       nextOrganizer: "Beagle Club",
+      nextJudge: "Judge A",
     });
   });
 
@@ -289,6 +299,7 @@ describe("updateAdminShowEvent", () => {
           eventName: "",
           eventType: "",
           organizer: "",
+          judge: "",
         },
         {
           id: "u_1",
