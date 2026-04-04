@@ -9,6 +9,14 @@ export default defineConfig([
     rules: {
       "@next/next/no-html-link-for-pages": "off",
       "import/export": "error",
+      "import/no-self-import": "error",
+      "import/no-useless-path-segments": "error",
+      "import/no-cycle": [
+        "warn",
+        {
+          ignoreExternal: true,
+        },
+      ],
       "import/no-duplicates": "error",
     },
   },
