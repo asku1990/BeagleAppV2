@@ -28,7 +28,7 @@ const {
   withLogContextMock: vi.fn(),
 }));
 
-vi.mock("../../../../core/logger", () => ({
+vi.mock("@server/core/logger", () => ({
   toErrorLog: (error: Error) => ({
     error: {
       type: error.name,

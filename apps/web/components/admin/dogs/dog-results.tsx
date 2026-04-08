@@ -1,15 +1,7 @@
 import { ListingResponsiveResults } from "@/components/listing";
-import { Button } from "@/components/ui/button";
+import { AdminRowActionsMenu } from "@/components/admin";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useI18n } from "@/hooks/i18n";
-import { MoreHorizontal } from "lucide-react";
 import type { AdminDogParentPreview, AdminDogRecord } from "./types";
 
 type DogResultsProps = {
@@ -109,40 +101,6 @@ function formatParent(parent: AdminDogParentPreview | null): string {
   return safeName || safeRegistrationNo;
 }
 
-function DogActionsMenu({
-  onEdit,
-  onDelete,
-  label,
-  editLabel,
-  deleteLabel,
-}: {
-  onEdit: () => void;
-  onDelete: () => void;
-  label: string;
-  editLabel: string;
-  deleteLabel: string;
-}) {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button type="button" variant="ghost" size="icon-sm" aria-label={label}>
-          <MoreHorizontal />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={onEdit}>{editLabel}</DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="text-destructive focus:text-destructive"
-          onClick={onDelete}
-        >
-          {deleteLabel}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
 export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
   const { t, locale } = useI18n();
 
@@ -215,12 +173,22 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
                   {showDash(dog.note)}
                 </td>
                 <td className="px-2 py-2">
-                  <DogActionsMenu
-                    label={t("admin.dogs.actions.more")}
-                    editLabel={t("admin.dogs.actions.edit")}
-                    deleteLabel={t("admin.dogs.actions.delete")}
-                    onEdit={() => onEdit(dog)}
-                    onDelete={() => onDelete(dog)}
+                  <AdminRowActionsMenu
+                    triggerAriaLabel={t("admin.dogs.actions.more")}
+                    actions={[
+                      {
+                        id: "edit",
+                        label: t("admin.dogs.actions.edit"),
+                        onSelect: () => onEdit(dog),
+                      },
+                      {
+                        id: "delete",
+                        label: t("admin.dogs.actions.delete"),
+                        onSelect: () => onDelete(dog),
+                        destructive: true,
+                        separatorBefore: true,
+                      },
+                    ]}
                   />
                 </td>
               </tr>
@@ -278,12 +246,22 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
                 {t("admin.dogs.mobile.noteLabel")}: {showDash(dog.note)}
               </p>
             </div>
-            <DogActionsMenu
-              label={t("admin.dogs.actions.more")}
-              editLabel={t("admin.dogs.actions.edit")}
-              deleteLabel={t("admin.dogs.actions.delete")}
-              onEdit={() => onEdit(dog)}
-              onDelete={() => onDelete(dog)}
+            <AdminRowActionsMenu
+              triggerAriaLabel={t("admin.dogs.actions.more")}
+              actions={[
+                {
+                  id: "edit",
+                  label: t("admin.dogs.actions.edit"),
+                  onSelect: () => onEdit(dog),
+                },
+                {
+                  id: "delete",
+                  label: t("admin.dogs.actions.delete"),
+                  onSelect: () => onDelete(dog),
+                  destructive: true,
+                  separatorBefore: true,
+                },
+              ]}
             />
           </CardContent>
         </Card>

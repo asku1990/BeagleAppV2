@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AdminMutationError } from "../mutation-error";
+import { AdminMutationError } from "@/queries/admin/mutation-error";
 import { adminUsersQueryKey } from "../query-keys";
 import { useDeleteAdminUserMutation } from "../use-delete-admin-user-mutation";
 

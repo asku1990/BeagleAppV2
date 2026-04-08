@@ -19,7 +19,10 @@ export function ListingSectionShell({
   contentClassName?: string;
 }) {
   return (
-    <Card className={cn(beagleTheme.panel, "gap-0 py-0", className)}>
+    <Card
+      suppressHydrationWarning
+      className={cn(beagleTheme.panel, "gap-0 py-0", className)}
+    >
       <CardHeader className="px-5 pt-5 pb-3 md:px-6 md:pt-6 md:pb-4">
         <CardTitle
           className={cn(beagleTheme.headingMd, beagleTheme.inkStrongText)}

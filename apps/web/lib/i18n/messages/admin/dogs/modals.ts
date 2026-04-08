@@ -1,7 +1,7 @@
 export const fiAdminDogsModalMessages = {
   "admin.dogs.delete.modalAria": "Vahvista koiran poisto",
   "admin.dogs.delete.title": "Poistetaanko koira?",
-  "admin.dogs.delete.descriptionPrefix": "Tama poistaa koiran",
+  "admin.dogs.delete.descriptionPrefix": "Tämä poistaa koiran",
   "admin.dogs.delete.confirm": "Poista koira",
   "admin.dogs.delete.confirming": "Poistetaan...",
   "admin.dogs.delete.cancel": "Peruuta",

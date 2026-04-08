@@ -1,4 +1,4 @@
-import { normalizeRegistrationNo } from "../../../dogs/manage/normalization";
+import { normalizeRegistrationNo } from "@server/admin/dogs/manage/normalization";
 
 type WorkbookCell = string | number | boolean | Date | null | undefined;
 

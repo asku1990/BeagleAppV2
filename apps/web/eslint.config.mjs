@@ -37,6 +37,18 @@ const webConfig = [
   {
     files: ["**/*.{ts,tsx,mts}"],
     rules: {
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector: "ImportDeclaration[source.value=/^(?:\\.\\.\\/){2,}/]",
+          message: "Use @web/ paths instead of deep relative imports.",
+        },
+      ],
+    },
+  },
+  {
+    files: ["**/*.{ts,tsx,mts}"],
+    rules: {
       "no-restricted-imports": serverImportRestriction,
     },
   },
@@ -48,6 +60,23 @@ const webConfig = [
     ],
     rules: {
       "no-restricted-imports": dbImportRestriction,
+    },
+  },
+  {
+    files: ["queries/admin/**/*.{ts,tsx,mts}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@/queries/admin",
+              message:
+                "Avoid importing the admin barrel from admin query internals to prevent circular dependencies.",
+            },
+          ],
+        },
+      ],
     },
   },
 ];

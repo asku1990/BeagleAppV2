@@ -15,8 +15,8 @@ import { Input } from "@/components/ui/input";
 import { ListingResponsiveResults } from "@/components/listing";
 import { ListLoadingSkeleton } from "@/components/ui/list-loading-skeleton";
 import { useI18n } from "@/hooks/i18n";
+import { AdminMutationError } from "@/queries/admin/mutation-error";
 import {
-  AdminMutationError,
   useAdminUsersQuery,
   useCreateAdminUserMutation,
   useDeleteAdminUserMutation,

@@ -3,41 +3,15 @@ import {
   WORKBOOK_IMPORT_WRITE_TX_CONFIG,
   writeAdminShowWorkbookImportDb,
 } from "@beagle/db";
-import { toErrorLog, withLogContext } from "../../../core/logger";
-import type { ServiceResult } from "../../../core/result";
+import { toErrorLog, withLogContext } from "@server/core/logger";
+import { isPrismaTransactionTimeoutError } from "@server/core/prisma-transaction-timeout";
+import type { ServiceResult } from "@server/core/result";
 import {
   ISSUE_CODES,
   WORKBOOK_FILE_PATTERN,
 } from "./internal/workbook-preview-constants";
 import { buildWorkbookIssueLogSummary } from "./internal/workbook-import-log-summary";
 import { evaluateWorkbookImport } from "./internal/runtime/evaluate-workbook-import";
-
-type PrismaLikeError = {
-  code?: unknown;
-  message?: unknown;
-};
-
-function isPrismaTransactionTimeoutError(error: unknown): boolean {
-  if (typeof error !== "object" || error === null) {
-    return false;
-  }
-  const prismaLikeError = error as PrismaLikeError;
-
-  const code =
-    "code" in error && typeof prismaLikeError.code === "string"
-      ? prismaLikeError.code
-      : null;
-  const message =
-    "message" in error && typeof prismaLikeError.message === "string"
-      ? prismaLikeError.message.toLowerCase()
-      : "";
-
-  const matchesTimeoutMessage =
-    /transaction.*expired/i.test(message) ||
-    /unable to start a transaction in the given time/i.test(message);
-
-  return matchesTimeoutMessage;
-}
 
 export async function applyAdminShowWorkbookImport(input: {
   fileName: string;

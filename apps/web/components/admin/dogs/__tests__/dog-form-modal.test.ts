@@ -118,4 +118,34 @@ describe("DogFormModal", () => {
     expect(html).toContain('value="Important note"');
     expect(html).toContain("admin.dogs.form.recordIdPrefix dog_1");
   });
+
+  it("caps the birth date picker at today", () => {
+    const values = buildEditValues();
+    const today = new Date().toISOString().slice(0, 10);
+    const html = renderToStaticMarkup(
+      React.createElement(DogFormModal, {
+        mode: "edit",
+        dog: buildDog(values),
+        values,
+        breederOptions: [{ id: "b_1", name: "Metsapolun" }],
+        ownerOptions: [
+          { id: "o_1", name: "Tiina Virtanen" },
+          { id: "o_2", name: "Antti Virtanen" },
+        ],
+        parentOptions: [
+          { registrationNo: "FI54321/20", name: "Korven Aatos" },
+          { registrationNo: "FI77777/18", name: "Havupolun Helmi" },
+        ],
+        onBreederSearchChange: vi.fn(),
+        onOwnerSearchChange: vi.fn(),
+        onParentSearchChange: vi.fn(),
+        open: true,
+        onClose: vi.fn(),
+        onValuesChange: vi.fn(),
+        onSubmit: vi.fn(),
+      }),
+    );
+
+    expect(html).toContain(`max="${today}"`);
+  });
 });

@@ -3,7 +3,7 @@ import type {
   AdminShowWorkbookSchemaRuleDraft,
   AdminShowWorkbookSchemaValidationError,
 } from "@beagle/contracts";
-import { normalizeWorkbookComparisonToken } from "../import/internal/cell";
+import { normalizeWorkbookComparisonToken } from "@server/admin/shows/import/internal/cell";
 
 // Validates admin-managed workbook schema rules before they are persisted or
 // used by the workbook preview parser.

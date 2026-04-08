@@ -1,10 +1,10 @@
 import {
   type AuditContextDb,
+  type ImportIssueSeverity,
   getImportRunById,
   isInvalidImportRunIssuesCursorError,
   listImportRunIssues,
 } from "@beagle/db";
-import type { ImportIssueSeverity } from "@beagle/db";
 import type {
   ImportRunIssuesResponse,
   ImportRunResponse,

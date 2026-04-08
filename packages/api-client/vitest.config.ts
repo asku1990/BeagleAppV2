@@ -1,6 +1,12 @@
 import { defineConfig } from "vitest/config";
+import { fileURLToPath, URL } from "node:url";
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@api-client": fileURLToPath(new URL("./", import.meta.url)),
+    },
+  },
   test: {
     include: ["**/__tests__/**/*.test.ts"],
     coverage: {

@@ -7,7 +7,7 @@ import type {
   UpdateAdminShowWorkbookSchemaRuleRequest,
   UpdateAdminShowWorkbookSchemaRuleResponse,
 } from "@beagle/contracts";
-import type { ServiceResult } from "../../../core/result";
+import type { ServiceResult } from "@server/core/result";
 import { validateAdminShowWorkbookSchemaRuleDraft } from "../core/workbook-schema-validation";
 
 // Validates and persists a single workbook schema rule update for future

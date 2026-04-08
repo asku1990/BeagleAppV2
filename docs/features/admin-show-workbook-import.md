@@ -156,7 +156,8 @@ The preview response returns:
   not block preview or produce result items.
 - Writes happen only after apply passes full revalidation.
 - Any transaction failure or unique conflict rolls back the whole import.
-- Apply write uses an explicit interactive transaction timeout budget
+- Apply write uses the shared long-running interactive transaction budget from
+  [`docs/prisma-write-transactions.md`](../prisma-write-transactions.md)
   (`maxWait=10s`, `timeout=20s`) and returns a dedicated timeout failure when
   commit cannot complete in time. Timeout failures are still all-or-nothing
   (no partial writes).

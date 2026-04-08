@@ -1,8 +1,8 @@
 {
   "name": "beagle-app-v2",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "private": true,
-  "packageManager": "pnpm@10.4.1",
+  "packageManager": "pnpm@10.33.0",
   "scripts": {
     "dev": "pnpm --filter @beagle/web dev",
     "build": "turbo build",
@@ -28,6 +28,7 @@
     "db:seed:initial-test-data": "pnpm --filter @beagle/db seed:initial-test-data",
     "db:dump": "bash ./scripts/db/dump.sh",
     "db:restore": "bash ./scripts/db/restore.sh",
+    "legacy:restore": "bash ./scripts/db/restore-legacy.sh",
     "audit:prune": "pnpm --filter @beagle/db audit:prune",
     "auth:generate": "pnpm dlx @better-auth/cli@latest generate --config packages/server/auth/better-auth.ts",
     "auth:migrate": "pnpm dlx @better-auth/cli@latest migrate --config packages/server/auth/better-auth.ts",
