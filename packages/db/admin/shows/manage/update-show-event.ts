@@ -62,7 +62,7 @@ async function syncLookupKeysAfterEventMove(
           moved_entries.next_entry_lookup_key
       )
       UPDATE "ShowResultItem" item
-      SET "itemLookupKey" = updated_entries.next_entry_lookup_key || substring(
+      SET "itemLookupKey" = updated_entries.next_entry_lookup_key || '|' || substring(
         item."itemLookupKey"
         FROM char_length(updated_entries.current_entry_lookup_key) + 2
       )
@@ -72,7 +72,7 @@ async function syncLookupKeysAfterEventMove(
           item."itemLookupKey",
           char_length(updated_entries.current_entry_lookup_key) + 1
         ) = updated_entries.current_entry_lookup_key || '|'
-        AND item."itemLookupKey" <> updated_entries.next_entry_lookup_key || substring(
+        AND item."itemLookupKey" <> updated_entries.next_entry_lookup_key || '|' || substring(
           item."itemLookupKey"
           FROM char_length(updated_entries.current_entry_lookup_key) + 2
         )
