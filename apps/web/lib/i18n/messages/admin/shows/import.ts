@@ -16,7 +16,6 @@ export const fiAdminShowsImportMessages = {
     "Tähän osioon rakennetaan uusi turvallinen näyttelyiden workbook-tuonti ylläpidolle.",
   "admin.shows.import.pageDescription":
     "Valitse workbook, validoi sisältö ja tarkastele jäsennettyä esikatselua samalla sivulla ennen kuin tuonti aktivoidaan.",
-  "admin.shows.import.back": "Takaisin näyttelymoduuliin",
   "admin.shows.import.upload.title": "Workbookin valinta",
   "admin.shows.import.upload.label": "Valitse workbook",
   "admin.shows.import.upload.help":
@@ -184,7 +183,6 @@ export const svAdminShowsImportMessages = {
     "Denna sektion bygger en ny och saker workbook-import for utstallningar i admin.",
   "admin.shows.import.pageDescription":
     "Valj workbook, validera innehallet och se den tolkade forhandsgranskningen pa samma sida innan importen aktiveras.",
-  "admin.shows.import.back": "Tillbaka till utstallningsmodulen",
   "admin.shows.import.upload.title": "Val av workbook",
   "admin.shows.import.upload.label": "Valj workbook",
   "admin.shows.import.upload.help":

@@ -82,7 +82,7 @@ describe("AdminShowWorkbookImportPageClient", () => {
       React.createElement(AdminShowWorkbookImportPageClient),
     );
 
-    expect(html).toContain("admin.shows.import.back");
+    expect(html).not.toContain("admin.shows.import.back");
     expect(html).toContain("admin.shows.import.title");
     expect(html).toContain("admin.shows.import.upload.title");
     expect(html).toContain("admin.shows.import.actions.validate");
