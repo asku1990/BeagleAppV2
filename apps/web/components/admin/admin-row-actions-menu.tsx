@@ -32,6 +32,9 @@ export function AdminRowActionsMenu({
           variant="ghost"
           size="icon-sm"
           aria-label={triggerAriaLabel}
+          onClick={(event) => {
+            event.stopPropagation();
+          }}
         >
           <MoreHorizontal />
         </Button>
