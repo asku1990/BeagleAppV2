@@ -20,6 +20,21 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.9.0] - 2026-04-08
+
+### Added
+
+- Ylläpitoon lisättiin uusi näyttelytulosten muokkaussivu (`/admin/shows/manage`).
+- Samalla sivulla voi muokata näyttelyn perustietoja, kuten päivää, paikkaa, tapahtuman nimeä ja tuomaria.
+- Samalla sivulla voi muokata koiran näyttelyrivin arvostelutietoja, kuten luokkaa, laatua, sijoitusta, PUPN-merkintää ja lisäpalkintoja.
+- Samalla sivulla koiran voi myös poistaa valitun näyttelytapahtuman tuloksista.
+
+### Changed
+
+### Fixed
+
+### Removed
+
 ## [0.8.0] - 2026-03-29
 
 ### Added

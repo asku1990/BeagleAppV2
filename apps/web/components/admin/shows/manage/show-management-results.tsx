@@ -28,10 +28,6 @@ export function ShowManagementResults({
 }) {
   const { t } = useI18n();
 
-  function handleEventSelect(showId: string) {
-    onSelectEvent(showId);
-  }
-
   function eventSelectAriaLabel(eventPlace: string): string {
     return `${t("admin.shows.manage.results.selectEventAriaPrefix")} ${eventPlace}`;
   }
@@ -84,19 +80,19 @@ export function ShowManagementResults({
               return (
                 <tr
                   key={event.showId}
-                  onClick={() => handleEventSelect(event.showId)}
+                  onClick={() => onSelectEvent(event.showId)}
                   onKeyDown={(keyboardEvent) => {
                     if (!isActivationKey(keyboardEvent)) {
                       return;
                     }
 
                     keyboardEvent.preventDefault();
-                    handleEventSelect(event.showId);
+                    onSelectEvent(event.showId);
                   }}
                   role="button"
                   tabIndex={0}
                   aria-label={eventSelectAriaLabel(event.eventPlace)}
-                  aria-selected={isSelected}
+                  aria-pressed={isSelected}
                   className={cn(
                     "border-b align-top cursor-pointer transition-colors focus-visible:bg-muted/40 focus-visible:outline-none",
                     isSelected ? "bg-muted/40" : "hover:bg-muted/20",
@@ -127,15 +123,15 @@ export function ShowManagementResults({
             role="button"
             tabIndex={0}
             aria-label={eventSelectAriaLabel(event.eventPlace)}
-            aria-selected={isSelected}
-            onClick={() => handleEventSelect(event.showId)}
+            aria-pressed={isSelected}
+            onClick={() => onSelectEvent(event.showId)}
             onKeyDown={(keyboardEvent) => {
               if (!isActivationKey(keyboardEvent)) {
                 return;
               }
 
               keyboardEvent.preventDefault();
-              handleEventSelect(event.showId);
+              onSelectEvent(event.showId);
             }}
             className={cn(
               "transition-colors focus-visible:ring-2 focus-visible:ring-ring",

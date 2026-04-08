@@ -164,6 +164,7 @@ That value belongs only on the selected event section.
 - Keep entry edits local until the user applies them through write mutations.
 - Keep the remove dialog scoped to the currently selected event entry.
 - Event and entry edits use modal forms.
+- Event result rows/cards behave as keyboard-operable button-like controls and expose selected state with valid button accessibility attributes.
 - Class and placement are edited as a compact paired row.
 - Placement uses a numeric field so values above `4` remain supported.
 - Quality is edited via a single-select control backed by `options`.
