@@ -1,4 +1,5 @@
 import { prisma } from "@db/core/prisma";
+import { ADMIN_WRITE_TX_CONFIG } from "@db/core/interactive-write-transaction";
 import { resolveAdminShowEventTargetDb } from "./internal/event-target";
 import { isLegacyQualityValue } from "./internal/legacy-quality";
 import {
@@ -313,5 +314,5 @@ export async function updateAdminShowEntryWriteDb(
       status: "updated",
       entryId: entry.id,
     };
-  });
+  }, ADMIN_WRITE_TX_CONFIG);
 }

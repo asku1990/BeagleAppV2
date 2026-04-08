@@ -1,12 +1,10 @@
 import { prisma } from "@db/core/prisma";
+import { LONG_RUNNING_WRITE_TX_CONFIG } from "@db/core/interactive-write-transaction";
 import { randomUUID } from "node:crypto";
 import type { Prisma } from "@prisma/client";
 
 // Persists accepted workbook rows with create-only semantics in one transaction.
-export const WORKBOOK_IMPORT_WRITE_TX_CONFIG = {
-  maxWait: 10_000,
-  timeout: 20_000,
-} as const;
+export const WORKBOOK_IMPORT_WRITE_TX_CONFIG = LONG_RUNNING_WRITE_TX_CONFIG;
 
 export type AdminShowWorkbookImportWriteRowDb = {
   rowNumber: number;

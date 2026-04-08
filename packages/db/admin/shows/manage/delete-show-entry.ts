@@ -1,4 +1,5 @@
 import { prisma } from "@db/core/prisma";
+import { ADMIN_WRITE_TX_CONFIG } from "@db/core/interactive-write-transaction";
 import { resolveAdminShowEventTargetDb } from "./internal/event-target";
 import type {
   DeleteAdminShowEntryWriteRequestDb,
@@ -46,5 +47,5 @@ export async function deleteAdminShowEntryWriteDb(
       status: "deleted",
       entryId: input.entryId,
     };
-  });
+  }, ADMIN_WRITE_TX_CONFIG);
 }

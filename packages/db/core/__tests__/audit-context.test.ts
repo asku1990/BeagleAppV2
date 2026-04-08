@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ADMIN_WRITE_TX_CONFIG } from "../interactive-write-transaction";
 
 const { executeRawMock, transactionMock, prismaMock } = vi.hoisted(() => {
   const executeRaw = vi.fn();
@@ -66,6 +67,10 @@ describe("runInAuditContextDb", () => {
     expect(calls[4]?.[1]).toBe("req-789");
 
     expect(callback).toHaveBeenCalledWith(prismaMock);
+    expect(transactionMock).toHaveBeenLastCalledWith(
+      expect.any(Function),
+      ADMIN_WRITE_TX_CONFIG,
+    );
   });
 
   it("normalizes default or missing values", async () => {

@@ -6,6 +6,7 @@ import {
 import { updateAdminShowEventWriteDb } from "@beagle/db";
 import { toBusinessDateOnly } from "@server/core/date-only";
 import { toErrorLog, withLogContext } from "@server/core/logger";
+import { isPrismaTransactionTimeoutError } from "@server/core/prisma-transaction-timeout";
 import type { ServiceResult } from "@server/core/result";
 import { requireAdmin } from "@server/admin/core/service";
 import { parseIsoDateOnlyToUtcDate } from "@server/shows/internal/iso-date";
@@ -214,20 +215,24 @@ export async function updateAdminShowEvent(
       },
     };
   } catch (error) {
+    const isTimeout = isPrismaTransactionTimeoutError(error);
     log.error(
       {
         event: "exception",
         durationMs: Date.now() - startedAt,
+        isTransactionTimeout: isTimeout,
         ...toErrorLog(error),
       },
       "admin show update failed",
     );
     return {
-      status: 500,
+      status: isTimeout ? 409 : 500,
       body: {
         ok: false,
-        error: "Failed to update admin show event.",
-        code: "INTERNAL_ERROR",
+        error: isTimeout
+          ? "Show update timed out before commit. Retry the update."
+          : "Failed to update admin show event.",
+        code: isTimeout ? "WRITE_TIMEOUT" : "INTERNAL_ERROR",
       },
     };
   }
