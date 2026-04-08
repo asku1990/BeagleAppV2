@@ -26,6 +26,7 @@ This document defines the default rule for Prisma interactive write transactions
 ## Current rollout
 
 - Admin show manage writes use the shared admin write budget.
+- Audited admin dog writes inherit the shared admin write budget via `runInAuditContextDb`.
 - Workbook import uses the shared long-running write budget because it intentionally persists a larger all-or-nothing batch.
 
 ## Error handling

@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+import { ADMIN_WRITE_TX_CONFIG } from "./interactive-write-transaction";
 import { prisma } from "./prisma";
 
 export type AuditSourceDb = "WEB" | "SCRIPT" | "SYSTEM";
@@ -36,5 +37,5 @@ export async function runInAuditContextDb<T>(
   return prisma.$transaction(async (tx) => {
     await setAuditContextDb(tx, context);
     return callback(tx);
-  });
+  }, ADMIN_WRITE_TX_CONFIG);
 }
