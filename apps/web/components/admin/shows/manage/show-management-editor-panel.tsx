@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useI18n } from "@/hooks/i18n";
 import { buildEntryDisplayState } from "@/lib/admin/shows/manage";
 import { ShowManagementEntryResults } from "./internal/show-management-entry-results";
 import { ShowManagementSelectedEventHeader } from "./internal/show-management-selected-event-header";
@@ -38,6 +39,7 @@ export function ShowManagementEditorPanel({
   applyingEntryId,
   isRemovingEntry,
 }: ShowManagementEditorPanelProps) {
+  const { t } = useI18n();
   const [isEventModalOpen, setEventModalOpen] = useState(false);
   const [editingEventSnapshot, setEditingEventSnapshot] =
     useState<ManageShowEvent | null>(null);
@@ -48,7 +50,7 @@ export function ShowManagementEditorPanel({
     return (
       <Card>
         <CardContent className="pt-5 text-sm text-muted-foreground">
-          Select an event from the left.
+          {t("admin.shows.manage.editor.empty")}
         </CardContent>
       </Card>
     );
@@ -117,9 +119,12 @@ export function ShowManagementEditorPanel({
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h3 className="font-medium">Dog evaluations</h3>
+              <h3 className="font-medium">
+                {t("admin.shows.manage.editor.dogEvaluations")}
+              </h3>
               <p className="text-sm text-muted-foreground">
-                {selectedEvent.entries.length} dogs
+                {selectedEvent.entries.length}{" "}
+                {t("admin.shows.manage.editor.dogCountSuffix")}
               </p>
             </div>
           </div>

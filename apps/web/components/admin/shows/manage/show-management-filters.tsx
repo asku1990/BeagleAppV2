@@ -1,6 +1,7 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/hooks/i18n";
 
 export function ShowManagementFilters({
   query,
@@ -9,12 +10,14 @@ export function ShowManagementFilters({
   query: string;
   onQueryChange: (value: string) => void;
 }) {
+  const { t } = useI18n();
+
   return (
     <Input
       value={query}
       onChange={(event) => onQueryChange(event.target.value)}
-      placeholder="Search by place, dog, registration number, or judge"
-      aria-label="Search shows"
+      placeholder={t("admin.shows.manage.filters.placeholder")}
+      aria-label={t("admin.shows.manage.filters.aria")}
     />
   );
 }

@@ -29,16 +29,16 @@ describe("ShowManagementSelectedEventHeader", () => {
       }),
     );
 
-    expect(html).toContain("Selected event");
+    expect(html).toContain("Valittu tapahtuma");
     expect(html).toContain("Seinäjoki Areena");
-    expect(html).toContain("Date:");
-    expect(html).toContain("City:");
-    expect(html).toContain("Event:");
-    expect(html).toContain("Type:");
-    expect(html).toContain("Organizer:");
-    expect(html).toContain("Judge:");
-    expect(html).toContain("Dogs:");
-    expect(html).toContain("2025-10-25");
+    expect(html).toContain("Päivä:");
+    expect(html).toContain("Kaupunki:");
+    expect(html).toContain("Tapahtuma:");
+    expect(html).toContain("Tyyppi:");
+    expect(html).toContain("Järjestäjä:");
+    expect(html).toContain("Tuomari:");
+    expect(html).toContain("Koiria:");
+    expect(html).toContain("25.10.2025");
     expect(html).toContain("Seinäjoki");
     expect(html).toContain("Autumn Show");
   });

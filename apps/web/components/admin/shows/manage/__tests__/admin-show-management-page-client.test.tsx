@@ -174,13 +174,13 @@ describe("AdminShowManagementPageClient", () => {
       React.createElement(AdminShowManagementPageClient),
     );
 
-    expect(html).toContain("Show management");
+    expect(html).toContain("Näyttelyiden hallinta");
     expect(html).toContain(
-      "Search shows, open one event, and edit its entries from the live read layer.",
+      "Hae näyttelytapahtumia, avaa tapahtuman tiedot ja muokkaa osallistujien arvosteluja.",
     );
     expect(html).toContain("Summer Show");
     expect(html).toContain("Helsinki");
-    expect(html).toContain("Loading selected event details...");
+    expect(html).toContain("Valitun tapahtuman tietoja ladataan...");
     expect(html).not.toContain("Metsapolun Kide");
     expect(html).not.toContain("Dog evaluations");
     expect(html).not.toContain("Apply event changes");

@@ -2,6 +2,7 @@
 
 import React from "react";
 import type { AdminShowResultOption } from "@beagle/contracts";
+import { useI18n } from "@/hooks/i18n";
 import type {
   ManageShowAward,
   ManageShowEntry,
@@ -26,9 +27,11 @@ export function ShowManagementAwardsEditor({
   onRemoveAward,
   resolveAwardLabel,
 }: ShowManagementAwardsEditorProps) {
+  const { t } = useI18n();
+
   return (
     <div className="space-y-1 text-sm">
-      <span className="block">Awards</span>
+      <span className="block">{t("admin.shows.manage.awards.label")}</span>
       <div className="flex flex-wrap gap-2 rounded-md border border-input p-2">
         {entry.awards.length === 0 ? (
           <span className="text-xs text-muted-foreground">-</span>
@@ -66,7 +69,7 @@ export function ShowManagementAwardsEditor({
         ))}
       </select>
       <p className="text-xs text-muted-foreground">
-        Selected awards appear as badges. Use the `x` to remove one.
+        {t("admin.shows.manage.awards.help")}
       </p>
     </div>
   );
@@ -85,12 +88,14 @@ function AwardChip({
   onRemoveAward: (entryId: string, awardId: string) => void;
   resolveAwardLabel: (value: string) => string;
 }) {
+  const { t } = useI18n();
+
   return (
     <span className="bg-muted text-foreground inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs">
       <span>{resolveAwardLabel(award.code)}</span>
       <button
         type="button"
-        aria-label={`Remove award ${award.code}`}
+        aria-label={`${t("admin.shows.manage.awards.removeAriaPrefix")} ${award.code}`}
         disabled={isDisabled}
         onClick={() => onRemoveAward(entry.id, award.id)}
         className="hover:bg-muted-foreground/10 rounded-full px-1 leading-none"

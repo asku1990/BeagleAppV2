@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "@/components/ui/sonner";
+import { useI18n } from "@/hooks/i18n";
 import {
   createEntryRemovedSyncPayload,
   createEntrySavedSyncPayload,
@@ -32,6 +33,7 @@ export function useShowManagementMutationFlow({
   onStatusTextChange: (nextStatusText: string) => void;
   onRemoveConfirmed: () => void;
 }) {
+  const { t } = useI18n();
   const [applyingEntryId, setApplyingEntryId] = useState<string | null>(null);
   const [isRemovingEntry, setIsRemovingEntry] = useState(false);
   const [pendingServerSync, setPendingServerSync] =
@@ -101,7 +103,8 @@ export function useShowManagementMutationFlow({
       setPendingServerSync(
         createEventSavedSyncPayload({
           showId: response.showId,
-          eventPlace: response.eventPlace,
+          statusText: `${response.eventPlace} ${t("admin.shows.manage.mutation.status.eventSavedSuffix")}`,
+          successToast: t("admin.shows.manage.mutation.toast.eventSaved"),
           selectedEventUpdatedAt,
         }),
       );
@@ -109,7 +112,7 @@ export function useShowManagementMutationFlow({
     } catch (error) {
       const message = toMutationErrorMessage(
         error,
-        "Failed to save event changes.",
+        t("admin.shows.manage.mutation.error.saveEvent"),
       );
       toast.error(message);
       onStatusTextChange(message);
@@ -145,7 +148,8 @@ export function useShowManagementMutationFlow({
       setPendingServerSync(
         createEntrySavedSyncPayload({
           showId: selectedEvent.id,
-          entry,
+          statusText: `${entry.dogName} ${t("admin.shows.manage.mutation.status.entrySavedSuffix")}`,
+          successToast: `${entry.dogName} ${t("admin.shows.manage.mutation.status.entrySavedSuffix")}`,
           selectedEventUpdatedAt,
         }),
       );
@@ -153,7 +157,7 @@ export function useShowManagementMutationFlow({
     } catch (error) {
       const message = toMutationErrorMessage(
         error,
-        `Failed to save ${entry.dogName} changes.`,
+        `${entry.dogName} ${t("admin.shows.manage.mutation.error.saveEntrySuffix")}`,
       );
       toast.error(message);
       onStatusTextChange(message);
@@ -191,7 +195,8 @@ export function useShowManagementMutationFlow({
       setPendingServerSync(
         createEntryRemovedSyncPayload({
           showId: selectedEvent.id,
-          dogName: pendingRemovalEntry.dogName,
+          statusText: `${pendingRemovalEntry.dogName} ${t("admin.shows.manage.mutation.status.entryRemovedSuffix")}`,
+          successToast: `${pendingRemovalEntry.dogName} ${t("admin.shows.manage.mutation.status.entryRemovedSuffix")}`,
           selectedEventUpdatedAt,
         }),
       );
@@ -199,7 +204,7 @@ export function useShowManagementMutationFlow({
     } catch (error) {
       const message = toMutationErrorMessage(
         error,
-        `Failed to remove ${pendingRemovalEntry.dogName} from the event.`,
+        `${pendingRemovalEntry.dogName} ${t("admin.shows.manage.mutation.error.removeEntrySuffix")}`,
       );
       toast.error(message);
       onStatusTextChange(message);

@@ -3,6 +3,7 @@
 import React from "react";
 import { Input } from "@web/components/ui/input";
 import type { AdminShowResultOption } from "@beagle/contracts";
+import { useI18n } from "@/hooks/i18n";
 import type { ManageShowEntry } from "../show-management-types";
 
 type ShowManagementResultFieldsGridProps = {
@@ -39,13 +40,14 @@ export function ShowManagementResultFieldsGrid({
   isDisabled = false,
   onEntryFieldChange,
 }: ShowManagementResultFieldsGridProps) {
+  const { t } = useI18n();
   const pupnParts = getPupnParts(entry.pupn);
   const pupnPrefix = pupnParts.prefix;
 
   return (
     <>
       <label className="space-y-1 text-sm">
-        <span>Judge</span>
+        <span>{t("admin.shows.manage.results.judge")}</span>
         <Input
           value={entry.judge}
           disabled={isDisabled}
@@ -55,7 +57,7 @@ export function ShowManagementResultFieldsGrid({
         />
       </label>
       <label className="space-y-1 text-sm">
-        <span>Height</span>
+        <span>{t("admin.shows.manage.entryResults.height")}</span>
         <Input
           type="number"
           inputMode="numeric"
@@ -67,7 +69,7 @@ export function ShowManagementResultFieldsGrid({
         />
       </label>
       <label className="block space-y-1 text-sm">
-        <span>Quality</span>
+        <span>{t("admin.shows.manage.entryResults.quality")}</span>
         <select
           value={entry.qualityGrade}
           onChange={(event) =>
@@ -85,7 +87,7 @@ export function ShowManagementResultFieldsGrid({
         </select>
       </label>
       <label className="block space-y-1 text-sm">
-        <span>Class</span>
+        <span>{t("admin.shows.manage.entryResults.classResult")}</span>
         <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_120px]">
           <select
             value={entry.classCode}
@@ -112,15 +114,17 @@ export function ShowManagementResultFieldsGrid({
             onChange={(event) =>
               onEntryFieldChange(entry.id, "classPlacement", event.target.value)
             }
-            placeholder="Placement"
+            placeholder={t(
+              "admin.shows.manage.resultFields.placementPlaceholder",
+            )}
           />
         </div>
         <p className="text-xs text-muted-foreground">
-          Example: `AVO 8`. Class and placement stay paired.
+          {t("admin.shows.manage.resultFields.classHelp")}
         </p>
       </label>
       <label className="space-y-1 text-sm">
-        <span>PUPN</span>
+        <span>{t("admin.shows.manage.entryResults.pupn")}</span>
         <div className="grid gap-2 sm:grid-cols-[88px_minmax(0,1fr)]">
           <select
             value={pupnPrefix}
@@ -170,11 +174,11 @@ export function ShowManagementResultFieldsGrid({
                 pupnPrefix === "-" ? "" : `${pupnPrefix}${rank}`,
               );
             }}
-            placeholder="Rank"
+            placeholder={t("admin.shows.manage.resultFields.rankPlaceholder")}
           />
         </div>
         <p className="text-xs text-muted-foreground">
-          Example: `PU8`. Choose `-` to clear the value.
+          {t("admin.shows.manage.resultFields.pupnHelp")}
         </p>
       </label>
     </>

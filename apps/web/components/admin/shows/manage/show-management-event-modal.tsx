@@ -3,6 +3,7 @@
 import { AdminFormModalShell } from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/hooks/i18n";
 import {
   areShowEventFieldsEqual,
   cloneManageShowEvent,
@@ -23,6 +24,7 @@ export function ShowManagementEventModal({
   onClose: () => void;
   onApplyEvent: (draftEvent: ManageShowEvent) => Promise<boolean>;
 }) {
+  const { t } = useI18n();
   const { draft: draftEvent, setDraft: setDraftEvent } = useModalDraftState(
     () => cloneManageShowEvent(selectedEvent),
   );
@@ -32,13 +34,13 @@ export function ShowManagementEventModal({
     <AdminFormModalShell
       open={open}
       onClose={onClose}
-      title="Edit event"
-      ariaLabel="Edit event"
+      title={t("admin.shows.manage.eventModal.title")}
+      ariaLabel={t("admin.shows.manage.eventModal.aria")}
       contentClassName="max-w-xl"
       footer={
         <>
           <Button type="button" variant="outline" onClick={onClose}>
-            Close
+            {t("admin.shows.manage.eventModal.close")}
           </Button>
           <Button
             type="button"
@@ -51,15 +53,18 @@ export function ShowManagementEventModal({
             }
             disabled={isApplying || !isDirty}
           >
-            {isApplying ? "Saving event..." : "Save event"}
+            {isApplying
+              ? t("admin.shows.manage.eventModal.saving")
+              : t("admin.shows.manage.eventModal.save")}
           </Button>
         </>
       }
     >
       <div className="grid gap-3 md:grid-cols-2">
         <label className="space-y-1 text-sm">
-          <span>Date</span>
+          <span>{t("admin.shows.manage.results.date")}</span>
           <Input
+            type="date"
             value={draftEvent.eventDate}
             disabled={isApplying}
             onChange={(event) =>
@@ -71,7 +76,7 @@ export function ShowManagementEventModal({
           />
         </label>
         <label className="space-y-1 text-sm">
-          <span>Place</span>
+          <span>{t("admin.shows.manage.results.place")}</span>
           <Input
             value={draftEvent.eventPlace}
             disabled={isApplying}
@@ -84,7 +89,7 @@ export function ShowManagementEventModal({
           />
         </label>
         <label className="space-y-1 text-sm">
-          <span>City</span>
+          <span>{t("admin.shows.manage.results.city")}</span>
           <Input
             value={draftEvent.eventCity}
             disabled={isApplying}
@@ -97,7 +102,7 @@ export function ShowManagementEventModal({
           />
         </label>
         <label className="space-y-1 text-sm">
-          <span>Type</span>
+          <span>{t("admin.shows.manage.results.type")}</span>
           <Input
             value={draftEvent.eventType}
             disabled={isApplying}
@@ -110,7 +115,7 @@ export function ShowManagementEventModal({
           />
         </label>
         <label className="space-y-1 text-sm">
-          <span>Name</span>
+          <span>{t("admin.shows.manage.results.event")}</span>
           <Input
             value={draftEvent.eventName}
             disabled={isApplying}
@@ -123,7 +128,7 @@ export function ShowManagementEventModal({
           />
         </label>
         <label className="space-y-1 text-sm">
-          <span>Organizer</span>
+          <span>{t("admin.shows.manage.results.organizer")}</span>
           <Input
             value={draftEvent.organizer}
             disabled={isApplying}
@@ -136,7 +141,7 @@ export function ShowManagementEventModal({
           />
         </label>
         <label className="space-y-1 text-sm md:col-span-2">
-          <span>Judge</span>
+          <span>{t("admin.shows.manage.results.judge")}</span>
           <Input
             value={draftEvent.judge}
             disabled={isApplying}

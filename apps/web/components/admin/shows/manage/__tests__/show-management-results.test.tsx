@@ -44,15 +44,15 @@ describe("ShowManagementResults", () => {
     );
 
     expect(html).toContain("Helsinki");
-    expect(html).toContain("2025-06-01");
+    expect(html).toContain("1.6.2025");
     expect(html).toContain("Summer Show");
-    expect(html).toContain("Date:");
-    expect(html).toContain("Place:");
-    expect(html).toContain("City:");
-    expect(html).toContain("Type:");
-    expect(html).toContain("Event:");
-    expect(html).toContain("Organizer:");
-    expect(html).toContain("Judge:");
-    expect(html).toContain("Dogs:");
+    expect(html).toContain("Päivä:");
+    expect(html).toContain("Paikka:");
+    expect(html).toContain("Kaupunki:");
+    expect(html).toContain("Tyyppi:");
+    expect(html).toContain("Tapahtuma:");
+    expect(html).toContain("Järjestäjä:");
+    expect(html).toContain("Tuomari:");
+    expect(html).toContain("Koiria:");
   });
 });

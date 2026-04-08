@@ -1,4 +1,4 @@
-export const fiAdminShowsMessages = {
+export const fiAdminShowsImportMessages = {
   "admin.shows.title": "Ylläpito: näyttelyt",
   "admin.shows.description":
     "Valitse näyttelymoduulin toiminto. Workbook-tuonti avautuu omaan työtilaan ja muut osiot lisätään myöhemmin.",
@@ -10,7 +10,7 @@ export const fiAdminShowsMessages = {
   "admin.shows.home.runs.comingSoon": "Tulossa myöhemmin",
   "admin.shows.home.search.description":
     "Näyttelyhaku ja muokkaus rakennetaan omaksi ylläpitonäkymäkseen tuonnin jälkeen.",
-  "admin.shows.home.search.comingSoon": "Tulossa myöhemmin",
+  "admin.shows.home.search.open": "Avaa haku",
   "admin.shows.import.title": "Workbook-tuonti",
   "admin.shows.import.description":
     "Tähän osioon rakennetaan uusi turvallinen näyttelyiden workbook-tuonti ylläpidolle.",
@@ -166,7 +166,7 @@ export const fiAdminShowsMessages = {
     "Tuonnin kirjoitus epäonnistui. Validoi uudelleen ja yritä uudestaan.",
 } as const;
 
-export const svAdminShowsMessages = {
+export const svAdminShowsImportMessages = {
   "admin.shows.title": "Admin: utstallningar",
   "admin.shows.description":
     "Valj funktion i utstallningsmodulen. Workbook-importen oppnas i en egen arbetsyta och ovriga vyer kommer senare.",
@@ -178,7 +178,7 @@ export const svAdminShowsMessages = {
   "admin.shows.home.runs.comingSoon": "Kommer senare",
   "admin.shows.home.search.description":
     "Utstallningssokning och redigering byggs som en egen adminvy efter importflodet.",
-  "admin.shows.home.search.comingSoon": "Kommer senare",
+  "admin.shows.home.search.open": "Oppna sokning",
   "admin.shows.import.title": "Workbook-import",
   "admin.shows.import.description":
     "Denna sektion bygger en ny och saker workbook-import for utstallningar i admin.",

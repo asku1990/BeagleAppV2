@@ -2,6 +2,7 @@
 
 import React from "react";
 import { ConfirmModal } from "@web/components/ui/confirm-modal";
+import { useI18n } from "@/hooks/i18n";
 import type { PendingRemovalEntry } from "./show-management-types";
 
 type ShowManagementRemovePanelProps = {
@@ -17,24 +18,26 @@ export function ShowManagementRemovePanel({
   onConfirm,
   isConfirming = false,
 }: ShowManagementRemovePanelProps) {
+  const { t } = useI18n();
   return (
     <ConfirmModal
       open={Boolean(pendingRemovalEntry)}
-      title="Remove dog from event"
+      title={t("admin.shows.manage.remove.title")}
       description={
         <>
-          {pendingRemovalEntry?.dogName ?? "This dog"} will be removed only from
-          this event.
+          {pendingRemovalEntry?.dogName ??
+            t("admin.shows.manage.remove.defaultDog")}{" "}
+          {t("admin.shows.manage.remove.descriptionSuffix")}
         </>
       }
-      confirmLabel="Remove"
-      cancelLabel="Cancel"
+      confirmLabel={t("admin.shows.manage.remove.confirm")}
+      cancelLabel={t("admin.shows.manage.remove.cancel")}
       confirmVariant="destructive"
-      ariaLabel="Remove dog from event"
+      ariaLabel={t("admin.shows.manage.remove.aria")}
       onConfirm={onConfirm}
       onCancel={onCancel}
       isConfirming={isConfirming}
-      confirmingLabel="Removing..."
+      confirmingLabel={t("admin.shows.manage.remove.confirming")}
     />
   );
 }

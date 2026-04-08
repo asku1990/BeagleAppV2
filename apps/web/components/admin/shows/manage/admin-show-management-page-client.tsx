@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import type { AdminShowEventSummary } from "@beagle/contracts";
 import { ListingSectionShell } from "@/components/listing";
 import { Card, CardContent } from "@/components/ui/card";
+import { useI18n } from "@/hooks/i18n";
 import {
   toManageShowEditOptions,
   toManageShowEvent,
@@ -18,6 +19,7 @@ const DEFAULT_PAGE_SIZE = 20;
 const EMPTY_SHOW_EVENTS: AdminShowEventSummary[] = [];
 
 export function AdminShowManagementPageClient() {
+  const { t } = useI18n();
   const [query, setQuery] = useState("");
   const [selectedEventIdInput, setSelectedEventIdInput] = useState("");
   const [hasMounted, setHasMounted] = useState(false);
@@ -55,29 +57,28 @@ export function AdminShowManagementPageClient() {
   const searchErrorText =
     searchQuery.error instanceof Error
       ? searchQuery.error.message
-      : "Failed to load admin show events.";
+      : t("admin.shows.manage.error.events");
   const detailErrorText =
     detailQuery.error instanceof Error
       ? detailQuery.error.message
-      : "Failed to load admin show details.";
+      : t("admin.shows.manage.error.details");
   const shouldRenderInteractiveDetail = hasMounted;
 
   return (
     <div className="space-y-4">
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight">
-          Show management
+          {t("admin.shows.manage.title")}
         </h1>
         <p className="text-sm text-muted-foreground">
-          Search shows, open one event, and edit its entries from the live read
-          layer.
+          {t("admin.shows.manage.description")}
         </p>
       </div>
 
       <ListingSectionShell
-        title="Events"
-        subtitle="Search and select a show event from the live admin read endpoint."
-        count={`${searchQuery.data?.total ?? showEvents.length} events`}
+        title={t("admin.shows.manage.events.title")}
+        subtitle={t("admin.shows.manage.events.subtitle")}
+        count={`${searchQuery.data?.total ?? showEvents.length} ${t("admin.shows.manage.events.countSuffix")}`}
       >
         <div className="space-y-3">
           {searchQuery.isError && showEvents.length === 0 ? (
@@ -98,14 +99,14 @@ export function AdminShowManagementPageClient() {
       </ListingSectionShell>
 
       <ListingSectionShell
-        title="Selected event details"
-        subtitle="Edit event-level fields and dog entries for the selected show event."
+        title={t("admin.shows.manage.selected.title")}
+        subtitle={t("admin.shows.manage.selected.subtitle")}
       >
         <div className="space-y-3">
           {!shouldRenderInteractiveDetail ? (
             <Card>
               <CardContent className="p-5 text-sm text-muted-foreground">
-                Loading selected event details...
+                {t("admin.shows.manage.loading.details")}
               </CardContent>
             </Card>
           ) : detailQuery.isError ? (
@@ -117,7 +118,7 @@ export function AdminShowManagementPageClient() {
           ) : isDetailLoading ? (
             <Card>
               <CardContent className="p-5 text-sm text-muted-foreground">
-                Loading selected event details...
+                {t("admin.shows.manage.loading.details")}
               </CardContent>
             </Card>
           ) : selectedEvent ? (
@@ -131,8 +132,7 @@ export function AdminShowManagementPageClient() {
           ) : (
             <Card>
               <CardContent className="p-5 text-sm text-muted-foreground">
-                Search for an event and pick one from the results to inspect its
-                entries.
+                {t("admin.shows.manage.empty.details")}
               </CardContent>
             </Card>
           )}

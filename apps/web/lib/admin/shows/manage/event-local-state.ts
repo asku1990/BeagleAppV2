@@ -2,6 +2,7 @@ import type {
   AdminShowDetailsEvent,
   AdminShowResultOptions,
 } from "@beagle/contracts";
+import { normalizeDateForInput } from "@/lib/admin/core/date";
 import { createManageShowAward } from "./show-management";
 import type {
   ManageShowAward,
@@ -31,7 +32,7 @@ export function toManageShowEvent(
 ): ManageShowEvent {
   return {
     id: show.showId,
-    eventDate: show.eventDate,
+    eventDate: normalizeDateForInput(show.eventDate) ?? "",
     eventPlace: show.eventPlace,
     eventCity: show.eventCity,
     eventName: show.eventName,

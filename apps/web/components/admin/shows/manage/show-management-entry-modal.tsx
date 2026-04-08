@@ -2,6 +2,7 @@
 
 import { AdminFormModalShell } from "@/components/admin";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/hooks/i18n";
 import {
   areShowEntriesEqual,
   cloneManageShowEntry,
@@ -32,6 +33,7 @@ export function ShowManagementEntryModal({
   onClose: () => void;
   onApplyEntry: (entry: ManageShowEntry) => Promise<boolean>;
 }) {
+  const { t } = useI18n();
   const { draft: draftEntry, setDraft: setDraftEntry } = useModalDraftState(
     () => cloneManageShowEntry(entry),
   );
@@ -50,12 +52,12 @@ export function ShowManagementEntryModal({
       open={open}
       onClose={onClose}
       title={entry.dogName}
-      ariaLabel="Edit entry"
+      ariaLabel={t("admin.shows.manage.entryModal.aria")}
       contentClassName="max-h-[90vh] max-w-3xl overflow-y-auto"
       footer={
         <>
           <Button type="button" variant="outline" onClick={onClose}>
-            Close
+            {t("admin.shows.manage.entryModal.close")}
           </Button>
           <Button
             type="button"
@@ -68,7 +70,9 @@ export function ShowManagementEntryModal({
             }
             disabled={isApplying || !isDirty}
           >
-            {isApplying ? "Saving entry..." : "Save entry"}
+            {isApplying
+              ? t("admin.shows.manage.entryModal.saving")
+              : t("admin.shows.manage.entryModal.save")}
           </Button>
         </>
       }
@@ -82,8 +86,8 @@ export function ShowManagementEntryModal({
         }
       >
         {entry.dogId
-          ? "Linked to dog record"
-          : "Using snapshot (dog not linked)"}
+          ? t("admin.shows.manage.entryModal.linked")
+          : t("admin.shows.manage.entryModal.snapshot")}
       </p>
 
       <div className="grid gap-3 md:grid-cols-2">
@@ -149,7 +153,7 @@ export function ShowManagementEntryModal({
 
       {optionsUnavailable ? (
         <p className="text-xs text-destructive">
-          Result options are currently unavailable from the database.
+          {t("admin.shows.manage.entryModal.optionsUnavailable")}
         </p>
       ) : null}
     </AdminFormModalShell>

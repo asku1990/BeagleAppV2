@@ -4,6 +4,8 @@ import type React from "react";
 import type { AdminShowEventSummary } from "@beagle/contracts";
 import { ListingResponsiveResults } from "@/components/listing";
 import { Card, CardContent } from "@/components/ui/card";
+import { useI18n } from "@/hooks/i18n";
+import { formatDateForFinland } from "@/lib/admin/core/date";
 import { cn } from "@/lib/utils";
 
 function formatText(value: string): string {
@@ -24,14 +26,20 @@ export function ShowManagementResults({
   selectedEventId: string | undefined;
   onSelectEvent: (showId: string) => void;
 }) {
+  const { t } = useI18n();
+
   function handleEventSelect(showId: string) {
     onSelectEvent(showId);
+  }
+
+  function eventSelectAriaLabel(eventPlace: string): string {
+    return `${t("admin.shows.manage.results.selectEventAriaPrefix")} ${eventPlace}`;
   }
 
   if (events.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        No matches. Try another place, dog, or date.
+        {t("admin.shows.manage.results.empty")}
       </p>
     );
   }
@@ -44,14 +52,30 @@ export function ShowManagementResults({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b text-left">
-              <th className="px-2 py-2">Date</th>
-              <th className="px-2 py-2">Place</th>
-              <th className="px-2 py-2">City</th>
-              <th className="px-2 py-2">Type</th>
-              <th className="px-2 py-2">Event</th>
-              <th className="px-2 py-2">Organizer</th>
-              <th className="px-2 py-2">Judge</th>
-              <th className="px-2 py-2">Dogs</th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.results.date")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.results.place")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.results.city")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.results.type")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.results.event")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.results.organizer")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.results.judge")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.results.dogs")}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -71,14 +95,16 @@ export function ShowManagementResults({
                   }}
                   role="button"
                   tabIndex={0}
-                  aria-label={`Select ${event.eventPlace} event`}
+                  aria-label={eventSelectAriaLabel(event.eventPlace)}
                   aria-selected={isSelected}
                   className={cn(
                     "border-b align-top cursor-pointer transition-colors focus-visible:bg-muted/40 focus-visible:outline-none",
                     isSelected ? "bg-muted/40" : "hover:bg-muted/20",
                   )}
                 >
-                  <td className="px-2 py-2">{event.eventDate}</td>
+                  <td className="px-2 py-2">
+                    {formatDateForFinland(event.eventDate)}
+                  </td>
                   <td className="px-2 py-2 font-medium">{event.eventPlace}</td>
                   <td className="px-2 py-2">{formatText(event.eventCity)}</td>
                   <td className="px-2 py-2">{formatText(event.eventType)}</td>
@@ -100,7 +126,7 @@ export function ShowManagementResults({
             key={event.showId}
             role="button"
             tabIndex={0}
-            aria-label={`Select ${event.eventPlace} event`}
+            aria-label={eventSelectAriaLabel(event.eventPlace)}
             aria-selected={isSelected}
             onClick={() => handleEventSelect(event.showId)}
             onKeyDown={(keyboardEvent) => {
@@ -124,47 +150,63 @@ export function ShowManagementResults({
                 </div>
                 {isSelected ? (
                   <span className="inline-flex rounded-md bg-muted px-2 py-0.5 text-xs font-medium">
-                    Selected
+                    {t("admin.shows.manage.results.selected")}
                   </span>
                 ) : null}
               </div>
               <div className="grid gap-1 text-sm sm:grid-cols-2">
                 <p>
-                  <span className="text-muted-foreground">Date:</span>{" "}
-                  {event.eventDate}
+                  <span className="text-muted-foreground">
+                    {t("admin.shows.manage.results.date")}:
+                  </span>{" "}
+                  {formatDateForFinland(event.eventDate)}
                 </p>
                 <p>
-                  <span className="text-muted-foreground">Place:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("admin.shows.manage.results.place")}:
+                  </span>{" "}
                   {event.eventPlace}
                 </p>
                 <p>
-                  <span className="text-muted-foreground">City:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("admin.shows.manage.results.city")}:
+                  </span>{" "}
                   {formatText(event.eventCity)}
                 </p>
                 <p>
-                  <span className="text-muted-foreground">Type:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("admin.shows.manage.results.type")}:
+                  </span>{" "}
                   {formatText(event.eventType)}
                 </p>
                 <p>
-                  <span className="text-muted-foreground">Event:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("admin.shows.manage.results.event")}:
+                  </span>{" "}
                   {event.eventName}
                 </p>
                 <p>
-                  <span className="text-muted-foreground">Organizer:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("admin.shows.manage.results.organizer")}:
+                  </span>{" "}
                   {formatText(event.organizer)}
                 </p>
                 <p>
-                  <span className="text-muted-foreground">Judge:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("admin.shows.manage.results.judge")}:
+                  </span>{" "}
                   {formatText(event.judge)}
                 </p>
                 <p>
-                  <span className="text-muted-foreground">Dogs:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("admin.shows.manage.results.dogs")}:
+                  </span>{" "}
                   {event.dogCount}
                 </p>
               </div>
               {isSelected ? (
                 <p className="text-sm font-medium text-muted-foreground">
-                  Selected
+                  {t("admin.shows.manage.results.selected")}
                 </p>
               ) : null}
             </CardContent>

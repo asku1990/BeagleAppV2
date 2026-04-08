@@ -54,6 +54,6 @@ describe("AdminShowsHomePageClient", () => {
     expect(html).toContain("/admin/shows/import");
     expect(html).toContain("admin.shows.home.runs.comingSoon");
     expect(html).toContain("/admin/shows/manage");
-    expect(html).toContain("Open search");
+    expect(html).toContain("admin.shows.home.search.open");
   });
 });

@@ -3,6 +3,7 @@
 import { AdminRowActionsMenu } from "@/components/admin";
 import { ListingResponsiveResults } from "@/components/listing";
 import { Card, CardContent } from "@/components/ui/card";
+import { useI18n } from "@/hooks/i18n";
 import type { ManageShowEntry } from "../show-management-types";
 
 type EntryDisplayState = {
@@ -42,6 +43,7 @@ export function ShowManagementEntryResults({
   onEditEntry: (entryId: string) => void;
   onRemoveEntry: (entry: ManageShowEntry) => void;
 }) {
+  const { t } = useI18n();
   const areActionsDisabled =
     isApplyingEvent || isRemovingEntry || Boolean(applyingEntryId);
 
@@ -53,16 +55,36 @@ export function ShowManagementEntryResults({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b text-left">
-              <th className="px-2 py-2">Reg</th>
-              <th className="px-2 py-2">Name</th>
-              <th className="px-2 py-2">Class result</th>
-              <th className="px-2 py-2">Quality</th>
-              <th className="px-2 py-2">PUPN</th>
-              <th className="px-2 py-2">Awards</th>
-              <th className="px-2 py-2">Height</th>
-              <th className="px-2 py-2">Judge</th>
-              <th className="px-2 py-2">Review text</th>
-              <th className="px-2 py-2">Actions</th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.entryResults.reg")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.entryResults.name")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.entryResults.classResult")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.entryResults.quality")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.entryResults.pupn")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.entryResults.awards")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.entryResults.height")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.entryResults.judge")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.entryResults.reviewText")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.shows.manage.entryResults.actions")}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -79,8 +101,8 @@ export function ShowManagementEntryResults({
                     }
                   >
                     {entry.dogId
-                      ? "Linked to dog record"
-                      : "Using snapshot (dog not linked)"}
+                      ? t("admin.shows.manage.entryModal.linked")
+                      : t("admin.shows.manage.entryModal.snapshot")}
                   </p>
                 </td>
                 <td className="px-2 py-2">
@@ -100,17 +122,17 @@ export function ShowManagementEntryResults({
                 <td className="px-2 py-2">{formatText(entry.critiqueText)}</td>
                 <td className="px-2 py-2">
                   <AdminRowActionsMenu
-                    triggerAriaLabel={`Actions for ${entry.dogName}`}
+                    triggerAriaLabel={`${t("admin.shows.manage.entryResults.actionsAriaPrefix")} ${entry.dogName}`}
                     actions={[
                       {
                         id: "edit",
-                        label: "Edit entry",
+                        label: t("admin.shows.manage.entryResults.editEntry"),
                         onSelect: () => onEditEntry(entry.id),
                         disabled: areActionsDisabled,
                       },
                       {
                         id: "remove",
-                        label: "Remove dog",
+                        label: t("admin.shows.manage.entryResults.removeDog"),
                         onSelect: () => onRemoveEntry(entry),
                         disabled: areActionsDisabled,
                         destructive: true,
@@ -140,35 +162,56 @@ export function ShowManagementEntryResults({
                 }
               >
                 {entry.dogId
-                  ? "Linked to dog record"
-                  : "Using snapshot (dog not linked)"}
+                  ? t("admin.shows.manage.entryModal.linked")
+                  : t("admin.shows.manage.entryModal.snapshot")}
               </p>
             </div>
             <div className="text-sm space-y-1">
-              <p>Reg: {entry.registrationNo}</p>
               <p>
-                Class result:{" "}
+                {t("admin.shows.manage.entryResults.reg")}:{" "}
+                {entry.registrationNo}
+              </p>
+              <p>
+                {t("admin.shows.manage.entryResults.classResult")}:{" "}
                 {entryDisplayStates[entry.id]?.classResultText ?? "-"}
               </p>
-              <p>Quality: {entryDisplayStates[entry.id]?.qualityText ?? "-"}</p>
-              <p>PUPN: {entryDisplayStates[entry.id]?.pupnText ?? "-"}</p>
-              <p>Awards: {entryDisplayStates[entry.id]?.awardsText ?? "-"}</p>
-              <p>Height: {formatHeight(entry.heightCm)}</p>
-              <p>Judge: {formatText(entry.judge)}</p>
-              <p>Review text: {formatText(entry.critiqueText)}</p>
+              <p>
+                {t("admin.shows.manage.entryResults.quality")}:{" "}
+                {entryDisplayStates[entry.id]?.qualityText ?? "-"}
+              </p>
+              <p>
+                {t("admin.shows.manage.entryResults.pupn")}:{" "}
+                {entryDisplayStates[entry.id]?.pupnText ?? "-"}
+              </p>
+              <p>
+                {t("admin.shows.manage.entryResults.awards")}:{" "}
+                {entryDisplayStates[entry.id]?.awardsText ?? "-"}
+              </p>
+              <p>
+                {t("admin.shows.manage.entryResults.height")}:{" "}
+                {formatHeight(entry.heightCm)}
+              </p>
+              <p>
+                {t("admin.shows.manage.entryResults.judge")}:{" "}
+                {formatText(entry.judge)}
+              </p>
+              <p>
+                {t("admin.shows.manage.entryResults.reviewText")}:{" "}
+                {formatText(entry.critiqueText)}
+              </p>
             </div>
             <AdminRowActionsMenu
-              triggerAriaLabel={`Actions for ${entry.dogName}`}
+              triggerAriaLabel={`${t("admin.shows.manage.entryResults.actionsAriaPrefix")} ${entry.dogName}`}
               actions={[
                 {
                   id: "edit",
-                  label: "Edit entry",
+                  label: t("admin.shows.manage.entryResults.editEntry"),
                   onSelect: () => onEditEntry(entry.id),
                   disabled: areActionsDisabled,
                 },
                 {
                   id: "remove",
-                  label: "Remove dog",
+                  label: t("admin.shows.manage.entryResults.removeDog"),
                   onSelect: () => onRemoveEntry(entry),
                   disabled: areActionsDisabled,
                   destructive: true,

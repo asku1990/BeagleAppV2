@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useI18n } from "@/hooks/i18n";
 import type { ManageShowEntry } from "../show-management-types";
 
 type ShowManagementCritiqueFieldProps = {
@@ -18,9 +19,11 @@ export function ShowManagementCritiqueField({
   isDisabled = false,
   onEntryFieldChange,
 }: ShowManagementCritiqueFieldProps) {
+  const { t } = useI18n();
+
   return (
     <label className="space-y-1 text-sm md:col-span-2">
-      <span>Critique</span>
+      <span>{t("admin.shows.manage.critique.label")}</span>
       <textarea
         value={entry.critiqueText}
         disabled={isDisabled}

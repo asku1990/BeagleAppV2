@@ -69,7 +69,7 @@ export function AdminShowsHomePageClient() {
         <ShowModuleCard
           title={t("admin.shows.search.title")}
           description={t("admin.shows.home.search.description")}
-          actionLabel="Open search"
+          actionLabel={t("admin.shows.home.search.open")}
           href="/admin/shows/manage"
         />
       </div>

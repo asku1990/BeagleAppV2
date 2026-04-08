@@ -1,5 +1,4 @@
 import { AdminMutationError } from "@/queries/admin/mutation-error";
-import type { ManageShowEntry } from "@/components/admin/shows/manage/show-management-types";
 
 export type PendingServerSync = {
   targetShowId: string;
@@ -24,42 +23,45 @@ export function toMutationErrorMessage(
 
 export function createEventSavedSyncPayload(input: {
   showId: string;
-  eventPlace: string;
+  statusText: string;
+  successToast: string;
   selectedEventUpdatedAt: number;
 }): PendingServerSync {
   return {
     targetShowId: input.showId,
     baselineUpdatedAt: input.selectedEventUpdatedAt,
-    statusText: `${input.eventPlace} event changes saved.`,
-    successToast: "Event changes saved.",
+    statusText: input.statusText,
+    successToast: input.successToast,
     clearPendingRemoval: false,
   };
 }
 
 export function createEntrySavedSyncPayload(input: {
   showId: string;
-  entry: ManageShowEntry;
+  statusText: string;
+  successToast: string;
   selectedEventUpdatedAt: number;
 }): PendingServerSync {
   return {
     targetShowId: input.showId,
     baselineUpdatedAt: input.selectedEventUpdatedAt,
-    statusText: `${input.entry.dogName} changes saved.`,
-    successToast: `${input.entry.dogName} changes saved.`,
+    statusText: input.statusText,
+    successToast: input.successToast,
     clearPendingRemoval: false,
   };
 }
 
 export function createEntryRemovedSyncPayload(input: {
   showId: string;
-  dogName: string;
+  statusText: string;
+  successToast: string;
   selectedEventUpdatedAt: number;
 }): PendingServerSync {
   return {
     targetShowId: input.showId,
     baselineUpdatedAt: input.selectedEventUpdatedAt,
-    statusText: `${input.dogName} removed from the selected event.`,
-    successToast: `${input.dogName} removed from the selected event.`,
+    statusText: input.statusText,
+    successToast: input.successToast,
     clearPendingRemoval: true,
   };
 }
