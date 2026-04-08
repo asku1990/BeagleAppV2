@@ -51,6 +51,10 @@ export function DogFormModal({
 }: DogFormModalProps) {
   const { t } = useI18n();
   const [ownerCandidate, setOwnerCandidate] = useState("");
+  const todayDateInputValue = useMemo(
+    () => new Date().toISOString().slice(0, 10),
+    [],
+  );
   const isSubmitDisabled = useMemo(() => {
     return (
       isSubmitting ||
@@ -245,6 +249,7 @@ export function DogFormModal({
             onValuesChange({ ...values, birthDate: event.target.value })
           }
           aria-label={t("admin.dogs.form.birthDateAria")}
+          max={todayDateInputValue}
         />
 
         <div className="space-y-2">
