@@ -12,6 +12,19 @@ type EntryDisplayState = {
   awardsText: string;
 };
 
+function formatHeight(heightCm: string): string {
+  const normalized = heightCm.trim();
+  if (!normalized) {
+    return "-";
+  }
+  return `${normalized} cm`;
+}
+
+function formatText(value: string): string {
+  const normalized = value.trim();
+  return normalized || "-";
+}
+
 export function ShowManagementEntryResults({
   entries,
   entryDisplayStates,
@@ -40,22 +53,24 @@ export function ShowManagementEntryResults({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b text-left">
-              <th className="px-2 py-2">Dog</th>
-              <th className="px-2 py-2">Class</th>
+              <th className="px-2 py-2">Reg</th>
+              <th className="px-2 py-2">Name</th>
+              <th className="px-2 py-2">Class result</th>
               <th className="px-2 py-2">Quality</th>
               <th className="px-2 py-2">PUPN</th>
               <th className="px-2 py-2">Awards</th>
+              <th className="px-2 py-2">Height</th>
+              <th className="px-2 py-2">Judge</th>
+              <th className="px-2 py-2">Review text</th>
               <th className="px-2 py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
             {entries.map((entry) => (
               <tr key={entry.id} className="border-b align-top">
+                <td className="px-2 py-2">{entry.registrationNo}</td>
                 <td className="px-2 py-2">
                   <p className="font-medium">{entry.dogName}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {entry.registrationNo}
-                  </p>
                   <p
                     className={
                       entry.dogId
@@ -80,6 +95,9 @@ export function ShowManagementEntryResults({
                 <td className="px-2 py-2">
                   {entryDisplayStates[entry.id]?.awardsText ?? "-"}
                 </td>
+                <td className="px-2 py-2">{formatHeight(entry.heightCm)}</td>
+                <td className="px-2 py-2">{formatText(entry.judge)}</td>
+                <td className="px-2 py-2">{formatText(entry.critiqueText)}</td>
                 <td className="px-2 py-2">
                   <AdminRowActionsMenu
                     triggerAriaLabel={`Actions for ${entry.dogName}`}
@@ -127,12 +145,17 @@ export function ShowManagementEntryResults({
               </p>
             </div>
             <div className="text-sm space-y-1">
+              <p>Reg: {entry.registrationNo}</p>
               <p>
-                Class: {entryDisplayStates[entry.id]?.classResultText ?? "-"}
+                Class result:{" "}
+                {entryDisplayStates[entry.id]?.classResultText ?? "-"}
               </p>
               <p>Quality: {entryDisplayStates[entry.id]?.qualityText ?? "-"}</p>
               <p>PUPN: {entryDisplayStates[entry.id]?.pupnText ?? "-"}</p>
               <p>Awards: {entryDisplayStates[entry.id]?.awardsText ?? "-"}</p>
+              <p>Height: {formatHeight(entry.heightCm)}</p>
+              <p>Judge: {formatText(entry.judge)}</p>
+              <p>Review text: {formatText(entry.critiqueText)}</p>
             </div>
             <AdminRowActionsMenu
               triggerAriaLabel={`Actions for ${entry.dogName}`}

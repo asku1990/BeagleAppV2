@@ -122,6 +122,7 @@ export function AdminShowManagementPageClient() {
             </Card>
           ) : selectedEvent ? (
             <ShowManagementSelectedEventPanel
+              key={selectedEvent.id}
               selectedEvent={selectedEvent}
               selectedEventUpdatedAt={detailQuery.dataUpdatedAt}
               resultOptions={resultOptions}
