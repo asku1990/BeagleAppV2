@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ADMIN_WRITE_TX_CONFIG } from "@db/core/interactive-write-transaction";
 import { updateAdminShowEntryWriteDb } from "../update-show-entry";
 
 const {
@@ -141,6 +142,39 @@ describe("updateAdminShowEntryWriteDb", () => {
         awards: [],
       }),
     ).resolves.toEqual({ status: "invalid_class_code" });
+  });
+
+  it("passes explicit transaction timeout options", async () => {
+    showEventFindFirstMock.mockResolvedValue({ id: "event-1" });
+    showEntryFindFirstMock.mockResolvedValue({
+      id: "entry-1",
+      entryLookupKey: "FI123/21|2025-06-01|HELSINKI",
+    });
+    showResultDefinitionFindManyMock.mockResolvedValue([]);
+    showEntryUpdateMock.mockResolvedValue({ id: "entry-1" });
+    showResultItemDeleteManyMock.mockResolvedValue({ count: 0 });
+    showResultItemCreateManyMock.mockResolvedValue({ count: 0 });
+
+    await updateAdminShowEntryWriteDb({
+      eventKey: "2025-06-01|HELSINKI",
+      eventDate: new Date("2025-06-01T00:00:00.000Z"),
+      eventPlace: "Helsinki",
+      entryId: "entry-1",
+      judge: null,
+      critiqueText: null,
+      heightText: null,
+      classCode: null,
+      qualityGrade: null,
+      classPlacement: null,
+      pupn: null,
+      awards: [],
+    });
+
+    expect(prismaTransactionMock).toHaveBeenCalledTimes(1);
+    expect(prismaTransactionMock).toHaveBeenLastCalledWith(
+      expect.any(Function),
+      ADMIN_WRITE_TX_CONFIG,
+    );
   });
 
   it("updates entry fields and replaces editable result items", async () => {

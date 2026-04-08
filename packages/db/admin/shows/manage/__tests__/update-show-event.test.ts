@@ -1,23 +1,25 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ADMIN_WRITE_TX_CONFIG } from "@db/core/interactive-write-transaction";
 import { updateAdminShowEventWriteDb } from "../update-show-event";
 
 const {
   prismaTransactionMock,
+  executeRawMock,
   showEventFindFirstMock,
   showEventFindManyMock,
   showEventFindUniqueMock,
   showEventUpdateMock,
-  showEntryUpdateMock,
-  showResultItemUpdateMock,
+  showEntryUpdateManyMock,
 } = vi.hoisted(() => {
+  const executeRaw = vi.fn();
   const showEventFindFirst = vi.fn();
   const showEventFindMany = vi.fn();
   const showEventFindUnique = vi.fn();
   const showEventUpdate = vi.fn();
-  const showEntryUpdate = vi.fn();
-  const showResultItemUpdate = vi.fn();
+  const showEntryUpdateMany = vi.fn();
 
   const tx = {
+    $executeRaw: executeRaw,
     showEvent: {
       findFirst: showEventFindFirst,
       findMany: showEventFindMany,
@@ -25,21 +27,18 @@ const {
       update: showEventUpdate,
     },
     showEntry: {
-      update: showEntryUpdate,
-    },
-    showResultItem: {
-      update: showResultItemUpdate,
+      updateMany: showEntryUpdateMany,
     },
   };
 
   return {
     prismaTransactionMock: vi.fn(async (callback) => callback(tx)),
+    executeRawMock: executeRaw,
     showEventFindFirstMock: showEventFindFirst,
     showEventFindManyMock: showEventFindMany,
     showEventFindUniqueMock: showEventFindUnique,
     showEventUpdateMock: showEventUpdate,
-    showEntryUpdateMock: showEntryUpdate,
-    showResultItemUpdateMock: showResultItemUpdate,
+    showEntryUpdateManyMock: showEntryUpdateMany,
   };
 });
 
@@ -52,12 +51,12 @@ vi.mock("@db/core/prisma", () => ({
 describe("updateAdminShowEventWriteDb", () => {
   beforeEach(() => {
     prismaTransactionMock.mockClear();
+    executeRawMock.mockReset();
     showEventFindFirstMock.mockReset();
     showEventFindManyMock.mockReset();
     showEventFindUniqueMock.mockReset();
     showEventUpdateMock.mockReset();
-    showEntryUpdateMock.mockReset();
-    showResultItemUpdateMock.mockReset();
+    showEntryUpdateManyMock.mockReset();
   });
 
   it("returns not_found when event key lookup misses", async () => {
@@ -86,7 +85,6 @@ describe("updateAdminShowEventWriteDb", () => {
     showEventFindFirstMock.mockResolvedValue({
       id: "event-1",
       eventLookupKey: "2025-06-01|HELSINKI",
-      entries: [],
     });
     showEventFindUniqueMock.mockResolvedValue({
       id: "event-2",
@@ -111,23 +109,48 @@ describe("updateAdminShowEventWriteDb", () => {
     expect(showEventUpdateMock).not.toHaveBeenCalled();
   });
 
+  it("passes explicit transaction timeout options", async () => {
+    showEventFindFirstMock.mockResolvedValue({
+      id: "event-1",
+      eventLookupKey: "2025-06-01|HELSINKI",
+    });
+    showEventUpdateMock.mockResolvedValue({
+      eventLookupKey: "2025-06-01|HELSINKI",
+      eventDate: new Date("2025-06-01T00:00:00.000Z"),
+      eventPlace: "Helsinki",
+      eventCity: null,
+      eventName: null,
+      eventType: null,
+      organizer: null,
+    });
+    executeRawMock.mockResolvedValue(0);
+    showEntryUpdateManyMock.mockResolvedValue({ count: 0 });
+
+    await updateAdminShowEventWriteDb({
+      eventKey: "2025-06-01|HELSINKI",
+      eventDate: new Date("2025-06-01T00:00:00.000Z"),
+      eventPlace: "Helsinki",
+      nextEventLookupKey: "2025-06-01|HELSINKI",
+      nextEventDate: new Date("2025-06-01T00:00:00.000Z"),
+      nextEventPlace: "Helsinki",
+      nextEventCity: null,
+      nextEventName: null,
+      nextEventType: null,
+      nextOrganizer: null,
+      nextJudge: null,
+    });
+
+    expect(prismaTransactionMock).toHaveBeenCalledTimes(1);
+    expect(prismaTransactionMock).toHaveBeenLastCalledWith(
+      expect.any(Function),
+      ADMIN_WRITE_TX_CONFIG,
+    );
+  });
+
   it("updates event and cascades lookup keys for entries/items when event key changes", async () => {
     showEventFindFirstMock.mockResolvedValue({
       id: "event-1",
       eventLookupKey: "2025-06-01|HELSINKI",
-      entries: [
-        {
-          id: "entry-1",
-          entryLookupKey: "FI12345/21|2025-06-01|HELSINKI",
-          registrationNoSnapshot: "FI12345/21",
-          resultItems: [
-            {
-              id: "item-1",
-              itemLookupKey: "FI12345/21|2025-06-01|HELSINKI|ERI|flag:1|1",
-            },
-          ],
-        },
-      ],
     });
     showEventFindUniqueMock.mockResolvedValue(null);
     showEventUpdateMock.mockResolvedValue({
@@ -138,8 +161,9 @@ describe("updateAdminShowEventWriteDb", () => {
       eventName: "Updated",
       eventType: "Specialty",
       organizer: "Club",
-      judge: "Judge A",
     });
+    executeRawMock.mockResolvedValue(2);
+    showEntryUpdateManyMock.mockResolvedValue({ count: 1 });
 
     const result = await updateAdminShowEventWriteDb({
       eventKey: "2025-06-01|HELSINKI",
@@ -177,15 +201,13 @@ describe("updateAdminShowEventWriteDb", () => {
         }),
       }),
     );
-    expect(showEntryUpdateMock).toHaveBeenCalledWith({
-      where: { id: "entry-1" },
-      data: { entryLookupKey: "FI12345/21|2025-06-02|ESPOO" },
-    });
-    expect(showResultItemUpdateMock).toHaveBeenCalledWith({
-      where: { id: "item-1" },
-      data: {
-        itemLookupKey: "FI12345/21|2025-06-02|ESPOO|ERI|flag:1|1",
+    expect(executeRawMock).toHaveBeenCalledTimes(1);
+    expect(showEntryUpdateManyMock).toHaveBeenCalledWith({
+      where: {
+        showEventId: "event-1",
+        OR: [{ judge: null }, { judge: { not: "Judge A" } }],
       },
+      data: { judge: "Judge A" },
     });
   });
 
@@ -194,7 +216,6 @@ describe("updateAdminShowEventWriteDb", () => {
       {
         id: "event-1",
         eventLookupKey: "2025-06-01|HELSINKI",
-        entries: [],
       },
     ]);
     showEventUpdateMock.mockResolvedValue({
@@ -205,8 +226,8 @@ describe("updateAdminShowEventWriteDb", () => {
       eventName: null,
       eventType: null,
       organizer: null,
-      judge: null,
     });
+    showEntryUpdateManyMock.mockResolvedValue({ count: 1 });
 
     const result = await updateAdminShowEventWriteDb({
       eventKey: null,
@@ -240,7 +261,13 @@ describe("updateAdminShowEventWriteDb", () => {
         take: 2,
       }),
     );
-    expect(showEntryUpdateMock).not.toHaveBeenCalled();
-    expect(showResultItemUpdateMock).not.toHaveBeenCalled();
+    expect(executeRawMock).not.toHaveBeenCalled();
+    expect(showEntryUpdateManyMock).toHaveBeenCalledWith({
+      where: {
+        showEventId: "event-1",
+        judge: { not: null },
+      },
+      data: { judge: null },
+    });
   });
 });

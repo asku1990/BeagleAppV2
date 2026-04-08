@@ -317,4 +317,41 @@ describe("updateAdminShowEvent", () => {
       },
     });
   });
+
+  it("returns 409 write timeout when db transaction expires", async () => {
+    updateAdminShowEventWriteDbMock.mockRejectedValue(
+      new Error(
+        "Transaction API error: A query cannot be executed on an expired transaction.",
+      ),
+    );
+    const showId = encodeShowId("2025-06-01", "Helsinki", "show-event-1");
+
+    await expect(
+      updateAdminShowEvent(
+        {
+          showId,
+          eventDate: "2025-06-01",
+          eventPlace: "Helsinki",
+          eventCity: "",
+          eventName: "",
+          eventType: "",
+          organizer: "",
+          judge: "",
+        },
+        {
+          id: "u_1",
+          email: "admin@example.com",
+          username: null,
+          role: "ADMIN",
+        },
+      ),
+    ).resolves.toEqual({
+      status: 409,
+      body: {
+        ok: false,
+        error: "Show update timed out before commit. Retry the update.",
+        code: "WRITE_TIMEOUT",
+      },
+    });
+  });
 });

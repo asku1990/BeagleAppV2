@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ADMIN_WRITE_TX_CONFIG } from "@db/core/interactive-write-transaction";
 import { deleteAdminShowEntryWriteDb } from "../delete-show-entry";
 
 const {
@@ -94,6 +95,24 @@ describe("deleteAdminShowEntryWriteDb", () => {
         showEventId: "event-1",
       },
     });
+  });
+
+  it("passes explicit transaction timeout options", async () => {
+    showEventFindFirstMock.mockResolvedValue({ id: "event-1" });
+    showEntryDeleteManyMock.mockResolvedValue({ count: 1 });
+
+    await deleteAdminShowEntryWriteDb({
+      eventKey: "2025-06-01|HELSINKI",
+      eventDate: new Date("2025-06-01T00:00:00.000Z"),
+      eventPlace: "Helsinki",
+      entryId: "entry-1",
+    });
+
+    expect(prismaTransactionMock).toHaveBeenCalledTimes(1);
+    expect(prismaTransactionMock).toHaveBeenLastCalledWith(
+      expect.any(Function),
+      ADMIN_WRITE_TX_CONFIG,
+    );
   });
 
   it("returns not_found when date/place fallback matches multiple events", async () => {

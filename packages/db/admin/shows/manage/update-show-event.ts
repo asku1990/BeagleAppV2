@@ -1,4 +1,5 @@
-import type { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { ADMIN_WRITE_TX_CONFIG } from "@db/core/interactive-write-transaction";
 import { prisma } from "@db/core/prisma";
 import { resolveAdminShowEventTargetDb } from "./internal/event-target";
 import type {
@@ -19,118 +20,84 @@ async function resolveTargetEvent(
   const select = {
     id: true,
     eventLookupKey: true,
-    entries: {
-      select: {
-        id: true,
-        judge: true,
-        entryLookupKey: true,
-        registrationNoSnapshot: true,
-        resultItems: {
-          select: {
-            id: true,
-            itemLookupKey: true,
-          },
-        },
-      },
-    },
   } satisfies Prisma.ShowEventSelect;
 
   return resolveAdminShowEventTargetDb<{
     id: string;
     eventLookupKey: string;
-    entries: Array<{
-      id: string;
-      judge: string | null;
-      entryLookupKey: string;
-      registrationNoSnapshot: string;
-      resultItems: Array<{
-        id: string;
-        itemLookupKey: string;
-      }>;
-    }>;
   }>(tx, input, select);
-}
-
-function replaceLookupPrefix(
-  currentLookupKey: string,
-  currentPrefix: string,
-  nextPrefix: string,
-): string {
-  const expectedPrefix = `${currentPrefix}|`;
-  if (!currentLookupKey.startsWith(expectedPrefix)) {
-    return currentLookupKey;
-  }
-
-  return `${nextPrefix}|${currentLookupKey.slice(expectedPrefix.length)}`;
 }
 
 async function syncLookupKeysAfterEventMove(
   tx: Prisma.TransactionClient,
   input: {
+    eventId: string;
     currentEventLookupKey: string;
     nextEventLookupKey: string;
-    entries: Array<{
-      id: string;
-      entryLookupKey: string;
-      registrationNoSnapshot: string;
-      resultItems: Array<{
-        id: string;
-        itemLookupKey: string;
-      }>;
-    }>;
   },
 ): Promise<void> {
   if (input.currentEventLookupKey === input.nextEventLookupKey) {
     return;
   }
 
-  for (const entry of input.entries) {
-    const nextEntryLookupKey = `${entry.registrationNoSnapshot}|${input.nextEventLookupKey}`;
-    if (entry.entryLookupKey !== nextEntryLookupKey) {
-      await tx.showEntry.update({
-        where: { id: entry.id },
-        data: { entryLookupKey: nextEntryLookupKey },
-      });
-    }
-
-    for (const resultItem of entry.resultItems) {
-      const nextItemLookupKey = replaceLookupPrefix(
-        resultItem.itemLookupKey,
-        entry.entryLookupKey,
-        nextEntryLookupKey,
-      );
-      if (resultItem.itemLookupKey === nextItemLookupKey) {
-        continue;
-      }
-
-      await tx.showResultItem.update({
-        where: { id: resultItem.id },
-        data: { itemLookupKey: nextItemLookupKey },
-      });
-    }
-  }
+  await tx.$executeRaw(
+    Prisma.sql`
+      WITH moved_entries AS (
+        SELECT
+          entry.id,
+          entry."entryLookupKey" AS current_entry_lookup_key,
+          entry."registrationNoSnapshot" || '|' || ${input.nextEventLookupKey} AS next_entry_lookup_key
+        FROM "ShowEntry" entry
+        WHERE entry."showEventId" = ${input.eventId}
+      ),
+      updated_entries AS (
+        UPDATE "ShowEntry" entry
+        SET "entryLookupKey" = moved_entries.next_entry_lookup_key
+        FROM moved_entries
+        WHERE entry.id = moved_entries.id
+          AND entry."entryLookupKey" <> moved_entries.next_entry_lookup_key
+        RETURNING
+          entry.id,
+          moved_entries.current_entry_lookup_key,
+          moved_entries.next_entry_lookup_key
+      )
+      UPDATE "ShowResultItem" item
+      SET "itemLookupKey" = updated_entries.next_entry_lookup_key || substring(
+        item."itemLookupKey"
+        FROM char_length(updated_entries.current_entry_lookup_key) + 2
+      )
+      FROM updated_entries
+      WHERE item."showEntryId" = updated_entries.id
+        AND left(
+          item."itemLookupKey",
+          char_length(updated_entries.current_entry_lookup_key) + 1
+        ) = updated_entries.current_entry_lookup_key || '|'
+        AND item."itemLookupKey" <> updated_entries.next_entry_lookup_key || substring(
+          item."itemLookupKey"
+          FROM char_length(updated_entries.current_entry_lookup_key) + 2
+        )
+    `,
+  );
 }
 
 async function syncEntryJudgeAfterEventUpdate(
   tx: Prisma.TransactionClient,
   input: {
+    eventId: string;
     targetJudge: string | null;
-    entries: Array<{
-      id: string;
-      judge: string | null;
-    }>;
   },
 ): Promise<void> {
-  for (const entry of input.entries) {
-    if (entry.judge === input.targetJudge) {
-      continue;
-    }
-
-    await tx.showEntry.update({
-      where: { id: entry.id },
-      data: { judge: input.targetJudge },
-    });
-  }
+  await tx.showEntry.updateMany({
+    where: {
+      showEventId: input.eventId,
+      ...(input.targetJudge === null
+        ? { judge: { not: null } }
+        : {
+            OR: [{ judge: null }, { judge: { not: input.targetJudge } }],
+          }),
+    },
+    data: { judge: input.targetJudge },
+  });
 }
 
 export async function updateAdminShowEventWriteDb(
@@ -180,13 +147,13 @@ export async function updateAdminShowEventWriteDb(
     });
 
     await syncLookupKeysAfterEventMove(tx, {
+      eventId: targetEvent.id,
       currentEventLookupKey: targetEvent.eventLookupKey,
       nextEventLookupKey: input.nextEventLookupKey,
-      entries: targetEvent.entries,
     });
     await syncEntryJudgeAfterEventUpdate(tx, {
+      eventId: targetEvent.id,
       targetJudge: input.nextJudge,
-      entries: targetEvent.entries,
     });
 
     const row: UpdatedAdminShowEventRowDb = {
@@ -201,5 +168,5 @@ export async function updateAdminShowEventWriteDb(
     };
 
     return { status: "updated", row };
-  });
+  }, ADMIN_WRITE_TX_CONFIG);
 }
