@@ -2,6 +2,7 @@ import type {
   AdminShowResultOptionDb,
   AdminShowResultOptionsDb,
 } from "@db/admin/shows/manage/types";
+import { LEGACY_QUALITY_MAX, LEGACY_QUALITY_MIN } from "./legacy-quality";
 import {
   CATEGORY_CLASS,
   CATEGORY_PLACEMENT,
@@ -14,8 +15,6 @@ import {
 } from "./result-types";
 
 const PUPN_MAX_RANK = 4;
-const LEGACY_QUALITY_MIN = 1;
-const LEGACY_QUALITY_MAX = 6;
 
 function buildDefinitionOptionLabel(
   definition: AdminShowResultDefinitionOptionRow,

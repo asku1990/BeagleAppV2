@@ -28,6 +28,7 @@
     "db:seed:initial-test-data": "pnpm --filter @beagle/db seed:initial-test-data",
     "db:dump": "bash ./scripts/db/dump.sh",
     "db:restore": "bash ./scripts/db/restore.sh",
+    "legacy:restore": "bash ./scripts/db/restore-legacy.sh",
     "audit:prune": "pnpm --filter @beagle/db audit:prune",
     "auth:generate": "pnpm dlx @better-auth/cli@latest generate --config packages/server/auth/better-auth.ts",
     "auth:migrate": "pnpm dlx @better-auth/cli@latest migrate --config packages/server/auth/better-auth.ts",

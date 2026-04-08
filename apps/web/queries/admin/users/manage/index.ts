@@ -1,4 +1,3 @@
-export { AdminMutationError } from "./mutation-error";
 export { adminUsersQueryKey } from "./query-keys";
 export { useAdminUsersQuery } from "./use-admin-users-query";
 export { useCreateAdminUserMutation } from "./use-create-admin-user-mutation";

@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import type { AdminShowWorkbookImportPreviewResponse } from "@beagle/contracts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { beagleTheme } from "@/components/ui/beagle-theme";

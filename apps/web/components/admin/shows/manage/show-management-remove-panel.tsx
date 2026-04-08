@@ -8,12 +8,14 @@ type ShowManagementRemovePanelProps = {
   pendingRemovalEntry: PendingRemovalEntry;
   onCancel: () => void;
   onConfirm: () => void;
+  isConfirming?: boolean;
 };
 
 export function ShowManagementRemovePanel({
   pendingRemovalEntry,
   onCancel,
   onConfirm,
+  isConfirming = false,
 }: ShowManagementRemovePanelProps) {
   return (
     <ConfirmModal
@@ -31,6 +33,8 @@ export function ShowManagementRemovePanel({
       ariaLabel="Remove dog from event"
       onConfirm={onConfirm}
       onCancel={onCancel}
+      isConfirming={isConfirming}
+      confirmingLabel="Removing..."
     />
   );
 }

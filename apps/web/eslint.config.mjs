@@ -62,6 +62,23 @@ const webConfig = [
       "no-restricted-imports": dbImportRestriction,
     },
   },
+  {
+    files: ["queries/admin/**/*.{ts,tsx,mts}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@/queries/admin",
+              message:
+                "Avoid importing the admin barrel from admin query internals to prevent circular dependencies.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
 
 export default webConfig;

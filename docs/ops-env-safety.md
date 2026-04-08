@@ -125,6 +125,22 @@ pass-cli run --env-file .env.staging -- pnpm import:phase1
 CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:phase1
 ```
 
+Legacy dump restore into MariaDB:
+
+```bash
+# Default dump file:
+# /Users/akikuivas/personal-projects/beagle/beagle_db_v1_dumps/beagle.sql
+pass-cli run --env-file .env.local -- pnpm legacy:restore
+pass-cli run --env-file .env.staging -- pnpm legacy:restore
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm legacy:restore
+
+# Override the target database name if needed.
+pass-cli run --env-file .env.local -- pnpm legacy:restore /path/to/beagle.sql beagle_db_v1
+```
+
+Note: `legacy:restore` drops the target MariaDB database if it exists, recreates it, and restores the dump into it.
+Use `CONFIRM_PROD=YES` for any prod-targeted restore.
+
 Phase-2 import:
 
 ```bash

@@ -3,8 +3,12 @@ import {
   beagleNewestQueryKeyRoot,
   beagleSearchQueryKeyRoot,
 } from "@/queries/public/beagle/search/query-keys";
+import {
+  beagleShowDetailsQueryKeyRoot,
+  beagleShowSearchQueryKeyRoot,
+} from "@/queries/public/beagle/shows/query-keys";
 import { homeStatisticsQueryKey } from "@/queries/public/home/statistics/query-keys";
-import { AdminMutationError } from "@/queries/admin/dogs/manage/mutation-error";
+import { AdminMutationError } from "@/queries/admin/mutation-error";
 import {
   adminDogBreederOptionsQueryKeyRoot,
   adminDogOwnerOptionsQueryKeyRoot,
@@ -112,7 +116,7 @@ describe("useCreateAdminDogMutation", () => {
 
     await options.onSuccess();
 
-    expect(invalidateQueriesMock).toHaveBeenCalledTimes(7);
+    expect(invalidateQueriesMock).toHaveBeenCalledTimes(9);
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
       queryKey: adminDogsQueryKeyRoot,
     });
@@ -130,6 +134,12 @@ describe("useCreateAdminDogMutation", () => {
     });
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
       queryKey: beagleNewestQueryKeyRoot,
+    });
+    expect(invalidateQueriesMock).toHaveBeenCalledWith({
+      queryKey: beagleShowSearchQueryKeyRoot,
+    });
+    expect(invalidateQueriesMock).toHaveBeenCalledWith({
+      queryKey: beagleShowDetailsQueryKeyRoot,
     });
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
       queryKey: homeStatisticsQueryKey,

@@ -456,6 +456,52 @@ describe("getBeagleShowDetailsDb", () => {
     });
   });
 
+  it("renders legacy quality as numeric even when legacy definition is visible", async () => {
+    showEventFindManyMock.mockResolvedValue([
+      {
+        eventLookupKey: "show-event-legacy-visible",
+        eventDate: new Date("2025-06-01T12:34:00.000Z"),
+        eventPlace: "Helsinki",
+        entries: [
+          {
+            id: "r-legacy-visible",
+            judge: "Judge Main",
+            heightText: null,
+            dog: {
+              id: "d-legacy-visible",
+              name: "Legacy Dog",
+              sex: DogSex.UNKNOWN,
+              registrations: [{ registrationNo: "FI-999/25" }],
+            },
+            resultItems: [
+              {
+                valueCode: null,
+                valueNumeric: 4,
+                isAwarded: null,
+                definition: makeDefinition(
+                  "LEGACY-LAATUARVOSTELU",
+                  "LAATUARVOSTELU",
+                  20,
+                  70,
+                  true,
+                ),
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+
+    const result = await getBeagleShowDetailsDb({
+      eventDate: new Date("2025-06-01T00:00:00.000Z"),
+      eventPlace: "Helsinki",
+    });
+
+    expect(result?.items[0]).toMatchObject({
+      qualityGrade: "4",
+    });
+  });
+
   it("keeps unlinked canonical entries visible with snapshot identity", async () => {
     showEventFindManyMock.mockResolvedValue([
       {

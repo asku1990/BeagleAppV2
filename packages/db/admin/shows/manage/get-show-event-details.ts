@@ -62,11 +62,24 @@ export async function getAdminShowEventDetailsDb(
     entries: {
       select: {
         id: true,
+        dogId: true,
         judge: true,
         critiqueText: true,
         heightText: true,
         registrationNoSnapshot: true,
         dogNameSnapshot: true,
+        dog: {
+          select: {
+            name: true,
+            registrations: {
+              select: {
+                registrationNo: true,
+              },
+              orderBy: [{ createdAt: "asc" }, { registrationNo: "asc" }],
+              take: 1,
+            },
+          },
+        },
         resultItems: {
           select: {
             valueCode: true,
@@ -115,8 +128,10 @@ export async function getAdminShowEventDetailsDb(
   const items = event.entries
     .map((row) => ({
       id: row.id,
-      registrationNo: row.registrationNoSnapshot,
-      dogName: row.dogNameSnapshot,
+      dogId: row.dogId,
+      registrationNo:
+        row.dog?.registrations[0]?.registrationNo ?? row.registrationNoSnapshot,
+      dogName: row.dog?.name ?? row.dogNameSnapshot,
       judge: row.judge,
       critiqueText: row.critiqueText,
       heightCm: parseHeightCm(row.heightText),

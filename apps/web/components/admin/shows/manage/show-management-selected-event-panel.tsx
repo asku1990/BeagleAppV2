@@ -11,53 +11,52 @@ import type {
 
 export function ShowManagementSelectedEventPanel({
   selectedEvent,
+  selectedEventUpdatedAt,
   resultOptions,
+  onSelectedEventIdChange,
 }: {
   selectedEvent: ManageShowEvent;
+  selectedEventUpdatedAt: number;
   resultOptions: ManageShowEditOptions;
+  onSelectedEventIdChange: (nextShowId: string) => void;
 }) {
   const {
-    draftEvent,
     pendingRemovalEntry,
     statusText,
-    dirtyEntryIds,
-    isEventDirty,
-    handleEventFieldChange,
-    handleEntryFieldChange,
-    handleAddAward,
-    handleRemoveAward,
     handleApplyEvent,
     handleApplyEntry,
     handleRequestRemoveEntry,
     handleCancelRemove,
     handleConfirmRemove,
-    handleResetShell,
+    isApplyingEvent,
+    isSyncingAfterSave,
+    applyingEntryId,
+    isRemovingEntry,
   } = useShowManagementSelectedEventState({
     selectedEvent,
+    selectedEventUpdatedAt,
+    onSelectedEventIdChange,
   });
 
   return (
     <>
       <ShowManagementEditorPanel
-        selectedEvent={draftEvent}
+        selectedEvent={selectedEvent}
         resultOptions={resultOptions}
-        isEventDirty={isEventDirty}
-        dirtyEntryIds={dirtyEntryIds}
-        onEventFieldChange={handleEventFieldChange}
-        onEntryFieldChange={handleEntryFieldChange}
-        onAddAward={handleAddAward}
-        onRemoveAward={handleRemoveAward}
         onApplyEvent={handleApplyEvent}
         onApplyEntry={handleApplyEntry}
         onRequestRemoveEntry={handleRequestRemoveEntry}
-        onResetShell={handleResetShell}
         statusText={statusText}
+        isApplyingEvent={isApplyingEvent || isSyncingAfterSave}
+        applyingEntryId={applyingEntryId}
+        isRemovingEntry={isRemovingEntry}
       />
 
       <ShowManagementRemovePanel
         pendingRemovalEntry={pendingRemovalEntry}
         onCancel={handleCancelRemove}
-        onConfirm={handleConfirmRemove}
+        onConfirm={() => void handleConfirmRemove()}
+        isConfirming={isRemovingEntry}
       />
     </>
   );

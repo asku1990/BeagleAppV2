@@ -1,11 +1,14 @@
 "use client";
 
-import React from "react";
-import { Button } from "@web/components/ui/button";
-import { Card, CardContent } from "@web/components/ui/card";
-import { Input } from "@web/components/ui/input";
-import { Separator } from "@web/components/ui/separator";
-import { ShowManagementEntryCard } from "./show-management-entry-card";
+import React, { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { buildEntryDisplayState } from "@/lib/admin/shows/manage";
+import { ShowManagementEntryResults } from "./internal/show-management-entry-results";
+import { ShowManagementSelectedEventHeader } from "./internal/show-management-selected-event-header";
+import { ShowManagementStatusFooter } from "./internal/show-management-status-footer";
+import { ShowManagementEntryModal } from "./show-management-entry-modal";
+import { ShowManagementEventModal } from "./show-management-event-modal";
 import type {
   ManageShowEditOptions,
   ManageShowEntry,
@@ -15,41 +18,32 @@ import type {
 type ShowManagementEditorPanelProps = {
   selectedEvent: ManageShowEvent | null;
   resultOptions: ManageShowEditOptions;
-  isEventDirty: boolean;
-  dirtyEntryIds: string[];
-  onEventFieldChange: (
-    field: keyof Omit<ManageShowEvent, "id" | "entries">,
-    value: string,
-  ) => void;
-  onEntryFieldChange: (
-    entryId: string,
-    field: keyof Omit<ManageShowEntry, "id" | "awards">,
-    value: string,
-  ) => void;
-  onAddAward: (entryId: string, award: string) => void;
-  onRemoveAward: (entryId: string, awardId: string) => void;
-  onApplyEvent: () => void;
-  onApplyEntry: (entry: ManageShowEntry) => void;
+  onApplyEvent: (event: ManageShowEvent) => Promise<boolean>;
+  onApplyEntry: (entry: ManageShowEntry) => Promise<boolean>;
   onRequestRemoveEntry: (entry: ManageShowEntry) => void;
-  onResetShell: () => void;
   statusText: string;
+  isApplyingEvent: boolean;
+  applyingEntryId: string | null;
+  isRemovingEntry: boolean;
 };
 
 export function ShowManagementEditorPanel({
   selectedEvent,
   resultOptions,
-  isEventDirty,
-  dirtyEntryIds,
-  onEventFieldChange,
-  onEntryFieldChange,
-  onAddAward,
-  onRemoveAward,
   onApplyEvent,
   onApplyEntry,
   onRequestRemoveEntry,
-  onResetShell,
   statusText,
+  isApplyingEvent,
+  applyingEntryId,
+  isRemovingEntry,
 }: ShowManagementEditorPanelProps) {
+  const [isEventModalOpen, setEventModalOpen] = useState(false);
+  const [editingEventSnapshot, setEditingEventSnapshot] =
+    useState<ManageShowEvent | null>(null);
+  const [editingEntrySnapshot, setEditingEntrySnapshot] =
+    useState<ManageShowEntry | null>(null);
+
   if (!selectedEvent) {
     return (
       <Card>
@@ -60,90 +54,63 @@ export function ShowManagementEditorPanel({
     );
   }
 
+  const isEventInputsDisabled = isApplyingEvent;
+  const entryDisplayStates = selectedEvent.entries.reduce<
+    Record<
+      string,
+      {
+        classResultText: string;
+        qualityText: string;
+        pupnText: string;
+        awardsText: string;
+      }
+    >
+  >((accumulator, entry) => {
+    const displayState = buildEntryDisplayState(entry, resultOptions);
+    accumulator[entry.id] = {
+      classResultText: displayState.selectedClassResultText,
+      qualityText: displayState.selectedQualityText,
+      pupnText: displayState.selectedPupnText,
+      awardsText: displayState.selectedAwardsText,
+    };
+    return accumulator;
+  }, {});
+
+  function openEntryEditor(entryId: string) {
+    if (isApplyingEvent || isRemovingEntry || Boolean(applyingEntryId)) {
+      return;
+    }
+    const currentEvent = selectedEvent;
+    if (!currentEvent) {
+      return;
+    }
+
+    const entry = currentEvent.entries.find((item) => item.id === entryId);
+    if (!entry) {
+      return;
+    }
+    setEditingEntrySnapshot(entry);
+  }
+
+  function openEventEditor() {
+    if (isApplyingEvent || Boolean(applyingEntryId) || isRemovingEntry) {
+      return;
+    }
+    if (!selectedEvent) {
+      return;
+    }
+    setEditingEventSnapshot(selectedEvent);
+    setEventModalOpen(true);
+  }
+
   return (
     <Card>
       <CardContent className="space-y-4 pt-5">
-        <div className="space-y-1">
-          <p className="text-sm text-muted-foreground">Selected event</p>
-          <h2 className="text-lg font-semibold">{selectedEvent.eventPlace}</h2>
-          <p className="text-sm text-muted-foreground">
-            {selectedEvent.eventDate} · {selectedEvent.eventName}
-          </p>
-        </div>
-
-        <div className="grid gap-3 md:grid-cols-2">
-          <label className="space-y-1 text-sm">
-            <span>Date</span>
-            <Input
-              value={selectedEvent.eventDate}
-              onChange={(event) =>
-                onEventFieldChange("eventDate", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span>Place</span>
-            <Input
-              value={selectedEvent.eventPlace}
-              onChange={(event) =>
-                onEventFieldChange("eventPlace", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span>City</span>
-            <Input
-              value={selectedEvent.eventCity}
-              onChange={(event) =>
-                onEventFieldChange("eventCity", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span>Type</span>
-            <Input
-              value={selectedEvent.eventType}
-              onChange={(event) =>
-                onEventFieldChange("eventType", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span>Name</span>
-            <Input
-              value={selectedEvent.eventName}
-              onChange={(event) =>
-                onEventFieldChange("eventName", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm">
-            <span>Organizer</span>
-            <Input
-              value={selectedEvent.organizer}
-              onChange={(event) =>
-                onEventFieldChange("organizer", event.target.value)
-              }
-            />
-          </label>
-          <label className="space-y-1 text-sm md:col-span-2">
-            <span>Judge</span>
-            <Input
-              value={selectedEvent.judge}
-              onChange={(event) =>
-                onEventFieldChange("judge", event.target.value)
-              }
-            />
-          </label>
-        </div>
-
-        {isEventDirty ? (
-          <div className="flex justify-end">
-            <Button type="button" onClick={onApplyEvent}>
-              Apply event changes
-            </Button>
-          </div>
-        ) : null}
+        <ShowManagementSelectedEventHeader
+          selectedEvent={selectedEvent}
+          isEditDisabled={isEventInputsDisabled || Boolean(applyingEntryId)}
+          onEdit={openEventEditor}
+        />
 
         <Separator />
 
@@ -155,35 +122,48 @@ export function ShowManagementEditorPanel({
                 {selectedEvent.entries.length} dogs
               </p>
             </div>
-            <Button type="button" variant="outline" onClick={onResetShell}>
-              Reset changes
-            </Button>
           </div>
 
-          <div className="space-y-3">
-            {selectedEvent.entries.map((entry) => (
-              <ShowManagementEntryCard
-                key={entry.id}
-                entry={entry}
-                resultOptions={resultOptions}
-                isDirty={dirtyEntryIds.includes(entry.id)}
-                onEntryFieldChange={onEntryFieldChange}
-                onAddAward={onAddAward}
-                onRemoveAward={onRemoveAward}
-                onRemove={onRequestRemoveEntry}
-                onApply={onApplyEntry}
-              />
-            ))}
-          </div>
+          <ShowManagementEntryResults
+            entries={selectedEvent.entries}
+            entryDisplayStates={entryDisplayStates}
+            isApplyingEvent={isApplyingEvent}
+            isRemovingEntry={isRemovingEntry}
+            applyingEntryId={applyingEntryId}
+            onEditEntry={openEntryEditor}
+            onRemoveEntry={onRequestRemoveEntry}
+          />
         </div>
 
         <Separator />
 
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-muted-foreground">
-            {statusText || "No unsaved changes."}
-          </p>
-        </div>
+        <ShowManagementStatusFooter statusText={statusText} />
+
+        {isEventModalOpen && editingEventSnapshot ? (
+          <ShowManagementEventModal
+            open={isEventModalOpen}
+            selectedEvent={editingEventSnapshot}
+            isApplying={isApplyingEvent}
+            onClose={() => {
+              setEventModalOpen(false);
+              setEditingEventSnapshot(null);
+            }}
+            onApplyEvent={onApplyEvent}
+          />
+        ) : null}
+
+        {editingEntrySnapshot ? (
+          <ShowManagementEntryModal
+            open={Boolean(editingEntrySnapshot)}
+            entry={editingEntrySnapshot}
+            resultOptions={resultOptions}
+            isApplying={
+              isApplyingEvent || applyingEntryId === editingEntrySnapshot.id
+            }
+            onClose={() => setEditingEntrySnapshot(null)}
+            onApplyEntry={onApplyEntry}
+          />
+        ) : null}
       </CardContent>
     </Card>
   );

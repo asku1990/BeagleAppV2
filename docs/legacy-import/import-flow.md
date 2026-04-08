@@ -28,6 +28,29 @@ Optional actor id for phase commands:
 - `pnpm import:phase2 <USER_ID>`
 - `pnpm import:phase3 <USER_ID>`
 
+Legacy source restore:
+
+- Phase 1 reads the legacy source directly from `LEGACY_DATABASE_URL`; it does not consume a dump file itself.
+- If you have a v1 SQL dump, restore it into MariaDB first, then point `LEGACY_DATABASE_URL` at that restored database.
+- The original dump database name is `beagle`; the helper preserves that name unless you explicitly pass a different target database name.
+- The helper script `pnpm legacy:restore <dump-file.sql> [database-name]` drops the target database if it exists, recreates it, and restores the dump into it.
+
+Example restore flow for a dump that uses `beagle` as the legacy database name:
+
+```bash
+# Default dump file:
+# /Users/akikuivas/personal-projects/beagle/beagle_db_v1_dumps/beagle.sql
+pnpm legacy:restore
+```
+
+Then set:
+
+```bash
+LEGACY_DATABASE_URL=mariadb://root:<password>@127.0.0.1:3306/beagle?ssl=false
+```
+
+If you need to restore a different dump, pass its file path as the first argument. If you need to rename the database, pass the target database name as the second argument.
+
 Issue tooling:
 
 - Inspect issues: `pnpm import:issues <RUN_ID>`
