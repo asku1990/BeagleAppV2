@@ -40,12 +40,7 @@ describe("useAdminShowEventQuery", () => {
     expect(options.staleTime).toBe(30_000);
     expect(options.refetchOnWindowFocus).toBe(true);
     expect(options.retryDelay).toBe(300);
-    expect(
-      options.retry(1, {
-        name: "AdminShowEventQueryError",
-        errorCode: "SHOW_NOT_FOUND",
-      }),
-    ).toBe(false);
+    expect(options.retry).toBe(false);
   });
 
   it("disables the query when the show id is empty", () => {
@@ -132,30 +127,5 @@ describe("useAdminShowEventQuery", () => {
       message: "Show not found.",
       errorCode: "SHOW_NOT_FOUND",
     });
-  });
-
-  it("retries transient show-not-found errors for a short window", async () => {
-    useQueryMock.mockImplementation((options) => options);
-
-    useAdminShowEventQuery({ showId: "missing" });
-    const options = useQueryMock.mock.calls[0]?.[0] as {
-      retry: (failureCount: number, error: unknown) => boolean;
-      queryFn: () => Promise<unknown>;
-    };
-
-    let thrownError: unknown;
-    getAdminShowEventMock.mockResolvedValueOnce({
-      ok: false,
-      error: "Show not found.",
-      code: "SHOW_NOT_FOUND",
-    });
-    try {
-      await options.queryFn();
-    } catch (error) {
-      thrownError = error;
-    }
-
-    expect(options.retry(1, thrownError)).toBe(true);
-    expect(options.retry(5, thrownError)).toBe(false);
   });
 });

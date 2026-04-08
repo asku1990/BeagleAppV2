@@ -22,6 +22,7 @@ export function AdminShowManagementPageClient() {
   const { t } = useI18n();
   const [query, setQuery] = useState("");
   const [selectedEventIdInput, setSelectedEventIdInput] = useState("");
+  const [statusText, setStatusText] = useState("");
   const [hasMounted, setHasMounted] = useState(false);
 
   React.useEffect(() => {
@@ -64,6 +65,11 @@ export function AdminShowManagementPageClient() {
       : t("admin.shows.manage.error.details");
   const shouldRenderInteractiveDetail = hasMounted;
 
+  function handleSelectEvent(eventId: string) {
+    setStatusText("");
+    setSelectedEventIdInput(eventId);
+  }
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -93,7 +99,7 @@ export function AdminShowManagementPageClient() {
           <ShowManagementResults
             events={showEvents}
             selectedEventId={selectedSummary?.showId}
-            onSelectEvent={(eventId) => setSelectedEventIdInput(eventId)}
+            onSelectEvent={handleSelectEvent}
           />
         </div>
       </ListingSectionShell>
@@ -127,6 +133,8 @@ export function AdminShowManagementPageClient() {
               selectedEvent={selectedEvent}
               selectedEventUpdatedAt={detailQuery.dataUpdatedAt}
               resultOptions={resultOptions}
+              statusText={statusText}
+              onStatusTextChange={setStatusText}
               onSelectedEventIdChange={setSelectedEventIdInput}
             />
           ) : (

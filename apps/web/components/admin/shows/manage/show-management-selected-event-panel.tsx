@@ -13,16 +13,19 @@ export function ShowManagementSelectedEventPanel({
   selectedEvent,
   selectedEventUpdatedAt,
   resultOptions,
+  statusText,
+  onStatusTextChange,
   onSelectedEventIdChange,
 }: {
   selectedEvent: ManageShowEvent;
   selectedEventUpdatedAt: number;
   resultOptions: ManageShowEditOptions;
+  statusText: string;
+  onStatusTextChange: (nextStatusText: string) => void;
   onSelectedEventIdChange: (nextShowId: string) => void;
 }) {
   const {
     pendingRemovalEntry,
-    statusText,
     handleApplyEvent,
     handleApplyEntry,
     handleRequestRemoveEntry,
@@ -35,6 +38,8 @@ export function ShowManagementSelectedEventPanel({
   } = useShowManagementSelectedEventState({
     selectedEvent,
     selectedEventUpdatedAt,
+    statusText,
+    onStatusTextChange,
     onSelectedEventIdChange,
   });
 

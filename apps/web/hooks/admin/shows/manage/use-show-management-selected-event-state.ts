@@ -11,21 +11,24 @@ import { useShowManagementMutationFlow } from "./use-show-management-mutation-fl
 export function useShowManagementSelectedEventState({
   selectedEvent,
   selectedEventUpdatedAt,
+  statusText,
+  onStatusTextChange,
   onSelectedEventIdChange,
 }: {
   selectedEvent: ManageShowEvent;
   selectedEventUpdatedAt: number;
+  statusText: string;
+  onStatusTextChange: (nextStatusText: string) => void;
   onSelectedEventIdChange: (nextShowId: string) => void;
 }) {
   const [pendingRemovalEntry, setPendingRemovalEntry] =
     useState<PendingRemovalEntry>(null);
-  const [statusText, setStatusText] = useState("");
 
   const mutationFlow = useShowManagementMutationFlow({
     selectedEvent,
     selectedEventUpdatedAt,
     onSelectedEventIdChange,
-    onStatusTextChange: setStatusText,
+    onStatusTextChange,
     onRemoveConfirmed: () => setPendingRemovalEntry(null),
   });
 
