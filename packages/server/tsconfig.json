@@ -1,4 +1,10 @@
 {
   "extends": "../config-typescript/base.json",
+  "compilerOptions": {
+    "paths": {
+      "@server/*": ["./*"],
+      "@db/*": ["../db/*"]
+    }
+  },
   "include": ["**/*.ts"]
 }

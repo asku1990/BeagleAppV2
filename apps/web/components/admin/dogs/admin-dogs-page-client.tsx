@@ -20,6 +20,7 @@ import { DeleteDogConfirmModal } from "./delete-dog-confirm-modal";
 import { DogFilters } from "./dog-filters";
 import { DogFormModal } from "./dog-form-modal";
 import { DogResults } from "./dog-results";
+import { normalizeDateForInput } from "@/lib/admin/core/date";
 import type { AdminDogFormValues, AdminDogRecord, AdminDogSex } from "./types";
 
 type DogFormState = {
@@ -165,14 +166,6 @@ function getMutationErrorCode(error: unknown): string | undefined {
   }
 
   return undefined;
-}
-
-function normalizeDateForInput(value: string | null): string | null {
-  if (!value) {
-    return null;
-  }
-
-  return value.slice(0, 10);
 }
 
 function mapDogFromQuery(item: AdminDogListItem): AdminDogRecord {

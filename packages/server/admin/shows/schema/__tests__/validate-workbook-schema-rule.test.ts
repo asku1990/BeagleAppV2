@@ -17,7 +17,7 @@ vi.mock("@beagle/db", () => ({
   listAdminShowWorkbookSchemaRulesDb: listAdminShowWorkbookSchemaRulesDbMock,
 }));
 
-vi.mock("../../core/workbook-schema-validation", () => ({
+vi.mock("@server/admin/shows/core/workbook-schema-validation", () => ({
   validateAdminShowWorkbookSchemaRuleDraft:
     validateAdminShowWorkbookSchemaRuleDraftMock,
 }));

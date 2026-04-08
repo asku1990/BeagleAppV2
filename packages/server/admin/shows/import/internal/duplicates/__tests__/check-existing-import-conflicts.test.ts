@@ -3,8 +3,8 @@ import type {
   AdminShowWorkbookImportIssue,
   AdminShowWorkbookImportPreviewItem,
 } from "@beagle/contracts";
-import { ISSUE_CODES } from "../../workbook-preview-constants";
-import type { WorkbookParsedRow } from "../../workbook-preview-types";
+import { ISSUE_CODES } from "@server/admin/shows/import/internal/workbook-preview-constants";
+import type { WorkbookParsedRow } from "@server/admin/shows/import/internal/workbook-preview-types";
 import { checkExistingImportConflicts } from "../check-existing-import-conflicts";
 
 const { listExistingShowImportKeysDbMock } = vi.hoisted(() => ({

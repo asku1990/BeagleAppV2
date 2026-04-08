@@ -75,7 +75,7 @@ const SHOW_RESULT_DEFINITIONS_LUOKAT = [
     valueType: ShowResultValueType.CODE,
     sortOrder: 20,
     categoryCode: "KILPAILULUOKKA",
-    isVisibleByDefault: false,
+    isVisibleByDefault: true,
   },
   {
     code: "JUN", // Junioriluokka
@@ -85,7 +85,7 @@ const SHOW_RESULT_DEFINITIONS_LUOKAT = [
     valueType: ShowResultValueType.CODE,
     sortOrder: 30,
     categoryCode: "KILPAILULUOKKA",
-    isVisibleByDefault: false,
+    isVisibleByDefault: true,
   },
   {
     code: "NUO", // Nuortenluokka
@@ -95,7 +95,7 @@ const SHOW_RESULT_DEFINITIONS_LUOKAT = [
     valueType: ShowResultValueType.CODE,
     sortOrder: 40,
     categoryCode: "KILPAILULUOKKA",
-    isVisibleByDefault: false,
+    isVisibleByDefault: true,
   },
   {
     code: "AVO", // Avoin luokka
@@ -105,7 +105,7 @@ const SHOW_RESULT_DEFINITIONS_LUOKAT = [
     valueType: ShowResultValueType.CODE,
     sortOrder: 50,
     categoryCode: "KILPAILULUOKKA",
-    isVisibleByDefault: false,
+    isVisibleByDefault: true,
   },
   {
     code: "KÄY", // Käyttöluokka
@@ -115,7 +115,7 @@ const SHOW_RESULT_DEFINITIONS_LUOKAT = [
     valueType: ShowResultValueType.CODE,
     sortOrder: 60,
     categoryCode: "KILPAILULUOKKA",
-    isVisibleByDefault: false,
+    isVisibleByDefault: true,
   },
   {
     code: "VAL", // Valioluokka
@@ -125,7 +125,7 @@ const SHOW_RESULT_DEFINITIONS_LUOKAT = [
     valueType: ShowResultValueType.CODE,
     sortOrder: 70,
     categoryCode: "KILPAILULUOKKA",
-    isVisibleByDefault: false,
+    isVisibleByDefault: true,
   },
   {
     code: "VET", // Veteraaniluokka
@@ -135,7 +135,7 @@ const SHOW_RESULT_DEFINITIONS_LUOKAT = [
     valueType: ShowResultValueType.CODE,
     sortOrder: 80,
     categoryCode: "KILPAILULUOKKA",
-    isVisibleByDefault: false,
+    isVisibleByDefault: true,
   },
 ] as const;
 

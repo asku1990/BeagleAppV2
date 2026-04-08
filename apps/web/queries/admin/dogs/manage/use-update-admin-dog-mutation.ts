@@ -6,7 +6,7 @@ import type {
 } from "@beagle/contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateAdminDogAction } from "@/app/actions/admin/dogs/manage/update-admin-dog";
-import { AdminMutationError } from "@/queries/admin/dogs/manage/mutation-error";
+import { AdminMutationError } from "@/queries/admin/mutation-error";
 import {
   adminDogBreederOptionsQueryKeyRoot,
   adminDogOwnerOptionsQueryKeyRoot,
@@ -17,6 +17,10 @@ import {
   beagleNewestQueryKeyRoot,
   beagleSearchQueryKeyRoot,
 } from "@/queries/public/beagle/search/query-keys";
+import {
+  beagleShowDetailsQueryKeyRoot,
+  beagleShowSearchQueryKeyRoot,
+} from "@/queries/public/beagle/shows/query-keys";
 import { homeStatisticsQueryKey } from "@/queries/public/home/statistics/query-keys";
 
 export function useUpdateAdminDogMutation() {
@@ -54,6 +58,12 @@ export function useUpdateAdminDogMutation() {
       });
       await queryClient.invalidateQueries({
         queryKey: beagleNewestQueryKeyRoot,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: beagleShowSearchQueryKeyRoot,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: beagleShowDetailsQueryKeyRoot,
       });
       await queryClient.invalidateQueries({
         queryKey: homeStatisticsQueryKey,

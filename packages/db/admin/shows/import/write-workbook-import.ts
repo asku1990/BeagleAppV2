@@ -1,4 +1,4 @@
-import { prisma } from "../../../core/prisma";
+import { prisma } from "@db/core/prisma";
 import { randomUUID } from "node:crypto";
 import type { Prisma } from "@prisma/client";
 

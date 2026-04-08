@@ -1,4 +1,4 @@
-import { prisma } from "../../../core/prisma";
+import { prisma } from "@db/core/prisma";
 
 // Fetches existing canonical event/entry lookup keys used for duplicate and conflict checks.
 export async function listExistingShowImportKeysDb(input: {

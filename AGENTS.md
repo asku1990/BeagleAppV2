@@ -34,6 +34,8 @@ Agent operating rules for this repository.
 - Non-hook utilities/types/constants belong in `apps/web/lib/**`.
 - Query/mutation hooks may live in `apps/web/queries/**`.
 - Prefer feature-local query key constants over inline query key arrays.
+- `apps/web` client code may import feature-scoped clients from `packages/api-client`, but prefer direct feature imports over a single catch-all client.
+- Do not create API clients inside React render paths when a module-scope instance or thin feature-local wrapper is sufficient.
 
 ## Boundaries to enforce
 

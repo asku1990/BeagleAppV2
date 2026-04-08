@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { useState, type ChangeEvent } from "react";
 import type {
@@ -216,12 +215,6 @@ export function AdminShowWorkbookImportPageClient() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <Button asChild variant="outline">
-          <Link href="/admin/shows">{t("admin.shows.import.back")}</Link>
-        </Button>
-      </div>
-
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight">
           {t("admin.shows.import.title")}

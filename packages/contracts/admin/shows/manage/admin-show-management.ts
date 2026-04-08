@@ -1,0 +1,71 @@
+export type AdminShowSearchSort = "date-desc" | "date-asc";
+
+export type AdminShowSearchRequest = {
+  query?: string;
+  page?: number;
+  pageSize?: number;
+  sort?: AdminShowSearchSort;
+};
+
+export type AdminShowEventSummary = {
+  showId: string;
+  eventDate: string;
+  eventPlace: string;
+  eventCity: string;
+  eventName: string;
+  eventType: string;
+  organizer: string;
+  judge: string;
+  dogCount: number;
+};
+
+export type AdminShowSearchResponse = {
+  total: number;
+  totalPages: number;
+  page: number;
+  items: AdminShowEventSummary[];
+};
+
+export type AdminShowEntry = {
+  id: string;
+  dogId?: string | null;
+  registrationNo: string;
+  dogName: string;
+  judge: string;
+  critiqueText: string;
+  heightCm: string;
+  classCode: string;
+  qualityGrade: string;
+  classPlacement: string;
+  pupn: string;
+  awards: string[];
+  classDisplay: string;
+  qualityDisplay: string;
+  pupnDisplay: string;
+  awardsDisplay: string[];
+};
+
+export type AdminShowResultOption = {
+  value: string;
+  label: string;
+};
+
+export type AdminShowResultOptions = {
+  classOptions: AdminShowResultOption[];
+  qualityOptions: AdminShowResultOption[];
+  awardOptions: AdminShowResultOption[];
+  pupnOptions: AdminShowResultOption[];
+};
+
+export type AdminShowDetailsRequest = {
+  showId: string;
+};
+
+export type AdminShowDetailsEvent = AdminShowEventSummary & {
+  entries: AdminShowEntry[];
+};
+
+export type AdminShowDetailsResponse = {
+  show: AdminShowDetailsEvent;
+  options: AdminShowResultOptions;
+};

@@ -91,7 +91,8 @@ export function projectCanonicalShowResult(
     sortedItems.find(
       (item) =>
         item.definition.category.code === CATEGORY_QUALITY &&
-        item.definition.isVisibleByDefault,
+        item.definition.isVisibleByDefault &&
+        item.definition.code !== LEGACY_QUALITY_CODE,
     ) ?? null;
   const legacyQualityItem =
     sortedItems.find((item) => item.definition.code === LEGACY_QUALITY_CODE) ??
