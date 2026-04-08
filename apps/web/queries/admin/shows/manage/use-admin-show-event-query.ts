@@ -9,7 +9,6 @@ import { useQuery } from "@tanstack/react-query";
 import { adminShowEventQueryKey } from "./query-keys";
 
 const adminShowsApiClient = createAdminShowsApiClient();
-const SHOW_NOT_FOUND_RETRY_LIMIT = 4;
 
 class AdminShowEventQueryError extends Error {
   errorCode?: string;
@@ -50,10 +49,7 @@ export function useAdminShowEventQuery(input: UseAdminShowEventQueryInput) {
     },
     staleTime: 30_000,
     refetchOnWindowFocus: true,
-    retry: (failureCount, error) =>
-      error instanceof AdminShowEventQueryError &&
-      error.errorCode === "SHOW_NOT_FOUND" &&
-      failureCount <= SHOW_NOT_FOUND_RETRY_LIMIT,
+    retry: false,
     retryDelay: 300,
     enabled: input.enabled ?? normalizedShowId.length > 0,
   });

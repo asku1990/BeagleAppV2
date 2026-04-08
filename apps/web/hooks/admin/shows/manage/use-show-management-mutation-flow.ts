@@ -6,7 +6,6 @@ import { useI18n } from "@/hooks/i18n";
 import {
   createEntryRemovedSyncPayload,
   createEntrySavedSyncPayload,
-  createEventSavedSyncPayload,
   toMutationErrorMessage,
   type PendingServerSync,
 } from "@/lib/admin/shows/manage";
@@ -33,18 +32,26 @@ export function useShowManagementMutationFlow({
   onStatusTextChange: (nextStatusText: string) => void;
   onRemoveConfirmed: () => void;
 }) {
+  type PendingEventSelectionSync = {
+    targetShowId: string;
+    baselineUpdatedAt: number;
+  };
+
   const { t } = useI18n();
   const [applyingEntryId, setApplyingEntryId] = useState<string | null>(null);
   const [isRemovingEntry, setIsRemovingEntry] = useState(false);
   const [pendingServerSync, setPendingServerSync] =
     useState<PendingServerSync | null>(null);
+  const [pendingEventSelectionSync, setPendingEventSelectionSync] =
+    useState<PendingEventSelectionSync | null>(null);
 
   const updateEventMutation = useUpdateAdminShowEventMutation();
   const updateEntryMutation = useUpdateAdminShowEntryMutation();
   const deleteEntryMutation = useDeleteAdminShowEntryMutation();
 
   const isApplyingEvent = updateEventMutation.isPending;
-  const isSyncingAfterSave = pendingServerSync !== null;
+  const isSyncingAfterSave =
+    pendingServerSync !== null || pendingEventSelectionSync !== null;
 
   useEffect(() => {
     if (!pendingServerSync) {
@@ -74,6 +81,20 @@ export function useShowManagementMutationFlow({
     selectedEventUpdatedAt,
   ]);
 
+  useEffect(() => {
+    if (!pendingEventSelectionSync) {
+      return;
+    }
+    if (selectedEvent.id !== pendingEventSelectionSync.targetShowId) {
+      return;
+    }
+    if (selectedEventUpdatedAt <= pendingEventSelectionSync.baselineUpdatedAt) {
+      return;
+    }
+
+    setPendingEventSelectionSync(null);
+  }, [pendingEventSelectionSync, selectedEvent.id, selectedEventUpdatedAt]);
+
   async function applyEventChanges(draftEvent: ManageShowEvent) {
     if (
       isApplyingEvent ||
@@ -97,17 +118,16 @@ export function useShowManagementMutationFlow({
       });
 
       if (response.showId !== draftEvent.id) {
+        setPendingEventSelectionSync({
+          targetShowId: response.showId,
+          baselineUpdatedAt: selectedEventUpdatedAt,
+        });
         onSelectedEventIdChange(response.showId);
       }
 
-      setPendingServerSync(
-        createEventSavedSyncPayload({
-          showId: response.showId,
-          statusText: `${response.eventPlace} ${t("admin.shows.manage.mutation.status.eventSavedSuffix")}`,
-          successToast: t("admin.shows.manage.mutation.toast.eventSaved"),
-          selectedEventUpdatedAt,
-        }),
-      );
+      const statusText = `${response.eventPlace} ${t("admin.shows.manage.mutation.status.eventSavedSuffix")}`;
+      onStatusTextChange(statusText);
+      toast.success(t("admin.shows.manage.mutation.toast.eventSaved"));
       return true;
     } catch (error) {
       const message = toMutationErrorMessage(

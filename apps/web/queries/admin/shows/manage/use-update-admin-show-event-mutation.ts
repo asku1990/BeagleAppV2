@@ -8,7 +8,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateAdminShowEventAction } from "@/app/actions/admin/shows/manage/update-admin-show-event";
 import { AdminMutationError } from "@/queries/admin/mutation-error";
 import {
-  adminShowEventQueryKeyRoot,
+  adminShowEventQueryKey,
   adminShowEventsQueryKeyRoot,
 } from "./query-keys";
 
@@ -31,12 +31,22 @@ export function useUpdateAdminShowEventMutation() {
 
       return result.data;
     },
-    onSuccess: async () => {
+    onSuccess: async (response, variables) => {
       await queryClient.invalidateQueries({
         queryKey: adminShowEventsQueryKeyRoot,
       });
+      await queryClient.cancelQueries({
+        queryKey: adminShowEventQueryKey(variables.showId),
+        exact: true,
+      });
+      queryClient.removeQueries({
+        queryKey: adminShowEventQueryKey(variables.showId),
+        exact: true,
+      });
+
       await queryClient.invalidateQueries({
-        queryKey: adminShowEventQueryKeyRoot,
+        queryKey: adminShowEventQueryKey(response.showId),
+        exact: true,
       });
     },
   });
