@@ -1,5 +1,8 @@
-import { prisma } from "../../../core/prisma";
-import { normalizeQuery, parseLookupLimit } from "../manage/normalization";
+import { prisma } from "@db/core/prisma";
+import {
+  normalizeQuery,
+  parseLookupLimit,
+} from "@db/admin/dogs/manage/normalization";
 
 export type AdminOwnerLookupRequestDb = {
   query?: string;

@@ -1,5 +1,5 @@
 import { DogSex, type Prisma } from "@prisma/client";
-import { prisma } from "../../../core/prisma";
+import { prisma } from "@db/core/prisma";
 import { normalizeQuery, uniqueNonEmptyNames } from "./normalization";
 
 export type AdminDogListSortDb = "name-asc" | "birth-desc" | "created-desc";
