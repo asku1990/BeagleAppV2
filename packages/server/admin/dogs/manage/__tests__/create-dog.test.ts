@@ -380,4 +380,96 @@ describe("createAdminDog", () => {
       },
     });
   });
+
+  it("creates dog with many titles and nullable title fields", async () => {
+    findDogByRegistrationNoDbMock.mockResolvedValue(null);
+    createAdminDogWriteDbMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Metsapolun Kide",
+      sex: "FEMALE",
+      registrationNo: "FI12345/21",
+    });
+
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        titles: [
+          {
+            titleCode: " fi jva ",
+            awardedOn: null,
+            titleName: null,
+            sortOrder: 0,
+          },
+          {
+            titleCode: "se jch",
+            awardedOn: "2021-05-06",
+            titleName: " Champion ",
+            sortOrder: 1,
+          },
+        ],
+      }),
+    ).resolves.toEqual({
+      status: 201,
+      body: {
+        ok: true,
+        data: {
+          id: "dog_1",
+          name: "Metsapolun Kide",
+          sex: "FEMALE",
+          registrationNo: "FI12345/21",
+        },
+      },
+    });
+
+    expect(createAdminDogWriteDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        titles: [
+          {
+            titleCode: "FI JVA",
+            awardedOn: null,
+            titleName: null,
+            sortOrder: 0,
+          },
+          {
+            titleCode: "SE JCH",
+            awardedOn: new Date("2021-05-06T00:00:00.000Z"),
+            titleName: "Champion",
+            sortOrder: 1,
+          },
+        ],
+      }),
+      {},
+    );
+  });
+
+  it("returns 400 for duplicate normalized dog titles when date is null", async () => {
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        titles: [
+          {
+            titleCode: " fi jva ",
+            awardedOn: null,
+            sortOrder: 0,
+          },
+          {
+            titleCode: "FI JVA",
+            awardedOn: null,
+            sortOrder: 1,
+          },
+        ],
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Duplicate dog titles are not allowed.",
+        code: "DUPLICATE_DOG_TITLE",
+      },
+    });
+  });
 });
