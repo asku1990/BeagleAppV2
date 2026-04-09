@@ -6,6 +6,21 @@ export type AdminDogParentPreview = {
   registrationNo: string | null;
 };
 
+export type AdminDogTitleInput = {
+  awardedOn?: string | null;
+  titleCode: string;
+  titleName?: string | null;
+  sortOrder: number;
+};
+
+export type AdminDogTitleItem = {
+  id: string;
+  awardedOn: string | null;
+  titleCode: string;
+  titleName: string | null;
+  sortOrder: number;
+};
+
 export type AdminDogListItem = {
   id: string;
   registrationNo: string | null;
@@ -21,6 +36,7 @@ export type AdminDogListItem = {
   showCount: number;
   ekNo: number | null;
   note: string | null;
+  titles?: AdminDogTitleItem[];
 };
 
 export type AdminDogListSort = "name-asc" | "birth-desc" | "created-desc";

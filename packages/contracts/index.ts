@@ -41,7 +41,11 @@ export type ImportStatusResponse = {
   info: string;
 };
 
-export type ImportRunKind = "LEGACY_PHASE1" | "LEGACY_PHASE2" | "LEGACY_PHASE3";
+export type ImportRunKind =
+  | "LEGACY_PHASE1"
+  | "LEGACY_PHASE1_5"
+  | "LEGACY_PHASE2"
+  | "LEGACY_PHASE3";
 
 export type ImportRunStatus = "PENDING" | "RUNNING" | "SUCCEEDED" | "FAILED";
 
@@ -151,6 +155,8 @@ export type {
   AdminDogListSex,
   AdminDogListSort,
   AdminDogParentPreview,
+  AdminDogTitleInput,
+  AdminDogTitleItem,
   CreateAdminDogRequest,
   CreateAdminDogResponse,
   UpdateAdminDogRequest,

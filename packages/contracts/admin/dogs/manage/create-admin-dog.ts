@@ -1,4 +1,4 @@
-import type { AdminDogListSex } from "./admin-dogs-list";
+import type { AdminDogListSex, AdminDogTitleInput } from "./admin-dogs-list";
 
 export type CreateAdminDogRequest = {
   name: string;
@@ -12,6 +12,7 @@ export type CreateAdminDogRequest = {
   secondaryRegistrationNos?: string[];
   sireRegistrationNo?: string;
   damRegistrationNo?: string;
+  titles?: AdminDogTitleInput[];
 };
 
 export type CreateAdminDogResponse = {
