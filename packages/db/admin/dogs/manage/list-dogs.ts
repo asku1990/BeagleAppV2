@@ -18,6 +18,14 @@ export type AdminDogParentPreviewDb = {
   registrationNo: string | null;
 };
 
+export type AdminDogTitleItemDb = {
+  id: string;
+  awardedOn: Date | null;
+  titleCode: string;
+  titleName: string | null;
+  sortOrder: number;
+};
+
 export type AdminDogListRowDb = {
   id: string;
   registrationNo: string | null;
@@ -33,6 +41,7 @@ export type AdminDogListRowDb = {
   showCount: number;
   ekNo: number | null;
   note: string | null;
+  titles: AdminDogTitleItemDb[];
 };
 
 export type AdminDogListResponseDb = {
@@ -249,6 +258,16 @@ export async function listAdminDogsDb(
           showEntries: true,
         },
       },
+      titles: {
+        select: {
+          id: true,
+          awardedOn: true,
+          titleCode: true,
+          titleName: true,
+          sortOrder: true,
+        },
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }, { id: "asc" }],
+      },
     },
     orderBy: resolveOrderBy(sort),
     skip: (safePage - 1) * pageSize,
@@ -278,6 +297,13 @@ export async function listAdminDogsDb(
       showCount: row._count.showEntries,
       ekNo: row.ekNo,
       note: row.note,
+      titles: row.titles.map((title) => ({
+        id: title.id,
+        awardedOn: title.awardedOn,
+        titleCode: title.titleCode,
+        titleName: title.titleName,
+        sortOrder: title.sortOrder,
+      })),
     })),
   };
 }

@@ -87,6 +87,26 @@ async function createOwnerships(
   }
 }
 
+async function createTitles(
+  dogId: string,
+  titles: CreateAdminDogDbInput["titles"],
+  tx: Prisma.TransactionClient,
+): Promise<void> {
+  if ((titles?.length ?? 0) === 0) {
+    return;
+  }
+
+  await tx.dogTitle.createMany({
+    data: (titles ?? []).map((title) => ({
+      dogId,
+      awardedOn: title.awardedOn,
+      titleCode: title.titleCode,
+      titleName: title.titleName,
+      sortOrder: title.sortOrder,
+    })),
+  });
+}
+
 async function createAdminDogDb(
   input: CreateAdminDogDbInput,
   tx: Prisma.TransactionClient,
@@ -130,6 +150,7 @@ async function createAdminDogDb(
   }
 
   await createOwnerships(createdDog.id, input.ownerNames, tx);
+  await createTitles(createdDog.id, input.titles, tx);
 
   return {
     id: createdDog.id,
