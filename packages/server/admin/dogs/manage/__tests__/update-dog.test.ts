@@ -665,4 +665,60 @@ describe("updateAdminDog", () => {
       },
     });
   });
+
+  it("derives title sortOrder from row order when omitted", async () => {
+    findDogByRegistrationNoDbMock.mockResolvedValue(null);
+    updateAdminDogWriteDbMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Metsapolun Kide",
+      sex: "FEMALE",
+      registrationNo: "FI12345/21",
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        titles: [
+          {
+            titleCode: "FI JVA",
+            awardedOn: "2022-01-10",
+          },
+          {
+            titleCode: "SE JCH",
+            awardedOn: null,
+          },
+        ],
+      }),
+    ).resolves.toEqual({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          id: "dog_1",
+          name: "Metsapolun Kide",
+          sex: "FEMALE",
+          registrationNo: "FI12345/21",
+        },
+      },
+    });
+
+    expect(updateAdminDogWriteDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        titles: [
+          expect.objectContaining({
+            titleCode: "FI JVA",
+            sortOrder: 0,
+          }),
+          expect.objectContaining({
+            titleCode: "SE JCH",
+            sortOrder: 1,
+          }),
+        ],
+      }),
+      {},
+    );
+  });
 });

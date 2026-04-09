@@ -173,14 +173,14 @@ export function parseAdminDogTitles(
         awardedOn?: string | null;
         titleCode: string;
         titleName?: string | null;
-        sortOrder: number;
+        sortOrder?: number;
       }>
     | undefined,
 ): ParseAdminDogTitlesResult {
   const normalizedTitles: AdminDogTitleInputNormalized[] = [];
   const duplicateKeys = new Set<string>();
 
-  for (const input of titlesInput ?? []) {
+  for (const [index, input] of (titlesInput ?? []).entries()) {
     const titleCode = normalizeRequiredText(input.titleCode)?.toUpperCase();
     if (!titleCode) {
       return {
@@ -200,7 +200,7 @@ export function parseAdminDogTitles(
     }
 
     const sortOrder = parseNonNegativeInteger(input.sortOrder);
-    if (sortOrder === "INVALID" || sortOrder === null) {
+    if (sortOrder === "INVALID") {
       return {
         ok: false,
         code: "INVALID_TITLE_SORT_ORDER",
@@ -222,7 +222,7 @@ export function parseAdminDogTitles(
       awardedOn,
       titleCode,
       titleName: normalizeOptionalText(input.titleName ?? undefined),
-      sortOrder,
+      sortOrder: sortOrder ?? index,
     });
   }
 

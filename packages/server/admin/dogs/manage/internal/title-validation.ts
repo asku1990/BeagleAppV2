@@ -30,7 +30,7 @@ export function validateDogTitles(
         awardedOn?: string | null;
         titleCode: string;
         titleName?: string | null;
-        sortOrder: number;
+        sortOrder?: number;
       }>
     | undefined,
 ): DogTitleValidationResult {

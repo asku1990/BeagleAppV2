@@ -172,13 +172,11 @@ function normalizeTitlesForMutation(
   awardedOn?: string | null;
   titleCode: string;
   titleName?: string | null;
-  sortOrder: number;
 }> {
-  return values.map((title, index) => ({
+  return values.map((title) => ({
     awardedOn: normalizeOptionalText(title.awardedOn),
     titleCode: title.titleCode.trim(),
     titleName: normalizeOptionalText(title.titleName),
-    sortOrder: index,
   }));
 }
 
