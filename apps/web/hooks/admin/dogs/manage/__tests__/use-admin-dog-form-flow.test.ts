@@ -225,4 +225,31 @@ describe("useAdminDogFormFlow", () => {
       "tr:admin.dogs.mutation.errorInvalidName",
     );
   });
+
+  it("keeps create modal birth date empty by default", () => {
+    const setFormValues = vi.fn();
+
+    useStateMock
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, setFormValues])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()]);
+
+    const hook = useAdminDogFormFlow({
+      t: (key) => key,
+      createDogMutation: { isPending: false, mutateAsync: vi.fn() },
+      updateDogMutation: { isPending: false, mutateAsync: vi.fn() },
+      deleteDogMutation: { isPending: false, mutateAsync: vi.fn() },
+    });
+
+    hook.openCreateModal();
+
+    expect(setFormValues).toHaveBeenCalledWith(
+      expect.objectContaining({
+        birthDate: "",
+      }),
+    );
+  });
 });

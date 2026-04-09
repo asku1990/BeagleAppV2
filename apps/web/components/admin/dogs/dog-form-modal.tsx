@@ -239,18 +239,59 @@ export function DogFormModal({
           maxLength={120}
           required
         />
-        <p className="text-sm text-muted-foreground">
-          {t("admin.dogs.form.birthDateAria")}
-        </p>
-        <Input
-          type="date"
-          value={values.birthDate}
-          onChange={(event) =>
-            onValuesChange({ ...values, birthDate: event.target.value })
-          }
-          aria-label={t("admin.dogs.form.birthDateAria")}
-          max={todayDateInputValue}
-        />
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">
+            {t("admin.dogs.form.birthDateAria")}
+          </p>
+          {values.birthDate.trim().length > 0 ? (
+            <div className="flex items-center gap-2">
+              <Input
+                type="date"
+                value={values.birthDate}
+                onChange={(event) =>
+                  onValuesChange({ ...values, birthDate: event.target.value })
+                }
+                aria-label={t("admin.dogs.form.birthDateAria")}
+                max={todayDateInputValue}
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  onValuesChange({
+                    ...values,
+                    birthDate: "",
+                  })
+                }
+                disabled={isSubmitting}
+              >
+                {t("admin.dogs.form.birthDateClear")}
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs text-muted-foreground">
+                {t("admin.dogs.form.birthDateUnknown")}
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  onValuesChange({
+                    ...values,
+                    birthDate: todayDateInputValue,
+                  })
+                }
+                disabled={isSubmitting}
+              >
+                {t("admin.dogs.form.birthDateSet")}
+              </Button>
+            </div>
+          )}
+        </div>
 
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground">

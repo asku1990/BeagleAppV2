@@ -62,6 +62,25 @@ function buildEditValues(): AdminDogFormValues {
   };
 }
 
+function buildCreateValues(): AdminDogFormValues {
+  return {
+    name: "",
+    sex: "UNKNOWN",
+    birthDate: "",
+    breederNameText: "",
+    ownershipNames: [],
+    ekNo: "",
+    note: "",
+    registrationNo: "",
+    secondaryRegistrationNos: [],
+    sirePreviewName: "",
+    sirePreviewRegistrationNo: "",
+    damPreviewName: "",
+    damPreviewRegistrationNo: "",
+    titles: [],
+  };
+}
+
 function buildDog(values: AdminDogFormValues): AdminDogRecord {
   return {
     id: "dog_1",
@@ -164,5 +183,30 @@ describe("DogFormModal", () => {
     );
 
     expect(html).toContain(`max="${today}"`);
+  });
+
+  it("shows explicit set-date control when birth date is empty", () => {
+    const values = buildCreateValues();
+    const html = renderToStaticMarkup(
+      React.createElement(DogFormModal, {
+        mode: "create",
+        dog: null,
+        values,
+        breederOptions: [],
+        ownerOptions: [],
+        parentOptions: [],
+        onBreederSearchChange: vi.fn(),
+        onOwnerSearchChange: vi.fn(),
+        onParentSearchChange: vi.fn(),
+        open: true,
+        onClose: vi.fn(),
+        onValuesChange: vi.fn(),
+        onSubmit: vi.fn(),
+      }),
+    );
+
+    expect(html).toContain("admin.dogs.form.birthDateUnknown");
+    expect(html).toContain("admin.dogs.form.birthDateSet");
+    expect(html).not.toContain("admin.dogs.form.birthDateClear");
   });
 });
