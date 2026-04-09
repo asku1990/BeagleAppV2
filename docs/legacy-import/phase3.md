@@ -64,7 +64,7 @@ Run seed first:
 - `pnpm --filter @beagle/db seed:show-result-definitions`
 - `pnpm --filter @beagle/db seed:show-workbook-import-schema`
 
-The seed step above is part of the same one-shot legacy import flow as phase1-3.
+The seed step above is part of the same one-shot legacy import flow as phase1, phase1.5, phase2, and phase3.
 This flow is documented as initial bootstrap/migration only, not as replay or
 upgrade of an already bootstrapped environment.
 

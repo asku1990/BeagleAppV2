@@ -26,11 +26,13 @@ export {
 export { fetchLegacyTrialRows } from "./imports/phase2";
 export { fetchLegacyShowRows } from "./imports/phase3";
 export { fetchLegacyPhase1Rows } from "./imports/phase1";
+export { fetchLegacyPhase1_5Rows } from "./imports/phase1_5";
 
 export {
   type LegacyBreederRow,
   type LegacyDogRow,
   type LegacyEkRow,
+  type LegacyDogTitleRow,
   type LegacyOwnerRow,
   type LegacyTrialResultRow,
   type LegacyShowResultRow,

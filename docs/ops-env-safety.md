@@ -125,6 +125,14 @@ pass-cli run --env-file .env.staging -- pnpm import:phase1
 CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:phase1
 ```
 
+Phase-1.5 import:
+
+```bash
+pass-cli run --env-file .env.local -- pnpm import:phase1.5
+pass-cli run --env-file .env.staging -- pnpm import:phase1.5
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:phase1.5
+```
+
 Legacy dump restore into MariaDB:
 
 ```bash
@@ -177,7 +185,7 @@ This seed is the bootstrap baseline for `ShowWorkbookColumnRule` /
 `ShowWorkbookColumnValueMap` metadata. It is not intended as the long-term
 editing path once admin-managed workbook schema settings exist.
 
-Bootstrap import (`auth:bootstrap-admin` -> `seed:show-result-definitions` -> `seed:show-workbook-import-schema` -> `phase1` -> `phase2` -> `phase3`):
+Bootstrap import (`auth:bootstrap-admin` -> `seed:show-result-definitions` -> `seed:show-workbook-import-schema` -> `phase1` -> `phase1.5` -> `phase2` -> `phase3`):
 
 ```bash
 pass-cli run --env-file .env.local -- pnpm import:bootstrap

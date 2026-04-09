@@ -10,7 +10,7 @@ For show-domain deep details, see:
 
 - `Role`: `USER`, `ADMIN`
 - `DogSex`: `MALE`, `FEMALE`, `UNKNOWN`
-- `ImportKind`: `LEGACY_PHASE1`, `LEGACY_PHASE2`, `LEGACY_PHASE3`
+- `ImportKind`: `LEGACY_PHASE1`, `LEGACY_PHASE1_5`, `LEGACY_PHASE2`, `LEGACY_PHASE3`
 - `ImportStatus`: `PENDING`, `RUNNING`, `SUCCEEDED`, `FAILED`
 - `ImportIssueSeverity`: `INFO`, `WARNING`, `ERROR`
 - `ShowSourceTag`: source tagging for legacy/workbook/manual show data

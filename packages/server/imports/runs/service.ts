@@ -11,6 +11,7 @@ import type {
 } from "@beagle/contracts";
 import type { ServiceResult } from "../../core/result";
 import { runLegacyPhase1 } from "../phase1";
+import { runLegacyPhase1_5 } from "../phase1_5";
 import { runLegacyPhase2 } from "../phase2";
 import { runLegacyPhase3 } from "../phase3";
 import { toImportRunIssueResponse, toImportRunResponse } from "./transform";
@@ -25,6 +26,16 @@ export function createImportsService() {
       },
     ): Promise<ServiceResult<ImportRunResponse>> {
       return runLegacyPhase1(createdByUserId, options);
+    },
+
+    async runLegacyPhase1_5(
+      createdByUserId?: string,
+      options?: {
+        log?: (message: string) => void;
+        auditSource?: AuditContextDb["source"];
+      },
+    ): Promise<ServiceResult<ImportRunResponse>> {
+      return runLegacyPhase1_5(createdByUserId, options);
     },
 
     async runLegacyPhase2(

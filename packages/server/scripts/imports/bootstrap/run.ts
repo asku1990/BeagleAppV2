@@ -50,7 +50,7 @@ function runScript(scriptFile: string, label: string) {
 async function main() {
   const args = process.argv.slice(2).filter((arg) => arg !== "--");
   console.log(
-    "[import:bootstrap] Starting bootstrap-admin -> seed-show-result-definitions -> seed-show-workbook-import-schema -> phase1 -> phase2 -> phase3",
+    "[import:bootstrap] Starting bootstrap-admin -> seed-show-result-definitions -> seed-show-workbook-import-schema -> phase1 -> phase1.5 -> phase2 -> phase3",
   );
 
   runScript("../../bootstrap-admin.ts", "auth:bootstrap-admin");
@@ -63,6 +63,7 @@ async function main() {
     "seed:show-workbook-import-schema",
   );
   runPhase("../phase1/run.ts", "import:phase1", args);
+  runPhase("../phase1_5/run.ts", "import:phase1.5", args);
   runPhase("../phase2/run.ts", "import:phase2", args);
   runPhase("../phase3/run.ts", "import:phase3", args);
 

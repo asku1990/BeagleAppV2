@@ -13,6 +13,7 @@
     "test:unit": "node ../../node_modules/vitest/vitest.mjs run",
     "test:coverage": "node ../../node_modules/vitest/vitest.mjs run --coverage",
     "import:phase1": "node --import tsx/esm scripts/imports/phase1/run.ts",
+    "import:phase1.5": "node --import tsx/esm scripts/imports/phase1_5/run.ts",
     "import:phase2": "node --import tsx/esm scripts/imports/phase2/run.ts",
     "import:phase3": "node --import tsx/esm scripts/imports/phase3/run.ts",
     "import:bootstrap": "node --import tsx/esm scripts/imports/bootstrap/run.ts",
