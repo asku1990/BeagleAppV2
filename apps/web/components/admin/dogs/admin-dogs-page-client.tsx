@@ -99,6 +99,7 @@ function createEmptyFormValues(): AdminDogFormValues {
     sirePreviewRegistrationNo: "",
     damPreviewName: "",
     damPreviewRegistrationNo: "",
+    titles: [],
   };
 }
 
@@ -117,6 +118,11 @@ function mapDogToFormValues(dog: AdminDogRecord): AdminDogFormValues {
     sirePreviewRegistrationNo: dog.sirePreview?.registrationNo ?? "",
     damPreviewName: dog.damPreview?.name ?? "",
     damPreviewRegistrationNo: dog.damPreview?.registrationNo ?? "",
+    titles: dog.titles.map((title) => ({
+      awardedOn: title.awardedOn ?? "",
+      titleCode: title.titleCode,
+      titleName: title.titleName ?? "",
+    })),
   };
 }
 
@@ -160,6 +166,20 @@ function normalizeSecondaryRegistrations(values: string[]): string[] {
     .filter((value) => value.length > 0);
 }
 
+function normalizeTitlesForMutation(
+  values: AdminDogFormValues["titles"],
+): Array<{
+  awardedOn?: string | null;
+  titleCode: string;
+  titleName?: string | null;
+}> {
+  return values.map((title) => ({
+    awardedOn: normalizeOptionalText(title.awardedOn),
+    titleCode: title.titleCode.trim(),
+    titleName: normalizeOptionalText(title.titleName),
+  }));
+}
+
 function getMutationErrorCode(error: unknown): string | undefined {
   if (error instanceof AdminMutationError) {
     return error.errorCode;
@@ -194,6 +214,13 @@ function mapDogFromQuery(item: AdminDogListItem): AdminDogRecord {
     showCount: item.showCount,
     ekNo: item.ekNo,
     note: item.note,
+    titles: (item.titles ?? []).map((title) => ({
+      id: title.id,
+      awardedOn: normalizeDateForInput(title.awardedOn),
+      titleCode: title.titleCode,
+      titleName: title.titleName,
+      sortOrder: title.sortOrder,
+    })),
   };
 }
 
@@ -289,6 +316,14 @@ export function AdminDogsPageClient() {
         return t("admin.dogs.mutation.errorDuplicateDog");
       case "DOG_NOT_FOUND":
         return t("admin.dogs.mutation.errorDogNotFound");
+      case "INVALID_TITLE_CODE":
+        return t("admin.dogs.mutation.errorInvalidTitleCode");
+      case "INVALID_TITLE_AWARDED_ON":
+        return t("admin.dogs.mutation.errorInvalidTitleAwardedOn");
+      case "INVALID_TITLE_SORT_ORDER":
+        return t("admin.dogs.mutation.errorInvalidTitleSortOrder");
+      case "DUPLICATE_DOG_TITLE":
+        return t("admin.dogs.mutation.errorDuplicateDogTitle");
       default:
         return t("admin.dogs.mutation.errorDefault");
     }
@@ -378,6 +413,7 @@ export function AdminDogsPageClient() {
             undefined,
           damRegistrationNo:
             normalizeOptionalText(values.damPreviewRegistrationNo) ?? undefined,
+          titles: normalizeTitlesForMutation(values.titles),
         });
 
         toast.success(t("admin.dogs.create.success"));
@@ -414,6 +450,7 @@ export function AdminDogsPageClient() {
           values.damPreviewRegistrationNo,
           formState.target.damPreview?.registrationNo ?? "",
         ),
+        titles: normalizeTitlesForMutation(values.titles),
       });
 
       toast.success(t("admin.dogs.edit.success"));
@@ -440,7 +477,7 @@ export function AdminDogsPageClient() {
   const resultCount = dogs.length;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" suppressHydrationWarning>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">
           {t("admin.dogs.title")}

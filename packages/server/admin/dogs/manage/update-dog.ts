@@ -1,6 +1,5 @@
 import {
   findDogByIdDb,
-  findDogByRegistrationNoDb,
   runAdminDogWriteTransactionDb,
   updateAdminDogWriteDb,
   type AuditContextDb,
@@ -24,35 +23,16 @@ import {
   parseDogSex,
   parsePositiveInteger,
 } from "./normalization";
+import {
+  resolveParentByRegistration,
+  type ParentRef,
+} from "./internal/parent-resolution";
+import { isPrismaUniqueConstraintError } from "./internal/prisma-errors";
+import { validateDogTitles } from "./internal/title-validation";
 
 const DOG_NAME_MAX_LENGTH = 120;
 const DOG_REGISTRATION_NO_MAX_LENGTH = 40;
 const DOG_NOTE_MAX_LENGTH = 500;
-type ParentRef = { id: string; sex: "MALE" | "FEMALE" | "UNKNOWN" };
-
-async function resolveParentByRegistration(
-  registrationNo: string | null,
-): Promise<ParentRef | null> {
-  if (!registrationNo) {
-    return null;
-  }
-
-  const row = await findDogByRegistrationNoDb(registrationNo);
-  if (!row) {
-    return null;
-  }
-
-  return { id: row.id, sex: row.sex };
-}
-
-function isDuplicateError(error: unknown): boolean {
-  return Boolean(
-    error &&
-    typeof error === "object" &&
-    "code" in error &&
-    (error as { code?: string }).code === "P2002",
-  );
-}
 
 function isDogNotFoundError(error: unknown): boolean {
   return error instanceof Error && error.message === "DOG_NOT_FOUND";
@@ -332,6 +312,21 @@ export async function updateAdminDog(
         ? undefined
         : normalizeOptionalText(input.breederNameText ?? undefined);
 
+    const parsedTitles =
+      input.titles === undefined ? undefined : validateDogTitles(input.titles);
+    if (parsedTitles !== undefined && !parsedTitles.ok) {
+      log.warn(
+        {
+          event: "invalid_titles",
+          dogId: id,
+          code: parsedTitles.response.body.code,
+          durationMs: Date.now() - startedAt,
+        },
+        "admin dog update rejected because title rows are invalid",
+      );
+      return parsedTitles.response;
+    }
+
     const sireRegistrationNo =
       input.sireRegistrationNo === undefined
         ? undefined
@@ -465,6 +460,8 @@ export async function updateAdminDog(
               input.secondaryRegistrationNos === undefined
                 ? undefined
                 : secondaryRegistrationNos,
+            titles:
+              parsedTitles === undefined ? undefined : parsedTitles.titles,
           },
           tx,
         ),
@@ -512,7 +509,7 @@ export async function updateAdminDog(
       };
     }
 
-    if (isDuplicateError(error)) {
+    if (isPrismaUniqueConstraintError(error)) {
       log.warn(
         {
           event: "duplicate_dog",

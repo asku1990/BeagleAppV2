@@ -190,6 +190,15 @@ export async function listAdminDogs(
             showCount: item.showCount,
             ekNo: item.ekNo,
             note: item.note,
+            titles: item.titles.map((title) => ({
+              id: title.id,
+              awardedOn: title.awardedOn
+                ? toBusinessDateOnly(title.awardedOn)
+                : null,
+              titleCode: title.titleCode,
+              titleName: title.titleName,
+              sortOrder: title.sortOrder,
+            })),
           })),
         },
       },

@@ -14,6 +14,12 @@ export type UpdateAdminDogDbInput = {
   note?: string | null;
   registrationNo: string;
   secondaryRegistrationNos?: string[];
+  titles?: Array<{
+    awardedOn: Date | null;
+    titleCode: string;
+    titleName: string | null;
+    sortOrder: number;
+  }>;
 };
 
 export type UpdatedAdminDogRowDb = {
@@ -248,6 +254,34 @@ async function syncPrimaryRegistration(
   return registrationNo;
 }
 
+async function syncTitles(
+  dogId: string,
+  titles: UpdateAdminDogDbInput["titles"] | undefined,
+  tx: Prisma.TransactionClient,
+): Promise<void> {
+  if (titles === undefined) {
+    return;
+  }
+
+  await tx.dogTitle.deleteMany({
+    where: { dogId },
+  });
+
+  if (titles.length === 0) {
+    return;
+  }
+
+  await tx.dogTitle.createMany({
+    data: titles.map((title) => ({
+      dogId,
+      awardedOn: title.awardedOn,
+      titleCode: title.titleCode,
+      titleName: title.titleName,
+      sortOrder: title.sortOrder,
+    })),
+  });
+}
+
 export async function updateAdminDogWriteDb(
   input: UpdateAdminDogDbInput,
   tx: Prisma.TransactionClient,
@@ -297,6 +331,7 @@ export async function updateAdminDogWriteDb(
     input.secondaryRegistrationNos,
     tx,
   );
+  await syncTitles(updatedDog.id, input.titles, tx);
 
   return {
     id: updatedDog.id,

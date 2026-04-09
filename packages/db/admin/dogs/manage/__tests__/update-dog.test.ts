@@ -15,6 +15,8 @@ describe("updateAdminDogWriteDb", () => {
   const dogRegistrationUpdateMock = vi.fn();
   const dogRegistrationCreateMock = vi.fn();
   const dogRegistrationCreateManyMock = vi.fn();
+  const dogTitleDeleteManyMock = vi.fn();
+  const dogTitleCreateManyMock = vi.fn();
 
   const tx = {
     dog: {
@@ -41,6 +43,10 @@ describe("updateAdminDogWriteDb", () => {
       create: dogRegistrationCreateMock,
       createMany: dogRegistrationCreateManyMock,
     },
+    dogTitle: {
+      deleteMany: dogTitleDeleteManyMock,
+      createMany: dogTitleCreateManyMock,
+    },
   };
 
   beforeEach(() => {
@@ -57,6 +63,8 @@ describe("updateAdminDogWriteDb", () => {
     dogRegistrationUpdateMock.mockReset();
     dogRegistrationCreateMock.mockReset();
     dogRegistrationCreateManyMock.mockReset();
+    dogTitleDeleteManyMock.mockReset();
+    dogTitleCreateManyMock.mockReset();
   });
 
   it("promotes existing secondary registration to primary", async () => {
@@ -319,5 +327,79 @@ describe("updateAdminDogWriteDb", () => {
     expect(dogRegistrationDeleteMock.mock.invocationCallOrder[0]).toBeLessThan(
       dogRegistrationUpdateMock.mock.invocationCallOrder[0],
     );
+  });
+
+  it("replaces titles when titles payload is provided", async () => {
+    dogFindUniqueMock.mockResolvedValue({ id: "dog_1" });
+    dogUpdateMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Kide",
+      sex: "FEMALE",
+    });
+    dogRegistrationFindManyMock.mockResolvedValue([
+      { id: "reg_primary", registrationNo: "FI11111/21" },
+    ]);
+
+    await updateAdminDogWriteDb(
+      {
+        id: "dog_1",
+        name: "Kide",
+        sex: "FEMALE",
+        sireId: undefined,
+        damId: undefined,
+        registrationNo: "FI11111/21",
+        titles: [
+          {
+            awardedOn: new Date("2022-01-10T00:00:00.000Z"),
+            titleCode: "FI JVA",
+            titleName: "Valio",
+            sortOrder: 0,
+          },
+        ],
+      },
+      tx as never,
+    );
+
+    expect(dogTitleDeleteManyMock).toHaveBeenCalledWith({
+      where: { dogId: "dog_1" },
+    });
+    expect(dogTitleCreateManyMock).toHaveBeenCalledWith({
+      data: [
+        {
+          dogId: "dog_1",
+          awardedOn: new Date("2022-01-10T00:00:00.000Z"),
+          titleCode: "FI JVA",
+          titleName: "Valio",
+          sortOrder: 0,
+        },
+      ],
+    });
+  });
+
+  it("does not touch titles when titles payload is omitted", async () => {
+    dogFindUniqueMock.mockResolvedValue({ id: "dog_1" });
+    dogUpdateMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Kide",
+      sex: "FEMALE",
+    });
+    dogRegistrationFindManyMock.mockResolvedValue([
+      { id: "reg_primary", registrationNo: "FI11111/21" },
+    ]);
+
+    await updateAdminDogWriteDb(
+      {
+        id: "dog_1",
+        name: "Kide",
+        sex: "FEMALE",
+        sireId: undefined,
+        damId: undefined,
+        registrationNo: "FI11111/21",
+      },
+      tx as never,
+    );
+
+    expect(dogTitleDeleteManyMock).not.toHaveBeenCalled();
+    expect(dogTitleCreateManyMock).not.toHaveBeenCalled();
   });
 });
