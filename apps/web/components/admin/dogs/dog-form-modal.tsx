@@ -480,7 +480,7 @@ export function DogFormModal({
                   titles: [
                     ...values.titles,
                     {
-                      awardedOn: todayDateInputValue,
+                      awardedOn: "",
                       titleCode: "",
                       titleName: "",
                     },
@@ -506,22 +506,32 @@ export function DogFormModal({
                   {t("admin.dogs.form.titlesRowPrefix")} {index + 1}
                 </p>
                 <div className="grid gap-2 md:grid-cols-3">
-                  <Input
-                    type="date"
-                    value={title.awardedOn}
-                    onChange={(event) =>
-                      onValuesChange({
-                        ...values,
-                        titles: values.titles.map((value, valueIndex) =>
-                          valueIndex === index
-                            ? { ...value, awardedOn: event.target.value }
-                            : value,
-                        ),
-                      })
-                    }
-                    aria-label={t("admin.dogs.form.titleAwardedOnLabel")}
-                    max={todayDateInputValue}
-                  />
+                  {title.awardedOn.trim().length > 0 ? (
+                    <div>
+                      <Input
+                        type="date"
+                        value={title.awardedOn}
+                        onChange={(event) =>
+                          onValuesChange({
+                            ...values,
+                            titles: values.titles.map((value, valueIndex) =>
+                              valueIndex === index
+                                ? { ...value, awardedOn: event.target.value }
+                                : value,
+                            ),
+                          })
+                        }
+                        aria-label={t("admin.dogs.form.titleAwardedOnLabel")}
+                        max={todayDateInputValue}
+                      />
+                    </div>
+                  ) : (
+                    <div className="rounded-md border border-dashed px-3 py-2">
+                      <p className="text-xs font-medium text-muted-foreground">
+                        {t("admin.dogs.form.titleAwardedOnUnknown")}
+                      </p>
+                    </div>
+                  )}
                   <Input
                     value={title.titleCode}
                     onChange={(event) =>
@@ -556,11 +566,51 @@ export function DogFormModal({
                     maxLength={160}
                   />
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex gap-2 overflow-x-auto whitespace-nowrap">
+                  {title.awardedOn.trim().length > 0 ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="shrink-0"
+                      onClick={() =>
+                        onValuesChange({
+                          ...values,
+                          titles: values.titles.map((value, valueIndex) =>
+                            valueIndex === index
+                              ? { ...value, awardedOn: "" }
+                              : value,
+                          ),
+                        })
+                      }
+                    >
+                      {t("admin.dogs.form.titleAwardedOnClear")}
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="shrink-0"
+                      onClick={() =>
+                        onValuesChange({
+                          ...values,
+                          titles: values.titles.map((value, valueIndex) =>
+                            valueIndex === index
+                              ? { ...value, awardedOn: todayDateInputValue }
+                              : value,
+                          ),
+                        })
+                      }
+                    >
+                      {t("admin.dogs.form.titleAwardedOnSet")}
+                    </Button>
+                  )}
                   <Button
                     type="button"
                     size="sm"
                     variant="outline"
+                    className="shrink-0"
                     onClick={() => {
                       if (index === 0) {
                         return;
@@ -582,6 +632,7 @@ export function DogFormModal({
                     type="button"
                     size="sm"
                     variant="outline"
+                    className="shrink-0"
                     onClick={() => {
                       if (index >= values.titles.length - 1) {
                         return;
@@ -603,6 +654,7 @@ export function DogFormModal({
                     type="button"
                     size="sm"
                     variant="outline"
+                    className="shrink-0"
                     onClick={() =>
                       onValuesChange({
                         ...values,
