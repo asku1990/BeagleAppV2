@@ -1,6 +1,5 @@
 import {
   createAdminDogWriteDb,
-  findDogByRegistrationNoDb,
   runAdminDogWriteTransactionDb,
   type AuditContextDb,
 } from "@beagle/db";
@@ -22,34 +21,13 @@ import {
   parseDogSex,
   parsePositiveInteger,
 } from "./normalization";
+import { resolveParentByRegistration } from "./internal/parent-resolution";
+import { isPrismaUniqueConstraintError } from "./internal/prisma-errors";
+import { validateDogTitles } from "./internal/title-validation";
 
 const DOG_NAME_MAX_LENGTH = 120;
 const DOG_REGISTRATION_NO_MAX_LENGTH = 40;
 const DOG_NOTE_MAX_LENGTH = 500;
-
-function isDuplicateError(error: unknown): boolean {
-  return Boolean(
-    error &&
-    typeof error === "object" &&
-    "code" in error &&
-    (error as { code?: string }).code === "P2002",
-  );
-}
-
-async function resolveParentByRegistration(
-  registrationNo: string | null,
-): Promise<{ id: string; sex: "MALE" | "FEMALE" | "UNKNOWN" } | null> {
-  if (!registrationNo) {
-    return null;
-  }
-
-  const row = await findDogByRegistrationNoDb(registrationNo);
-  if (!row) {
-    return null;
-  }
-
-  return { id: row.id, sex: row.sex };
-}
 
 export async function createAdminDog(
   input: CreateAdminDogRequest,
@@ -286,6 +264,19 @@ export async function createAdminDog(
       };
     }
 
+    const parsedTitles = validateDogTitles(input.titles);
+    if (!parsedTitles.ok) {
+      log.warn(
+        {
+          event: "invalid_titles",
+          code: parsedTitles.response.body.code,
+          durationMs: Date.now() - startedAt,
+        },
+        "admin dog create rejected because title rows are invalid",
+      );
+      return parsedTitles.response;
+    }
+
     const sireRegistrationNo = normalizeOptionalText(input.sireRegistrationNo);
     const damRegistrationNo = normalizeOptionalText(input.damRegistrationNo);
 
@@ -361,6 +352,7 @@ export async function createAdminDog(
             note,
             registrationNo: normalizedPrimaryRegistrationNo,
             secondaryRegistrationNos,
+            titles: parsedTitles.titles,
           },
           tx,
         ),
@@ -389,7 +381,7 @@ export async function createAdminDog(
       },
     };
   } catch (error) {
-    if (isDuplicateError(error)) {
+    if (isPrismaUniqueConstraintError(error)) {
       log.warn(
         { event: "duplicate_dog", durationMs: Date.now() - startedAt },
         "admin dog create rejected because duplicate dog exists",

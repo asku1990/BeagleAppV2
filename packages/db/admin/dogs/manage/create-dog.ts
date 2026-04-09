@@ -17,6 +17,12 @@ export type CreateAdminDogDbInput = {
   note: string | null;
   registrationNo: string;
   secondaryRegistrationNos?: string[];
+  titles?: Array<{
+    awardedOn: Date | null;
+    titleCode: string;
+    titleName: string | null;
+    sortOrder: number;
+  }>;
 };
 
 export type CreatedAdminDogRowDb = {

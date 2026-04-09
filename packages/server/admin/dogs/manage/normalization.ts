@@ -3,6 +3,30 @@ const MAX_LOOKUP_LIMIT = 100;
 const MAX_DB_INT = 2_147_483_647;
 const REGISTRATION_NO_PATTERN = /^[\p{L}\p{N}/.-]+$/u;
 
+export type AdminDogTitleInputNormalized = {
+  awardedOn: Date | null;
+  titleCode: string;
+  titleName: string | null;
+  sortOrder: number;
+};
+
+export type ParseAdminDogTitlesErrorCode =
+  | "INVALID_TITLE_CODE"
+  | "INVALID_TITLE_AWARDED_ON"
+  | "INVALID_TITLE_SORT_ORDER"
+  | "DUPLICATE_DOG_TITLE";
+
+export type ParseAdminDogTitlesResult =
+  | {
+      ok: true;
+      titles: AdminDogTitleInputNormalized[];
+    }
+  | {
+      ok: false;
+      code: ParseAdminDogTitlesErrorCode;
+      error: string;
+    };
+
 export function normalizeRequiredText(value: string): string | null {
   const normalized = value.trim();
   return normalized.length > 0 ? normalized : null;
@@ -81,6 +105,20 @@ export function parsePositiveInteger(
   return value;
 }
 
+function parseNonNegativeInteger(
+  value: number | null | undefined,
+): number | null | "INVALID" {
+  if (value === undefined || value === null) {
+    return null;
+  }
+
+  if (!Number.isInteger(value) || value < 0 || value > MAX_DB_INT) {
+    return "INVALID";
+  }
+
+  return value;
+}
+
 export function hasMaxLength(value: string | null, maxLength: number): boolean {
   return !value || value.length <= maxLength;
 }
@@ -127,4 +165,66 @@ export function normalizeRegistrationNos(
 
 export function isValidRegistrationNo(value: string): boolean {
   return REGISTRATION_NO_PATTERN.test(value);
+}
+
+export function parseAdminDogTitles(
+  titlesInput:
+    | Array<{
+        awardedOn?: string | null;
+        titleCode: string;
+        titleName?: string | null;
+        sortOrder: number;
+      }>
+    | undefined,
+): ParseAdminDogTitlesResult {
+  const normalizedTitles: AdminDogTitleInputNormalized[] = [];
+  const duplicateKeys = new Set<string>();
+
+  for (const input of titlesInput ?? []) {
+    const titleCode = normalizeRequiredText(input.titleCode)?.toUpperCase();
+    if (!titleCode) {
+      return {
+        ok: false,
+        code: "INVALID_TITLE_CODE",
+        error: "Title code is required.",
+      };
+    }
+
+    const awardedOn = parseBirthDate(input.awardedOn);
+    if (awardedOn === "INVALID") {
+      return {
+        ok: false,
+        code: "INVALID_TITLE_AWARDED_ON",
+        error: "Title awarded date must use YYYY-MM-DD format.",
+      };
+    }
+
+    const sortOrder = parseNonNegativeInteger(input.sortOrder);
+    if (sortOrder === "INVALID" || sortOrder === null) {
+      return {
+        ok: false,
+        code: "INVALID_TITLE_SORT_ORDER",
+        error: "Title sort order must be a non-negative integer.",
+      };
+    }
+
+    const duplicateKey = `${titleCode}::${awardedOn ? awardedOn.toISOString().slice(0, 10) : ""}`;
+    if (duplicateKeys.has(duplicateKey)) {
+      return {
+        ok: false,
+        code: "DUPLICATE_DOG_TITLE",
+        error: "Duplicate dog titles are not allowed.",
+      };
+    }
+    duplicateKeys.add(duplicateKey);
+
+    normalizedTitles.push({
+      awardedOn,
+      titleCode,
+      titleName: normalizeOptionalText(input.titleName ?? undefined),
+      sortOrder,
+    });
+  }
+
+  return { ok: true, titles: normalizedTitles };
 }

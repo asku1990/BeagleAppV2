@@ -196,6 +196,7 @@ describe("createAdminDog", () => {
         note: "Important",
         registrationNo: "FI12345/21",
         secondaryRegistrationNos: [],
+        titles: [],
       },
       {},
     );
@@ -323,6 +324,59 @@ describe("createAdminDog", () => {
         ok: false,
         error: "Sire and dam must be different dogs.",
         code: "INVALID_PARENT_COMBINATION",
+      },
+    });
+  });
+
+  it("returns 400 for duplicate normalized dog titles", async () => {
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        titles: [
+          {
+            titleCode: " fi jva ",
+            awardedOn: "2022-01-10",
+            sortOrder: 0,
+          },
+          {
+            titleCode: "FI JVA",
+            awardedOn: "2022-01-10",
+            sortOrder: 1,
+          },
+        ],
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Duplicate dog titles are not allowed.",
+        code: "DUPLICATE_DOG_TITLE",
+      },
+    });
+  });
+
+  it("returns 400 for invalid dog title awarded date", async () => {
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        titles: [
+          {
+            titleCode: "FI JVA",
+            awardedOn: "2022/01/10",
+            sortOrder: 0,
+          },
+        ],
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Title awarded date must use YYYY-MM-DD format.",
+        code: "INVALID_TITLE_AWARDED_ON",
       },
     });
   });

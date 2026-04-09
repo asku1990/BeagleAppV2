@@ -217,6 +217,7 @@ describe("updateAdminDog", () => {
         note: "Important",
         registrationNo: "FI12345/21",
         secondaryRegistrationNos: undefined,
+        titles: undefined,
       },
       {},
     );
@@ -512,6 +513,61 @@ describe("updateAdminDog", () => {
         ok: false,
         error: "Note cannot exceed 500 characters.",
         code: "NOTE_TOO_LONG",
+      },
+    });
+  });
+
+  it("returns 400 for duplicate normalized dog titles", async () => {
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        titles: [
+          {
+            titleCode: " fi jva ",
+            awardedOn: "2022-01-10",
+            sortOrder: 0,
+          },
+          {
+            titleCode: "FI JVA",
+            awardedOn: "2022-01-10",
+            sortOrder: 1,
+          },
+        ],
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Duplicate dog titles are not allowed.",
+        code: "DUPLICATE_DOG_TITLE",
+      },
+    });
+  });
+
+  it("returns 400 for invalid title sort order", async () => {
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        titles: [
+          {
+            titleCode: "FI JVA",
+            awardedOn: "2022-01-10",
+            sortOrder: -1,
+          },
+        ],
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Title sort order must be a non-negative integer.",
+        code: "INVALID_TITLE_SORT_ORDER",
       },
     });
   });
