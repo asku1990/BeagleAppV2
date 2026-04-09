@@ -4,10 +4,13 @@ import type {
   AdminDogLookupRequest,
   CurrentUserDto,
 } from "@beagle/contracts";
-import { toErrorLog, withLogContext } from "../../../core/logger";
-import type { ServiceResult } from "../../../core/result";
-import { requireAdmin } from "../../core/service";
-import { normalizeQuery, parseLookupLimit } from "../manage/normalization";
+import { requireAdmin } from "@server/admin/core/service";
+import { toErrorLog, withLogContext } from "@server/core/logger";
+import type { ServiceResult } from "@server/core/result";
+import {
+  normalizeQuery,
+  parseLookupLimit,
+} from "@server/admin/dogs/manage/normalization";
 
 type ServiceLogContext = {
   requestId?: string;

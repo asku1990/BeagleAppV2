@@ -2,7 +2,7 @@ import type { Prisma } from "@prisma/client";
 import {
   runInAuditContextDb,
   type AuditContextDb,
-} from "../../../core/audit-context";
+} from "@db/core/audit-context";
 import { uniqueNonEmptyNames } from "./normalization";
 
 export type CreateAdminDogDbInput = {

@@ -4,10 +4,10 @@ import type {
   AdminDogListResponse,
   CurrentUserDto,
 } from "@beagle/contracts";
-import { toBusinessDateOnly } from "../../../core/date-only";
-import type { ServiceResult } from "../../../core/result";
-import { requireAdmin } from "../../core/service";
-import { toErrorLog, withLogContext } from "../../../core/logger";
+import { toBusinessDateOnly } from "@server/core/date-only";
+import { toErrorLog, withLogContext } from "@server/core/logger";
+import type { ServiceResult } from "@server/core/result";
+import { requireAdmin } from "@server/admin/core/service";
 import { normalizeQuery } from "./normalization";
 
 type ServiceLogContext = {
