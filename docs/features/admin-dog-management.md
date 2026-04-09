@@ -12,9 +12,11 @@ Developer notes for the admin dog management flow.
 - `apps/web/app/(admin)/admin/dogs/page.tsx`: route entrypoint for the page.
 - `apps/web/components/admin/dogs/admin-dogs-page-client.tsx`: page composition and query wiring.
 - `apps/web/hooks/admin/dogs/manage/use-admin-dog-form-flow.ts`: modal/form state + mutation orchestration.
+- `apps/web/components/admin/dogs/dog-form-modal.tsx`: thin form modal shell and section composition.
+- `apps/web/components/admin/dogs/internal/*`: dog form private section components.
 - `apps/web/lib/admin/dogs/manage/dog-form-mappers.ts`: pure query-to-view-model and lookup option shaping helpers.
 - `apps/web/lib/admin/dogs/manage/dog-mutation-flow.ts`: pure mutation payload normalization and error-key mapping.
-- `apps/web/components/admin/dogs/dog-form-modal.tsx`: presentational create/edit form modal.
+- `apps/web/lib/admin/dogs/manage/dog-form-section-updates.ts`: pure immutable field update helpers for section-level edits.
 - `apps/web/components/admin/dogs/delete-dog-confirm-modal.tsx`: delete confirmation modal.
 - `apps/web/components/admin/dogs/dog-results.tsx`: dog result table/cards with edit/delete actions.
 
@@ -24,7 +26,8 @@ Developer notes for the admin dog management flow.
 2. The page delegates modal/form state and submit/delete handlers to `useAdminDogFormFlow`.
 3. Lookup queries for breeder/owner/parent options are enabled while the form modal is open.
 4. Lookup response data and current form values are shaped via pure feature-local `lib` helpers before rendering `DogFormModal`.
-5. Create/update/delete actions call admin dog mutation hooks, then rely on existing query invalidation behavior from those hooks.
+5. `DogFormModal` delegates large form areas to private `internal/*` sections while keeping controlled form values in the parent flow.
+6. Create/update/delete actions call admin dog mutation hooks, then rely on existing query invalidation behavior from those hooks.
 
 ## Refactor boundary (BEJ-73)
 
