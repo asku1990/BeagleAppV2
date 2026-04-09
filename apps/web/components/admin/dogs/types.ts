@@ -5,6 +5,14 @@ export type AdminDogParentPreview = {
   registrationNo: string;
 };
 
+export type AdminDogTitleRecord = {
+  id: string;
+  awardedOn: string | null;
+  titleCode: string;
+  titleName: string | null;
+  sortOrder: number;
+};
+
 export type AdminDogRecord = {
   id: string;
   name: string;
@@ -20,6 +28,13 @@ export type AdminDogRecord = {
   secondaryRegistrationNos: string[];
   sirePreview: AdminDogParentPreview | null;
   damPreview: AdminDogParentPreview | null;
+  titles: AdminDogTitleRecord[];
+};
+
+export type AdminDogTitleFormValues = {
+  awardedOn: string;
+  titleCode: string;
+  titleName: string;
 };
 
 export type AdminDogFormValues = {
@@ -36,4 +51,5 @@ export type AdminDogFormValues = {
   sirePreviewRegistrationNo: string;
   damPreviewName: string;
   damPreviewRegistrationNo: string;
+  titles: AdminDogTitleFormValues[];
 };

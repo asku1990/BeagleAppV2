@@ -52,6 +52,13 @@ function buildEditValues(): AdminDogFormValues {
     sirePreviewRegistrationNo: "FI54321/20",
     damPreviewName: "Havupolun Helmi",
     damPreviewRegistrationNo: "FI77777/18",
+    titles: [
+      {
+        awardedOn: "2022-01-10",
+        titleCode: "FI JVA",
+        titleName: "Valio",
+      },
+    ],
   };
 }
 
@@ -77,6 +84,13 @@ function buildDog(values: AdminDogFormValues): AdminDogRecord {
     note: values.note,
     registrationNo: values.registrationNo,
     secondaryRegistrationNos: values.secondaryRegistrationNos,
+    titles: values.titles.map((title, index) => ({
+      id: `title_${index + 1}`,
+      awardedOn: title.awardedOn,
+      titleCode: title.titleCode,
+      titleName: title.titleName,
+      sortOrder: index,
+    })),
   };
 }
 
@@ -116,6 +130,9 @@ describe("DogFormModal", () => {
     expect(html).toContain(">Antti Virtanen<");
     expect(html).toContain('value="5588"');
     expect(html).toContain('value="Important note"');
+    expect(html).toContain('value="2022-01-10"');
+    expect(html).toContain('value="FI JVA"');
+    expect(html).toContain('value="Valio"');
     expect(html).toContain("admin.dogs.form.recordIdPrefix dog_1");
   });
 

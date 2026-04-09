@@ -48,6 +48,13 @@ export const fiAdminDogsCommonMessages = {
   "admin.dogs.mutation.errorDuplicateDog":
     "Koira samalla EK-numerolla tai rekisterinumerolla on jo olemassa.",
   "admin.dogs.mutation.errorDogNotFound": "Koiraa ei löytynyt.",
+  "admin.dogs.mutation.errorInvalidTitleCode": "Tittelikoodi on pakollinen.",
+  "admin.dogs.mutation.errorInvalidTitleAwardedOn":
+    "Tittelin myöntämispäivän muoto on virheellinen.",
+  "admin.dogs.mutation.errorInvalidTitleSortOrder":
+    "Tittelirivin järjestysarvo on virheellinen.",
+  "admin.dogs.mutation.errorDuplicateDogTitle":
+    "Sama titteli samalla päivällä on annettu useammin kuin kerran.",
 } as const;
 
 export const svAdminDogsCommonMessages = {
@@ -98,4 +105,11 @@ export const svAdminDogsCommonMessages = {
   "admin.dogs.mutation.errorDuplicateDog":
     "En hund med samma EK-nummer eller registreringsnummer finns redan.",
   "admin.dogs.mutation.errorDogNotFound": "Hunden hittades inte.",
+  "admin.dogs.mutation.errorInvalidTitleCode": "Titelkod ar obligatorisk.",
+  "admin.dogs.mutation.errorInvalidTitleAwardedOn":
+    "Titelns tilldelningsdatum har ogiltigt format.",
+  "admin.dogs.mutation.errorInvalidTitleSortOrder":
+    "Titelradens ordningsvarde ar ogiltigt.",
+  "admin.dogs.mutation.errorDuplicateDogTitle":
+    "Samma titel med samma datum far inte forekomma flera ganger.",
 } as const;

@@ -465,6 +465,161 @@ export function DogFormModal({
           maxLength={500}
         />
 
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              {t("admin.dogs.form.titlesLabel")}
+            </p>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() =>
+                onValuesChange({
+                  ...values,
+                  titles: [
+                    ...values.titles,
+                    {
+                      awardedOn: todayDateInputValue,
+                      titleCode: "",
+                      titleName: "",
+                    },
+                  ],
+                })
+              }
+            >
+              {t("admin.dogs.form.titlesAdd")}
+            </Button>
+          </div>
+          {values.titles.length === 0 ? (
+            <p className="text-xs text-muted-foreground">
+              {t("admin.dogs.form.titlesEmpty")}
+            </p>
+          ) : null}
+          <div className="space-y-3">
+            {values.titles.map((title, index) => (
+              <div
+                key={`dog-title-row-${index + 1}`}
+                className="space-y-2 rounded-md border p-2"
+              >
+                <p className="text-xs text-muted-foreground">
+                  {t("admin.dogs.form.titlesRowPrefix")} {index + 1}
+                </p>
+                <div className="grid gap-2 md:grid-cols-3">
+                  <Input
+                    type="date"
+                    value={title.awardedOn}
+                    onChange={(event) =>
+                      onValuesChange({
+                        ...values,
+                        titles: values.titles.map((value, valueIndex) =>
+                          valueIndex === index
+                            ? { ...value, awardedOn: event.target.value }
+                            : value,
+                        ),
+                      })
+                    }
+                    aria-label={t("admin.dogs.form.titleAwardedOnLabel")}
+                    max={todayDateInputValue}
+                  />
+                  <Input
+                    value={title.titleCode}
+                    onChange={(event) =>
+                      onValuesChange({
+                        ...values,
+                        titles: values.titles.map((value, valueIndex) =>
+                          valueIndex === index
+                            ? {
+                                ...value,
+                                titleCode: event.target.value.toUpperCase(),
+                              }
+                            : value,
+                        ),
+                      })
+                    }
+                    placeholder={t("admin.dogs.form.titleCodePlaceholder")}
+                    maxLength={80}
+                  />
+                  <Input
+                    value={title.titleName}
+                    onChange={(event) =>
+                      onValuesChange({
+                        ...values,
+                        titles: values.titles.map((value, valueIndex) =>
+                          valueIndex === index
+                            ? { ...value, titleName: event.target.value }
+                            : value,
+                        ),
+                      })
+                    }
+                    placeholder={t("admin.dogs.form.titleNamePlaceholder")}
+                    maxLength={160}
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      if (index === 0) {
+                        return;
+                      }
+                      const reordered = [...values.titles];
+                      const current = reordered[index];
+                      reordered[index] = reordered[index - 1];
+                      reordered[index - 1] = current;
+                      onValuesChange({
+                        ...values,
+                        titles: reordered,
+                      });
+                    }}
+                    disabled={index === 0}
+                  >
+                    {t("admin.dogs.form.titlesMoveUp")}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      if (index >= values.titles.length - 1) {
+                        return;
+                      }
+                      const reordered = [...values.titles];
+                      const current = reordered[index];
+                      reordered[index] = reordered[index + 1];
+                      reordered[index + 1] = current;
+                      onValuesChange({
+                        ...values,
+                        titles: reordered,
+                      });
+                    }}
+                    disabled={index >= values.titles.length - 1}
+                  >
+                    {t("admin.dogs.form.titlesMoveDown")}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      onValuesChange({
+                        ...values,
+                        titles: values.titles.filter(
+                          (_value, valueIndex) => valueIndex !== index,
+                        ),
+                      })
+                    }
+                  >
+                    {t("admin.dogs.form.titlesRemove")}
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {mode === "edit" && dog ? (
           <p className="text-xs text-muted-foreground">
             {t("admin.dogs.form.recordIdPrefix")} {dog.id}
