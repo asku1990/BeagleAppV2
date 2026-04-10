@@ -2,7 +2,8 @@
   "extends": "../config-typescript/base.json",
   "compilerOptions": {
     "paths": {
-      "@api-client/*": ["./*"]
+      "@api-client/*": ["./*"],
+      "@contracts/*": ["../contracts/*"]
     }
   },
   "include": ["**/*.ts"]

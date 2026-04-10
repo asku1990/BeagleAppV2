@@ -3,7 +3,8 @@
   "compilerOptions": {
     "paths": {
       "@server/*": ["./*"],
-      "@db/*": ["../db/*"]
+      "@db/*": ["../db/*"],
+      "@contracts/*": ["../contracts/*"]
     }
   },
   "include": ["**/*.ts"]
