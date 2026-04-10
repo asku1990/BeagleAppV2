@@ -79,6 +79,7 @@ describe("BeagleDogProfilePage", () => {
               litterCount: 0,
             },
           ],
+          titles: [],
           litters: [
             {
               id: "litter_1",
@@ -225,6 +226,7 @@ describe("BeagleDogProfilePage", () => {
           offspringSummary: { litterCount: 0, puppyCount: 0 },
           siblingsSummary: { siblingCount: 0 },
           siblings: [],
+          titles: [],
           litters: [],
           shows: [],
           trials: [],
