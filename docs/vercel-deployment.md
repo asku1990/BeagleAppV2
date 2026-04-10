@@ -19,6 +19,12 @@ This repository supports two valid Vercel project configurations.
 - `RUN_DB_MIGRATIONS=true` (default): run `pnpm db:migrate:deploy` after successful build.
 - `RUN_DB_MIGRATIONS=false`: skip migration deploy in that environment.
 
+## Database URL precedence on Vercel
+
+- Runtime DB client resolution prefers scoped Vercel variables first (`beagle_db_<scope>_...`), then falls back to `DATABASE_URL`.
+- Migration resolution (`prisma migrate deploy`) prefers non-pooled scoped values first (`beagle_db_<scope>_DATABASE_URL_UNPOOLED` or `beagle_db_<scope>_POSTGRES_URL_NON_POOLING`), then falls back to `DATABASE_URL`.
+- For production deploys, set `beagle_db_production_POSTGRES_URL_NON_POOLING` (or `beagle_db_production_DATABASE_URL_UNPOOLED`) to ensure migrations run against a direct connection.
+
 ## Common failure: `Command "vercel:build" not found`
 
 If Vercel logs show:

@@ -46,4 +46,26 @@ describe("resolveDatabaseUrl", () => {
 
     expect(url).toBe("postgresql://develop-nonpooling");
   });
+
+  it("prefers scoped runtime URL over generic DATABASE_URL", () => {
+    const url = resolveDatabaseUrl({
+      DATABASE_URL: "postgresql://generic-runtime",
+      beagle_db_develop_POSTGRES_PRISMA_URL: "postgresql://scoped-runtime",
+    });
+
+    expect(url).toBe("postgresql://scoped-runtime");
+  });
+
+  it("prefers scoped migration URL over generic DATABASE_URL", () => {
+    const url = resolveDatabaseUrl(
+      {
+        DATABASE_URL: "postgresql://generic-migration",
+        beagle_db_develop_POSTGRES_URL_NON_POOLING:
+          "postgresql://scoped-migration",
+      },
+      "migration",
+    );
+
+    expect(url).toBe("postgresql://scoped-migration");
+  });
 });
