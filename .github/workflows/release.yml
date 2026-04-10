@@ -98,7 +98,16 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          if ! grep -q "^## \\[${VERSION}\\] - [0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}$" CHANGELOG.md; then
+          if ! awk -v prefix="## [${VERSION}] - " '
+            index($0, prefix) == 1 {
+              date = substr($0, length(prefix) + 1)
+              if (date ~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) {
+                found = 1
+                exit 0
+              }
+            }
+            END { exit(found ? 0 : 1) }
+          ' CHANGELOG.md; then
             echo "Missing CHANGELOG block for version ${VERSION} (expected: ## [${VERSION}] - YYYY-MM-DD)"
             exit 1
           fi
@@ -107,14 +116,17 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          awk -v version="$VERSION" '
+          awk -v prefix="## [${VERSION}] - " '
             BEGIN { in_block=0 }
             /^## \[/ {
               if (in_block == 1) exit
             }
-            $0 ~ ("^## \\[" version "\\] - ") {
-              in_block=1
-              next
+            if (in_block == 0 && index($0, prefix) == 1) {
+              date = substr($0, length(prefix) + 1)
+              if (date ~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) {
+                in_block=1
+                next
+              }
             }
             in_block == 1 { print }
           ' CHANGELOG.md > RELEASE_NOTES.md
@@ -131,7 +143,7 @@ jobs:
         run: |
           if git rev-parse "$TAG" >/dev/null 2>&1; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "Tag $TAG already exists, skipping release creation."
+            echo "Tag $TAG already exists, skipping tag creation."
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
@@ -147,7 +159,6 @@ jobs:
           git push origin "$TAG"
 
       - name: Create GitHub release
-        if: steps.tag_exists.outputs.exists == 'false'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
