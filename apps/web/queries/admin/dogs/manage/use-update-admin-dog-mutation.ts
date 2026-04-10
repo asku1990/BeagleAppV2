@@ -17,6 +17,7 @@ import {
   beagleNewestQueryKeyRoot,
   beagleSearchQueryKeyRoot,
 } from "@/queries/public/beagle/search/query-keys";
+import { beagleDogsQueryKeyRoot } from "@/queries/public/beagle/dogs/profile/query-keys";
 import {
   beagleShowDetailsQueryKeyRoot,
   beagleShowSearchQueryKeyRoot,
@@ -58,6 +59,9 @@ export function useUpdateAdminDogMutation() {
       });
       await queryClient.invalidateQueries({
         queryKey: beagleNewestQueryKeyRoot,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: beagleDogsQueryKeyRoot,
       });
       await queryClient.invalidateQueries({
         queryKey: beagleShowSearchQueryKeyRoot,

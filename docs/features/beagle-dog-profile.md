@@ -12,6 +12,7 @@ Developer notes for the public beagle dog profile feature.
 - `apps/web/components/beagle-dog-profile/beagle-dog-profile-page.tsx`: top-level page composition
 - `apps/web/components/beagle-dog-profile/beagle-dog-profile-page-container.tsx`: query state, loading, and error handling
 - `apps/web/components/beagle-dog-profile/dog-profile-details-card.tsx`: identity and basic metadata
+- `apps/web/components/beagle-dog-profile/dog-profile-titles-card.tsx`: dog title rows
 - `apps/web/components/beagle-dog-profile/dog-profile-lineage-card.tsx`: parent links and pedigree tree
 - `apps/web/components/beagle-dog-profile/dog-profile-shows-card.tsx`: show results
 - `apps/web/components/beagle-dog-profile/dog-profile-trials-card.tsx`: trial results
@@ -27,7 +28,7 @@ Developer notes for the public beagle dog profile feature.
    - base dog profile data from the dogs DB profile module
    - show rows from the shows domain
    - trial rows from the trials domain
-3. The web page renders details and lineage always, and renders secondary cards conditionally by data (siblings, litters, shows, trials).
+3. The web page renders details and lineage always, renders titles when title rows exist, and renders secondary cards conditionally by data (siblings, litters, shows, trials).
 4. Siblings are resolved in DB from one reliable birth litter and rendered after lineage.
 5. Litters are rendered between siblings and result sections.
 
@@ -39,6 +40,7 @@ The public dog profile contract includes:
 - parent and pedigree data
 - `shows[]`
 - `trials[]`
+- `titles[]`
 - `offspringSummary`
 - `litters[]`
 - `siblingsSummary`
@@ -47,6 +49,7 @@ The public dog profile contract includes:
 Current note:
 
 - grouped litter data is already part of the profile contract and backend mapping
+- title rows are stored and rendered as structured row data (`awardedOn`, `titleCode`, `titleName`)
 - the UI renders litters as grouped pentue blocks with summary counts, co-parent links, and puppy profile links
 - each litter uses the shared desktop/mobile listing pattern instead of a custom flat row list
 - puppy rows currently include registration number, name, sex, EK number, trial count, show count, litter count, and a placeholder color column
@@ -89,6 +92,7 @@ Ordering:
 
 - Keep the page header focused on dog identity: name and primary registration number
 - keep details and lineage always visible as separate cards
+- render titles as a separate card after details when `titles.length > 0`
 - render siblings/litters/shows/trials only when the corresponding arrays contain rows
 - keep unknown/missing data visible as explicit fallback values instead of collapsing the row unpredictably
 - parent links should remain the primary navigation path inside pedigree/profile content

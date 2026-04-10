@@ -51,6 +51,11 @@ function mapDogProfileFromDb(
     })),
     siblingsSummary: profile.siblingsSummary,
     siblings: profile.siblings,
+    titles: (profile.titles ?? []).map((title) => ({
+      awardedOn: title.awardedOn ? toBusinessDateOnly(title.awardedOn) : null,
+      titleCode: title.titleCode,
+      titleName: title.titleName,
+    })),
     shows: shows.map((show) => {
       const showDate = toBusinessDateOnly(show.date);
       return {

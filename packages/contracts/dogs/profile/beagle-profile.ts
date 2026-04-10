@@ -50,6 +50,12 @@ export type BeagleDogProfileShowRowDto = BeagleShowStructuredResultDto & {
   heightCm: number | null;
 };
 
+export type BeagleDogProfileTitleRowDto = {
+  awardedOn: string | null;
+  titleCode: string;
+  titleName: string | null;
+};
+
 export type BeagleDogProfileOffspringSummaryDto = {
   litterCount: number;
   puppyCount: number;
@@ -109,6 +115,7 @@ export type BeagleDogProfileDto = {
   litters: BeagleDogProfileLitterDto[];
   siblingsSummary: BeagleDogProfileSiblingsSummaryDto;
   siblings: BeagleDogProfileSiblingRowDto[];
+  titles: BeagleDogProfileTitleRowDto[];
   shows: BeagleDogProfileShowRowDto[];
   trials: BeagleDogProfileTrialRowDto[];
 };

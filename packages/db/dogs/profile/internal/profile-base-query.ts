@@ -143,6 +143,17 @@ export async function getDogProfileBaseRow(dogId: string) {
           },
         },
       },
+      titles: {
+        select: {
+          awardedOn: true,
+          titleCode: true,
+          titleName: true,
+          sortOrder: true,
+          createdAt: true,
+          id: true,
+        },
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }, { id: "asc" }],
+      },
     },
   });
 }

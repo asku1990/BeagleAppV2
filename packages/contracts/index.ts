@@ -109,6 +109,7 @@ export type {
   BeagleDogProfileShowRowDto,
   BeagleDogProfileSiblingRowDto,
   BeagleDogProfileSiblingsSummaryDto,
+  BeagleDogProfileTitleRowDto,
   BeagleDogProfileTrialRowDto,
 } from "./dogs";
 export type {

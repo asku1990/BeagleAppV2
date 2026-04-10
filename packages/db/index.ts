@@ -54,6 +54,7 @@ export {
   type BeagleDogProfilePedigreeCardDb,
   type BeagleDogProfilePedigreeGenerationDb,
   type BeagleDogProfileSexDb,
+  type BeagleDogProfileTitleDb,
   type BeagleSearchModeDb,
   type BeagleSearchRequestDb,
   type BeagleSearchResponseDb,
