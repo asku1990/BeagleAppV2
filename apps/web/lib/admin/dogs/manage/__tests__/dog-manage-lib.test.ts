@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   getAdminDogMutationErrorMessageKey,
+  mapAdminDogFromQuery,
   toAdminDogBreederOptions,
   toAdminDogParentOptions,
   toCreateAdminDogRequest,
@@ -82,5 +83,28 @@ describe("admin dog manage lib", () => {
     expect(getAdminDogMutationErrorMessageKey("UNKNOWN_ERROR")).toBe(
       "admin.dogs.mutation.errorDefault",
     );
+  });
+
+  it("maps list query titlesText for compact list rendering", () => {
+    const mapped = mapAdminDogFromQuery({
+      id: "dog_1",
+      registrationNo: "FI12345/21",
+      secondaryRegistrationNos: [],
+      name: "Metsapolun Kide",
+      sex: "FEMALE",
+      birthDate: "2021-04-09",
+      breederName: "Metsapolun",
+      ownerNames: ["Tiina Virtanen"],
+      sire: null,
+      dam: null,
+      trialCount: 3,
+      showCount: 2,
+      titlesText: "FI JVA, SE JCH",
+      ekNo: 5588,
+      note: null,
+      titles: [],
+    });
+
+    expect(mapped.titlesText).toBe("FI JVA, SE JCH");
   });
 });

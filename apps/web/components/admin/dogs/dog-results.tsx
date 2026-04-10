@@ -132,6 +132,7 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
               <th className="px-2 py-2">{t("admin.dogs.columns.dam")}</th>
               <th className="px-2 py-2">{t("admin.dogs.columns.trials")}</th>
               <th className="px-2 py-2">{t("admin.dogs.columns.shows")}</th>
+              <th className="px-2 py-2">{t("admin.dogs.columns.titles")}</th>
               <th className="px-2 py-2">{t("admin.dogs.columns.ekNo")}</th>
               <th className="px-2 py-2">{t("admin.dogs.columns.note")}</th>
               <th className="px-2 py-2">{t("admin.dogs.columns.actions")}</th>
@@ -168,6 +169,7 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
                 <td className="px-2 py-2">{formatParent(dog.damPreview)}</td>
                 <td className="px-2 py-2">{dog.trialCount}</td>
                 <td className="px-2 py-2">{dog.showCount}</td>
+                <td className="px-2 py-2">{showDash(dog.titlesText)}</td>
                 <td className="px-2 py-2">{showDash(dog.ekNo)}</td>
                 <td className="px-2 py-2 max-w-[20rem] whitespace-pre-wrap">
                   {showDash(dog.note)}
@@ -238,6 +240,9 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
               </p>
               <p>
                 {t("admin.dogs.mobile.showsLabel")}: {dog.showCount}
+              </p>
+              <p>
+                {t("admin.dogs.mobile.titlesLabel")}: {showDash(dog.titlesText)}
               </p>
               <p>
                 {t("admin.dogs.mobile.ekNoLabel")}: {showDash(dog.ekNo)}

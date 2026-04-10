@@ -21,6 +21,7 @@ export type AdminDogRecord = {
   breederNameText: string | null;
   trialCount: number;
   showCount: number;
+  titlesText: string | null;
   ownershipPreview: string[];
   ekNo: number | null;
   note: string | null;

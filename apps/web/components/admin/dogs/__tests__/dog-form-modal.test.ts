@@ -99,6 +99,8 @@ function buildDog(values: AdminDogFormValues): AdminDogRecord {
     },
     trialCount: 1,
     showCount: 2,
+    titlesText:
+      values.titles.map((title) => title.titleCode).join(", ") || null,
     ekNo: Number(values.ekNo),
     note: values.note,
     registrationNo: values.registrationNo,

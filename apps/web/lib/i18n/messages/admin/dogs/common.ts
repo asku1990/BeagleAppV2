@@ -8,7 +8,7 @@ export const fiAdminDogsCommonMessages = {
   "admin.dogs.loading": "Ladataan koiria...",
   "admin.dogs.error": "Koirien lataaminen epäonnistui.",
   "admin.dogs.filters.searchPlaceholder":
-    "Hae nimellä, rekisterinumerolla, kasvattajalla, omistajalla tai muistiinpanosta",
+    "Hae nimellä, rekisterinumerolla, tittelikoodilla, tittelin nimellä, kasvattajalla, omistajalla tai muistiinpanosta",
   "admin.dogs.filters.searchAria": "Hae koiria",
   "admin.dogs.filters.sexAria": "Suodata koirat sukupuolen mukaan",
   "admin.dogs.filters.sex.all": "Kaikki",
@@ -67,7 +67,7 @@ export const svAdminDogsCommonMessages = {
   "admin.dogs.loading": "Laddar hundar...",
   "admin.dogs.error": "Kunde inte ladda hundar.",
   "admin.dogs.filters.searchPlaceholder":
-    "Sök på namn, registreringsnummer, uppfödare, ägare eller anteckning",
+    "Sök på namn, registreringsnummer, titelkod, titelnamn, uppfödare, ägare eller anteckning",
   "admin.dogs.filters.searchAria": "Sok hundar",
   "admin.dogs.filters.sexAria": "Filtrera hundar efter kon",
   "admin.dogs.filters.sex.all": "Alla",

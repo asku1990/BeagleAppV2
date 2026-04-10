@@ -163,6 +163,7 @@ describe("AdminDogsPageClient", () => {
             dam: { name: "Havupolun Helmi", registrationNo: "FI77777/18" },
             trialCount: 2,
             showCount: 1,
+            titlesText: null,
             ekNo: 5588,
             note: null,
             titles: [],
@@ -234,6 +235,7 @@ describe("AdminDogsPageClient", () => {
     renderToStaticMarkup(React.createElement(AdminDogsPageClient));
 
     const dogFormProps = dogFormModalPropsMock.mock.calls[0][0];
+    const dogResultsProps = dogResultsPropsMock.mock.calls[0][0];
 
     expect(dogFormProps.breederOptions).toEqual([
       { id: "selected:Selected Breeder", name: "Selected Breeder" },
@@ -246,5 +248,6 @@ describe("AdminDogsPageClient", () => {
       { registrationNo: "FI77777/18", name: "Havupolun Helmi" },
       { registrationNo: "FI54321/20", name: "Korven Aatos" },
     ]);
+    expect(dogResultsProps.dogs[0]?.titlesText).toBeNull();
   });
 });

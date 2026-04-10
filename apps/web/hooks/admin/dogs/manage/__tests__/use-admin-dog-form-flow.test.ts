@@ -61,6 +61,7 @@ function buildTargetDog(): AdminDogRecord {
     breederNameText: "Metsapolun",
     trialCount: 1,
     showCount: 2,
+    titlesText: null,
     ownershipPreview: ["Tiina Virtanen"],
     ekNo: 5588,
     note: "Important note",

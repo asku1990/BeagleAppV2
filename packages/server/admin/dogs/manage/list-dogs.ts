@@ -188,6 +188,7 @@ export async function listAdminDogs(
             dam: item.dam,
             trialCount: item.trialCount,
             showCount: item.showCount,
+            titlesText: item.titlesText,
             ekNo: item.ekNo,
             note: item.note,
             titles: item.titles.map((title) => ({

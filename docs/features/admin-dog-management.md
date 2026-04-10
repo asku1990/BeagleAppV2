@@ -6,6 +6,7 @@ Developer notes for the admin dog management flow.
 
 - The page is an admin-facing dog management workflow for search, create, edit, and delete.
 - The main user task is to find a dog record and maintain dog identity details from one page.
+- The list view shows a compact aggregated title-code field (`titlesText`) while preserving full title rows in the read model payload for edit workflows.
 
 ## Main files
 
@@ -23,11 +24,12 @@ Developer notes for the admin dog management flow.
 ## Data flow
 
 1. `AdminDogsPageClient` loads dog results with `useAdminDogsQuery`.
-2. The page delegates modal/form state and submit/delete handlers to `useAdminDogFormFlow`.
-3. Lookup queries for breeder/owner/parent options are enabled while the form modal is open.
-4. Lookup response data and current form values are shaped via pure feature-local `lib` helpers before rendering `DogFormModal`.
-5. `DogFormModal` delegates large form areas to private `internal/*` sections while keeping controlled form values in the parent flow.
-6. Create/update/delete actions call admin dog mutation hooks, then rely on existing query invalidation behavior from those hooks.
+2. Admin dog search matches existing fields plus title row `titleCode` and `titleName`.
+3. The page delegates modal/form state and submit/delete handlers to `useAdminDogFormFlow`.
+4. Lookup queries for breeder/owner/parent options are enabled while the form modal is open.
+5. Lookup response data and current form values are shaped via pure feature-local `lib` helpers before rendering `DogFormModal`.
+6. `DogFormModal` delegates large form areas to private `internal/*` sections while keeping controlled form values in the parent flow.
+7. Create/update/delete actions call admin dog mutation hooks, then rely on existing query invalidation behavior from those hooks.
 
 ## Refactor boundary (BEJ-73)
 

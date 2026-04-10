@@ -39,6 +39,7 @@ export type AdminDogListRowDb = {
   dam: AdminDogParentPreviewDb | null;
   trialCount: number;
   showCount: number;
+  titlesText: string | null;
   ekNo: number | null;
   note: string | null;
   titles: AdminDogTitleItemDb[];
@@ -166,6 +167,26 @@ export async function listAdminDogsDb(
           },
         },
       },
+      {
+        titles: {
+          some: {
+            titleCode: {
+              contains: query,
+              mode: "insensitive",
+            },
+          },
+        },
+      },
+      {
+        titles: {
+          some: {
+            titleName: {
+              contains: query,
+              mode: "insensitive",
+            },
+          },
+        },
+      },
     ];
 
     andFilters.push({ OR: orFilters });
@@ -278,32 +299,39 @@ export async function listAdminDogsDb(
     total,
     totalPages,
     page: safePage,
-    items: rows.map((row) => ({
-      id: row.id,
-      registrationNo: row.registrations[0]?.registrationNo ?? null,
-      secondaryRegistrationNos: row.registrations
-        .slice(1)
-        .map((registration) => registration.registrationNo),
-      name: row.name,
-      sex: row.sex,
-      birthDate: row.birthDate,
-      breederName: row.breeder?.name ?? row.breederNameText ?? null,
-      ownerNames: uniqueNonEmptyNames(
-        row.ownerships.map((ownership) => ownership.owner.name),
-      ),
-      sire: toParentPreview(row.sire),
-      dam: toParentPreview(row.dam),
-      trialCount: row._count.trialResults,
-      showCount: row._count.showEntries,
-      ekNo: row.ekNo,
-      note: row.note,
-      titles: row.titles.map((title) => ({
-        id: title.id,
-        awardedOn: title.awardedOn,
-        titleCode: title.titleCode,
-        titleName: title.titleName,
-        sortOrder: title.sortOrder,
-      })),
-    })),
+    items: rows.map((row) => {
+      const titleCodes = row.titles
+        .map((title) => title.titleCode.trim())
+        .filter((titleCode) => titleCode.length > 0);
+
+      return {
+        id: row.id,
+        registrationNo: row.registrations[0]?.registrationNo ?? null,
+        secondaryRegistrationNos: row.registrations
+          .slice(1)
+          .map((registration) => registration.registrationNo),
+        name: row.name,
+        sex: row.sex,
+        birthDate: row.birthDate,
+        breederName: row.breeder?.name ?? row.breederNameText ?? null,
+        ownerNames: uniqueNonEmptyNames(
+          row.ownerships.map((ownership) => ownership.owner.name),
+        ),
+        sire: toParentPreview(row.sire),
+        dam: toParentPreview(row.dam),
+        trialCount: row._count.trialResults,
+        showCount: row._count.showEntries,
+        titlesText: titleCodes.length > 0 ? titleCodes.join(", ") : null,
+        ekNo: row.ekNo,
+        note: row.note,
+        titles: row.titles.map((title) => ({
+          id: title.id,
+          awardedOn: title.awardedOn,
+          titleCode: title.titleCode,
+          titleName: title.titleName,
+          sortOrder: title.sortOrder,
+        })),
+      };
+    }),
   };
 }
