@@ -3,7 +3,7 @@
 import {
   getBusinessDateUtcRange,
   toBusinessDateOnly,
-} from "../../../core/date-only";
+} from "@db/core/date-only";
 import { getPrimaryRegistrationNo, toSexCode } from "./profile-mappers";
 import type {
   BeagleDogProfileSiblingRowDb,
