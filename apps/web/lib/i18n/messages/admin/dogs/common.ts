@@ -8,7 +8,7 @@ export const fiAdminDogsCommonMessages = {
   "admin.dogs.loading": "Ladataan koiria...",
   "admin.dogs.error": "Koirien lataaminen epäonnistui.",
   "admin.dogs.filters.searchPlaceholder":
-    "Hae nimellä, rekisterinumerolla, kasvattajalla, omistajalla tai muistiinpanosta",
+    "Hae nimellä, rekisterinumerolla, tittelikoodilla, tittelin nimellä, kasvattajalla, omistajalla tai muistiinpanosta",
   "admin.dogs.filters.searchAria": "Hae koiria",
   "admin.dogs.filters.sexAria": "Suodata koirat sukupuolen mukaan",
   "admin.dogs.filters.sex.all": "Kaikki",
@@ -48,6 +48,13 @@ export const fiAdminDogsCommonMessages = {
   "admin.dogs.mutation.errorDuplicateDog":
     "Koira samalla EK-numerolla tai rekisterinumerolla on jo olemassa.",
   "admin.dogs.mutation.errorDogNotFound": "Koiraa ei löytynyt.",
+  "admin.dogs.mutation.errorInvalidTitleCode": "Tittelikoodi on pakollinen.",
+  "admin.dogs.mutation.errorInvalidTitleAwardedOn":
+    "Tittelin myöntämispäivän muoto on virheellinen.",
+  "admin.dogs.mutation.errorInvalidTitleSortOrder":
+    "Tittelirivin järjestysarvo on virheellinen.",
+  "admin.dogs.mutation.errorDuplicateDogTitle":
+    "Sama titteli samalla päivällä on annettu useammin kuin kerran.",
 } as const;
 
 export const svAdminDogsCommonMessages = {
@@ -60,7 +67,7 @@ export const svAdminDogsCommonMessages = {
   "admin.dogs.loading": "Laddar hundar...",
   "admin.dogs.error": "Kunde inte ladda hundar.",
   "admin.dogs.filters.searchPlaceholder":
-    "Sök på namn, registreringsnummer, uppfödare, ägare eller anteckning",
+    "Sök på namn, registreringsnummer, titelkod, titelnamn, uppfödare, ägare eller anteckning",
   "admin.dogs.filters.searchAria": "Sok hundar",
   "admin.dogs.filters.sexAria": "Filtrera hundar efter kon",
   "admin.dogs.filters.sex.all": "Alla",
@@ -98,4 +105,11 @@ export const svAdminDogsCommonMessages = {
   "admin.dogs.mutation.errorDuplicateDog":
     "En hund med samma EK-nummer eller registreringsnummer finns redan.",
   "admin.dogs.mutation.errorDogNotFound": "Hunden hittades inte.",
+  "admin.dogs.mutation.errorInvalidTitleCode": "Titelkod ar obligatorisk.",
+  "admin.dogs.mutation.errorInvalidTitleAwardedOn":
+    "Titelns tilldelningsdatum har ogiltigt format.",
+  "admin.dogs.mutation.errorInvalidTitleSortOrder":
+    "Titelradens ordningsvarde ar ogiltigt.",
+  "admin.dogs.mutation.errorDuplicateDogTitle":
+    "Samma titel med samma datum far inte forekomma flera ganger.",
 } as const;

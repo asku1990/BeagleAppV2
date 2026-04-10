@@ -1,4 +1,4 @@
-import type { AdminDogListSex } from "./admin-dogs-list";
+import type { AdminDogListSex, AdminDogTitleInput } from "./admin-dogs-list";
 
 export type UpdateAdminDogRequest = {
   id: string;
@@ -13,6 +13,7 @@ export type UpdateAdminDogRequest = {
   secondaryRegistrationNos?: string[];
   sireRegistrationNo?: string | null;
   damRegistrationNo?: string | null;
+  titles?: AdminDogTitleInput[];
 };
 
 export type UpdateAdminDogResponse = {

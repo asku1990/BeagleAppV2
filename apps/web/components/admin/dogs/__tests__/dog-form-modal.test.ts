@@ -52,6 +52,32 @@ function buildEditValues(): AdminDogFormValues {
     sirePreviewRegistrationNo: "FI54321/20",
     damPreviewName: "Havupolun Helmi",
     damPreviewRegistrationNo: "FI77777/18",
+    titles: [
+      {
+        awardedOn: "2022-01-10",
+        titleCode: "FI JVA",
+        titleName: "Valio",
+      },
+    ],
+  };
+}
+
+function buildCreateValues(): AdminDogFormValues {
+  return {
+    name: "",
+    sex: "UNKNOWN",
+    birthDate: "",
+    breederNameText: "",
+    ownershipNames: [],
+    ekNo: "",
+    note: "",
+    registrationNo: "",
+    secondaryRegistrationNos: [],
+    sirePreviewName: "",
+    sirePreviewRegistrationNo: "",
+    damPreviewName: "",
+    damPreviewRegistrationNo: "",
+    titles: [],
   };
 }
 
@@ -73,10 +99,19 @@ function buildDog(values: AdminDogFormValues): AdminDogRecord {
     },
     trialCount: 1,
     showCount: 2,
+    titlesText:
+      values.titles.map((title) => title.titleCode).join(", ") || null,
     ekNo: Number(values.ekNo),
     note: values.note,
     registrationNo: values.registrationNo,
     secondaryRegistrationNos: values.secondaryRegistrationNos,
+    titles: values.titles.map((title, index) => ({
+      id: `title_${index + 1}`,
+      awardedOn: title.awardedOn,
+      titleCode: title.titleCode,
+      titleName: title.titleName,
+      sortOrder: index,
+    })),
   };
 }
 
@@ -116,6 +151,9 @@ describe("DogFormModal", () => {
     expect(html).toContain(">Antti Virtanen<");
     expect(html).toContain('value="5588"');
     expect(html).toContain('value="Important note"');
+    expect(html).toContain('value="2022-01-10"');
+    expect(html).toContain('value="FI JVA"');
+    expect(html).toContain('value="Valio"');
     expect(html).toContain("admin.dogs.form.recordIdPrefix dog_1");
   });
 
@@ -147,5 +185,30 @@ describe("DogFormModal", () => {
     );
 
     expect(html).toContain(`max="${today}"`);
+  });
+
+  it("shows explicit set-date control when birth date is empty", () => {
+    const values = buildCreateValues();
+    const html = renderToStaticMarkup(
+      React.createElement(DogFormModal, {
+        mode: "create",
+        dog: null,
+        values,
+        breederOptions: [],
+        ownerOptions: [],
+        parentOptions: [],
+        onBreederSearchChange: vi.fn(),
+        onOwnerSearchChange: vi.fn(),
+        onParentSearchChange: vi.fn(),
+        open: true,
+        onClose: vi.fn(),
+        onValuesChange: vi.fn(),
+        onSubmit: vi.fn(),
+      }),
+    );
+
+    expect(html).toContain("admin.dogs.form.birthDateUnknown");
+    expect(html).toContain("admin.dogs.form.birthDateSet");
+    expect(html).not.toContain("admin.dogs.form.birthDateClear");
   });
 });

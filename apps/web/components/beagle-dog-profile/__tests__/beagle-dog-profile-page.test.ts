@@ -79,6 +79,18 @@ describe("BeagleDogProfilePage", () => {
               litterCount: 0,
             },
           ],
+          titles: [
+            {
+              awardedOn: "2021-09-05",
+              titleCode: "FI MVA",
+              titleName: "Suomen Muotovalio",
+            },
+            {
+              awardedOn: null,
+              titleCode: "SE MVA",
+              titleName: null,
+            },
+          ],
           litters: [
             {
               id: "litter_1",
@@ -163,6 +175,7 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain("FI-11/24");
     expect(html).not.toContain("dog.profile.page.backToSearch");
     expect(html).toContain("dog.profile.card.details.title");
+    expect(html).toContain("dog.profile.card.titles.title");
     expect(html).toContain("dog.profile.card.lineage.title");
     expect(html).toContain("dog.profile.card.siblings.title");
     expect(html).toContain("dog.profile.card.litters.title");
@@ -179,6 +192,12 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain("dog.profile.litters.col.litters");
     expect(html).toContain("dog.profile.litters.col.ekNo");
     expect(html).toContain("dog.profile.siblings.count.siblings");
+    expect(html).toContain("dog.profile.titles.col.date");
+    expect(html).toContain("dog.profile.titles.col.code");
+    expect(html).toContain("dog.profile.titles.col.name");
+    expect(html).toContain("FI MVA");
+    expect(html).toContain("Suomen Muotovalio");
+    expect(html).toContain("SE MVA");
     expect(html).toContain("CO-1");
     expect(html).toContain("Co Parent");
     expect(html).toContain("FI-29/24");
@@ -225,6 +244,7 @@ describe("BeagleDogProfilePage", () => {
           offspringSummary: { litterCount: 0, puppyCount: 0 },
           siblingsSummary: { siblingCount: 0 },
           siblings: [],
+          titles: [],
           litters: [],
           shows: [],
           trials: [],
@@ -233,6 +253,7 @@ describe("BeagleDogProfilePage", () => {
     );
 
     expect(html).toContain("dog.profile.card.details.title");
+    expect(html).not.toContain("dog.profile.card.titles.title");
     expect(html).toContain("dog.profile.card.lineage.title");
     expect(html).not.toContain("dog.profile.card.siblings.title");
     expect(html).not.toContain("dog.profile.card.litters.title");

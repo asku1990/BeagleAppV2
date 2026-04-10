@@ -196,6 +196,7 @@ describe("createAdminDog", () => {
         note: "Important",
         registrationNo: "FI12345/21",
         secondaryRegistrationNos: [],
+        titles: [],
       },
       {},
     );
@@ -325,5 +326,205 @@ describe("createAdminDog", () => {
         code: "INVALID_PARENT_COMBINATION",
       },
     });
+  });
+
+  it("returns 400 for duplicate normalized dog titles", async () => {
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        titles: [
+          {
+            titleCode: " fi jva ",
+            awardedOn: "2022-01-10",
+            sortOrder: 0,
+          },
+          {
+            titleCode: "FI JVA",
+            awardedOn: "2022-01-10",
+            sortOrder: 1,
+          },
+        ],
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Duplicate dog titles are not allowed.",
+        code: "DUPLICATE_DOG_TITLE",
+      },
+    });
+  });
+
+  it("returns 400 for invalid dog title awarded date", async () => {
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        titles: [
+          {
+            titleCode: "FI JVA",
+            awardedOn: "2022/01/10",
+            sortOrder: 0,
+          },
+        ],
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Title awarded date must use YYYY-MM-DD format.",
+        code: "INVALID_TITLE_AWARDED_ON",
+      },
+    });
+  });
+
+  it("creates dog with many titles and nullable title fields", async () => {
+    findDogByRegistrationNoDbMock.mockResolvedValue(null);
+    createAdminDogWriteDbMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Metsapolun Kide",
+      sex: "FEMALE",
+      registrationNo: "FI12345/21",
+    });
+
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        titles: [
+          {
+            titleCode: " fi jva ",
+            awardedOn: null,
+            titleName: null,
+            sortOrder: 0,
+          },
+          {
+            titleCode: "se jch",
+            awardedOn: "2021-05-06",
+            titleName: " Champion ",
+            sortOrder: 1,
+          },
+        ],
+      }),
+    ).resolves.toEqual({
+      status: 201,
+      body: {
+        ok: true,
+        data: {
+          id: "dog_1",
+          name: "Metsapolun Kide",
+          sex: "FEMALE",
+          registrationNo: "FI12345/21",
+        },
+      },
+    });
+
+    expect(createAdminDogWriteDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        titles: [
+          {
+            titleCode: "FI JVA",
+            awardedOn: null,
+            titleName: null,
+            sortOrder: 0,
+          },
+          {
+            titleCode: "SE JCH",
+            awardedOn: new Date("2021-05-06T00:00:00.000Z"),
+            titleName: "Champion",
+            sortOrder: 1,
+          },
+        ],
+      }),
+      {},
+    );
+  });
+
+  it("returns 400 for duplicate normalized dog titles when date is null", async () => {
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        titles: [
+          {
+            titleCode: " fi jva ",
+            awardedOn: null,
+            sortOrder: 0,
+          },
+          {
+            titleCode: "FI JVA",
+            awardedOn: null,
+            sortOrder: 1,
+          },
+        ],
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Duplicate dog titles are not allowed.",
+        code: "DUPLICATE_DOG_TITLE",
+      },
+    });
+  });
+
+  it("derives title sortOrder from row order when omitted", async () => {
+    findDogByRegistrationNoDbMock.mockResolvedValue(null);
+    createAdminDogWriteDbMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Metsapolun Kide",
+      sex: "FEMALE",
+      registrationNo: "FI12345/21",
+    });
+
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        titles: [
+          {
+            titleCode: "FI JVA",
+            awardedOn: "2022-01-10",
+          },
+          {
+            titleCode: "SE JCH",
+            awardedOn: null,
+          },
+        ],
+      }),
+    ).resolves.toEqual({
+      status: 201,
+      body: {
+        ok: true,
+        data: {
+          id: "dog_1",
+          name: "Metsapolun Kide",
+          sex: "FEMALE",
+          registrationNo: "FI12345/21",
+        },
+      },
+    });
+
+    expect(createAdminDogWriteDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        titles: [
+          expect.objectContaining({
+            titleCode: "FI JVA",
+            sortOrder: 0,
+          }),
+          expect.objectContaining({
+            titleCode: "SE JCH",
+            sortOrder: 1,
+          }),
+        ],
+      }),
+      {},
+    );
   });
 });

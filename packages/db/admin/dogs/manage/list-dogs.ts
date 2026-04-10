@@ -1,5 +1,5 @@
 import { DogSex, type Prisma } from "@prisma/client";
-import { prisma } from "../../../core/prisma";
+import { prisma } from "@db/core/prisma";
 import { normalizeQuery, uniqueNonEmptyNames } from "./normalization";
 
 export type AdminDogListSortDb = "name-asc" | "birth-desc" | "created-desc";
@@ -18,6 +18,14 @@ export type AdminDogParentPreviewDb = {
   registrationNo: string | null;
 };
 
+export type AdminDogTitleItemDb = {
+  id: string;
+  awardedOn: Date | null;
+  titleCode: string;
+  titleName: string | null;
+  sortOrder: number;
+};
+
 export type AdminDogListRowDb = {
   id: string;
   registrationNo: string | null;
@@ -31,8 +39,10 @@ export type AdminDogListRowDb = {
   dam: AdminDogParentPreviewDb | null;
   trialCount: number;
   showCount: number;
+  titlesText: string | null;
   ekNo: number | null;
   note: string | null;
+  titles: AdminDogTitleItemDb[];
 };
 
 export type AdminDogListResponseDb = {
@@ -157,6 +167,26 @@ export async function listAdminDogsDb(
           },
         },
       },
+      {
+        titles: {
+          some: {
+            titleCode: {
+              contains: query,
+              mode: "insensitive",
+            },
+          },
+        },
+      },
+      {
+        titles: {
+          some: {
+            titleName: {
+              contains: query,
+              mode: "insensitive",
+            },
+          },
+        },
+      },
     ];
 
     andFilters.push({ OR: orFilters });
@@ -249,6 +279,16 @@ export async function listAdminDogsDb(
           showEntries: true,
         },
       },
+      titles: {
+        select: {
+          id: true,
+          awardedOn: true,
+          titleCode: true,
+          titleName: true,
+          sortOrder: true,
+        },
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }, { id: "asc" }],
+      },
     },
     orderBy: resolveOrderBy(sort),
     skip: (safePage - 1) * pageSize,
@@ -259,25 +299,39 @@ export async function listAdminDogsDb(
     total,
     totalPages,
     page: safePage,
-    items: rows.map((row) => ({
-      id: row.id,
-      registrationNo: row.registrations[0]?.registrationNo ?? null,
-      secondaryRegistrationNos: row.registrations
-        .slice(1)
-        .map((registration) => registration.registrationNo),
-      name: row.name,
-      sex: row.sex,
-      birthDate: row.birthDate,
-      breederName: row.breeder?.name ?? row.breederNameText ?? null,
-      ownerNames: uniqueNonEmptyNames(
-        row.ownerships.map((ownership) => ownership.owner.name),
-      ),
-      sire: toParentPreview(row.sire),
-      dam: toParentPreview(row.dam),
-      trialCount: row._count.trialResults,
-      showCount: row._count.showEntries,
-      ekNo: row.ekNo,
-      note: row.note,
-    })),
+    items: rows.map((row) => {
+      const titleCodes = row.titles
+        .map((title) => title.titleCode.trim())
+        .filter((titleCode) => titleCode.length > 0);
+
+      return {
+        id: row.id,
+        registrationNo: row.registrations[0]?.registrationNo ?? null,
+        secondaryRegistrationNos: row.registrations
+          .slice(1)
+          .map((registration) => registration.registrationNo),
+        name: row.name,
+        sex: row.sex,
+        birthDate: row.birthDate,
+        breederName: row.breeder?.name ?? row.breederNameText ?? null,
+        ownerNames: uniqueNonEmptyNames(
+          row.ownerships.map((ownership) => ownership.owner.name),
+        ),
+        sire: toParentPreview(row.sire),
+        dam: toParentPreview(row.dam),
+        trialCount: row._count.trialResults,
+        showCount: row._count.showEntries,
+        titlesText: titleCodes.length > 0 ? titleCodes.join(", ") : null,
+        ekNo: row.ekNo,
+        note: row.note,
+        titles: row.titles.map((title) => ({
+          id: title.id,
+          awardedOn: title.awardedOn,
+          titleCode: title.titleCode,
+          titleName: title.titleName,
+          sortOrder: title.sortOrder,
+        })),
+      };
+    }),
   };
 }

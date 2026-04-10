@@ -3,6 +3,7 @@ import { createImportsService } from "../service";
 
 const {
   runLegacyPhase1Mock,
+  runLegacyPhase1_5Mock,
   runLegacyPhase2Mock,
   runLegacyPhase3Mock,
   getImportRunByIdMock,
@@ -10,6 +11,7 @@ const {
   isInvalidImportRunIssuesCursorErrorMock,
 } = vi.hoisted(() => ({
   runLegacyPhase1Mock: vi.fn(),
+  runLegacyPhase1_5Mock: vi.fn(),
   runLegacyPhase2Mock: vi.fn(),
   runLegacyPhase3Mock: vi.fn(),
   getImportRunByIdMock: vi.fn(),
@@ -25,6 +27,10 @@ vi.mock("../../phase2", () => ({
   runLegacyPhase2: runLegacyPhase2Mock,
 }));
 
+vi.mock("../../phase1_5", () => ({
+  runLegacyPhase1_5: runLegacyPhase1_5Mock,
+}));
+
 vi.mock("../../phase3", () => ({
   runLegacyPhase3: runLegacyPhase3Mock,
 }));
@@ -38,6 +44,7 @@ vi.mock("@beagle/db", () => ({
 describe("imports runs service", () => {
   beforeEach(() => {
     runLegacyPhase1Mock.mockReset();
+    runLegacyPhase1_5Mock.mockReset();
     runLegacyPhase2Mock.mockReset();
     runLegacyPhase3Mock.mockReset();
     getImportRunByIdMock.mockReset();
@@ -78,6 +85,20 @@ describe("imports runs service", () => {
     const result = await service.runLegacyPhase2("user-2");
 
     expect(runLegacyPhase2Mock).toHaveBeenCalledWith("user-2", undefined);
+    expect(result).toEqual(expected);
+  });
+
+  it("delegates runLegacyPhase1_5 to phase1_5 runner", async () => {
+    const expected = {
+      status: 202,
+      body: { ok: true, data: { id: "run-15", kind: "LEGACY_PHASE1_5" } },
+    };
+    runLegacyPhase1_5Mock.mockResolvedValue(expected);
+
+    const service = createImportsService();
+    const result = await service.runLegacyPhase1_5("user-15");
+
+    expect(runLegacyPhase1_5Mock).toHaveBeenCalledWith("user-15", undefined);
     expect(result).toEqual(expected);
   });
 

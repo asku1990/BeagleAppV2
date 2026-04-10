@@ -5,6 +5,8 @@ export type {
   AdminDogListSex,
   AdminDogListSort,
   AdminDogParentPreview,
+  AdminDogTitleInput,
+  AdminDogTitleItem,
 } from "./admin-dogs-list";
 export type {
   CreateAdminDogRequest,

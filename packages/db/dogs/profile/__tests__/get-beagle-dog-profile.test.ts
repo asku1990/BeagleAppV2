@@ -171,6 +171,63 @@ describe("getBeagleDogProfileDb", () => {
     expect(queryArgs.include).not.toHaveProperty("trialResults");
     expect(queryArgs.include).toHaveProperty("whelpedPuppies");
     expect(queryArgs.include).toHaveProperty("siredPuppies");
+    expect(queryArgs.include).toHaveProperty("titles");
+  });
+
+  it("maps title rows in stored row order", async () => {
+    dogFindUniqueMock.mockResolvedValue({
+      id: "dog-titles",
+      name: "Dog Titles",
+      sex: DogSex.FEMALE,
+      birthDate: null,
+      ekNo: null,
+      registrations: [makeRegistration("FI-9/20", "2020-01-01")],
+      sire: null,
+      dam: null,
+      whelpedPuppies: [],
+      siredPuppies: [],
+      titles: [
+        {
+          id: "title-1",
+          awardedOn: new Date("2020-06-01"),
+          titleCode: "FI MVA",
+          titleName: "Suomen muotovalio",
+          sortOrder: 0,
+          createdAt: new Date("2020-06-01"),
+        },
+        {
+          id: "title-2",
+          awardedOn: null,
+          titleCode: "SE MVA",
+          titleName: null,
+          sortOrder: 1,
+          createdAt: new Date("2020-06-02"),
+        },
+      ],
+    });
+
+    const result = await getBeagleDogProfileDb("dog-titles");
+    const queryArgs = dogFindUniqueMock.mock.calls[0]?.[0] as {
+      include: Record<string, unknown>;
+    };
+
+    expect(result?.titles).toEqual([
+      {
+        awardedOn: new Date("2020-06-01"),
+        titleCode: "FI MVA",
+        titleName: "Suomen muotovalio",
+      },
+      {
+        awardedOn: null,
+        titleCode: "SE MVA",
+        titleName: null,
+      },
+    ]);
+    expect(queryArgs.include).toMatchObject({
+      titles: {
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }, { id: "asc" }],
+      },
+    });
   });
 
   it("handles empty fields gracefully", async () => {
@@ -193,6 +250,7 @@ describe("getBeagleDogProfileDb", () => {
     expect(result?.sex).toBe("-");
     expect(result?.pedigree).toHaveLength(3);
     expect(result?.pedigree[0].cards[0].sire).toBeNull();
+    expect(result?.titles).toEqual([]);
   });
 
   it("returns null parent registration when parent has no registrations", async () => {

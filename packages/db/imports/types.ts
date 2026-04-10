@@ -22,6 +22,11 @@ export type LegacyEkRow = {
   ekNo: number | null;
 };
 
+export type LegacyDogTitleRow = {
+  registrationNo: string | null;
+  titleCodeRaw: string | null;
+};
+
 export type LegacyOwnerRow = {
   registrationNo: string;
   ownerName: string | null;

@@ -1,6 +1,16 @@
 # Beagle App v2
 
-Monorepo for a public Beagle database app with auth, admin-ready routing, and a single Next.js server runtime.
+Monorepo for a public Beagle database app supporting breeders, managed by Suomen Beaglejarjesto (Finska Beagleklubben).
+
+## Project snapshot
+
+Beagle App v2 is a production-style monorepo for a public Beagle database supporting breeders and managed by Suomen Beaglejarjesto (Finska Beagleklubben).
+
+- Next.js + React + TypeScript full-stack application
+- Monorepo architecture with separate web/server/db/contracts/api-client packages
+- PostgreSQL + Prisma for schema, migrations, and data access
+- Authentication and admin-ready routing for association-managed operations
+- Documented operational workflows for environment safety, imports, and deployment
 
 ## Quick links
 

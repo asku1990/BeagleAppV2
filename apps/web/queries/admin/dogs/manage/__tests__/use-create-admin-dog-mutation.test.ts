@@ -3,6 +3,7 @@ import {
   beagleNewestQueryKeyRoot,
   beagleSearchQueryKeyRoot,
 } from "@/queries/public/beagle/search/query-keys";
+import { beagleDogsQueryKeyRoot } from "@/queries/public/beagle/dogs/profile/query-keys";
 import {
   beagleShowDetailsQueryKeyRoot,
   beagleShowSearchQueryKeyRoot,
@@ -116,7 +117,7 @@ describe("useCreateAdminDogMutation", () => {
 
     await options.onSuccess();
 
-    expect(invalidateQueriesMock).toHaveBeenCalledTimes(9);
+    expect(invalidateQueriesMock).toHaveBeenCalledTimes(10);
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
       queryKey: adminDogsQueryKeyRoot,
     });
@@ -134,6 +135,9 @@ describe("useCreateAdminDogMutation", () => {
     });
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
       queryKey: beagleNewestQueryKeyRoot,
+    });
+    expect(invalidateQueriesMock).toHaveBeenCalledWith({
+      queryKey: beagleDogsQueryKeyRoot,
     });
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
       queryKey: beagleShowSearchQueryKeyRoot,

@@ -19,6 +19,7 @@ enum DogSex {
 
 enum ImportKind {
   LEGACY_PHASE1
+  LEGACY_PHASE1_5
   LEGACY_PHASE2
   LEGACY_PHASE3
 }
@@ -181,6 +182,7 @@ model Dog {
   breeder         Breeder?          @relation(fields: [breederId], references: [id])
   registrations   DogRegistration[]
   ownerships      DogOwnership[]
+  titles          DogTitle[]
   trialResults    TrialResult[]
   showEntries     ShowEntry[]
   createdAt       DateTime          @default(now())
@@ -192,6 +194,21 @@ model Dog {
   @@index([sireId])
   @@index([damId])
   @@index([breederId])
+}
+
+model DogTitle {
+  id        String   @id @default(cuid())
+  dogId     String
+  awardedOn DateTime?
+  titleCode String
+  titleName String?
+  sortOrder Int      @default(0)
+  dog       Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([dogId])
+  @@index([dogId, sortOrder])
 }
 
 model DogRegistration {
