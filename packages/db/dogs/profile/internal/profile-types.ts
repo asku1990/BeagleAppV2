@@ -63,6 +63,12 @@ export type BeagleDogProfileSiblingRowDb = {
   litterCount: number;
 };
 
+export type BeagleDogProfileTitleDb = {
+  awardedOn: Date | null;
+  titleCode: string;
+  titleName: string | null;
+};
+
 export type BeagleDogProfileDb = {
   id: string;
   name: string;
@@ -81,6 +87,7 @@ export type BeagleDogProfileDb = {
   litters: BeagleDogProfileLitterDb[];
   siblingsSummary: BeagleDogProfileSiblingsSummaryDb;
   siblings: BeagleDogProfileSiblingRowDb[];
+  titles: BeagleDogProfileTitleDb[];
 };
 
 export type RegistrationNode = {

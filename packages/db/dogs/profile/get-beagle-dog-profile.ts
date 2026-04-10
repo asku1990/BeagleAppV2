@@ -29,6 +29,7 @@ export type {
   BeagleDogProfileSiblingRowDb,
   BeagleDogProfileSiblingsSummaryDb,
   BeagleDogProfileSexDb,
+  BeagleDogProfileTitleDb,
 } from "./internal/profile-types";
 
 export async function getBeagleDogProfileDb(
@@ -80,5 +81,10 @@ export async function getBeagleDogProfileDb(
     litters,
     siblingsSummary: buildSiblingsSummary(siblings),
     siblings,
+    titles: (dog.titles ?? []).map((title) => ({
+      awardedOn: title.awardedOn,
+      titleCode: title.titleCode,
+      titleName: title.titleName,
+    })),
   };
 }
