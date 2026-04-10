@@ -1,4 +1,4 @@
-import type { BeagleShowStructuredResultDto } from "../../shows/beagle-shows";
+import type { BeagleShowStructuredResultDto } from "@contracts/shows/beagle-shows";
 
 export type BeagleDogProfileSex = "U" | "N" | "-";
 

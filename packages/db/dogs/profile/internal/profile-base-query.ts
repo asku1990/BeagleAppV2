@@ -1,6 +1,6 @@
 // Fetches the base dog profile row shape (dog + pedigree + offspring relations)
 // used by the profile DB orchestrator.
-import { prisma } from "../../../core/prisma";
+import { prisma } from "@db/core/prisma";
 
 export async function getDogProfileBaseRow(dogId: string) {
   return prisma.dog.findUnique({

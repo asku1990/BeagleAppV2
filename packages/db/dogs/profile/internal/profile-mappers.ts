@@ -1,6 +1,6 @@
 // Shared dog profile DB mappers for registration, parent, and pedigree shaping.
 import { DogSex } from "@prisma/client";
-import { getFirstInsertedRegistrationNo } from "../../core/registration";
+import { getFirstInsertedRegistrationNo } from "@db/dogs/core/registration";
 import type {
   BeagleDogProfileParentDb,
   BeagleDogProfilePedigreeCardDb,

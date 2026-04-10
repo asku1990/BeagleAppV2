@@ -9,6 +9,7 @@
       "@web/*": ["./*"],
       "@server/*": ["../../packages/server/*"],
       "@db/*": ["../../packages/db/*"],
+      "@contracts/*": ["../../packages/contracts/*"],
       "@api-client/*": ["../../packages/api-client/*"],
       "@beagle/api-client": ["../../packages/api-client/index.ts"],
       "@beagle/contracts": ["../../packages/contracts/index.ts"],

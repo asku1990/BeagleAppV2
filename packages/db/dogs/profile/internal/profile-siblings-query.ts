@@ -1,6 +1,6 @@
 // Encapsulates sibling candidate query shape so the profile DB use-case remains
 // focused on orchestration instead of Prisma include/where details.
-import { prisma } from "../../../core/prisma";
+import { prisma } from "@db/core/prisma";
 import {
   buildSiblingWhere,
   type SiblingProfileContext,
