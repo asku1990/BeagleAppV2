@@ -10,6 +10,7 @@ export const fiAdminDogsTableMessages = {
   "admin.dogs.columns.dam": "Emä",
   "admin.dogs.columns.trials": "Kokeet",
   "admin.dogs.columns.shows": "Näyttelyt",
+  "admin.dogs.columns.titles": "Tittelit",
   "admin.dogs.columns.ekNo": "EK-numero",
   "admin.dogs.columns.note": "Muistiinpano",
   "admin.dogs.columns.actions": "Toiminnot",
@@ -25,6 +26,7 @@ export const fiAdminDogsTableMessages = {
   "admin.dogs.mobile.damLabel": "Emä",
   "admin.dogs.mobile.trialsLabel": "Kokeet",
   "admin.dogs.mobile.showsLabel": "Näyttelyt",
+  "admin.dogs.mobile.titlesLabel": "Tittelit",
   "admin.dogs.mobile.ekNoLabel": "EK-numero",
   "admin.dogs.mobile.noteLabel": "Muistiinpano",
   "admin.dogs.empty.noResults":
@@ -44,6 +46,7 @@ export const svAdminDogsTableMessages = {
   "admin.dogs.columns.dam": "Tik",
   "admin.dogs.columns.trials": "Prov",
   "admin.dogs.columns.shows": "Utställningar",
+  "admin.dogs.columns.titles": "Titlar",
   "admin.dogs.columns.ekNo": "EK-nummer",
   "admin.dogs.columns.note": "Anteckning",
   "admin.dogs.columns.actions": "Atgarder",
@@ -60,6 +63,7 @@ export const svAdminDogsTableMessages = {
   "admin.dogs.mobile.damLabel": "Tik",
   "admin.dogs.mobile.trialsLabel": "Prov",
   "admin.dogs.mobile.showsLabel": "Utställningar",
+  "admin.dogs.mobile.titlesLabel": "Titlar",
   "admin.dogs.mobile.ekNoLabel": "EK-nummer",
   "admin.dogs.mobile.noteLabel": "Anteckning",
   "admin.dogs.empty.noResults":

@@ -108,8 +108,18 @@ describe("listAdminDogs", () => {
           },
           trialCount: 7,
           showCount: 4,
+          titlesText: "FI JVA",
           ekNo: 5588,
           note: "Important",
+          titles: [
+            {
+              id: "title_1",
+              awardedOn: new Date("2022-01-10T00:00:00.000Z"),
+              titleCode: "FI JVA",
+              titleName: "Valio",
+              sortOrder: 0,
+            },
+          ],
         },
       ],
     });
@@ -160,8 +170,18 @@ describe("listAdminDogs", () => {
               },
               trialCount: 7,
               showCount: 4,
+              titlesText: "FI JVA",
               ekNo: 5588,
               note: "Important",
+              titles: [
+                {
+                  id: "title_1",
+                  awardedOn: "2022-01-10",
+                  titleCode: "FI JVA",
+                  titleName: "Valio",
+                  sortOrder: 0,
+                },
+              ],
             },
           ],
         },

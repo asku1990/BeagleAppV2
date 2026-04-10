@@ -314,6 +314,18 @@ describe("dogs service", () => {
           litterCount: 0,
         },
       ],
+      titles: [
+        {
+          awardedOn: new Date("2019-07-22T00:00:00.000Z"),
+          titleCode: "FI MVA",
+          titleName: "Suomen Muotovalio",
+        },
+        {
+          awardedOn: null,
+          titleCode: "EE MVA",
+          titleName: null,
+        },
+      ],
     };
     const mockShows = [
       {
@@ -377,6 +389,18 @@ describe("dogs service", () => {
               birthDate: "2024-05-01",
             },
           ],
+          titles: [
+            {
+              awardedOn: "2019-07-22",
+              titleCode: "FI MVA",
+              titleName: "Suomen Muotovalio",
+            },
+            {
+              awardedOn: null,
+              titleCode: "EE MVA",
+              titleName: null,
+            },
+          ],
           shows: [
             {
               ...show1,
@@ -429,6 +453,7 @@ describe("dogs service", () => {
       litters: [],
       siblingsSummary: { siblingCount: 0 },
       siblings: [],
+      titles: [],
     };
     const mockShows = [
       {
@@ -535,6 +560,7 @@ describe("dogs service", () => {
       litters: [],
       siblingsSummary: { siblingCount: 0 },
       siblings: [],
+      titles: [],
     };
     const mockShows = [
       {
@@ -599,6 +625,7 @@ describe("dogs service", () => {
       litters: [],
       siblingsSummary: { siblingCount: 0 },
       siblings: [],
+      titles: [],
     };
     const mockShows = [
       {
@@ -691,6 +718,7 @@ describe("dogs service", () => {
       litters: [],
       siblingsSummary: { siblingCount: 0 },
       siblings: [],
+      titles: [],
     });
     getBeagleShowsForDogDbMock.mockResolvedValue([]);
     getBeagleTrialsForDogDbMock.mockResolvedValue([]);

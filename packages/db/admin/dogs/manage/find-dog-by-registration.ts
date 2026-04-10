@@ -1,5 +1,5 @@
 import type { DogSex, Prisma } from "@prisma/client";
-import { prisma } from "../../../core/prisma";
+import { prisma } from "@db/core/prisma";
 
 type AdminDogDbClient = Prisma.TransactionClient | typeof prisma;
 

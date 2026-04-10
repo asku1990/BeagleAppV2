@@ -15,6 +15,7 @@ export {
   type AdminDogListRequestDb,
   type AdminDogListResponseDb,
   type AdminDogListRowDb,
+  type AdminDogTitleItemDb,
   type AdminDogListSortDb,
   type AdminDogParentPreviewDb,
 } from "./list-dogs";

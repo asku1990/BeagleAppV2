@@ -70,12 +70,13 @@ export function resolveDatabaseUrl(
 ): string {
   const scope = getScopeFromEnv(env);
 
-  const resolvedUrl =
-    env.DATABASE_URL ??
-    (target === "runtime"
+  const scopedResolvedUrl =
+    target === "runtime"
       ? pickRuntimeUrl(env, scope)
-      : pickMigrationUrl(env, scope)) ??
-    LOCAL_DATABASE_URL;
+      : pickMigrationUrl(env, scope);
+
+  const resolvedUrl =
+    scopedResolvedUrl ?? env.DATABASE_URL ?? LOCAL_DATABASE_URL;
 
   return resolvedUrl;
 }

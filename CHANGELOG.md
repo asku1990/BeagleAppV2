@@ -20,6 +20,19 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.10.0] - 2026-04-10
+
+### Added
+
+### Changed
+
+- Koiraprofiiliin lisättiin oma `Tittelit`-osio. Kun koiralla on tittelitietoja, ne näkyvät selkeänä listana (päiväys, titteli ja tittelin nimi).
+- Ylläpidon koiralistalla voi nyt hakea koiria myös tittelikoodilla tai tittelin nimellä. Listassa näytetään samalla koiran tittelikoodit tiivistettynä, jotta oikea koira löytyy nopeammin.
+
+### Fixed
+
+### Removed
+
 ## [0.9.0] - 2026-04-08
 
 ### Added
