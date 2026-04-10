@@ -1,8 +1,8 @@
-import { prisma } from "../../../core/prisma";
+import { prisma } from "@db/core/prisma";
 import {
   runInAuditContextDb,
   type AuditContextDb,
-} from "../../../core/audit-context";
+} from "@db/core/audit-context";
 import type { Prisma, PrismaClient } from "@prisma/client";
 
 type AdminUserDbClient = PrismaClient | Prisma.TransactionClient;

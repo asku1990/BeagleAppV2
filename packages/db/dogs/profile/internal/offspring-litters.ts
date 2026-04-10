@@ -1,5 +1,5 @@
 // Groups dog profile offspring into litters using birth date and co-parent identity.
-import { toBusinessDateOnly } from "../../../core/date-only";
+import { toBusinessDateOnly } from "@db/core/date-only";
 import {
   getPrimaryRegistrationNo,
   mapParent,
