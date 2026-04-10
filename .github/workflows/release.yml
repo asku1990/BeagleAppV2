@@ -1,0 +1,155 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - CHANGELOG.md
+      - package.json
+      - apps/web/package.json
+      - packages/api-client/package.json
+      - packages/auth/package.json
+      - packages/config-eslint/package.json
+      - packages/config-typescript/package.json
+      - packages/contracts/package.json
+      - packages/db/package.json
+      - packages/server/package.json
+      - .github/workflows/release.yml
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Optional version without v-prefix (for example 0.10.0). Defaults to root package.json version.
+        required: false
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Ensure workflow runs from main
+        run: |
+          if [ "${GITHUB_REF_NAME}" != "main" ]; then
+            echo "Run this workflow from main. Current ref: ${GITHUB_REF_NAME}"
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve and validate release version
+        id: version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          node <<'NODE'
+          const fs = require("node:fs");
+
+          const files = [
+            "package.json",
+            "apps/web/package.json",
+            "packages/api-client/package.json",
+            "packages/auth/package.json",
+            "packages/config-eslint/package.json",
+            "packages/config-typescript/package.json",
+            "packages/contracts/package.json",
+            "packages/db/package.json",
+            "packages/server/package.json",
+          ];
+
+          const versions = files.map((file) => {
+            const json = JSON.parse(fs.readFileSync(file, "utf8"));
+            return { file, version: json.version };
+          });
+
+          const uniqueVersions = [...new Set(versions.map((entry) => entry.version))];
+          if (uniqueVersions.length !== 1) {
+            console.error("Workspace versions are not aligned:");
+            for (const entry of versions) {
+              console.error(`- ${entry.file}: ${entry.version}`);
+            }
+            process.exit(1);
+          }
+
+          const alignedVersion = uniqueVersions[0];
+          const requestedRaw = (process.env.INPUT_VERSION || "").trim();
+          const requested = requestedRaw.startsWith("v")
+            ? requestedRaw.slice(1)
+            : requestedRaw;
+
+          if (requested && requested !== alignedVersion) {
+            console.error(
+              `Requested version ${requested} does not match workspace version ${alignedVersion}.`
+            );
+            process.exit(1);
+          }
+
+          const releaseVersion = requested || alignedVersion;
+          const output = process.env.GITHUB_OUTPUT;
+          fs.appendFileSync(output, `version=${releaseVersion}\n`);
+          fs.appendFileSync(output, `tag=v${releaseVersion}\n`);
+          NODE
+
+      - name: Ensure changelog block exists for version
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if ! grep -q "^## \\[${VERSION}\\] - [0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}$" CHANGELOG.md; then
+            echo "Missing CHANGELOG block for version ${VERSION} (expected: ## [${VERSION}] - YYYY-MM-DD)"
+            exit 1
+          fi
+
+      - name: Build release notes from changelog block
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          awk -v version="$VERSION" '
+            BEGIN { in_block=0 }
+            /^## \[/ {
+              if (in_block == 1) exit
+            }
+            $0 ~ ("^## \\[" version "\\] - ") {
+              in_block=1
+              next
+            }
+            in_block == 1 { print }
+          ' CHANGELOG.md > RELEASE_NOTES.md
+
+          if [ ! -s RELEASE_NOTES.md ]; then
+            echo "Release notes section is empty for version ${VERSION}"
+            exit 1
+          fi
+
+      - name: Check whether tag already exists
+        id: tag_exists
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Tag $TAG already exists, skipping release creation."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create and push tag
+        if: steps.tag_exists.outputs.exists == 'false'
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "Release $TAG"
+          git push origin "$TAG"
+
+      - name: Create GitHub release
+        if: steps.tag_exists.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          body_path: RELEASE_NOTES.md
