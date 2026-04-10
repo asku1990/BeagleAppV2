@@ -17,6 +17,7 @@ This project uses a user-facing changelog format.
 ### Changed
 
 - Koiraprofiili näyttää nyt erillisen `Tittelit`-osion, jossa tittelit esitetään riveinä muodossa `Päiväys`, `Titteli` ja `Tittelin nimi`. Osio näytetään vain, kun koiralla on tallennettuja tittelerivejä.
+- Ylläpidon koiralistan haku löytää nyt koirat myös tittelikoodin ja tittelin nimen perusteella. Koiralistassa näytetään samalla tiivistetty tittelikoodien sarake (`titlesText`), mutta taustalla säilytetään edelleen täydet tittelirivit myöhempää käyttöä varten.
 
 ### Fixed
 

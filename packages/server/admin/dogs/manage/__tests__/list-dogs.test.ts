@@ -108,6 +108,7 @@ describe("listAdminDogs", () => {
           },
           trialCount: 7,
           showCount: 4,
+          titlesText: "FI JVA",
           ekNo: 5588,
           note: "Important",
           titles: [
@@ -169,6 +170,7 @@ describe("listAdminDogs", () => {
               },
               trialCount: 7,
               showCount: 4,
+              titlesText: "FI JVA",
               ekNo: 5588,
               note: "Important",
               titles: [

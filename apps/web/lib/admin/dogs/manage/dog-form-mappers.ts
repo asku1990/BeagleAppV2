@@ -89,6 +89,7 @@ export function mapAdminDogFromQuery(item: AdminDogListItem): AdminDogRecord {
       : null,
     trialCount: item.trialCount,
     showCount: item.showCount,
+    titlesText: item.titlesText,
     ekNo: item.ekNo,
     note: item.note,
     titles: (item.titles ?? []).map((title) => ({

@@ -82,6 +82,13 @@ describe("listAdminDogsDb", () => {
             titleName: "Valio",
             sortOrder: 0,
           },
+          {
+            id: "title_2",
+            awardedOn: null,
+            titleCode: "SE JCH",
+            titleName: "Jaktchampion",
+            sortOrder: 1,
+          },
         ],
       },
     ]);
@@ -112,6 +119,7 @@ describe("listAdminDogsDb", () => {
           },
           trialCount: 7,
           showCount: 4,
+          titlesText: "FI JVA, SE JCH",
           ekNo: 5588,
           note: "Important",
           titles: [
@@ -121,6 +129,13 @@ describe("listAdminDogsDb", () => {
               titleCode: "FI JVA",
               titleName: "Valio",
               sortOrder: 0,
+            },
+            {
+              id: "title_2",
+              awardedOn: null,
+              titleCode: "SE JCH",
+              titleName: "Jaktchampion",
+              sortOrder: 1,
             },
           ],
         },
@@ -154,6 +169,38 @@ describe("listAdminDogsDb", () => {
     expect(findManyArgs.skip).toBe(20);
     expect(findManyArgs.take).toBe(10);
     expect(JSON.stringify(findManyArgs.orderBy)).toContain("birthDate");
+    expect(whereJson).toContain("titleCode");
+    expect(whereJson).toContain("titleName");
+  });
+
+  it("returns null titlesText when dog has no title rows", async () => {
+    dogCountMock.mockResolvedValue(1);
+    dogFindManyMock.mockResolvedValue([
+      {
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: DogSex.FEMALE,
+        birthDate: null,
+        breederNameText: null,
+        note: null,
+        ekNo: null,
+        breeder: null,
+        registrations: [{ registrationNo: "FI12345/21" }],
+        ownerships: [],
+        sire: null,
+        dam: null,
+        _count: {
+          trialResults: 0,
+          showEntries: 0,
+        },
+        titles: [],
+      },
+    ]);
+
+    const result = await listAdminDogsDb({ query: "kide" });
+
+    expect(result.items[0]?.titlesText).toBeNull();
+    expect(result.items[0]?.titles).toEqual([]);
   });
 
   it("does not apply ekNo filter for numeric queries", async () => {

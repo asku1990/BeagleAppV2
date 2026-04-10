@@ -34,6 +34,7 @@ export type AdminDogListItem = {
   dam: AdminDogParentPreview | null;
   trialCount: number;
   showCount: number;
+  titlesText: string | null;
   ekNo: number | null;
   note: string | null;
   titles?: AdminDogTitleItem[];
