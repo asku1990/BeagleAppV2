@@ -132,7 +132,7 @@ export async function runLegacyPhase1_5(
     const titleRows = await fetchLegacyPhase1_5Rows({
       log: (message) => log(`[stage:load] ${message}`),
     });
-    log(`Loaded legacy title rows: rows=${titleRows.length}`);
+    log(`Loaded legacy title source rows: total=${titleRows.length}`);
     finishStage("load");
 
     startStage("index");

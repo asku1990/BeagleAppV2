@@ -36,7 +36,7 @@ export async function fetchLegacyTrialRows(options?: {
        FROM akoeall`,
     )) as LegacyTrialResultRow[];
     log(
-      `Fetched trial rows: count=${trialResults.length}, elapsed=${Math.round((Date.now() - trialResultsStartedAt) / 1000)}s`,
+      `Fetched akoeall source rows: total=${trialResults.length}, elapsed=${Math.round((Date.now() - trialResultsStartedAt) / 1000)}s`,
     );
 
     log(

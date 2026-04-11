@@ -94,7 +94,7 @@ export async function runLegacyPhase2(
     const trialRows = await fetchLegacyTrialRows({
       log: (message) => log(`[stage:load] ${message}`),
     });
-    log(`Loaded legacy trial rows: trialResults=${trialRows.length}`);
+    log(`Loaded legacy trial source rows: total=${trialRows.length}`);
     finishStage("load");
 
     startStage("index");

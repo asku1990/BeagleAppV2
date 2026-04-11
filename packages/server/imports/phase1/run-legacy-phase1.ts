@@ -290,7 +290,7 @@ export async function runLegacyPhase1(
       (row) => row.ekNo != null,
     ).length;
     log(
-      `Loaded legacy rows: dogs=${legacy.dogs.length}, breeders=${legacy.breeders.length}, bea_apuRows=${beaApuRows}, bea_apuRowsWithEkNo=${beaApuRowsWithEkNo}, owners=${legacy.owners.length}, samakoira=${legacy.samakoira.length}`,
+      `Loaded legacy source rows: dogs=${legacy.dogs.length}, breeders=${legacy.breeders.length}, bea_apuRows=${beaApuRows}, bea_apuRowsWithEkNo=${beaApuRowsWithEkNo}, owners=${legacy.owners.length}, samakoira=${legacy.samakoira.length}`,
     );
     finishStage("load");
 

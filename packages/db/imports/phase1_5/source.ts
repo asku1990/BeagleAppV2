@@ -19,7 +19,7 @@ export async function fetchLegacyPhase1_5Rows(options?: {
        FROM bea_apu`,
     )) as LegacyDogTitleRow[];
     log(
-      `Fetched title rows: count=${titleRows.length}, elapsed=${Math.round((Date.now() - titleRowsStartedAt) / 1000)}s`,
+      `Fetched bea_apu title source rows: total=${titleRows.length}, elapsed=${Math.round((Date.now() - titleRowsStartedAt) / 1000)}s`,
     );
 
     log(

@@ -147,7 +147,7 @@ export async function runLegacyPhase3(
     const showRows = await fetchLegacyShowRows({
       log: (message) => log(`[stage:load] ${message}`),
     });
-    log(`Loaded legacy show rows: showResults=${showRows.length}`);
+    log(`Loaded legacy show source rows: total=${showRows.length}`);
     finishStage("load");
 
     startStage("index");
