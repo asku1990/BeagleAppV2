@@ -8,6 +8,10 @@ Määritellä, miten AJOK-kokeen koirakohtainen pöytäkirja tallennetaan uuteen
 - tietosisältö riittää pöytäkirjan (PDF) tuottamiseen
 - tuloksen uudelleenlähetys korjaa olemassa olevan rivin ilman duplikaatteja
 
+Kenttätason mapping yhdestä todellisesta lähderivistä löytyy tiedostosta:
+
+- `/Users/akikuivas/personal-projects/beagle/beagle-app-v2/docs/features/trials/ajokoe-kenttamapping-yksi-tulos.md`
+
 ## Yksilöinti ja päivityssääntö
 
 Koetulos yksilöidään avaimella:
