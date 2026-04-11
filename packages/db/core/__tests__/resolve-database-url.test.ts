@@ -68,4 +68,65 @@ describe("resolveDatabaseUrl", () => {
 
     expect(url).toBe("postgresql://scoped-migration");
   });
+
+  it("rejects Vercel migration fallback to generic DATABASE_URL", () => {
+    expect(() =>
+      resolveDatabaseUrl(
+        {
+          VERCEL: "1",
+          VERCEL_ENV: "production",
+          DATABASE_URL: "postgresql://pooled-generic",
+        },
+        "migration",
+      ),
+    ).toThrowError(
+      /Missing direct migration database URL for Vercel production deploys/,
+    );
+  });
+
+  it("rejects pooled Vercel migration URLs", () => {
+    expect(() =>
+      resolveDatabaseUrl(
+        {
+          VERCEL: "1",
+          VERCEL_ENV: "production",
+          beagle_db_production_POSTGRES_PRISMA_URL:
+            "postgresql://production-pooled",
+          DATABASE_URL: "postgresql://pooled-generic",
+        },
+        "migration",
+      ),
+    ).toThrowError(
+      /Missing direct migration database URL for Vercel production deploys/,
+    );
+  });
+
+  it("accepts POSTGRES_URL_NO_SSL for Vercel migrations", () => {
+    const url = resolveDatabaseUrl(
+      {
+        VERCEL: "1",
+        VERCEL_ENV: "production",
+        beagle_db_production_POSTGRES_URL_NO_SSL:
+          "postgresql://production-no-ssl",
+      },
+      "migration",
+    );
+
+    expect(url).toBe("postgresql://production-no-ssl");
+  });
+
+  it("rejects fallback-scope direct URLs on Vercel migrations", () => {
+    expect(() =>
+      resolveDatabaseUrl(
+        {
+          VERCEL: "1",
+          VERCEL_ENV: "production",
+          beagle_db_develop_POSTGRES_URL_NO_SSL: "postgresql://develop-no-ssl",
+        },
+        "migration",
+      ),
+    ).toThrowError(
+      /Missing direct migration database URL for Vercel production deploys/,
+    );
+  });
 });

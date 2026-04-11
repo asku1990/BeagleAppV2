@@ -116,7 +116,8 @@ describe("runLegacyPhase1_5", () => {
       expect.objectContaining({
         status: "SUCCEEDED",
         errorsCount: 4,
-        errorSummary: "Import completed with warnings.",
+        errorSummary:
+          "Phase 1.5: titles=1, skippedBlank=1, conflicts=1, errors=4.",
       }),
       expect.any(Object),
     );
