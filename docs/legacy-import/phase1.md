@@ -55,7 +55,8 @@ Phase 1 imports foundation entities and link structures. It does not import tria
   - ownership uses `ownershipDateKey` and `createMany(skipDuplicates=true)`
 - EK rows:
   - `bea_apu` rows with a non-empty `EKNO` update `Dog.ekNo`
-  - rows without `EKNO` are treated as non-EK rows and skipped without recording an issue
+  - rows without `EKNO` do not update `Dog.ekNo`
+  - malformed `registrationNo` values are still recorded as issues before the `EKNO` check
 
 ## Idempotency and rerun behavior
 
