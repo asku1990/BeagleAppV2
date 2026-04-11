@@ -71,6 +71,10 @@ function parseRegistrationNo(value: string | null | undefined): {
   };
 }
 
+function formatPlaceholderRelationMessage(role: "Sire" | "Dam"): string {
+  return `${role} registration is a placeholder and was treated as unknown, so the placeholder reference was not written to the new database.`;
+}
+
 async function loadDogIdByRegistration(): Promise<Map<string, string>> {
   const registrations = await prisma.dogRegistration.findMany({
     select: { registrationNo: true, dogId: true },
@@ -996,8 +1000,7 @@ export async function runLegacyPhase1(
           stage: "relations",
           severity: "INFO",
           code: "RELATION_SIRE_PLACEHOLDER",
-          message:
-            "Sire registration is a placeholder and was treated as unknown.",
+          message: formatPlaceholderRelationMessage("Sire"),
           registrationNo: registration.registrationNo,
           sourceTable: "bearek_id",
           payloadJson: JSON.stringify({
@@ -1012,8 +1015,7 @@ export async function runLegacyPhase1(
           stage: "relations",
           severity: "INFO",
           code: "RELATION_DAM_PLACEHOLDER",
-          message:
-            "Dam registration is a placeholder and was treated as unknown.",
+          message: formatPlaceholderRelationMessage("Dam"),
           registrationNo: registration.registrationNo,
           sourceTable: "bearek_id",
           payloadJson: JSON.stringify({

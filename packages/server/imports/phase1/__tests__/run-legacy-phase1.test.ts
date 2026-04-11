@@ -209,7 +209,9 @@ describe("runLegacyPhase1", () => {
       owners: [],
       samakoira: [],
     });
-    dogRegistrationFindManyMock.mockResolvedValue([]);
+    dogRegistrationFindManyMock.mockResolvedValue([
+      { registrationNo: "FI12345/21", dogId: "dog-1" },
+    ]);
 
     const result = await runLegacyPhase1("user-1");
 
@@ -234,6 +236,58 @@ describe("runLegacyPhase1", () => {
           sourceTable: "bearek_id",
         }),
       ]),
+      expect.any(Object),
+    );
+  });
+
+  it("describes placeholder parent registrations as unknown and excluded from the new database", async () => {
+    fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogs: [
+        {
+          registrationNo: "FI12345/21",
+          name: "Aino",
+          sex: "U",
+          birthDateRaw: "20240101",
+          sireRegistrationNo: null,
+          damRegistrationNo: "U000000",
+          breederName: null,
+        },
+      ],
+      breeders: [],
+      eks: [],
+      owners: [],
+      samakoira: [],
+    });
+    dogRegistrationFindManyMock.mockResolvedValue([
+      { registrationNo: "FI12345/21", dogId: "dog-1" },
+    ]);
+
+    const result = await runLegacyPhase1("user-1");
+
+    expect(result.status).toBe(202);
+    expect(createImportRunIssuesBulkMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.arrayContaining([
+        expect.objectContaining({
+          stage: "relations",
+          severity: "INFO",
+          code: "RELATION_DAM_PLACEHOLDER",
+          message:
+            "Dam registration is a placeholder and was treated as unknown, so the placeholder reference was not written to the new database.",
+          registrationNo: "FI12345/21",
+          sourceTable: "bearek_id",
+        }),
+      ]),
+      expect.any(Object),
+    );
+    expect(createImportRunIssueMock).not.toHaveBeenCalled();
+    expect(markImportRunFinishedMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.objectContaining({
+        status: "SUCCEEDED",
+        errorsCount: 0,
+        errorSummary: null,
+      }),
       expect.any(Object),
     );
   });
