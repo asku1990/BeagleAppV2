@@ -59,6 +59,7 @@ Phase 1 imports foundation entities and link structures. It does not import tria
   - `bea_apu` rows with a non-empty `EKNO` update `Dog.ekNo`
   - rows without `EKNO` do not update `Dog.ekNo`
   - malformed `registrationNo` values are still recorded as issues before the `EKNO` check
+  - the phase log reports both the raw `bea_apu` row count and the subset that has a non-empty `EKNO`
 
 ## Idempotency and rerun behavior
 

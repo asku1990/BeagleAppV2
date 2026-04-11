@@ -285,8 +285,12 @@ export async function runLegacyPhase1(
     const legacy = await fetchLegacyPhase1Rows({
       log: (message) => log(`[stage:load] ${message}`),
     });
+    const beaApuRows = legacy.eks.length;
+    const beaApuRowsWithEkNo = legacy.eks.filter(
+      (row) => row.ekNo != null,
+    ).length;
     log(
-      `Loaded legacy rows: dogs=${legacy.dogs.length}, breeders=${legacy.breeders.length}, eks=${legacy.eks.length}, owners=${legacy.owners.length}, samakoira=${legacy.samakoira.length}`,
+      `Loaded legacy rows: dogs=${legacy.dogs.length}, breeders=${legacy.breeders.length}, bea_apuRows=${beaApuRows}, bea_apuRowsWithEkNo=${beaApuRowsWithEkNo}, owners=${legacy.owners.length}, samakoira=${legacy.samakoira.length}`,
     );
     finishStage("load");
 
