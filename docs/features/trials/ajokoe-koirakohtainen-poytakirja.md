@@ -215,4 +215,7 @@ Jos jokin pakollinen arvo puuttuu, pyyntö hylätään (400).
 2. Lisätään skeemaan tyypitetyt sarakkeet + `raakadataJson`
 3. Toteutetaan yksi-rivi-kerrallaan `upsert` yksilöintiavaimella
 4. Lisätään testit: luonti, päivitys, uudelleenlähetys, puuttuva pakollinen kenttä
-5. Varmistetaan, että tallennetusta datasta saadaan tuotettua AJOK-pöytäkirja
+5. Lisätään koiran lisäys/päivitys -virtaan taustalinkitys:
+   - linkitä `dogId` kaikkiin `TrialEntry`-riveihin, joissa `dogId` puuttuu ja rekisterinumero täsmää
+   - tee sama myös `ShowEntry`-riveihin
+6. Varmistetaan, että tallennetusta datasta saadaan tuotettua AJOK-pöytäkirja

@@ -113,6 +113,14 @@ Tulosrivin tallennus ei saa kaatua siihen, ettei koiraa löydy:
 - `rekisterinumeroSnapshot` pakollinen
 - myöhempi linkitysajo voi täyttää `dogId`:n rekisterinumeron perusteella
 
+Koiran lisäys/päivitys -virrassa tehdään automaattinen backfill-linkitys:
+
+1. Etsi `TrialEntry`-rivit, joissa:
+   - `rekisterinumeroSnapshot` vastaa lisättyä rekisterinumeroa
+   - `dogId IS NULL`
+2. Päivitä löydettyihin riveihin `dogId`.
+3. Tee sama logiikka myös `ShowEntry`-riveille (`registrationNoSnapshot`, `dogId IS NULL`).
+
 ## Päätökset ennen toteutusta
 
 1. Onko `sklKoeId` API:ssa pakollinen kaikissa uusissa kutsuissa? (suositus: kyllä)
