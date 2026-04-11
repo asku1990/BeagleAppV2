@@ -711,18 +711,21 @@ export async function runLegacyPhase1(
       for (const alias of aliases) {
         const parsedAlias = parseRegistrationNo(alias.value);
         if (!parsedAlias.registrationNo) {
-          await recordIssue({
-            stage: "samakoira",
-            severity: "INFO",
-            code: "SAMAKOIRA_ALIAS_EMPTY",
-            message: `Samakoira alias ${alias.key} is empty.`,
-            registrationNo: canonical.registrationNo,
-            sourceTable: "samakoira",
-            payloadJson: JSON.stringify({
-              rek1: canonical.registrationNo,
-              [alias.key]: alias.value,
-            }),
-          });
+          if (alias.key === "REK_2") {
+            await recordIssue({
+              stage: "samakoira",
+              severity: "WARNING",
+              code: "SAMAKOIRA_ALIAS_EMPTY",
+              message: `Samakoira alias ${alias.key} is empty.`,
+              registrationNo: canonical.registrationNo,
+              sourceTable: "samakoira",
+              payloadJson: JSON.stringify({
+                rek1: canonical.registrationNo,
+                [alias.key]: alias.value,
+              }),
+            });
+          }
+          // Missing alias slots are expected in legacy samakoira rows.
           continue;
         }
         if (parsedAlias.isInvalid) {

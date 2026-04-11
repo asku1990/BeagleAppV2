@@ -64,6 +64,8 @@ Phase 1 imports foundation entities and link structures. It does not import tria
 - Alias registration inserts from `samakoira` avoid duplicates/conflicts:
   - existing alias on same dog: kept
   - existing alias on different dog: `REGISTRATION_ALIAS_CONFLICT`
+  - empty `REK_2` slots are recorded as warnings
+  - empty `REK_3` slots are expected and skipped silently
 - Ownership rows are duplicate-safe via unique key + `skipDuplicates`.
 
 ## Issue profile

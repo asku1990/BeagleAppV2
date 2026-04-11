@@ -11,6 +11,7 @@ const {
   breederFindManyMock,
   dogRegistrationFindUniqueMock,
   dogRegistrationFindManyMock,
+  dogRegistrationCreateMock,
   dogRegistrationUpdateMock,
   dogCreateMock,
   dogUpdateMock,
@@ -27,6 +28,7 @@ const {
   breederFindManyMock: vi.fn(),
   dogRegistrationFindUniqueMock: vi.fn(),
   dogRegistrationFindManyMock: vi.fn(),
+  dogRegistrationCreateMock: vi.fn(),
   dogRegistrationUpdateMock: vi.fn(),
   dogCreateMock: vi.fn(),
   dogUpdateMock: vi.fn(),
@@ -55,8 +57,8 @@ vi.mock("@beagle/db", () => ({
     dogRegistration: {
       findUnique: dogRegistrationFindUniqueMock,
       findMany: dogRegistrationFindManyMock,
+      create: dogRegistrationCreateMock,
       update: dogRegistrationUpdateMock,
-      create: vi.fn(),
       findFirst: vi.fn(),
     },
     dog: {
@@ -86,6 +88,7 @@ describe("runLegacyPhase1", () => {
     breederFindManyMock.mockReset();
     dogRegistrationFindUniqueMock.mockReset();
     dogRegistrationFindManyMock.mockReset();
+    dogRegistrationCreateMock.mockReset();
     dogRegistrationUpdateMock.mockReset();
     dogCreateMock.mockReset();
     dogUpdateMock.mockReset();
@@ -145,6 +148,9 @@ describe("runLegacyPhase1", () => {
     dogRegistrationFindManyMock.mockResolvedValue([
       { registrationNo: "FI12345/21", dogId: "dog-1" },
     ]);
+    dogRegistrationCreateMock.mockResolvedValue({
+      id: "registration-1",
+    });
     dogRegistrationUpdateMock.mockResolvedValue(undefined);
     dogCreateMock.mockResolvedValue({ id: "dog-1" });
     dogUpdateMock.mockResolvedValue(undefined);
@@ -211,6 +217,125 @@ describe("runLegacyPhase1", () => {
       dogUpdateMock.mock.calls.filter(([call]) => "ekNo" in call.data),
     ).toHaveLength(0);
     expect(createImportRunIssuesBulkMock).not.toHaveBeenCalled();
+    expect(createImportRunIssueMock).not.toHaveBeenCalled();
+    expect(markImportRunFinishedMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.objectContaining({
+        status: "SUCCEEDED",
+        errorsCount: 0,
+        errorSummary: null,
+      }),
+      expect.any(Object),
+    );
+  });
+
+  it("does not record an issue for an empty REK_3 alias slot", async () => {
+    fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogs: [
+        {
+          registrationNo: "FI12345/21",
+          name: "Aino",
+          sex: "U",
+          birthDateRaw: "20240101",
+          sireRegistrationNo: null,
+          damRegistrationNo: null,
+          breederName: null,
+        },
+      ],
+      breeders: [],
+      eks: [],
+      owners: [],
+      samakoira: [
+        {
+          rek1: "FI12345/21",
+          rek2: "FI99999/21",
+          rek3: null,
+        },
+      ],
+    });
+    dogRegistrationFindUniqueMock.mockImplementation(({ where, select }) => {
+      if (select?.source) {
+        return Promise.resolve(null);
+      }
+      if (where?.registrationNo === "FI99999/21") {
+        return Promise.resolve(null);
+      }
+      return Promise.resolve({ dogId: "dog-1" });
+    });
+
+    const result = await runLegacyPhase1("user-1");
+
+    expect(result.status).toBe(202);
+    expect(dogRegistrationCreateMock).toHaveBeenCalledWith({
+      data: {
+        dogId: "dog-1",
+        registrationNo: "FI99999/21",
+        source: "LEGACY_SAMAKOIRA",
+      },
+    });
+    expect(createImportRunIssuesBulkMock).not.toHaveBeenCalled();
+    expect(createImportRunIssueMock).not.toHaveBeenCalled();
+    expect(markImportRunFinishedMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.objectContaining({
+        status: "SUCCEEDED",
+        errorsCount: 0,
+        errorSummary: null,
+      }),
+      expect.any(Object),
+    );
+  });
+
+  it("records an empty REK_2 alias slot as a warning", async () => {
+    fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogs: [
+        {
+          registrationNo: "FI12345/21",
+          name: "Aino",
+          sex: "U",
+          birthDateRaw: "20240101",
+          sireRegistrationNo: null,
+          damRegistrationNo: null,
+          breederName: null,
+        },
+      ],
+      breeders: [],
+      eks: [],
+      owners: [],
+      samakoira: [
+        {
+          rek1: "FI12345/21",
+          rek2: null,
+          rek3: null,
+        },
+      ],
+    });
+    dogRegistrationFindUniqueMock.mockImplementation(({ where, select }) => {
+      if (select?.source) {
+        return Promise.resolve(null);
+      }
+      if (where?.registrationNo === "FI12345/21") {
+        return Promise.resolve({ dogId: "dog-1" });
+      }
+      return Promise.resolve(null);
+    });
+
+    const result = await runLegacyPhase1("user-1");
+
+    expect(result.status).toBe(202);
+    expect(createImportRunIssuesBulkMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.arrayContaining([
+        expect.objectContaining({
+          stage: "samakoira",
+          severity: "WARNING",
+          code: "SAMAKOIRA_ALIAS_EMPTY",
+          registrationNo: "FI12345/21",
+          sourceTable: "samakoira",
+        }),
+      ]),
+      expect.any(Object),
+    );
     expect(createImportRunIssueMock).not.toHaveBeenCalled();
     expect(markImportRunFinishedMock).toHaveBeenCalledWith(
       "run-1",
