@@ -572,26 +572,6 @@ export async function runLegacyPhase1(
         continue;
       }
 
-      if (row.ekNo == null) {
-        eksSkipped += 1;
-        await recordIssue({
-          stage: "ek",
-          severity: "INFO",
-          code: "EK_MISSING_EKNO",
-          message: "EK row missing EK number.",
-          registrationNo,
-          sourceTable: "bea_apu",
-          payloadJson: JSON.stringify({
-            registrationNo: row.registrationNo,
-            ekNo: row.ekNo,
-          }),
-        });
-        if (eksProcessed % 1000 === 0) {
-          logProgress("ek", eksProcessed, totalEks);
-        }
-        continue;
-      }
-
       if (isInvalid) {
         eksSkipped += 1;
         errorsCount += 1;
