@@ -958,15 +958,18 @@ export async function runLegacyPhase1(
       if (!dogId) {
         relationsSkippedDogNotFound += 1;
         errorsCount += 1;
+        const missingDogName = !normalizeNullable(row.name);
         await recordIssue({
           stage: "relations",
           code: "RELATION_DOG_NOT_FOUND",
-          message:
-            "Relations row references a dog that was not found among imported dogs.",
+          message: missingDogName
+            ? "Dog was not found in the imported dogs index because the source row was skipped earlier due to blank KNIMI, so sire/dam relations were not created."
+            : "Dog was not found in the imported dogs index from the new database, so sire/dam relations were not created.",
           registrationNo: registration.registrationNo,
           sourceTable: "bearek_id",
           payloadJson: JSON.stringify({
             registrationNo: row.registrationNo,
+            dogName: row.name,
             sireRegistrationNo: row.sireRegistrationNo,
             damRegistrationNo: row.damRegistrationNo,
           }),

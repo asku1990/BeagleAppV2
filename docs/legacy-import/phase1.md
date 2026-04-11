@@ -51,6 +51,7 @@ Phase 1 imports foundation entities and link structures. It does not import tria
 - Parent links (`sireId`, `damId`):
   - resolved after dog/registration indexing
   - missing/invalid/placeholder parent refs are reported as issues
+  - when the dog itself never imported, `RELATION_DOG_NOT_FOUND` now clarifies whether the row was skipped earlier because `KNIMI` was blank or whether the dog was absent from the imported dogs index in the new database
 - Owner links:
   - owner row requires a resolved dog by registration
   - ownership uses `ownershipDateKey` and `createMany(skipDuplicates=true)`

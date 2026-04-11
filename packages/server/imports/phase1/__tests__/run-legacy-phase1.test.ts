@@ -191,6 +191,53 @@ describe("runLegacyPhase1", () => {
     );
   });
 
+  it("explains that missing KNIMI prevented the dog from being imported and linked", async () => {
+    fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogs: [
+        {
+          registrationNo: "S87477",
+          name: null,
+          sex: "N",
+          birthDateRaw: null,
+          sireRegistrationNo: null,
+          damRegistrationNo: null,
+          breederName: null,
+        },
+      ],
+      breeders: [],
+      eks: [],
+      owners: [],
+      samakoira: [],
+    });
+    dogRegistrationFindManyMock.mockResolvedValue([]);
+
+    const result = await runLegacyPhase1("user-1");
+
+    expect(result.status).toBe(202);
+    expect(dogCreateMock).not.toHaveBeenCalled();
+    expect(createImportRunIssuesBulkMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.arrayContaining([
+        expect.objectContaining({
+          stage: "dogs",
+          code: "DOG_MISSING_REQUIRED_FIELDS",
+          message: "Dog row missing registration number or name.",
+          registrationNo: "S87477",
+          sourceTable: "bearek_id",
+        }),
+        expect.objectContaining({
+          stage: "relations",
+          code: "RELATION_DOG_NOT_FOUND",
+          message:
+            "Dog was not found in the imported dogs index because the source row was skipped earlier due to blank KNIMI, so sire/dam relations were not created.",
+          registrationNo: "S87477",
+          sourceTable: "bearek_id",
+        }),
+      ]),
+      expect.any(Object),
+    );
+  });
+
   it("skips a null EK row without writing an EK value", async () => {
     fetchLegacyPhase1RowsMock.mockResolvedValue({
       dogs: [
