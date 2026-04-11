@@ -139,8 +139,8 @@ Each phase creates its own `ImportRun` with its own `runId`.
 
 Issue rows are written to shared `ImportRunIssue` storage per run.
 
-- Successful run with no issues: `status=SUCCEEDED`, `errorsCount=0`, `errorSummary=null`
-- Successful run with issues: `status=SUCCEEDED`, `errorSummary="Import completed with warnings."`
+- Successful run: `status=SUCCEEDED`, `errorSummary` stores a phase-specific summary
+  of the imported counters for that phase
 - Failed run: `status=FAILED`, run-level `UNEXPECTED_EXCEPTION` issue recorded
 
 CSV export is per run id. Export separate CSV sets for each phase run id.

@@ -13,6 +13,7 @@ import {
 import type { ImportRunResponse } from "@beagle/contracts";
 import type { ServiceResult } from "../../core/result";
 import { upsertTrialRows } from "../internal";
+import { formatLegacyImportSummary } from "../runs/phase-summary";
 import { toImportRunResponse } from "../runs/transform";
 
 // Runs the legacy phase2 trials-only import using current trial schema.
@@ -142,8 +143,11 @@ export async function runLegacyPhase2(
         trialResultsUpserted,
         showResultsUpserted: 0,
         errorsCount,
-        errorSummary:
-          errorsCount > 0 ? "Import completed with warnings." : null,
+        errorSummary: formatLegacyImportSummary({
+          kind: "LEGACY_PHASE2",
+          trialResultsUpserted,
+          errorsCount,
+        }),
       },
       auditContext,
     );

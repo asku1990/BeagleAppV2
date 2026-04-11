@@ -185,7 +185,7 @@ describe("runLegacyPhase1", () => {
       expect.objectContaining({
         status: "SUCCEEDED",
         errorsCount: 0,
-        errorSummary: null,
+        errorSummary: expect.stringContaining("Phase 1:"),
       }),
       expect.any(Object),
     );
@@ -286,7 +286,7 @@ describe("runLegacyPhase1", () => {
       expect.objectContaining({
         status: "SUCCEEDED",
         errorsCount: 0,
-        errorSummary: null,
+        errorSummary: expect.stringContaining("Phase 1:"),
       }),
       expect.any(Object),
     );
@@ -324,7 +324,7 @@ describe("runLegacyPhase1", () => {
       expect.objectContaining({
         status: "SUCCEEDED",
         errorsCount: 0,
-        errorSummary: null,
+        errorSummary: expect.stringContaining("Phase 1:"),
       }),
       expect.any(Object),
     );
@@ -381,7 +381,7 @@ describe("runLegacyPhase1", () => {
       expect.objectContaining({
         status: "SUCCEEDED",
         errorsCount: 0,
-        errorSummary: null,
+        errorSummary: expect.stringContaining("Phase 1:"),
       }),
       expect.any(Object),
     );
@@ -443,7 +443,7 @@ describe("runLegacyPhase1", () => {
       expect.objectContaining({
         status: "SUCCEEDED",
         errorsCount: 0,
-        errorSummary: null,
+        errorSummary: expect.stringContaining("Phase 1:"),
       }),
       expect.any(Object),
     );

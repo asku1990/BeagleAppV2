@@ -23,6 +23,7 @@ import {
 } from "../core";
 import { toOwnershipDateKey, upsertOwner } from "../internal";
 import { toImportRunResponse } from "../runs/transform";
+import { formatLegacyImportSummary } from "../runs/phase-summary";
 
 const FINNISH_REGISTRATION_PREFIXES = new Set(["FI", "SF"]);
 
@@ -1229,8 +1230,13 @@ export async function runLegacyPhase1(
         trialResultsUpserted,
         showResultsUpserted,
         errorsCount,
-        errorSummary:
-          errorsCount > 0 ? "Import completed with warnings." : null,
+        errorSummary: formatLegacyImportSummary({
+          kind: "LEGACY_PHASE1",
+          dogsUpserted,
+          ownersUpserted,
+          ownershipsUpserted,
+          errorsCount,
+        }),
       },
       auditContext,
     );

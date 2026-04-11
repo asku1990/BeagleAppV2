@@ -18,6 +18,7 @@ import {
   normalizeRegistrationNo,
 } from "../core";
 import { toImportRunResponse } from "../runs/transform";
+import { formatLegacyImportSummary } from "../runs/phase-summary";
 
 type TitleCandidate = {
   registrationNo: string;
@@ -361,8 +362,13 @@ export async function runLegacyPhase1_5(
         trialResultsUpserted: 0,
         showResultsUpserted: 0,
         errorsCount,
-        errorSummary:
-          errorsCount > 0 ? "Import completed with warnings." : null,
+        errorSummary: formatLegacyImportSummary({
+          kind: "LEGACY_PHASE1_5",
+          titlesInserted,
+          skippedBlank,
+          conflicts,
+          errorsCount,
+        }),
       },
       auditContext,
     );

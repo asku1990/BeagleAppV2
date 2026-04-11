@@ -1,4 +1,8 @@
-import { listImportRunIssues, prisma } from "@beagle/db";
+import { getImportRunById, listImportRunIssues, prisma } from "@beagle/db";
+import {
+  createImportIssueSummaryCollector,
+  formatImportIssueSummary,
+} from "./issue-summary";
 
 type RunResult = {
   ok: boolean;
@@ -31,7 +35,6 @@ export async function runImportPhase(
   console.log(
     `[import:${phaseLabel}] Completed in ${Math.round((Date.now() - start) / 1000)}s`,
   );
-  console.log(JSON.stringify(output, null, 2));
 
   const runIdFromError =
     !output.ok &&
@@ -55,30 +58,27 @@ export async function runImportPhase(
       : runIdFromError;
 
   if (runId) {
-    const grouped = new Map<string, number>();
-    const samples: Array<{
-      stage: string;
-      severity: string;
-      code: string;
-      message: string;
-      registrationNo: string | null;
-      sourceTable: string | null;
-      payloadJson: string | null;
-    }> = [];
-    let cursor: string | undefined;
-    let total = 0;
+    try {
+      const run = await getImportRunById(runId);
+      if (run) {
+        console.log(
+          `[import:${phaseLabel}] Summary: ${run.errorSummary ?? "No final summary available."}`,
+        );
+        console.log(
+          `[import:${phaseLabel}] Run stats: status=${run.status} errors=${run.errorsCount} issues=${run.issuesCount}`,
+        );
+      }
 
-    do {
-      const page = await listImportRunIssues(runId, {
-        limit: 500,
-        cursor,
-      });
-      for (const issue of page.items) {
-        total += 1;
-        const key = `${issue.stage}:${issue.severity}:${issue.code}`;
-        grouped.set(key, (grouped.get(key) ?? 0) + 1);
-        if (samples.length < 10) {
-          samples.push({
+      const collector = createImportIssueSummaryCollector();
+      let cursor: string | undefined;
+
+      do {
+        const page = await listImportRunIssues(runId, {
+          limit: 500,
+          cursor,
+        });
+        for (const issue of page.items) {
+          collector.add({
             stage: issue.stage,
             severity: issue.severity,
             code: issue.code,
@@ -88,31 +88,20 @@ export async function runImportPhase(
             payloadJson: issue.payloadJson,
           });
         }
-      }
-      cursor = page.nextCursor ?? undefined;
-    } while (cursor);
+        cursor = page.nextCursor ?? undefined;
+      } while (cursor);
 
-    if (total > 0) {
-      console.log(`[import:${phaseLabel}] Issue rows stored: ${total}`);
-      console.log(`[import:${phaseLabel}] Issue groups:`);
-      for (const [key, count] of [...grouped.entries()].sort(
-        (a, b) => b[1] - a[1],
-      )) {
-        console.log(`[import:${phaseLabel}]   ${key} = ${count}`);
-      }
-      console.log(`[import:${phaseLabel}] Issue samples:`);
-      for (const sample of samples) {
-        console.log(
-          `[import:${phaseLabel}]   [${sample.stage}/${sample.severity}/${sample.code}] reg=${sample.registrationNo ?? "-"} table=${sample.sourceTable ?? "-"} msg=${sample.message}`,
-        );
-        if (sample.payloadJson) {
-          const trimmed =
-            sample.payloadJson.length > 500
-              ? `${sample.payloadJson.slice(0, 500)}...`
-              : sample.payloadJson;
-          console.log(`[import:${phaseLabel}]     payload=${trimmed}`);
+      const summary = collector.build();
+      if (summary.total > 0) {
+        for (const line of formatImportIssueSummary(summary)) {
+          console.log(`[import:${phaseLabel}] ${line}`);
         }
       }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      console.log(
+        `[import:${phaseLabel}] Skipped post-run summary due to error: ${message}`,
+      );
     }
   }
 
