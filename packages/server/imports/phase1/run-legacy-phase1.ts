@@ -592,6 +592,14 @@ export async function runLegacyPhase1(
         continue;
       }
 
+      if (row.ekNo == null) {
+        eksSkipped += 1;
+        if (eksProcessed % 1000 === 0) {
+          logProgress("ek", eksProcessed, totalEks);
+        }
+        continue;
+      }
+
       const registration = await prisma.dogRegistration.findUnique({
         where: { registrationNo },
         select: { dogId: true },

@@ -157,10 +157,59 @@ describe("runLegacyPhase1", () => {
     const result = await runLegacyPhase1("user-1");
 
     expect(result.status).toBe(202);
-    expect(dogUpdateMock).toHaveBeenCalledWith({
-      where: { id: "dog-1" },
-      data: { ekNo: 5588 },
+    expect(dogUpdateMock.mock.calls).toEqual(
+      expect.arrayContaining([
+        [
+          {
+            where: { id: "dog-1" },
+            data: { ekNo: 5588 },
+          },
+        ],
+      ]),
+    );
+    expect(
+      dogUpdateMock.mock.calls.some(
+        ([call]) => "ekNo" in call.data && call.data.ekNo === 0,
+      ),
+    ).toBe(false);
+    expect(createImportRunIssuesBulkMock).not.toHaveBeenCalled();
+    expect(createImportRunIssueMock).not.toHaveBeenCalled();
+    expect(markImportRunFinishedMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.objectContaining({
+        status: "SUCCEEDED",
+        errorsCount: 0,
+        errorSummary: null,
+      }),
+      expect.any(Object),
+    );
+  });
+
+  it("skips a null EK row without writing an EK value", async () => {
+    fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogs: [
+        {
+          registrationNo: "FI12345/21",
+          name: "Aino",
+          sex: "U",
+          birthDateRaw: "20240101",
+          sireRegistrationNo: null,
+          damRegistrationNo: null,
+          breederName: null,
+        },
+      ],
+      breeders: [],
+      eks: [{ registrationNo: "FI12345/21", ekNo: null }],
+      owners: [],
+      samakoira: [],
     });
+
+    const result = await runLegacyPhase1("user-1");
+
+    expect(result.status).toBe(202);
+    expect(
+      dogUpdateMock.mock.calls.filter(([call]) => "ekNo" in call.data),
+    ).toHaveLength(0);
     expect(createImportRunIssuesBulkMock).not.toHaveBeenCalled();
     expect(createImportRunIssueMock).not.toHaveBeenCalled();
     expect(markImportRunFinishedMock).toHaveBeenCalledWith(
