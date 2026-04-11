@@ -196,7 +196,7 @@ export async function fetchLegacyShowRows(options?: {
     }
 
     log(
-      `Fetched and merged show rows: count=${showResults.length}, mergedKeys=${mergedByKey.size}, passthroughRowsWithoutMergeKey=${rowsWithoutMergeKey.length}, elapsed=${Math.round((Date.now() - showResultsStartedAt) / 1000)}s`,
+      `Fetched legacy show source rows: total=${showResults.length}, mergedKeys=${mergedByKey.size}, passthroughRowsWithoutMergeKey=${rowsWithoutMergeKey.length}, elapsed=${Math.round((Date.now() - showResultsStartedAt) / 1000)}s`,
     );
 
     log(

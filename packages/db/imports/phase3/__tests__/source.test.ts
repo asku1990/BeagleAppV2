@@ -39,6 +39,7 @@ describe("fetchLegacyShowRows", () => {
   });
 
   it("resolves equal-priority collisions deterministically", async () => {
+    const log = vi.fn();
     const zetaFirst: RawLegacyRow = {
       registrationNo: "FI-123/20",
       eventDateRaw: "20240101",
@@ -59,12 +60,15 @@ describe("fetchLegacyShowRows", () => {
       .mockResolvedValueOnce(createConnection([zetaFirst, alphaSecond]))
       .mockResolvedValueOnce(createConnection([alphaSecond, zetaFirst]));
 
-    const first = await fetchLegacyShowRows();
-    const second = await fetchLegacyShowRows();
+    const first = await fetchLegacyShowRows({ log });
+    const second = await fetchLegacyShowRows({ log });
 
     expect(first).toHaveLength(1);
     expect(second).toHaveLength(1);
     expect(first[0]?.judge).toBe("Alpha Judge");
     expect(second[0]?.judge).toBe("Alpha Judge");
+    expect(log).toHaveBeenCalledWith(
+      "Fetched legacy show source rows: total=1, mergedKeys=1, passthroughRowsWithoutMergeKey=0, elapsed=0s",
+    );
   });
 });
