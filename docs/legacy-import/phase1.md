@@ -31,6 +31,7 @@ Phase 1 imports foundation entities and link structures. It does not import tria
 - `bea_apu` -> `Dog.ekNo` by registration lookup.
 - `beaom` -> `Owner` + `DogOwnership` rows by registration lookup.
 - `samakoira` -> alias registrations (`REK_2`, `REK_3`) attached to canonical `REK_1`.
+- `samakoira.VARA` -> appended into `Dog.note` for the canonical dog when non-empty.
 
 ## Main writes
 
@@ -66,6 +67,7 @@ Phase 1 imports foundation entities and link structures. It does not import tria
   - existing alias on different dog: `REGISTRATION_ALIAS_CONFLICT`
   - empty `REK_2` slots are recorded as warnings
   - empty `REK_3` slots are expected and skipped silently
+- `samakoira.VARA` values are merged into `Dog.note` using a `|` separator and duplicate text is not re-added.
 - Ownership rows are duplicate-safe via unique key + `skipDuplicates`.
 
 ## Issue profile
