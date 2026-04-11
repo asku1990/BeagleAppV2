@@ -109,13 +109,59 @@ Nämä kannattaa tallentaa rakenteisena koontina:
 
 - `lisatiedotJson`
 
-Rakenne jaetaan lohkoihin:
+Yleinen arvorakenne lisätietoriveille:
 
-- `olosuhteet` (11-18)
-- `haku` (20-22)
-- `haukku` (30-36)
-- `ajo` (40-56)
-- `muutOminaisuudet` (60-61)
+- `koodi` (esim. `11`, `42`, `61`)
+- `nimi` (esim. `Paljas maa`, `Metsästysinto koetteluaikana`)
+- `era1` (numero, boolean tai teksti)
+- `era2` (numero, boolean tai teksti)
+
+Lisätietojen ryhmittely:
+
+#### 9.1 Olosuhteet (11-18)
+
+- `11` Paljas maa (x)
+- `12` Lumikeli (cm)
+- `13` Kohtalainen tai kova tuuli
+- `14` Kuiva keli
+- `15` Kostea keli
+- `16` Kohtalainen tai kova sade
+- `17` Lämpötila (°C)
+- `18` Maasto
+
+#### 9.2 Haku (20-22)
+
+- `20` Haun laajuus ilman yöjälkeä
+- `21` Vainuamistapa
+- `22` Hakulöysyyden laatu
+
+#### 9.3 Haukku (30-36)
+
+- `30` Kuuluvuus
+- `31` Kertovuus
+- `32` Intohimoisuus
+- `33` Tiheys
+- `34` Äänien määrä
+- `35` Sukupuolileima
+- `36` Beaglen haukku
+
+#### 9.4 Ajo (40-56)
+
+- `40` Metsästysinto haun aikana
+- `41` Metsästysinto ajon aikana
+- `42` Metsästysinto koetteluaikana
+- `50` Ajotaito
+- `51` Nopeus
+- `52` Tie- ja estetyöskentely
+- `53` Vainuamistapa
+- `54` Herkkyys
+- `55` Ajolöysyyden laatu
+- `56` Ajettava nähty
+
+#### 9.5 Muut ominaisuudet (60-61)
+
+- `60` Muiden eläinten ja sorkkaeläinten ajo
+- `61` Hallittavuus
 
 ### 10) Tuomarit ja vahvistus
 
