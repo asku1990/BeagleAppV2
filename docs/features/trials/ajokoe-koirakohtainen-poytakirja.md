@@ -1,26 +1,7 @@
-# AJOK-kokeen koirakohtainen pöytäkirja - integraatiosuunnitelma
+# AJOK koirakohtainen pöytäkirja
 
-## Tavoite
-
-Määritellä, miten AJOK-kokeen koirakohtainen pöytäkirja tallennetaan uuteen järjestelmään niin, että:
-
-- yksi koetulos voidaan vastaanottaa ja päivittää kerrallaan
-- tietosisältö riittää pöytäkirjan (PDF) tuottamiseen
-- tuloksen uudelleenlähetys korjaa olemassa olevan rivin ilman duplikaatteja
-
-Kenttätason mapping yhdestä todellisesta lähderivistä löytyy tiedostosta:
-
-- `/Users/akikuivas/personal-projects/beagle/beagle-app-v2/docs/features/trials/ajokoe-kenttamapping-yksi-tulos.md`
-
-## Yksilöinti ja päivityssääntö
-
-Koetulos yksilöidään avaimella:
-
-- `rekisterinumero + koepaiva + sklKoeId`
-
-Tästä muodostetaan uniikki `yksilointiAvain`.
-
-Kun sama avain tulee uudelleen, olemassa oleva tulos päivitetään.
+Tämä tiedosto kuvaa API-payloadin ja pöytäkirjan vaatimat tiedot.
+Lopulliset skeemapäätökset on dokumentissa `ajokoe-suunnitelma.md`.
 
 ## Tietoryhmät
 
@@ -173,49 +154,3 @@ Lisätietojen ryhmittely:
 - `palkintotuomariNimi`
 - `ylituomariNimi`
 - `ylituomariNumero`
-
-## Tallennusmalli (suositus)
-
-### Tyypitetyt sarakkeet
-
-Tyypitettyinä sarakkeina tallennetaan:
-
-- yksilöinti
-- kokeen otsikkotiedot
-- koiran perustiedot
-- eräajat
-- tuloksen ydinpisteet, palkinto ja sijoitus
-- tilatiedot (luopui/suljettu/keskeytti)
-- tuomarit
-
-### Raakadatan säilytys
-
-Kaikki saapuva aineisto säilytetään lisäksi:
-
-- `raakadataJson`
-
-Tämä varmistaa, että PDF:n tarvitsema täydellinen sisältö säilyy myös silloin, kun kaikkia yksityiskohtia ei vielä nosteta omiksi sarakkeiksi.
-
-## Rajapinnan minimivaatimus
-
-Koetulos vastaanotetaan yksi kerrallaan.
-
-Pakolliset kentät:
-
-- `rekisterinumero`
-- `koepaiva`
-- `sklKoeId`
-- `koekunta`
-
-Jos jokin pakollinen arvo puuttuu, pyyntö hylätään (400).
-
-## Toteutusvaiheet
-
-1. Lukitaan kenttäryhmät ja pakolliset kentät
-2. Lisätään skeemaan tyypitetyt sarakkeet + `raakadataJson`
-3. Toteutetaan yksi-rivi-kerrallaan `upsert` yksilöintiavaimella
-4. Lisätään testit: luonti, päivitys, uudelleenlähetys, puuttuva pakollinen kenttä
-5. Lisätään koiran lisäys/päivitys -virtaan taustalinkitys:
-   - linkitä `dogId` kaikkiin `TrialEntry`-riveihin, joissa `dogId` puuttuu ja rekisterinumero täsmää
-   - tee sama myös `ShowEntry`-riveihin
-6. Varmistetaan, että tallennetusta datasta saadaan tuotettua AJOK-pöytäkirja

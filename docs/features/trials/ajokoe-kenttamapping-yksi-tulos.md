@@ -1,8 +1,8 @@
-# AJOK kenttämapping (`yksi_tulos.txt` -> uusi skeema)
+# AJOK kenttämapping yhdestä tuloksesta
 
-## Tavoite
-
-Tämä tiedosto kertoo, miten yhden todellisen lähderivin (`yksi_tulos.txt`) kentät mapataan uuteen trial-skeemaan.
+Tämä tiedosto on tekninen mapping-liite yhdestä esimerkkituloksesta.
+Tämä ei ole pääsuunnitelma.
+Lopulliset skeemapäätökset on dokumentissa `ajokoe-suunnitelma.md`.
 
 Lähde:
 
@@ -22,22 +22,29 @@ Lähde:
 
 ## Event-mapping
 
-| Lähdekenttä (`yksi_tulos`)         | Kohde                                            |
-| ---------------------------------- | ------------------------------------------------ |
-| `SKLid`                            | `TrialEvent.sklKoeId`                            |
-| `Koepvm`                           | `TrialEvent.koepaiva`                            |
-| `KOEPAIKKA`                        | `TrialEvent.koekunta`                            |
-| `JARJESTAJA`                       | `TrialEvent.jarjestaja`                          |
-| `KENNELPIIRI`                      | `TrialEvent.kennelpiiri`                         |
-| `KENNELPIIRINRO`                   | `TrialEvent.kennelpiirinro`                      |
-| `SKLkoemuoto`                      | `TrialEvent.koemuoto`                            |
-| `LUOKKA` / `SKLkoemuoto` konteksti | `TrialEvent.rotukoodi` (jos saatavilla erikseen) |
+| Lähdekenttä (`yksi_tulos`) | Kohde                       |
+| -------------------------- | --------------------------- |
+| `SKLid`                    | `TrialEvent.sklKoeId`       |
+| `Koepvm`                   | `TrialEvent.koepaiva`       |
+| `KOEPAIKKA`                | `TrialEvent.koekunta`       |
+| `JARJESTAJA`               | `TrialEvent.jarjestaja`     |
+| `KENNELPIIRI`              | `TrialEvent.kennelpiiri`    |
+| `KENNELPIIRINRO`           | `TrialEvent.kennelpiirinro` |
+| `SKLkoemuoto`              | `TrialEvent.koemuoto`       |
+
+Huomio:
+
+- `SKLkoemuoto` (esim. `AJOK`) ei mapata `rotukoodi`-kenttään.
+- `LUOKKA` ja `rotukoodi` käsitellään erillisinä kenttinä.
+- `rotukoodi` täytetään vain jos lähde antaa sen erillisenä varmana arvona (esim. `161/1`).
+- Eräkohtainen lisätietodata (esim. `521_*`, `522_*`) mapataan vain silloin kun se on lähteessä mukana.
 
 ## Entry-mapping (ydin)
 
 | Lähdekenttä (`yksi_tulos`)         | Kohde                                                   |
 | ---------------------------------- | ------------------------------------------------------- |
 | `REKISTERINUMERO`                  | `TrialEntry.rekisterinumeroSnapshot`                    |
+| `LUOKKA`                           | `TrialEntry.luokka`                                     |
 | `Omistaja`                         | `TrialEntry.omistajaSnapshot`                           |
 | `Omistajankotipaikka`              | `TrialEntry.omistajanKotikuntaSnapshot`                 |
 | `I_ERA_KLO`                        | `TrialEntry.era1Alkoi`                                  |
