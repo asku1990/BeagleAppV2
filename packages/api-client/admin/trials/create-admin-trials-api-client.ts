@@ -1,6 +1,6 @@
 import type { AdminTrialSearchRequest } from "@beagle/contracts";
-import type { ClientOptions } from "../../core/client-options";
-import { createRequest } from "../../core/request";
+import type { ClientOptions } from "@api-client/core/client-options";
+import { createRequest } from "@api-client/core/request";
 import { listAdminTrials } from "./list-admin-trials";
 
 export function createAdminTrialsApiClient(options: ClientOptions = {}) {
