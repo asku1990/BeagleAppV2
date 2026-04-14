@@ -1,5 +1,38 @@
 export type AdminTrialSearchSortDb = "date-desc" | "date-asc";
 
+export type AdminTrialDetailsRequestDb = {
+  trialId: string;
+};
+
+export type AdminTrialDetailsDb = {
+  trialId: string;
+  dogId: string;
+  dogName: string;
+  registrationNo: string | null;
+  eventDate: Date;
+  eventName: string | null;
+  eventPlace: string;
+  kennelDistrict: string | null;
+  kennelDistrictNo: string | null;
+  ke: string | null;
+  lk: string | null;
+  pa: string | null;
+  piste: number | null;
+  sija: string | null;
+  haku: number | null;
+  hauk: number | null;
+  yva: number | null;
+  hlo: number | null;
+  alo: number | null;
+  tja: number | null;
+  pin: number | null;
+  judge: string | null;
+  legacyFlag: string | null;
+  sourceKey: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export type AdminTrialSearchRequestDb = {
   query?: string;
   page?: number;

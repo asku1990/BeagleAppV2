@@ -1,4 +1,9 @@
 export type {
+  AdminTrialDetails,
+  AdminTrialDetailsRequest,
+  AdminTrialDetailsResponse,
+} from "./admin-trial-details";
+export type {
   AdminTrialSearchRequest,
   AdminTrialSearchResponse,
   AdminTrialSearchSort,
