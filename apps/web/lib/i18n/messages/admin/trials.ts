@@ -29,6 +29,33 @@ export const fiAdminTrialsMessages = {
   "admin.trials.manage.mobile.pa": "Pa",
   "admin.trials.manage.mobile.sija": "Sija",
   "admin.trials.manage.mobile.judge": "Tuomari",
+  "admin.trials.validation.title": "Pöytäkirja-gap validointi",
+  "admin.trials.validation.description.detail":
+    "Näyttää mitkä koirakohtaisen AJOK-pöytäkirjan kentät puuttuvat nykyisestä mallista tai ovat epätäydellisiä tällä rivillä.",
+  "admin.trials.validation.description.search":
+    "Näyttää event-haun perusnäkymässä mitkä koirakohtaisen AJOK-pöytäkirjan kentät puuttuvat nykyisestä mallista.",
+  "admin.trials.validation.summary.totalPrefix": "Pöytäkirjakenttiä yhteensä:",
+  "admin.trials.validation.summary.availablePrefix":
+    "Saatavilla nykyisessä mallissa:",
+  "admin.trials.validation.summary.missingPrefix":
+    "Puuttuu nykyisestä mallista:",
+  "admin.trials.validation.sections.missing":
+    "Puuttuvat kentät (missing_from_model)",
+  "admin.trials.validation.sections.incomplete":
+    "Epätäydelliset kentät (available_but_incomplete)",
+  "admin.trials.validation.empty.missing":
+    "Puuttuvia kenttiä ei tunnistettu nykyistä mallia vasten.",
+  "admin.trials.validation.empty.incomplete":
+    "Epätäydellisiä kenttiä ei löytynyt valitulta riviltä.",
+  "admin.trials.validation.incomplete.notEvaluated":
+    "Epätäydellisyys arvioidaan detail-näkymässä, koska listahaussa ei ladata kaikkia koirakohtaisia arvoja.",
+  "admin.trials.validation.groups.event": "Kokeen tiedot",
+  "admin.trials.validation.groups.dog": "Koiran tiedot",
+  "admin.trials.validation.groups.result": "Pisteet ja tulos",
+  "admin.trials.validation.groups.conditions": "Olosuhteet",
+  "admin.trials.validation.groups.status": "Tilat ja huomautukset",
+  "admin.trials.validation.groups.additional": "Lisätiedot",
+  "admin.trials.validation.groups.judges": "Tuomarit",
   "admin.trials.detail.title": "Koetuloksen detalji",
   "admin.trials.detail.header.placeholder": "Ladataan koetulosta...",
   "admin.trials.detail.section.title": "Koetuloksen tiedot",
@@ -106,6 +133,32 @@ export const svAdminTrialsMessages = {
   "admin.trials.manage.mobile.pa": "Pa",
   "admin.trials.manage.mobile.sija": "Placering",
   "admin.trials.manage.mobile.judge": "Domare",
+  "admin.trials.validation.title": "Protokoll-gap validering",
+  "admin.trials.validation.description.detail":
+    "Visar vilka fält i framtida hundspecifika AJOK-protokoll som saknas i nuvarande modell eller är ofullständiga i den valda raden.",
+  "admin.trials.validation.description.search":
+    "Visar i event-sökvyn vilka fält i framtida hundspecifika AJOK-protokoll som saknas i nuvarande modell.",
+  "admin.trials.validation.summary.totalPrefix": "Protokollfält totalt:",
+  "admin.trials.validation.summary.availablePrefix":
+    "Tillgängliga i nuvarande modell:",
+  "admin.trials.validation.summary.missingPrefix": "Saknas i nuvarande modell:",
+  "admin.trials.validation.sections.missing":
+    "Saknade fält (missing_from_model)",
+  "admin.trials.validation.sections.incomplete":
+    "Ofullständiga fält (available_but_incomplete)",
+  "admin.trials.validation.empty.missing":
+    "Inga saknade fält identifierades mot nuvarande modell.",
+  "admin.trials.validation.empty.incomplete":
+    "Inga ofullständiga fält hittades i den valda raden.",
+  "admin.trials.validation.incomplete.notEvaluated":
+    "Ofullständighet utvärderas i detaljvyn eftersom listsökningen inte laddar alla hundspecifika värden.",
+  "admin.trials.validation.groups.event": "Provets uppgifter",
+  "admin.trials.validation.groups.dog": "Hundens uppgifter",
+  "admin.trials.validation.groups.result": "Poäng och resultat",
+  "admin.trials.validation.groups.conditions": "Förhållanden",
+  "admin.trials.validation.groups.status": "Status och anmärkningar",
+  "admin.trials.validation.groups.additional": "Tilläggsuppgifter",
+  "admin.trials.validation.groups.judges": "Domare",
   "admin.trials.detail.title": "Provresultatdetalj",
   "admin.trials.detail.header.placeholder": "Laddar provresultat...",
   "admin.trials.detail.section.title": "Provresultatets uppgifter",
