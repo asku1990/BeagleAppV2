@@ -20,17 +20,22 @@ Lähde:
 
 3. Lähdearvot säilytetään lisäksi `TrialEntry.raakadataJson`-kentässä.
 
+4. Lisätiedot toteutetaan tuotannossa normalisoituna `TrialLisatietoItem`-malliin
+   (ei `lisatiedotJson`-välivaihetta).
+
 ## Event-mapping
 
-| Lähdekenttä (`yksi_tulos`) | Kohde                       |
-| -------------------------- | --------------------------- |
-| `SKLid`                    | `TrialEvent.sklKoeId`       |
-| `Koepvm`                   | `TrialEvent.koepaiva`       |
-| `KOEPAIKKA`                | `TrialEvent.koekunta`       |
-| `JARJESTAJA`               | `TrialEvent.jarjestaja`     |
-| `KENNELPIIRI`              | `TrialEvent.kennelpiiri`    |
-| `KENNELPIIRINRO`           | `TrialEvent.kennelpiirinro` |
-| `SKLkoemuoto`              | `TrialEvent.koemuoto`       |
+| Lähdekenttä (`yksi_tulos`) | Kohde                         |
+| -------------------------- | ----------------------------- |
+| `SKLid`                    | `TrialEvent.sklKoeId`         |
+| `Koepvm`                   | `TrialEvent.koepaiva`         |
+| `KOEPAIKKA`                | `TrialEvent.koekunta`         |
+| `JARJESTAJA`               | `TrialEvent.jarjestaja`       |
+| `KENNELPIIRI`              | `TrialEvent.kennelpiiri`      |
+| `KENNELPIIRINRO`           | `TrialEvent.kennelpiirinro`   |
+| `SKLkoemuoto`              | `TrialEvent.koemuoto`         |
+| `yt`                       | `TrialEvent.ylituomariNimi`   |
+| `ytnro`                    | `TrialEvent.ylituomariNumero` |
 
 Huomio:
 
@@ -85,9 +90,12 @@ Huomio:
 | `HUOMAUTUS`                        | `TrialEntry.huomautusTeksti`                            |
 | `palkintotuomari1`                 | `TrialEntry.ryhmatuomariNimi`                           |
 | `palkintotuomari2`                 | `TrialEntry.palkintotuomariNimi`                        |
-| `yt`                               | `TrialEntry.ylituomariNimi`                             |
-| `ytnro`                            | `TrialEntry.ylituomariNumero`                           |
 | Koko JSON-rivi                     | `TrialEntry.raakadataJson`                              |
+
+Huomio:
+
+- `ylituomari` on event-tason tieto.
+- Jos saman `sklKoeId` tapahtuman riveillä on ristiriitainen ylituomari, ristiriita kirjataan issueksi ja eventille jätetään ensimmäinen ei-null arvo.
 
 ## Lisätietojen mapping
 
@@ -106,6 +114,7 @@ Kaikki lisätiedot mapataan samaan kohteeseen:
 - `TrialLisatietoItem.nimi`
 - `TrialLisatietoItem.era1Arvo`
 - `TrialLisatietoItem.era2Arvo`
+- `TrialLisatietoItem.era3Arvo`
 
 ### Kuvaava mapping-lista
 
@@ -149,3 +158,8 @@ Tämä mapping perustuu yhteen todelliseen riviin. Lopullinen import-mapping vaa
 1. kaikista sääntöversioista
 2. kaikista trial-tyypeistä
 3. kaikista legacy-tauluista, joista lisätietoja voidaan yhdistää
+
+Huomio:
+
+- Skeemarakenne on lukittu `ajokoe-suunnitelma.md`-dokumentissa:
+  `TrialEvent + TrialEntry + TrialLisatietoItem`.
