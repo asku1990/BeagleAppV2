@@ -15,6 +15,13 @@ vi.mock("@/hooks/i18n", () => ({
 
 vi.mock("@/queries/admin/trials", () => ({
   useAdminTrialQuery: useAdminTrialQueryMock,
+  isAdminTrialQueryError: (error: unknown) =>
+    Boolean(
+      error &&
+      typeof error === "object" &&
+      "errorCode" in error &&
+      typeof (error as { errorCode?: unknown }).errorCode === "string",
+    ),
 }));
 
 vi.mock("@/lib/admin/core/date", () => ({
@@ -76,6 +83,27 @@ describe("AdminTrialDetailsPageClient", () => {
     );
 
     expect(html).toContain("admin.trials.detail.state.loading");
+  });
+
+  it("renders not found state when query returns TRIAL_NOT_FOUND error", () => {
+    useAdminTrialQueryMock.mockReturnValue({
+      data: null,
+      isLoading: false,
+      isError: true,
+      error: {
+        message: "Trial not found.",
+        errorCode: "TRIAL_NOT_FOUND",
+      },
+    });
+
+    const html = renderToStaticMarkup(
+      React.createElement(AdminTrialDetailsPageClient, {
+        trialId: "trial-404",
+      }),
+    );
+
+    expect(html).toContain("admin.trials.detail.state.notFound");
+    expect(html).not.toContain("Trial not found.");
   });
 
   it("renders grouped detail fields and raw fallback", () => {

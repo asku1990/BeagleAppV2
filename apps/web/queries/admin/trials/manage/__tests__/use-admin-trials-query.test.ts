@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { adminTrialQueryKey, adminTrialsQueryKey } from "../query-keys";
-import { useAdminTrialQuery } from "../use-admin-trial-query";
+import { isAdminTrialQueryError , useAdminTrialQuery } from "../use-admin-trial-query";
 import { useAdminTrialsQuery } from "../use-admin-trials-query";
 
 const { useQueryMock, listAdminTrialsMock, getAdminTrialMock } = vi.hoisted(
@@ -257,6 +257,18 @@ describe("useAdminTrialQuery", () => {
       queryFn: () => Promise<unknown>;
     };
 
-    await expect(options.queryFn()).rejects.toThrow("Trial not found.");
+    let thrownError: unknown;
+    try {
+      await options.queryFn();
+    } catch (error) {
+      thrownError = error;
+    }
+
+    expect(isAdminTrialQueryError(thrownError)).toBe(true);
+    if (!isAdminTrialQueryError(thrownError)) {
+      throw new Error("Expected AdminTrialQueryError.");
+    }
+    expect(thrownError.message).toBe("Trial not found.");
+    expect(thrownError.errorCode).toBe("TRIAL_NOT_FOUND");
   });
 });

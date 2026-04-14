@@ -10,7 +10,7 @@ import { adminTrialQueryKey } from "./query-keys";
 
 const adminTrialsApiClient = createAdminTrialsApiClient();
 
-class AdminTrialQueryError extends Error {
+export class AdminTrialQueryError extends Error {
   errorCode?: string;
 
   constructor(message: string, errorCode?: string) {
@@ -18,6 +18,12 @@ class AdminTrialQueryError extends Error {
     this.name = "AdminTrialQueryError";
     this.errorCode = errorCode;
   }
+}
+
+export function isAdminTrialQueryError(
+  error: unknown,
+): error is AdminTrialQueryError {
+  return error instanceof AdminTrialQueryError;
 }
 
 type UseAdminTrialQueryInput = AdminTrialDetailsRequest & {

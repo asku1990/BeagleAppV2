@@ -1,10 +1,14 @@
 "use client";
+import React from "react";
 import { ListingSectionShell } from "@/components/listing";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useI18n } from "@/hooks/i18n";
 import { formatDateForFinland } from "@/lib/admin/core/date";
-import { useAdminTrialQuery } from "@/queries/admin/trials";
+import {
+  isAdminTrialQueryError,
+  useAdminTrialQuery,
+} from "@/queries/admin/trials";
 
 function showDash(value: string | number | null | undefined): string {
   if (value === null || value === undefined) {
@@ -68,6 +72,9 @@ export function AdminTrialDetailsPageClient({
   });
 
   const trial = trialQuery.data?.trial;
+  const isNotFoundError =
+    isAdminTrialQueryError(trialQuery.error) &&
+    trialQuery.error.errorCode === "TRIAL_NOT_FOUND";
   const detailErrorMessage =
     trialQuery.error instanceof Error
       ? trialQuery.error.message
@@ -100,6 +107,12 @@ export function AdminTrialDetailsPageClient({
           <Card>
             <CardContent className="p-5 text-sm text-muted-foreground">
               {t("admin.trials.detail.state.loading")}
+            </CardContent>
+          </Card>
+        ) : trialQuery.isError && isNotFoundError ? (
+          <Card>
+            <CardContent className="p-5 text-sm text-muted-foreground">
+              {t("admin.trials.detail.state.notFound")}
             </CardContent>
           </Card>
         ) : trialQuery.isError ? (
