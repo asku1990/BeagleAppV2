@@ -8,6 +8,7 @@ import {
 } from "@/components/listing";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/hooks/i18n";
 import { formatDateForFinland } from "@/lib/admin/core/date";
 import { useAdminTrialsQuery } from "@/queries/admin/trials";
 
@@ -51,6 +52,7 @@ const DEFAULT_PAGE_SIZE = 50;
 const EMPTY_TRIALS: AdminTrialSummary[] = [];
 
 export function AdminTrialsPageClient() {
+  const { t } = useI18n();
   const [query, setQuery] = useState("");
   const filters = useMemo(
     () => ({
@@ -70,30 +72,30 @@ export function AdminTrialsPageClient() {
     <div className="space-y-4" suppressHydrationWarning>
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight">
-          AJOK: koetulokset
+          {t("admin.trials.title")}
         </h1>
         <p className="text-sm text-muted-foreground">
-          Read-only näkymä nykyisestä TrialResult-datasta.
+          {t("admin.trials.description")}
         </p>
       </div>
 
       <ListingSectionShell
-        title="Koetulokset"
-        subtitle="Hae nykyiset ajokokeiden rivit."
-        count={`${totalCount} tulosta`}
+        title={t("admin.trials.manage.title")}
+        subtitle={t("admin.trials.manage.description")}
+        count={`${totalCount} ${t("admin.trials.manage.countSuffix")}`}
       >
         <div className="space-y-4">
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Hae koetuloksia"
-            aria-label="Hae koetuloksia"
+            placeholder={t("admin.trials.manage.filters.placeholder")}
+            aria-label={t("admin.trials.manage.filters.aria")}
           />
 
           {trialsQuery.isLoading ? (
             <Card>
               <CardContent className="p-5 text-sm text-muted-foreground">
-                Ladataan koetuloksia...
+                {t("admin.trials.manage.loading")}
               </CardContent>
             </Card>
           ) : null}
@@ -101,7 +103,7 @@ export function AdminTrialsPageClient() {
           {trialsQuery.isError ? (
             <Card>
               <CardContent className="p-5 text-sm text-destructive">
-                Koetulosten lataus epäonnistui.
+                {t("admin.trials.manage.error")}
               </CardContent>
             </Card>
           ) : null}
@@ -116,10 +118,12 @@ export function AdminTrialsPageClient() {
 }
 
 function TrialResults({ trials }: { trials: AdminTrialSummary[] }) {
+  const { t } = useI18n();
+
   if (trials.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        Ei koetuloksia näytettäväksi.
+        {t("admin.trials.manage.empty")}
       </p>
     );
   }
@@ -132,14 +136,30 @@ function TrialResults({ trials }: { trials: AdminTrialSummary[] }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b text-left">
-              <th className="px-2 py-2">Koira</th>
-              <th className="px-2 py-2">Rekisteri / sourceKey</th>
-              <th className="px-2 py-2">Päivä</th>
-              <th className="px-2 py-2">Paikka</th>
-              <th className="px-2 py-2">Pisteet</th>
-              <th className="px-2 py-2">Pa</th>
-              <th className="px-2 py-2">Sija</th>
-              <th className="px-2 py-2">Tuomari</th>
+              <th className="px-2 py-2">
+                {t("admin.trials.manage.columns.dog")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.trials.manage.columns.registration")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.trials.manage.columns.date")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.trials.manage.columns.place")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.trials.manage.columns.piste")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.trials.manage.columns.pa")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.trials.manage.columns.sija")}
+              </th>
+              <th className="px-2 py-2">
+                {t("admin.trials.manage.columns.judge")}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -191,27 +211,39 @@ function TrialResults({ trials }: { trials: AdminTrialSummary[] }) {
               </div>
               <div className="grid gap-1 text-sm sm:grid-cols-2">
                 <p>
-                  <span className="text-muted-foreground">Päivä:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("admin.trials.manage.mobile.date")}:
+                  </span>{" "}
                   {formatDateForFinland(trial.eventDate)}
                 </p>
                 <p>
-                  <span className="text-muted-foreground">Paikka:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("admin.trials.manage.mobile.place")}:
+                  </span>{" "}
                   {showDash(trial.eventPlace)}
                 </p>
                 <p>
-                  <span className="text-muted-foreground">Pisteet:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("admin.trials.manage.mobile.piste")}:
+                  </span>{" "}
                   {formatPiste(trial.piste)}
                 </p>
                 <p>
-                  <span className="text-muted-foreground">Pa:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("admin.trials.manage.mobile.pa")}:
+                  </span>{" "}
                   {showDash(trial.pa)}
                 </p>
                 <p>
-                  <span className="text-muted-foreground">Sija:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("admin.trials.manage.mobile.sija")}:
+                  </span>{" "}
                   {showDash(trial.sija)}
                 </p>
                 <p>
-                  <span className="text-muted-foreground">Tuomari:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {t("admin.trials.manage.mobile.judge")}:
+                  </span>{" "}
                   {showDash(trial.judge)}
                 </p>
               </div>
