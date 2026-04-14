@@ -117,7 +117,7 @@ describe("AdminTrialDetailsPageClient", () => {
           eventDate: "2026-04-14",
           eventName: "Kevätkoe",
           eventPlace: "Helsinki",
-          kennelDistrict: "Etelä",
+          kennelDistrict: null,
           kennelDistrictNo: "01",
           ke: "KE",
           lk: "A",
@@ -157,6 +157,11 @@ describe("AdminTrialDetailsPageClient", () => {
     expect(html).toContain("admin.trials.detail.sections.scoreBreakdown");
     expect(html).toContain("admin.trials.detail.sections.metadata");
     expect(html).toContain("admin.trials.detail.sections.raw");
+    expect(html).toContain("admin.trials.validation.title");
+    expect(html).toContain("admin.trials.validation.sections.missing");
+    expect(html).toContain("admin.trials.validation.sections.incomplete");
+    expect(html).toContain("sklKoeId");
+    expect(html).toContain("kennelpiiri");
     expect(html).toContain("Rex");
     expect(html).toContain("source-1");
     expect(html).toContain("admin.trials.detail.raw.unavailable");

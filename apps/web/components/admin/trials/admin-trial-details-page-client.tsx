@@ -9,6 +9,7 @@ import {
   isAdminTrialQueryError,
   useAdminTrialQuery,
 } from "@/queries/admin/trials";
+import { AdminTrialValidationPanel } from "./admin-trial-validation-panel";
 
 function showDash(value: string | number | null | undefined): string {
   if (value === null || value === undefined) {
@@ -97,217 +98,224 @@ export function AdminTrialDetailsPageClient({
         title={t("admin.trials.detail.section.title")}
         subtitle={t("admin.trials.detail.section.subtitle")}
       >
-        {!normalizedTrialId ? (
-          <Card>
-            <CardContent className="p-5 text-sm text-destructive">
-              {t("admin.trials.detail.state.invalid")}
-            </CardContent>
-          </Card>
-        ) : trialQuery.isLoading ? (
-          <Card>
-            <CardContent className="p-5 text-sm text-muted-foreground">
-              {t("admin.trials.detail.state.loading")}
-            </CardContent>
-          </Card>
-        ) : trialQuery.isError && isNotFoundError ? (
-          <Card>
-            <CardContent className="p-5 text-sm text-muted-foreground">
-              {t("admin.trials.detail.state.notFound")}
-            </CardContent>
-          </Card>
-        ) : trialQuery.isError ? (
-          <Card>
-            <CardContent className="p-5 text-sm text-destructive">
-              {detailErrorMessage}
-            </CardContent>
-          </Card>
-        ) : !trial ? (
-          <Card>
-            <CardContent className="p-5 text-sm text-muted-foreground">
-              {t("admin.trials.detail.state.notFound")}
-            </CardContent>
-          </Card>
-        ) : (
-          <Card>
-            <CardContent className="space-y-4 pt-5">
-              <div className="space-y-2">
-                <SectionTitle>
-                  {t("admin.trials.detail.sections.trialInfo")}
-                </SectionTitle>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.eventDate")}
-                    value={formatDateForFinland(trial.eventDate)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.eventPlace")}
-                    value={showDash(trial.eventPlace)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.eventName")}
-                    value={showDash(trial.eventName)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.kennelDistrict")}
-                    value={showDash(trial.kennelDistrict)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.kennelDistrictNo")}
-                    value={showDash(trial.kennelDistrictNo)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.judge")}
-                    value={showDash(trial.judge)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.ke")}
-                    value={showDash(trial.ke)}
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <SectionTitle>
-                  {t("admin.trials.detail.sections.dogInfo")}
-                </SectionTitle>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.dogName")}
-                    value={showDash(trial.dogName)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.registrationNo")}
-                    value={showDash(trial.registrationNo)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.dogId")}
-                    value={showDash(trial.dogId)}
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <SectionTitle>
-                  {t("admin.trials.detail.sections.resultSummary")}
-                </SectionTitle>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.lk")}
-                    value={showDash(trial.lk)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.pa")}
-                    value={showDash(trial.pa)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.sija")}
-                    value={showDash(trial.sija)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.piste")}
-                    value={formatNumber(trial.piste)}
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <SectionTitle>
-                  {t("admin.trials.detail.sections.scoreBreakdown")}
-                </SectionTitle>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.haku")}
-                    value={formatNumber(trial.haku)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.hauk")}
-                    value={formatNumber(trial.hauk)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.yva")}
-                    value={formatNumber(trial.yva)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.hlo")}
-                    value={formatNumber(trial.hlo)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.alo")}
-                    value={formatNumber(trial.alo)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.tja")}
-                    value={formatNumber(trial.tja)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.pin")}
-                    value={formatNumber(trial.pin)}
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <SectionTitle>
-                  {t("admin.trials.detail.sections.metadata")}
-                </SectionTitle>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.trialId")}
-                    value={showDash(trial.trialId)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.sourceKey")}
-                    value={showDash(trial.sourceKey)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.legacyFlag")}
-                    value={showDash(trial.legacyFlag)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.createdAt")}
-                    value={formatTimestamp(trial.createdAt)}
-                  />
-                  <FieldRow
-                    label={t("admin.trials.detail.fields.updatedAt")}
-                    value={formatTimestamp(trial.updatedAt)}
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <SectionTitle>
-                  {t("admin.trials.detail.sections.raw")}
-                </SectionTitle>
-                <details>
-                  <summary className="cursor-pointer text-sm underline-offset-2 hover:underline">
-                    {t("admin.trials.detail.raw.toggle")}
-                  </summary>
-                  <div className="mt-3">
-                    {trial.rawPayloadAvailable && trial.rawPayloadJson ? (
-                      <pre className="overflow-x-auto rounded-md bg-muted p-3 text-xs">
-                        {trial.rawPayloadJson}
-                      </pre>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        {t("admin.trials.detail.raw.unavailable")}
-                      </p>
-                    )}
+        <div className="space-y-4">
+          {!normalizedTrialId ? (
+            <Card>
+              <CardContent className="p-5 text-sm text-destructive">
+                {t("admin.trials.detail.state.invalid")}
+              </CardContent>
+            </Card>
+          ) : trialQuery.isLoading ? (
+            <Card>
+              <CardContent className="p-5 text-sm text-muted-foreground">
+                {t("admin.trials.detail.state.loading")}
+              </CardContent>
+            </Card>
+          ) : trialQuery.isError && isNotFoundError ? (
+            <Card>
+              <CardContent className="p-5 text-sm text-muted-foreground">
+                {t("admin.trials.detail.state.notFound")}
+              </CardContent>
+            </Card>
+          ) : trialQuery.isError ? (
+            <Card>
+              <CardContent className="p-5 text-sm text-destructive">
+                {detailErrorMessage}
+              </CardContent>
+            </Card>
+          ) : !trial ? (
+            <Card>
+              <CardContent className="p-5 text-sm text-muted-foreground">
+                {t("admin.trials.detail.state.notFound")}
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardContent className="space-y-4 pt-5">
+                <div className="space-y-2">
+                  <SectionTitle>
+                    {t("admin.trials.detail.sections.trialInfo")}
+                  </SectionTitle>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.eventDate")}
+                      value={formatDateForFinland(trial.eventDate)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.eventPlace")}
+                      value={showDash(trial.eventPlace)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.eventName")}
+                      value={showDash(trial.eventName)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.kennelDistrict")}
+                      value={showDash(trial.kennelDistrict)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.kennelDistrictNo")}
+                      value={showDash(trial.kennelDistrictNo)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.judge")}
+                      value={showDash(trial.judge)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.ke")}
+                      value={showDash(trial.ke)}
+                    />
                   </div>
-                </details>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <SectionTitle>
+                    {t("admin.trials.detail.sections.dogInfo")}
+                  </SectionTitle>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.dogName")}
+                      value={showDash(trial.dogName)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.registrationNo")}
+                      value={showDash(trial.registrationNo)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.dogId")}
+                      value={showDash(trial.dogId)}
+                    />
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <SectionTitle>
+                    {t("admin.trials.detail.sections.resultSummary")}
+                  </SectionTitle>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.lk")}
+                      value={showDash(trial.lk)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.pa")}
+                      value={showDash(trial.pa)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.sija")}
+                      value={showDash(trial.sija)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.piste")}
+                      value={formatNumber(trial.piste)}
+                    />
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <SectionTitle>
+                    {t("admin.trials.detail.sections.scoreBreakdown")}
+                  </SectionTitle>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.haku")}
+                      value={formatNumber(trial.haku)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.hauk")}
+                      value={formatNumber(trial.hauk)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.yva")}
+                      value={formatNumber(trial.yva)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.hlo")}
+                      value={formatNumber(trial.hlo)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.alo")}
+                      value={formatNumber(trial.alo)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.tja")}
+                      value={formatNumber(trial.tja)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.pin")}
+                      value={formatNumber(trial.pin)}
+                    />
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <SectionTitle>
+                    {t("admin.trials.detail.sections.metadata")}
+                  </SectionTitle>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.trialId")}
+                      value={showDash(trial.trialId)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.sourceKey")}
+                      value={showDash(trial.sourceKey)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.legacyFlag")}
+                      value={showDash(trial.legacyFlag)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.createdAt")}
+                      value={formatTimestamp(trial.createdAt)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.updatedAt")}
+                      value={formatTimestamp(trial.updatedAt)}
+                    />
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <SectionTitle>
+                    {t("admin.trials.detail.sections.raw")}
+                  </SectionTitle>
+                  <details>
+                    <summary className="cursor-pointer text-sm underline-offset-2 hover:underline">
+                      {t("admin.trials.detail.raw.toggle")}
+                    </summary>
+                    <div className="mt-3">
+                      {trial.rawPayloadAvailable && trial.rawPayloadJson ? (
+                        <pre className="overflow-x-auto rounded-md bg-muted p-3 text-xs">
+                          {trial.rawPayloadJson}
+                        </pre>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          {t("admin.trials.detail.raw.unavailable")}
+                        </p>
+                      )}
+                    </div>
+                  </details>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          <AdminTrialValidationPanel
+            context="detail"
+            trial={!trialQuery.isError && !trialQuery.isLoading ? trial : null}
+          />
+        </div>
       </ListingSectionShell>
     </div>
   );

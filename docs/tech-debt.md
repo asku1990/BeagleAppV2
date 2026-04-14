@@ -70,3 +70,30 @@ Use this format for new entries:
 - Suggested fix: Add explicit multi-judge support to the public show contract/UI instead of collapsing to one value.
 - Trigger to revisit: Next public show UI/contract redesign or workbook-driven show presentation task.
 - Ticket: BEJ-45 follow-up.
+
+## 2026-04-14 - AJOK missing event/dog contract fields
+
+- Area: AJOK future poytakirja event and dog field parity.
+- Issue: `TrialResult`-based read model does not type event metadata (`sklKoeId`, `rotukoodi`, `jarjestaja`, `koemuoto`) or most dog identity snapshot fields required by the locked flow-gate contract.
+- Impact: BEJ-79 schema rollout can drift from BEJ-78 contract unless these fields are implemented with explicit mapping rules.
+- Suggested fix: In BEJ-79, add canonical `TrialEvent` and `TrialEntry` typed fields and map them from API/legacy sources with per-field tests against the BEJ-78 contract table.
+- Trigger to revisit: BEJ-79 implementation kickoff and schema mapping PR review.
+- Ticket: BEJ-79.
+
+## 2026-04-14 - AJOK missing era/result/status contract fields
+
+- Area: AJOK result/era/status read parity.
+- Issue: Current read model lacks era-level timing/score fields and explicit status flags (`luopui`, `suljettu`, `keskeytetty`, `huomautusTeksti`) expected by the future poytakirja contract.
+- Impact: Read-path switch readiness cannot be expanded beyond the BEJ-78 minimum set until these fields are typed and validated.
+- Suggested fix: Implement missing result/status fields in BEJ-79 schema and BEJ-80 import mapping, then re-run BEJ-78 flow-gate tests with updated statuses.
+- Trigger to revisit: BEJ-80 backfill/import mapping work and BEJ-82 read-switch preparation.
+- Ticket: BEJ-80.
+
+## 2026-04-14 - AJOK additional/conditions detail gap follow-up
+
+- Area: AJOK lisatiedot and condition-detail completeness.
+- Issue: `lisatiedotJson`, `paljasMaa`, `lumikeli`, `rokotusOk`, and `tunnistusOk` remain outside typed read-path parity in the current model.
+- Impact: Detail-level validation and future PDF/structured rendering remain partial until these fields are carried through canonical storage and read adapters.
+- Suggested fix: Preserve and normalize additional/condition detail fields during schema/import steps, then update BEJ-82 gap panel to consume new typed sources.
+- Trigger to revisit: BEJ-82 panel/read-path migration update.
+- Ticket: BEJ-82.
