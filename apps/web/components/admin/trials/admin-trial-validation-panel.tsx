@@ -8,25 +8,20 @@ import {
   type TrialValidationGapItem,
 } from "@/lib/admin/trials/manage";
 
-function groupLabelKey(group: TrialValidationGapItem["group"]): string {
-  switch (group) {
-    case "event":
-      return "admin.trials.validation.groups.event";
-    case "dog":
-      return "admin.trials.validation.groups.dog";
-    case "result":
-      return "admin.trials.validation.groups.result";
-    case "conditions":
-      return "admin.trials.validation.groups.conditions";
-    case "status":
-      return "admin.trials.validation.groups.status";
-    case "additional":
-      return "admin.trials.validation.groups.additional";
-    case "judges":
-      return "admin.trials.validation.groups.judges";
-    default:
-      return "admin.trials.validation.groups.result";
-  }
+const GROUP_LABEL_KEYS = {
+  event: "admin.trials.validation.groups.event",
+  dog: "admin.trials.validation.groups.dog",
+  result: "admin.trials.validation.groups.result",
+  conditions: "admin.trials.validation.groups.conditions",
+  status: "admin.trials.validation.groups.status",
+  additional: "admin.trials.validation.groups.additional",
+  judges: "admin.trials.validation.groups.judges",
+} as const;
+
+function groupLabelKey(
+  group: TrialValidationGapItem["group"],
+): (typeof GROUP_LABEL_KEYS)[TrialValidationGapItem["group"]] {
+  return GROUP_LABEL_KEYS[group];
 }
 
 function GapList({ items }: { items: TrialValidationGapItem[] }) {
