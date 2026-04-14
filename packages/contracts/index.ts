@@ -215,6 +215,10 @@ export type {
   UpdateAdminShowWorkbookSchemaRuleResponse,
   ValidateAdminShowWorkbookSchemaRuleRequest,
   ValidateAdminShowWorkbookSchemaRuleResponse,
+  AdminTrialSearchRequest,
+  AdminTrialSearchResponse,
+  AdminTrialSearchSort,
+  AdminTrialSummary,
 } from "./admin";
 export type { HomeStatisticsResponse } from "./home";
 export {

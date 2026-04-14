@@ -127,6 +127,12 @@ const adminModuleNavItems: NavItem[] = [
     availability: "enabled",
   },
   {
+    labelKey: "sidebar.nav.adminTrials",
+    icon: FileText,
+    href: "/admin/trials",
+    availability: "enabled",
+  },
+  {
     labelKey: "sidebar.nav.adminShows",
     icon: Award,
     href: "/admin/shows",
