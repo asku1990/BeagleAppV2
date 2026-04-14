@@ -114,6 +114,13 @@ export {
   type BeagleTrialSearchRowDb,
   type BeagleTrialSearchSortDb,
 } from "./trials";
+export {
+  searchAdminTrialsDb,
+  type AdminTrialSearchRequestDb,
+  type AdminTrialSearchResponseDb,
+  type AdminTrialSearchSortDb,
+  type AdminTrialSummaryDb,
+} from "./admin/trials";
 
 export {
   createAdminDogWriteDb,
