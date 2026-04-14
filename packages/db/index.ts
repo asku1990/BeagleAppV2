@@ -115,7 +115,10 @@ export {
   type BeagleTrialSearchSortDb,
 } from "./trials";
 export {
+  getAdminTrialDetailsDb,
   searchAdminTrialsDb,
+  type AdminTrialDetailsDb,
+  type AdminTrialDetailsRequestDb,
   type AdminTrialSearchRequestDb,
   type AdminTrialSearchResponseDb,
   type AdminTrialSearchSortDb,

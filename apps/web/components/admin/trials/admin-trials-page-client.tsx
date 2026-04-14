@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { AdminTrialSummary } from "@beagle/contracts";
 import {
   ListingResponsiveResults,
@@ -11,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { useI18n } from "@/hooks/i18n";
 import { formatDateForFinland } from "@/lib/admin/core/date";
 import { useAdminTrialsQuery } from "@/queries/admin/trials";
+import { cn } from "@/lib/utils";
 
 function showDash(value: string | number | null | undefined): string {
   if (value === null || value === undefined) {
@@ -119,6 +121,7 @@ export function AdminTrialsPageClient() {
 
 function TrialResults({ trials }: { trials: AdminTrialSummary[] }) {
   const { t } = useI18n();
+  const router = useRouter();
 
   if (trials.length === 0) {
     return (
@@ -166,7 +169,31 @@ function TrialResults({ trials }: { trials: AdminTrialSummary[] }) {
             {trials.map((trial) => {
               const registrationCell = renderRegistrationCell(trial);
               return (
-                <tr key={trial.trialId} className="border-b align-top">
+                <tr
+                  key={trial.trialId}
+                  className={cn(
+                    "border-b align-top cursor-pointer transition-colors",
+                    "focus-visible:bg-muted/40 focus-visible:outline-none hover:bg-muted/20",
+                  )}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`${t("admin.trials.manage.results.openDetailAriaPrefix")} ${showDash(trial.dogName)}`}
+                  onClick={() => {
+                    router.push(
+                      `/admin/trials/${encodeURIComponent(trial.trialId)}`,
+                    );
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key !== "Enter" && event.key !== " ") {
+                      return;
+                    }
+
+                    event.preventDefault();
+                    router.push(
+                      `/admin/trials/${encodeURIComponent(trial.trialId)}`,
+                    );
+                  }}
+                >
                   <td className="px-2 py-2 font-medium">
                     {showDash(trial.dogName)}
                   </td>
@@ -196,7 +223,26 @@ function TrialResults({ trials }: { trials: AdminTrialSummary[] }) {
         const registrationCell = renderRegistrationCell(trial);
 
         return (
-          <Card key={trial.trialId}>
+          <Card
+            key={trial.trialId}
+            role="button"
+            tabIndex={0}
+            aria-label={`${t("admin.trials.manage.results.openDetailAriaPrefix")} ${showDash(trial.dogName)}`}
+            onClick={() => {
+              router.push(`/admin/trials/${encodeURIComponent(trial.trialId)}`);
+            }}
+            onKeyDown={(event) => {
+              if (event.key !== "Enter" && event.key !== " ") {
+                return;
+              }
+
+              event.preventDefault();
+              router.push(`/admin/trials/${encodeURIComponent(trial.trialId)}`);
+            }}
+            className={cn(
+              "cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-ring hover:bg-muted/20",
+            )}
+          >
             <CardContent className="space-y-3 pt-4">
               <div>
                 <p className="font-medium">{showDash(trial.dogName)}</p>
@@ -247,6 +293,9 @@ function TrialResults({ trials }: { trials: AdminTrialSummary[] }) {
                   {showDash(trial.judge)}
                 </p>
               </div>
+              <p className="text-sm font-medium text-muted-foreground">
+                {t("admin.trials.manage.results.openDetailHint")}
+              </p>
             </CardContent>
           </Card>
         );
