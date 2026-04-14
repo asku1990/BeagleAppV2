@@ -72,11 +72,6 @@ function buildWhere(query: string): Prisma.TrialResultWhereInput {
         dog: {
           is: {
             name: { contains: query, mode: "insensitive" },
-            registrations: {
-              some: {
-                registrationNo: { contains: query, mode: "insensitive" },
-              },
-            },
           },
         },
       },
