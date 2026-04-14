@@ -1,11 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { adminTrialsQueryKey } from "../query-keys";
+import { adminTrialQueryKey, adminTrialsQueryKey } from "../query-keys";
+import { useAdminTrialQuery } from "../use-admin-trial-query";
 import { useAdminTrialsQuery } from "../use-admin-trials-query";
 
-const { useQueryMock, listAdminTrialsMock } = vi.hoisted(() => ({
-  useQueryMock: vi.fn(),
-  listAdminTrialsMock: vi.fn(),
-}));
+const { useQueryMock, listAdminTrialsMock, getAdminTrialMock } = vi.hoisted(
+  () => ({
+    useQueryMock: vi.fn(),
+    listAdminTrialsMock: vi.fn(),
+    getAdminTrialMock: vi.fn(),
+  }),
+);
 
 vi.mock("@tanstack/react-query", () => ({
   useQuery: useQueryMock,
@@ -14,6 +18,7 @@ vi.mock("@tanstack/react-query", () => ({
 vi.mock("@beagle/api-client", () => ({
   createAdminTrialsApiClient: () => ({
     listAdminTrials: listAdminTrialsMock,
+    getAdminTrial: getAdminTrialMock,
   }),
 }));
 
@@ -21,6 +26,7 @@ describe("useAdminTrialsQuery", () => {
   beforeEach(() => {
     useQueryMock.mockReset();
     listAdminTrialsMock.mockReset();
+    getAdminTrialMock.mockReset();
   });
 
   it("uses the expected query key and options", () => {
@@ -118,5 +124,139 @@ describe("useAdminTrialsQuery", () => {
     await expect(options.queryFn()).rejects.toThrow(
       "Failed to load admin trials.",
     );
+  });
+});
+
+describe("useAdminTrialQuery", () => {
+  beforeEach(() => {
+    useQueryMock.mockReset();
+    getAdminTrialMock.mockReset();
+  });
+
+  it("uses the expected detail query key and options", () => {
+    useQueryMock.mockImplementation((options) => options);
+
+    useAdminTrialQuery({
+      trialId: " trial-1 ",
+    });
+
+    const options = useQueryMock.mock.calls[0]?.[0] as {
+      queryKey: unknown[];
+      staleTime: number;
+      refetchOnWindowFocus: boolean;
+      enabled: boolean;
+    };
+
+    expect(options.queryKey).toEqual(adminTrialQueryKey("trial-1"));
+    expect(options.staleTime).toBe(30_000);
+    expect(options.refetchOnWindowFocus).toBe(true);
+    expect(options.enabled).toBe(true);
+  });
+
+  it("is disabled when trial id is empty", () => {
+    useQueryMock.mockImplementation((options) => options);
+
+    useAdminTrialQuery({
+      trialId: "   ",
+    });
+
+    const options = useQueryMock.mock.calls[0]?.[0] as {
+      enabled: boolean;
+    };
+
+    expect(options.enabled).toBe(false);
+  });
+
+  it("returns detail data when request succeeds", async () => {
+    useQueryMock.mockImplementation((options) => options);
+    getAdminTrialMock.mockResolvedValue({
+      ok: true,
+      data: {
+        trial: {
+          trialId: "trial-1",
+          dogId: "dog-1",
+          dogName: "Rex",
+          registrationNo: "FI123",
+          eventDate: "2026-04-14",
+          eventName: null,
+          eventPlace: "Helsinki",
+          kennelDistrict: null,
+          kennelDistrictNo: null,
+          ke: null,
+          lk: null,
+          pa: null,
+          piste: null,
+          sija: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          tja: null,
+          pin: null,
+          judge: null,
+          legacyFlag: null,
+          sourceKey: "source-1",
+          rawPayloadJson: null,
+          rawPayloadAvailable: false,
+          createdAt: "2026-04-14T10:00:00.000Z",
+          updatedAt: "2026-04-14T10:00:00.000Z",
+        },
+      },
+    });
+
+    useAdminTrialQuery({ trialId: "trial-1" });
+    const options = useQueryMock.mock.calls[0]?.[0] as {
+      queryFn: () => Promise<unknown>;
+    };
+
+    await expect(options.queryFn()).resolves.toEqual({
+      trial: {
+        trialId: "trial-1",
+        dogId: "dog-1",
+        dogName: "Rex",
+        registrationNo: "FI123",
+        eventDate: "2026-04-14",
+        eventName: null,
+        eventPlace: "Helsinki",
+        kennelDistrict: null,
+        kennelDistrictNo: null,
+        ke: null,
+        lk: null,
+        pa: null,
+        piste: null,
+        sija: null,
+        haku: null,
+        hauk: null,
+        yva: null,
+        hlo: null,
+        alo: null,
+        tja: null,
+        pin: null,
+        judge: null,
+        legacyFlag: null,
+        sourceKey: "source-1",
+        rawPayloadJson: null,
+        rawPayloadAvailable: false,
+        createdAt: "2026-04-14T10:00:00.000Z",
+        updatedAt: "2026-04-14T10:00:00.000Z",
+      },
+    });
+  });
+
+  it("throws mapped not found error for detail query", async () => {
+    useQueryMock.mockImplementation((options) => options);
+    getAdminTrialMock.mockResolvedValue({
+      ok: false,
+      error: "Trial not found.",
+      code: "TRIAL_NOT_FOUND",
+    });
+
+    useAdminTrialQuery({ trialId: "trial-1" });
+    const options = useQueryMock.mock.calls[0]?.[0] as {
+      queryFn: () => Promise<unknown>;
+    };
+
+    await expect(options.queryFn()).rejects.toThrow("Trial not found.");
   });
 });

@@ -30,4 +30,24 @@ describe("admin trials api client", () => {
     );
     expect(init?.method).toBe("GET");
   });
+
+  it("builds detail endpoint path via createAdminTrialsApiClient", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, data: { trial: null } }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    const client = createAdminTrialsApiClient({
+      baseUrl: "http://example.test",
+    });
+
+    await client.getAdminTrial({
+      trialId: "trial/1",
+    });
+
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe("http://example.test/api/admin/trials/trial%2F1");
+    expect(init?.method).toBe("GET");
+  });
 });
