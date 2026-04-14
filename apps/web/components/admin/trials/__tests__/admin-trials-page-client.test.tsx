@@ -3,6 +3,12 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { AdminTrialsPageClient } from "../admin-trials-page-client";
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}));
+
 vi.mock("@/hooks/i18n", () => ({
   useI18n: () => ({
     t: (key: string) => key,
@@ -88,6 +94,8 @@ describe("AdminTrialsPageClient", () => {
     expect(html).toContain("admin.trials.manage.columns.pa");
     expect(html).toContain("admin.trials.manage.columns.sija");
     expect(html).toContain("admin.trials.manage.columns.judge");
+    expect(html).toContain("admin.trials.manage.results.openDetailHint");
+    expect(html).toContain("admin.trials.manage.results.openDetailAriaPrefix");
     expect(html).toContain("Rex");
     expect(html).toContain("FI123");
     expect(html).toContain("src-1");
