@@ -5,18 +5,20 @@ import {
   createImportRun,
   createImportRunIssue,
   createImportRunIssuesBulk,
+  countTrialEntryRowsDb,
+  countTrialResultRowsDb,
   fetchLegacyTrialRows,
+  listPhase2DogRegistrationsDb,
   markImportRunFinished,
   markImportRunRunning,
-  prisma,
 } from "@beagle/db";
 import type { ImportRunResponse } from "@beagle/contracts";
 import type { ServiceResult } from "../../core/result";
-import { upsertTrialRows } from "../internal";
+import { upsertCanonicalTrialRows } from "../internal";
 import { formatLegacyImportSummary } from "../runs/phase-summary";
 import { toImportRunResponse } from "../runs/transform";
 
-// Runs the legacy phase2 trials-only import using current trial schema.
+// Runs the legacy phase2 trials-only import into canonical TrialEvent/TrialEntry schema.
 export async function runLegacyPhase2(
   createdByUserId?: string,
   options?: {
@@ -49,6 +51,8 @@ export async function runLegacyPhase2(
   let runId: string | null = null;
   let trialResultsUpserted = 0;
   let errorsCount = 0;
+  let trialResultBaselineCount = 0;
+  let canonicalEntryTotalCount = 0;
   const issueBuffer: Array<{
     stage: string;
     severity?: ImportIssueSeverity;
@@ -98,9 +102,7 @@ export async function runLegacyPhase2(
     finishStage("load");
 
     startStage("index");
-    const registrations = await prisma.dogRegistration.findMany({
-      select: { registrationNo: true, dogId: true },
-    });
+    const registrations = await listPhase2DogRegistrationsDb();
     const dogIdByRegistration = new Map(
       registrations.map((registration) => [
         registration.registrationNo,
@@ -110,15 +112,26 @@ export async function runLegacyPhase2(
     log(`Indexed dogs by registration: ${dogIdByRegistration.size}`);
     finishStage("index");
 
+    startStage("baseline-counts");
+    trialResultBaselineCount = await countTrialResultRowsDb();
+    log(`Baseline TrialResult count=${trialResultBaselineCount}`);
+    finishStage("baseline-counts");
+
     startStage("trials");
-    const trialResult = await upsertTrialRows(trialRows, dogIdByRegistration, {
-      onProgress: (processed, total) => logProgress("trials", processed, total),
-    });
+    const trialResult = await upsertCanonicalTrialRows(
+      trialRows,
+      dogIdByRegistration,
+      {
+        onProgress: (processed, total) =>
+          logProgress("trials", processed, total),
+      },
+    );
     trialResultsUpserted = trialResult.upserted;
     errorsCount += trialResult.errors;
     for (const issue of trialResult.issues) {
       await recordIssue({
         stage: "trials",
+        severity: issue.severity,
         code: issue.code,
         message: issue.message,
         registrationNo: issue.registrationNo,
@@ -127,9 +140,16 @@ export async function runLegacyPhase2(
       });
     }
     log(
-      `Trial results upserted=${trialResultsUpserted}, trial errors=${trialResult.errors}`,
+      `Canonical trial entries upserted=${trialResultsUpserted}, trial errors=${trialResult.errors}`,
     );
     finishStage("trials");
+
+    startStage("compare-counts");
+    canonicalEntryTotalCount = await countTrialEntryRowsDb();
+    log(
+      `Count comparison oldTrialResult=${trialResultBaselineCount}, canonicalTrialEntry=${canonicalEntryTotalCount}`,
+    );
+    finishStage("compare-counts");
 
     await flushIssueBuffer();
 
@@ -147,6 +167,8 @@ export async function runLegacyPhase2(
           kind: "LEGACY_PHASE2",
           trialResultsUpserted,
           errorsCount,
+          oldTrialResultCount: trialResultBaselineCount,
+          canonicalTrialEntryCount: canonicalEntryTotalCount,
         }),
       },
       auditContext,
@@ -194,7 +216,10 @@ export async function runLegacyPhase2(
         trialResultsUpserted,
         showResultsUpserted: 0,
         errorsCount: errorsCount + 1,
-        errorSummary: message,
+        errorSummary:
+          canonicalEntryTotalCount > 0 || trialResultBaselineCount > 0
+            ? `${message} (oldTrialResult=${trialResultBaselineCount}, canonicalTrialEntry=${canonicalEntryTotalCount})`
+            : message,
       },
       auditContext,
     );

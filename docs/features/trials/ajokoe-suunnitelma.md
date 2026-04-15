@@ -9,6 +9,8 @@
 - Upsert-avaimet:
   - event: `sklKoeId`
   - entry: `trialEventId + rekisterinumeroSnapshot`
+- Legacy phase2 fallback (BEJ-80):
+  - `sklKoeId` voi olla `null`, jolloin event upsert käyttää `legacyEventKey`-avainta.
 - `raakadataJson` säilytetään myös tuotannossa audit/debug/replay-käyttöön.
 
 ## Päätetyt linjaukset
@@ -40,7 +42,8 @@
 ### `TrialEvent`
 
 - `id`
-- `sklKoeId` (uniikki)
+- `sklKoeId` (uniikki, voi olla `null` legacy phase2 -backfillissä)
+- `legacyEventKey` (uniikki, deterministinen fallback-avain legacy-riveille)
 - `koepaiva` (`DateTime`, pakollinen)
 - `koekunta` (`String`, pakollinen)
 - `jarjestaja` (`String?`)
@@ -186,6 +189,7 @@ Kommentti:
 
 - `TrialEvent`
   - `UNIQUE (sklKoeId)`
+  - `UNIQUE (legacyEventKey)`
   - `INDEX (koepaiva)`
   - `INDEX (koekunta, koepaiva)`
 - `TrialEntry`

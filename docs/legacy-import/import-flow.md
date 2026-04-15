@@ -79,7 +79,8 @@ Issue tooling:
    grouped by dog via canonical registration resolution.
    Same-value aliases are deduplicated; conflicting alias values create import issues.
 
-3. `phase2` imports trial rows using current trial schema.
+3. `phase2` imports trial rows from `akoeall` into canonical AJOK schema
+   (`TrialEvent` + `TrialEntry`).
 
 4. `phase3` imports show rows into canonical show tables (`ShowEvent`, `ShowEntry`,
    `ShowResultItem`) using merged legacy sources (`nay9599`, `beanay`, optional

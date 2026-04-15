@@ -105,7 +105,8 @@ erDiagram
 - `Dog.ekNo` unique
 - `DogRegistration.registrationNo` unique
 - `TrialResult.sourceKey` unique
-- `TrialEvent.sklKoeId` unique
+- `TrialEvent.sklKoeId` unique (nullable in legacy phase2 fallback)
+- `TrialEvent.legacyEventKey` unique (nullable, used for legacy fallback identity)
 - `TrialEntry.yksilointiAvain` unique
 - `TrialEntry.[trialEventId, rekisterinumeroSnapshot]` unique
 - `TrialLisatietoItem.[trialEntryId, koodi]` unique

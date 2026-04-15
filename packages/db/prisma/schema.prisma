@@ -307,7 +307,8 @@ model TrialResult {
 
 model TrialEvent {
   id               String       @id @default(cuid())
-  sklKoeId         Int          @unique
+  sklKoeId         Int?         @unique
+  legacyEventKey   String?      @unique
   koepaiva         DateTime
   koekunta         String
   jarjestaja       String?

@@ -1,7 +1,7 @@
 import { connectLegacyDatabase } from "../internal";
 import type { LegacyTrialResultRow } from "../types";
 
-// Loads legacy trial rows for phase2 import.
+// Loads legacy akoeall rows for canonical AJOK phase2 mapping.
 export async function fetchLegacyTrialRows(options?: {
   log?: (message: string) => void;
 }): Promise<LegacyTrialResultRow[]> {
