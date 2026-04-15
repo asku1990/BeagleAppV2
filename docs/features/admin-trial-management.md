@@ -47,6 +47,8 @@ AJOK validation-gap panel baseline (`BEJ-77`).
   `docs/features/trials/ajokoe-koirakohtainen-poytakirja.md`.
 - Flow-gate contract source of truth (versioned status table and minimum
   pre-switch requirements) is `docs/features/trials/ajok-flow-gate-contract.md`.
+- During BEJ-79 schema rollout, admin list/detail reads remain on `TrialResult`
+  until BEJ-81 read-path switch.
 
 ## Render rules
 

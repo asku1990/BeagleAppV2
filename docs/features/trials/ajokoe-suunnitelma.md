@@ -23,6 +23,11 @@
 - `rekisterinumeroSnapshot` on pakollinen.
 - Lisätiedot 11-61 tallennetaan rakenteisesti.
 - Koko saapuva payload tallennetaan myös `raakadataJson`-kenttään.
+- Järjestelmätimestampit ovat DB-omisteisia:
+  - `createdAt` asetetaan vain luontihetkellä.
+  - `updatedAt` päivittyy aina DB/Prisma-mekanismin kautta.
+  - Kirjoituskoodit (BEJ-80/84) eivät saa asettaa `createdAt` tai `updatedAt`
+    manuaalisesti create/update payloadiin.
 
 ## Tietomalli
 

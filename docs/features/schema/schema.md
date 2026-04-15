@@ -14,6 +14,7 @@ For show-domain deep details, see:
 - `ImportStatus`: `PENDING`, `RUNNING`, `SUCCEEDED`, `FAILED`
 - `ImportIssueSeverity`: `INFO`, `WARNING`, `ERROR`
 - `ShowSourceTag`: source tagging for legacy/workbook/manual show data
+- `TrialSourceTag`: source tagging for canonical trial entry writes
 - `ShowResultValueType`: `FLAG`, `CODE`, `TEXT`, `NUMERIC`, `DATE`
 - `AuditAction`: `INSERT`, `UPDATE`, `DELETE`
 - `AuditSource`: `WEB`, `SCRIPT`, `SYSTEM`
@@ -31,6 +32,9 @@ erDiagram
   Dog ||--o{ DogOwnership : "ownership history"
   Owner ||--o{ DogOwnership : "owns dogs"
   Dog ||--o{ TrialResult : "trial results"
+  Dog ||--o{ TrialEntry : "canonical trial entries (optional)"
+  TrialEvent ||--o{ TrialEntry : "canonical AJOK entries"
+  TrialEntry ||--o{ TrialLisatietoItem : "canonical AJOK lisatieto rows"
   Dog ||--o{ ShowEntry : "canonical show entries (optional)"
 
   ImportRun ||--o{ ImportRunIssue : "issues"
@@ -65,6 +69,9 @@ erDiagram
 ### Results
 
 - `TrialResult`: canonical trial rows keyed by unique `sourceKey`.
+- `TrialEvent`: canonical AJOK trial event (new schema event level).
+- `TrialEntry`: canonical AJOK trial dog entry (new schema entry level).
+- `TrialLisatietoItem`: canonical AJOK lisatieto rows (koodi 11-61) per trial entry.
 - `ShowEvent`: canonical show event.
 - `ShowEntry`: canonical show participation row; `dogId` nullable.
 - `ShowResultCategory`: UI/admin managed grouping for show definitions.
@@ -82,6 +89,9 @@ erDiagram
 - `BetterAuthUser -> BetterAuthSession/BetterAuthAccount`: `Cascade`
 - `BetterAuthUser -> ImportRun(createdByUser)`: `SetNull`
 - `Dog -> DogRegistration/DogOwnership/TrialResult`: `Cascade`
+- `Dog -> TrialEntry`: `SetNull` (allows trial rows without local dog)
+- `TrialEvent -> TrialEntry`: `Cascade`
+- `TrialEntry -> TrialLisatietoItem`: `Cascade`
 - `Dog -> ShowEntry`: `SetNull` (allows show rows without local dog)
 - `ShowEvent -> ShowEntry`: `Cascade`
 - `ShowEntry -> ShowResultItem`: `Cascade`
@@ -95,6 +105,10 @@ erDiagram
 - `Dog.ekNo` unique
 - `DogRegistration.registrationNo` unique
 - `TrialResult.sourceKey` unique
+- `TrialEvent.sklKoeId` unique
+- `TrialEntry.yksilointiAvain` unique
+- `TrialEntry.[trialEventId, rekisterinumeroSnapshot]` unique
+- `TrialLisatietoItem.[trialEntryId, koodi]` unique
 - `ShowEvent.eventLookupKey` unique
 - `ShowEntry.entryLookupKey` unique
 - `ShowResultItem.itemLookupKey` unique

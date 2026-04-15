@@ -1,4 +1,10 @@
-# AJOK suunnitelma - yksinkertainen nyt
+# AJOK suunnitelma - yksinkertainen nyt (ARCHIVED)
+
+## Status
+
+- Tämä dokumentti on arkistoitu 2026-04-15.
+- Aktiivinen lähde on `docs/features/trials/ajokoe-suunnitelma.md`.
+- Uudet toteutuspäätökset ja muutokset kirjataan vain aktiiviseen dokumenttiin.
 
 Tama on erillinen uusi dokumentti nykyista toteutusta varten.
 Ei oletuksia seuraavista vaiheista.
