@@ -34,6 +34,40 @@ The canonical AJOK entry stores the metric scores as:
 - `TJA` -> `TrialEntry.tieJaEstetyoskentelyPisteet`
 - `PIN` -> `TrialEntry.metsastysintoPisteet`
 
+## Source row mapping (field-by-field)
+
+This is the current phase2 write mapping for legacy `akoeall` rows.
+
+### TrialEvent
+
+| Legacy source field | Canonical target            | Note                                         |
+| ------------------- | --------------------------- | -------------------------------------------- |
+| `TAPPV`             | `TrialEvent.koepaiva`       | Event date                                   |
+| `TAPPA`             | `TrialEvent.koekunta`       | Event place                                  |
+| `KENNELPIIRI`       | `TrialEvent.kennelpiiri`    | Kennel district                              |
+| `KENNELPIIRINRO`    | `TrialEvent.kennelpiirinro` | Kennel district number                       |
+| `TUOM1`             | `TrialEvent.ylituomariNimi` | First non-null judge wins when rows disagree |
+
+### TrialEntry
+
+| Legacy source field | Canonical target                                 | Note                                                        |
+| ------------------- | ------------------------------------------------ | ----------------------------------------------------------- |
+| `REKNO`             | `TrialEntry.rekisterinumeroSnapshot`             | Registration number snapshot                                |
+| `PA`                | `TrialEntry.palkinto`                            | Award / prize                                               |
+| `SIJA`              | `TrialEntry.sijoitus`                            | Placement                                                   |
+| `PISTE`             | `TrialEntry.loppupisteet`                        | Total points                                                |
+| `HAKU`              | `TrialEntry.hakuKeskiarvo`                       | Haku score                                                  |
+| `HAUK`              | `TrialEntry.haukkuKeskiarvo`                     | Haukku score                                                |
+| `YVA`               | `TrialEntry.yleisvaikutelmaPisteet`              | General impression score                                    |
+| `HLO`               | `TrialEntry.hakuloysyysTappioYhteensa`           | Haku löysyys penalty total                                  |
+| `ALO`               | `TrialEntry.ajoloysyysTappioYhteensa`            | Ajo löysyys penalty total                                   |
+| `TJA`               | `TrialEntry.tieJaEstetyoskentelyPisteet`         | Tie- ja estetyöskentely score                               |
+| `PIN`               | `TrialEntry.metsastysintoPisteet`                | Metsästysinto score                                         |
+| `KE`                | `TrialEntry.keli`                                | Weather / conditions                                        |
+| `VARA`              | `TrialEntry.notes`                               | Raw legacy flag kept as note text                           |
+| `VARA`              | `TrialEntry.luopui` / `suljettu` / `keskeytetty` | Parsed from the legacy flag letters                         |
+| full row JSON       | `TrialEntry.raakadataJson`                       | Preserves the original source payload, including `MUOKATTU` |
+
 ## Main writes
 
 - `TrialEvent`
