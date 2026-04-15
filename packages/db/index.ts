@@ -1,4 +1,10 @@
-export { DogSex, ImportKind, ImportStatus, Role } from "@prisma/client";
+export {
+  DogSex,
+  ImportKind,
+  ImportStatus,
+  Role,
+  TrialSourceTag,
+} from "@prisma/client";
 
 export { prisma } from "./core/prisma";
 export {
@@ -24,6 +30,12 @@ export {
 } from "./imports/repository";
 
 export { fetchLegacyTrialRows } from "./imports/phase2";
+export {
+  countTrialEntryRowsDb,
+  listPhase2DogRegistrationsDb,
+  upsertTrialEntryByEventAndRegistrationDb,
+  upsertTrialEventByLegacyKeyDb,
+} from "./imports/phase2";
 export { fetchLegacyShowRows } from "./imports/phase3";
 export { fetchLegacyPhase1Rows } from "./imports/phase1";
 export { fetchLegacyPhase1_5Rows } from "./imports/phase1_5";

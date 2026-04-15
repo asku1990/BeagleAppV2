@@ -25,6 +25,8 @@ type LegacyImportSummaryInput =
       kind: "LEGACY_PHASE2";
       trialResultsUpserted: number;
       errorsCount: number;
+      canonicalTrialEntryCount?: number;
+      warningsCount?: number;
     }
   | {
       kind: "LEGACY_PHASE3";
@@ -61,7 +63,7 @@ export function formatLegacyImportSummary(
     case ImportKind.LEGACY_PHASE1_5:
       return `${phaseLabel}: ${formatMetric("titles", input.titlesInserted)}, ${formatMetric("skippedBlank", input.skippedBlank)}, ${formatMetric("conflicts", input.conflicts)}, ${formatMetric("errors", input.errorsCount)}.`;
     case ImportKind.LEGACY_PHASE2:
-      return `${phaseLabel}: ${formatMetric("trialResults", input.trialResultsUpserted)}, ${formatMetric("errors", input.errorsCount)}.`;
+      return `${phaseLabel}: ${formatMetric("canonicalTrialEntry", input.canonicalTrialEntryCount ?? 0)}, ${formatMetric("warnings", input.warningsCount ?? 0)}, ${formatMetric("errors", input.errorsCount)}.`;
     case ImportKind.LEGACY_PHASE3:
       return `${phaseLabel}: ${formatMetric("showResults", input.showResultsUpserted)}, ${formatMetric("errors", input.errorsCount)}.`;
   }

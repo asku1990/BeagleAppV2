@@ -1,10 +1,16 @@
+-- NOTE: In this repository's current workflow, legacy-import schema is developed
+-- against fresh bootstrap databases in `develop`. Editing this migration in-place
+-- is intentional for that flow; forward-only follow-up migrations are only needed
+-- once this migration is treated as immutable in shared deployed environments.
+
 -- CreateEnum
 CREATE TYPE "TrialSourceTag" AS ENUM ('LEGACY_AKOEALL', 'KOIRATIETOKANTA_API');
 
 -- CreateTable
 CREATE TABLE "TrialEvent" (
     "id" TEXT NOT NULL,
-    "sklKoeId" INTEGER NOT NULL,
+    "sklKoeId" INTEGER,
+    "legacyEventKey" TEXT,
     "koepaiva" TIMESTAMP(3) NOT NULL,
     "koekunta" TEXT NOT NULL,
     "jarjestaja" TEXT,
@@ -46,9 +52,12 @@ CREATE TABLE "TrialEntry" (
     "ajoMin4" INTEGER,
     "hakuKeskiarvo" DECIMAL(6,2),
     "haukkuKeskiarvo" DECIMAL(6,2),
+    "yleisvaikutelmaPisteet" DECIMAL(6,2),
     "ajotaitoKeskiarvo" DECIMAL(6,2),
     "hakuloysyysTappioYhteensa" DECIMAL(6,2),
     "ajoloysyysTappioYhteensa" DECIMAL(6,2),
+    "tieJaEstetyoskentelyPisteet" DECIMAL(6,2),
+    "metsastysintoPisteet" DECIMAL(6,2),
     "keli" TEXT,
     "luopui" BOOLEAN,
     "suljettu" BOOLEAN,
@@ -80,6 +89,7 @@ CREATE TABLE "TrialLisatietoItem" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "TrialEvent_sklKoeId_key" ON "TrialEvent"("sklKoeId");
+CREATE UNIQUE INDEX "TrialEvent_legacyEventKey_key" ON "TrialEvent"("legacyEventKey");
 
 -- CreateIndex
 CREATE INDEX "TrialEvent_koepaiva_idx" ON "TrialEvent"("koepaiva");
@@ -123,6 +133,7 @@ ALTER TABLE "TrialLisatietoItem" ADD CONSTRAINT "TrialLisatietoItem_trialEntryId
 -- Table/column comments for AJOK canonical trial schema
 COMMENT ON TABLE "TrialEvent" IS 'AJOK-kokeen tapahtumatason kanoninen rivi.';
 COMMENT ON COLUMN "TrialEvent"."sklKoeId" IS 'SKL:n tapahtuma-avain (uniikki).';
+COMMENT ON COLUMN "TrialEvent"."legacyEventKey" IS 'Legacy fallback-avain kun SKL-id puuttuu.';
 COMMENT ON COLUMN "TrialEvent"."koepaiva" IS 'Kokeen paivamaara.';
 COMMENT ON COLUMN "TrialEvent"."koekunta" IS 'Kokeen paikkakunta.';
 COMMENT ON COLUMN "TrialEvent"."ylituomariNimi" IS 'Ylituomarin nimi tapahtumatasolla.';
@@ -133,6 +144,9 @@ COMMENT ON COLUMN "TrialEntry"."rekisterinumeroSnapshot" IS 'Koiran rekisterinum
 COMMENT ON COLUMN "TrialEntry"."yksilointiAvain" IS 'Tekninen yksilointiavain import/upsert-ajoon.';
 COMMENT ON COLUMN "TrialEntry"."lahde" IS 'Lahdetunniste (legacy/API).';
 COMMENT ON COLUMN "TrialEntry"."raakadataJson" IS 'Koko alkuperainen payload audit/debug/replay-kayttoon.';
+COMMENT ON COLUMN "TrialEntry"."yleisvaikutelmaPisteet" IS 'AJOK yleisvaikutelma (legacy YVA).';
+COMMENT ON COLUMN "TrialEntry"."tieJaEstetyoskentelyPisteet" IS 'AJOK tie- ja estetyoskentely (legacy TJA).';
+COMMENT ON COLUMN "TrialEntry"."metsastysintoPisteet" IS 'AJOK metsastysinto (legacy PIN).';
 
 COMMENT ON TABLE "TrialLisatietoItem" IS 'AJOK-lisatieto (koodi 11-61) koirakohtaiselle trial entrylle.';
 COMMENT ON COLUMN "TrialLisatietoItem"."koodi" IS 'Lisatietokoodi (esim. 11, 42, 61).';

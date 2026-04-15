@@ -5,18 +5,20 @@ import {
   createImportRun,
   createImportRunIssue,
   createImportRunIssuesBulk,
+  countTrialEntryRowsDb,
   fetchLegacyTrialRows,
+  listPhase2DogRegistrationsDb,
   markImportRunFinished,
   markImportRunRunning,
-  prisma,
 } from "@beagle/db";
 import type { ImportRunResponse } from "@beagle/contracts";
 import type { ServiceResult } from "../../core/result";
-import { upsertTrialRows } from "../internal";
+import { upsertCanonicalTrialRows } from "../internal";
 import { formatLegacyImportSummary } from "../runs/phase-summary";
 import { toImportRunResponse } from "../runs/transform";
 
-// Runs the legacy phase2 trials-only import using current trial schema.
+// Orchestrates the one-shot legacy phase2 bootstrap for canonical AJOK trials.
+// Stage boundaries, issue buffering, and summary counters live here; writes stay in helpers.
 export async function runLegacyPhase2(
   createdByUserId?: string,
   options?: {
@@ -47,8 +49,10 @@ export async function runLegacyPhase2(
     log(`[stage:${name}] progress ${processed}/${total} (${percent}%)`);
   };
   let runId: string | null = null;
-  let trialResultsUpserted = 0;
+  let canonicalEntriesUpserted = 0;
   let errorsCount = 0;
+  let warningsCount = 0;
+  let canonicalEntryTotalCount = 0;
   const issueBuffer: Array<{
     stage: string;
     severity?: ImportIssueSeverity;
@@ -98,9 +102,7 @@ export async function runLegacyPhase2(
     finishStage("load");
 
     startStage("index");
-    const registrations = await prisma.dogRegistration.findMany({
-      select: { registrationNo: true, dogId: true },
-    });
+    const registrations = await listPhase2DogRegistrationsDb();
     const dogIdByRegistration = new Map(
       registrations.map((registration) => [
         registration.registrationNo,
@@ -111,14 +113,23 @@ export async function runLegacyPhase2(
     finishStage("index");
 
     startStage("trials");
-    const trialResult = await upsertTrialRows(trialRows, dogIdByRegistration, {
-      onProgress: (processed, total) => logProgress("trials", processed, total),
-    });
-    trialResultsUpserted = trialResult.upserted;
+    const trialResult = await upsertCanonicalTrialRows(
+      trialRows,
+      dogIdByRegistration,
+      {
+        onProgress: (processed, total) =>
+          logProgress("trials", processed, total),
+      },
+    );
+    canonicalEntriesUpserted = trialResult.upserted;
     errorsCount += trialResult.errors;
+    warningsCount += trialResult.issues.filter(
+      (issue) => issue.severity === "WARNING",
+    ).length;
     for (const issue of trialResult.issues) {
       await recordIssue({
         stage: "trials",
+        severity: issue.severity,
         code: issue.code,
         message: issue.message,
         registrationNo: issue.registrationNo,
@@ -127,9 +138,12 @@ export async function runLegacyPhase2(
       });
     }
     log(
-      `Trial results upserted=${trialResultsUpserted}, trial errors=${trialResult.errors}`,
+      `Canonical trial entries upserted=${canonicalEntriesUpserted}, trial warnings=${warningsCount}, trial errors=${trialResult.errors}`,
     );
     finishStage("trials");
+
+    canonicalEntryTotalCount = await countTrialEntryRowsDb();
+    log(`Canonical TrialEntry count=${canonicalEntryTotalCount}`);
 
     await flushIssueBuffer();
 
@@ -140,13 +154,15 @@ export async function runLegacyPhase2(
         dogsUpserted: 0,
         ownersUpserted: 0,
         ownershipsUpserted: 0,
-        trialResultsUpserted,
+        trialResultsUpserted: canonicalEntriesUpserted,
         showResultsUpserted: 0,
         errorsCount,
         errorSummary: formatLegacyImportSummary({
           kind: "LEGACY_PHASE2",
-          trialResultsUpserted,
+          trialResultsUpserted: canonicalEntriesUpserted,
           errorsCount,
+          canonicalTrialEntryCount: canonicalEntryTotalCount,
+          warningsCount,
         }),
       },
       auditContext,
@@ -191,10 +207,13 @@ export async function runLegacyPhase2(
         dogsUpserted: 0,
         ownersUpserted: 0,
         ownershipsUpserted: 0,
-        trialResultsUpserted,
+        trialResultsUpserted: canonicalEntriesUpserted,
         showResultsUpserted: 0,
         errorsCount: errorsCount + 1,
-        errorSummary: message,
+        errorSummary:
+          canonicalEntryTotalCount > 0
+            ? `${message} (canonicalTrialEntry=${canonicalEntryTotalCount})`
+            : message,
       },
       auditContext,
     );

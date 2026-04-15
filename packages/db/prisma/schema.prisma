@@ -307,7 +307,8 @@ model TrialResult {
 
 model TrialEvent {
   id               String       @id @default(cuid())
-  sklKoeId         Int          @unique
+  sklKoeId         Int?         @unique
+  legacyEventKey   String?      @unique
   koepaiva         DateTime
   koekunta         String
   jarjestaja       String?
@@ -350,9 +351,12 @@ model TrialEntry {
   ajoMin4                   Int?
   hakuKeskiarvo             Decimal?       @db.Decimal(6, 2)
   haukkuKeskiarvo           Decimal?       @db.Decimal(6, 2)
+  yleisvaikutelmaPisteet    Decimal?       @db.Decimal(6, 2)
   ajotaitoKeskiarvo         Decimal?       @db.Decimal(6, 2)
   hakuloysyysTappioYhteensa Decimal?       @db.Decimal(6, 2)
   ajoloysyysTappioYhteensa  Decimal?       @db.Decimal(6, 2)
+  tieJaEstetyoskentelyPisteet Decimal?      @db.Decimal(6, 2)
+  metsastysintoPisteet      Decimal?       @db.Decimal(6, 2)
   keli                      String?
   luopui                    Boolean?
   suljettu                  Boolean?

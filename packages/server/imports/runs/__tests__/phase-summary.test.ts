@@ -40,12 +40,17 @@ describe("formatLegacyImportSummary", () => {
       kind: "LEGACY_PHASE2",
       trialResultsUpserted: 9,
       errorsCount: 0,
+      canonicalTrialEntryCount: 9,
+      warningsCount: 4,
     });
 
-    expect(summary).toBe("Phase 2: trialResults=9, errors=0.");
+    expect(summary).toBe(
+      "Phase 2: canonicalTrialEntry=9, warnings=4, errors=0.",
+    );
     expect(summary).not.toContain("dogs=");
     expect(summary).not.toContain("owners=");
     expect(summary).not.toContain("titles=");
+    expect(summary).not.toContain("trialResults=");
     expect(summary).not.toContain("showResults=");
   });
 
