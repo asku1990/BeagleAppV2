@@ -69,8 +69,11 @@ describe("upsertTrialEventByLegacyKeyDb", () => {
       loppupisteet: null,
       hakuKeskiarvo: null,
       haukkuKeskiarvo: null,
+      yleisvaikutelmaPisteet: null,
       hakuloysyysTappioYhteensa: null,
       ajoloysyysTappioYhteensa: null,
+      tieJaEstetyoskentelyPisteet: null,
+      metsastysintoPisteet: null,
       keli: null,
       luopui: null,
       suljettu: null,
@@ -80,5 +83,10 @@ describe("upsertTrialEventByLegacyKeyDb", () => {
 
     const call = prismaMock.trialEntry.upsert.mock.calls[0]?.[0];
     expect(call.update).not.toHaveProperty("dogId");
+    expect(call.create).toMatchObject({
+      yleisvaikutelmaPisteet: null,
+      tieJaEstetyoskentelyPisteet: null,
+      metsastysintoPisteet: null,
+    });
   });
 });

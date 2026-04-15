@@ -52,9 +52,12 @@ CREATE TABLE "TrialEntry" (
     "ajoMin4" INTEGER,
     "hakuKeskiarvo" DECIMAL(6,2),
     "haukkuKeskiarvo" DECIMAL(6,2),
+    "yleisvaikutelmaPisteet" DECIMAL(6,2),
     "ajotaitoKeskiarvo" DECIMAL(6,2),
     "hakuloysyysTappioYhteensa" DECIMAL(6,2),
     "ajoloysyysTappioYhteensa" DECIMAL(6,2),
+    "tieJaEstetyoskentelyPisteet" DECIMAL(6,2),
+    "metsastysintoPisteet" DECIMAL(6,2),
     "keli" TEXT,
     "luopui" BOOLEAN,
     "suljettu" BOOLEAN,
@@ -141,6 +144,9 @@ COMMENT ON COLUMN "TrialEntry"."rekisterinumeroSnapshot" IS 'Koiran rekisterinum
 COMMENT ON COLUMN "TrialEntry"."yksilointiAvain" IS 'Tekninen yksilointiavain import/upsert-ajoon.';
 COMMENT ON COLUMN "TrialEntry"."lahde" IS 'Lahdetunniste (legacy/API).';
 COMMENT ON COLUMN "TrialEntry"."raakadataJson" IS 'Koko alkuperainen payload audit/debug/replay-kayttoon.';
+COMMENT ON COLUMN "TrialEntry"."yleisvaikutelmaPisteet" IS 'AJOK yleisvaikutelma (legacy YVA).';
+COMMENT ON COLUMN "TrialEntry"."tieJaEstetyoskentelyPisteet" IS 'AJOK tie- ja estetyoskentely (legacy TJA).';
+COMMENT ON COLUMN "TrialEntry"."metsastysintoPisteet" IS 'AJOK metsastysinto (legacy PIN).';
 
 COMMENT ON TABLE "TrialLisatietoItem" IS 'AJOK-lisatieto (koodi 11-61) koirakohtaiselle trial entrylle.';
 COMMENT ON COLUMN "TrialLisatietoItem"."koodi" IS 'Lisatietokoodi (esim. 11, 42, 61).';

@@ -28,6 +28,12 @@ Phase 2 imports trial rows from `akoeall` into canonical AJOK tables.
   - trial metric fields (`HAKU`, `HAUK`, `YVA`, `HLO`, `ALO`, `TJA`, `PIN`)
   - judge and legacy flag (`TUOM1`, `VARA`)
 
+The canonical AJOK entry stores the metric scores as:
+
+- `YVA` -> `TrialEntry.yleisvaikutelmaPisteet`
+- `TJA` -> `TrialEntry.tieJaEstetyoskentelyPisteet`
+- `PIN` -> `TrialEntry.metsastysintoPisteet`
+
 ## Main writes
 
 - `TrialEvent`
@@ -56,7 +62,6 @@ Dog linkage is resolved through `DogRegistration` (`registrationNo -> dogId`).
 - `TRIAL_CANONICAL_MISSING_REQUIRED_FIELDS`
 - `TRIAL_CANONICAL_DOG_NOT_FOUND`
 - `TRIAL_CANONICAL_JUDGE_CONFLICT`
-- `TRIAL_CANONICAL_UNMAPPED_FIELDS`
 - run-level fallback: `UNEXPECTED_EXCEPTION`
 
 Issue rows are written to `ImportRunIssue` with `kind=LEGACY_PHASE2`.

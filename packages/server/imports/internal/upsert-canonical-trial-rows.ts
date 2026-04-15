@@ -206,34 +206,17 @@ export async function upsertCanonicalTrialRows(
       loppupisteet: parseLegacyScore(row.piste),
       hakuKeskiarvo: parseLegacyScore(row.haku),
       haukkuKeskiarvo: parseLegacyScore(row.hauk),
+      yleisvaikutelmaPisteet: parseLegacyScore(row.yva),
       hakuloysyysTappioYhteensa: parseLegacyScore(row.hlo),
       ajoloysyysTappioYhteensa: parseLegacyScore(row.alo),
+      tieJaEstetyoskentelyPisteet: parseLegacyScore(row.tja),
+      metsastysintoPisteet: parseLegacyScore(row.pin),
       keli: normalizeNullable(row.ke),
       luopui: flags.luopui,
       suljettu: flags.suljettu,
       keskeytetty: flags.keskeytetty,
       notes: normalizeNullable(row.legacyFlag),
     });
-
-    if (
-      normalizeNullable(String(row.yva ?? "")) ||
-      normalizeNullable(String(row.tja ?? "")) ||
-      normalizeNullable(String(row.pin ?? ""))
-    ) {
-      issues.push({
-        severity: "INFO",
-        code: "TRIAL_CANONICAL_UNMAPPED_FIELDS",
-        message:
-          "Some legacy trial metrics are not yet mapped to canonical entry fields (YVA/TJA/PIN).",
-        registrationNo,
-        sourceTable,
-        payloadJson: JSON.stringify({
-          yva: row.yva,
-          tja: row.tja,
-          pin: row.pin,
-        }),
-      });
-    }
 
     upserted += 1;
 

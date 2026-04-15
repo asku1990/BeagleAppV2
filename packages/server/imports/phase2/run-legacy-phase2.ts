@@ -51,6 +51,7 @@ export async function runLegacyPhase2(
   let runId: string | null = null;
   let canonicalEntriesUpserted = 0;
   let errorsCount = 0;
+  let warningsCount = 0;
   let canonicalEntryTotalCount = 0;
   const issueBuffer: Array<{
     stage: string;
@@ -122,6 +123,9 @@ export async function runLegacyPhase2(
     );
     canonicalEntriesUpserted = trialResult.upserted;
     errorsCount += trialResult.errors;
+    warningsCount += trialResult.issues.filter(
+      (issue) => issue.severity === "WARNING",
+    ).length;
     for (const issue of trialResult.issues) {
       await recordIssue({
         stage: "trials",
@@ -134,7 +138,7 @@ export async function runLegacyPhase2(
       });
     }
     log(
-      `Canonical trial entries upserted=${canonicalEntriesUpserted}, trial errors=${trialResult.errors}`,
+      `Canonical trial entries upserted=${canonicalEntriesUpserted}, trial warnings=${warningsCount}, trial errors=${trialResult.errors}`,
     );
     finishStage("trials");
 
@@ -158,6 +162,7 @@ export async function runLegacyPhase2(
           trialResultsUpserted: canonicalEntriesUpserted,
           errorsCount,
           canonicalTrialEntryCount: canonicalEntryTotalCount,
+          warningsCount,
         }),
       },
       auditContext,

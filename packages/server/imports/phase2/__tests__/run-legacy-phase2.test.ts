@@ -107,11 +107,11 @@ describe("runLegacyPhase2", () => {
       issues: [
         {
           severity: "INFO",
-          code: "TRIAL_CANONICAL_UNMAPPED_FIELDS",
-          message: "some fields are not mapped",
+          code: "TRIAL_CANONICAL_NOTE",
+          message: "some informational note",
           registrationNo: "FI-1/24",
           sourceTable: "akoeall",
-          payloadJson: '{"yva":"7.0"}',
+          payloadJson: '{"registrationNo":"FI-1/24"}',
         },
       ],
     });
@@ -125,7 +125,7 @@ describe("runLegacyPhase2", () => {
         expect.objectContaining({
           stage: "trials",
           severity: "INFO",
-          code: "TRIAL_CANONICAL_UNMAPPED_FIELDS",
+          code: "TRIAL_CANONICAL_NOTE",
         }),
       ]),
       expect.any(Object),

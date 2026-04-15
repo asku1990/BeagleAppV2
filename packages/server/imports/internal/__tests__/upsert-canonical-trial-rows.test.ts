@@ -104,16 +104,12 @@ describe("upsertCanonicalTrialRows", () => {
         rekisterinumeroSnapshot: "FI-1/24",
         dogId: "dog-1",
         luopui: true,
+        yleisvaikutelmaPisteet: 7,
+        tieJaEstetyoskentelyPisteet: 5,
+        metsastysintoPisteet: 6,
       }),
     );
-    expect(result.issues).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          code: "TRIAL_CANONICAL_UNMAPPED_FIELDS",
-          severity: "INFO",
-        }),
-      ]),
-    );
+    expect(result.issues).toEqual([]);
   });
 
   it("records a warning when the dog registration is not found", async () => {

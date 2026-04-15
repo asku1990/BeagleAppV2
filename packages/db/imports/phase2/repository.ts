@@ -23,8 +23,11 @@ type TrialEntryUpsertInput = {
   loppupisteet: number | null;
   hakuKeskiarvo: number | null;
   haukkuKeskiarvo: number | null;
+  yleisvaikutelmaPisteet: number | null;
   hakuloysyysTappioYhteensa: number | null;
   ajoloysyysTappioYhteensa: number | null;
+  tieJaEstetyoskentelyPisteet: number | null;
+  metsastysintoPisteet: number | null;
   keli: string | null;
   luopui: boolean | null;
   suljettu: boolean | null;
@@ -113,9 +116,12 @@ export async function upsertTrialEntryByEventAndRegistrationDb(
       ajoMin4: null,
       hakuKeskiarvo: input.hakuKeskiarvo,
       haukkuKeskiarvo: input.haukkuKeskiarvo,
+      yleisvaikutelmaPisteet: input.yleisvaikutelmaPisteet,
       ajotaitoKeskiarvo: null,
       hakuloysyysTappioYhteensa: input.hakuloysyysTappioYhteensa,
       ajoloysyysTappioYhteensa: input.ajoloysyysTappioYhteensa,
+      tieJaEstetyoskentelyPisteet: input.tieJaEstetyoskentelyPisteet,
+      metsastysintoPisteet: input.metsastysintoPisteet,
       keli: input.keli,
       luopui: input.luopui,
       suljettu: input.suljettu,
@@ -132,8 +138,11 @@ export async function upsertTrialEntryByEventAndRegistrationDb(
       loppupisteet: input.loppupisteet,
       hakuKeskiarvo: input.hakuKeskiarvo,
       haukkuKeskiarvo: input.haukkuKeskiarvo,
+      yleisvaikutelmaPisteet: input.yleisvaikutelmaPisteet,
       hakuloysyysTappioYhteensa: input.hakuloysyysTappioYhteensa,
       ajoloysyysTappioYhteensa: input.ajoloysyysTappioYhteensa,
+      tieJaEstetyoskentelyPisteet: input.tieJaEstetyoskentelyPisteet,
+      metsastysintoPisteet: input.metsastysintoPisteet,
       keli: input.keli,
       luopui: input.luopui,
       suljettu: input.suljettu,
