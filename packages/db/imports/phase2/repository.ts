@@ -125,7 +125,6 @@ export async function upsertTrialEntryByEventAndRegistrationDb(
       notes: input.notes,
     },
     update: {
-      dogId: input.dogId,
       yksilointiAvain: input.yksilointiAvain,
       lahde: TrialSourceTag.LEGACY_AKOEALL,
       raakadataJson: input.raakadataJson,
@@ -141,6 +140,7 @@ export async function upsertTrialEntryByEventAndRegistrationDb(
       suljettu: input.suljettu,
       keskeytetty: input.keskeytetty,
       notes: input.notes,
+      ...(input.dogId !== null ? { dogId: input.dogId } : {}),
     },
   });
 }

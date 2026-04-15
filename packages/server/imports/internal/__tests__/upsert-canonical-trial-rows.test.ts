@@ -114,6 +114,185 @@ describe("upsertCanonicalTrialRows", () => {
     );
   });
 
+  it("records a warning when the dog registration is not found", async () => {
+    const result = await upsertCanonicalTrialRows(
+      [
+        {
+          registrationNo: "FI-1/24",
+          eventPlace: "Oulu",
+          eventDateRaw: "20240101",
+          kennelDistrict: null,
+          kennelDistrictNo: null,
+          ke: null,
+          lk: null,
+          pa: null,
+          piste: null,
+          sija: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          tja: null,
+          pin: null,
+          judge: null,
+          legacyFlag: null,
+        },
+      ],
+      new Map(),
+    );
+
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "TRIAL_CANONICAL_DOG_NOT_FOUND",
+          severity: "WARNING",
+        }),
+      ]),
+    );
+    expect(upsertTrialEntryMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        dogId: null,
+      }),
+    );
+  });
+
+  it("keeps the first non-null judge and ignores later nulls", async () => {
+    await upsertCanonicalTrialRows(
+      [
+        {
+          registrationNo: "FI-1/24",
+          eventPlace: "Oulu",
+          eventDateRaw: "20240101",
+          kennelDistrict: null,
+          kennelDistrictNo: null,
+          ke: null,
+          lk: null,
+          pa: null,
+          piste: null,
+          sija: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          tja: null,
+          pin: null,
+          judge: "Judge One",
+          legacyFlag: null,
+        },
+        {
+          registrationNo: "FI-2/24",
+          eventPlace: "Oulu",
+          eventDateRaw: "20240101",
+          kennelDistrict: null,
+          kennelDistrictNo: null,
+          ke: null,
+          lk: null,
+          pa: null,
+          piste: null,
+          sija: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          tja: null,
+          pin: null,
+          judge: null,
+          legacyFlag: null,
+        },
+      ],
+      new Map([
+        ["FI-1/24", "dog-1"],
+        ["FI-2/24", "dog-2"],
+      ]),
+    );
+
+    expect(upsertTrialEventMock).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        ylituomariNimi: "Judge One",
+      }),
+    );
+    expect(upsertTrialEventMock).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        ylituomariNimi: "Judge One",
+      }),
+    );
+    expect(upsertTrialEntryMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("records a conflict when two non-null judges disagree", async () => {
+    const result = await upsertCanonicalTrialRows(
+      [
+        {
+          registrationNo: "FI-1/24",
+          eventPlace: "Oulu",
+          eventDateRaw: "20240101",
+          kennelDistrict: null,
+          kennelDistrictNo: null,
+          ke: null,
+          lk: null,
+          pa: null,
+          piste: null,
+          sija: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          tja: null,
+          pin: null,
+          judge: "Judge One",
+          legacyFlag: null,
+        },
+        {
+          registrationNo: "FI-2/24",
+          eventPlace: "Oulu",
+          eventDateRaw: "20240101",
+          kennelDistrict: null,
+          kennelDistrictNo: null,
+          ke: null,
+          lk: null,
+          pa: null,
+          piste: null,
+          sija: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          tja: null,
+          pin: null,
+          judge: "Judge Two",
+          legacyFlag: null,
+        },
+      ],
+      new Map([
+        ["FI-1/24", "dog-1"],
+        ["FI-2/24", "dog-2"],
+      ]),
+    );
+
+    expect(result.errors).toBe(1);
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "TRIAL_CANONICAL_JUDGE_CONFLICT",
+          severity: "WARNING",
+        }),
+      ]),
+    );
+    expect(upsertTrialEventMock).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        ylituomariNimi: "Judge One",
+      }),
+    );
+  });
+
   it("maps combined legacy flags using contains semantics", async () => {
     await upsertCanonicalTrialRows(
       [
@@ -147,6 +326,44 @@ describe("upsertCanonicalTrialRows", () => {
         luopui: true,
         suljettu: true,
         keskeytetty: false,
+      }),
+    );
+  });
+
+  it("treats NUL legacy flags as unset", async () => {
+    await upsertCanonicalTrialRows(
+      [
+        {
+          registrationNo: "FI-1/24",
+          eventPlace: "Oulu",
+          eventDateRaw: "20240101",
+          kennelDistrict: null,
+          kennelDistrictNo: null,
+          ke: null,
+          lk: null,
+          pa: null,
+          piste: null,
+          sija: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          tja: null,
+          pin: null,
+          judge: null,
+          legacyFlag: "NUL",
+        },
+      ],
+      new Map([["FI-1/24", "dog-1"]]),
+    );
+
+    expect(upsertTrialEntryMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        luopui: null,
+        suljettu: null,
+        keskeytetty: null,
+        notes: "NUL",
       }),
     );
   });

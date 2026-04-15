@@ -18,7 +18,10 @@ vi.mock("../../../core/prisma", () => ({
   prisma: prismaMock,
 }));
 
-import { upsertTrialEventByLegacyKeyDb } from "../repository";
+import {
+  upsertTrialEntryByEventAndRegistrationDb,
+  upsertTrialEventByLegacyKeyDb,
+} from "../repository";
 
 describe("upsertTrialEventByLegacyKeyDb", () => {
   beforeEach(() => {
@@ -52,5 +55,30 @@ describe("upsertTrialEventByLegacyKeyDb", () => {
 
     const call = trialEventUpsertMock.mock.calls[0]?.[0];
     expect(call.update.ylituomariNimi).toBe("Matti Meikalainen");
+  });
+
+  it("does not clear an existing dog link when the lookup is missing", async () => {
+    await upsertTrialEntryByEventAndRegistrationDb({
+      trialEventId: "event-1",
+      dogId: null,
+      rekisterinumeroSnapshot: "FI-1/24",
+      yksilointiAvain: "event-1|FI-1/24",
+      raakadataJson: "{}",
+      palkinto: null,
+      sijoitus: null,
+      loppupisteet: null,
+      hakuKeskiarvo: null,
+      haukkuKeskiarvo: null,
+      hakuloysyysTappioYhteensa: null,
+      ajoloysyysTappioYhteensa: null,
+      keli: null,
+      luopui: null,
+      suljettu: null,
+      keskeytetty: null,
+      notes: null,
+    });
+
+    const call = prismaMock.trialEntry.upsert.mock.calls[0]?.[0];
+    expect(call.update).not.toHaveProperty("dogId");
   });
 });

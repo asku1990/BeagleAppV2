@@ -31,7 +31,11 @@ function parseLegacyFlags(flag: string | null): {
   keskeytetty: boolean | null;
 } {
   const normalized = normalizeNullable(flag)?.toUpperCase();
-  if (!normalized) {
+  if (!normalized || normalized === "NUL" || normalized === "NULL") {
+    return { luopui: null, suljettu: null, keskeytetty: null };
+  }
+
+  if (!/[LSK]/.test(normalized)) {
     return { luopui: null, suljettu: null, keskeytetty: null };
   }
 
@@ -71,6 +75,7 @@ export async function upsertCanonicalTrialRows(
   let upserted = 0;
   let errors = 0;
   const issues: CanonicalTrialUpsertIssue[] = [];
+  const judgeByEventKey = new Map<string, string>();
 
   for (const row of rows) {
     processed += 1;
@@ -129,6 +134,34 @@ export async function upsertCanonicalTrialRows(
     });
     const flags = parseLegacyFlags(row.legacyFlag);
     const payloadJson = JSON.stringify(row);
+    const incomingJudge = normalizeNullable(row.judge);
+    const existingJudge = judgeByEventKey.get(legacyEventKey) ?? null;
+    let judgeForEvent: string | null = incomingJudge;
+
+    if (existingJudge) {
+      if (incomingJudge && incomingJudge !== existingJudge) {
+        errors += 1;
+        issues.push({
+          severity: "WARNING",
+          code: "TRIAL_CANONICAL_JUDGE_CONFLICT",
+          message:
+            "Canonical trial row has a different judge than the one already recorded for this event; the first non-null judge is kept.",
+          registrationNo,
+          sourceTable,
+          payloadJson: JSON.stringify({
+            legacyEventKey,
+            existingJudge,
+            incomingJudge,
+            registrationNo: row.registrationNo,
+            eventPlace: row.eventPlace,
+            eventDateRaw: row.eventDateRaw,
+          }),
+        });
+      }
+      judgeForEvent = existingJudge;
+    } else if (incomingJudge) {
+      judgeByEventKey.set(legacyEventKey, incomingJudge);
+    }
 
     const trialEvent = await upsertTrialEventByLegacyKeyDb({
       legacyEventKey,
@@ -136,13 +169,29 @@ export async function upsertCanonicalTrialRows(
       koekunta,
       kennelpiiri,
       kennelpiirinro,
-      ylituomariNimi: normalizeNullable(row.judge),
+      ylituomariNimi: judgeForEvent,
     });
 
     const yksilointiAvain = `${legacyEventKey}|${registrationNo}`;
+    const dogId = dogIdByRegistration.get(registrationNo) ?? null;
+    if (!dogId) {
+      issues.push({
+        severity: "WARNING",
+        code: "TRIAL_CANONICAL_DOG_NOT_FOUND",
+        message:
+          "Canonical trial row imported without a dog link because no matching registration was found in DogRegistration.",
+        registrationNo,
+        sourceTable,
+        payloadJson: JSON.stringify({
+          registrationNo: row.registrationNo,
+          eventPlace: row.eventPlace,
+          eventDateRaw: row.eventDateRaw,
+        }),
+      });
+    }
     await upsertTrialEntryByEventAndRegistrationDb({
       trialEventId: trialEvent.id,
-      dogId: dogIdByRegistration.get(registrationNo) ?? null,
+      dogId,
       rekisterinumeroSnapshot: registrationNo,
       yksilointiAvain,
       raakadataJson: payloadJson,

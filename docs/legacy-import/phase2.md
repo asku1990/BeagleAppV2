@@ -53,6 +53,8 @@ Dog linkage is resolved through `DogRegistration` (`registrationNo -> dogId`).
 
 - `TRIAL_CANONICAL_REGISTRATION_INVALID_FORMAT`
 - `TRIAL_CANONICAL_MISSING_REQUIRED_FIELDS`
+- `TRIAL_CANONICAL_DOG_NOT_FOUND`
+- `TRIAL_CANONICAL_JUDGE_CONFLICT`
 - `TRIAL_CANONICAL_UNMAPPED_FIELDS`
 - run-level fallback: `UNEXPECTED_EXCEPTION`
 
@@ -61,6 +63,10 @@ Issue rows are written to `ImportRunIssue` with `kind=LEGACY_PHASE2`.
 ## Error handling detail
 
 - Row-level validation issues are recorded and import continues.
+- If a registration cannot be resolved to a local dog, phase2 keeps the trial
+  row with `dogId = null` and records `TRIAL_CANONICAL_DOG_NOT_FOUND`.
+- If the same event row yields multiple non-null judges, phase2 keeps the first
+  judge value and records `TRIAL_CANONICAL_JUDGE_CONFLICT`.
 - Run finishes `SUCCEEDED` with warnings when row issues exist.
 - Unexpected exceptions mark run as `FAILED` with `UNEXPECTED_EXCEPTION`.
 
