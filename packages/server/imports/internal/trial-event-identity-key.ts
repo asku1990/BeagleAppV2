@@ -1,5 +1,7 @@
 import { toEventSourceDatePart } from "./date-key";
 
+// Builds the fallback legacy event identity used by the phase2 canonical import.
+// This keeps event grouping deterministic when SKL identifiers are unavailable.
 function normalizePart(value: string | null | undefined): string {
   return (value ?? "")
     .trim()

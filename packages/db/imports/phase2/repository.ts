@@ -1,8 +1,8 @@
 import { TrialSourceTag } from "@prisma/client";
 import { prisma } from "../../core/prisma";
 
-// Persistence helpers for legacy phase2 canonical trial import writes/metrics.
-// Keeps Prisma access in @beagle/db while server layer orchestrates flow and mapping.
+// Phase2-specific Prisma adapters for canonical AJOK trial bootstrap writes.
+// Keeps database shape changes isolated from the server-side import mapping.
 type TrialEventUpsertInput = {
   legacyEventKey: string;
   koepaiva: Date;
@@ -73,6 +73,9 @@ export async function upsertTrialEventByLegacyKeyDb(
       kennelpiiri: input.kennelpiiri,
       kennelpiirinro: input.kennelpiirinro,
       koemuoto: "AJOK",
+      // Phase2 is a one-shot bootstrap, but multiple rows can map to the same
+      // event. Keep an existing judge unless the current import row actually
+      // provides one.
       ...(input.ylituomariNimi !== null
         ? { ylituomariNimi: input.ylituomariNimi }
         : {}),
@@ -140,6 +143,8 @@ export async function upsertTrialEntryByEventAndRegistrationDb(
       suljettu: input.suljettu,
       keskeytetty: input.keskeytetty,
       notes: input.notes,
+      // Dog lookup can be missing on individual rows; do not erase a previously
+      // resolved link unless the import row supplies a concrete replacement.
       ...(input.dogId !== null ? { dogId: input.dogId } : {}),
     },
   });

@@ -18,7 +18,8 @@ import { upsertCanonicalTrialRows } from "../internal";
 import { formatLegacyImportSummary } from "../runs/phase-summary";
 import { toImportRunResponse } from "../runs/transform";
 
-// Runs the legacy phase2 trials-only import into canonical TrialEvent/TrialEntry schema.
+// Orchestrates the one-shot legacy phase2 bootstrap for canonical AJOK trials.
+// Stage boundaries, issue buffering, and summary counters live here; writes stay in helpers.
 export async function runLegacyPhase2(
   createdByUserId?: string,
   options?: {

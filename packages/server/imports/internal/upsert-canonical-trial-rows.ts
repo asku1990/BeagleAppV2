@@ -11,6 +11,8 @@ import {
 } from "../core";
 import { toTrialLegacyEventKey } from "./trial-event-identity-key";
 
+// Maps legacy akoeall rows into canonical AJOK TrialEvent and TrialEntry writes.
+// Owns row validation, legacy-field normalization, and import issue reporting.
 function parseLegacyScore(
   value: string | number | null | undefined,
 ): number | null {
@@ -138,6 +140,9 @@ export async function upsertCanonicalTrialRows(
     const existingJudge = judgeByEventKey.get(legacyEventKey) ?? null;
     let judgeForEvent: string | null = incomingJudge;
 
+    // Multiple akoeall rows can belong to the same event. A null judge on a
+    // later row must not erase a judge that was already established earlier in
+    // the same phase2 pass.
     if (existingJudge) {
       if (incomingJudge && incomingJudge !== existingJudge) {
         errors += 1;
@@ -174,6 +179,8 @@ export async function upsertCanonicalTrialRows(
 
     const yksilointiAvain = `${legacyEventKey}|${registrationNo}`;
     const dogId = dogIdByRegistration.get(registrationNo) ?? null;
+    // Missing dog matches are tracked as issues, but the row still carries a
+    // nullable dog link so the import does not invent an association.
     if (!dogId) {
       issues.push({
         severity: "WARNING",
