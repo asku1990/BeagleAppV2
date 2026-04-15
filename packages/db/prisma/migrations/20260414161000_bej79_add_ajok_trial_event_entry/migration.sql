@@ -1,3 +1,8 @@
+-- NOTE: In this repository's current workflow, legacy-import schema is developed
+-- against fresh bootstrap databases in `develop`. Editing this migration in-place
+-- is intentional for that flow; forward-only follow-up migrations are only needed
+-- once this migration is treated as immutable in shared deployed environments.
+
 -- CreateEnum
 CREATE TYPE "TrialSourceTag" AS ENUM ('LEGACY_AKOEALL', 'KOIRATIETOKANTA_API');
 

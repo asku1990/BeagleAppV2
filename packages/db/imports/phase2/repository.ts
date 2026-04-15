@@ -73,7 +73,9 @@ export async function upsertTrialEventByLegacyKeyDb(
       kennelpiiri: input.kennelpiiri,
       kennelpiirinro: input.kennelpiirinro,
       koemuoto: "AJOK",
-      ylituomariNimi: input.ylituomariNimi,
+      ...(input.ylituomariNimi !== null
+        ? { ylituomariNimi: input.ylituomariNimi }
+        : {}),
     },
     select: { id: true },
   });
