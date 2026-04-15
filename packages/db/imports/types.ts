@@ -56,6 +56,7 @@ export type LegacyTrialResultRow = {
   tja: LegacyScore;
   pin: LegacyScore;
   judge: string | null;
+  muokattu: string | null;
   legacyFlag: string | null;
 };
 

@@ -41,6 +41,7 @@ describe("upsertCanonicalTrialRows", () => {
           tja: null,
           pin: null,
           judge: null,
+          muokattu: null,
           legacyFlag: null,
         },
       ],
@@ -83,6 +84,7 @@ describe("upsertCanonicalTrialRows", () => {
           tja: "5.0",
           pin: "6.0",
           judge: "Judge One",
+          muokattu: "20240101",
           legacyFlag: "L",
         },
       ],
@@ -136,6 +138,7 @@ describe("upsertCanonicalTrialRows", () => {
           tja: null,
           pin: null,
           judge: null,
+          muokattu: null,
           legacyFlag: null,
         },
       ],
@@ -179,6 +182,7 @@ describe("upsertCanonicalTrialRows", () => {
           tja: null,
           pin: null,
           judge: "Judge One",
+          muokattu: null,
           legacyFlag: null,
         },
         {
@@ -200,6 +204,7 @@ describe("upsertCanonicalTrialRows", () => {
           tja: null,
           pin: null,
           judge: null,
+          muokattu: null,
           legacyFlag: null,
         },
       ],
@@ -246,6 +251,7 @@ describe("upsertCanonicalTrialRows", () => {
           tja: null,
           pin: null,
           judge: "Judge One",
+          muokattu: null,
           legacyFlag: null,
         },
         {
@@ -267,6 +273,7 @@ describe("upsertCanonicalTrialRows", () => {
           tja: null,
           pin: null,
           judge: "Judge Two",
+          muokattu: null,
           legacyFlag: null,
         },
       ],
@@ -276,7 +283,7 @@ describe("upsertCanonicalTrialRows", () => {
       ]),
     );
 
-    expect(result.errors).toBe(1);
+    expect(result.errors).toBe(0);
     expect(result.issues).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -315,6 +322,7 @@ describe("upsertCanonicalTrialRows", () => {
           tja: null,
           pin: null,
           judge: null,
+          muokattu: null,
           legacyFlag: "LS",
         },
       ],
@@ -352,6 +360,7 @@ describe("upsertCanonicalTrialRows", () => {
           tja: null,
           pin: null,
           judge: null,
+          muokattu: null,
           legacyFlag: "NUL",
         },
       ],

@@ -145,7 +145,6 @@ export async function upsertCanonicalTrialRows(
     // the same phase2 pass.
     if (existingJudge) {
       if (incomingJudge && incomingJudge !== existingJudge) {
-        errors += 1;
         issues.push({
           severity: "WARNING",
           code: "TRIAL_CANONICAL_JUDGE_CONFLICT",

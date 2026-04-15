@@ -40,10 +40,6 @@ export async function listPhase2DogRegistrationsDb(): Promise<
   });
 }
 
-export async function countTrialResultRowsDb(): Promise<number> {
-  return prisma.trialResult.count();
-}
-
 export async function countTrialEntryRowsDb(): Promise<number> {
   return prisma.trialEntry.count();
 }

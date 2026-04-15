@@ -41,6 +41,7 @@ Dog linkage is resolved through `DogRegistration` (`registrationNo -> dogId`).
 - Each trial row uses that index to set `dogId` when possible (`dogId` may remain `null`).
 - `TrialEvent` is upserted with deterministic `legacyEventKey` fallback when `sklKoeId` is unknown.
 - `TrialEntry` is upserted by unique `(trialEventId, rekisterinumeroSnapshot)`.
+- `raakadataJson` preserves the full legacy source row, including `MUOKATTU`.
 - Invalid registration format or missing required event fields are written as issues.
 
 ## Idempotency and rerun behavior
@@ -66,7 +67,7 @@ Issue rows are written to `ImportRunIssue` with `kind=LEGACY_PHASE2`.
 - If a registration cannot be resolved to a local dog, phase2 keeps the trial
   row with `dogId = null` and records `TRIAL_CANONICAL_DOG_NOT_FOUND`.
 - If the same event row yields multiple non-null judges, phase2 keeps the first
-  judge value and records `TRIAL_CANONICAL_JUDGE_CONFLICT`.
+  judge value and records `TRIAL_CANONICAL_JUDGE_CONFLICT` as a warning.
 - Run finishes `SUCCEEDED` with warnings when row issues exist.
 - Unexpected exceptions mark run as `FAILED` with `UNEXPECTED_EXCEPTION`.
 

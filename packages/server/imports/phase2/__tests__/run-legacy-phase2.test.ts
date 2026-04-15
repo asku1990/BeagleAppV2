@@ -8,7 +8,6 @@ const {
   createImportRunIssueMock,
   createImportRunIssuesBulkMock,
   countTrialEntryRowsDbMock,
-  countTrialResultRowsDbMock,
   fetchLegacyTrialRowsMock,
   listPhase2DogRegistrationsDbMock,
   upsertCanonicalTrialRowsMock,
@@ -19,7 +18,6 @@ const {
   createImportRunIssueMock: vi.fn(),
   createImportRunIssuesBulkMock: vi.fn(),
   countTrialEntryRowsDbMock: vi.fn(),
-  countTrialResultRowsDbMock: vi.fn(),
   fetchLegacyTrialRowsMock: vi.fn(),
   listPhase2DogRegistrationsDbMock: vi.fn(),
   upsertCanonicalTrialRowsMock: vi.fn(),
@@ -35,7 +33,6 @@ vi.mock("@beagle/db", () => ({
   createImportRunIssue: createImportRunIssueMock,
   createImportRunIssuesBulk: createImportRunIssuesBulkMock,
   countTrialEntryRowsDb: countTrialEntryRowsDbMock,
-  countTrialResultRowsDb: countTrialResultRowsDbMock,
   fetchLegacyTrialRows: fetchLegacyTrialRowsMock,
   listPhase2DogRegistrationsDb: listPhase2DogRegistrationsDbMock,
 }));
@@ -52,7 +49,6 @@ describe("runLegacyPhase2", () => {
     createImportRunIssueMock.mockReset();
     createImportRunIssuesBulkMock.mockReset();
     countTrialEntryRowsDbMock.mockReset();
-    countTrialResultRowsDbMock.mockReset();
     fetchLegacyTrialRowsMock.mockReset();
     listPhase2DogRegistrationsDbMock.mockReset();
     upsertCanonicalTrialRowsMock.mockReset();
@@ -79,7 +75,6 @@ describe("runLegacyPhase2", () => {
     });
     fetchLegacyTrialRowsMock.mockResolvedValue([]);
     listPhase2DogRegistrationsDbMock.mockResolvedValue([]);
-    countTrialResultRowsDbMock.mockResolvedValue(10);
     countTrialEntryRowsDbMock.mockResolvedValue(12);
     upsertCanonicalTrialRowsMock.mockResolvedValue({
       upserted: 2,
@@ -99,7 +94,7 @@ describe("runLegacyPhase2", () => {
         status: "SUCCEEDED",
         trialResultsUpserted: 2,
         errorsCount: 0,
-        errorSummary: expect.stringContaining("oldTrialResult=10"),
+        errorSummary: expect.stringContaining("canonicalTrialEntry=12"),
       }),
       expect.any(Object),
     );

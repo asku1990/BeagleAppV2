@@ -6,7 +6,6 @@ import {
   createImportRunIssue,
   createImportRunIssuesBulk,
   countTrialEntryRowsDb,
-  countTrialResultRowsDb,
   fetchLegacyTrialRows,
   listPhase2DogRegistrationsDb,
   markImportRunFinished,
@@ -50,9 +49,8 @@ export async function runLegacyPhase2(
     log(`[stage:${name}] progress ${processed}/${total} (${percent}%)`);
   };
   let runId: string | null = null;
-  let trialResultsUpserted = 0;
+  let canonicalEntriesUpserted = 0;
   let errorsCount = 0;
-  let trialResultBaselineCount = 0;
   let canonicalEntryTotalCount = 0;
   const issueBuffer: Array<{
     stage: string;
@@ -113,11 +111,6 @@ export async function runLegacyPhase2(
     log(`Indexed dogs by registration: ${dogIdByRegistration.size}`);
     finishStage("index");
 
-    startStage("baseline-counts");
-    trialResultBaselineCount = await countTrialResultRowsDb();
-    log(`Baseline TrialResult count=${trialResultBaselineCount}`);
-    finishStage("baseline-counts");
-
     startStage("trials");
     const trialResult = await upsertCanonicalTrialRows(
       trialRows,
@@ -127,7 +120,7 @@ export async function runLegacyPhase2(
           logProgress("trials", processed, total),
       },
     );
-    trialResultsUpserted = trialResult.upserted;
+    canonicalEntriesUpserted = trialResult.upserted;
     errorsCount += trialResult.errors;
     for (const issue of trialResult.issues) {
       await recordIssue({
@@ -141,16 +134,12 @@ export async function runLegacyPhase2(
       });
     }
     log(
-      `Canonical trial entries upserted=${trialResultsUpserted}, trial errors=${trialResult.errors}`,
+      `Canonical trial entries upserted=${canonicalEntriesUpserted}, trial errors=${trialResult.errors}`,
     );
     finishStage("trials");
 
-    startStage("compare-counts");
     canonicalEntryTotalCount = await countTrialEntryRowsDb();
-    log(
-      `Count comparison oldTrialResult=${trialResultBaselineCount}, canonicalTrialEntry=${canonicalEntryTotalCount}`,
-    );
-    finishStage("compare-counts");
+    log(`Canonical TrialEntry count=${canonicalEntryTotalCount}`);
 
     await flushIssueBuffer();
 
@@ -161,14 +150,13 @@ export async function runLegacyPhase2(
         dogsUpserted: 0,
         ownersUpserted: 0,
         ownershipsUpserted: 0,
-        trialResultsUpserted,
+        trialResultsUpserted: canonicalEntriesUpserted,
         showResultsUpserted: 0,
         errorsCount,
         errorSummary: formatLegacyImportSummary({
           kind: "LEGACY_PHASE2",
-          trialResultsUpserted,
+          trialResultsUpserted: canonicalEntriesUpserted,
           errorsCount,
-          oldTrialResultCount: trialResultBaselineCount,
           canonicalTrialEntryCount: canonicalEntryTotalCount,
         }),
       },
@@ -214,12 +202,12 @@ export async function runLegacyPhase2(
         dogsUpserted: 0,
         ownersUpserted: 0,
         ownershipsUpserted: 0,
-        trialResultsUpserted,
+        trialResultsUpserted: canonicalEntriesUpserted,
         showResultsUpserted: 0,
         errorsCount: errorsCount + 1,
         errorSummary:
-          canonicalEntryTotalCount > 0 || trialResultBaselineCount > 0
-            ? `${message} (oldTrialResult=${trialResultBaselineCount}, canonicalTrialEntry=${canonicalEntryTotalCount})`
+          canonicalEntryTotalCount > 0
+            ? `${message} (canonicalTrialEntry=${canonicalEntryTotalCount})`
             : message,
       },
       auditContext,

@@ -32,7 +32,6 @@ export {
 export { fetchLegacyTrialRows } from "./imports/phase2";
 export {
   countTrialEntryRowsDb,
-  countTrialResultRowsDb,
   listPhase2DogRegistrationsDb,
   upsertTrialEntryByEventAndRegistrationDb,
   upsertTrialEventByLegacyKeyDb,

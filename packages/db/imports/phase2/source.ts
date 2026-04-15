@@ -32,6 +32,7 @@ export async function fetchLegacyTrialRows(options?: {
               TJA as tja,
               PIN as pin,
               TUOM1 as judge,
+              MUOKATTU as muokattu,
               VARA as legacyFlag
        FROM akoeall`,
     )) as LegacyTrialResultRow[];
