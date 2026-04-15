@@ -45,6 +45,11 @@ enum ShowSourceTag {
   MANUAL_ADMIN
 }
 
+enum TrialSourceTag {
+  LEGACY_AKOEALL
+  KOIRATIETOKANTA_API
+}
+
 enum ShowResultValueType {
   FLAG
   CODE
@@ -184,6 +189,7 @@ model Dog {
   ownerships      DogOwnership[]
   titles          DogTitle[]
   trialResults    TrialResult[]
+  trialEntries    TrialEntry[]
   showEntries     ShowEntry[]
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
@@ -297,6 +303,91 @@ model TrialResult {
 
   @@index([eventDate])
   @@index([dogId, eventDate])
+}
+
+model TrialEvent {
+  id               String       @id @default(cuid())
+  sklKoeId         Int          @unique
+  koepaiva         DateTime
+  koekunta         String
+  jarjestaja       String?
+  kennelpiiri      String?
+  kennelpiirinro   String?
+  koemuoto         String?
+  rotukoodi        String?
+  ylituomariNimi   String?
+  ylituomariNumero String?
+  ytKertomus       String?      @db.Text
+  entries          TrialEntry[]
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([koepaiva])
+  @@index([koekunta, koepaiva])
+}
+
+model TrialEntry {
+  id                        String         @id @default(cuid())
+  trialEventId              String
+  dogId                     String?
+  rekisterinumeroSnapshot   String
+  yksilointiAvain           String         @unique
+  lahde                     TrialSourceTag
+  raakadataJson             String?        @db.Text
+  koiranNimiSnapshot        String?
+  omistajaSnapshot          String?
+  palkinto                  String?
+  sijoitus                  String?
+  koiriaLuokassa            Int?
+  loppupisteet              Decimal?       @db.Decimal(6, 2)
+  hakuMin1                  Int?
+  hakuMin2                  Int?
+  hakuMin3                  Int?
+  hakuMin4                  Int?
+  ajoMin1                   Int?
+  ajoMin2                   Int?
+  ajoMin3                   Int?
+  ajoMin4                   Int?
+  hakuKeskiarvo             Decimal?       @db.Decimal(6, 2)
+  haukkuKeskiarvo           Decimal?       @db.Decimal(6, 2)
+  ajotaitoKeskiarvo         Decimal?       @db.Decimal(6, 2)
+  hakuloysyysTappioYhteensa Decimal?       @db.Decimal(6, 2)
+  ajoloysyysTappioYhteensa  Decimal?       @db.Decimal(6, 2)
+  keli                      String?
+  luopui                    Boolean?
+  suljettu                  Boolean?
+  keskeytetty               Boolean?
+  huomautusTeksti           String?        @db.Text
+  notes                     String?        @db.Text
+  lisatiedot                TrialLisatietoItem[]
+  trialEvent                TrialEvent     @relation(fields: [trialEventId], references: [id], onDelete: Cascade)
+  dog                       Dog?           @relation(fields: [dogId], references: [id], onDelete: SetNull)
+  createdAt                 DateTime       @default(now())
+  updatedAt                 DateTime       @updatedAt
+
+  @@unique([trialEventId, rekisterinumeroSnapshot])
+  @@index([dogId])
+  @@index([trialEventId])
+  @@index([loppupisteet])
+}
+
+model TrialLisatietoItem {
+  id           String     @id @default(cuid())
+  trialEntryId String
+  koodi        String
+  nimi         String
+  era1Arvo     String?
+  era2Arvo     String?
+  era3Arvo     String?
+  era4Arvo     String?
+  jarjestys    Int?
+  trialEntry   TrialEntry @relation(fields: [trialEntryId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([trialEntryId, koodi])
+  @@index([koodi])
+  @@index([trialEntryId])
 }
 
 model ShowEvent {
