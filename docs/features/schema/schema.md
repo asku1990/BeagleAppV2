@@ -72,6 +72,10 @@ erDiagram
 - `TrialEvent`: canonical AJOK trial event (new schema event level).
 - `TrialEntry`: canonical AJOK trial dog entry (new schema entry level).
 - `TrialLisatietoItem`: canonical AJOK lisatieto rows (koodi 11-61) per trial entry.
+  - `TrialEntry` stores the direct pöytäkirja core fields (event-linked dog row,
+    era1/era2 summary metrics, status/notes, judges, and raw payload snapshot).
+  - `TrialLisatietoItem` stores detailed 11-61 code rows as typed `era1..era4`
+    values for report/PDF rendering without decoding raw payload JSON.
 - `ShowEvent`: canonical show event.
 - `ShowEntry`: canonical show participation row; `dogId` nullable.
 - `ShowResultCategory`: UI/admin managed grouping for show definitions.

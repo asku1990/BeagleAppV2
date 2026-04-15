@@ -36,8 +36,44 @@ CREATE TABLE "TrialEntry" (
     "yksilointiAvain" TEXT NOT NULL,
     "lahde" "TrialSourceTag" NOT NULL,
     "raakadataJson" TEXT,
+    "luokka" TEXT,
     "koiranNimiSnapshot" TEXT,
+    "isanNimiSnapshot" TEXT,
+    "isanRekisterinumeroSnapshot" TEXT,
+    "emanNimiSnapshot" TEXT,
+    "emanRekisterinumeroSnapshot" TEXT,
     "omistajaSnapshot" TEXT,
+    "omistajanKotikuntaSnapshot" TEXT,
+    "sukupuoliSnapshot" TEXT,
+    "rokotusOk" BOOLEAN,
+    "tunnistusOk" BOOLEAN,
+    "era1Alkoi" TEXT,
+    "era2Alkoi" TEXT,
+    "era3Alkoi" TEXT,
+    "era4Alkoi" TEXT,
+    "hyvaksytytAjominuutit" INTEGER,
+    "ajoajanPisteet" DECIMAL(6,2),
+    "hakuEra1" DECIMAL(6,2),
+    "hakuEra2" DECIMAL(6,2),
+    "hakuEra3" DECIMAL(6,2),
+    "hakuEra4" DECIMAL(6,2),
+    "haukkuEra1" DECIMAL(6,2),
+    "haukkuEra2" DECIMAL(6,2),
+    "haukkuEra3" DECIMAL(6,2),
+    "haukkuEra4" DECIMAL(6,2),
+    "ajotaitoEra1" DECIMAL(6,2),
+    "ajotaitoEra2" DECIMAL(6,2),
+    "ajotaitoEra3" DECIMAL(6,2),
+    "ajotaitoEra4" DECIMAL(6,2),
+    "ansiopisteetYhteensa" DECIMAL(6,2),
+    "hakuloysyysTappioEra1" DECIMAL(6,2),
+    "hakuloysyysTappioEra2" DECIMAL(6,2),
+    "hakuloysyysTappioEra3" DECIMAL(6,2),
+    "hakuloysyysTappioEra4" DECIMAL(6,2),
+    "ajoloysyysTappioEra1" DECIMAL(6,2),
+    "ajoloysyysTappioEra2" DECIMAL(6,2),
+    "ajoloysyysTappioEra3" DECIMAL(6,2),
+    "ajoloysyysTappioEra4" DECIMAL(6,2),
     "palkinto" TEXT,
     "sijoitus" TEXT,
     "koiriaLuokassa" INTEGER,
@@ -56,13 +92,20 @@ CREATE TABLE "TrialEntry" (
     "ajotaitoKeskiarvo" DECIMAL(6,2),
     "hakuloysyysTappioYhteensa" DECIMAL(6,2),
     "ajoloysyysTappioYhteensa" DECIMAL(6,2),
+    "tappiopisteetYhteensa" DECIMAL(6,2),
     "tieJaEstetyoskentelyPisteet" DECIMAL(6,2),
     "metsastysintoPisteet" DECIMAL(6,2),
     "keli" TEXT,
+    "paljasMaa" BOOLEAN,
+    "lumikeli" TEXT,
     "luopui" BOOLEAN,
     "suljettu" BOOLEAN,
     "keskeytetty" BOOLEAN,
     "huomautusTeksti" TEXT,
+    "ylituomariNimiSnapshot" TEXT,
+    "ylituomariNumeroSnapshot" TEXT,
+    "ryhmatuomariNimi" TEXT,
+    "palkintotuomariNimi" TEXT,
     "notes" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -144,9 +187,64 @@ COMMENT ON COLUMN "TrialEntry"."rekisterinumeroSnapshot" IS 'Koiran rekisterinum
 COMMENT ON COLUMN "TrialEntry"."yksilointiAvain" IS 'Tekninen yksilointiavain import/upsert-ajoon.';
 COMMENT ON COLUMN "TrialEntry"."lahde" IS 'Lahdetunniste (legacy/API).';
 COMMENT ON COLUMN "TrialEntry"."raakadataJson" IS 'Koko alkuperainen payload audit/debug/replay-kayttoon.';
+COMMENT ON COLUMN "TrialEntry"."luokka" IS 'Koirakohtainen AJOK-luokka.';
+COMMENT ON COLUMN "TrialEntry"."koiranNimiSnapshot" IS 'Koiran nimen snapshot upsert-hetkella.';
+COMMENT ON COLUMN "TrialEntry"."isanNimiSnapshot" IS 'Koiran isan nimen snapshot.';
+COMMENT ON COLUMN "TrialEntry"."isanRekisterinumeroSnapshot" IS 'Koiran isan rekisterinumeron snapshot.';
+COMMENT ON COLUMN "TrialEntry"."emanNimiSnapshot" IS 'Koiran eman nimen snapshot.';
+COMMENT ON COLUMN "TrialEntry"."emanRekisterinumeroSnapshot" IS 'Koiran eman rekisterinumeron snapshot.';
+COMMENT ON COLUMN "TrialEntry"."omistajaSnapshot" IS 'Omistajatieto snapshot-muodossa.';
+COMMENT ON COLUMN "TrialEntry"."omistajanKotikuntaSnapshot" IS 'Omistajan kotikunta snapshot-muodossa.';
+COMMENT ON COLUMN "TrialEntry"."sukupuoliSnapshot" IS 'Koiran sukupuolitieto payloadista.';
+COMMENT ON COLUMN "TrialEntry"."rokotusOk" IS 'Rokotuksen tarkistus (poytakirjan rasti).';
+COMMENT ON COLUMN "TrialEntry"."tunnistusOk" IS 'Tunnistuksen tarkistus (poytakirjan rasti).';
+COMMENT ON COLUMN "TrialEntry"."era1Alkoi" IS 'Koe-eran 1 aloitusaika tekstimuodossa.';
+COMMENT ON COLUMN "TrialEntry"."era2Alkoi" IS 'Koe-eran 2 aloitusaika tekstimuodossa.';
+COMMENT ON COLUMN "TrialEntry"."era3Alkoi" IS 'Koe-eran 3 aloitusaika tekstimuodossa.';
+COMMENT ON COLUMN "TrialEntry"."era4Alkoi" IS 'Koe-eran 4 aloitusaika tekstimuodossa.';
+COMMENT ON COLUMN "TrialEntry"."hyvaksytytAjominuutit" IS 'Hyvaksyttyjen ajominuuttien kokonaismaara.';
+COMMENT ON COLUMN "TrialEntry"."ajoajanPisteet" IS 'Ajoajan pisteet.';
+COMMENT ON COLUMN "TrialEntry"."hakuEra1" IS 'Haun erakohtainen arvo, era 1.';
+COMMENT ON COLUMN "TrialEntry"."hakuEra2" IS 'Haun erakohtainen arvo, era 2.';
+COMMENT ON COLUMN "TrialEntry"."hakuEra3" IS 'Haun erakohtainen arvo, era 3.';
+COMMENT ON COLUMN "TrialEntry"."hakuEra4" IS 'Haun erakohtainen arvo, era 4.';
+COMMENT ON COLUMN "TrialEntry"."haukkuEra1" IS 'Haukun erakohtainen arvo, era 1.';
+COMMENT ON COLUMN "TrialEntry"."haukkuEra2" IS 'Haukun erakohtainen arvo, era 2.';
+COMMENT ON COLUMN "TrialEntry"."haukkuEra3" IS 'Haukun erakohtainen arvo, era 3.';
+COMMENT ON COLUMN "TrialEntry"."haukkuEra4" IS 'Haukun erakohtainen arvo, era 4.';
+COMMENT ON COLUMN "TrialEntry"."ajotaitoEra1" IS 'Ajotaidon erakohtainen arvo, era 1.';
+COMMENT ON COLUMN "TrialEntry"."ajotaitoEra2" IS 'Ajotaidon erakohtainen arvo, era 2.';
+COMMENT ON COLUMN "TrialEntry"."ajotaitoEra3" IS 'Ajotaidon erakohtainen arvo, era 3.';
+COMMENT ON COLUMN "TrialEntry"."ajotaitoEra4" IS 'Ajotaidon erakohtainen arvo, era 4.';
+COMMENT ON COLUMN "TrialEntry"."ansiopisteetYhteensa" IS 'Ansiopisteiden yhteissumma.';
+COMMENT ON COLUMN "TrialEntry"."hakuloysyysTappioEra1" IS 'Hakuloysyyden tappiopisteet, era 1.';
+COMMENT ON COLUMN "TrialEntry"."hakuloysyysTappioEra2" IS 'Hakuloysyyden tappiopisteet, era 2.';
+COMMENT ON COLUMN "TrialEntry"."hakuloysyysTappioEra3" IS 'Hakuloysyyden tappiopisteet, era 3.';
+COMMENT ON COLUMN "TrialEntry"."hakuloysyysTappioEra4" IS 'Hakuloysyyden tappiopisteet, era 4.';
+COMMENT ON COLUMN "TrialEntry"."ajoloysyysTappioEra1" IS 'Ajoloysyyden tappiopisteet, era 1.';
+COMMENT ON COLUMN "TrialEntry"."ajoloysyysTappioEra2" IS 'Ajoloysyyden tappiopisteet, era 2.';
+COMMENT ON COLUMN "TrialEntry"."ajoloysyysTappioEra3" IS 'Ajoloysyyden tappiopisteet, era 3.';
+COMMENT ON COLUMN "TrialEntry"."ajoloysyysTappioEra4" IS 'Ajoloysyyden tappiopisteet, era 4.';
+COMMENT ON COLUMN "TrialEntry"."tappiopisteetYhteensa" IS 'AJOK tappiopisteiden yhteissumma.';
+COMMENT ON COLUMN "TrialEntry"."palkinto" IS 'Palkintoluokka.';
+COMMENT ON COLUMN "TrialEntry"."sijoitus" IS 'Sijoitus luokassa.';
+COMMENT ON COLUMN "TrialEntry"."koiriaLuokassa" IS 'Koirien lukumaara luokassa.';
+COMMENT ON COLUMN "TrialEntry"."loppupisteet" IS 'Loppupisteet.';
 COMMENT ON COLUMN "TrialEntry"."yleisvaikutelmaPisteet" IS 'AJOK yleisvaikutelma (legacy YVA).';
 COMMENT ON COLUMN "TrialEntry"."tieJaEstetyoskentelyPisteet" IS 'AJOK tie- ja estetyoskentely (legacy TJA).';
 COMMENT ON COLUMN "TrialEntry"."metsastysintoPisteet" IS 'AJOK metsastysinto (legacy PIN).';
+COMMENT ON COLUMN "TrialEntry"."keli" IS 'Kelitunnus (esim. P).';
+COMMENT ON COLUMN "TrialEntry"."paljasMaa" IS 'Poytakirjan olosuhderasti: paljas maa.';
+COMMENT ON COLUMN "TrialEntry"."lumikeli" IS 'Lumikelin arvo (esim. cm).';
+COMMENT ON COLUMN "TrialEntry"."luopui" IS 'Koe keskeytetty luopumisen vuoksi.';
+COMMENT ON COLUMN "TrialEntry"."suljettu" IS 'Koe suljettu.';
+COMMENT ON COLUMN "TrialEntry"."keskeytetty" IS 'Koe keskeytetty.';
+COMMENT ON COLUMN "TrialEntry"."huomautusTeksti" IS 'Vapaa huomautusteksti.';
+COMMENT ON COLUMN "TrialEntry"."ylituomariNimiSnapshot" IS 'Rivikohtainen ylituomarin nimi payload-snapshotina.';
+COMMENT ON COLUMN "TrialEntry"."ylituomariNumeroSnapshot" IS 'Rivikohtainen ylituomarin numero payload-snapshotina.';
+COMMENT ON COLUMN "TrialEntry"."ryhmatuomariNimi" IS 'Ryhmatuomarin nimi.';
+COMMENT ON COLUMN "TrialEntry"."palkintotuomariNimi" IS 'Palkintotuomarin nimi.';
+COMMENT ON COLUMN "TrialEntry"."notes" IS 'Tekninen lisahuomio tai lahdeteksti.';
 
 COMMENT ON TABLE "TrialLisatietoItem" IS 'AJOK-lisatieto (koodi 11-61) koirakohtaiselle trial entrylle.';
 COMMENT ON COLUMN "TrialLisatietoItem"."koodi" IS 'Lisatietokoodi (esim. 11, 42, 61).';

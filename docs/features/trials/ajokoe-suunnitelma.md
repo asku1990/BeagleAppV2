@@ -37,6 +37,17 @@
 - `TrialEntry` = yhden koiran tulos yhdessä kokeessa
 - `TrialLisatietoItem` = lisätiedot 11-61
 
+## BEJ-84 skeemarajaus (toteutettu)
+
+- `TrialEntry` sisältää pöytäkirjan suorat ydinkentät (koiran perustiedot,
+  koe-erät ja pisteet, tulos,
+  olosuhteet, tilaliput, tuomarit).
+- `TrialEntry` pidetään pöytäkirjakontraktin tasolla; legacy-/kuljetusmuodon
+  lisäavaimia ei nosteta omiksi sarakkeiksi.
+- Lisätietorivit 11-61 tallennetaan `TrialLisatietoItem`-tauluun
+  (`koodi`, `nimi`, `era1Arvo..era4Arvo`), ei omiksi `TrialEntry`-sarakkeiksi.
+- Koko sisääntulo säilytetään aina `TrialEntry.raakadataJson`-kentässä.
+
 ## Uusi skeema (pöytäkirjan mukainen)
 
 ### `TrialEvent`
@@ -89,10 +100,6 @@ Erä- ja aikatiedot:
 - `ajoMin3`
 - `ajoMin4`
 - `hyvaksytytAjominuutit`
-- `viiteEra1`
-- `viiteEra2`
-- `viiteEra3`
-- `viiteEra4`
 
 Pisteet ja tulos:
 
@@ -112,10 +119,6 @@ Pisteet ja tulos:
 - `ajotaitoEra3`
 - `ajotaitoEra4`
 - `ajotaitoKeskiarvo`
-- `yleisvaikutusEra1`
-- `yleisvaikutusEra2`
-- `yleisvaikutusEra3`
-- `yleisvaikutusEra4`
 - `yleisvaikutelmaPisteet`
 - `hakuloysyysTappioEra1`
 - `hakuloysyysTappioEra2`
@@ -127,14 +130,6 @@ Pisteet ja tulos:
 - `ajoloysyysTappioEra3`
 - `ajoloysyysTappioEra4`
 - `ajoloysyysTappioYhteensa`
-- `takajalkeenAjoEra1`
-- `takajalkeenAjoEra2`
-- `takajalkeenAjoEra3`
-- `takajalkeenAjoEra4`
-- `puutteellinenMetsastysintoEra1`
-- `puutteellinenMetsastysintoEra2`
-- `puutteellinenMetsastysintoEra3`
-- `puutteellinenMetsastysintoEra4`
 - `tieJaEstetyoskentelyPisteet`
 - `metsastysintoPisteet` (legacy `PIN`)
 - `ansiopisteetYhteensa`
@@ -157,6 +152,8 @@ Olosuhteet ja huomautukset:
 
 Tuomarit:
 
+- `ylituomariNimiSnapshot` (rivi-/payload-snapshot)
+- `ylituomariNumeroSnapshot` (rivi-/payload-snapshot)
 - `ryhmatuomariNimi`
 - `palkintotuomariNimi`
 

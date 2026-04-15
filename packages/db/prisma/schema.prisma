@@ -306,9 +306,9 @@ model TrialResult {
 }
 
 model TrialEvent {
+  // 1) kokeen tiedot
   id               String       @id @default(cuid())
   sklKoeId         Int?         @unique
-  legacyEventKey   String?      @unique
   koepaiva         DateTime
   koekunta         String
   jarjestaja       String?
@@ -316,8 +316,13 @@ model TrialEvent {
   kennelpiirinro   String?
   koemuoto         String?
   rotukoodi        String?
+
+  // 10) tuomarit ja vahvistus (event-taso)
   ylituomariNimi   String?
   ylituomariNumero String?
+
+  // technical/event metadata
+  legacyEventKey   String?      @unique
   ytKertomus       String?      @db.Text
   entries          TrialEntry[]
   createdAt        DateTime     @default(now())
@@ -328,19 +333,32 @@ model TrialEvent {
 }
 
 model TrialEntry {
+  // identity and relations
   id                        String         @id @default(cuid())
   trialEventId              String
   dogId                     String?
-  rekisterinumeroSnapshot   String
   yksilointiAvain           String         @unique
   lahde                     TrialSourceTag
-  raakadataJson             String?        @db.Text
+
+  // 2) koiran tiedot
+  rekisterinumeroSnapshot   String
+  luokka                    String?
   koiranNimiSnapshot        String?
+  isanNimiSnapshot          String?
+  isanRekisterinumeroSnapshot String?
+  emanNimiSnapshot          String?
+  emanRekisterinumeroSnapshot String?
   omistajaSnapshot          String?
-  palkinto                  String?
-  sijoitus                  String?
-  koiriaLuokassa            Int?
-  loppupisteet              Decimal?       @db.Decimal(6, 2)
+  omistajanKotikuntaSnapshot String?
+  sukupuoliSnapshot         String?
+  rokotusOk                 Boolean?
+  tunnistusOk               Boolean?
+
+  // 3) koe-erat
+  era1Alkoi                 String?
+  era2Alkoi                 String?
+  era3Alkoi                 String?
+  era4Alkoi                 String?
   hakuMin1                  Int?
   hakuMin2                  Int?
   hakuMin3                  Int?
@@ -349,20 +367,71 @@ model TrialEntry {
   ajoMin2                   Int?
   ajoMin3                   Int?
   ajoMin4                   Int?
+  hyvaksytytAjominuutit     Int?
+  ajoajanPisteet            Decimal?       @db.Decimal(6, 2)
+
+  // 4) ansiopisteiden keskiarvot ja yhteensa
+  hakuEra1                  Decimal?       @db.Decimal(6, 2)
+  hakuEra2                  Decimal?       @db.Decimal(6, 2)
+  hakuEra3                  Decimal?       @db.Decimal(6, 2)
+  hakuEra4                  Decimal?       @db.Decimal(6, 2)
   hakuKeskiarvo             Decimal?       @db.Decimal(6, 2)
+  haukkuEra1                Decimal?       @db.Decimal(6, 2)
+  haukkuEra2                Decimal?       @db.Decimal(6, 2)
+  haukkuEra3                Decimal?       @db.Decimal(6, 2)
+  haukkuEra4                Decimal?       @db.Decimal(6, 2)
   haukkuKeskiarvo           Decimal?       @db.Decimal(6, 2)
+  ajotaitoEra1              Decimal?       @db.Decimal(6, 2)
+  ajotaitoEra2              Decimal?       @db.Decimal(6, 2)
+  ajotaitoEra3              Decimal?       @db.Decimal(6, 2)
+  ajotaitoEra4              Decimal?       @db.Decimal(6, 2)
   yleisvaikutelmaPisteet    Decimal?       @db.Decimal(6, 2)
   ajotaitoKeskiarvo         Decimal?       @db.Decimal(6, 2)
-  hakuloysyysTappioYhteensa Decimal?       @db.Decimal(6, 2)
-  ajoloysyysTappioYhteensa  Decimal?       @db.Decimal(6, 2)
+  ansiopisteetYhteensa      Decimal?       @db.Decimal(6, 2)
   tieJaEstetyoskentelyPisteet Decimal?      @db.Decimal(6, 2)
   metsastysintoPisteet      Decimal?       @db.Decimal(6, 2)
+
+  // 5) tappiopisteiden summat
+  hakuloysyysTappioEra1     Decimal?       @db.Decimal(6, 2)
+  hakuloysyysTappioEra2     Decimal?       @db.Decimal(6, 2)
+  hakuloysyysTappioEra3     Decimal?       @db.Decimal(6, 2)
+  hakuloysyysTappioEra4     Decimal?       @db.Decimal(6, 2)
+  hakuloysyysTappioYhteensa Decimal?       @db.Decimal(6, 2)
+  ajoloysyysTappioEra1      Decimal?       @db.Decimal(6, 2)
+  ajoloysyysTappioEra2      Decimal?       @db.Decimal(6, 2)
+  ajoloysyysTappioEra3      Decimal?       @db.Decimal(6, 2)
+  ajoloysyysTappioEra4      Decimal?       @db.Decimal(6, 2)
+  ajoloysyysTappioYhteensa  Decimal?       @db.Decimal(6, 2)
+  tappiopisteetYhteensa     Decimal?       @db.Decimal(6, 2)
+
+  // 6) pisteet ja tulos
+  loppupisteet              Decimal?       @db.Decimal(6, 2)
+  palkinto                  String?
+  sijoitus                  String?
+  koiriaLuokassa            Int?
+
+  // 7) olosuhteet
   keli                      String?
+  paljasMaa                 Boolean?
+  lumikeli                  String?
+
+  // 8) huomautukset ja tilat
   luopui                    Boolean?
   suljettu                  Boolean?
   keskeytetty               Boolean?
   huomautusTeksti           String?        @db.Text
+
+  // 10) tuomarit ja vahvistus (entry-taso)
+  ylituomariNimiSnapshot    String?
+  ylituomariNumeroSnapshot  String?
+  ryhmatuomariNimi          String?
+  palkintotuomariNimi       String?
+
+  // technical storage
+  raakadataJson             String?        @db.Text
   notes                     String?        @db.Text
+
+  // 9) lisatiedot (asteikko/rastit)
   lisatiedot                TrialLisatietoItem[]
   trialEvent                TrialEvent     @relation(fields: [trialEventId], references: [id], onDelete: Cascade)
   dog                       Dog?           @relation(fields: [dogId], references: [id], onDelete: SetNull)
