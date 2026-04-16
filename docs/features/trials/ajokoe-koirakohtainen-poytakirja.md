@@ -85,8 +85,6 @@ Alla oleva ryhmittely on suunniteltu AJOK-koirakohtaisen pöytäkirjan näkymän
 ### 7) Olosuhteet
 
 - `keli` (esim. `P`) on pöytäkirjan top-level olosuhdearvo.
-- `paljasMaa` ja `lumikeli` ovat legacy-/compat-kenttiä; BEJ-84 API-upsert
-  ei täytä niitä tässä vaiheessa.
 
 Lisäolotiedot, kuten `111_PALJAS_MAA`, `121_LUMIKELI`, `171_LAMPOTILA` ja muut
 11-18-/20-61-rivit, tallennetaan `TrialLisatietoItem`-riveiksi.

@@ -38,7 +38,9 @@ Developer notes for the admin trial read-only list/detail flow (`BEJ-76`,
 5. Validation panel compares current read model against AJOK target field set and shows:
    - `missing_from_model`: field not represented in current read contract.
    - `available_but_incomplete`: field exists in current model but selected row value is empty/null.
-   - BEJ-82 fields (`rokotusOk`, `tunnistusOk`, `paljasMaa`, `lumikeli`) are typed in detail-read, so they are evaluated in incomplete gaps instead of model-missing gaps.
+   - `rokotusOk` and `tunnistusOk` are typed in detail-read.
+   - `paljasMaa` and `lumikeli` columns are unused; do not use them in AJOK parity decisions.
+   - Top-level weather value is `keli`.
 
 ## Contract rules
 
