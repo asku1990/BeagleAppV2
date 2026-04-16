@@ -1,7 +1,16 @@
 # AJOK koirakohtainen pöytäkirja
 
 Tämä tiedosto kuvaa API-payloadin ja pöytäkirjan vaatimat tiedot.
-Lopulliset skeemapäätökset on dokumentissa `ajokoe-suunnitelma.md`.
+Aktiivinen kirjoitussopimus on dokumentissa
+`koiratietokanta-api-ajok-upsert.md`.
+
+Raw PDF template used by the web app:
+
+- `/Users/akikuivas/personal-projects/beagle/beagle-app-v2/apps/web/public/templates/ajok-koirakohtainen-poytakirja.pdf`
+
+Keep it under `apps/web/public/templates/` while the web app serves it as a
+public template asset. Move it to a project-global docs/assets folder only if it
+stops being a runtime-served file and becomes documentation-only source material.
 
 ## Tietoryhmät
 
@@ -75,9 +84,12 @@ Alla oleva ryhmittely on suunniteltu AJOK-koirakohtaisen pöytäkirjan näkymän
 
 ### 7) Olosuhteet
 
-- `keli` (esim. `P`)
-- `paljasMaa` (X-rasti, boolean)
-- `lumikeli` (cm-arvo tai `0`)
+- `keli` (esim. `P`) on pöytäkirjan top-level olosuhdearvo.
+- `paljasMaa` ja `lumikeli` ovat legacy-/compat-kenttiä; BEJ-84 API-upsert
+  ei täytä niitä tässä vaiheessa.
+
+Lisäolotiedot, kuten `111_PALJAS_MAA`, `121_LUMIKELI`, `171_LAMPOTILA` ja muut
+11-18-/20-61-rivit, tallennetaan `TrialLisatietoItem`-riveiksi.
 
 ### 8) Huomautukset ja tilat
 

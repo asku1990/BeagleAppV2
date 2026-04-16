@@ -74,6 +74,10 @@ erDiagram
 - `TrialLisatietoItem`: canonical AJOK lisatieto rows (koodi 11-61) per trial entry.
   - `TrialEntry` stores the direct pöytäkirja core fields (event-linked dog row,
     era1/era2 summary metrics, status/notes, judges, and raw payload snapshot).
+  - `TrialEntry.keli` stores the main top-level condition value from `KELI`.
+  - `TrialEntry.paljasMaa` and `TrialEntry.lumikeli` remain compatibility columns;
+    see `docs/features/trials/koiratietokanta-api-ajok-upsert.md` for the Koiratietokanta
+    API write-path contract and the numbered 11-18 lisätieto mapping.
   - `TrialLisatietoItem` stores detailed 11-61 code rows as typed `era1..era4`
     values for report/PDF rendering without decoding raw payload JSON.
 - `ShowEvent`: canonical show event.

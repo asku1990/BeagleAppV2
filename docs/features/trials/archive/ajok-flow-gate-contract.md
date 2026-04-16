@@ -1,4 +1,4 @@
-# AJOK Flow Gate Contract
+# AJOK Flow Gate Contract (ARCHIVED)
 
 Versioned source of truth for the BEJ-78 flow gate that locks the future
 poytakirja field contract before BEJ-79 schema work.

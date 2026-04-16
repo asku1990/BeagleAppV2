@@ -45,8 +45,8 @@ AJOK validation-gap panel baseline (`BEJ-77`).
 - `TRIAL_NOT_FOUND` is returned as an error code from API/service layers for missing IDs.
 - Validation target field source of truth for AJOK baseline is
   `docs/features/trials/ajokoe-koirakohtainen-poytakirja.md`.
-- Flow-gate contract source of truth (versioned status table and minimum
-  pre-switch requirements) is `docs/features/trials/ajok-flow-gate-contract.md`.
+- The BEJ-78 flow-gate contract is archived; the active read/write docs now
+  live under `docs/features/trials/`.
 - During BEJ-79 schema rollout, admin list/detail reads remain on `TrialResult`
   until BEJ-81 read-path switch.
 
@@ -61,9 +61,8 @@ AJOK validation-gap panel baseline (`BEJ-77`).
 - Detail view renders the validation panel and evaluates both missing and incomplete categories against selected row data.
 - Search/list view renders the same panel in baseline mode and shows only model-level missing fields (incomplete evaluation is detail-only because the list query does not load full row payload).
 - Validation panel is analysis/visualization only and does not mutate data.
-- This panel is a baseline input to the locked flow-gate contract in
-  `docs/features/trials/ajok-flow-gate-contract.md` and later read-path
-  migration updates in `BEJ-82`.
+- This panel is a baseline input to the historical AJOK read-model work
+  and later read-path migration updates in `BEJ-82`.
 
 ## Tests
 

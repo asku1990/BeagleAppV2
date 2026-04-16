@@ -1,4 +1,4 @@
-# AJOK-suunnitelma
+# AJOK-suunnitelma (ARCHIVED)
 
 ## Lukitut päätökset (2026-04-14)
 
@@ -39,17 +39,10 @@
 - `TrialEntry` = yhden koiran tulos yhdessä kokeessa
 - `TrialLisatietoItem` = lisätiedot 11-61
 
-## BEJ-84 skeemarajaus (toteutettu)
+## BEJ-84 API-upsert
 
-- `TrialEntry` sisältää pöytäkirjan suorat ydinkentät (koiran perustiedot,
-  koe-erät ja pisteet, tulos,
-  olosuhteet, tilaliput, tuomarit).
-- `TrialEntry` pidetään pöytäkirjakontraktin tasolla; legacy-/kuljetusmuodon
-  lisäavaimia ei nosteta omiksi sarakkeiksi.
-- Lisätietorivit 11-61 tallennetaan myöhemmässä vaiheessa
-  `TrialLisatietoItem`-tauluun
-  (`koodi`, `nimi`, `era1Arvo..era4Arvo`), ei omiksi `TrialEntry`-sarakkeiksi.
-- Koko sisääntulo säilytetään aina `TrialEntry.raakadataJson`-kentässä.
+- Koiratietokanta API AJOK upsertin tarkka kirjoitussopimus on dokumentissa
+  `docs/features/trials/koiratietokanta-api-ajok-upsert.md`.
 
 ## Uusi skeema (pöytäkirjan mukainen)
 
@@ -163,6 +156,12 @@ Tuomarit:
 Tekninen säilytys:
 
 - `raakadataJson`
+
+Huomio:
+
+- Numerolla alkavat olosuhde- ja arviointirivit (`11_*`, `12_*`, `17_*` jne.)
+  kuuluvat `TrialLisatietoItem`-tauluun. Ne eivät korvaa `TrialEntry.keli`-kenttää,
+  joka säilyttää pöytäkirjan pääasiallisen sää-/olosuhdearvon.
 
 ### `TrialLisatietoItem`
 
