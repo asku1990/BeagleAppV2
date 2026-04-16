@@ -77,9 +77,20 @@ export type KoiratietokantaAjokEntryDbInput = {
   palkintotuomariNimi: string | null;
 };
 
+export type KoiratietokantaAjokLisatietoDbInput = {
+  koodi: string;
+  nimi: string;
+  era1Arvo: string | null;
+  era2Arvo: string | null;
+  era3Arvo: string | null;
+  era4Arvo: string | null;
+  jarjestys: number | null;
+};
+
 export type KoiratietokantaAjokUpsertDbInput = {
   event: KoiratietokantaAjokEventDbInput;
   entry: KoiratietokantaAjokEntryDbInput;
+  lisatiedot: KoiratietokantaAjokLisatietoDbInput[];
 };
 
 export type KoiratietokantaAjokUpsertDbResult = {
@@ -222,6 +233,24 @@ export async function upsertKoiratietokantaAjokResultDb(
       update: entryWrite,
       select: { id: true },
     });
+
+    await tx.trialLisatietoItem.deleteMany({
+      where: { trialEntryId: trialEntry.id },
+    });
+    if (input.lisatiedot.length > 0) {
+      await tx.trialLisatietoItem.createMany({
+        data: input.lisatiedot.map((item) => ({
+          trialEntryId: trialEntry.id,
+          koodi: item.koodi,
+          nimi: item.nimi,
+          era1Arvo: item.era1Arvo,
+          era2Arvo: item.era2Arvo,
+          era3Arvo: item.era3Arvo,
+          era4Arvo: item.era4Arvo,
+          jarjestys: item.jarjestys,
+        })),
+      });
+    }
 
     return {
       trialEventId: trialEvent.id,

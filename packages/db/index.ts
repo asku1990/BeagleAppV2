@@ -128,6 +128,7 @@ export {
   type BeagleTrialSearchSortDb,
   type KoiratietokantaAjokEntryDbInput,
   type KoiratietokantaAjokEventDbInput,
+  type KoiratietokantaAjokLisatietoDbInput,
   type KoiratietokantaAjokUpsertDbInput,
   type KoiratietokantaAjokUpsertDbResult,
 } from "./trials";

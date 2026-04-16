@@ -304,11 +304,15 @@ Huomio:
   - `TrialEntry.lahde = KOIRATIETOKANTA_API`.
   - `TrialEntry.yksilointiAvain = SKL:<SKLid>|REG:<rekisterinumero>`.
   - Koko sisääntulo tallennetaan aina `TrialEntry.raakadataJson`-kenttään.
-- Phase 1 mapittaa vain ydinkentät `TrialEvent`- ja `TrialEntry`-sarakkeisiin.
+- Phase 1 mapittaa ydinkentät `TrialEvent`- ja `TrialEntry`-sarakkeisiin.
+- Phase 2 mapittaa PDF-relevantit lisätietokentät `TrialLisatietoItem`-riveihin.
 - Tuntemattomat kentät eivät estä tallennusta.
 - Jos koiraa ei löydy paikallisesta rekisterinumerosta, tulos tallennetaan
   ilman `dogId`-linkkiä ja vastaukseen lisätään varoitus.
-- Lisätietojen `TrialLisatietoItem`-normalisointi ei kuulu Phase 1:een.
+- Lisätiedot korvataan upsertissa aina saman transaktion sisällä: vanhat
+  `TrialLisatietoItem`-rivit poistetaan entryltä ja nykyisen payloadin
+  ei-tyhjät lisätietorivit luodaan uudelleen. Tämä pitää uudelleenlähetykset
+  idempotentteina eikä duplikoi rivejä.
 
 ## Legacy-import (kertamigraatio)
 

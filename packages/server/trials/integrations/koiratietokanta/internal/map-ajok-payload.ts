@@ -20,12 +20,14 @@ import {
   parseOptionalDecimal,
   parseOptionalInteger,
 } from "./parse-ajok-payload";
+import { mapKoiratietokantaAjokLisatiedot } from "./map-ajok-lisatiedot";
 
 type MapperResult =
   | {
       ok: true;
       event: KoiratietokantaAjokEventDbInput;
       entry: KoiratietokantaAjokEntryDbInput;
+      lisatiedot: ReturnType<typeof mapKoiratietokantaAjokLisatiedot>;
       warnings: KoiratietokantaAjokWarning[];
     }
   | {
@@ -107,6 +109,7 @@ export function mapKoiratietokantaAjokPayload(
   return {
     ok: true,
     warnings,
+    lisatiedot: mapKoiratietokantaAjokLisatiedot(payload),
     event: {
       sklKoeId,
       koepaiva,

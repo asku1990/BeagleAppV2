@@ -53,6 +53,15 @@ describe("upsertKoiratietokantaAjokResultService", () => {
       keskeytti: "0",
       palkintotuomari1: "Mikko Kemppainen",
       palkintotuomari2: "-",
+      "111_PALJAS_MAA": "1",
+      "112_PALJAS_MAA": "1",
+      "113_PALJAS_MAA": null,
+      "171_LAMPOTILA": "13",
+      "172_LAMPOTILA": "19",
+      "301_KUULUVUUS": "4.00",
+      "302_KUULUVUUS": "0.00",
+      "531_BEAGLEN_HAUKKU": "4",
+      "532_BEAGLEN_HAUKKU": "0",
     };
 
     const result = await upsertKoiratietokantaAjokResultService(payload);
@@ -85,7 +94,38 @@ describe("upsertKoiratietokantaAjokResultService", () => {
         ryhmatuomariNimi: "Mikko Kemppainen",
         palkintotuomariNimi: null,
       }),
+      lisatiedot: expect.arrayContaining([
+        expect.objectContaining({
+          koodi: "11",
+          nimi: "Paljas maa",
+          era1Arvo: "1",
+          era2Arvo: "1",
+          era3Arvo: null,
+        }),
+        expect.objectContaining({
+          koodi: "17",
+          nimi: "Lämpötila",
+          era1Arvo: "13",
+          era2Arvo: "19",
+        }),
+        expect.objectContaining({
+          koodi: "30",
+          nimi: "Kuuluvuus",
+          era1Arvo: "4.00",
+          era2Arvo: "0.00",
+        }),
+        expect.objectContaining({
+          koodi: "36",
+          nimi: "Beaglen haukku",
+          era1Arvo: "4",
+          era2Arvo: "0",
+        }),
+      ]),
     });
+    const call = upsertDbMock.mock.calls[0]?.[0];
+    expect(call.lisatiedot).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ koodi: "12" })]),
+    );
     expect(result.body.ok).toBe(true);
     if (result.body.ok) {
       expect(result.body.data.warnings).toEqual([]);

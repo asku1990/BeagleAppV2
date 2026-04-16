@@ -14,7 +14,7 @@ This project uses a user-facing changelog format.
 
 ### Added
 
-- Lisättiin Koiratietokannan AJOK-tulosten integraatio-upsert, joka vastaanottaa yhden hyväksytyn tuloksen kerrallaan ja säilyttää alkuperäisen payloadin raakadatana.
+- Lisättiin Koiratietokannan AJOK-tulosten integraatio-upsert, joka vastaanottaa yhden hyväksytyn tuloksen kerrallaan, säilyttää alkuperäisen payloadin raakadatana ja normalisoi lisätiedot erillisiksi riveiksi.
 - Ylläpidon ajokokeisiin lisättiin uusi koetulosten detaljisivu (`/admin/trials/[trialId]`), joka näyttää yhden nykyisen `TrialResult`-rivin kentät read-only-muodossa.
 - Ylläpidon ajokokeiden listalta avataan nyt koetuloksen detaljinäkymä suoraan yhtenäisellä rivi-/korttivalinnalla.
 - Ylläpidon ajokokeisiin lisättiin uusi tapahtumahaku, jolla koetuloksia voi hakea tapahtuman nimellä ja paikalla.
