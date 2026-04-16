@@ -3,8 +3,10 @@
 ## Lukitut päätökset (2026-04-14)
 
 - `TrialEvent + TrialEntry` säilytetään (ei yhden taulun mallia).
-- Lisätiedot toteutetaan heti täysin normalisoituna `TrialLisatietoItem`-tauluun.
-- `lisatiedotJson`-välivaihetta ei tehdä.
+- API-upsert toteutetaan vaiheittain raw-first-linjalla: ensin identiteetti,
+  ydinkentät ja `raakadataJson`, sitten lisätietojen normalisointi.
+- `lisatiedotJson`-välivaihetta ei tehdä; lisätietojen myöhempi rakenne on
+  `TrialLisatietoItem`.
 - API:n sisääntulo säilyy `yksi_tulos`-muotoisena; kanoninen `event + entry + lisatiedot[]` on mapperin sisäinen kohdemalli.
 - Upsert-avaimet:
   - event: `sklKoeId`
@@ -44,7 +46,8 @@
   olosuhteet, tilaliput, tuomarit).
 - `TrialEntry` pidetään pöytäkirjakontraktin tasolla; legacy-/kuljetusmuodon
   lisäavaimia ei nosteta omiksi sarakkeiksi.
-- Lisätietorivit 11-61 tallennetaan `TrialLisatietoItem`-tauluun
+- Lisätietorivit 11-61 tallennetaan myöhemmässä vaiheessa
+  `TrialLisatietoItem`-tauluun
   (`koodi`, `nimi`, `era1Arvo..era4Arvo`), ei omiksi `TrialEntry`-sarakkeiksi.
 - Koko sisääntulo säilytetään aina `TrialEntry.raakadataJson`-kentässä.
 
@@ -244,7 +247,8 @@ Huomio:
 
 - API saa vastaanottaa täydellisen lähdepayloadin (`yksi_tulos`-tyylinen, integraation nykyinen muoto, ylimääräiset avaimet sallittu).
 - Mapperi poimii siitä vain kanonisen AJOK-mallin kentät (`TrialEvent`, `TrialEntry`, `TrialLisatietoItem`).
-- Lisätiedoissa tuetaan 1-4 erää (`era1Arvo`, `era2Arvo`, `era3Arvo`, `era4Arvo`).
+- Lisätiedoissa tuetaan myöhemmässä normalisointivaiheessa 1-4 erää
+  (`era1Arvo`, `era2Arvo`, `era3Arvo`, `era4Arvo`).
 - Koko sisääntulon JSON tallennetaan aina `TrialEntry.raakadataJson`-kenttään audit/debug/replay-käyttöön.
 - Tuntemattomat tai käyttämättömät kentät eivät aiheuta virhettä.
 - Pyyntö hylätään vain, jos kanoniset minimikentät puuttuvat:
@@ -263,14 +267,13 @@ Huomio:
 - Tuntematon tai muu sisältö talletetaan `notes`-kenttään.
 - Arvot kuten `NUL`, tyhjä tai `null` eivät aseta tilalippuja.
 
-## Ylituomari-konsistenssisääntö (lukittu)
+## Ylituomari-upsert-sääntö
 
-- `ylituomariNimi` ja `ylituomariNumero` ovat event-tason kenttiä (`TrialEvent`).
-- Saman `sklKoeId` tapahtuman rivien tulee tuottaa sama ylituomari.
-- Jos importissa/API:ssa havaitaan ristiriita:
-  - kirjataan import issue / warning
-  - säilytetään eventin aiempi ensimmäinen ei-null arvo
-  - ristiriitainen arvo säilyy vain rivin `raakadataJson`-kentässä.
+- API-upsertissa `ylituomariNimi` ja `ylituomariNumero` käyttäytyvät kuten
+  muutkin mapatut event-kentät: uusi hyväksytty payload korvaa aiemman arvon.
+- Legacy phase2 -kertamigraatiossa saman ajon ensimmäinen ei-null ylituomari
+  säilytetään, koska legacy-riveillä ei ole `SKLid`-pohjaista virallista
+  korjaus-/uudelleenlähetyssemantiikkaa.
 
 ## API-minimikentät
 
@@ -283,6 +286,29 @@ Huomio:
 
 - Suositus integraatiolle: `POST /api/integraatiot/koiratietokanta/koetulokset/upsert`
 - Vaihtoehto (lyhyt): `POST /api/trials/results/upsert`
+
+## BEJ-84 Phase 1 API-upsert
+
+- Reitti: `POST /api/integraatiot/koiratietokanta/koetulokset/upsert`
+- Auth: `Authorization: Bearer <secret>`, jossa secret luetaan
+  `KOIRATIETOKANTA_RESULTS_API_SECRET`-ympäristömuuttujasta.
+- Sisääntulo on yksi täydellinen `yksi_tulos`-tyylinen JSON-objekti.
+- Pakolliset lähdekentät:
+  - `SKLid`
+  - `REKISTERINUMERO`
+  - `Koepvm`
+  - `KOEPAIKKA`
+- Tallennus:
+  - `TrialEvent` upsertataan `SKLid`-avaimella.
+  - `TrialEntry` upsertataan `trialEventId + rekisterinumeroSnapshot`-avaimella.
+  - `TrialEntry.lahde = KOIRATIETOKANTA_API`.
+  - `TrialEntry.yksilointiAvain = SKL:<SKLid>|REG:<rekisterinumero>`.
+  - Koko sisääntulo tallennetaan aina `TrialEntry.raakadataJson`-kenttään.
+- Phase 1 mapittaa vain ydinkentät `TrialEvent`- ja `TrialEntry`-sarakkeisiin.
+- Tuntemattomat kentät eivät estä tallennusta.
+- Jos koiraa ei löydy paikallisesta rekisterinumerosta, tulos tallennetaan
+  ilman `dogId`-linkkiä ja vastaukseen lisätään varoitus.
+- Lisätietojen `TrialLisatietoItem`-normalisointi ei kuulu Phase 1:een.
 
 ## Legacy-import (kertamigraatio)
 

@@ -12,3 +12,10 @@ export {
   type BeagleTrialSearchRowDb,
   type BeagleTrialSearchSortDb,
 } from "./repository";
+export {
+  upsertKoiratietokantaAjokResultDb,
+  type KoiratietokantaAjokEntryDbInput,
+  type KoiratietokantaAjokEventDbInput,
+  type KoiratietokantaAjokUpsertDbInput,
+  type KoiratietokantaAjokUpsertDbResult,
+} from "./integrations/koiratietokanta";
