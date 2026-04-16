@@ -43,7 +43,7 @@ function isValueComplete(value: unknown): boolean {
   return true;
 }
 
-// Evaluates AJOK poytakirja field availability against the current TrialResult read model.
+// Evaluates AJOK poytakirja field availability against the current AdminTrialDetails read model.
 export function evaluateTrialValidationGaps(
   trial: AdminTrialDetails | null | undefined,
 ): TrialValidationEvaluation {

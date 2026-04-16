@@ -196,10 +196,10 @@ export async function searchAdminTrialsDb(
     entryKey: row.yksilointiAvain,
     eventDate: row.trialEvent.koepaiva,
     eventPlace: row.trialEvent.koekunta,
-    judge: row.trialEvent.ylituomariNimi,
-    piste: toNumberOrNull(row.loppupisteet),
-    pa: row.palkinto,
-    sija: row.sijoitus,
+    ylituomariNimi: row.trialEvent.ylituomariNimi,
+    loppupisteet: toNumberOrNull(row.loppupisteet),
+    palkinto: row.palkinto,
+    sijoitus: row.sijoitus,
   }));
 
   return {

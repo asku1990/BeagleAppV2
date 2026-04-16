@@ -215,10 +215,14 @@ function TrialResults({ trials }: { trials: AdminTrialSummary[] }) {
                     {formatDateForFinland(trial.eventDate)}
                   </td>
                   <td className="px-2 py-2">{showDash(trial.eventPlace)}</td>
-                  <td className="px-2 py-2">{formatPiste(trial.piste)}</td>
-                  <td className="px-2 py-2">{showDash(trial.pa)}</td>
-                  <td className="px-2 py-2">{showDash(trial.sija)}</td>
-                  <td className="px-2 py-2">{showDash(trial.judge)}</td>
+                  <td className="px-2 py-2">
+                    {formatPiste(trial.loppupisteet)}
+                  </td>
+                  <td className="px-2 py-2">{showDash(trial.palkinto)}</td>
+                  <td className="px-2 py-2">{showDash(trial.sijoitus)}</td>
+                  <td className="px-2 py-2">
+                    {showDash(trial.ylituomariNimi)}
+                  </td>
                 </tr>
               );
             })}
@@ -278,25 +282,25 @@ function TrialResults({ trials }: { trials: AdminTrialSummary[] }) {
                   <span className="text-muted-foreground">
                     {t("admin.trials.manage.mobile.piste")}:
                   </span>{" "}
-                  {formatPiste(trial.piste)}
+                  {formatPiste(trial.loppupisteet)}
                 </p>
                 <p>
                   <span className="text-muted-foreground">
                     {t("admin.trials.manage.mobile.pa")}:
                   </span>{" "}
-                  {showDash(trial.pa)}
+                  {showDash(trial.palkinto)}
                 </p>
                 <p>
                   <span className="text-muted-foreground">
                     {t("admin.trials.manage.mobile.sija")}:
                   </span>{" "}
-                  {showDash(trial.sija)}
+                  {showDash(trial.sijoitus)}
                 </p>
                 <p>
                   <span className="text-muted-foreground">
                     {t("admin.trials.manage.mobile.judge")}:
                   </span>{" "}
-                  {showDash(trial.judge)}
+                  {showDash(trial.ylituomariNimi)}
                 </p>
               </div>
               <p className="text-sm font-medium text-muted-foreground">

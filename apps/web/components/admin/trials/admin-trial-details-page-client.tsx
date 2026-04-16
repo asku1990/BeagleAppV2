@@ -159,11 +159,11 @@ export function AdminTrialDetailsPageClient({
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.judge")}
-                      value={showDash(trial.judge)}
+                      value={showDash(trial.ylituomariNimi)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.ke")}
-                      value={showDash(trial.ke)}
+                      value={showDash(trial.keli)}
                     />
                   </div>
                 </div>
@@ -199,19 +199,19 @@ export function AdminTrialDetailsPageClient({
                   <div className="grid gap-2 sm:grid-cols-2">
                     <FieldRow
                       label={t("admin.trials.detail.fields.lk")}
-                      value={showDash(trial.lk)}
+                      value={showDash(trial.luokka)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.pa")}
-                      value={showDash(trial.pa)}
+                      value={showDash(trial.palkinto)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.sija")}
-                      value={showDash(trial.sija)}
+                      value={showDash(trial.sijoitus)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.piste")}
-                      value={formatNumber(trial.piste)}
+                      value={formatNumber(trial.loppupisteet)}
                     />
                   </div>
                 </div>
@@ -225,31 +225,31 @@ export function AdminTrialDetailsPageClient({
                   <div className="grid gap-2 sm:grid-cols-2">
                     <FieldRow
                       label={t("admin.trials.detail.fields.haku")}
-                      value={formatNumber(trial.haku)}
+                      value={formatNumber(trial.hakuKeskiarvo)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.hauk")}
-                      value={formatNumber(trial.hauk)}
+                      value={formatNumber(trial.haukkuKeskiarvo)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.yva")}
-                      value={formatNumber(trial.yva)}
+                      value={formatNumber(trial.yleisvaikutelmaPisteet)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.hlo")}
-                      value={formatNumber(trial.hlo)}
+                      value={formatNumber(trial.hakuloysyysTappioYhteensa)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.alo")}
-                      value={formatNumber(trial.alo)}
+                      value={formatNumber(trial.ajoloysyysTappioYhteensa)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.tja")}
-                      value={formatNumber(trial.tja)}
+                      value={formatNumber(trial.tieJaEstetyoskentelyPisteet)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.pin")}
-                      value={formatNumber(trial.pin)}
+                      value={formatNumber(trial.metsastysintoPisteet)}
                     />
                   </div>
                 </div>
@@ -275,7 +275,7 @@ export function AdminTrialDetailsPageClient({
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.legacyFlag")}
-                      value={showDash(trial.legacyFlag)}
+                      value={showDash(trial.notes)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.createdAt")}

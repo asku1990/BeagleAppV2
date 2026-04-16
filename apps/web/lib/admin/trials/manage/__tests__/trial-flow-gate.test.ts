@@ -64,9 +64,9 @@ describe("evaluateTrialFlowGate", () => {
     const evaluation = evaluateTrialFlowGate({ catalog: driftedCatalog });
 
     expect(evaluation.statusCounts).toEqual({
-      "typed-now": 16,
+      "typed-now": 20,
       "raw-only": 7,
-      missing: 27,
+      missing: 23,
     });
   });
 });

@@ -25,9 +25,9 @@ describe("TRIAL_FIELD_CONTRACT_CATALOG", () => {
 
   it("matches locked baseline status counts", () => {
     expect(countTrialFieldContractStatuses()).toEqual({
-      "typed-now": 16,
+      "typed-now": 20,
       "raw-only": 8,
-      missing: 26,
+      missing: 22,
     });
   });
 

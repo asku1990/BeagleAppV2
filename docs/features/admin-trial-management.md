@@ -38,6 +38,7 @@ Developer notes for the admin trial read-only list/detail flow (`BEJ-76`,
 5. Validation panel compares current read model against AJOK target field set and shows:
    - `missing_from_model`: field not represented in current read contract.
    - `available_but_incomplete`: field exists in current model but selected row value is empty/null.
+   - BEJ-82 fields (`rokotusOk`, `tunnistusOk`, `paljasMaa`, `lumikeli`) are typed in detail-read, so they are evaluated in incomplete gaps instead of model-missing gaps.
 
 ## Contract rules
 
@@ -67,6 +68,7 @@ Developer notes for the admin trial read-only list/detail flow (`BEJ-76`,
 - Validation panel is analysis/visualization only and does not mutate data.
 - This panel is a baseline input to the historical AJOK read-model work
   and later read-path migration updates in `BEJ-82`.
+- BEJ-82 keeps the gap report format unchanged (same groups and status labels) for Phase 2/3 comparability.
 
 ## Tests
 

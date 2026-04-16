@@ -28,20 +28,24 @@ describe("evaluateTrialValidationGaps", () => {
       eventPlace: "Helsinki",
       kennelDistrict: null,
       kennelDistrictNo: null,
-      ke: null,
-      lk: null,
-      pa: null,
-      piste: null,
-      sija: null,
-      haku: null,
-      hauk: null,
-      yva: null,
-      hlo: null,
-      alo: null,
-      tja: null,
-      pin: null,
-      judge: null,
-      legacyFlag: null,
+      keli: null,
+      paljasMaa: null,
+      lumikeli: null,
+      luokka: null,
+      palkinto: null,
+      loppupisteet: null,
+      sijoitus: null,
+      hakuKeskiarvo: null,
+      haukkuKeskiarvo: null,
+      yleisvaikutelmaPisteet: null,
+      hakuloysyysTappioYhteensa: null,
+      ajoloysyysTappioYhteensa: null,
+      tieJaEstetyoskentelyPisteet: null,
+      metsastysintoPisteet: null,
+      ylituomariNimi: null,
+      rokotusOk: null,
+      tunnistusOk: null,
+      notes: null,
       rawPayloadJson: null,
       rawPayloadAvailable: false,
       createdAt: "2026-04-14T10:00:00.000Z",
@@ -59,6 +63,20 @@ describe("evaluateTrialValidationGaps", () => {
       evaluation.availableButIncomplete.some(
         (item) =>
           item.targetField === "kennelpiiri" &&
+          item.status === "available_but_incomplete",
+      ),
+    ).toBe(true);
+    expect(
+      evaluation.availableButIncomplete.some(
+        (item) =>
+          item.targetField === "rokotusOk" &&
+          item.status === "available_but_incomplete",
+      ),
+    ).toBe(true);
+    expect(
+      evaluation.availableButIncomplete.some(
+        (item) =>
+          item.targetField === "paljasMaa" &&
           item.status === "available_but_incomplete",
       ),
     ).toBe(true);
