@@ -57,17 +57,31 @@ function resolvePagination(
   };
 }
 
-function buildWhere(query: string): Prisma.TrialResultWhereInput {
+function buildWhere(query: string): Prisma.TrialEntryWhereInput {
   if (!query) {
     return {};
   }
 
   return {
     OR: [
-      { eventPlace: { contains: query, mode: "insensitive" } },
-      { eventName: { contains: query, mode: "insensitive" } },
-      { judge: { contains: query, mode: "insensitive" } },
-      { sourceKey: { contains: query, mode: "insensitive" } },
+      {
+        trialEvent: {
+          is: { koekunta: { contains: query, mode: "insensitive" } },
+        },
+      },
+      {
+        trialEvent: {
+          is: { ylituomariNimi: { contains: query, mode: "insensitive" } },
+        },
+      },
+      {
+        trialEvent: {
+          is: { legacyEventKey: { contains: query, mode: "insensitive" } },
+        },
+      },
+      { yksilointiAvain: { contains: query, mode: "insensitive" } },
+      { rekisterinumeroSnapshot: { contains: query, mode: "insensitive" } },
+      { koiranNimiSnapshot: { contains: query, mode: "insensitive" } },
       {
         dog: {
           is: {
@@ -107,28 +121,34 @@ export async function searchAdminTrialsDb(
   const pageSize = parsePageSize(input.pageSize);
   const sort = normalizeSort(input.sort);
   const where = buildWhere(query);
-  const orderBy: Prisma.TrialResultOrderByWithRelationInput[] = [
-    { eventDate: sort === "date-asc" ? "asc" : "desc" },
-    { eventPlace: "asc" },
-    { sourceKey: "asc" },
+  const orderBy: Prisma.TrialEntryOrderByWithRelationInput[] = [
+    { trialEvent: { koepaiva: sort === "date-asc" ? "asc" : "desc" } },
+    { trialEvent: { koekunta: "asc" } },
+    { yksilointiAvain: "asc" },
   ];
 
-  const total = await prisma.trialResult.count({ where });
+  const total = await prisma.trialEntry.count({ where });
   const pagination = resolvePagination(total, page, pageSize);
-  const rows = await prisma.trialResult.findMany({
+  const rows = await prisma.trialEntry.findMany({
     where,
     orderBy,
     skip: pagination.skip,
     take: pageSize,
     select: {
       id: true,
-      sourceKey: true,
-      eventDate: true,
-      eventPlace: true,
-      judge: true,
-      piste: true,
-      pa: true,
-      sija: true,
+      yksilointiAvain: true,
+      rekisterinumeroSnapshot: true,
+      koiranNimiSnapshot: true,
+      loppupisteet: true,
+      palkinto: true,
+      sijoitus: true,
+      trialEvent: {
+        select: {
+          koepaiva: true,
+          koekunta: true,
+          ylituomariNimi: true,
+        },
+      },
       dog: {
         select: {
           name: true,
@@ -146,15 +166,21 @@ export async function searchAdminTrialsDb(
 
   const items: AdminTrialSummaryDb[] = rows.map((row) => ({
     trialId: row.id,
-    dogName: row.dog.name,
-    registrationNo: row.dog.registrations[0]?.registrationNo ?? null,
-    sourceKey: row.sourceKey,
-    eventDate: row.eventDate,
-    eventPlace: row.eventPlace,
-    judge: row.judge,
-    piste: toNumberOrNull(row.piste),
-    pa: row.pa,
-    sija: row.sija,
+    dogName:
+      row.dog?.name?.trim() ||
+      row.koiranNimiSnapshot?.trim() ||
+      row.rekisterinumeroSnapshot,
+    registrationNo:
+      row.rekisterinumeroSnapshot ||
+      row.dog?.registrations[0]?.registrationNo ||
+      null,
+    sourceKey: row.yksilointiAvain,
+    eventDate: row.trialEvent.koepaiva,
+    eventPlace: row.trialEvent.koekunta,
+    judge: row.trialEvent.ylituomariNimi,
+    piste: toNumberOrNull(row.loppupisteet),
+    pa: row.palkinto,
+    sija: row.sijoitus,
   }));
 
   return {
