@@ -1,0 +1,178 @@
+// Sample fixtures that lock visible admin AJOK list/detail parity expectations
+// between legacy TrialResult-style output fields and canonical AJOK row inputs.
+
+type DecimalLike = {
+  valueOf: () => number;
+};
+
+function decimal(value: number | null): DecimalLike | null {
+  if (value === null) {
+    return null;
+  }
+
+  return {
+    valueOf: () => value,
+  };
+}
+
+export const ADMIN_TRIAL_LIST_PARITY_ROWS = [
+  {
+    id: "entry-1",
+    yksilointiAvain: "SKL:1001|REG:FI12345/21",
+    rekisterinumeroSnapshot: "FI12345/21",
+    koiranNimiSnapshot: "Rex Snapshot",
+    loppupisteet: decimal(88.5),
+    palkinto: "VOI1",
+    sijoitus: "1",
+    trialEvent: {
+      sklKoeId: 1001,
+      koepaiva: new Date("2026-01-12T00:00:00.000Z"),
+      koekunta: "Helsinki",
+      ylituomariNimi: "Judge One",
+    },
+    dog: {
+      name: "Rex",
+      registrations: [{ registrationNo: "FI00000/00" }],
+    },
+  },
+  {
+    id: "entry-2",
+    yksilointiAvain: "LEGACY:2026-01-13|REG:FI22222/20",
+    rekisterinumeroSnapshot: "FI22222/20",
+    koiranNimiSnapshot: "Mila Snapshot",
+    loppupisteet: decimal(null),
+    palkinto: null,
+    sijoitus: null,
+    trialEvent: {
+      sklKoeId: null,
+      koepaiva: new Date("2026-01-13T00:00:00.000Z"),
+      koekunta: "Tampere",
+      ylituomariNimi: null,
+    },
+    dog: null,
+  },
+  {
+    id: "entry-3",
+    yksilointiAvain: "SKL:1003|REG:FI33333/19",
+    rekisterinumeroSnapshot: "FI33333/19",
+    koiranNimiSnapshot: null,
+    loppupisteet: decimal(72.25),
+    palkinto: "AVO2",
+    sijoitus: "3",
+    trialEvent: {
+      sklKoeId: 1003,
+      koepaiva: new Date("2026-01-14T00:00:00.000Z"),
+      koekunta: "Turku",
+      ylituomariNimi: "Judge Three",
+    },
+    dog: {
+      name: "Aatu",
+      registrations: [{ registrationNo: "FI99999/99" }],
+    },
+  },
+] as const;
+
+export const ADMIN_TRIAL_LIST_PARITY_EXPECTED = [
+  {
+    trialId: "entry-1",
+    dogName: "Rex",
+    registrationNo: "FI12345/21",
+    sklKoeId: 1001,
+    entryKey: "SKL:1001|REG:FI12345/21",
+    eventDate: new Date("2026-01-12T00:00:00.000Z"),
+    eventPlace: "Helsinki",
+    judge: "Judge One",
+    piste: 88.5,
+    pa: "VOI1",
+    sija: "1",
+  },
+  {
+    trialId: "entry-2",
+    dogName: "Mila Snapshot",
+    registrationNo: "FI22222/20",
+    sklKoeId: null,
+    entryKey: "LEGACY:2026-01-13|REG:FI22222/20",
+    eventDate: new Date("2026-01-13T00:00:00.000Z"),
+    eventPlace: "Tampere",
+    judge: null,
+    piste: null,
+    pa: null,
+    sija: null,
+  },
+  {
+    trialId: "entry-3",
+    dogName: "Aatu",
+    registrationNo: "FI33333/19",
+    sklKoeId: 1003,
+    entryKey: "SKL:1003|REG:FI33333/19",
+    eventDate: new Date("2026-01-14T00:00:00.000Z"),
+    eventPlace: "Turku",
+    judge: "Judge Three",
+    piste: 72.25,
+    pa: "AVO2",
+    sija: "3",
+  },
+] as const;
+
+export const ADMIN_TRIAL_DETAIL_PARITY_ROW = {
+  id: "entry-detail-1",
+  dogId: null,
+  rekisterinumeroSnapshot: "FI44444/18",
+  koiranNimiSnapshot: "Nella Snapshot",
+  luokka: "VOI",
+  palkinto: "VOI1",
+  loppupisteet: decimal(91.25),
+  sijoitus: "1",
+  hakuKeskiarvo: decimal(12.5),
+  haukkuKeskiarvo: decimal(11.75),
+  yleisvaikutelmaPisteet: decimal(9.5),
+  hakuloysyysTappioYhteensa: decimal(1.5),
+  ajoloysyysTappioYhteensa: decimal(2.25),
+  tieJaEstetyoskentelyPisteet: decimal(4.75),
+  metsastysintoPisteet: decimal(5.0),
+  keli: "P",
+  notes: "L",
+  yksilointiAvain: "LEGACY:2026-01-15|REG:FI44444/18",
+  createdAt: new Date("2026-01-15T10:00:00.000Z"),
+  updatedAt: new Date("2026-01-15T11:00:00.000Z"),
+  trialEvent: {
+    sklKoeId: null,
+    koepaiva: new Date("2026-01-15T00:00:00.000Z"),
+    koekunta: "Lahti",
+    jarjestaja: "Talvikoe",
+    kennelpiiri: "Etelä",
+    kennelpiirinro: "01",
+    ylituomariNimi: "Judge Detail",
+  },
+  dog: null,
+} as const;
+
+export const ADMIN_TRIAL_DETAIL_PARITY_EXPECTED = {
+  trialId: "entry-detail-1",
+  dogId: null,
+  dogName: "Nella Snapshot",
+  registrationNo: "FI44444/18",
+  sklKoeId: null,
+  entryKey: "LEGACY:2026-01-15|REG:FI44444/18",
+  eventDate: new Date("2026-01-15T00:00:00.000Z"),
+  eventName: "Talvikoe",
+  eventPlace: "Lahti",
+  kennelDistrict: "Etelä",
+  kennelDistrictNo: "01",
+  ke: "P",
+  lk: "VOI",
+  pa: "VOI1",
+  piste: 91.25,
+  sija: "1",
+  haku: 12.5,
+  hauk: 11.75,
+  yva: 9.5,
+  hlo: 1.5,
+  alo: 2.25,
+  tja: 4.75,
+  pin: 5,
+  judge: "Judge Detail",
+  legacyFlag: "L",
+  createdAt: new Date("2026-01-15T10:00:00.000Z"),
+  updatedAt: new Date("2026-01-15T11:00:00.000Z"),
+} as const;

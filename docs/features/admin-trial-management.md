@@ -80,6 +80,12 @@ Developer notes for the admin trial read-only list/detail flow (`BEJ-76`,
 - `packages/server/admin/trials/manage/__tests__/*`
 - `packages/db/admin/trials/manage/__tests__/*`
 
+Parity sample evidence for BEJ-81:
+
+- `packages/db/admin/trials/manage/__tests__/fixtures/parity-samples.ts`
+- `packages/db/admin/trials/manage/__tests__/search-trials.parity.test.ts`
+- `packages/db/admin/trials/manage/__tests__/get-trial-details.parity.test.ts`
+
 ## When to update this doc
 
 - Update this file when the trial summary/detail contracts change.
