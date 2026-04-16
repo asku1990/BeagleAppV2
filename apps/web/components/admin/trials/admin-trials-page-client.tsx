@@ -38,15 +38,18 @@ function renderRegistrationCell(trial: AdminTrialSummary): {
   primary: string;
   secondary: string | null;
 } {
+  const fallbackIdentifier =
+    trial.sklKoeId !== null ? String(trial.sklKoeId) : trial.entryKey;
+
   if (trial.registrationNo) {
     return {
       primary: trial.registrationNo,
-      secondary: trial.sourceKey,
+      secondary: fallbackIdentifier,
     };
   }
 
   return {
-    primary: trial.sourceKey,
+    primary: fallbackIdentifier,
     secondary: null,
   };
 }

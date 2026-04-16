@@ -6,9 +6,11 @@ export type AdminTrialDetailsRequestDb = {
 
 export type AdminTrialDetailsDb = {
   trialId: string;
-  dogId: string;
+  dogId: string | null;
   dogName: string;
   registrationNo: string | null;
+  sklKoeId: number | null;
+  entryKey: string;
   eventDate: Date;
   eventName: string | null;
   eventPlace: string;
@@ -28,7 +30,6 @@ export type AdminTrialDetailsDb = {
   pin: number | null;
   judge: string | null;
   legacyFlag: string | null;
-  sourceKey: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -44,7 +45,8 @@ export type AdminTrialSummaryDb = {
   trialId: string;
   dogName: string;
   registrationNo: string | null;
-  sourceKey: string;
+  sklKoeId: number | null;
+  entryKey: string;
   eventDate: Date;
   eventPlace: string;
   judge: string | null;

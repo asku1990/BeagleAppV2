@@ -11,7 +11,8 @@ export type AdminTrialSummary = {
   trialId: string;
   dogName: string;
   registrationNo: string | null;
-  sourceKey: string;
+  sklKoeId: number | null;
+  entryKey: string;
   eventDate: string;
   eventPlace: string;
   judge: string | null;

@@ -1,7 +1,7 @@
 export const fiAdminTrialsMessages = {
   "admin.trials.title": "Ylläpito: ajokokeet",
   "admin.trials.description":
-    "Selailu nykyiseen TrialResult-dataan. Näkymä näyttää koiran, rekisterin tai sourceKeyn sekä kokeen peruskentät.",
+    "Selailu AJOK-kokeiden uuteen skeemaan. Näkymä näyttää koiran, rekisterin tai SKL-koeavaimen sekä kokeen peruskentät.",
   "admin.trials.manage.title": "Ajokokeiden koetulokset",
   "admin.trials.manage.description":
     "Hae ja selaa nykyisiä ajokokeiden koetuloksia read-only-näkymässä.",
@@ -12,7 +12,7 @@ export const fiAdminTrialsMessages = {
   "admin.trials.manage.error": "Koetulosten lataus epäonnistui.",
   "admin.trials.manage.empty": "Ei koetuloksia näytettäväksi.",
   "admin.trials.manage.columns.dog": "Koira",
-  "admin.trials.manage.columns.registration": "Rekisteri / sourceKey",
+  "admin.trials.manage.columns.registration": "Rekisteri / SKL-koeavain",
   "admin.trials.manage.columns.date": "Päivä",
   "admin.trials.manage.columns.place": "Paikka",
   "admin.trials.manage.columns.piste": "Pisteet",
@@ -60,7 +60,7 @@ export const fiAdminTrialsMessages = {
   "admin.trials.detail.header.placeholder": "Ladataan koetulosta...",
   "admin.trials.detail.section.title": "Koetuloksen tiedot",
   "admin.trials.detail.section.subtitle":
-    "Nykyisen TrialResult-rivin read-only detaljinäkymä.",
+    "Read-only detaljinäkymä AJOK uuden skeeman riville.",
   "admin.trials.detail.state.loading": "Ladataan koetuloksen detaljia...",
   "admin.trials.detail.state.error": "Koetuloksen detaljin lataus epäonnistui.",
   "admin.trials.detail.state.notFound": "Koetulosta ei löytynyt.",
@@ -72,7 +72,8 @@ export const fiAdminTrialsMessages = {
   "admin.trials.detail.sections.metadata": "Metadata",
   "admin.trials.detail.sections.raw": "Raaka / lähdedata",
   "admin.trials.detail.fields.trialId": "trialId",
-  "admin.trials.detail.fields.sourceKey": "sourceKey",
+  "admin.trials.detail.fields.sklKoeId": "SKL-koeId",
+  "admin.trials.detail.fields.entryKey": "entryKey",
   "admin.trials.detail.fields.createdAt": "Luotu",
   "admin.trials.detail.fields.updatedAt": "Päivitetty",
   "admin.trials.detail.fields.dogName": "Koiran nimi",
@@ -99,13 +100,13 @@ export const fiAdminTrialsMessages = {
   "admin.trials.detail.fields.pin": "Metsästysinto",
   "admin.trials.detail.raw.toggle": "Näytä raw/source data",
   "admin.trials.detail.raw.unavailable":
-    "Raw/source payload ei ole saatavilla nykyisessä TrialResult-skeemassa.",
+    "Raw/source payload ei ole saatavilla tällä AJOK-rivillä.",
 } as const;
 
 export const svAdminTrialsMessages = {
   "admin.trials.title": "Admin: jaktprov",
   "admin.trials.description":
-    "Bläddra i nuvarande TrialResult-data. Vyn visar hunden, registreringsnumret eller sourceKey samt provets baskolumner.",
+    "Bläddra i AJOK nya schema. Vyn visar hunden, registreringsnumret eller SKL-provnyckeln samt provets baskolumner.",
   "admin.trials.manage.title": "Jaktprovresultat",
   "admin.trials.manage.description":
     "Sök och bläddra i nuvarande jaktprovresultat i en read-only-vy.",
@@ -116,7 +117,7 @@ export const svAdminTrialsMessages = {
   "admin.trials.manage.error": "Det gick inte att ladda provresultat.",
   "admin.trials.manage.empty": "Inga provresultat att visa.",
   "admin.trials.manage.columns.dog": "Hund",
-  "admin.trials.manage.columns.registration": "Reg / sourceKey",
+  "admin.trials.manage.columns.registration": "Reg / SKL-provnyckel",
   "admin.trials.manage.columns.date": "Datum",
   "admin.trials.manage.columns.place": "Plats",
   "admin.trials.manage.columns.piste": "Poäng",
@@ -163,7 +164,7 @@ export const svAdminTrialsMessages = {
   "admin.trials.detail.header.placeholder": "Laddar provresultat...",
   "admin.trials.detail.section.title": "Provresultatets uppgifter",
   "admin.trials.detail.section.subtitle":
-    "Skrivskyddad detaljvy för en rad i nuvarande TrialResult.",
+    "Skrivskyddad detaljvy för en rad i AJOK nya schema.",
   "admin.trials.detail.state.loading": "Laddar provresultatdetalj...",
   "admin.trials.detail.state.error":
     "Det gick inte att ladda provresultatdetaljen.",
@@ -176,7 +177,8 @@ export const svAdminTrialsMessages = {
   "admin.trials.detail.sections.metadata": "Metadata",
   "admin.trials.detail.sections.raw": "Rådata / källdata",
   "admin.trials.detail.fields.trialId": "trialId",
-  "admin.trials.detail.fields.sourceKey": "sourceKey",
+  "admin.trials.detail.fields.sklKoeId": "SKL-koeId",
+  "admin.trials.detail.fields.entryKey": "entryKey",
   "admin.trials.detail.fields.createdAt": "Skapad",
   "admin.trials.detail.fields.updatedAt": "Uppdaterad",
   "admin.trials.detail.fields.dogName": "Hundens namn",
@@ -203,5 +205,5 @@ export const svAdminTrialsMessages = {
   "admin.trials.detail.fields.pin": "Jaktlust",
   "admin.trials.detail.raw.toggle": "Visa raw/source-data",
   "admin.trials.detail.raw.unavailable":
-    "Raw/source payload finns inte i nuvarande TrialResult-schema.",
+    "Raw/source payload finns inte tillgänglig för den här AJOK-raden.",
 } as const;

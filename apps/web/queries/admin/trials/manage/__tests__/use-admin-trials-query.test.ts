@@ -1,6 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { adminTrialQueryKey, adminTrialsQueryKey } from "../query-keys";
-import { isAdminTrialQueryError , useAdminTrialQuery } from "../use-admin-trial-query";
+import {
+  isAdminTrialQueryError,
+  useAdminTrialQuery,
+} from "../use-admin-trial-query";
 import { useAdminTrialsQuery } from "../use-admin-trials-query";
 
 const { useQueryMock, listAdminTrialsMock, getAdminTrialMock } = vi.hoisted(
@@ -70,7 +73,8 @@ describe("useAdminTrialsQuery", () => {
             trialId: "trial-1",
             dogName: "Rex",
             registrationNo: "FI123",
-            sourceKey: "src-1",
+            sklKoeId: 123456,
+            entryKey: "entry-1",
             eventDate: "2026-04-14",
             eventPlace: "Helsinki",
             judge: "Judge",
@@ -96,7 +100,8 @@ describe("useAdminTrialsQuery", () => {
           trialId: "trial-1",
           dogName: "Rex",
           registrationNo: "FI123",
-          sourceKey: "src-1",
+          sklKoeId: 123456,
+          entryKey: "entry-1",
           eventDate: "2026-04-14",
           eventPlace: "Helsinki",
           judge: "Judge",
@@ -174,9 +179,11 @@ describe("useAdminTrialQuery", () => {
       data: {
         trial: {
           trialId: "trial-1",
-          dogId: "dog-1",
+          dogId: null,
           dogName: "Rex",
           registrationNo: "FI123",
+          sklKoeId: 54321,
+          entryKey: "entry-1",
           eventDate: "2026-04-14",
           eventName: null,
           eventPlace: "Helsinki",
@@ -196,7 +203,6 @@ describe("useAdminTrialQuery", () => {
           pin: null,
           judge: null,
           legacyFlag: null,
-          sourceKey: "source-1",
           rawPayloadJson: null,
           rawPayloadAvailable: false,
           createdAt: "2026-04-14T10:00:00.000Z",
@@ -213,9 +219,11 @@ describe("useAdminTrialQuery", () => {
     await expect(options.queryFn()).resolves.toEqual({
       trial: {
         trialId: "trial-1",
-        dogId: "dog-1",
+        dogId: null,
         dogName: "Rex",
         registrationNo: "FI123",
+        sklKoeId: 54321,
+        entryKey: "entry-1",
         eventDate: "2026-04-14",
         eventName: null,
         eventPlace: "Helsinki",
@@ -235,7 +243,6 @@ describe("useAdminTrialQuery", () => {
         pin: null,
         judge: null,
         legacyFlag: null,
-        sourceKey: "source-1",
         rawPayloadJson: null,
         rawPayloadAvailable: false,
         createdAt: "2026-04-14T10:00:00.000Z",

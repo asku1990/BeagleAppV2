@@ -18,9 +18,11 @@ describe("evaluateTrialValidationGaps", () => {
   it("returns row-level incomplete gaps for available fields with empty values", () => {
     const evaluation = evaluateTrialValidationGaps({
       trialId: "trial-1",
-      dogId: "dog-1",
+      dogId: null,
       dogName: "Rex",
       registrationNo: null,
+      sklKoeId: 54321,
+      entryKey: "entry-1",
       eventDate: "2026-04-14",
       eventName: null,
       eventPlace: "Helsinki",
@@ -40,7 +42,6 @@ describe("evaluateTrialValidationGaps", () => {
       pin: null,
       judge: null,
       legacyFlag: null,
-      sourceKey: "source-1",
       rawPayloadJson: null,
       rawPayloadAvailable: false,
       createdAt: "2026-04-14T10:00:00.000Z",

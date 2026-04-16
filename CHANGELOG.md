@@ -19,6 +19,7 @@ This project uses a user-facing changelog format.
 - Ylläpidon ajokokeiden listalta avataan nyt koetuloksen detaljinäkymä suoraan yhtenäisellä rivi-/korttivalinnalla.
 - Ylläpidon ajokokeisiin lisättiin uusi tapahtumahaku, jolla koetuloksia voi hakea tapahtuman nimellä ja paikalla.
 - Koetuloksen detaljisivu ryhmittelee kentät pöytäkirjamaisesti osioihin ja näyttää mahdollisen raw/source-datan kollapsoitavana read-only-näkymänä.
+- Ylläpidon AJOK-listaus ja detalji (`/admin/trials`) lukevat nyt uutta kanonista AJOK-skeemaa (`TrialEvent` + `TrialEntry`) read-only-polussa. Näkymän tunnistekentissä käytetään SKL-koeavainta ja entry-avainta vanhan `sourceKey`-esityksen sijaan.
 
 ### Changed
 

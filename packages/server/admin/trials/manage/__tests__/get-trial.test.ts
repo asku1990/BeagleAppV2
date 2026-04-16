@@ -70,9 +70,11 @@ describe("getAdminTrial", () => {
   it("maps trial details from db to contract format", async () => {
     getAdminTrialDetailsDbMock.mockResolvedValue({
       trialId: "trial-1",
-      dogId: "dog-1",
+      dogId: null,
       dogName: "Rex",
       registrationNo: "FI12345/21",
+      sklKoeId: 54321,
+      entryKey: "entry-1",
       eventDate: new Date("2026-04-10T06:00:00.000Z"),
       eventName: "Kevätkoe",
       eventPlace: "Helsinki",
@@ -92,7 +94,6 @@ describe("getAdminTrial", () => {
       pin: 4,
       judge: "Judge One",
       legacyFlag: "L",
-      sourceKey: "source-1",
       createdAt: new Date("2026-04-10T06:30:00.000Z"),
       updatedAt: new Date("2026-04-10T07:00:00.000Z"),
     });
@@ -114,9 +115,11 @@ describe("getAdminTrial", () => {
         data: {
           trial: {
             trialId: "trial-1",
-            dogId: "dog-1",
+            dogId: null,
             dogName: "Rex",
             registrationNo: "FI12345/21",
+            sklKoeId: 54321,
+            entryKey: "entry-1",
             eventDate: "2026-04-10",
             eventName: "Kevätkoe",
             eventPlace: "Helsinki",
@@ -136,7 +139,6 @@ describe("getAdminTrial", () => {
             pin: 4,
             judge: "Judge One",
             legacyFlag: "L",
-            sourceKey: "source-1",
             rawPayloadJson: null,
             rawPayloadAvailable: false,
             createdAt: "2026-04-10T06:30:00.000Z",

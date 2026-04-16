@@ -4,9 +4,11 @@ export type AdminTrialDetailsRequest = {
 
 export type AdminTrialDetails = {
   trialId: string;
-  dogId: string;
+  dogId: string | null;
   dogName: string;
   registrationNo: string | null;
+  sklKoeId: number | null;
+  entryKey: string;
   eventDate: string;
   eventName: string | null;
   eventPlace: string;
@@ -26,7 +28,6 @@ export type AdminTrialDetails = {
   pin: number | null;
   judge: string | null;
   legacyFlag: string | null;
-  sourceKey: string;
   rawPayloadJson: string | null;
   rawPayloadAvailable: boolean;
   createdAt: string;

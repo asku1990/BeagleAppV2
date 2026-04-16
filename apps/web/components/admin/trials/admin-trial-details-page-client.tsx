@@ -266,8 +266,12 @@ export function AdminTrialDetailsPageClient({
                       value={showDash(trial.trialId)}
                     />
                     <FieldRow
-                      label={t("admin.trials.detail.fields.sourceKey")}
-                      value={showDash(trial.sourceKey)}
+                      label={t("admin.trials.detail.fields.sklKoeId")}
+                      value={showDash(trial.sklKoeId)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.entryKey")}
+                      value={showDash(trial.entryKey)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.legacyFlag")}

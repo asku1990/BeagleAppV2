@@ -41,6 +41,7 @@ export async function getAdminTrialDetailsDb(
       updatedAt: true,
       trialEvent: {
         select: {
+          sklKoeId: true,
           koepaiva: true,
           koekunta: true,
           jarjestaja: true,
@@ -70,7 +71,7 @@ export async function getAdminTrialDetailsDb(
 
   return {
     trialId: row.id,
-    dogId: row.dogId ?? "",
+    dogId: row.dogId ?? null,
     dogName:
       row.dog?.name?.trim() ||
       row.koiranNimiSnapshot?.trim() ||
@@ -79,6 +80,8 @@ export async function getAdminTrialDetailsDb(
       row.rekisterinumeroSnapshot ||
       row.dog?.registrations[0]?.registrationNo ||
       null,
+    sklKoeId: row.trialEvent.sklKoeId ?? null,
+    entryKey: row.yksilointiAvain,
     eventDate: row.trialEvent.koepaiva,
     eventName: row.trialEvent.jarjestaja,
     eventPlace: row.trialEvent.koekunta,
@@ -98,7 +101,6 @@ export async function getAdminTrialDetailsDb(
     pin: toNumberOrNull(row.metsastysintoPisteet),
     judge: row.trialEvent.ylituomariNimi,
     legacyFlag: row.notes,
-    sourceKey: row.yksilointiAvain,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };

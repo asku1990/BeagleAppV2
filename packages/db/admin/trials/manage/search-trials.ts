@@ -144,6 +144,7 @@ export async function searchAdminTrialsDb(
       sijoitus: true,
       trialEvent: {
         select: {
+          sklKoeId: true,
           koepaiva: true,
           koekunta: true,
           ylituomariNimi: true,
@@ -174,7 +175,8 @@ export async function searchAdminTrialsDb(
       row.rekisterinumeroSnapshot ||
       row.dog?.registrations[0]?.registrationNo ||
       null,
-    sourceKey: row.yksilointiAvain,
+    sklKoeId: row.trialEvent.sklKoeId ?? null,
+    entryKey: row.yksilointiAvain,
     eventDate: row.trialEvent.koepaiva,
     eventPlace: row.trialEvent.koekunta,
     judge: row.trialEvent.ylituomariNimi,

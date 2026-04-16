@@ -111,9 +111,11 @@ describe("AdminTrialDetailsPageClient", () => {
       data: {
         trial: {
           trialId: "trial-1",
-          dogId: "dog-1",
+          dogId: null,
           dogName: "Rex",
           registrationNo: "FI12345/21",
+          sklKoeId: 54321,
+          entryKey: "entry-1",
           eventDate: "2026-04-14",
           eventName: "Kevätkoe",
           eventPlace: "Helsinki",
@@ -133,7 +135,6 @@ describe("AdminTrialDetailsPageClient", () => {
           pin: 4,
           judge: "Judge One",
           legacyFlag: "L",
-          sourceKey: "source-1",
           rawPayloadJson: null,
           rawPayloadAvailable: false,
           createdAt: "2026-04-14T10:00:00.000Z",
@@ -160,10 +161,12 @@ describe("AdminTrialDetailsPageClient", () => {
     expect(html).toContain("admin.trials.validation.title");
     expect(html).toContain("admin.trials.validation.sections.missing");
     expect(html).toContain("admin.trials.validation.sections.incomplete");
-    expect(html).toContain("sklKoeId");
+    expect(html).toContain("admin.trials.detail.fields.sklKoeId");
+    expect(html).toContain("admin.trials.detail.fields.entryKey");
     expect(html).toContain("kennelpiiri");
     expect(html).toContain("Rex");
-    expect(html).toContain("source-1");
+    expect(html).toContain("54321");
+    expect(html).toContain("entry-1");
     expect(html).toContain("admin.trials.detail.raw.unavailable");
   });
 });
