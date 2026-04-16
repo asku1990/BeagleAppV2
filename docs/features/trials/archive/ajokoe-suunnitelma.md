@@ -1,10 +1,12 @@
-# AJOK-suunnitelma
+# AJOK-suunnitelma (ARCHIVED)
 
 ## Lukitut päätökset (2026-04-14)
 
 - `TrialEvent + TrialEntry` säilytetään (ei yhden taulun mallia).
-- Lisätiedot toteutetaan heti täysin normalisoituna `TrialLisatietoItem`-tauluun.
-- `lisatiedotJson`-välivaihetta ei tehdä.
+- API-upsert toteutetaan vaiheittain raw-first-linjalla: ensin identiteetti,
+  ydinkentät ja `raakadataJson`, sitten lisätietojen normalisointi.
+- `lisatiedotJson`-välivaihetta ei tehdä; lisätietojen myöhempi rakenne on
+  `TrialLisatietoItem`.
 - API:n sisääntulo säilyy `yksi_tulos`-muotoisena; kanoninen `event + entry + lisatiedot[]` on mapperin sisäinen kohdemalli.
 - Upsert-avaimet:
   - event: `sklKoeId`
@@ -36,6 +38,11 @@
 - `TrialEvent` = kokeen yhteiset tiedot
 - `TrialEntry` = yhden koiran tulos yhdessä kokeessa
 - `TrialLisatietoItem` = lisätiedot 11-61
+
+## BEJ-84 API-upsert
+
+- Koiratietokanta API AJOK upsertin tarkka kirjoitussopimus on dokumentissa
+  `docs/features/trials/koiratietokanta-api-ajok-upsert.md`.
 
 ## Uusi skeema (pöytäkirjan mukainen)
 
@@ -89,10 +96,6 @@ Erä- ja aikatiedot:
 - `ajoMin3`
 - `ajoMin4`
 - `hyvaksytytAjominuutit`
-- `viiteEra1`
-- `viiteEra2`
-- `viiteEra3`
-- `viiteEra4`
 
 Pisteet ja tulos:
 
@@ -112,10 +115,6 @@ Pisteet ja tulos:
 - `ajotaitoEra3`
 - `ajotaitoEra4`
 - `ajotaitoKeskiarvo`
-- `yleisvaikutusEra1`
-- `yleisvaikutusEra2`
-- `yleisvaikutusEra3`
-- `yleisvaikutusEra4`
 - `yleisvaikutelmaPisteet`
 - `hakuloysyysTappioEra1`
 - `hakuloysyysTappioEra2`
@@ -127,14 +126,6 @@ Pisteet ja tulos:
 - `ajoloysyysTappioEra3`
 - `ajoloysyysTappioEra4`
 - `ajoloysyysTappioYhteensa`
-- `takajalkeenAjoEra1`
-- `takajalkeenAjoEra2`
-- `takajalkeenAjoEra3`
-- `takajalkeenAjoEra4`
-- `puutteellinenMetsastysintoEra1`
-- `puutteellinenMetsastysintoEra2`
-- `puutteellinenMetsastysintoEra3`
-- `puutteellinenMetsastysintoEra4`
 - `tieJaEstetyoskentelyPisteet`
 - `metsastysintoPisteet` (legacy `PIN`)
 - `ansiopisteetYhteensa`
@@ -157,12 +148,20 @@ Olosuhteet ja huomautukset:
 
 Tuomarit:
 
+- `ylituomariNimiSnapshot` (rivi-/payload-snapshot)
+- `ylituomariNumeroSnapshot` (rivi-/payload-snapshot)
 - `ryhmatuomariNimi`
 - `palkintotuomariNimi`
 
 Tekninen säilytys:
 
 - `raakadataJson`
+
+Huomio:
+
+- Numerolla alkavat olosuhde- ja arviointirivit (`11_*`, `12_*`, `17_*` jne.)
+  kuuluvat `TrialLisatietoItem`-tauluun. Ne eivät korvaa `TrialEntry.keli`-kenttää,
+  joka säilyttää pöytäkirjan pääasiallisen sää-/olosuhdearvon.
 
 ### `TrialLisatietoItem`
 
@@ -247,7 +246,8 @@ Huomio:
 
 - API saa vastaanottaa täydellisen lähdepayloadin (`yksi_tulos`-tyylinen, integraation nykyinen muoto, ylimääräiset avaimet sallittu).
 - Mapperi poimii siitä vain kanonisen AJOK-mallin kentät (`TrialEvent`, `TrialEntry`, `TrialLisatietoItem`).
-- Lisätiedoissa tuetaan 1-4 erää (`era1Arvo`, `era2Arvo`, `era3Arvo`, `era4Arvo`).
+- Lisätiedoissa tuetaan myöhemmässä normalisointivaiheessa 1-4 erää
+  (`era1Arvo`, `era2Arvo`, `era3Arvo`, `era4Arvo`).
 - Koko sisääntulon JSON tallennetaan aina `TrialEntry.raakadataJson`-kenttään audit/debug/replay-käyttöön.
 - Tuntemattomat tai käyttämättömät kentät eivät aiheuta virhettä.
 - Pyyntö hylätään vain, jos kanoniset minimikentät puuttuvat:
@@ -266,14 +266,13 @@ Huomio:
 - Tuntematon tai muu sisältö talletetaan `notes`-kenttään.
 - Arvot kuten `NUL`, tyhjä tai `null` eivät aseta tilalippuja.
 
-## Ylituomari-konsistenssisääntö (lukittu)
+## Ylituomari-upsert-sääntö
 
-- `ylituomariNimi` ja `ylituomariNumero` ovat event-tason kenttiä (`TrialEvent`).
-- Saman `sklKoeId` tapahtuman rivien tulee tuottaa sama ylituomari.
-- Jos importissa/API:ssa havaitaan ristiriita:
-  - kirjataan import issue / warning
-  - säilytetään eventin aiempi ensimmäinen ei-null arvo
-  - ristiriitainen arvo säilyy vain rivin `raakadataJson`-kentässä.
+- API-upsertissa `ylituomariNimi` ja `ylituomariNumero` käyttäytyvät kuten
+  muutkin mapatut event-kentät: uusi hyväksytty payload korvaa aiemman arvon.
+- Legacy phase2 -kertamigraatiossa saman ajon ensimmäinen ei-null ylituomari
+  säilytetään, koska legacy-riveillä ei ole `SKLid`-pohjaista virallista
+  korjaus-/uudelleenlähetyssemantiikkaa.
 
 ## API-minimikentät
 
@@ -286,6 +285,33 @@ Huomio:
 
 - Suositus integraatiolle: `POST /api/integraatiot/koiratietokanta/koetulokset/upsert`
 - Vaihtoehto (lyhyt): `POST /api/trials/results/upsert`
+
+## BEJ-84 Phase 1 API-upsert
+
+- Reitti: `POST /api/integraatiot/koiratietokanta/koetulokset/upsert`
+- Auth: `Authorization: Bearer <secret>`, jossa secret luetaan
+  `KOIRATIETOKANTA_RESULTS_API_SECRET`-ympäristömuuttujasta.
+- Sisääntulo on yksi täydellinen `yksi_tulos`-tyylinen JSON-objekti.
+- Pakolliset lähdekentät:
+  - `SKLid`
+  - `REKISTERINUMERO`
+  - `Koepvm`
+  - `KOEPAIKKA`
+- Tallennus:
+  - `TrialEvent` upsertataan `SKLid`-avaimella.
+  - `TrialEntry` upsertataan `trialEventId + rekisterinumeroSnapshot`-avaimella.
+  - `TrialEntry.lahde = KOIRATIETOKANTA_API`.
+  - `TrialEntry.yksilointiAvain = SKL:<SKLid>|REG:<rekisterinumero>`.
+  - Koko sisääntulo tallennetaan aina `TrialEntry.raakadataJson`-kenttään.
+- Phase 1 mapittaa ydinkentät `TrialEvent`- ja `TrialEntry`-sarakkeisiin.
+- Phase 2 mapittaa PDF-relevantit lisätietokentät `TrialLisatietoItem`-riveihin.
+- Tuntemattomat kentät eivät estä tallennusta.
+- Jos koiraa ei löydy paikallisesta rekisterinumerosta, tulos tallennetaan
+  ilman `dogId`-linkkiä ja vastaukseen lisätään varoitus.
+- Lisätiedot korvataan upsertissa aina saman transaktion sisällä: vanhat
+  `TrialLisatietoItem`-rivit poistetaan entryltä ja nykyisen payloadin
+  ei-tyhjät lisätietorivit luodaan uudelleen. Tämä pitää uudelleenlähetykset
+  idempotentteina eikä duplikoi rivejä.
 
 ## Legacy-import (kertamigraatio)
 

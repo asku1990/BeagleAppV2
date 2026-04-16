@@ -136,6 +136,11 @@ export type {
   BeagleTrialSearchResponse,
   BeagleTrialSearchRow,
   BeagleTrialSearchSort,
+  KoiratietokantaAjokUpsertRequest,
+  KoiratietokantaAjokUpsertResponse,
+  KoiratietokantaAjokValidationIssue,
+  KoiratietokantaAjokWarning,
+  KoiratietokantaAjokWarningCode,
 } from "./trials";
 
 export type {

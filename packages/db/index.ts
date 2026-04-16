@@ -116,6 +116,7 @@ export {
   getBeagleTrialDetailsDb,
   getBeagleTrialsForDogDb,
   searchBeagleTrialsDb,
+  upsertKoiratietokantaAjokResultDb,
   type BeagleTrialDetailsRequestDb,
   type BeagleTrialDetailsResponseDb,
   type BeagleTrialDetailsRowDb,
@@ -125,6 +126,11 @@ export {
   type BeagleTrialSearchResponseDb,
   type BeagleTrialSearchRowDb,
   type BeagleTrialSearchSortDb,
+  type KoiratietokantaAjokEntryDbInput,
+  type KoiratietokantaAjokEventDbInput,
+  type KoiratietokantaAjokLisatietoDbInput,
+  type KoiratietokantaAjokUpsertDbInput,
+  type KoiratietokantaAjokUpsertDbResult,
 } from "./trials";
 export {
   getAdminTrialDetailsDb,
