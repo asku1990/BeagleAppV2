@@ -54,4 +54,63 @@ describe("searchAdminTrialsDb parity sample", () => {
     expect(result.items[1]?.entryKey).toBe("LEGACY:2026-01-13|REG:FI22222/20");
     expect(result.items[2]?.registrationNo).toBe("FI33333/19");
   });
+
+  it("searches by trial organizer name on the canonical relation", async () => {
+    trialEntryCountMock.mockResolvedValue(0);
+    trialEntryFindManyMock.mockResolvedValue([]);
+
+    await searchAdminTrialsDb({
+      query: "Talvikoe",
+      page: 1,
+      pageSize: 50,
+      sort: "date-desc",
+    });
+
+    expect(trialEntryFindManyMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          OR: expect.arrayContaining([
+            expect.objectContaining({
+              trialEvent: {
+                is: {
+                  jarjestaja: {
+                    contains: "Talvikoe",
+                    mode: "insensitive",
+                  },
+                },
+              },
+            }),
+          ]),
+        }),
+      }),
+    );
+  });
+
+  it("searches by canonical SKL trial id when the query is numeric", async () => {
+    trialEntryCountMock.mockResolvedValue(0);
+    trialEntryFindManyMock.mockResolvedValue([]);
+
+    await searchAdminTrialsDb({
+      query: "1001",
+      page: 1,
+      pageSize: 50,
+      sort: "date-desc",
+    });
+
+    expect(trialEntryFindManyMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          OR: expect.arrayContaining([
+            expect.objectContaining({
+              trialEvent: {
+                is: {
+                  sklKoeId: 1001,
+                },
+              },
+            }),
+          ]),
+        }),
+      }),
+    );
+  });
 });

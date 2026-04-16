@@ -6,7 +6,8 @@ export const fiAdminTrialsMessages = {
   "admin.trials.manage.description":
     "Hae ja selaa nykyisiä ajokokeiden koetuloksia read-only-näkymässä.",
   "admin.trials.manage.countSuffix": "tulosta",
-  "admin.trials.manage.filters.placeholder": "Hae koetuloksia",
+  "admin.trials.manage.filters.placeholder":
+    "Hae koira, rekisteri, SKL-koeavain, paikka, tuomari tai järjestäjä",
   "admin.trials.manage.filters.aria": "Hae ajokokeita",
   "admin.trials.manage.loading": "Ladataan koetuloksia...",
   "admin.trials.manage.error": "Koetulosten lataus epäonnistui.",
@@ -111,7 +112,8 @@ export const svAdminTrialsMessages = {
   "admin.trials.manage.description":
     "Sök och bläddra i nuvarande jaktprovresultat i en read-only-vy.",
   "admin.trials.manage.countSuffix": "resultat",
-  "admin.trials.manage.filters.placeholder": "Sök provresultat",
+  "admin.trials.manage.filters.placeholder":
+    "Sök hund, regnr, SKL-provnyckel, plats, domare eller arrangör",
   "admin.trials.manage.filters.aria": "Sök jaktprov",
   "admin.trials.manage.loading": "Laddar provresultat...",
   "admin.trials.manage.error": "Det gick inte att ladda provresultat.",

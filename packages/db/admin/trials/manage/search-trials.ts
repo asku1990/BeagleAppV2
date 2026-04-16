@@ -62,8 +62,20 @@ function buildWhere(query: string): Prisma.TrialEntryWhereInput {
     return {};
   }
 
+  const parsedSklKoeId = Number(query);
+  const hasSklKoeId = Number.isInteger(parsedSklKoeId) && parsedSklKoeId >= 0;
+
   return {
     OR: [
+      ...(hasSklKoeId
+        ? [
+            {
+              trialEvent: {
+                is: { sklKoeId: parsedSklKoeId },
+              },
+            },
+          ]
+        : []),
       {
         trialEvent: {
           is: { koekunta: { contains: query, mode: "insensitive" } },
@@ -72,6 +84,11 @@ function buildWhere(query: string): Prisma.TrialEntryWhereInput {
       {
         trialEvent: {
           is: { ylituomariNimi: { contains: query, mode: "insensitive" } },
+        },
+      },
+      {
+        trialEvent: {
+          is: { jarjestaja: { contains: query, mode: "insensitive" } },
         },
       },
       {
