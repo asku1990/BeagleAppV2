@@ -53,7 +53,8 @@ export async function GET(
       });
     }
 
-    const registrationNo = result.body.data.registrationNo?.trim();
+    const registrationNo = result.body.data.registrationNo.trim();
+    const dogName = result.body.data.dogName?.trim() ?? null;
     if (!registrationNo) {
       return jsonResponse(
         {
@@ -69,7 +70,7 @@ export async function GET(
       );
     }
 
-    const pdfBytes = await renderTrialDogPdf({ registrationNo });
+    const pdfBytes = await renderTrialDogPdf({ registrationNo, dogName });
 
     log.info(
       {

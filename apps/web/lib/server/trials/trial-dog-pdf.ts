@@ -9,7 +9,13 @@ const AJOK_TEMPLATE_RELATIVE_PATH = path.join(
 );
 
 export const DOG_REGISTRATION_NO_FIELD = {
-  x: 287,
+  x: 286.3,
+  y: 433,
+  size: 12,
+} as const;
+
+export const DOG_NAME_FIELD = {
+  x: 62.3,
   y: 433,
   size: 12,
 } as const;
@@ -35,6 +41,7 @@ async function resolveTemplatePath(): Promise<string> {
 // Renders trial row data onto the static AJOK dog-specific protocol template.
 export async function renderTrialDogPdf(input: {
   registrationNo: string;
+  dogName: string | null;
 }): Promise<Uint8Array> {
   const templatePath = await resolveTemplatePath();
   const templateBytes = await readFile(templatePath);
@@ -49,6 +56,16 @@ export async function renderTrialDogPdf(input: {
     font,
     color: rgb(0, 0, 0),
   });
+
+  if (input.dogName) {
+    page.drawText(input.dogName, {
+      x: DOG_NAME_FIELD.x,
+      y: DOG_NAME_FIELD.y,
+      size: DOG_NAME_FIELD.size,
+      font,
+      color: rgb(0, 0, 0),
+    });
+  }
 
   return pdfDocument.save();
 }

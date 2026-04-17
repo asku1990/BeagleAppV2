@@ -6,7 +6,8 @@ export type TrialDogPdfDataRequestDb = {
 
 export type TrialDogPdfDataDb = {
   trialId: string;
-  registrationNo: string | null;
+  registrationNo: string;
+  dogName: string | null;
 };
 
 export async function getTrialDogPdfDataDb(
@@ -21,11 +22,12 @@ export async function getTrialDogPdfDataDb(
       rekisterinumeroSnapshot: true,
       dog: {
         select: {
+          name: true,
           registrations: {
             select: {
               registrationNo: true,
             },
-            orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+            orderBy: [{ createdAt: "desc" }, { id: "desc" }],
             take: 1,
           },
         },
@@ -40,8 +42,7 @@ export async function getTrialDogPdfDataDb(
   return {
     trialId: row.id,
     registrationNo:
-      row.rekisterinumeroSnapshot ||
-      row.dog?.registrations[0]?.registrationNo ||
-      null,
+      row.dog?.registrations[0]?.registrationNo || row.rekisterinumeroSnapshot,
+    dogName: row.dog?.name || null,
   };
 }

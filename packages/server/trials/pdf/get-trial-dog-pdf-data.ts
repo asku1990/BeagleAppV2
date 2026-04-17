@@ -4,7 +4,8 @@ import type { ServiceResult } from "@server/core/result";
 
 export type TrialDogPdfData = {
   trialId: string;
-  registrationNo: string | null;
+  registrationNo: string;
+  dogName: string | null;
 };
 
 function normalizeTrialId(value: string): string {
@@ -67,6 +68,7 @@ export async function getTrialDogPdfDataService(
         data: {
           trialId: result.trialId,
           registrationNo: result.registrationNo,
+          dogName: result.dogName,
         },
       },
     };
