@@ -28,7 +28,6 @@ describe("evaluateTrialValidationGaps", () => {
       kennelDistrictNo: null,
       ylituomariNumero: null,
       keli: null,
-      paljasMaa: null,
       luokka: null,
       koiriaLuokassa: null,
       palkinto: null,
@@ -100,7 +99,7 @@ describe("evaluateTrialValidationGaps", () => {
     expect(
       evaluation.availableButIncomplete.some(
         (item) =>
-          item.targetField === "paljasMaa" &&
+          item.targetField === "keli" &&
           item.status === "available_but_incomplete",
       ),
     ).toBe(true);

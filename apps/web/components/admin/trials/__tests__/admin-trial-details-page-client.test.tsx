@@ -126,7 +126,6 @@ describe("AdminTrialDetailsPageClient", () => {
           kennelDistrictNo: "01",
           ylituomariNumero: "123",
           keli: "KE",
-          paljasMaa: true,
           luokka: "A",
           koiriaLuokassa: 10,
           palkinto: "VOI1",

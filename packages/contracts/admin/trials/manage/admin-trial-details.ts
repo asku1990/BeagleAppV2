@@ -19,7 +19,6 @@ export type AdminTrialDetails = {
   kennelDistrictNo: string | null;
   ylituomariNumero: string | null;
   keli: string | null;
-  paljasMaa: boolean | null;
   luokka: string | null;
   koiriaLuokassa: number | null;
   palkinto: string | null;

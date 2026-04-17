@@ -330,13 +330,6 @@ export const TRIAL_FIELD_CONTRACT_CATALOG: readonly TrialFieldContractItem[] = [
     followUpTicket: null,
   },
   {
-    group: "conditions",
-    targetField: "paljasMaa",
-    status: "typed-now",
-    sourceField: "paljasMaa",
-    followUpTicket: null,
-  },
-  {
     group: "status",
     targetField: "luopui",
     status: "typed-now",

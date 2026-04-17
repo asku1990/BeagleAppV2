@@ -410,10 +410,6 @@ export function AdminTrialDetailsPageClient({
                       )}
                       value={formatNumber(trial.tappiopisteetYhteensa)}
                     />
-                    <FieldRow
-                      label={t("admin.trials.detail.fields.paljasMaa")}
-                      value={showDash(trial.paljasMaa)}
-                    />
                   </div>
                 </div>
 

@@ -132,7 +132,6 @@ export async function getAdminTrial(
             kennelDistrictNo: result.kennelDistrictNo,
             ylituomariNumero: result.ylituomariNumero,
             keli: result.keli,
-            paljasMaa: result.paljasMaa,
             luokka: result.luokka,
             koiriaLuokassa: result.koiriaLuokassa,
             palkinto: result.palkinto,
