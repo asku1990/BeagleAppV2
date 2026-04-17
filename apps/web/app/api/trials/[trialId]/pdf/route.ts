@@ -59,6 +59,7 @@ export async function GET(
     const kennelpiirinro = result.body.data.kennelpiirinro?.trim() ?? null;
     const koekunta = result.body.data.koekunta?.trim() ?? null;
     const koepaiva = result.body.data.koepaiva;
+    const jarjeastaja = result.body.data.jarjestaja?.trim() ?? null;
 
     if (!registrationNo) {
       return jsonResponse(
@@ -82,6 +83,7 @@ export async function GET(
       kennelpiirinro,
       koekunta,
       koepaiva,
+      jarjeastaja,
     });
 
     log.info(

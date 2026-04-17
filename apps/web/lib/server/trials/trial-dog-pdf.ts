@@ -32,6 +32,12 @@ export const KOEPAIVA_FIELD = {
   size: 12,
 } as const;
 
+export const JARJESTAJA_FIELD = {
+  x: 62.3,
+  y: 481,
+  size: 12,
+} as const;
+
 export const DOG_REGISTRATION_NO_FIELD = {
   x: 286.3,
   y: 433,
@@ -79,6 +85,7 @@ export async function renderTrialDogPdf(input: {
   kennelpiirinro: string | null;
   koekunta: string | null;
   koepaiva: Date;
+  jarjeastaja: string | null;
 }): Promise<Uint8Array> {
   const templatePath = await resolveTemplatePath();
   const templateBytes = await readFile(templatePath);
@@ -122,6 +129,16 @@ export async function renderTrialDogPdf(input: {
       x: KOEPAIVA_FIELD.x,
       y: KOEPAIVA_FIELD.y,
       size: KOEPAIVA_FIELD.size,
+      font,
+      color: rgb(0, 0, 0),
+    });
+  }
+
+  if (input.jarjeastaja) {
+    page.drawText(input.jarjeastaja, {
+      x: JARJESTAJA_FIELD.x,
+      y: JARJESTAJA_FIELD.y,
+      size: JARJESTAJA_FIELD.size,
       font,
       color: rgb(0, 0, 0),
     });
