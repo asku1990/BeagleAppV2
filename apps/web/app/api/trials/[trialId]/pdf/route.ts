@@ -55,6 +55,7 @@ export async function GET(
 
     const registrationNo = result.body.data.registrationNo.trim();
     const dogName = result.body.data.dogName?.trim() ?? null;
+    const kennelpiiri = result.body.data.kennelpiiri?.trim() ?? null;
     if (!registrationNo) {
       return jsonResponse(
         {
@@ -70,13 +71,19 @@ export async function GET(
       );
     }
 
-    const pdfBytes = await renderTrialDogPdf({ registrationNo, dogName });
+    const pdfBytes = await renderTrialDogPdf({
+      registrationNo,
+      dogName,
+      kennelpiiri,
+    });
 
     log.info(
       {
         event: "success",
         trialId: normalizedTrialId,
         registrationNo,
+        dogName,
+        kennelpiiri,
         durationMs: Date.now() - startedAt,
       },
       "trial pdf generation succeeded",

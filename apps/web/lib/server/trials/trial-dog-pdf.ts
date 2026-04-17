@@ -8,6 +8,12 @@ const AJOK_TEMPLATE_RELATIVE_PATH = path.join(
   "ajok-koirakohtainen-poytakirja.pdf",
 );
 
+export const KENNELPIIRI_FIELD = {
+  x: 62.3,
+  y: 526.5,
+  size: 12,
+} as const;
+
 export const DOG_REGISTRATION_NO_FIELD = {
   x: 286.3,
   y: 433,
@@ -42,12 +48,23 @@ async function resolveTemplatePath(): Promise<string> {
 export async function renderTrialDogPdf(input: {
   registrationNo: string;
   dogName: string | null;
+  kennelpiiri: string | null;
 }): Promise<Uint8Array> {
   const templatePath = await resolveTemplatePath();
   const templateBytes = await readFile(templatePath);
   const pdfDocument = await PDFDocument.load(templateBytes);
   const font = await pdfDocument.embedFont(StandardFonts.Helvetica);
   const page = pdfDocument.getPage(0);
+
+  if (input.kennelpiiri) {
+    page.drawText(input.kennelpiiri, {
+      x: KENNELPIIRI_FIELD.x,
+      y: KENNELPIIRI_FIELD.y,
+      size: KENNELPIIRI_FIELD.size,
+      font,
+      color: rgb(0, 0, 0),
+    });
+  }
 
   page.drawText(input.registrationNo, {
     x: DOG_REGISTRATION_NO_FIELD.x,
