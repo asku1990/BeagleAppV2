@@ -18,7 +18,7 @@ const GROUP_LABEL_KEYS = {
   judges: "admin.trials.validation.groups.judges",
 } as const;
 
-const NOT_FROM_API_UPSERT_FIELDS = new Set([
+const NOT_FROM_API_UPSERT_FIELDS: ReadonlySet<string> = new Set([
   "rotukoodi",
   "isanNimi",
   "isanRekisterinumero",
