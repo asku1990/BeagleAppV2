@@ -1,0 +1,93 @@
+import { getTrialDogPdfDataDb } from "@db/trials/pdf";
+import { toErrorLog, withLogContext } from "@server/core/logger";
+import type { ServiceResult } from "@server/core/result";
+
+export type TrialDogPdfData = {
+  trialId: string;
+  registrationNo: string | null;
+};
+
+function normalizeTrialId(value: string): string {
+  return value.trim();
+}
+
+export async function getTrialDogPdfDataService(
+  trialId: string,
+  context?: { requestId?: string },
+): Promise<ServiceResult<TrialDogPdfData>> {
+  const startedAt = Date.now();
+  const normalizedTrialId = normalizeTrialId(trialId);
+  const log = withLogContext({
+    layer: "service",
+    useCase: "trials.getTrialDogPdfData",
+    ...(context?.requestId ? { requestId: context.requestId } : {}),
+  });
+
+  if (!normalizedTrialId) {
+    return {
+      status: 400,
+      body: {
+        ok: false,
+        error: "Invalid trial id.",
+        code: "INVALID_TRIAL_ID",
+      },
+    };
+  }
+
+  try {
+    const result = await getTrialDogPdfDataDb({
+      trialId: normalizedTrialId,
+    });
+
+    if (!result) {
+      return {
+        status: 404,
+        body: {
+          ok: false,
+          error: "Trial not found.",
+          code: "TRIAL_NOT_FOUND",
+        },
+      };
+    }
+
+    log.info(
+      {
+        event: "success",
+        trialId: normalizedTrialId,
+        hasRegistrationNo: Boolean(result.registrationNo),
+        durationMs: Date.now() - startedAt,
+      },
+      "trial dog pdf data fetch succeeded",
+    );
+
+    return {
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          trialId: result.trialId,
+          registrationNo: result.registrationNo,
+        },
+      },
+    };
+  } catch (error) {
+    log.error(
+      {
+        event: "exception",
+        trialId: normalizedTrialId,
+        durationMs: Date.now() - startedAt,
+        ...toErrorLog(error),
+      },
+      "trial dog pdf data fetch failed",
+    );
+
+    return {
+      status: 500,
+      body: {
+        ok: false,
+        error: "Failed to load trial dog pdf data.",
+        code: "INTERNAL_ERROR",
+      },
+    };
+  }
+}

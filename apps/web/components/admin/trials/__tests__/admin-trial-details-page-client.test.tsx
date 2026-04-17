@@ -3,8 +3,6 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AdminTrialDetailsPageClient } from "../admin-trial-details-page-client";
 
-const originalNodeEnv = process.env.NODE_ENV;
-
 const { useAdminTrialQueryMock } = vi.hoisted(() => ({
   useAdminTrialQueryMock: vi.fn(),
 }));
@@ -86,7 +84,7 @@ vi.mock("@/components/listing", () => ({
 describe("AdminTrialDetailsPageClient", () => {
   beforeEach(() => {
     useAdminTrialQueryMock.mockReset();
-    process.env.NODE_ENV = "test";
+    vi.stubEnv("NODE_ENV", "test");
     useAdminTrialQueryMock.mockReturnValue({
       data: null,
       isLoading: false,
@@ -96,7 +94,7 @@ describe("AdminTrialDetailsPageClient", () => {
   });
 
   afterEach(() => {
-    process.env.NODE_ENV = originalNodeEnv;
+    vi.unstubAllEnvs();
   });
 
   it("renders invalid state for empty trial id", () => {
@@ -246,11 +244,11 @@ describe("AdminTrialDetailsPageClient", () => {
     expect(html).toContain("54321");
     expect(html).toContain("entry-1");
     expect(html).toContain("source");
-    expect(html).not.toContain("/beagle/trials/trial-1/pdf");
+    expect(html).not.toContain("/api/trials/trial-1/pdf");
   });
 
   it("shows the dev-only pdf link in development", () => {
-    process.env.NODE_ENV = "development";
+    vi.stubEnv("NODE_ENV", "development");
 
     useAdminTrialQueryMock.mockReturnValue({
       data: {
@@ -326,7 +324,7 @@ describe("AdminTrialDetailsPageClient", () => {
       React.createElement(AdminTrialDetailsPageClient, { trialId: "trial-1" }),
     );
 
-    expect(html).toContain('href="/beagle/trials/trial-1/pdf"');
+    expect(html).toContain('href="/api/trials/trial-1/pdf"');
     expect(html).toContain("admin.trials.detail.pdf.open");
   });
 });

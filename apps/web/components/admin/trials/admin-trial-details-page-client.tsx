@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useI18n } from "@/hooks/i18n";
 import { formatDateForFinland } from "@/lib/admin/core/date";
-import { getBeagleTrialPdfHref } from "@/lib/public/beagle/trials";
+import { getTrialPdfHref } from "@/lib/trials";
 import {
   isAdminTrialQueryError,
   useAdminTrialQuery,
@@ -99,7 +99,7 @@ export function AdminTrialDetailsPageClient({
         {process.env.NODE_ENV === "development" ? (
           <Button asChild variant="outline" size="sm" className="w-fit">
             <Link
-              href={getBeagleTrialPdfHref(normalizedTrialId)}
+              href={getTrialPdfHref(normalizedTrialId)}
               target="_blank"
               rel="noreferrer"
             >
