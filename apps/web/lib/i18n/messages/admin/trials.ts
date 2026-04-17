@@ -144,7 +144,7 @@ export const fiAdminTrialsMessages = {
   "admin.trials.detail.additional.columns.era3": "Erä 3",
   "admin.trials.detail.additional.columns.era4": "Erä 4",
   "admin.trials.detail.additional.unavailable":
-    "Lisätiedot JSON ei ole saatavilla tällä AJOK-rivillä.",
+    "Lisätietoja ei ole saatavilla tällä AJOK-rivillä.",
   "admin.trials.detail.raw.toggle": "Näytä raw/source data",
   "admin.trials.detail.raw.unavailable":
     "Raw/source payload ei ole saatavilla tällä AJOK-rivillä.",
@@ -298,7 +298,7 @@ export const svAdminTrialsMessages = {
   "admin.trials.detail.additional.columns.era3": "Period 3",
   "admin.trials.detail.additional.columns.era4": "Period 4",
   "admin.trials.detail.additional.unavailable":
-    "Tilläggsdata JSON finns inte tillgänglig för den här AJOK-raden.",
+    "Tilläggsuppgifter finns inte tillgängliga för den här AJOK-raden.",
   "admin.trials.detail.raw.toggle": "Visa raw/source-data",
   "admin.trials.detail.raw.unavailable":
     "Raw/source payload finns inte tillgänglig för den här AJOK-raden.",

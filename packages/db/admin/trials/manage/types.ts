@@ -60,10 +60,21 @@ export type AdminTrialDetailsDb = {
   suljettu: boolean | null;
   keskeytetty: boolean | null;
   huomautusTeksti: string | null;
-  lisatiedotJson: string | null;
+  lisatiedot: AdminTrialLisatietoDb[];
+  rawPayloadJson: string | null;
   notes: string | null;
   createdAt: Date;
   updatedAt: Date;
+};
+
+export type AdminTrialLisatietoDb = {
+  koodi: string;
+  nimi: string;
+  era1Arvo: string | null;
+  era2Arvo: string | null;
+  era3Arvo: string | null;
+  era4Arvo: string | null;
+  jarjestys: number;
 };
 
 export type AdminTrialSearchRequestDb = {

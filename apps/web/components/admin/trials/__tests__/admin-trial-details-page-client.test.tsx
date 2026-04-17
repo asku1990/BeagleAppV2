@@ -165,10 +165,19 @@ describe("AdminTrialDetailsPageClient", () => {
           suljettu: false,
           keskeytetty: false,
           huomautusTeksti: null,
-          lisatiedotJson: '[{"koodi":"11"}]',
+          lisatiedot: [
+            {
+              koodi: "11",
+              nimi: "Paljas maa",
+              era1Arvo: null,
+              era2Arvo: null,
+              era3Arvo: null,
+              era4Arvo: null,
+              jarjestys: 11,
+            },
+          ],
           notes: "L",
-          rawPayloadJson: null,
-          rawPayloadAvailable: false,
+          rawPayloadJson: '{"source":"raw"}',
           createdAt: "2026-04-14T10:00:00.000Z",
           updatedAt: "2026-04-14T10:30:00.000Z",
         },
@@ -199,6 +208,6 @@ describe("AdminTrialDetailsPageClient", () => {
     expect(html).toContain("Rex");
     expect(html).toContain("54321");
     expect(html).toContain("entry-1");
-    expect(html).toContain("admin.trials.detail.raw.unavailable");
+    expect(html).toContain("source");
   });
 });

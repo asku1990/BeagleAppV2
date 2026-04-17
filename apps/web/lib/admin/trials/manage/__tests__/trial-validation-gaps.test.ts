@@ -67,10 +67,9 @@ describe("evaluateTrialValidationGaps", () => {
       suljettu: null,
       keskeytetty: null,
       huomautusTeksti: null,
-      lisatiedotJson: null,
+      lisatiedot: [],
       notes: null,
       rawPayloadJson: null,
-      rawPayloadAvailable: false,
       createdAt: "2026-04-14T10:00:00.000Z",
       updatedAt: "2026-04-14T10:00:00.000Z",
     });

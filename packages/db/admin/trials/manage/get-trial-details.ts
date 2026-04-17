@@ -62,6 +62,7 @@ export async function getAdminTrialDetailsDb(
       palkintotuomariNimi: true,
       rokotusOk: true,
       tunnistusOk: true,
+      raakadataJson: true,
       notes: true,
       lisatiedot: {
         select: {
@@ -175,8 +176,16 @@ export async function getAdminTrialDetailsDb(
     suljettu: row.suljettu,
     keskeytetty: row.keskeytetty,
     huomautusTeksti: row.huomautusTeksti,
-    lisatiedotJson:
-      row.lisatiedot.length > 0 ? JSON.stringify(row.lisatiedot) : null,
+    lisatiedot: row.lisatiedot.map((item) => ({
+      koodi: item.koodi,
+      nimi: item.nimi,
+      era1Arvo: item.era1Arvo,
+      era2Arvo: item.era2Arvo,
+      era3Arvo: item.era3Arvo,
+      era4Arvo: item.era4Arvo,
+      jarjestys: item.jarjestys ?? 0,
+    })),
+    rawPayloadJson: row.raakadataJson,
     notes: row.notes,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,

@@ -158,6 +158,7 @@ export const ADMIN_TRIAL_DETAIL_PARITY_ROW = {
   palkintotuomariNimi: "Prize Judge",
   rokotusOk: true,
   tunnistusOk: false,
+  raakadataJson: '{"source":"raw"}',
   notes: "L",
   lisatiedot: [
     {
@@ -244,8 +245,18 @@ export const ADMIN_TRIAL_DETAIL_PARITY_EXPECTED = {
   suljettu: false,
   keskeytetty: false,
   huomautusTeksti: "Ei huomautuksia",
-  lisatiedotJson:
-    '[{"koodi":"11","nimi":"Paljas maa","era1Arvo":"x","era2Arvo":null,"era3Arvo":null,"era4Arvo":null,"jarjestys":11}]',
+  lisatiedot: [
+    {
+      koodi: "11",
+      nimi: "Paljas maa",
+      era1Arvo: "x",
+      era2Arvo: null,
+      era3Arvo: null,
+      era4Arvo: null,
+      jarjestys: 11,
+    },
+  ],
+  rawPayloadJson: '{"source":"raw"}',
   notes: "L",
   createdAt: new Date("2026-01-15T10:00:00.000Z"),
   updatedAt: new Date("2026-01-15T11:00:00.000Z"),

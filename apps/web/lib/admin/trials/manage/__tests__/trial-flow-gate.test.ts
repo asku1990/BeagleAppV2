@@ -64,7 +64,7 @@ describe("evaluateTrialFlowGate", () => {
     const evaluation = evaluateTrialFlowGate({ catalog: driftedCatalog });
 
     expect(evaluation.statusCounts).toEqual({
-      "typed-now": 48,
+      "typed-now": 47,
       "raw-only": 0,
       missing: 1,
     });

@@ -46,54 +46,6 @@ function formatTimestamp(value: string | null | undefined): string {
   }).format(parsed);
 }
 
-type LisatietoRow = {
-  koodi: string;
-  nimi: string;
-  era1Arvo: string | null;
-  era2Arvo: string | null;
-  era3Arvo: string | null;
-  era4Arvo: string | null;
-  jarjestys: number;
-};
-
-function parseLisatiedotRows(
-  rawLisatiedotJson: string | null | undefined,
-): LisatietoRow[] {
-  if (!rawLisatiedotJson) {
-    return [];
-  }
-
-  try {
-    const parsed = JSON.parse(rawLisatiedotJson);
-    if (!Array.isArray(parsed)) {
-      return [];
-    }
-
-    return parsed.filter((item): item is LisatietoRow => {
-      if (!item || typeof item !== "object") {
-        return false;
-      }
-
-      const candidate = item as Partial<LisatietoRow>;
-      return (
-        typeof candidate.koodi === "string" &&
-        typeof candidate.nimi === "string" &&
-        (candidate.era1Arvo === null ||
-          typeof candidate.era1Arvo === "string") &&
-        (candidate.era2Arvo === null ||
-          typeof candidate.era2Arvo === "string") &&
-        (candidate.era3Arvo === null ||
-          typeof candidate.era3Arvo === "string") &&
-        (candidate.era4Arvo === null ||
-          typeof candidate.era4Arvo === "string") &&
-        typeof candidate.jarjestys === "number"
-      );
-    });
-  } catch {
-    return [];
-  }
-}
-
 function FieldRow({ label, value }: { label: string; value: string }) {
   return (
     <p className="text-sm">
@@ -121,7 +73,7 @@ export function AdminTrialDetailsPageClient({
   });
 
   const trial = trialQuery.data?.trial;
-  const lisatiedotRows = parseLisatiedotRows(trial?.lisatiedotJson);
+  const lisatiedotRows = trial?.lisatiedot ?? [];
   const isNotFoundError =
     isAdminTrialQueryError(trialQuery.error) &&
     trialQuery.error.errorCode === "TRIAL_NOT_FOUND";
@@ -556,12 +508,12 @@ export function AdminTrialDetailsPageClient({
                   <SectionTitle>
                     {t("admin.trials.detail.sections.raw")}
                   </SectionTitle>
-                  <details>
+                  <details open={Boolean(trial.rawPayloadJson)}>
                     <summary className="cursor-pointer text-sm underline-offset-2 hover:underline">
                       {t("admin.trials.detail.raw.toggle")}
                     </summary>
                     <div className="mt-3">
-                      {trial.rawPayloadAvailable && trial.rawPayloadJson ? (
+                      {trial.rawPayloadJson ? (
                         <pre className="overflow-x-auto rounded-md bg-muted p-3 text-xs">
                           {trial.rawPayloadJson}
                         </pre>

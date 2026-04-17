@@ -2,6 +2,16 @@ export type AdminTrialDetailsRequest = {
   trialId: string;
 };
 
+export type AdminTrialLisatieto = {
+  koodi: string;
+  nimi: string;
+  era1Arvo: string | null;
+  era2Arvo: string | null;
+  era3Arvo: string | null;
+  era4Arvo: string | null;
+  jarjestys: number;
+};
+
 export type AdminTrialDetails = {
   trialId: string;
   dogId: string | null;
@@ -58,10 +68,9 @@ export type AdminTrialDetails = {
   suljettu: boolean | null;
   keskeytetty: boolean | null;
   huomautusTeksti: string | null;
-  lisatiedotJson: string | null;
+  lisatiedot: AdminTrialLisatieto[];
   notes: string | null;
   rawPayloadJson: string | null;
-  rawPayloadAvailable: boolean;
   createdAt: string;
   updatedAt: string;
 };

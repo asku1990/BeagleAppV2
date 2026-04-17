@@ -359,9 +359,9 @@ export const TRIAL_FIELD_CONTRACT_CATALOG: readonly TrialFieldContractItem[] = [
   },
   {
     group: "additional",
-    targetField: "lisatiedotJson",
+    targetField: "lisatiedot",
     status: "typed-now",
-    sourceField: "lisatiedotJson",
+    sourceField: "lisatiedot",
     followUpTicket: null,
   },
   {
