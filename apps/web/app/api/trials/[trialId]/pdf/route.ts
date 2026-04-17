@@ -56,6 +56,10 @@ export async function GET(
     const registrationNo = result.body.data.registrationNo.trim();
     const dogName = result.body.data.dogName?.trim() ?? null;
     const kennelpiiri = result.body.data.kennelpiiri?.trim() ?? null;
+    const kennelpiirinro = result.body.data.kennelpiirinro?.trim() ?? null;
+    const koekunta = result.body.data.koekunta?.trim() ?? null;
+    const koepaiva = result.body.data.koepaiva;
+
     if (!registrationNo) {
       return jsonResponse(
         {
@@ -75,6 +79,9 @@ export async function GET(
       registrationNo,
       dogName,
       kennelpiiri,
+      kennelpiirinro,
+      koekunta,
+      koepaiva,
     });
 
     log.info(

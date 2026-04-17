@@ -7,6 +7,9 @@ export type TrialDogPdfData = {
   registrationNo: string;
   dogName: string | null;
   kennelpiiri: string | null;
+  kennelpiirinro: string | null;
+  koekunta: string | null;
+  koepaiva: Date;
 };
 
 function normalizeTrialId(value: string): string {
@@ -71,6 +74,9 @@ export async function getTrialDogPdfDataService(
           registrationNo: result.registrationNo,
           dogName: result.dogName,
           kennelpiiri: result.kennelpiiri,
+          kennelpiirinro: result.kennelpiirinro,
+          koekunta: result.koekunta,
+          koepaiva: result.koepaiva,
         },
       },
     };

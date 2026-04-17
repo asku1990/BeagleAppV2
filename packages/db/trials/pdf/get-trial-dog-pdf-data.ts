@@ -9,6 +9,9 @@ export type TrialDogPdfDataDb = {
   registrationNo: string;
   dogName: string | null;
   kennelpiiri: string | null;
+  kennelpiirinro: string | null;
+  koekunta: string | null;
+  koepaiva: Date;
 };
 
 export async function getTrialDogPdfDataDb(
@@ -36,6 +39,9 @@ export async function getTrialDogPdfDataDb(
       trialEvent: {
         select: {
           kennelpiiri: true,
+          kennelpiirinro: true,
+          koekunta: true,
+          koepaiva: true,
         },
       },
     },
@@ -51,5 +57,8 @@ export async function getTrialDogPdfDataDb(
       row.dog?.registrations[0]?.registrationNo || row.rekisterinumeroSnapshot,
     dogName: row.dog?.name || null,
     kennelpiiri: row.trialEvent.kennelpiiri ?? null,
+    kennelpiirinro: row.trialEvent.kennelpiirinro ?? null,
+    koekunta: row.trialEvent.koekunta ?? null,
+    koepaiva: row.trialEvent.koepaiva,
   };
 }

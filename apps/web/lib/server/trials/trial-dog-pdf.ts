@@ -14,6 +14,24 @@ export const KENNELPIIRI_FIELD = {
   size: 12,
 } as const;
 
+export const KENNELPIIRI_NRO_FIELD = {
+  x: 343,
+  y: 526.5,
+  size: 12,
+} as const;
+
+export const KOEKUNTA_FIELD = {
+  x: 62.3,
+  y: 504,
+  size: 12,
+} as const;
+
+export const KOEPAIVA_FIELD = {
+  x: 258,
+  y: 504,
+  size: 12,
+} as const;
+
 export const DOG_REGISTRATION_NO_FIELD = {
   x: 286.3,
   y: 433,
@@ -25,6 +43,15 @@ export const DOG_NAME_FIELD = {
   y: 433,
   size: 12,
 } as const;
+
+function formatTrialDate(value: Date): string {
+  return new Intl.DateTimeFormat("fi-FI", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(value);
+}
 
 async function resolveTemplatePath(): Promise<string> {
   const candidates = [
@@ -49,6 +76,9 @@ export async function renderTrialDogPdf(input: {
   registrationNo: string;
   dogName: string | null;
   kennelpiiri: string | null;
+  kennelpiirinro: string | null;
+  koekunta: string | null;
+  koepaiva: Date;
 }): Promise<Uint8Array> {
   const templatePath = await resolveTemplatePath();
   const templateBytes = await readFile(templatePath);
@@ -61,6 +91,37 @@ export async function renderTrialDogPdf(input: {
       x: KENNELPIIRI_FIELD.x,
       y: KENNELPIIRI_FIELD.y,
       size: KENNELPIIRI_FIELD.size,
+      font,
+      color: rgb(0, 0, 0),
+    });
+  }
+
+  if (input.kennelpiirinro) {
+    page.drawText(input.kennelpiirinro, {
+      x: KENNELPIIRI_NRO_FIELD.x,
+      y: KENNELPIIRI_NRO_FIELD.y,
+      size: KENNELPIIRI_NRO_FIELD.size,
+      font,
+      color: rgb(0, 0, 0),
+    });
+  }
+
+  // koemaasto will be added later when schema chnages are done.
+  if (input.koekunta) {
+    page.drawText(`${input.koekunta}\\koemaasto`, {
+      x: KOEKUNTA_FIELD.x,
+      y: KOEKUNTA_FIELD.y,
+      size: KOEKUNTA_FIELD.size,
+      font,
+      color: rgb(0, 0, 0),
+    });
+  }
+
+  if (input.koepaiva) {
+    page.drawText(formatTrialDate(input.koepaiva), {
+      x: KOEPAIVA_FIELD.x,
+      y: KOEPAIVA_FIELD.y,
+      size: KOEPAIVA_FIELD.size,
       font,
       color: rgb(0, 0, 0),
     });
