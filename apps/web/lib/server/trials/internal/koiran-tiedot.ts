@@ -25,26 +25,10 @@ export const DOG_SEX_NARTTU_FIELD = {
   size: 12,
 } as const;
 
-type TrialDogSex = "MALE" | "FEMALE" | "UNKNOWN" | null;
-
-function drawMark(
-  page: PDFPage,
-  font: PDFFont,
-  field: { x: number; y: number; size: number },
-): void {
-  page.drawText("X", {
-    x: field.x,
-    y: field.y,
-    size: field.size,
-    font,
-    color: rgb(0, 0, 0),
-  });
-}
-
-export function drawTrialDogPdfPhase2(input: {
+export function drawTrialDogPdfKoiranTiedot(input: {
   registrationNo: string;
   dogName: string | null;
-  dogSex: TrialDogSex;
+  dogSex: "MALE" | "FEMALE" | "UNKNOWN" | null;
   page: PDFPage;
   font: PDFFont;
 }): void {
@@ -69,8 +53,20 @@ export function drawTrialDogPdfPhase2(input: {
   }
 
   if (input.dogSex === "MALE") {
-    drawMark(page, font, DOG_SEX_UROS_FIELD);
+    page.drawText("X", {
+      x: DOG_SEX_UROS_FIELD.x,
+      y: DOG_SEX_UROS_FIELD.y,
+      size: DOG_SEX_UROS_FIELD.size,
+      font,
+      color: rgb(0, 0, 0),
+    });
   } else if (input.dogSex === "FEMALE") {
-    drawMark(page, font, DOG_SEX_NARTTU_FIELD);
+    page.drawText("X", {
+      x: DOG_SEX_NARTTU_FIELD.x,
+      y: DOG_SEX_NARTTU_FIELD.y,
+      size: DOG_SEX_NARTTU_FIELD.size,
+      font,
+      color: rgb(0, 0, 0),
+    });
   }
 }

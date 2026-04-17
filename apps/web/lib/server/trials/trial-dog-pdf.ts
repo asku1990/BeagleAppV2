@@ -1,11 +1,11 @@
 import { access, readFile } from "node:fs/promises";
 import path from "node:path";
 import { PDFDocument, StandardFonts } from "pdf-lib";
-import { drawTrialDogPdfPhase1 } from "./trial-dog-pdf-phase-1";
-import { drawTrialDogPdfPhase2 } from "./trial-dog-pdf-phase-2";
-import { drawTrialDogPdfPhase3 } from "./trial-dog-pdf-phase-3";
+import { drawTrialDogPdfKokeenTiedot } from "./internal/kokeen-tiedot";
+import { drawTrialDogPdfKoiranTiedot } from "./internal/koiran-tiedot";
+import { drawTrialDogPdfKoiranTausta } from "./internal/koiran-tausta";
 
-export { DOG_REGISTRATION_NO_FIELD } from "./trial-dog-pdf-phase-2";
+export { DOG_REGISTRATION_NO_FIELD } from "./internal/koiran-tiedot";
 
 const AJOK_TEMPLATE_RELATIVE_PATH = path.join(
   "public",
@@ -48,7 +48,7 @@ export async function renderTrialDogPdf(input: {
   const font = await pdfDocument.embedFont(StandardFonts.Helvetica);
   const page = pdfDocument.getPage(0);
 
-  drawTrialDogPdfPhase1({
+  drawTrialDogPdfKokeenTiedot({
     kennelpiiri: input.kennelpiiri,
     kennelpiirinro: input.kennelpiirinro,
     koekunta: input.koekunta,
@@ -58,7 +58,7 @@ export async function renderTrialDogPdf(input: {
     font,
   });
 
-  drawTrialDogPdfPhase2({
+  drawTrialDogPdfKoiranTiedot({
     registrationNo: input.registrationNo,
     dogName: input.dogName,
     dogSex: input.dogSex,
@@ -66,7 +66,7 @@ export async function renderTrialDogPdf(input: {
     font,
   });
 
-  drawTrialDogPdfPhase3({ page });
+  drawTrialDogPdfKoiranTausta({ page });
 
   return pdfDocument.save();
 }

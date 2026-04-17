@@ -1,7 +1,6 @@
-import { getTrialDogPdfDataDb } from "@db/trials/pdf";
+import { getTrialDogPdfDataDb, type TrialDogSexDb } from "@db/trials/pdf";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
-import type { TrialDogSexDb } from "@db/trials/pdf";
 
 export type TrialDogPdfData = {
   trialId: string;

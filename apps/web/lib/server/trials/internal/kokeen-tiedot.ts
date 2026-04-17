@@ -40,7 +40,7 @@ function formatTrialDate(value: Date): string {
   }).format(value);
 }
 
-export function drawTrialDogPdfPhase1(input: {
+export function drawTrialDogPdfKokeenTiedot(input: {
   kennelpiiri: string | null;
   kennelpiirinro: string | null;
   koekunta: string | null;
