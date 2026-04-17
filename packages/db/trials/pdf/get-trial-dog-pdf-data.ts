@@ -4,10 +4,13 @@ export type TrialDogPdfDataRequestDb = {
   trialId: string;
 };
 
+export type TrialDogSexDb = "MALE" | "FEMALE" | "UNKNOWN";
+
 export type TrialDogPdfDataDb = {
   trialId: string;
   registrationNo: string;
   dogName: string | null;
+  dogSex: TrialDogSexDb | null;
   kennelpiiri: string | null;
   kennelpiirinro: string | null;
   koekunta: string | null;
@@ -28,6 +31,7 @@ export async function getTrialDogPdfDataDb(
       dog: {
         select: {
           name: true,
+          sex: true,
           registrations: {
             select: {
               registrationNo: true,
@@ -58,6 +62,7 @@ export async function getTrialDogPdfDataDb(
     registrationNo:
       row.dog?.registrations[0]?.registrationNo || row.rekisterinumeroSnapshot,
     dogName: row.dog?.name || null,
+    dogSex: (row.dog?.sex ?? null) as TrialDogSexDb | null,
     kennelpiiri: row.trialEvent.kennelpiiri ?? null,
     kennelpiirinro: row.trialEvent.kennelpiirinro ?? null,
     koekunta: row.trialEvent.koekunta ?? null,

@@ -57,6 +57,7 @@ describe("trial pdf api route", () => {
         data: {
           trialId: "entry-1",
           registrationNo: "FI12345/21",
+          dogSex: "MALE",
         },
       },
     });
@@ -96,31 +97,6 @@ describe("trial pdf api route", () => {
       ok: false,
       error: "Trial not found.",
       code: "TRIAL_NOT_FOUND",
-    });
-  });
-
-  it("returns 404 when the trial row has no registration number", async () => {
-    getTrialDogPdfDataServiceMock.mockResolvedValue({
-      status: 200,
-      body: {
-        ok: true,
-        data: {
-          trialId: "entry-1",
-          registrationNo: null,
-        },
-      },
-    });
-
-    const { GET } = await import("../route");
-    const response = await GET(request(), {
-      params: Promise.resolve({ trialId: "entry-1" }),
-    });
-
-    expect(response.status).toBe(404);
-    await expect(response.json()).resolves.toMatchObject({
-      ok: false,
-      error: "Trial dog registration number not found.",
-      code: "REGISTRATION_NO_NOT_FOUND",
     });
   });
 });

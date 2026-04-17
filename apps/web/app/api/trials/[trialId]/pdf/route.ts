@@ -61,24 +61,10 @@ export async function GET(
     const koepaiva = result.body.data.koepaiva;
     const jarjeastaja = result.body.data.jarjestaja?.trim() ?? null;
 
-    if (!registrationNo) {
-      return jsonResponse(
-        {
-          ok: false,
-          error: "Trial dog registration number not found.",
-          code: "REGISTRATION_NO_NOT_FOUND",
-        },
-        {
-          status: 404,
-          methods: METHODS,
-          origin: request.headers.get("origin"),
-        },
-      );
-    }
-
     const pdfBytes = await renderTrialDogPdf({
       registrationNo,
       dogName,
+      dogSex: result.body.data.dogSex,
       kennelpiiri,
       kennelpiirinro,
       koekunta,

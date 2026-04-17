@@ -6,6 +6,12 @@ describe("renderTrialDogPdf", () => {
     const bytes = await renderTrialDogPdf({
       registrationNo: "FI12345/21",
       dogName: null,
+      dogSex: "MALE",
+      kennelpiiri: null,
+      kennelpiirinro: null,
+      koekunta: null,
+      koepaiva: new Date("2025-09-07T00:00:00.000Z"),
+      jarjeastaja: null,
     });
 
     expect(Buffer.from(bytes).toString("latin1", 0, 4)).toBe("%PDF");

@@ -1,11 +1,13 @@
 import { getTrialDogPdfDataDb } from "@db/trials/pdf";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
+import type { TrialDogSexDb } from "@db/trials/pdf";
 
 export type TrialDogPdfData = {
   trialId: string;
   registrationNo: string;
   dogName: string | null;
+  dogSex: TrialDogSexDb | null;
   kennelpiiri: string | null;
   kennelpiirinro: string | null;
   koekunta: string | null;
@@ -74,6 +76,7 @@ export async function getTrialDogPdfDataService(
           trialId: result.trialId,
           registrationNo: result.registrationNo,
           dogName: result.dogName,
+          dogSex: result.dogSex,
           kennelpiiri: result.kennelpiiri,
           kennelpiirinro: result.kennelpiirinro,
           koekunta: result.koekunta,
