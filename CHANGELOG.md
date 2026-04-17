@@ -26,6 +26,8 @@ This project uses a user-facing changelog format.
 
 ### Fixed
 
+- Ajokokeen koirakohtainen PDF näyttää nyt koiran oman primary-rekisterinumeron eli ensimmäisenä lisätyn rekisterinumeron.
+
 ### Removed
 
 ## [0.10.0] - 2026-04-10

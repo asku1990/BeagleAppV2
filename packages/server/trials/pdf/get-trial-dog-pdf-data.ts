@@ -7,6 +7,12 @@ export type TrialDogPdfData = {
   registrationNo: string;
   dogName: string | null;
   dogSex: TrialDogSexDb | null;
+  sireName: string | null;
+  sireRegistrationNo: string | null;
+  damName: string | null;
+  damRegistrationNo: string | null;
+  omistaja: string | null;
+  omistajanKotikunta: string | null;
   kennelpiiri: string | null;
   kennelpiirinro: string | null;
   koekunta: string | null;
@@ -76,6 +82,12 @@ export async function getTrialDogPdfDataService(
           registrationNo: result.registrationNo,
           dogName: result.dogName,
           dogSex: result.dogSex,
+          sireName: result.sireName,
+          sireRegistrationNo: result.sireRegistrationNo,
+          damName: result.damName,
+          damRegistrationNo: result.damRegistrationNo,
+          omistaja: result.omistaja,
+          omistajanKotikunta: result.omistajanKotikunta,
           kennelpiiri: result.kennelpiiri,
           kennelpiirinro: result.kennelpiirinro,
           koekunta: result.koekunta,

@@ -30,7 +30,7 @@ Alla oleva ryhmittely on suunniteltu AJOK-koirakohtaisen pöytäkirjan näkymän
 ### 2) Koiran tiedot
 
 - `koiranNimi`
-- `rekisterinumero`
+- `rekisterinumero` (koiran primary-rekisterinumero, eli ensimmäisenä lisätty rekisteri)
 - `isanNimi`
 - `isanRekisterinumero`
 - `emanNimi`

@@ -36,6 +36,12 @@ export async function renderTrialDogPdf(input: {
   registrationNo: string;
   dogName: string | null;
   dogSex: "MALE" | "FEMALE" | "UNKNOWN" | null;
+  sireName: string | null;
+  sireRegistrationNo: string | null;
+  damName: string | null;
+  damRegistrationNo: string | null;
+  omistaja: string | null;
+  omistajanKotikunta: string | null;
   kennelpiiri: string | null;
   kennelpiirinro: string | null;
   koekunta: string | null;
@@ -66,7 +72,16 @@ export async function renderTrialDogPdf(input: {
     font,
   });
 
-  drawTrialDogPdfKoiranTausta({ page });
+  drawTrialDogPdfKoiranTausta({
+    sireName: input.sireName,
+    sireRegistrationNo: input.sireRegistrationNo,
+    damName: input.damName,
+    damRegistrationNo: input.damRegistrationNo,
+    omistaja: input.omistaja,
+    omistajanKotikunta: input.omistajanKotikunta,
+    page,
+    font,
+  });
 
   return pdfDocument.save();
 }

@@ -58,6 +58,12 @@ describe("trial pdf api route", () => {
           trialId: "entry-1",
           registrationNo: "FI12345/21",
           dogSex: "MALE",
+          sireName: "KIMNOBLE PONTE",
+          sireRegistrationNo: "FI30688/14",
+          damName: "ERÄSOINNUN TUKSU",
+          damRegistrationNo: "FI21421/13",
+          omistaja: "Marja ja Kari Virtanen",
+          omistajanKotikunta: "Hyrynsalmi",
         },
       },
     });

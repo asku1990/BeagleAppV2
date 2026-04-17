@@ -55,6 +55,15 @@ export async function GET(
 
     const registrationNo = result.body.data.registrationNo.trim();
     const dogName = result.body.data.dogName?.trim() ?? null;
+    const sireName = result.body.data.sireName?.trim() ?? null;
+    const sireRegistrationNo =
+      result.body.data.sireRegistrationNo?.trim() ?? null;
+    const damName = result.body.data.damName?.trim() ?? null;
+    const damRegistrationNo =
+      result.body.data.damRegistrationNo?.trim() ?? null;
+    const omistaja = result.body.data.omistaja?.trim() ?? null;
+    const omistajanKotikunta =
+      result.body.data.omistajanKotikunta?.trim() ?? null;
     const kennelpiiri = result.body.data.kennelpiiri?.trim() ?? null;
     const kennelpiirinro = result.body.data.kennelpiirinro?.trim() ?? null;
     const koekunta = result.body.data.koekunta?.trim() ?? null;
@@ -65,6 +74,12 @@ export async function GET(
       registrationNo,
       dogName,
       dogSex: result.body.data.dogSex,
+      sireName,
+      sireRegistrationNo,
+      damName,
+      damRegistrationNo,
+      omistaja,
+      omistajanKotikunta,
       kennelpiiri,
       kennelpiirinro,
       koekunta,
