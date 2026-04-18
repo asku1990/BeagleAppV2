@@ -24,6 +24,8 @@ export type TrialDogPdfData = {
   hakuMin2: number | null;
   ajoMin1: number | null;
   ajoMin2: number | null;
+  hyvaksytytAjominuutit: number | null;
+  ajoajanPisteet: number | null;
 };
 
 function normalizeTrialId(value: string): string {
@@ -105,6 +107,8 @@ export async function getTrialDogPdfDataService(
           hakuMin2: result.hakuMin2,
           ajoMin1: result.ajoMin1,
           ajoMin2: result.ajoMin2,
+          hyvaksytytAjominuutit: result.hyvaksytytAjominuutit,
+          ajoajanPisteet: result.ajoajanPisteet,
         },
       },
     };

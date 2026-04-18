@@ -37,6 +37,18 @@ const AJO_MIN2_VALUE_FIELD = {
   size: 12,
 } as const;
 
+const ACCEPTED_MINUTES_VALUE_FIELD = {
+  x: 293,
+  y: 305.3,
+  size: 12,
+} as const;
+
+const AJOAJAN_PISTEET_VALUE_FIELD = {
+  x: 357,
+  y: 305.3,
+  size: 12,
+} as const;
+
 function drawText(
   page: PDFPage,
   font: PDFFont,
@@ -84,6 +96,8 @@ export function drawTrialDogPdfKoeErat(input: {
   hakuMin2: number | null;
   ajoMin1: number | null;
   ajoMin2: number | null;
+  hyvaksytytAjominuutit: number | null;
+  ajoajanPisteet: number | null;
   page: PDFPage;
   font: PDFFont;
 }): void {
@@ -115,4 +129,16 @@ export function drawTrialDogPdfKoeErat(input: {
   );
   drawText(page, font, formatKoeEraValue(input.ajoMin1), AJO_MIN1_VALUE_FIELD);
   drawText(page, font, formatKoeEraValue(input.ajoMin2), AJO_MIN2_VALUE_FIELD);
+  drawText(
+    page,
+    font,
+    formatKoeEraValue(input.hyvaksytytAjominuutit),
+    ACCEPTED_MINUTES_VALUE_FIELD,
+  );
+  drawText(
+    page,
+    font,
+    formatKoeEraValue(input.ajoajanPisteet),
+    AJOAJAN_PISTEET_VALUE_FIELD,
+  );
 }

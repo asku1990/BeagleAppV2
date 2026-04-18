@@ -1,4 +1,9 @@
 import { prisma } from "@db/core/prisma";
+import { Prisma } from "@prisma/client";
+
+function toNumberOrNull(value: Prisma.Decimal | null): number | null {
+  return value === null ? null : value.toNumber();
+}
 
 export type TrialDogPdfDataRequestDb = {
   trialId: string;
@@ -28,6 +33,8 @@ export type TrialDogPdfDataDb = {
   hakuMin2: number | null;
   ajoMin1: number | null;
   ajoMin2: number | null;
+  hyvaksytytAjominuutit: number | null;
+  ajoajanPisteet: number | null;
 };
 
 export async function getTrialDogPdfDataDb(
@@ -94,6 +101,8 @@ export async function getTrialDogPdfDataDb(
       hakuMin2: true,
       ajoMin1: true,
       ajoMin2: true,
+      hyvaksytytAjominuutit: true,
+      ajoajanPisteet: true,
     },
   });
 
@@ -124,5 +133,7 @@ export async function getTrialDogPdfDataDb(
     hakuMin2: row.hakuMin2 ?? null,
     ajoMin1: row.ajoMin1 ?? null,
     ajoMin2: row.ajoMin2 ?? null,
+    hyvaksytytAjominuutit: row.hyvaksytytAjominuutit ?? null,
+    ajoajanPisteet: toNumberOrNull(row.ajoajanPisteet),
   };
 }

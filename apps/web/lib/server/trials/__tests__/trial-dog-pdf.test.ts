@@ -24,6 +24,8 @@ describe("renderTrialDogPdf", () => {
       hakuMin2: null,
       ajoMin1: null,
       ajoMin2: null,
+      hyvaksytytAjominuutit: null,
+      ajoajanPisteet: null,
     });
 
     expect(Buffer.from(bytes).toString("latin1", 0, 4)).toBe("%PDF");

@@ -54,6 +54,8 @@ export async function renderTrialDogPdf(input: {
   hakuMin2: number | null;
   ajoMin1: number | null;
   ajoMin2: number | null;
+  hyvaksytytAjominuutit: number | null;
+  ajoajanPisteet: number | null;
 }): Promise<Uint8Array> {
   const templatePath = await resolveTemplatePath();
   const templateBytes = await readFile(templatePath);
@@ -97,6 +99,8 @@ export async function renderTrialDogPdf(input: {
     hakuMin2: input.hakuMin2,
     ajoMin1: input.ajoMin1,
     ajoMin2: input.ajoMin2,
+    hyvaksytytAjominuutit: input.hyvaksytytAjominuutit,
+    ajoajanPisteet: input.ajoajanPisteet,
     page,
     font,
   });
