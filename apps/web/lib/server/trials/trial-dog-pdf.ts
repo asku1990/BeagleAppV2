@@ -1,6 +1,7 @@
 import { access, readFile } from "node:fs/promises";
 import path from "node:path";
 import { PDFDocument, StandardFonts } from "pdf-lib";
+import { drawTrialDogPdfKoeErat } from "./internal/koe-erat";
 import { drawTrialDogPdfKokeenTiedot } from "./internal/kokeen-tiedot";
 import { drawTrialDogPdfKoiranTiedot } from "./internal/koiran-tiedot";
 import { drawTrialDogPdfKoiranTausta } from "./internal/koiran-tausta";
@@ -47,6 +48,8 @@ export async function renderTrialDogPdf(input: {
   koekunta: string | null;
   koepaiva: Date;
   jarjeastaja: string | null;
+  era1Alkoi: string | null;
+  era2Alkoi: string | null;
 }): Promise<Uint8Array> {
   const templatePath = await resolveTemplatePath();
   const templateBytes = await readFile(templatePath);
@@ -79,6 +82,13 @@ export async function renderTrialDogPdf(input: {
     damRegistrationNo: input.damRegistrationNo,
     omistaja: input.omistaja,
     omistajanKotikunta: input.omistajanKotikunta,
+    page,
+    font,
+  });
+
+  drawTrialDogPdfKoeErat({
+    era1Alkoi: input.era1Alkoi,
+    era2Alkoi: input.era2Alkoi,
     page,
     font,
   });

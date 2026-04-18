@@ -69,11 +69,14 @@ export async function GET(
     const koekunta = result.body.data.koekunta?.trim() ?? null;
     const koepaiva = result.body.data.koepaiva;
     const jarjeastaja = result.body.data.jarjestaja?.trim() ?? null;
+    const dogSex = result.body.data.dogSex;
+    const era1Alkoi = result.body.data.era1Alkoi?.trim() ?? null;
+    const era2Alkoi = result.body.data.era2Alkoi?.trim() ?? null;
 
     const pdfBytes = await renderTrialDogPdf({
       registrationNo,
       dogName,
-      dogSex: result.body.data.dogSex,
+      dogSex,
       sireName,
       sireRegistrationNo,
       damName,
@@ -85,6 +88,8 @@ export async function GET(
       koekunta,
       koepaiva,
       jarjeastaja,
+      era1Alkoi,
+      era2Alkoi,
     });
 
     log.info(

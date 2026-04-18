@@ -18,6 +18,7 @@ Internal helper blocks:
 - `apps/web/lib/server/trials/internal/kokeen-tiedot.ts`
 - `apps/web/lib/server/trials/internal/koiran-tiedot.ts`
 - `apps/web/lib/server/trials/internal/koiran-tausta.ts`
+- `apps/web/lib/server/trials/internal/koe-erat.ts`
 
 The orchestrator loads the template, embeds the font, and delegates each block
 to the internal helpers. The helpers are intentionally internal and are not
@@ -86,6 +87,22 @@ Rules:
   other dog-facing views unless the PDF spec says otherwise.
 - Owner name and owner home municipality come from the `TrialEntry` snapshot
   fields.
+
+### 4) `koe-erät`
+
+Renders the first two era start times for the dog-specific PDF.
+
+Input data:
+
+- `era1Alkoi`
+- `era2Alkoi`
+
+Rules:
+
+- The current renderer only places the two era-start values into the template.
+- Missing values render as `-`.
+- The minute and score fields exist on `TrialEntry`, but they are not part of
+  the current PDF renderer contract.
 
 ## Registration rule
 

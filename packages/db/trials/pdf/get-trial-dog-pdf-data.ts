@@ -22,6 +22,8 @@ export type TrialDogPdfDataDb = {
   koekunta: string | null;
   koepaiva: Date;
   jarjestaja: string | null;
+  era1Alkoi: string | null;
+  era2Alkoi: string | null;
 };
 
 export async function getTrialDogPdfDataDb(
@@ -82,6 +84,8 @@ export async function getTrialDogPdfDataDb(
           jarjestaja: true,
         },
       },
+      era1Alkoi: true,
+      era2Alkoi: true,
     },
   });
 
@@ -106,5 +110,7 @@ export async function getTrialDogPdfDataDb(
     koekunta: row.trialEvent.koekunta ?? null,
     koepaiva: row.trialEvent.koepaiva,
     jarjestaja: row.trialEvent.jarjestaja ?? null,
+    era1Alkoi: row.era1Alkoi ?? null,
+    era2Alkoi: row.era2Alkoi ?? null,
   };
 }
