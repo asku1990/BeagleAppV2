@@ -34,6 +34,8 @@ describe("renderTrialDogPdf", () => {
       haukkuKeskiarvo: null,
       ajotaitoEra1: 4,
       ajotaitoEra2: 2,
+      ajotaitoKeskiarvo: 3,
+      ansiopisteetYhteensa: 0,
     });
 
     expect(Buffer.from(bytes).toString("latin1", 0, 4)).toBe("%PDF");
