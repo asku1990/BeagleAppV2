@@ -125,14 +125,6 @@ function formatKoeEraValue(value: string | number | null | undefined): string {
   return String(value);
 }
 
-function formatIntegerValue(value: number | null | undefined): string {
-  if (value === null || value === undefined) {
-    return "-";
-  }
-
-  return Number.isFinite(value) ? String(Math.trunc(value)) : "-";
-}
-
 export function drawTrialDogPdfKoeErat(input: {
   era1Alkoi: string | null;
   era2Alkoi: string | null;
@@ -218,13 +210,13 @@ export function drawTrialDogPdfKoeErat(input: {
   drawText(
     page,
     font,
-    formatIntegerValue(input.ajotaitoEra1),
+    formatKoeEraValue(input.ajotaitoEra1),
     AJOTAITO_ERA1_VALUE_FIELD,
   );
   drawText(
     page,
     font,
-    formatIntegerValue(input.ajotaitoEra2),
+    formatKoeEraValue(input.ajotaitoEra2),
     AJOTAITO_ERA2_VALUE_FIELD,
   );
 }
