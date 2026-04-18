@@ -74,6 +74,8 @@ export async function GET(
     const era2Alkoi = result.body.data.era2Alkoi?.trim() ?? null;
     const hakuMin1 = result.body.data.hakuMin1;
     const hakuMin2 = result.body.data.hakuMin2;
+    const ajoMin1 = result.body.data.ajoMin1;
+    const ajoMin2 = result.body.data.ajoMin2;
 
     const pdfBytes = await renderTrialDogPdf({
       registrationNo,
@@ -94,6 +96,8 @@ export async function GET(
       era2Alkoi,
       hakuMin1,
       hakuMin2,
+      ajoMin1,
+      ajoMin2,
     });
 
     log.info(

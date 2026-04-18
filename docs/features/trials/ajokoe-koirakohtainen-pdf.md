@@ -99,17 +99,20 @@ Input data:
 - `era2Alkoi`
 - `hakuMin1`
 - `hakuMin2`
+- `ajoMin1`
+- `ajoMin2`
 
 Rules:
 
 - The current renderer places the two era-start values on the first line and
-  the haku-minute values on the second line.
+  the haku-minute values on the second line and the ajo-minute values on the
+  third line.
 - Era start times are normalized to `HH:MM` before rendering.
 - Haku-minute values are rendered as plain integers.
+- Ajo-minute values are rendered as plain integers.
 - Missing values render as `-`.
-- The other minute/score fields on `TrialEntry` (`ajoMin1`, `ajoMin2`,
-  `hyvaksytytAjominuutit`, `ajoajanPisteet`) are not part of the current PDF
-  renderer contract.
+- The other minute/score fields on `TrialEntry` (`hyvaksytytAjominuutit`,
+  `ajoajanPisteet`) are not part of the current PDF renderer contract.
 
 ## Registration rule
 

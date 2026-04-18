@@ -25,6 +25,18 @@ const HAKU_MIN2_VALUE_FIELD = {
   size: 12,
 } as const;
 
+const AJO_MIN1_VALUE_FIELD = {
+  x: 147,
+  y: 285.3,
+  size: 12,
+} as const;
+
+const AJO_MIN2_VALUE_FIELD = {
+  x: 221,
+  y: 285.3,
+  size: 12,
+} as const;
+
 function drawText(
   page: PDFPage,
   font: PDFFont,
@@ -70,6 +82,8 @@ export function drawTrialDogPdfKoeErat(input: {
   era2Alkoi: string | null;
   hakuMin1: number | null;
   hakuMin2: number | null;
+  ajoMin1: number | null;
+  ajoMin2: number | null;
   page: PDFPage;
   font: PDFFont;
 }): void {
@@ -99,4 +113,6 @@ export function drawTrialDogPdfKoeErat(input: {
     formatKoeEraValue(input.hakuMin2),
     HAKU_MIN2_VALUE_FIELD,
   );
+  drawText(page, font, formatKoeEraValue(input.ajoMin1), AJO_MIN1_VALUE_FIELD);
+  drawText(page, font, formatKoeEraValue(input.ajoMin2), AJO_MIN2_VALUE_FIELD);
 }
