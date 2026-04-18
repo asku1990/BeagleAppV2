@@ -98,6 +98,12 @@ const AJOTAITO_ERA2_VALUE_FIELD = {
   size: 12,
 } as const;
 
+const AJOTAITOKESKIARVO_VALUE_FIELD = {
+  x: 286,
+  y: 203.3,
+  size: 12,
+} as const;
+
 function drawText(
   page: PDFPage,
   font: PDFFont,
@@ -231,5 +237,11 @@ export function drawTrialDogPdfKoeErat(
     font,
     formatKoeEraValue(input.ajotaitoEra2),
     AJOTAITO_ERA2_VALUE_FIELD,
+  );
+  drawText(
+    page,
+    font,
+    formatKoeEraValue(input.ajotaitoKeskiarvo),
+    AJOTAITOKESKIARVO_VALUE_FIELD,
   );
 }

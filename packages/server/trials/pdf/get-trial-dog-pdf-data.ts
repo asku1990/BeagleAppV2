@@ -96,6 +96,7 @@ export async function getTrialDogPdfDataService(
           haukkuKeskiarvo: result.haukkuKeskiarvo,
           ajotaitoEra1: result.ajotaitoEra1,
           ajotaitoEra2: result.ajotaitoEra2,
+          ajotaitoKeskiarvo: result.ajotaitoKeskiarvo,
         },
       },
     };

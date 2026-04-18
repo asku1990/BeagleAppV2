@@ -44,6 +44,7 @@ export type TrialDogPdfKoeErat = {
   haukkuKeskiarvo: number | null;
   ajotaitoEra1: number | null;
   ajotaitoEra2: number | null;
+  ajotaitoKeskiarvo: number | null;
 };
 
 export type TrialDogPdfData = TrialDogPdfKokeenTiedot &

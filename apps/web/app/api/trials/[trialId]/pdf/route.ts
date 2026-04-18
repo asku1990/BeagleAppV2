@@ -86,6 +86,7 @@ export async function GET(
     const haukkuKeskiarvo = result.body.data.haukkuKeskiarvo;
     const ajotaitoEra1 = result.body.data.ajotaitoEra1;
     const ajotaitoEra2 = result.body.data.ajotaitoEra2;
+    const ajotaitoKeskiarvo = result.body.data.ajotaitoKeskiarvo;
 
     const pdfBytes = await renderTrialDogPdf({
       registrationNo,
@@ -118,6 +119,7 @@ export async function GET(
       haukkuKeskiarvo,
       ajotaitoEra1,
       ajotaitoEra2,
+      ajotaitoKeskiarvo,
     });
 
     log.info(

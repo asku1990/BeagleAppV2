@@ -92,6 +92,7 @@ export async function getTrialDogPdfDataDb(
       haukkuKeskiarvo: true,
       ajotaitoEra1: true,
       ajotaitoEra2: true,
+      ajotaitoKeskiarvo: true,
     },
   });
 
@@ -132,5 +133,6 @@ export async function getTrialDogPdfDataDb(
     haukkuKeskiarvo: toNumberOrNull(row.haukkuKeskiarvo),
     ajotaitoEra1: toNumberOrNull(row.ajotaitoEra1),
     ajotaitoEra2: toNumberOrNull(row.ajotaitoEra2),
+    ajotaitoKeskiarvo: toNumberOrNull(row.ajotaitoKeskiarvo),
   };
 }
