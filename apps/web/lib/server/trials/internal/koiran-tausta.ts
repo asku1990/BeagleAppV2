@@ -27,7 +27,7 @@ const DAM_REGISTRATION_NO_FIELD = {
 
 const OWNER_FIELD = {
   x: 62.3,
-  y: 361.9682,
+  y: 362.3,
   size: 12,
 } as const;
 

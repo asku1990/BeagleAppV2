@@ -100,6 +100,7 @@ Input data:
 Rules:
 
 - The current renderer only places the two era-start values into the template.
+- Era start times are normalized to `HH:MM` before rendering.
 - Missing values render as `-`.
 - The minute and score fields exist on `TrialEntry`, but they are not part of
   the current PDF renderer contract.

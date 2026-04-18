@@ -2,15 +2,15 @@ import type { PDFFont, PDFPage } from "pdf-lib";
 import { rgb } from "pdf-lib";
 
 const ERA1_ALKOI_VALUE_FIELD = {
-  x: 200,
-  y: 293.3,
-  size: 10,
+  x: 142,
+  y: 322.3,
+  size: 12,
 } as const;
 
 const ERA2_ALKOI_VALUE_FIELD = {
-  x: 283,
-  y: 293.3,
-  size: 10,
+  x: 215,
+  y: 322.3,
+  size: 12,
 } as const;
 
 function drawText(
@@ -35,7 +35,19 @@ function formatKoeEraValue(value: string | number | null | undefined): string {
 
   if (typeof value === "string") {
     const trimmed = value.trim();
-    return trimmed.length > 0 ? trimmed : "-";
+    if (trimmed.length === 0) {
+      return "-";
+    }
+
+    const parts = trimmed.split(":");
+    if (parts.length === 2) {
+      const [hours, minutes] = parts;
+      const normalizedHours = hours.padStart(2, "0");
+      const normalizedMinutes = minutes.padStart(2, "0");
+      return `${normalizedHours}:${normalizedMinutes}`;
+    }
+
+    return trimmed;
   }
 
   return String(value);
