@@ -37,6 +37,10 @@ export type TrialDogPdfDataDb = {
   ajoajanPisteet: number | null;
   hakuEra1: number | null;
   hakuEra2: number | null;
+  haukkuEra1: number | null;
+  haukkuEra2: number | null;
+  ajotaitoEra1: number | null;
+  ajotaitoEra2: number | null;
 };
 
 export async function getTrialDogPdfDataDb(
@@ -107,6 +111,10 @@ export async function getTrialDogPdfDataDb(
       ajoajanPisteet: true,
       hakuEra1: true,
       hakuEra2: true,
+      haukkuEra1: true,
+      haukkuEra2: true,
+      ajotaitoEra1: true,
+      ajotaitoEra2: true,
     },
   });
 
@@ -141,5 +149,9 @@ export async function getTrialDogPdfDataDb(
     ajoajanPisteet: toNumberOrNull(row.ajoajanPisteet),
     hakuEra1: toNumberOrNull(row.hakuEra1),
     hakuEra2: toNumberOrNull(row.hakuEra2),
+    haukkuEra1: toNumberOrNull(row.haukkuEra1),
+    haukkuEra2: toNumberOrNull(row.haukkuEra2),
+    ajotaitoEra1: toNumberOrNull(row.ajotaitoEra1),
+    ajotaitoEra2: toNumberOrNull(row.ajotaitoEra2),
   };
 }

@@ -371,20 +371,20 @@ model TrialEntry {
   ajoajanPisteet            Decimal?       @db.Decimal(6, 2)
 
   // 4) ansiopisteiden keskiarvot ja yhteensa
-  hakuEra1                  Decimal?       @db.Decimal(6, 2)
-  hakuEra2                  Decimal?       @db.Decimal(6, 2)
-  hakuEra3                  Decimal?       @db.Decimal(6, 2)
-  hakuEra4                  Decimal?       @db.Decimal(6, 2)
+  hakuEra1                  Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  hakuEra2                  Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  hakuEra3                  Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  hakuEra4                  Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
   hakuKeskiarvo             Decimal?       @db.Decimal(6, 2)
-  haukkuEra1                Decimal?       @db.Decimal(6, 2)
-  haukkuEra2                Decimal?       @db.Decimal(6, 2)
-  haukkuEra3                Decimal?       @db.Decimal(6, 2)
-  haukkuEra4                Decimal?       @db.Decimal(6, 2)
+  haukkuEra1                Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  haukkuEra2                Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  haukkuEra3                Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  haukkuEra4                Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
   haukkuKeskiarvo           Decimal?       @db.Decimal(6, 2)
-  ajotaitoEra1              Decimal?       @db.Decimal(6, 2)
-  ajotaitoEra2              Decimal?       @db.Decimal(6, 2)
-  ajotaitoEra3              Decimal?       @db.Decimal(6, 2)
-  ajotaitoEra4              Decimal?       @db.Decimal(6, 2)
+  ajotaitoEra1              Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  ajotaitoEra2              Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  ajotaitoEra3              Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  ajotaitoEra4              Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
   yleisvaikutelmaPisteet    Decimal?       @db.Decimal(6, 2)
   ajotaitoKeskiarvo         Decimal?       @db.Decimal(6, 2)
   ansiopisteetYhteensa      Decimal?       @db.Decimal(6, 2)

@@ -61,6 +61,30 @@ const HAKU_ERA2_VALUE_FIELD = {
   size: 12,
 } as const;
 
+const HAUKKU_ERA1_VALUE_FIELD = {
+  x: 147,
+  y: 223.3,
+  size: 12,
+} as const;
+
+const HAUKKU_ERA2_VALUE_FIELD = {
+  x: 221,
+  y: 223.3,
+  size: 12,
+} as const;
+
+const AJOTAITO_ERA1_VALUE_FIELD = {
+  x: 147,
+  y: 203.3,
+  size: 12,
+} as const;
+
+const AJOTAITO_ERA2_VALUE_FIELD = {
+  x: 221,
+  y: 203.3,
+  size: 12,
+} as const;
+
 function drawText(
   page: PDFPage,
   font: PDFFont,
@@ -101,6 +125,14 @@ function formatKoeEraValue(value: string | number | null | undefined): string {
   return String(value);
 }
 
+function formatIntegerValue(value: number | null | undefined): string {
+  if (value === null || value === undefined) {
+    return "-";
+  }
+
+  return Number.isFinite(value) ? String(Math.trunc(value)) : "-";
+}
+
 export function drawTrialDogPdfKoeErat(input: {
   era1Alkoi: string | null;
   era2Alkoi: string | null;
@@ -112,6 +144,10 @@ export function drawTrialDogPdfKoeErat(input: {
   ajoajanPisteet: number | null;
   hakuEra1: number | null;
   hakuEra2: number | null;
+  haukkuEra1: number | null;
+  haukkuEra2: number | null;
+  ajotaitoEra1: number | null;
+  ajotaitoEra2: number | null;
   page: PDFPage;
   font: PDFFont;
 }): void {
@@ -166,5 +202,29 @@ export function drawTrialDogPdfKoeErat(input: {
     font,
     formatKoeEraValue(input.hakuEra2),
     HAKU_ERA2_VALUE_FIELD,
+  );
+  drawText(
+    page,
+    font,
+    formatKoeEraValue(input.haukkuEra1),
+    HAUKKU_ERA1_VALUE_FIELD,
+  );
+  drawText(
+    page,
+    font,
+    formatKoeEraValue(input.haukkuEra2),
+    HAUKKU_ERA2_VALUE_FIELD,
+  );
+  drawText(
+    page,
+    font,
+    formatIntegerValue(input.ajotaitoEra1),
+    AJOTAITO_ERA1_VALUE_FIELD,
+  );
+  drawText(
+    page,
+    font,
+    formatIntegerValue(input.ajotaitoEra2),
+    AJOTAITO_ERA2_VALUE_FIELD,
   );
 }
