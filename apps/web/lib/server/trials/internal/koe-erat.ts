@@ -55,6 +55,12 @@ const HAKU_ERA1_VALUE_FIELD = {
   size: 12,
 } as const;
 
+const HAKUKESKIARVO_VALUE_FIELD = {
+  x: 293,
+  y: 243.3,
+  size: 12,
+} as const;
+
 const HAKU_ERA2_VALUE_FIELD = {
   x: 221,
   y: 243.3,
@@ -136,6 +142,7 @@ export function drawTrialDogPdfKoeErat(input: {
   ajoajanPisteet: number | null;
   hakuEra1: number | null;
   hakuEra2: number | null;
+  hakuKeskiarvo: number | null;
   haukkuEra1: number | null;
   haukkuEra2: number | null;
   ajotaitoEra1: number | null;
@@ -194,6 +201,12 @@ export function drawTrialDogPdfKoeErat(input: {
     font,
     formatKoeEraValue(input.hakuEra2),
     HAKU_ERA2_VALUE_FIELD,
+  );
+  drawText(
+    page,
+    font,
+    formatKoeEraValue(input.hakuKeskiarvo),
+    HAKUKESKIARVO_VALUE_FIELD,
   );
   drawText(
     page,

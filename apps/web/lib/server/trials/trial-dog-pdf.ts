@@ -58,6 +58,7 @@ export async function renderTrialDogPdf(input: {
   ajoajanPisteet: number | null;
   hakuEra1: number | null;
   hakuEra2: number | null;
+  hakuKeskiarvo: number | null;
   haukkuEra1: number | null;
   haukkuEra2: number | null;
   ajotaitoEra1: number | null;
@@ -109,6 +110,7 @@ export async function renderTrialDogPdf(input: {
     ajoajanPisteet: input.ajoajanPisteet,
     hakuEra1: input.hakuEra1,
     hakuEra2: input.hakuEra2,
+    hakuKeskiarvo: input.hakuKeskiarvo,
     haukkuEra1: input.haukkuEra1,
     haukkuEra2: input.haukkuEra2,
     ajotaitoEra1: input.ajotaitoEra1,

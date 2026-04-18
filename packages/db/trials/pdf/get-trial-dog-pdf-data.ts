@@ -37,6 +37,7 @@ export type TrialDogPdfDataDb = {
   ajoajanPisteet: number | null;
   hakuEra1: number | null;
   hakuEra2: number | null;
+  hakuKeskiarvo: number | null;
   haukkuEra1: number | null;
   haukkuEra2: number | null;
   ajotaitoEra1: number | null;
@@ -111,6 +112,7 @@ export async function getTrialDogPdfDataDb(
       ajoajanPisteet: true,
       hakuEra1: true,
       hakuEra2: true,
+      hakuKeskiarvo: true,
       haukkuEra1: true,
       haukkuEra2: true,
       ajotaitoEra1: true,
@@ -149,6 +151,7 @@ export async function getTrialDogPdfDataDb(
     ajoajanPisteet: toNumberOrNull(row.ajoajanPisteet),
     hakuEra1: toNumberOrNull(row.hakuEra1),
     hakuEra2: toNumberOrNull(row.hakuEra2),
+    hakuKeskiarvo: toNumberOrNull(row.hakuKeskiarvo),
     haukkuEra1: toNumberOrNull(row.haukkuEra1),
     haukkuEra2: toNumberOrNull(row.haukkuEra2),
     ajotaitoEra1: toNumberOrNull(row.ajotaitoEra1),

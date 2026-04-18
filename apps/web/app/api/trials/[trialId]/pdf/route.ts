@@ -80,6 +80,7 @@ export async function GET(
     const ajoajanPisteet = result.body.data.ajoajanPisteet;
     const hakuEra1 = result.body.data.hakuEra1;
     const hakuEra2 = result.body.data.hakuEra2;
+    const hakuKeskiarvo = result.body.data.hakuKeskiarvo;
     const haukkuEra1 = result.body.data.haukkuEra1;
     const haukkuEra2 = result.body.data.haukkuEra2;
     const ajotaitoEra1 = result.body.data.ajotaitoEra1;
@@ -110,6 +111,7 @@ export async function GET(
       ajoajanPisteet,
       hakuEra1,
       hakuEra2,
+      hakuKeskiarvo,
       haukkuEra1,
       haukkuEra2,
       ajotaitoEra1,
