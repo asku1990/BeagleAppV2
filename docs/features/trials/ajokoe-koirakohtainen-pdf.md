@@ -90,20 +90,26 @@ Rules:
 
 ### 4) `koe-erät`
 
-Renders the first two era start times for the dog-specific PDF.
+Renders the first two era start times and the haku-minute values for the
+dog-specific PDF.
 
 Input data:
 
 - `era1Alkoi`
 - `era2Alkoi`
+- `hakuMin1`
+- `hakuMin2`
 
 Rules:
 
-- The current renderer only places the two era-start values into the template.
+- The current renderer places the two era-start values on the first line and
+  the haku-minute values on the second line.
 - Era start times are normalized to `HH:MM` before rendering.
+- Haku-minute values are rendered as plain integers.
 - Missing values render as `-`.
-- The minute and score fields exist on `TrialEntry`, but they are not part of
-  the current PDF renderer contract.
+- The other minute/score fields on `TrialEntry` (`ajoMin1`, `ajoMin2`,
+  `hyvaksytytAjominuutit`, `ajoajanPisteet`) are not part of the current PDF
+  renderer contract.
 
 ## Registration rule
 

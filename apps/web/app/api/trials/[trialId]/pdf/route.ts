@@ -72,6 +72,8 @@ export async function GET(
     const dogSex = result.body.data.dogSex;
     const era1Alkoi = result.body.data.era1Alkoi?.trim() ?? null;
     const era2Alkoi = result.body.data.era2Alkoi?.trim() ?? null;
+    const hakuMin1 = result.body.data.hakuMin1;
+    const hakuMin2 = result.body.data.hakuMin2;
 
     const pdfBytes = await renderTrialDogPdf({
       registrationNo,
@@ -90,6 +92,8 @@ export async function GET(
       jarjeastaja,
       era1Alkoi,
       era2Alkoi,
+      hakuMin1,
+      hakuMin2,
     });
 
     log.info(
