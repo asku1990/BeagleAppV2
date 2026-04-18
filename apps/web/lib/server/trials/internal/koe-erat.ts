@@ -49,6 +49,18 @@ const AJOAJAN_PISTEET_VALUE_FIELD = {
   size: 12,
 } as const;
 
+const HAKU_ERA1_VALUE_FIELD = {
+  x: 147,
+  y: 243.3,
+  size: 12,
+} as const;
+
+const HAKU_ERA2_VALUE_FIELD = {
+  x: 221,
+  y: 243.3,
+  size: 12,
+} as const;
+
 function drawText(
   page: PDFPage,
   font: PDFFont,
@@ -98,6 +110,8 @@ export function drawTrialDogPdfKoeErat(input: {
   ajoMin2: number | null;
   hyvaksytytAjominuutit: number | null;
   ajoajanPisteet: number | null;
+  hakuEra1: number | null;
+  hakuEra2: number | null;
   page: PDFPage;
   font: PDFFont;
 }): void {
@@ -140,5 +154,17 @@ export function drawTrialDogPdfKoeErat(input: {
     font,
     formatKoeEraValue(input.ajoajanPisteet),
     AJOAJAN_PISTEET_VALUE_FIELD,
+  );
+  drawText(
+    page,
+    font,
+    formatKoeEraValue(input.hakuEra1),
+    HAKU_ERA1_VALUE_FIELD,
+  );
+  drawText(
+    page,
+    font,
+    formatKoeEraValue(input.hakuEra2),
+    HAKU_ERA2_VALUE_FIELD,
   );
 }
