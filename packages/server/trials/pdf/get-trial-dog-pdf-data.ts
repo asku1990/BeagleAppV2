@@ -93,6 +93,7 @@ export async function getTrialDogPdfDataService(
           hakuKeskiarvo: result.hakuKeskiarvo,
           haukkuEra1: result.haukkuEra1,
           haukkuEra2: result.haukkuEra2,
+          haukkuKeskiarvo: result.haukkuKeskiarvo,
           ajotaitoEra1: result.ajotaitoEra1,
           ajotaitoEra2: result.ajotaitoEra2,
         },

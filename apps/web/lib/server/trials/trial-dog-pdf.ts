@@ -86,6 +86,7 @@ export async function renderTrialDogPdf(
     hakuKeskiarvo: input.hakuKeskiarvo,
     haukkuEra1: input.haukkuEra1,
     haukkuEra2: input.haukkuEra2,
+    haukkuKeskiarvo: input.haukkuKeskiarvo,
     ajotaitoEra1: input.ajotaitoEra1,
     ajotaitoEra2: input.ajotaitoEra2,
     page,

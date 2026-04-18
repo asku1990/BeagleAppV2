@@ -1,5 +1,9 @@
 export type TrialDogSex = "MALE" | "FEMALE" | "UNKNOWN";
 
+export type TrialDogPdfDataRequest = {
+  trialId: string;
+};
+
 export type TrialDogPdfKokeenTiedot = {
   kennelpiiri: string | null;
   kennelpiirinro: string | null;
@@ -37,6 +41,7 @@ export type TrialDogPdfKoeErat = {
   hakuKeskiarvo: number | null;
   haukkuEra1: number | null;
   haukkuEra2: number | null;
+  haukkuKeskiarvo: number | null;
   ajotaitoEra1: number | null;
   ajotaitoEra2: number | null;
 };

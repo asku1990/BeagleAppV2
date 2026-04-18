@@ -65,6 +65,7 @@ describe("trial pdf api route", () => {
           omistaja: "Marja ja Kari Virtanen",
           omistajanKotikunta: "Hyrynsalmi",
           hakuKeskiarvo: 6,
+          haukkuKeskiarvo: 7,
           ajotaitoEra1: 4,
           ajotaitoEra2: 2,
         },

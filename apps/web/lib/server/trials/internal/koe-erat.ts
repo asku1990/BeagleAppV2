@@ -80,6 +80,12 @@ const HAUKKU_ERA2_VALUE_FIELD = {
   size: 12,
 } as const;
 
+const HAUKKUESKIARVO_VALUE_FIELD = {
+  x: 286,
+  y: 223.3,
+  size: 12,
+} as const;
+
 const AJOTAITO_ERA1_VALUE_FIELD = {
   x: 147,
   y: 203.3,
@@ -207,6 +213,12 @@ export function drawTrialDogPdfKoeErat(
     font,
     formatKoeEraValue(input.haukkuEra2),
     HAUKKU_ERA2_VALUE_FIELD,
+  );
+  drawText(
+    page,
+    font,
+    formatKoeEraValue(input.haukkuKeskiarvo),
+    HAUKKUESKIARVO_VALUE_FIELD,
   );
   drawText(
     page,

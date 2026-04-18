@@ -137,6 +137,7 @@ export type {
   BeagleTrialSearchRow,
   BeagleTrialSearchSort,
   TrialDogPdfData,
+  TrialDogPdfDataRequest,
   TrialDogPdfKoeErat,
   TrialDogPdfKokeenTiedot,
   TrialDogPdfKoiranTausta,

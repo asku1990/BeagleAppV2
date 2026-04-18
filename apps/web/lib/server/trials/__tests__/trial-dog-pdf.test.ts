@@ -31,6 +31,7 @@ describe("renderTrialDogPdf", () => {
       hakuKeskiarvo: null,
       haukkuEra1: null,
       haukkuEra2: null,
+      haukkuKeskiarvo: null,
       ajotaitoEra1: 4,
       ajotaitoEra2: 2,
     });

@@ -3,6 +3,8 @@
   "compilerOptions": {
     "paths": {
       "@auth/*": ["./*"],
+      "@contracts": ["../contracts/index.ts"],
+      "@contracts/*": ["../contracts/*"],
       "@db/*": ["../db/*"]
     }
   },

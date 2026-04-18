@@ -12,6 +12,7 @@ export type {
 } from "./beagle-trials";
 export type {
   TrialDogPdfData,
+  TrialDogPdfDataRequest,
   TrialDogPdfKoeErat,
   TrialDogPdfKokeenTiedot,
   TrialDogPdfKoiranTausta,

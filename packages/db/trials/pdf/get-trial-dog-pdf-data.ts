@@ -1,47 +1,21 @@
 import { prisma } from "@db/core/prisma";
+import type {
+  TrialDogPdfData,
+  TrialDogPdfDataRequest,
+  TrialDogSex,
+} from "@contracts";
 import { Prisma } from "@prisma/client";
 
 function toNumberOrNull(value: Prisma.Decimal | null): number | null {
   return value === null ? null : value.toNumber();
 }
 
-export type TrialDogPdfDataRequestDb = {
-  trialId: string;
-};
+export type TrialDogPdfDataRequestDb = TrialDogPdfDataRequest;
 
-export type TrialDogSexDb = "MALE" | "FEMALE" | "UNKNOWN";
+export type TrialDogSexDb = TrialDogSex;
 
-export type TrialDogPdfDataDb = {
+export type TrialDogPdfDataDb = TrialDogPdfData & {
   trialId: string;
-  registrationNo: string;
-  dogName: string | null;
-  dogSex: TrialDogSexDb | null;
-  sireName: string | null;
-  sireRegistrationNo: string | null;
-  damName: string | null;
-  damRegistrationNo: string | null;
-  omistaja: string | null;
-  omistajanKotikunta: string | null;
-  kennelpiiri: string | null;
-  kennelpiirinro: string | null;
-  koekunta: string | null;
-  koepaiva: Date;
-  jarjestaja: string | null;
-  era1Alkoi: string | null;
-  era2Alkoi: string | null;
-  hakuMin1: number | null;
-  hakuMin2: number | null;
-  ajoMin1: number | null;
-  ajoMin2: number | null;
-  hyvaksytytAjominuutit: number | null;
-  ajoajanPisteet: number | null;
-  hakuEra1: number | null;
-  hakuEra2: number | null;
-  hakuKeskiarvo: number | null;
-  haukkuEra1: number | null;
-  haukkuEra2: number | null;
-  ajotaitoEra1: number | null;
-  ajotaitoEra2: number | null;
 };
 
 export async function getTrialDogPdfDataDb(
@@ -115,6 +89,7 @@ export async function getTrialDogPdfDataDb(
       hakuKeskiarvo: true,
       haukkuEra1: true,
       haukkuEra2: true,
+      haukkuKeskiarvo: true,
       ajotaitoEra1: true,
       ajotaitoEra2: true,
     },
@@ -154,6 +129,7 @@ export async function getTrialDogPdfDataDb(
     hakuKeskiarvo: toNumberOrNull(row.hakuKeskiarvo),
     haukkuEra1: toNumberOrNull(row.haukkuEra1),
     haukkuEra2: toNumberOrNull(row.haukkuEra2),
+    haukkuKeskiarvo: toNumberOrNull(row.haukkuKeskiarvo),
     ajotaitoEra1: toNumberOrNull(row.ajotaitoEra1),
     ajotaitoEra2: toNumberOrNull(row.ajotaitoEra2),
   };
