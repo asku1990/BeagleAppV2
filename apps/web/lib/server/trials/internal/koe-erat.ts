@@ -1,5 +1,6 @@
 import type { PDFFont, PDFPage } from "pdf-lib";
 import { rgb } from "pdf-lib";
+import type { TrialDogPdfKoeErat } from "@contracts";
 
 const ERA1_ALKOI_VALUE_FIELD = {
   x: 142,
@@ -38,7 +39,7 @@ const AJO_MIN2_VALUE_FIELD = {
 } as const;
 
 const ACCEPTED_MINUTES_VALUE_FIELD = {
-  x: 293,
+  x: 286,
   y: 305.3,
   size: 12,
 } as const;
@@ -56,7 +57,7 @@ const HAKU_ERA1_VALUE_FIELD = {
 } as const;
 
 const HAKUKESKIARVO_VALUE_FIELD = {
-  x: 293,
+  x: 286,
   y: 243.3,
   size: 12,
 } as const;
@@ -131,25 +132,12 @@ function formatKoeEraValue(value: string | number | null | undefined): string {
   return String(value);
 }
 
-export function drawTrialDogPdfKoeErat(input: {
-  era1Alkoi: string | null;
-  era2Alkoi: string | null;
-  hakuMin1: number | null;
-  hakuMin2: number | null;
-  ajoMin1: number | null;
-  ajoMin2: number | null;
-  hyvaksytytAjominuutit: number | null;
-  ajoajanPisteet: number | null;
-  hakuEra1: number | null;
-  hakuEra2: number | null;
-  hakuKeskiarvo: number | null;
-  haukkuEra1: number | null;
-  haukkuEra2: number | null;
-  ajotaitoEra1: number | null;
-  ajotaitoEra2: number | null;
-  page: PDFPage;
-  font: PDFFont;
-}): void {
+export function drawTrialDogPdfKoeErat(
+  input: TrialDogPdfKoeErat & {
+    page: PDFPage;
+    font: PDFFont;
+  },
+): void {
   const { page, font } = input;
 
   drawText(

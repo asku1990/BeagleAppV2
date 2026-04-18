@@ -1,5 +1,6 @@
 import type { PDFFont, PDFPage } from "pdf-lib";
 import { rgb } from "pdf-lib";
+import type { TrialDogPdfKokeenTiedot } from "@contracts";
 
 export const KENNELPIIRI_FIELD = {
   x: 62.3,
@@ -40,15 +41,12 @@ function formatTrialDate(value: Date): string {
   }).format(value);
 }
 
-export function drawTrialDogPdfKokeenTiedot(input: {
-  kennelpiiri: string | null;
-  kennelpiirinro: string | null;
-  koekunta: string | null;
-  koepaiva: Date;
-  jarjeastaja: string | null;
-  page: PDFPage;
-  font: PDFFont;
-}): void {
+export function drawTrialDogPdfKokeenTiedot(
+  input: TrialDogPdfKokeenTiedot & {
+    page: PDFPage;
+    font: PDFFont;
+  },
+): void {
   const { page, font } = input;
 
   if (input.kennelpiiri) {
@@ -92,8 +90,8 @@ export function drawTrialDogPdfKokeenTiedot(input: {
     });
   }
 
-  if (input.jarjeastaja) {
-    page.drawText(input.jarjeastaja, {
+  if (input.jarjestaja) {
+    page.drawText(input.jarjestaja, {
       x: JARJESTAJA_FIELD.x,
       y: JARJESTAJA_FIELD.y,
       size: JARJESTAJA_FIELD.size,

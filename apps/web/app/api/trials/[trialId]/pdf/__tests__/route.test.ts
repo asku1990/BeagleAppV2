@@ -64,6 +64,7 @@ describe("trial pdf api route", () => {
           damRegistrationNo: "FI21421/13",
           omistaja: "Marja ja Kari Virtanen",
           omistajanKotikunta: "Hyrynsalmi",
+          hakuKeskiarvo: 6,
           ajotaitoEra1: 4,
           ajotaitoEra2: 2,
         },

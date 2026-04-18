@@ -1,5 +1,6 @@
 import type { PDFFont, PDFPage } from "pdf-lib";
 import { rgb } from "pdf-lib";
+import type { TrialDogPdfKoiranTausta } from "@contracts";
 
 const SIRE_NAME_FIELD = {
   x: 62.3,
@@ -52,16 +53,12 @@ function drawText(
   });
 }
 
-export function drawTrialDogPdfKoiranTausta(input: {
-  sireName: string | null;
-  sireRegistrationNo: string | null;
-  damName: string | null;
-  damRegistrationNo: string | null;
-  omistaja: string | null;
-  omistajanKotikunta: string | null;
-  page: PDFPage;
-  font: PDFFont;
-}): void {
+export function drawTrialDogPdfKoiranTausta(
+  input: TrialDogPdfKoiranTausta & {
+    page: PDFPage;
+    font: PDFFont;
+  },
+): void {
   const { page, font } = input;
 
   if (input.sireName) {

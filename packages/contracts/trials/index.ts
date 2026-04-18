@@ -11,6 +11,14 @@ export type {
   BeagleTrialSearchSort,
 } from "./beagle-trials";
 export type {
+  TrialDogPdfData,
+  TrialDogPdfKoeErat,
+  TrialDogPdfKokeenTiedot,
+  TrialDogPdfKoiranTausta,
+  TrialDogPdfKoiranTiedot,
+  TrialDogSex,
+} from "./trial-dog-pdf";
+export type {
   KoiratietokantaAjokUpsertRequest,
   KoiratietokantaAjokUpsertResponse,
   KoiratietokantaAjokValidationIssue,

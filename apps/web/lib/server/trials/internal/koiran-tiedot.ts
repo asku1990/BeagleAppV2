@@ -1,5 +1,6 @@
 import type { PDFFont, PDFPage } from "pdf-lib";
 import { rgb } from "pdf-lib";
+import type { TrialDogPdfKoiranTiedot } from "@contracts";
 
 export const DOG_REGISTRATION_NO_FIELD = {
   x: 286.3,
@@ -25,13 +26,12 @@ export const DOG_SEX_NARTTU_FIELD = {
   size: 12,
 } as const;
 
-export function drawTrialDogPdfKoiranTiedot(input: {
-  registrationNo: string;
-  dogName: string | null;
-  dogSex: "MALE" | "FEMALE" | "UNKNOWN" | null;
-  page: PDFPage;
-  font: PDFFont;
-}): void {
+export function drawTrialDogPdfKoiranTiedot(
+  input: TrialDogPdfKoiranTiedot & {
+    page: PDFPage;
+    font: PDFFont;
+  },
+): void {
   const { page, font } = input;
 
   page.drawText(input.registrationNo, {

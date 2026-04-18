@@ -13,7 +13,7 @@ describe("drawTrialDogPdfKokeenTiedot", () => {
       kennelpiirinro: "3",
       koekunta: "Ristijärvi",
       koepaiva: new Date("2025-09-07T00:00:00.000Z"),
-      jarjeastaja: "Kainuun Ajokoirakerho",
+      jarjestaja: "Kainuun Ajokoirakerho",
       page,
       font,
     });

@@ -1,5 +1,6 @@
 import { access, readFile } from "node:fs/promises";
 import path from "node:path";
+import type { TrialDogPdfData } from "@contracts";
 import { PDFDocument, StandardFonts } from "pdf-lib";
 import { drawTrialDogPdfKoeErat } from "./internal/koe-erat";
 import { drawTrialDogPdfKokeenTiedot } from "./internal/kokeen-tiedot";
@@ -33,37 +34,9 @@ async function resolveTemplatePath(): Promise<string> {
 }
 
 // Renders trial row data onto the static AJOK dog-specific protocol template.
-export async function renderTrialDogPdf(input: {
-  registrationNo: string;
-  dogName: string | null;
-  dogSex: "MALE" | "FEMALE" | "UNKNOWN" | null;
-  sireName: string | null;
-  sireRegistrationNo: string | null;
-  damName: string | null;
-  damRegistrationNo: string | null;
-  omistaja: string | null;
-  omistajanKotikunta: string | null;
-  kennelpiiri: string | null;
-  kennelpiirinro: string | null;
-  koekunta: string | null;
-  koepaiva: Date;
-  jarjeastaja: string | null;
-  era1Alkoi: string | null;
-  era2Alkoi: string | null;
-  hakuMin1: number | null;
-  hakuMin2: number | null;
-  ajoMin1: number | null;
-  ajoMin2: number | null;
-  hyvaksytytAjominuutit: number | null;
-  ajoajanPisteet: number | null;
-  hakuEra1: number | null;
-  hakuEra2: number | null;
-  hakuKeskiarvo: number | null;
-  haukkuEra1: number | null;
-  haukkuEra2: number | null;
-  ajotaitoEra1: number | null;
-  ajotaitoEra2: number | null;
-}): Promise<Uint8Array> {
+export async function renderTrialDogPdf(
+  input: TrialDogPdfData,
+): Promise<Uint8Array> {
   const templatePath = await resolveTemplatePath();
   const templateBytes = await readFile(templatePath);
   const pdfDocument = await PDFDocument.load(templateBytes);
@@ -75,7 +48,7 @@ export async function renderTrialDogPdf(input: {
     kennelpiirinro: input.kennelpiirinro,
     koekunta: input.koekunta,
     koepaiva: input.koepaiva,
-    jarjeastaja: input.jarjeastaja,
+    jarjestaja: input.jarjestaja,
     page,
     font,
   });

@@ -68,7 +68,7 @@ export async function GET(
     const kennelpiirinro = result.body.data.kennelpiirinro?.trim() ?? null;
     const koekunta = result.body.data.koekunta?.trim() ?? null;
     const koepaiva = result.body.data.koepaiva;
-    const jarjeastaja = result.body.data.jarjestaja?.trim() ?? null;
+    const jarjestaja = result.body.data.jarjestaja?.trim() ?? null;
     const dogSex = result.body.data.dogSex;
     const era1Alkoi = result.body.data.era1Alkoi?.trim() ?? null;
     const era2Alkoi = result.body.data.era2Alkoi?.trim() ?? null;
@@ -100,7 +100,7 @@ export async function GET(
       kennelpiirinro,
       koekunta,
       koepaiva,
-      jarjeastaja,
+      jarjestaja,
       era1Alkoi,
       era2Alkoi,
       hakuMin1,

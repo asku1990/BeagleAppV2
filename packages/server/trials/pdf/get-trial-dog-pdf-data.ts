@@ -1,38 +1,10 @@
-import { getTrialDogPdfDataDb, type TrialDogSexDb } from "@db/trials/pdf";
+import type { TrialDogPdfData as TrialDogPdfDataContract } from "@contracts";
+import { getTrialDogPdfDataDb } from "@db/trials/pdf";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
 
-export type TrialDogPdfData = {
+export type TrialDogPdfData = TrialDogPdfDataContract & {
   trialId: string;
-  registrationNo: string;
-  dogName: string | null;
-  dogSex: TrialDogSexDb | null;
-  sireName: string | null;
-  sireRegistrationNo: string | null;
-  damName: string | null;
-  damRegistrationNo: string | null;
-  omistaja: string | null;
-  omistajanKotikunta: string | null;
-  kennelpiiri: string | null;
-  kennelpiirinro: string | null;
-  koekunta: string | null;
-  koepaiva: Date;
-  jarjestaja: string | null;
-  era1Alkoi: string | null;
-  era2Alkoi: string | null;
-  hakuMin1: number | null;
-  hakuMin2: number | null;
-  ajoMin1: number | null;
-  ajoMin2: number | null;
-  hyvaksytytAjominuutit: number | null;
-  ajoajanPisteet: number | null;
-  hakuEra1: number | null;
-  hakuEra2: number | null;
-  hakuKeskiarvo: number | null;
-  haukkuEra1: number | null;
-  haukkuEra2: number | null;
-  ajotaitoEra1: number | null;
-  ajotaitoEra2: number | null;
 };
 
 function normalizeTrialId(value: string): string {
