@@ -38,7 +38,7 @@ const AJO_MIN2_VALUE_FIELD = {
   size: 12,
 } as const;
 
-const ACCEPTED_MINUTES_VALUE_FIELD = {
+const HYVAKSYTYT_AJOMINUUTIT_FIELD = {
   x: 286,
   y: 305.3,
   size: 12,
@@ -101,6 +101,12 @@ const AJOTAITO_ERA2_VALUE_FIELD = {
 const AJOTAITOKESKIARVO_VALUE_FIELD = {
   x: 286,
   y: 203.3,
+  size: 12,
+} as const;
+
+const ANSIOPISTEET_VALUE_FIELD = {
+  x: 357,
+  y: 223.3,
   size: 12,
 } as const;
 
@@ -182,7 +188,7 @@ export function drawTrialDogPdfKoeErat(
     page,
     font,
     formatKoeEraValue(input.hyvaksytytAjominuutit),
-    ACCEPTED_MINUTES_VALUE_FIELD,
+    HYVAKSYTYT_AJOMINUUTIT_FIELD,
   );
   drawText(
     page,
@@ -243,5 +249,11 @@ export function drawTrialDogPdfKoeErat(
     font,
     formatKoeEraValue(input.ajotaitoKeskiarvo),
     AJOTAITOKESKIARVO_VALUE_FIELD,
+  );
+  drawText(
+    page,
+    font,
+    formatKoeEraValue(input.ansiopisteetYhteensa),
+    ANSIOPISTEET_VALUE_FIELD,
   );
 }

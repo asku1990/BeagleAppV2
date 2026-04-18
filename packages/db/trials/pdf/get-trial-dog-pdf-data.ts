@@ -93,6 +93,7 @@ export async function getTrialDogPdfDataDb(
       ajotaitoEra1: true,
       ajotaitoEra2: true,
       ajotaitoKeskiarvo: true,
+      ansiopisteetYhteensa: true,
     },
   });
 
@@ -134,5 +135,6 @@ export async function getTrialDogPdfDataDb(
     ajotaitoEra1: toNumberOrNull(row.ajotaitoEra1),
     ajotaitoEra2: toNumberOrNull(row.ajotaitoEra2),
     ajotaitoKeskiarvo: toNumberOrNull(row.ajotaitoKeskiarvo),
+    ansiopisteetYhteensa: toNumberOrNull(row.ansiopisteetYhteensa),
   };
 }

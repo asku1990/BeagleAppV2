@@ -90,6 +90,7 @@ export async function renderTrialDogPdf(
     ajotaitoEra1: input.ajotaitoEra1,
     ajotaitoEra2: input.ajotaitoEra2,
     ajotaitoKeskiarvo: input.ajotaitoKeskiarvo,
+    ansiopisteetYhteensa: input.ansiopisteetYhteensa,
     page,
     font,
   });

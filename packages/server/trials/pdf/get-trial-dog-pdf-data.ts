@@ -97,6 +97,7 @@ export async function getTrialDogPdfDataService(
           ajotaitoEra1: result.ajotaitoEra1,
           ajotaitoEra2: result.ajotaitoEra2,
           ajotaitoKeskiarvo: result.ajotaitoKeskiarvo,
+          ansiopisteetYhteensa: result.ansiopisteetYhteensa,
         },
       },
     };
