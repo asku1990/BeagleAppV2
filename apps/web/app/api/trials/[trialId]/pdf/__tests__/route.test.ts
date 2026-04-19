@@ -78,6 +78,7 @@ describe("trial pdf api route", () => {
           keskeytetty: false,
           sijoitus: "1",
           koiriaLuokassa: 2,
+          huomautusTeksti: "Huomautus testiin.",
           ajotaitoEra1: 4,
           ajotaitoEra2: 2,
         },

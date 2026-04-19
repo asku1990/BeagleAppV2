@@ -123,6 +123,7 @@ export async function getTrialDogPdfDataService(
           sijoitus: result.sijoitus,
           koiriaLuokassa: result.koiriaLuokassa,
           Palkinto: result.palkinto,
+          huomautusTeksti: result.huomautusTeksti,
         },
       },
     };

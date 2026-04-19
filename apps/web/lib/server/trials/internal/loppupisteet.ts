@@ -84,9 +84,7 @@ export function drawTrialDogPdfLoppuppisteet(
     drawText(page, font, "X", KESKEYTETTY_X_FIELD);
   }
 
-  if (input.sijoitus) {
-    drawText(page, font, input.sijoitus, SIJOITUS_FIELD);
-  }
+  drawText(page, font, formatKoeEraValue(input.sijoitus), SIJOITUS_FIELD);
 
   drawText(
     page,

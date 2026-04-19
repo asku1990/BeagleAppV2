@@ -142,6 +142,7 @@ export type {
   TrialDogPdfKokeenTiedot,
   TrialDogPdfKoiranTausta,
   TrialDogPdfKoiranTiedot,
+  TrialDogPdfHuomautus,
   TrialDogPdfPayload,
   TrialDogPdfPayloadWithTrialId,
   TrialDogPdfTappiopisteet,

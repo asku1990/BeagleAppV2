@@ -193,4 +193,26 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
       size: 12,
     });
   });
+
+  it("renders dash for empty sijoitus", () => {
+    drawTrialDogPdfLoppuppisteet({
+      loppupisteet: 12,
+      paljasMaaTaiLumi: null,
+      luopui: false,
+      suljettu: false,
+      keskeytetty: false,
+      sijoitus: "",
+      koiriaLuokassa: 2,
+      Palkinto: "1",
+      page,
+      font,
+    });
+
+    expect(drawTextMock).toHaveBeenCalledTimes(4);
+    expect(drawTextMock).toHaveBeenNthCalledWith(2, page, font, "-", {
+      x: 355.5,
+      y: 106,
+      size: 12,
+    });
+  });
 });

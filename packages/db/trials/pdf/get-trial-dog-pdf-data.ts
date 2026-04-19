@@ -60,6 +60,7 @@ export type TrialDogPdfDataDbRow = {
   sijoitus: string | null;
   koiriaLuokassa: number | null;
   palkinto: string | null;
+  huomautusTeksti: string | null;
 };
 
 export async function getTrialDogPdfDataDb(
@@ -153,6 +154,7 @@ export async function getTrialDogPdfDataDb(
       sijoitus: true,
       koiriaLuokassa: true,
       palkinto: true,
+      huomautusTeksti: true,
     },
   });
 
@@ -210,5 +212,6 @@ export async function getTrialDogPdfDataDb(
     sijoitus: row.sijoitus,
     koiriaLuokassa: row.koiriaLuokassa,
     palkinto: row.palkinto,
+    huomautusTeksti: row.huomautusTeksti,
   };
 }

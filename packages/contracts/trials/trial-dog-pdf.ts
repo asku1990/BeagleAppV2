@@ -72,13 +72,18 @@ export type TrialDogPdfLoppupisteet = {
   Palkinto: string | null;
 };
 
+export type TrialDogPdfHuomautus = {
+  huomautusTeksti: string | null;
+};
+
 export type TrialDogPdfPayload = TrialDogPdfKokeenTiedot &
   TrialDogPdfKoiranTiedot &
   TrialDogPdfKoiranTausta &
   TrialDogPdfAjoajanPisteytys &
   TrialDogPdfAnsiopisteet &
   TrialDogPdfTappiopisteet &
-  TrialDogPdfLoppupisteet;
+  TrialDogPdfLoppupisteet &
+  TrialDogPdfHuomautus;
 
 export type TrialDogPdfPayloadWithTrialId = TrialDogPdfPayload & {
   trialId: string;

@@ -189,6 +189,20 @@ Rules:
 - `koiriaLuokassa` renders next to `sijoitus`.
 - `Palkinto` continues to render in the lower-right payout field.
 
+### 8) `huomautus`
+
+Renders the free-text note in its own sized block.
+
+Input data:
+
+- `huomautusTeksti`
+
+Rules:
+
+- The note uses its own block dimensions so the width, height, and line
+  wrapping can be tuned independently from the result block.
+- Missing values render as nothing.
+
 ## Registration rule
 
 The PDF uses the primary registration number for the dog itself.

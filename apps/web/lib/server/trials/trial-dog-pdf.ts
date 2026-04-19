@@ -5,6 +5,7 @@ import { PDFDocument, StandardFonts } from "pdf-lib";
 import { drawTrialDogPdfAjoajanPisteytys } from "./internal/ajoajan-pisteytys";
 import { drawTrialDogPdfAnsiopisteet } from "./internal/ansiopisteet";
 import { drawTrialDogPdfKokeenTiedot } from "./internal/kokeen-tiedot";
+import { drawTrialDogPdfHuomautus } from "./internal/huomautus";
 import { drawTrialDogPdfKoiranTiedot } from "./internal/koiran-tiedot";
 import { drawTrialDogPdfKoiranTausta } from "./internal/koiran-tausta";
 import { drawTrialDogPdfTappiopisteet } from "./internal/tappiopisteet";
@@ -131,5 +132,10 @@ export async function renderTrialDogPdf(
     font,
   } satisfies Parameters<typeof drawTrialDogPdfLoppuppisteet>[0];
   drawTrialDogPdfLoppuppisteet(loppupisteet);
+  drawTrialDogPdfHuomautus({
+    huomautusTeksti: input.huomautusTeksti,
+    page,
+    font,
+  });
   return pdfDocument.save();
 }
