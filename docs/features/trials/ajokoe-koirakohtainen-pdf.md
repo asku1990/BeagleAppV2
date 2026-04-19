@@ -177,12 +177,16 @@ Input data:
 - `luopui`
 - `suljettu`
 - `keskeytetty`
+- `sijoitus`
+- `koiriaLuokassa`
 - `Palkinto`
 
 Rules:
 
 - `paljasMaaTaiLumi` maps to `PALJAS_MAA` or `LUMI` markers, or nothing.
 - `luopui`, `suljettu`, and `keskeytetty` render as `X` markers when true.
+- `sijoitus` renders under the status markers.
+- `koiriaLuokassa` renders next to `sijoitus`.
 - `Palkinto` continues to render in the lower-right payout field.
 
 ## Registration rule

@@ -67,6 +67,8 @@ export type TrialDogPdfLoppupisteet = {
   luopui: boolean | null;
   suljettu: boolean | null;
   keskeytetty: boolean | null;
+  sijoitus: string | null;
+  koiriaLuokassa: number | null;
   Palkinto: string | null;
 };
 

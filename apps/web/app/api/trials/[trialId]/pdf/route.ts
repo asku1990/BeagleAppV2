@@ -101,6 +101,8 @@ export async function GET(
     const luopui = result.body.data.luopui;
     const suljettu = result.body.data.suljettu;
     const keskeytetty = result.body.data.keskeytetty;
+    const sijoitus = result.body.data.sijoitus;
+    const koiriaLuokassa = result.body.data.koiriaLuokassa;
     const Palkinto = result.body.data.Palkinto;
 
     const pdfBytes = await renderTrialDogPdf({
@@ -148,6 +150,8 @@ export async function GET(
       luopui,
       suljettu,
       keskeytetty,
+      sijoitus,
+      koiriaLuokassa,
       Palkinto,
     });
 

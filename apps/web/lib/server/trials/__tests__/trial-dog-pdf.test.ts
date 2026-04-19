@@ -48,6 +48,8 @@ describe("renderTrialDogPdf", () => {
       luopui: false,
       suljettu: false,
       keskeytetty: false,
+      sijoitus: null,
+      koiriaLuokassa: null,
       Palkinto: "1",
     });
 

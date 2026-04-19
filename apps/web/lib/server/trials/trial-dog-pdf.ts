@@ -124,6 +124,8 @@ export async function renderTrialDogPdf(
     luopui: input.luopui,
     suljettu: input.suljettu,
     keskeytetty: input.keskeytetty,
+    sijoitus: input.sijoitus,
+    koiriaLuokassa: input.koiriaLuokassa,
     Palkinto: input.Palkinto,
     page,
     font,

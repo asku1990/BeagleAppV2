@@ -38,6 +38,18 @@ const KESKEYTETTY_X_FIELD = {
   size: 12,
 } as const;
 
+const SIJOITUS_FIELD = {
+  x: 355.5,
+  y: 106,
+  size: 12,
+} as const;
+
+const KOIRIA_LUOKASSA_FIELD = {
+  x: 382.5,
+  y: 106,
+  size: 12,
+} as const;
+
 const PALKINTO = {
   x: 220,
   y: 110.3,
@@ -71,6 +83,17 @@ export function drawTrialDogPdfLoppuppisteet(
   if (input.keskeytetty) {
     drawText(page, font, "X", KESKEYTETTY_X_FIELD);
   }
+
+  if (input.sijoitus) {
+    drawText(page, font, input.sijoitus, SIJOITUS_FIELD);
+  }
+
+  drawText(
+    page,
+    font,
+    formatKoeEraValue(input.koiriaLuokassa),
+    KOIRIA_LUOKASSA_FIELD,
+  );
 
   drawText(page, font, formatKoeEraValue(input.Palkinto), PALKINTO);
 }
