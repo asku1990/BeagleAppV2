@@ -1,13 +1,6 @@
 import { access, readFile } from "node:fs/promises";
 import path from "node:path";
-import type {
-  TrialDogPdfAjoajanPisteytys,
-  TrialDogPdfAnsiopisteet,
-  TrialDogPdfKokeenTiedot,
-  TrialDogPdfKoiranTausta,
-  TrialDogPdfKoiranTiedot,
-  TrialDogPdfTappiopisteet,
-} from "@contracts";
+import type { TrialDogPdfPayload } from "@contracts";
 import { PDFDocument, StandardFonts } from "pdf-lib";
 import { drawTrialDogPdfAjoajanPisteytys } from "./internal/ajoajan-pisteytys";
 import { drawTrialDogPdfAnsiopisteet } from "./internal/ansiopisteet";
@@ -44,12 +37,7 @@ async function resolveTemplatePath(): Promise<string> {
 
 // Renders trial row data onto the static AJOK dog-specific protocol template.
 export async function renderTrialDogPdf(
-  input: TrialDogPdfKokeenTiedot &
-    TrialDogPdfKoiranTiedot &
-    TrialDogPdfKoiranTausta &
-    TrialDogPdfAjoajanPisteytys &
-    TrialDogPdfAnsiopisteet &
-    TrialDogPdfTappiopisteet,
+  input: TrialDogPdfPayload,
 ): Promise<Uint8Array> {
   const templatePath = await resolveTemplatePath();
   const templateBytes = await readFile(templatePath);

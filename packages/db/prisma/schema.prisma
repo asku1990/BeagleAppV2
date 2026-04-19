@@ -392,17 +392,17 @@ model TrialEntry {
   metsastysintoPisteet      Decimal?       @db.Decimal(6, 2)
 
   // 5) tappiopisteiden summat
-  hakuloysyysTappioEra1     Decimal?       @db.Decimal(6, 2)
-  hakuloysyysTappioEra2     Decimal?       @db.Decimal(6, 2)
-  hakuloysyysTappioEra3     Decimal?       @db.Decimal(6, 2)
-  hakuloysyysTappioEra4     Decimal?       @db.Decimal(6, 2)
-  hakuloysyysTappioYhteensa Decimal?       @db.Decimal(6, 2)
-  ajoloysyysTappioEra1      Decimal?       @db.Decimal(6, 2)
-  ajoloysyysTappioEra2      Decimal?       @db.Decimal(6, 2)
-  ajoloysyysTappioEra3      Decimal?       @db.Decimal(6, 2)
-  ajoloysyysTappioEra4      Decimal?       @db.Decimal(6, 2)
-  ajoloysyysTappioYhteensa  Decimal?       @db.Decimal(6, 2)
-  tappiopisteetYhteensa     Decimal?       @db.Decimal(6, 2)
+  hakuloysyysTappioEra1     Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  hakuloysyysTappioEra2     Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  hakuloysyysTappioEra3     Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  hakuloysyysTappioEra4     Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  hakuloysyysTappioYhteensa Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  ajoloysyysTappioEra1      Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  ajoloysyysTappioEra2      Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  ajoloysyysTappioEra3      Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  ajoloysyysTappioEra4      Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  ajoloysyysTappioYhteensa  Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
+  tappiopisteetYhteensa     Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
 
   // 6) pisteet ja tulos
   loppupisteet              Decimal?       @db.Decimal(6, 2)

@@ -17,6 +17,8 @@ export type {
   TrialDogPdfKokeenTiedot,
   TrialDogPdfKoiranTausta,
   TrialDogPdfKoiranTiedot,
+  TrialDogPdfPayload,
+  TrialDogPdfPayloadWithTrialId,
   TrialDogPdfTappiopisteet,
   TrialDogSex,
 } from "./trial-dog-pdf";

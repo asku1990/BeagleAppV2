@@ -1,11 +1,4 @@
-import type {
-  TrialDogPdfAjoajanPisteytys,
-  TrialDogPdfAnsiopisteet,
-  TrialDogPdfKokeenTiedot,
-  TrialDogPdfKoiranTausta,
-  TrialDogPdfKoiranTiedot,
-  TrialDogPdfTappiopisteet,
-} from "@contracts";
+import type { TrialDogPdfPayloadWithTrialId } from "@contracts";
 import { getTrialDogPdfDataDb } from "@db/trials/pdf";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
@@ -17,18 +10,7 @@ function normalizeTrialId(value: string): string {
 export async function getTrialDogPdfDataService(
   trialId: string,
   context?: { requestId?: string },
-): Promise<
-  ServiceResult<
-    TrialDogPdfKokeenTiedot &
-      TrialDogPdfKoiranTiedot &
-      TrialDogPdfKoiranTausta &
-      TrialDogPdfAjoajanPisteytys &
-      TrialDogPdfAnsiopisteet &
-      TrialDogPdfTappiopisteet & {
-        trialId: string;
-      }
-  >
-> {
+): Promise<ServiceResult<TrialDogPdfPayloadWithTrialId>> {
   const startedAt = Date.now();
   const normalizedTrialId = normalizeTrialId(trialId);
   const log = withLogContext({

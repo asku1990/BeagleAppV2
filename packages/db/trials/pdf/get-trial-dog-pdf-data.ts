@@ -1,12 +1,7 @@
 import { prisma } from "@db/core/prisma";
 import type {
-  TrialDogPdfAjoajanPisteytys,
-  TrialDogPdfAnsiopisteet,
   TrialDogPdfDataRequest,
-  TrialDogPdfKokeenTiedot,
-  TrialDogPdfKoiranTausta,
-  TrialDogPdfKoiranTiedot,
-  TrialDogPdfTappiopisteet,
+  TrialDogPdfPayloadWithTrialId,
   TrialDogSex,
 } from "@contracts";
 import { Prisma } from "@prisma/client";
@@ -17,17 +12,7 @@ function toNumberOrNull(value: Prisma.Decimal | null): number | null {
 
 export async function getTrialDogPdfDataDb(
   input: TrialDogPdfDataRequest,
-): Promise<
-  | (TrialDogPdfKokeenTiedot &
-      TrialDogPdfKoiranTiedot &
-      TrialDogPdfKoiranTausta &
-      TrialDogPdfAjoajanPisteytys &
-      TrialDogPdfAnsiopisteet &
-      TrialDogPdfTappiopisteet & {
-        trialId: string;
-      })
-  | null
-> {
+): Promise<TrialDogPdfPayloadWithTrialId | null> {
   const row = await prisma.trialEntry.findUnique({
     where: {
       id: input.trialId,
