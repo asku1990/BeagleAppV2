@@ -1,24 +1,63 @@
 import { prisma } from "@db/core/prisma";
-import type {
-  TrialDogPdfDataRequest,
-  TrialDogPdfPayloadWithTrialId,
-  TrialDogSex,
-} from "@contracts";
 import { Prisma } from "@prisma/client";
 
 function toNumberOrNull(value: Prisma.Decimal | null): number | null {
   return value === null ? null : value.toNumber();
 }
 
-export type TrialDogPdfDataDbRow = Omit<
-  TrialDogPdfPayloadWithTrialId,
-  "paljasMaaTaiLumi"
-> & {
+export type TrialDogPdfDataDbInput = {
+  trialId: string;
+};
+
+export type TrialDogPdfDataDbDogSex = "MALE" | "FEMALE" | "UNKNOWN";
+
+export type TrialDogPdfDataDbRow = {
+  trialId: string;
+  registrationNo: string;
+  dogName: string | null;
+  dogSex: TrialDogPdfDataDbDogSex | null;
+  sireName: string | null;
+  sireRegistrationNo: string | null;
+  damName: string | null;
+  damRegistrationNo: string | null;
+  omistaja: string | null;
+  omistajanKotikunta: string | null;
+  kennelpiiri: string | null;
+  kennelpiirinro: string | null;
+  koekunta: string | null;
+  koepaiva: Date;
+  jarjestaja: string | null;
+  era1Alkoi: string | null;
+  era2Alkoi: string | null;
+  hakuMin1: number | null;
+  hakuMin2: number | null;
+  ajoMin1: number | null;
+  ajoMin2: number | null;
+  hyvaksytytAjominuutit: number | null;
+  ajoajanPisteet: number | null;
+  hakuEra1: number | null;
+  hakuEra2: number | null;
+  hakuKeskiarvo: number | null;
+  haukkuEra1: number | null;
+  haukkuEra2: number | null;
+  haukkuKeskiarvo: number | null;
+  ajotaitoEra1: number | null;
+  ajotaitoEra2: number | null;
+  ajotaitoKeskiarvo: number | null;
+  hakuloysyysTappioEra1: number | null;
+  hakuloysyysTappioEra2: number | null;
+  hakuloysyysTappioYhteensa: number | null;
+  ajoloysyysTappioEra1: number | null;
+  ajoloysyysTappioEra2: number | null;
+  ajoloysyysTappioYhteensa: number | null;
+  tappiopisteetYhteensa: number | null;
+  ansiopisteetYhteensa: number | null;
+  loppupisteet: number | null;
   keli: string | null;
 };
 
 export async function getTrialDogPdfDataDb(
-  input: TrialDogPdfDataRequest,
+  input: TrialDogPdfDataDbInput,
 ): Promise<TrialDogPdfDataDbRow | null> {
   const row = await prisma.trialEntry.findUnique({
     where: {
@@ -114,7 +153,7 @@ export async function getTrialDogPdfDataDb(
     registrationNo:
       row.dog?.registrations[0]?.registrationNo || row.rekisterinumeroSnapshot,
     dogName: row.dog?.name || null,
-    dogSex: (row.dog?.sex ?? null) as TrialDogSex | null,
+    dogSex: (row.dog?.sex ?? null) as TrialDogPdfDataDbDogSex | null,
     sireName: row.dog?.sire?.name ?? null,
     sireRegistrationNo: row.dog?.sire?.registrations[0]?.registrationNo ?? null,
     damName: row.dog?.dam?.name ?? null,
