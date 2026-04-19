@@ -20,6 +20,24 @@ const LUMI_X_FIELD = {
   size: 12,
 } as const;
 
+const LUOPUI_X_FIELD = {
+  x: 107.5,
+  y: 86,
+  size: 12,
+} as const;
+
+const SULJETTU_X_FIELD = {
+  x: 159.5,
+  y: 86,
+  size: 12,
+} as const;
+
+const KESKEYTETTY_X_FIELD = {
+  x: 214.5,
+  y: 86,
+  size: 12,
+} as const;
+
 const PALKINTO = {
   x: 220,
   y: 110.3,
@@ -40,6 +58,18 @@ export function drawTrialDogPdfLoppuppisteet(
     drawText(page, font, "X", PALJAS_MAA_X_FIELD);
   } else if (input.paljasMaaTaiLumi === "LUMI") {
     drawText(page, font, "X", LUMI_X_FIELD);
+  }
+
+  if (input.luopui) {
+    drawText(page, font, "X", LUOPUI_X_FIELD);
+  }
+
+  if (input.suljettu) {
+    drawText(page, font, "X", SULJETTU_X_FIELD);
+  }
+
+  if (input.keskeytetty) {
+    drawText(page, font, "X", KESKEYTETTY_X_FIELD);
   }
 
   drawText(page, font, formatKoeEraValue(input.Palkinto), PALKINTO);

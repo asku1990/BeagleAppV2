@@ -30,6 +30,9 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
     drawTrialDogPdfLoppuppisteet({
       loppupisteet: 12,
       paljasMaaTaiLumi: "PALJAS_MAA",
+      luopui: false,
+      suljettu: false,
+      keskeytetty: false,
       Palkinto: "1",
       page,
       font,
@@ -57,6 +60,9 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
     drawTrialDogPdfLoppuppisteet({
       loppupisteet: 12,
       paljasMaaTaiLumi: "LUMI",
+      luopui: false,
+      suljettu: false,
+      keskeytetty: false,
       Palkinto: "1",
       page,
       font,
@@ -84,6 +90,9 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
     drawTrialDogPdfLoppuppisteet({
       loppupisteet: 12,
       paljasMaaTaiLumi: null,
+      luopui: false,
+      suljettu: false,
+      keskeytetty: false,
       Palkinto: "1",
       page,
       font,
@@ -98,6 +107,36 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
     expect(drawTextMock).toHaveBeenNthCalledWith(2, page, font, "1", {
       x: 220,
       y: 110.3,
+      size: 12,
+    });
+  });
+
+  it("draws luopui, suljettu and keskeytetty markers", () => {
+    drawTrialDogPdfLoppuppisteet({
+      loppupisteet: 12,
+      paljasMaaTaiLumi: null,
+      luopui: true,
+      suljettu: true,
+      keskeytetty: true,
+      Palkinto: "1",
+      page,
+      font,
+    });
+
+    expect(drawTextMock).toHaveBeenCalledTimes(5);
+    expect(drawTextMock).toHaveBeenNthCalledWith(2, page, font, "X", {
+      x: 107.5,
+      y: 86,
+      size: 12,
+    });
+    expect(drawTextMock).toHaveBeenNthCalledWith(3, page, font, "X", {
+      x: 159.5,
+      y: 86,
+      size: 12,
+    });
+    expect(drawTextMock).toHaveBeenNthCalledWith(4, page, font, "X", {
+      x: 214.5,
+      y: 86,
       size: 12,
     });
   });

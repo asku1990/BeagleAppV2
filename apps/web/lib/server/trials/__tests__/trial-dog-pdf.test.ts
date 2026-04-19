@@ -45,6 +45,9 @@ describe("renderTrialDogPdf", () => {
       ansiopisteetYhteensa: 0,
       loppupisteet: 0,
       paljasMaaTaiLumi: null,
+      luopui: false,
+      suljettu: false,
+      keskeytetty: false,
       Palkinto: "1",
     });
 

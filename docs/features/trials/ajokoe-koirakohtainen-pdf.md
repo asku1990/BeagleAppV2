@@ -18,7 +18,10 @@ Internal helper blocks:
 - `apps/web/lib/server/trials/internal/kokeen-tiedot.ts`
 - `apps/web/lib/server/trials/internal/koiran-tiedot.ts`
 - `apps/web/lib/server/trials/internal/koiran-tausta.ts`
-- `apps/web/lib/server/trials/internal/koe-erat.ts`
+- `apps/web/lib/server/trials/internal/ajoajan-pisteytys.ts`
+- `apps/web/lib/server/trials/internal/ansiopisteet.ts`
+- `apps/web/lib/server/trials/internal/tappiopisteet.ts`
+- `apps/web/lib/server/trials/internal/loppupisteet.ts`
 
 The orchestrator loads the template, embeds the font, and delegates each block
 to the internal helpers. The helpers are intentionally internal and are not
@@ -88,10 +91,10 @@ Rules:
 - Owner name and owner home municipality come from the `TrialEntry` snapshot
   fields.
 
-### 4) `koe-erät`
+### 4) `ajoajan-pisteytys`
 
-Renders the first two era start times, the haku-minute values, and the first
-two ajotaito values for the dog-specific PDF.
+Renders the first two era start times, the haku-minute values, the ajo-minute
+values, and the accepted-minute / score values for the dog-specific PDF.
 
 Input data:
 
@@ -103,30 +106,84 @@ Input data:
 - `ajoMin2`
 - `hyvaksytytAjominuutit`
 - `ajoajanPisteet`
-- `hakuEra1`
-- `hakuEra2`
-- `haukkuEra1`
-- `haukkuEra2`
-- `ajotaitoEra1`
-- `ajotaitoEra2`
 
 Rules:
 
 - The current renderer places the two era-start values on the first line and
   the haku-minute values on the second line, the ajo-minute values on the
   third line, the accepted-minute / score values on the right side of the
-  second line, the haku-era values on a fourth line below the haku-minute
-  row, and the haukku-era values on a fifth line below that.
+  second line.
 - Era start times are normalized to `HH:MM` before rendering.
 - Haku-minute values are rendered as plain integers.
 - Ajo-minute values are rendered as plain integers.
 - Accepted-minute and score values are rendered as plain integers / decimals.
+- Missing values render as `-`.
+
+### 5) `ansiopisteet`
+
+Renders the haku-era, haukku-era, and ajotaito-era values for the dog-specific
+PDF.
+
+Input data:
+
+- `hakuEra1`
+- `hakuEra2`
+- `hakuKeskiarvo`
+- `haukkuEra1`
+- `haukkuEra2`
+- `haukkuKeskiarvo`
+- `ajotaitoEra1`
+- `ajotaitoEra2`
+- `ajotaitoKeskiarvo`
+- `ansiopisteetYhteensa`
+
+Rules:
+
 - Haku-era values are rendered as plain integers.
 - Haukku-era values are rendered as plain integers.
 - Ajotaito-era values are rendered as plain integers.
 - Missing values render as `-`.
-- The other minute/score fields on `TrialEntry` are now rendered in the same
-  block, so the PDF contract includes them too.
+
+### 6) `tappiopisteet`
+
+Renders the hakuloysyys and ajoloysyys loss-point rows plus the total loss
+points.
+
+Input data:
+
+- `hakuloysyysTappioEra1`
+- `hakuloysyysTappioEra2`
+- `hakuloysyysTappioYhteensa`
+- `ajoloysyysTappioEra1`
+- `ajoloysyysTappioEra2`
+- `ajoloysyysTappioYhteensa`
+- `tappiopisteetYhteensa`
+
+Rules:
+
+- The hakuloysyys values render on the first loss-point row.
+- The ajoloysyys values render on the second loss-point row.
+- The total loss-point value renders on the right side of the loss-point block.
+- Missing values render as `-`.
+
+### 7) `loppupisteet`
+
+Renders the total points block and the status markers under `keli`.
+
+Input data:
+
+- `loppupisteet`
+- `paljasMaaTaiLumi`
+- `luopui`
+- `suljettu`
+- `keskeytetty`
+- `Palkinto`
+
+Rules:
+
+- `paljasMaaTaiLumi` maps to `PALJAS_MAA` or `LUMI` markers, or nothing.
+- `luopui`, `suljettu`, and `keskeytetty` render as `X` markers when true.
+- `Palkinto` continues to render in the lower-right payout field.
 
 ## Registration rule
 

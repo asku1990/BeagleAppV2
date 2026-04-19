@@ -121,6 +121,9 @@ export async function renderTrialDogPdf(
   const loppupisteet = {
     loppupisteet: input.loppupisteet,
     paljasMaaTaiLumi: input.paljasMaaTaiLumi,
+    luopui: input.luopui,
+    suljettu: input.suljettu,
+    keskeytetty: input.keskeytetty,
     Palkinto: input.Palkinto,
     page,
     font,
