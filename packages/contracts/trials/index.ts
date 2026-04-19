@@ -20,6 +20,7 @@ export type {
   TrialDogPdfPayload,
   TrialDogPdfPayloadWithTrialId,
   TrialDogPdfTappiopisteet,
+  TrialDogPdfLoppupisteet,
   TrialDogSex,
 } from "./trial-dog-pdf";
 export type {

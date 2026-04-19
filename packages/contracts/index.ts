@@ -145,6 +145,7 @@ export type {
   TrialDogPdfPayload,
   TrialDogPdfPayloadWithTrialId,
   TrialDogPdfTappiopisteet,
+  TrialDogPdfLoppupisteet,
   TrialDogSex,
   KoiratietokantaAjokUpsertRequest,
   KoiratietokantaAjokUpsertResponse,

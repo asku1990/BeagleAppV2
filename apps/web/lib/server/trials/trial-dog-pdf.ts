@@ -8,6 +8,7 @@ import { drawTrialDogPdfKokeenTiedot } from "./internal/kokeen-tiedot";
 import { drawTrialDogPdfKoiranTiedot } from "./internal/koiran-tiedot";
 import { drawTrialDogPdfKoiranTausta } from "./internal/koiran-tausta";
 import { drawTrialDogPdfTappiopisteet } from "./internal/tappiopisteet";
+import { drawTrialDogPdfLoppuppisteet } from "./internal/loppupisteet";
 
 export { DOG_REGISTRATION_NO_FIELD } from "./internal/koiran-tiedot";
 
@@ -117,5 +118,11 @@ export async function renderTrialDogPdf(
   } satisfies Parameters<typeof drawTrialDogPdfTappiopisteet>[0];
   drawTrialDogPdfTappiopisteet(tappiopisteet);
 
+  const loppupisteet = {
+    loppupisteet: input.loppupisteet,
+    page,
+    font,
+  } satisfies Parameters<typeof drawTrialDogPdfLoppuppisteet>[0];
+  drawTrialDogPdfLoppuppisteet(loppupisteet);
   return pdfDocument.save();
 }

@@ -93,6 +93,7 @@ export async function getTrialDogPdfDataDb(
       ajoloysyysTappioYhteensa: true,
       tappiopisteetYhteensa: true,
       ansiopisteetYhteensa: true,
+      loppupisteet: true,
     },
   });
 
@@ -142,5 +143,6 @@ export async function getTrialDogPdfDataDb(
     ajoloysyysTappioYhteensa: toNumberOrNull(row.ajoloysyysTappioYhteensa),
     tappiopisteetYhteensa: toNumberOrNull(row.tappiopisteetYhteensa),
     ansiopisteetYhteensa: toNumberOrNull(row.ansiopisteetYhteensa),
+    loppupisteet: toNumberOrNull(row.loppupisteet),
   };
 }

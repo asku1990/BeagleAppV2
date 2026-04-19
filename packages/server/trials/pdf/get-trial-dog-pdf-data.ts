@@ -101,6 +101,7 @@ export async function getTrialDogPdfDataService(
           ajoloysyysTappioYhteensa: result.ajoloysyysTappioYhteensa,
           tappiopisteetYhteensa: result.tappiopisteetYhteensa,
           ansiopisteetYhteensa: result.ansiopisteetYhteensa,
+          loppupisteet: result.loppupisteet,
         },
       },
     };
