@@ -22,25 +22,25 @@ const HAKULOYSYYS_YHTEENSA_VALUE_FIELD = {
 
 const AJOLOYSYYS_ERA1_VALUE_FIELD = {
   x: 147,
-  y: 145.3,
+  y: 144.3,
   size: 12,
 } as const;
 
 const AJOLOYSYYS_ERA2_VALUE_FIELD = {
   x: 221,
-  y: 145.3,
+  y: 144.3,
   size: 12,
 } as const;
 
 const AJOLOYSYYS_YHTEENSA_VALUE_FIELD = {
   x: 286,
-  y: 145.3,
+  y: 144.3,
   size: 12,
 } as const;
 
 const TAPPIOPISTEET_YHTEENSA_VALUE_FIELD = {
   x: 357,
-  y: 145.3,
+  y: 144.3,
   size: 12,
 } as const;
 
