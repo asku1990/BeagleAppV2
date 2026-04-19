@@ -10,9 +10,16 @@ function toNumberOrNull(value: Prisma.Decimal | null): number | null {
   return value === null ? null : value.toNumber();
 }
 
+export type TrialDogPdfDataDbRow = Omit<
+  TrialDogPdfPayloadWithTrialId,
+  "paljasMaaTaiLumi"
+> & {
+  keli: string | null;
+};
+
 export async function getTrialDogPdfDataDb(
   input: TrialDogPdfDataRequest,
-): Promise<TrialDogPdfPayloadWithTrialId | null> {
+): Promise<TrialDogPdfDataDbRow | null> {
   const row = await prisma.trialEntry.findUnique({
     where: {
       id: input.trialId,
@@ -94,6 +101,7 @@ export async function getTrialDogPdfDataDb(
       tappiopisteetYhteensa: true,
       ansiopisteetYhteensa: true,
       loppupisteet: true,
+      keli: true,
     },
   });
 
@@ -144,5 +152,6 @@ export async function getTrialDogPdfDataDb(
     tappiopisteetYhteensa: toNumberOrNull(row.tappiopisteetYhteensa),
     ansiopisteetYhteensa: toNumberOrNull(row.ansiopisteetYhteensa),
     loppupisteet: toNumberOrNull(row.loppupisteet),
+    keli: row.keli,
   };
 }

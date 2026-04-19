@@ -7,6 +7,20 @@ function normalizeTrialId(value: string): string {
   return value.trim();
 }
 
+function mapKeliToPaljasMaaTaiLumi(
+  keli: string | null,
+): "PALJAS_MAA" | "LUMI" | null {
+  if (keli === "P") {
+    return "PALJAS_MAA";
+  }
+
+  if (keli === "L") {
+    return "LUMI";
+  }
+
+  return null;
+}
+
 export async function getTrialDogPdfDataService(
   trialId: string,
   context?: { requestId?: string },
@@ -102,6 +116,7 @@ export async function getTrialDogPdfDataService(
           tappiopisteetYhteensa: result.tappiopisteetYhteensa,
           ansiopisteetYhteensa: result.ansiopisteetYhteensa,
           loppupisteet: result.loppupisteet,
+          paljasMaaTaiLumi: mapKeliToPaljasMaaTaiLumi(result.keli),
         },
       },
     };

@@ -97,6 +97,7 @@ export async function GET(
     const tappiopisteetYhteensa = result.body.data.tappiopisteetYhteensa;
     const ansiopisteetYhteensa = result.body.data.ansiopisteetYhteensa;
     const loppupisteet = result.body.data.loppupisteet;
+    const paljasMaaTaiLumi = result.body.data.paljasMaaTaiLumi;
 
     const pdfBytes = await renderTrialDogPdf({
       registrationNo,
@@ -139,6 +140,7 @@ export async function GET(
       tappiopisteetYhteensa,
       ansiopisteetYhteensa,
       loppupisteet,
+      paljasMaaTaiLumi,
     });
 
     log.info(

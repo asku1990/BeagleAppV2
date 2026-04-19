@@ -8,6 +8,18 @@ const LOPPUPISTEET = {
   size: 12,
 } as const;
 
+const PALJAS_MAA_X_FIELD = {
+  x: 37.5,
+  y: 114.3,
+  size: 12,
+} as const;
+
+const LUMI_X_FIELD = {
+  x: 107.5,
+  y: 114.3,
+  size: 12,
+} as const;
+
 export function drawTrialDogPdfLoppuppisteet(
   input: TrialDogPdfLoppupisteet & {
     page: PDFPage;
@@ -17,4 +29,10 @@ export function drawTrialDogPdfLoppuppisteet(
   const { page, font } = input;
 
   drawText(page, font, formatKoeEraValue(input.loppupisteet), LOPPUPISTEET);
+
+  if (input.paljasMaaTaiLumi === "PALJAS_MAA") {
+    drawText(page, font, "X", PALJAS_MAA_X_FIELD);
+  } else if (input.paljasMaaTaiLumi === "LUMI") {
+    drawText(page, font, "X", LUMI_X_FIELD);
+  }
 }

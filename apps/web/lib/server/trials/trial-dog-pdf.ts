@@ -120,6 +120,7 @@ export async function renderTrialDogPdf(
 
   const loppupisteet = {
     loppupisteet: input.loppupisteet,
+    paljasMaaTaiLumi: input.paljasMaaTaiLumi,
     page,
     font,
   } satisfies Parameters<typeof drawTrialDogPdfLoppuppisteet>[0];
