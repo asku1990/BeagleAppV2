@@ -107,6 +107,11 @@ export async function renderTrialDogPdf(
   const tappiopisteet = {
     hakuloysyysTappioEra1: input.hakuloysyysTappioEra1,
     hakuloysyysTappioEra2: input.hakuloysyysTappioEra2,
+    hakuloysyysTappioYhteensa: input.hakuloysyysTappioYhteensa,
+    ajoloysyysTappioEra1: input.ajoloysyysTappioEra1,
+    ajoloysyysTappioEra2: input.ajoloysyysTappioEra2,
+    ajoloysyysTappioYhteensa: input.ajoloysyysTappioYhteensa,
+    tappiopisteetYhteensa: input.tappiopisteetYhteensa,
     page,
     font,
   } satisfies Parameters<typeof drawTrialDogPdfTappiopisteet>[0];

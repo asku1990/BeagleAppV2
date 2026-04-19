@@ -87,6 +87,11 @@ export async function getTrialDogPdfDataDb(
       ajotaitoKeskiarvo: true,
       hakuloysyysTappioEra1: true,
       hakuloysyysTappioEra2: true,
+      hakuloysyysTappioYhteensa: true,
+      ajoloysyysTappioEra1: true,
+      ajoloysyysTappioEra2: true,
+      ajoloysyysTappioYhteensa: true,
+      tappiopisteetYhteensa: true,
       ansiopisteetYhteensa: true,
     },
   });
@@ -131,6 +136,11 @@ export async function getTrialDogPdfDataDb(
     ajotaitoKeskiarvo: toNumberOrNull(row.ajotaitoKeskiarvo),
     hakuloysyysTappioEra1: toNumberOrNull(row.hakuloysyysTappioEra1),
     hakuloysyysTappioEra2: toNumberOrNull(row.hakuloysyysTappioEra2),
+    hakuloysyysTappioYhteensa: toNumberOrNull(row.hakuloysyysTappioYhteensa),
+    ajoloysyysTappioEra1: toNumberOrNull(row.ajoloysyysTappioEra1),
+    ajoloysyysTappioEra2: toNumberOrNull(row.ajoloysyysTappioEra2),
+    ajoloysyysTappioYhteensa: toNumberOrNull(row.ajoloysyysTappioYhteensa),
+    tappiopisteetYhteensa: toNumberOrNull(row.tappiopisteetYhteensa),
     ansiopisteetYhteensa: toNumberOrNull(row.ansiopisteetYhteensa),
   };
 }
