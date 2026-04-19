@@ -2,10 +2,12 @@ import { access, readFile } from "node:fs/promises";
 import path from "node:path";
 import type { TrialDogPdfData } from "@contracts";
 import { PDFDocument, StandardFonts } from "pdf-lib";
-import { drawTrialDogPdfKoeErat } from "./internal/koe-erat";
+import { drawTrialDogPdfAjoajanPisteytys } from "./internal/ajoajan-pisteytys";
+import { drawTrialDogPdfAnsiopisteet } from "./internal/ansiopisteet";
 import { drawTrialDogPdfKokeenTiedot } from "./internal/kokeen-tiedot";
 import { drawTrialDogPdfKoiranTiedot } from "./internal/koiran-tiedot";
 import { drawTrialDogPdfKoiranTausta } from "./internal/koiran-tausta";
+import { drawTrialDogPdfTappiopisteet } from "./internal/tappiopisteet";
 
 export { DOG_REGISTRATION_NO_FIELD } from "./internal/koiran-tiedot";
 
@@ -72,7 +74,7 @@ export async function renderTrialDogPdf(
     font,
   });
 
-  drawTrialDogPdfKoeErat({
+  const ajoajanPisteytys = {
     era1Alkoi: input.era1Alkoi,
     era2Alkoi: input.era2Alkoi,
     hakuMin1: input.hakuMin1,
@@ -81,6 +83,12 @@ export async function renderTrialDogPdf(
     ajoMin2: input.ajoMin2,
     hyvaksytytAjominuutit: input.hyvaksytytAjominuutit,
     ajoajanPisteet: input.ajoajanPisteet,
+    page,
+    font,
+  } satisfies Parameters<typeof drawTrialDogPdfAjoajanPisteytys>[0];
+  drawTrialDogPdfAjoajanPisteytys(ajoajanPisteytys);
+
+  const ansiopisteet = {
     hakuEra1: input.hakuEra1,
     hakuEra2: input.hakuEra2,
     hakuKeskiarvo: input.hakuKeskiarvo,
@@ -93,7 +101,14 @@ export async function renderTrialDogPdf(
     ansiopisteetYhteensa: input.ansiopisteetYhteensa,
     page,
     font,
-  });
+  } satisfies Parameters<typeof drawTrialDogPdfAnsiopisteet>[0];
+  drawTrialDogPdfAnsiopisteet(ansiopisteet);
+
+  const tappiopisteet = {
+    page,
+    font,
+  } satisfies Parameters<typeof drawTrialDogPdfTappiopisteet>[0];
+  drawTrialDogPdfTappiopisteet(tappiopisteet);
 
   return pdfDocument.save();
 }

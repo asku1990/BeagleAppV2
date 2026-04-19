@@ -27,7 +27,7 @@ export type TrialDogPdfKoiranTausta = {
   omistajanKotikunta: string | null;
 };
 
-export type TrialDogPdfKoeErat = {
+export type TrialDogPdfAjoajanPisteytys = {
   era1Alkoi: string | null;
   era2Alkoi: string | null;
   hakuMin1: number | null;
@@ -36,6 +36,9 @@ export type TrialDogPdfKoeErat = {
   ajoMin2: number | null;
   hyvaksytytAjominuutit: number | null;
   ajoajanPisteet: number | null;
+};
+
+export type TrialDogPdfAnsiopisteet = {
   hakuEra1: number | null;
   hakuEra2: number | null;
   hakuKeskiarvo: number | null;
@@ -47,6 +50,9 @@ export type TrialDogPdfKoeErat = {
   ajotaitoKeskiarvo: number | null;
   ansiopisteetYhteensa: number | null;
 };
+
+export type TrialDogPdfKoeErat = TrialDogPdfAjoajanPisteytys &
+  TrialDogPdfAnsiopisteet;
 
 export type TrialDogPdfData = TrialDogPdfKokeenTiedot &
   TrialDogPdfKoiranTiedot &

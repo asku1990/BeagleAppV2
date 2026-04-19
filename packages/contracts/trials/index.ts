@@ -11,6 +11,8 @@ export type {
   BeagleTrialSearchSort,
 } from "./beagle-trials";
 export type {
+  TrialDogPdfAjoajanPisteytys,
+  TrialDogPdfAnsiopisteet,
   TrialDogPdfData,
   TrialDogPdfDataRequest,
   TrialDogPdfKoeErat,
