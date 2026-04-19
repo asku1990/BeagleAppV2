@@ -13,12 +13,11 @@ export type {
 export type {
   TrialDogPdfAjoajanPisteytys,
   TrialDogPdfAnsiopisteet,
-  TrialDogPdfData,
   TrialDogPdfDataRequest,
-  TrialDogPdfKoeErat,
   TrialDogPdfKokeenTiedot,
   TrialDogPdfKoiranTausta,
   TrialDogPdfKoiranTiedot,
+  TrialDogPdfTappiopisteet,
   TrialDogSex,
 } from "./trial-dog-pdf";
 export type {

@@ -87,6 +87,8 @@ export async function GET(
     const ajotaitoEra1 = result.body.data.ajotaitoEra1;
     const ajotaitoEra2 = result.body.data.ajotaitoEra2;
     const ajotaitoKeskiarvo = result.body.data.ajotaitoKeskiarvo;
+    const hakuloysyysTappioEra1 = result.body.data.hakuloysyysTappioEra1;
+    const hakuloysyysTappioEra2 = result.body.data.hakuloysyysTappioEra2;
     const ansiopisteetYhteensa = result.body.data.ansiopisteetYhteensa;
 
     const pdfBytes = await renderTrialDogPdf({
@@ -121,6 +123,8 @@ export async function GET(
       ajotaitoEra1,
       ajotaitoEra2,
       ajotaitoKeskiarvo,
+      hakuloysyysTappioEra1,
+      hakuloysyysTappioEra2,
       ansiopisteetYhteensa,
     });
 

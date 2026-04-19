@@ -50,14 +50,11 @@ const AJOAJAN_PISTEET_VALUE_FIELD = {
   size: 12,
 } as const;
 
-// Renders the AJOK era timings and minute-based result fields.
-type AjoajanPisteytysInput = TrialDogPdfAjoajanPisteytys & {
-  page: PDFPage;
-  font: PDFFont;
-};
-
 export function drawTrialDogPdfAjoajanPisteytys(
-  input: AjoajanPisteytysInput,
+  input: TrialDogPdfAjoajanPisteytys & {
+    page: PDFPage;
+    font: PDFFont;
+  },
 ): void {
   const { page, font } = input;
 

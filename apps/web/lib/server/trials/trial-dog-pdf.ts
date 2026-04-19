@@ -1,6 +1,13 @@
 import { access, readFile } from "node:fs/promises";
 import path from "node:path";
-import type { TrialDogPdfData } from "@contracts";
+import type {
+  TrialDogPdfAjoajanPisteytys,
+  TrialDogPdfAnsiopisteet,
+  TrialDogPdfKokeenTiedot,
+  TrialDogPdfKoiranTausta,
+  TrialDogPdfKoiranTiedot,
+  TrialDogPdfTappiopisteet,
+} from "@contracts";
 import { PDFDocument, StandardFonts } from "pdf-lib";
 import { drawTrialDogPdfAjoajanPisteytys } from "./internal/ajoajan-pisteytys";
 import { drawTrialDogPdfAnsiopisteet } from "./internal/ansiopisteet";
@@ -37,7 +44,12 @@ async function resolveTemplatePath(): Promise<string> {
 
 // Renders trial row data onto the static AJOK dog-specific protocol template.
 export async function renderTrialDogPdf(
-  input: TrialDogPdfData,
+  input: TrialDogPdfKokeenTiedot &
+    TrialDogPdfKoiranTiedot &
+    TrialDogPdfKoiranTausta &
+    TrialDogPdfAjoajanPisteytys &
+    TrialDogPdfAnsiopisteet &
+    TrialDogPdfTappiopisteet,
 ): Promise<Uint8Array> {
   const templatePath = await resolveTemplatePath();
   const templateBytes = await readFile(templatePath);
@@ -105,6 +117,8 @@ export async function renderTrialDogPdf(
   drawTrialDogPdfAnsiopisteet(ansiopisteet);
 
   const tappiopisteet = {
+    hakuloysyysTappioEra1: input.hakuloysyysTappioEra1,
+    hakuloysyysTappioEra2: input.hakuloysyysTappioEra2,
     page,
     font,
   } satisfies Parameters<typeof drawTrialDogPdfTappiopisteet>[0];

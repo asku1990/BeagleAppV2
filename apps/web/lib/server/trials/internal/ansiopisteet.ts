@@ -62,13 +62,12 @@ const ANSIOPISTEET_VALUE_FIELD = {
   size: 12,
 } as const;
 
-// Renders the AJOK scoring and average fields.
-type AnsiopisteetInput = TrialDogPdfAnsiopisteet & {
-  page: PDFPage;
-  font: PDFFont;
-};
-
-export function drawTrialDogPdfAnsiopisteet(input: AnsiopisteetInput): void {
+export function drawTrialDogPdfAnsiopisteet(
+  input: TrialDogPdfAnsiopisteet & {
+    page: PDFPage;
+    font: PDFFont;
+  },
+): void {
   const { page, font } = input;
 
   drawText(

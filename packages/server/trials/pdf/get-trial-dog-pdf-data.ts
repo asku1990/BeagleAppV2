@@ -1,11 +1,14 @@
-import type { TrialDogPdfData as TrialDogPdfDataContract } from "@contracts";
+import type {
+  TrialDogPdfAjoajanPisteytys,
+  TrialDogPdfAnsiopisteet,
+  TrialDogPdfKokeenTiedot,
+  TrialDogPdfKoiranTausta,
+  TrialDogPdfKoiranTiedot,
+  TrialDogPdfTappiopisteet,
+} from "@contracts";
 import { getTrialDogPdfDataDb } from "@db/trials/pdf";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
-
-export type TrialDogPdfData = TrialDogPdfDataContract & {
-  trialId: string;
-};
 
 function normalizeTrialId(value: string): string {
   return value.trim();
@@ -14,7 +17,18 @@ function normalizeTrialId(value: string): string {
 export async function getTrialDogPdfDataService(
   trialId: string,
   context?: { requestId?: string },
-): Promise<ServiceResult<TrialDogPdfData>> {
+): Promise<
+  ServiceResult<
+    TrialDogPdfKokeenTiedot &
+      TrialDogPdfKoiranTiedot &
+      TrialDogPdfKoiranTausta &
+      TrialDogPdfAjoajanPisteytys &
+      TrialDogPdfAnsiopisteet &
+      TrialDogPdfTappiopisteet & {
+        trialId: string;
+      }
+  >
+> {
   const startedAt = Date.now();
   const normalizedTrialId = normalizeTrialId(trialId);
   const log = withLogContext({
@@ -97,6 +111,8 @@ export async function getTrialDogPdfDataService(
           ajotaitoEra1: result.ajotaitoEra1,
           ajotaitoEra2: result.ajotaitoEra2,
           ajotaitoKeskiarvo: result.ajotaitoKeskiarvo,
+          hakuloysyysTappioEra1: result.hakuloysyysTappioEra1,
+          hakuloysyysTappioEra2: result.hakuloysyysTappioEra2,
           ansiopisteetYhteensa: result.ansiopisteetYhteensa,
         },
       },

@@ -51,10 +51,7 @@ export type TrialDogPdfAnsiopisteet = {
   ansiopisteetYhteensa: number | null;
 };
 
-export type TrialDogPdfKoeErat = TrialDogPdfAjoajanPisteytys &
-  TrialDogPdfAnsiopisteet;
-
-export type TrialDogPdfData = TrialDogPdfKokeenTiedot &
-  TrialDogPdfKoiranTiedot &
-  TrialDogPdfKoiranTausta &
-  TrialDogPdfKoeErat;
+export type TrialDogPdfTappiopisteet = {
+  hakuloysyysTappioEra1: number | null;
+  hakuloysyysTappioEra2: number | null;
+};

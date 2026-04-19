@@ -12,11 +12,7 @@ export {
   type BeagleTrialSearchRowDb,
   type BeagleTrialSearchSortDb,
 } from "./repository";
-export {
-  getTrialDogPdfDataDb,
-  type TrialDogPdfDataDb,
-  type TrialDogPdfDataRequestDb,
-} from "./pdf";
+export { getTrialDogPdfDataDb } from "./pdf";
 export {
   upsertKoiratietokantaAjokResultDb,
   type KoiratietokantaAjokEntryDbInput,

@@ -1,7 +1,12 @@
 import { prisma } from "@db/core/prisma";
 import type {
-  TrialDogPdfData,
+  TrialDogPdfAjoajanPisteytys,
+  TrialDogPdfAnsiopisteet,
   TrialDogPdfDataRequest,
+  TrialDogPdfKokeenTiedot,
+  TrialDogPdfKoiranTausta,
+  TrialDogPdfKoiranTiedot,
+  TrialDogPdfTappiopisteet,
   TrialDogSex,
 } from "@contracts";
 import { Prisma } from "@prisma/client";
@@ -10,17 +15,19 @@ function toNumberOrNull(value: Prisma.Decimal | null): number | null {
   return value === null ? null : value.toNumber();
 }
 
-export type TrialDogPdfDataRequestDb = TrialDogPdfDataRequest;
-
-export type TrialDogSexDb = TrialDogSex;
-
-export type TrialDogPdfDataDb = TrialDogPdfData & {
-  trialId: string;
-};
-
 export async function getTrialDogPdfDataDb(
-  input: TrialDogPdfDataRequestDb,
-): Promise<TrialDogPdfDataDb | null> {
+  input: TrialDogPdfDataRequest,
+): Promise<
+  | (TrialDogPdfKokeenTiedot &
+      TrialDogPdfKoiranTiedot &
+      TrialDogPdfKoiranTausta &
+      TrialDogPdfAjoajanPisteytys &
+      TrialDogPdfAnsiopisteet &
+      TrialDogPdfTappiopisteet & {
+        trialId: string;
+      })
+  | null
+> {
   const row = await prisma.trialEntry.findUnique({
     where: {
       id: input.trialId,
@@ -93,6 +100,8 @@ export async function getTrialDogPdfDataDb(
       ajotaitoEra1: true,
       ajotaitoEra2: true,
       ajotaitoKeskiarvo: true,
+      hakuloysyysTappioEra1: true,
+      hakuloysyysTappioEra2: true,
       ansiopisteetYhteensa: true,
     },
   });
@@ -106,7 +115,7 @@ export async function getTrialDogPdfDataDb(
     registrationNo:
       row.dog?.registrations[0]?.registrationNo || row.rekisterinumeroSnapshot,
     dogName: row.dog?.name || null,
-    dogSex: (row.dog?.sex ?? null) as TrialDogSexDb | null,
+    dogSex: (row.dog?.sex ?? null) as TrialDogSex | null,
     sireName: row.dog?.sire?.name ?? null,
     sireRegistrationNo: row.dog?.sire?.registrations[0]?.registrationNo ?? null,
     damName: row.dog?.dam?.name ?? null,
@@ -135,6 +144,8 @@ export async function getTrialDogPdfDataDb(
     ajotaitoEra1: toNumberOrNull(row.ajotaitoEra1),
     ajotaitoEra2: toNumberOrNull(row.ajotaitoEra2),
     ajotaitoKeskiarvo: toNumberOrNull(row.ajotaitoKeskiarvo),
+    hakuloysyysTappioEra1: toNumberOrNull(row.hakuloysyysTappioEra1),
+    hakuloysyysTappioEra2: toNumberOrNull(row.hakuloysyysTappioEra2),
     ansiopisteetYhteensa: toNumberOrNull(row.ansiopisteetYhteensa),
   };
 }

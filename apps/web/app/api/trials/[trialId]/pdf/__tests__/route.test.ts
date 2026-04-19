@@ -66,6 +66,8 @@ describe("trial pdf api route", () => {
           omistajanKotikunta: "Hyrynsalmi",
           hakuKeskiarvo: 6,
           haukkuKeskiarvo: 7,
+          hakuloysyysTappioEra1: 1,
+          hakuloysyysTappioEra2: 2,
           ajotaitoEra1: 4,
           ajotaitoEra2: 2,
         },
