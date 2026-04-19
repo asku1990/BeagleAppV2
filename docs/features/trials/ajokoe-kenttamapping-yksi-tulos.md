@@ -47,51 +47,51 @@ Huomio:
 
 ## Entry-mapping (ydin)
 
-| Lähdekenttä (`yksi_tulos`)         | Kohde                                         |
-| ---------------------------------- | --------------------------------------------- |
-| `REKISTERINUMERO`                  | `TrialEntry.rekisterinumeroSnapshot`          |
-| `LUOKKA`                           | `TrialEntry.luokka`                           |
-| `Omistaja`                         | `TrialEntry.omistajaSnapshot`                 |
-| `Omistajankotipaikka`              | `TrialEntry.omistajanKotikuntaSnapshot`       |
-| `I_ERA_KLO`                        | `TrialEntry.era1Alkoi`                        |
-| `II_ERA_KLO`                       | `TrialEntry.era2Alkoi`                        |
-| `i_haku_min`                       | `TrialEntry.hakuMin1`                         |
-| `II_HAKU_MIN`                      | `TrialEntry.hakuMin2`                         |
-| `I_AJO_MIN`                        | `TrialEntry.ajoMin1`                          |
-| `II_AJO_MIN`                       | `TrialEntry.ajoMin2`                          |
-| `HYV_AJOT_MIN`                     | `TrialEntry.hyvaksytytAjominuutit`            |
-| `AJOPISTEET`                       | `TrialEntry.ajoajanPisteet`                   |
-| `I_HAKU`                           | `TrialEntry.hakuEra1`                         |
-| `II_HAKU`                          | `TrialEntry.hakuEra2`                         |
-| `HAKUPISTEET`                      | `TrialEntry.hakuKeskiarvo`                    |
-| `I_HAUKKU`                         | `TrialEntry.haukkuEra1`                       |
-| `II_HAUKKU`                        | `TrialEntry.haukkuEra2`                       |
-| `HAUKKUPISTEET`                    | `TrialEntry.haukkuKeskiarvo`                  |
-| `I_AJOTAITO`                       | `TrialEntry.ajotaitoEra1`                     |
-| `II_AJOTAITO`                      | `TrialEntry.ajotaitoEra2`                     |
-| `AJOTAITOPISTEET`                  | `TrialEntry.ajotaitoKeskiarvo`                |
-| `ANSIOPISTEET`                     | `TrialEntry.ansiopisteetYhteensa`             |
-| `I_HAKULOYSYYS`                    | `TrialEntry.hakuloysyysTappioEra1`            |
-| `II_HAKULOYSYYS`                   | `TrialEntry.hakuloysyysTappioEra2`            |
-| `HAKULOYSYYSPISTEET`               | `TrialEntry.hakuloysyysTappioYhteensa`        |
-| `I_AJOLOYSYYS`                     | `TrialEntry.ajoloysyysTappioEra1`             |
-| `II_AJOLOYSYYS`                    | `TrialEntry.ajoloysyysTappioEra2`             |
-| `AJOLOYSYYSPISTEET`                | `TrialEntry.ajoloysyysTappioYhteensa`         |
-| `TAPPIOPISTEET`                    | `TrialEntry.tappiopisteetYhteensa`            |
-| `LOPPUPISTEET`                     | `TrialEntry.loppupisteet`                     |
-| `PALKINTOSIJA`                     | `TrialEntry.palkinto`                         |
-| `SIJOITUS_LUOKASSA`                | `TrialEntry.sijoitus`                         |
-| `KOIRIA_LUOKASSA`                  | `TrialEntry.koiriaLuokassa`                   |
-| `KELI`                             | `TrialEntry.keli`                             |
-| `111_PALJAS_MAA`..`113_PALJAS_MAA` | `TrialLisatietoItem` code `11` (`Paljas maa`) |
-| `121_LUMIKELI`..`123_LUMIKELI`     | `TrialLisatietoItem` code `12` (`Lumikeli`)   |
-| `luopui`                           | `TrialEntry.luopui`                           |
-| `suljettu`                         | `TrialEntry.suljettu`                         |
-| `keskeytti`                        | `TrialEntry.keskeytetty`                      |
-| `HUOMAUTUS`                        | `TrialEntry.huomautusTeksti`                  |
-| `palkintotuomari1`                 | `TrialEntry.ryhmatuomariNimi`                 |
-| `palkintotuomari2`                 | `TrialEntry.palkintotuomariNimi`              |
-| Koko JSON-rivi                     | `TrialEntry.raakadataJson`                    |
+| Lähdekenttä (`yksi_tulos`)         | Kohde                                                                                             |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `REKISTERINUMERO`                  | `TrialEntry.rekisterinumeroSnapshot`                                                              |
+| `LUOKKA`                           | `TrialEntry.luokka`                                                                               |
+| `Omistaja`                         | `TrialEntry.omistajaSnapshot`                                                                     |
+| `Omistajankotipaikka`              | `TrialEntry.omistajanKotikuntaSnapshot`                                                           |
+| `I_ERA_KLO`                        | `TrialEntry.era1Alkoi`                                                                            |
+| `II_ERA_KLO`                       | `TrialEntry.era2Alkoi`                                                                            |
+| `i_haku_min`                       | `TrialEntry.hakuMin1`                                                                             |
+| `II_HAKU_MIN`                      | `TrialEntry.hakuMin2`                                                                             |
+| `I_AJO_MIN`                        | `TrialEntry.ajoMin1`                                                                              |
+| `II_AJO_MIN`                       | `TrialEntry.ajoMin2`                                                                              |
+| `HYV_AJOT_MIN`                     | `TrialEntry.hyvaksytytAjominuutit`                                                                |
+| `AJOPISTEET`                       | `TrialEntry.ajoajanPisteet`                                                                       |
+| `I_HAKU`                           | `TrialEntry.hakuEra1`                                                                             |
+| `II_HAKU`                          | `TrialEntry.hakuEra2`                                                                             |
+| `HAKUPISTEET`                      | `TrialEntry.hakuKeskiarvo`                                                                        |
+| `I_HAUKKU`                         | `TrialEntry.haukkuEra1`                                                                           |
+| `II_HAUKKU`                        | `TrialEntry.haukkuEra2`                                                                           |
+| `HAUKKUPISTEET`                    | `TrialEntry.haukkuKeskiarvo`                                                                      |
+| `I_AJOTAITO`                       | `TrialEntry.ajotaitoEra1`                                                                         |
+| `II_AJOTAITO`                      | `TrialEntry.ajotaitoEra2`                                                                         |
+| `AJOTAITOPISTEET`                  | `TrialEntry.ajotaitoKeskiarvo`                                                                    |
+| `ANSIOPISTEET`                     | `TrialEntry.ansiopisteetYhteensa`                                                                 |
+| `I_HAKULOYSYYS`                    | `TrialEntry.hakuloysyysTappioEra1`                                                                |
+| `II_HAKULOYSYYS`                   | `TrialEntry.hakuloysyysTappioEra2`                                                                |
+| `HAKULOYSYYSPISTEET`               | `TrialEntry.hakuloysyysTappioYhteensa`                                                            |
+| `I_AJOLOYSYYS`                     | `TrialEntry.ajoloysyysTappioEra1`                                                                 |
+| `II_AJOLOYSYYS`                    | `TrialEntry.ajoloysyysTappioEra2`                                                                 |
+| `AJOLOYSYYSPISTEET`                | `TrialEntry.ajoloysyysTappioYhteensa`                                                             |
+| `TAPPIOPISTEET`                    | `TrialEntry.tappiopisteetYhteensa`                                                                |
+| `LOPPUPISTEET`                     | `TrialEntry.loppupisteet`                                                                         |
+| `PALKINTOSIJA`                     | `TrialEntry.palkinto` (stored as text; live values include `0`, `1`, `2`, `3`, `L`, `S`, and `-`) |
+| `SIJOITUS_LUOKASSA`                | `TrialEntry.sijoitus`                                                                             |
+| `KOIRIA_LUOKASSA`                  | `TrialEntry.koiriaLuokassa`                                                                       |
+| `KELI`                             | `TrialEntry.keli`                                                                                 |
+| `111_PALJAS_MAA`..`113_PALJAS_MAA` | `TrialLisatietoItem` code `11` (`Paljas maa`)                                                     |
+| `121_LUMIKELI`..`123_LUMIKELI`     | `TrialLisatietoItem` code `12` (`Lumikeli`)                                                       |
+| `luopui`                           | `TrialEntry.luopui`                                                                               |
+| `suljettu`                         | `TrialEntry.suljettu`                                                                             |
+| `keskeytti`                        | `TrialEntry.keskeytetty`                                                                          |
+| `HUOMAUTUS`                        | `TrialEntry.huomautusTeksti`                                                                      |
+| `palkintotuomari1`                 | `TrialEntry.ryhmatuomariNimi`                                                                     |
+| `palkintotuomari2`                 | `TrialEntry.palkintotuomariNimi`                                                                  |
+| Koko JSON-rivi                     | `TrialEntry.raakadataJson`                                                                        |
 
 Huomio:
 

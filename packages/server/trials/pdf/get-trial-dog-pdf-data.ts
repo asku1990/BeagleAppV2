@@ -117,6 +117,7 @@ export async function getTrialDogPdfDataService(
           ansiopisteetYhteensa: result.ansiopisteetYhteensa,
           loppupisteet: result.loppupisteet,
           paljasMaaTaiLumi: mapKeliToPaljasMaaTaiLumi(result.keli),
+          Palkinto: result.palkinto,
         },
       },
     };

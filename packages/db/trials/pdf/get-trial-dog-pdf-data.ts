@@ -54,6 +54,7 @@ export type TrialDogPdfDataDbRow = {
   ansiopisteetYhteensa: number | null;
   loppupisteet: number | null;
   keli: string | null;
+  palkinto: string | null;
 };
 
 export async function getTrialDogPdfDataDb(
@@ -141,6 +142,7 @@ export async function getTrialDogPdfDataDb(
       ansiopisteetYhteensa: true,
       loppupisteet: true,
       keli: true,
+      palkinto: true,
     },
   });
 
@@ -192,5 +194,6 @@ export async function getTrialDogPdfDataDb(
     ansiopisteetYhteensa: toNumberOrNull(row.ansiopisteetYhteensa),
     loppupisteet: toNumberOrNull(row.loppupisteet),
     keli: row.keli,
+    palkinto: row.palkinto,
   };
 }

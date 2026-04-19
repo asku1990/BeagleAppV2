@@ -20,6 +20,12 @@ const LUMI_X_FIELD = {
   size: 12,
 } as const;
 
+const PALKINTO = {
+  x: 220,
+  y: 110.3,
+  size: 12,
+} as const;
+
 export function drawTrialDogPdfLoppuppisteet(
   input: TrialDogPdfLoppupisteet & {
     page: PDFPage;
@@ -35,4 +41,6 @@ export function drawTrialDogPdfLoppuppisteet(
   } else if (input.paljasMaaTaiLumi === "LUMI") {
     drawText(page, font, "X", LUMI_X_FIELD);
   }
+
+  drawText(page, font, formatKoeEraValue(input.Palkinto), PALKINTO);
 }

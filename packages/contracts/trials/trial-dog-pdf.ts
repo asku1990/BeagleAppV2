@@ -64,6 +64,7 @@ export type TrialDogPdfTappiopisteet = {
 export type TrialDogPdfLoppupisteet = {
   loppupisteet: number | null;
   paljasMaaTaiLumi: "PALJAS_MAA" | "LUMI" | null;
+  Palkinto: string | null;
 };
 
 export type TrialDogPdfPayload = TrialDogPdfKokeenTiedot &

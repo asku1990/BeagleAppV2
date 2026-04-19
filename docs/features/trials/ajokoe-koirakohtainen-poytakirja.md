@@ -78,7 +78,8 @@ Alla oleva ryhmittely on suunniteltu AJOK-koirakohtaisen pöytäkirjan näkymän
 ### 6) Pisteet ja tulos
 
 - `loppupisteet`
-- `palkinto`
+- `palkinto` (stored as text; observed live values are `0`, `1`, `2`, `3`,
+  `L`, `S`, and `-`)
 - `sijoitus`
 - `koiriaLuokassa`
 
