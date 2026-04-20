@@ -97,9 +97,6 @@ describe("AdminTrialsPageClient", () => {
     expect(html).toContain("admin.trials.manage.columns.judge");
     expect(html).toContain("admin.trials.manage.results.openDetailHint");
     expect(html).toContain("admin.trials.manage.results.openDetailAriaPrefix");
-    expect(html).toContain("admin.trials.validation.title");
-    expect(html).toContain("admin.trials.validation.sections.missing");
-    expect(html).toContain("admin.trials.validation.incomplete.notEvaluated");
     expect(html).toContain("Rex");
     expect(html).toContain("FI123");
     expect(html).toContain("12345");

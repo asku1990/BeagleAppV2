@@ -13,7 +13,6 @@ import { useI18n } from "@/hooks/i18n";
 import { formatDateForFinland } from "@/lib/admin/core/date";
 import { useAdminTrialsQuery } from "@/queries/admin/trials";
 import { cn } from "@/lib/utils";
-import { AdminTrialValidationPanel } from "./admin-trial-validation-panel";
 
 function showDash(value: string | number | null | undefined): string {
   if (value === null || value === undefined) {
@@ -117,8 +116,6 @@ export function AdminTrialsPageClient() {
           {!trialsQuery.isLoading && !trialsQuery.isError ? (
             <TrialResults trials={trials} />
           ) : null}
-
-          <AdminTrialValidationPanel context="search" />
         </div>
       </ListingSectionShell>
     </div>
