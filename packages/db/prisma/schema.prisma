@@ -423,7 +423,7 @@ model TrialEntry {
 
   // 10) tuomarit ja vahvistus (entry-taso)
   ylituomariNimiSnapshot    String?
-  ylituomariNumeroSnapshot  String?
+  ylituomariNumeroSnapshot  String?  // this should be int i think?
   ryhmatuomariNimi          String?
   palkintotuomariNimi       String?
 

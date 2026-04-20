@@ -11,6 +11,7 @@ import { drawTrialDogPdfKoiranTausta } from "./internal/koiran-tausta";
 import { drawTrialDogPdfTappiopisteet } from "./internal/tappiopisteet";
 import { drawTrialDogPdfLoppuppisteet } from "./internal/loppupisteet";
 import { drawTrialDogPdfAllekirjoitukset } from "./internal/allekirjoitukset";
+import { Omega } from "lucide-react";
 
 export { DOG_REGISTRATION_NO_FIELD } from "./internal/koiran-tiedot";
 
@@ -139,6 +140,8 @@ export async function renderTrialDogPdf(
   drawTrialDogPdfAllekirjoitukset({
     ryhmatuomariNimi: input.ryhmatuomariNimi,
     palkintotuomariNimi: input.palkintotuomariNimi,
+    ylituomariNumeroSnapshot: input.ylituomariNumeroSnapshot,
+    ylituomariNimiSnapshot: input.ylituomariNimiSnapshot,
     page,
     font,
   });
