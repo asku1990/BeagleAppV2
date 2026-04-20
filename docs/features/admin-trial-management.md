@@ -1,11 +1,12 @@
 # Admin Trial Management
 
-Developer notes for the admin trial read-only list/detail flow (`BEJ-76`) and
-AJOK validation-gap panel baseline (`BEJ-77`).
+Developer notes for the admin trial read-only list/detail flow (`BEJ-76`,
+`BEJ-81`) and AJOK validation-gap panel baseline (`BEJ-77`).
 
 ## Primary purpose
 
-- The page is an admin-facing search and detail workflow for current `TrialResult` rows.
+- The page is an admin-facing search and detail workflow for canonical AJOK
+  `TrialEntry` + `TrialEvent` rows.
 - The main user task is to find one trial result row and inspect all typed fields without editing.
 - The detail page can also show raw/source payload when available in the current model.
 - The page also exposes a read-only validation panel that visualizes current AJOK
@@ -37,6 +38,9 @@ AJOK validation-gap panel baseline (`BEJ-77`).
 5. Validation panel compares current read model against AJOK target field set and shows:
    - `missing_from_model`: field not represented in current read contract.
    - `available_but_incomplete`: field exists in current model but selected row value is empty/null.
+   - `rokotusOk` and `tunnistusOk` are typed in detail-read.
+   - `paljasMaa` and `lumikeli` columns are unused; do not use them in AJOK parity decisions.
+   - Top-level weather value is `keli`.
 
 ## Contract rules
 
@@ -49,12 +53,15 @@ AJOK validation-gap panel baseline (`BEJ-77`).
   live under `docs/features/trials/`.
 - During BEJ-79 schema rollout, admin list/detail reads remain on `TrialResult`
   until BEJ-81 read-path switch.
+- After BEJ-81 switch, detail/list identifiers are:
+  - `sklKoeId` (preferred when available)
+  - `entryKey` (`TrialEntry.yksilointiAvain`) as fallback.
 
 ## Render rules
 
 - List rows/cards are the interaction target for opening detail.
 - Detail view is strictly read-only; no update/remove controls.
-- Detail shows all mapped typed `TrialResult` fields currently exposed by contract.
+- Detail shows all mapped typed canonical AJOK fields currently exposed by contract.
 - Raw/source payload is shown in a collapsible read-only section.
 - If payload is unavailable, detail shows localized fallback text.
 - If detail query returns `TRIAL_NOT_FOUND`, show dedicated `notFound` state card (not generic error state).
@@ -63,6 +70,7 @@ AJOK validation-gap panel baseline (`BEJ-77`).
 - Validation panel is analysis/visualization only and does not mutate data.
 - This panel is a baseline input to the historical AJOK read-model work
   and later read-path migration updates in `BEJ-82`.
+- BEJ-82 keeps the gap report format unchanged (same groups and status labels) for Phase 2/3 comparability.
 
 ## Tests
 
@@ -75,6 +83,12 @@ AJOK validation-gap panel baseline (`BEJ-77`).
 - `packages/api-client/admin/trials/__tests__/admin-trials.test.ts`
 - `packages/server/admin/trials/manage/__tests__/*`
 - `packages/db/admin/trials/manage/__tests__/*`
+
+Parity sample evidence for BEJ-81:
+
+- `packages/db/admin/trials/manage/__tests__/fixtures/parity-samples.ts`
+- `packages/db/admin/trials/manage/__tests__/search-trials.parity.test.ts`
+- `packages/db/admin/trials/manage/__tests__/get-trial-details.parity.test.ts`
 
 ## When to update this doc
 

@@ -412,7 +412,9 @@ model TrialEntry {
 
   // 7) olosuhteet
   keli                      String?
+  // Not used anywhere as source of truth.
   paljasMaa                 Boolean?
+  // Not used anywhere as source of truth.
   lumikeli                  String?
 
   // 8) huomautukset ja tilat

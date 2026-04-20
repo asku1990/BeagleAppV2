@@ -11,13 +11,14 @@ export type AdminTrialSummary = {
   trialId: string;
   dogName: string;
   registrationNo: string | null;
-  sourceKey: string;
+  sklKoeId: number | null;
+  entryKey: string;
   eventDate: string;
   eventPlace: string;
-  judge: string | null;
-  piste: number | null;
-  pa: string | null;
-  sija: string | null;
+  ylituomariNimi: string | null;
+  loppupisteet: number | null;
+  palkinto: string | null;
+  sijoitus: string | null;
 };
 
 export type AdminTrialSearchResponse = {

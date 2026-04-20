@@ -111,31 +111,73 @@ describe("AdminTrialDetailsPageClient", () => {
       data: {
         trial: {
           trialId: "trial-1",
-          dogId: "dog-1",
+          dogId: null,
           dogName: "Rex",
           registrationNo: "FI12345/21",
+          sklKoeId: 54321,
+          entryKey: "entry-1",
           eventDate: "2026-04-14",
           eventName: "Kevätkoe",
           eventPlace: "Helsinki",
+          rotukoodi: "161/1",
+          jarjestaja: "Kevätkoe",
+          koemuoto: "AJOK",
           kennelDistrict: null,
           kennelDistrictNo: "01",
-          ke: "KE",
-          lk: "A",
-          pa: "VOI1",
-          piste: 88.5,
-          sija: "2",
-          haku: 12,
-          hauk: 10.5,
-          yva: 9,
-          hlo: 1,
-          alo: 2,
-          tja: 3,
-          pin: 4,
-          judge: "Judge One",
-          legacyFlag: "L",
-          sourceKey: "source-1",
-          rawPayloadJson: null,
-          rawPayloadAvailable: false,
+          ylituomariNumero: "123",
+          keli: "KE",
+          luokka: "A",
+          koiriaLuokassa: 10,
+          palkinto: "VOI1",
+          loppupisteet: 88.5,
+          sijoitus: "2",
+          era1Alkoi: "08:10",
+          era2Alkoi: "11:20",
+          hakuMin1: 20,
+          hakuMin2: 18,
+          ajoMin1: 40,
+          ajoMin2: 35,
+          hyvaksytytAjominuutit: 75,
+          ajoajanPisteet: 7,
+          ansiopisteetYhteensa: 80,
+          hakuKeskiarvo: 12,
+          haukkuKeskiarvo: 10.5,
+          ajotaitoKeskiarvo: 9.5,
+          yleisvaikutelmaPisteet: 9,
+          hakuloysyysTappioYhteensa: 1,
+          ajoloysyysTappioYhteensa: 2,
+          tappiopisteetYhteensa: 3,
+          tieJaEstetyoskentelyPisteet: 3,
+          metsastysintoPisteet: 4,
+          ylituomariNimi: "Judge One",
+          ryhmatuomariNimi: "Group Judge",
+          palkintotuomariNimi: "Prize Judge",
+          isanNimi: "Sire",
+          isanRekisterinumero: "FI0001/20",
+          emanNimi: "Dam",
+          emanRekisterinumero: "FI0002/19",
+          omistaja: "Owner",
+          omistajanKotikunta: "Helsinki",
+          sukupuoli: "U",
+          rokotusOk: true,
+          tunnistusOk: true,
+          luopui: false,
+          suljettu: false,
+          keskeytetty: false,
+          huomautusTeksti: null,
+          lisatiedot: [
+            {
+              koodi: "11",
+              nimi: "Paljas maa",
+              era1Arvo: null,
+              era2Arvo: null,
+              era3Arvo: null,
+              era4Arvo: null,
+              jarjestys: 11,
+            },
+          ],
+          notes: "L",
+          rawPayloadJson: '{"source":"raw"}',
           createdAt: "2026-04-14T10:00:00.000Z",
           updatedAt: "2026-04-14T10:30:00.000Z",
         },
@@ -160,10 +202,12 @@ describe("AdminTrialDetailsPageClient", () => {
     expect(html).toContain("admin.trials.validation.title");
     expect(html).toContain("admin.trials.validation.sections.missing");
     expect(html).toContain("admin.trials.validation.sections.incomplete");
-    expect(html).toContain("sklKoeId");
+    expect(html).toContain("admin.trials.detail.fields.sklKoeId");
+    expect(html).toContain("admin.trials.detail.fields.entryKey");
     expect(html).toContain("kennelpiiri");
     expect(html).toContain("Rex");
-    expect(html).toContain("source-1");
-    expect(html).toContain("admin.trials.detail.raw.unavailable");
+    expect(html).toContain("54321");
+    expect(html).toContain("entry-1");
+    expect(html).toContain("source");
   });
 });

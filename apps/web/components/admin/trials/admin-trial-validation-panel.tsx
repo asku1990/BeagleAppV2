@@ -18,6 +18,17 @@ const GROUP_LABEL_KEYS = {
   judges: "admin.trials.validation.groups.judges",
 } as const;
 
+const NOT_FROM_API_UPSERT_FIELDS: ReadonlySet<string> = new Set([
+  "rotukoodi",
+  "isanNimi",
+  "isanRekisterinumero",
+  "emanNimi",
+  "emanRekisterinumero",
+  "sukupuoli",
+  "rokotusOk",
+  "tunnistusOk",
+] as const);
+
 function groupLabelKey(
   group: TrialValidationGapItem["group"],
 ): (typeof GROUP_LABEL_KEYS)[TrialValidationGapItem["group"]] {
@@ -37,6 +48,12 @@ function GapList({ items }: { items: TrialValidationGapItem[] }) {
           <code>{item.targetField}</code>
           {item.sourceField ? (
             <span className="text-muted-foreground"> ({item.sourceField})</span>
+          ) : null}
+          {NOT_FROM_API_UPSERT_FIELDS.has(item.targetField) ? (
+            <span className="text-muted-foreground">
+              {" "}
+              {t("admin.trials.validation.source.notFromApiUpsert")}
+            </span>
           ) : null}
         </li>
       ))}

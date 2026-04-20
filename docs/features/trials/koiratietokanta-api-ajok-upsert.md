@@ -85,8 +85,9 @@ result upsert contract.
 
 ### Compatibility columns
 
-- `TrialEntry.paljasMaa` and `TrialEntry.lumikeli` are compatibility columns.
+- `TrialEntry.paljasMaa` and `TrialEntry.lumikeli` are unused columns.
 - This API-upsert does not populate them.
+- Top-level weather value is written to `TrialEntry.keli` from `KELI`.
 - The numbered source rows below are stored as lisätieto instead.
 
 ## Lisätieto mapping

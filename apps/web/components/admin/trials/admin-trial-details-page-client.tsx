@@ -11,7 +11,7 @@ import {
 } from "@/queries/admin/trials";
 import { AdminTrialValidationPanel } from "./admin-trial-validation-panel";
 
-function showDash(value: string | number | null | undefined): string {
+function showDash(value: string | number | boolean | null | undefined): string {
   if (value === null || value === undefined) {
     return "-";
   }
@@ -73,6 +73,7 @@ export function AdminTrialDetailsPageClient({
   });
 
   const trial = trialQuery.data?.trial;
+  const lisatiedotRows = trial?.lisatiedot ?? [];
   const isNotFoundError =
     isAdminTrialQueryError(trialQuery.error) &&
     trialQuery.error.errorCode === "TRIAL_NOT_FOUND";
@@ -150,6 +151,18 @@ export function AdminTrialDetailsPageClient({
                       value={showDash(trial.eventName)}
                     />
                     <FieldRow
+                      label={t("admin.trials.detail.fields.rotukoodi")}
+                      value={showDash(trial.rotukoodi)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.jarjestaja")}
+                      value={showDash(trial.jarjestaja)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.koemuoto")}
+                      value={showDash(trial.koemuoto)}
+                    />
+                    <FieldRow
                       label={t("admin.trials.detail.fields.kennelDistrict")}
                       value={showDash(trial.kennelDistrict)}
                     />
@@ -159,11 +172,15 @@ export function AdminTrialDetailsPageClient({
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.judge")}
-                      value={showDash(trial.judge)}
+                      value={showDash(trial.ylituomariNimi)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.ylituomariNumero")}
+                      value={showDash(trial.ylituomariNumero)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.ke")}
-                      value={showDash(trial.ke)}
+                      value={showDash(trial.keli)}
                     />
                   </div>
                 </div>
@@ -187,6 +204,46 @@ export function AdminTrialDetailsPageClient({
                       label={t("admin.trials.detail.fields.dogId")}
                       value={showDash(trial.dogId)}
                     />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.isanNimi")}
+                      value={showDash(trial.isanNimi)}
+                    />
+                    <FieldRow
+                      label={t(
+                        "admin.trials.detail.fields.isanRekisterinumero",
+                      )}
+                      value={showDash(trial.isanRekisterinumero)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.emanNimi")}
+                      value={showDash(trial.emanNimi)}
+                    />
+                    <FieldRow
+                      label={t(
+                        "admin.trials.detail.fields.emanRekisterinumero",
+                      )}
+                      value={showDash(trial.emanRekisterinumero)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.omistaja")}
+                      value={showDash(trial.omistaja)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.omistajanKotikunta")}
+                      value={showDash(trial.omistajanKotikunta)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.sukupuoli")}
+                      value={showDash(trial.sukupuoli)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.rokotusOk")}
+                      value={showDash(trial.rokotusOk)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.tunnistusOk")}
+                      value={showDash(trial.tunnistusOk)}
+                    />
                   </div>
                 </div>
 
@@ -199,19 +256,39 @@ export function AdminTrialDetailsPageClient({
                   <div className="grid gap-2 sm:grid-cols-2">
                     <FieldRow
                       label={t("admin.trials.detail.fields.lk")}
-                      value={showDash(trial.lk)}
+                      value={showDash(trial.luokka)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.pa")}
-                      value={showDash(trial.pa)}
+                      value={showDash(trial.palkinto)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.sija")}
-                      value={showDash(trial.sija)}
+                      value={showDash(trial.sijoitus)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.piste")}
-                      value={formatNumber(trial.piste)}
+                      value={formatNumber(trial.loppupisteet)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.koiriaLuokassa")}
+                      value={formatNumber(trial.koiriaLuokassa)}
+                    />
+                    <FieldRow
+                      label={t(
+                        "admin.trials.detail.fields.ansiopisteetYhteensa",
+                      )}
+                      value={formatNumber(trial.ansiopisteetYhteensa)}
+                    />
+                    <FieldRow
+                      label={t(
+                        "admin.trials.detail.fields.hyvaksytytAjominuutit",
+                      )}
+                      value={formatNumber(trial.hyvaksytytAjominuutit)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.ajoajanPisteet")}
+                      value={formatNumber(trial.ajoajanPisteet)}
                     />
                   </div>
                 </div>
@@ -225,33 +302,170 @@ export function AdminTrialDetailsPageClient({
                   <div className="grid gap-2 sm:grid-cols-2">
                     <FieldRow
                       label={t("admin.trials.detail.fields.haku")}
-                      value={formatNumber(trial.haku)}
+                      value={formatNumber(trial.hakuKeskiarvo)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.hakuMin1")}
+                      value={formatNumber(trial.hakuMin1)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.hakuMin2")}
+                      value={formatNumber(trial.hakuMin2)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.hauk")}
-                      value={formatNumber(trial.hauk)}
+                      value={formatNumber(trial.haukkuKeskiarvo)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.ajoMin1")}
+                      value={formatNumber(trial.ajoMin1)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.ajoMin2")}
+                      value={formatNumber(trial.ajoMin2)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.era1Alkoi")}
+                      value={showDash(trial.era1Alkoi)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.era2Alkoi")}
+                      value={showDash(trial.era2Alkoi)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.yva")}
-                      value={formatNumber(trial.yva)}
+                      value={formatNumber(trial.yleisvaikutelmaPisteet)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.ajotaitoKeskiarvo")}
+                      value={formatNumber(trial.ajotaitoKeskiarvo)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.hlo")}
-                      value={formatNumber(trial.hlo)}
+                      value={formatNumber(trial.hakuloysyysTappioYhteensa)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.alo")}
-                      value={formatNumber(trial.alo)}
+                      value={formatNumber(trial.ajoloysyysTappioYhteensa)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.tja")}
-                      value={formatNumber(trial.tja)}
+                      value={formatNumber(trial.tieJaEstetyoskentelyPisteet)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.pin")}
-                      value={formatNumber(trial.pin)}
+                      value={formatNumber(trial.metsastysintoPisteet)}
+                    />
+                    <FieldRow
+                      label={t(
+                        "admin.trials.detail.fields.tappiopisteetYhteensa",
+                      )}
+                      value={formatNumber(trial.tappiopisteetYhteensa)}
                     />
                   </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <SectionTitle>
+                    {t("admin.trials.detail.sections.status")}
+                  </SectionTitle>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.luopui")}
+                      value={showDash(trial.luopui)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.suljettu")}
+                      value={showDash(trial.suljettu)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.keskeytetty")}
+                      value={showDash(trial.keskeytetty)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.huomautusTeksti")}
+                      value={showDash(trial.huomautusTeksti)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.ryhmatuomariNimi")}
+                      value={showDash(trial.ryhmatuomariNimi)}
+                    />
+                    <FieldRow
+                      label={t(
+                        "admin.trials.detail.fields.palkintotuomariNimi",
+                      )}
+                      value={showDash(trial.palkintotuomariNimi)}
+                    />
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <SectionTitle>
+                    {t("admin.trials.detail.sections.additional")}
+                  </SectionTitle>
+                  {lisatiedotRows.length > 0 ? (
+                    <div className="overflow-x-auto rounded-md border">
+                      <table className="min-w-full text-sm">
+                        <thead className="bg-muted/50">
+                          <tr>
+                            <th className="px-3 py-2 text-left font-medium">
+                              {t("admin.trials.detail.additional.columns.code")}
+                            </th>
+                            <th className="px-3 py-2 text-left font-medium">
+                              {t("admin.trials.detail.additional.columns.name")}
+                            </th>
+                            <th className="px-3 py-2 text-left font-medium">
+                              {t("admin.trials.detail.additional.columns.era1")}
+                            </th>
+                            <th className="px-3 py-2 text-left font-medium">
+                              {t("admin.trials.detail.additional.columns.era2")}
+                            </th>
+                            <th className="px-3 py-2 text-left font-medium">
+                              {t("admin.trials.detail.additional.columns.era3")}
+                            </th>
+                            <th className="px-3 py-2 text-left font-medium">
+                              {t("admin.trials.detail.additional.columns.era4")}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {lisatiedotRows.map((row) => (
+                            <tr
+                              className="border-t"
+                              key={`${row.koodi}-${row.jarjestys}`}
+                            >
+                              <td className="px-3 py-2 align-top">
+                                {showDash(row.koodi)}
+                              </td>
+                              <td className="px-3 py-2 align-top">
+                                {showDash(row.nimi)}
+                              </td>
+                              <td className="px-3 py-2 align-top">
+                                {showDash(row.era1Arvo)}
+                              </td>
+                              <td className="px-3 py-2 align-top">
+                                {showDash(row.era2Arvo)}
+                              </td>
+                              <td className="px-3 py-2 align-top">
+                                {showDash(row.era3Arvo)}
+                              </td>
+                              <td className="px-3 py-2 align-top">
+                                {showDash(row.era4Arvo)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      {t("admin.trials.detail.additional.unavailable")}
+                    </p>
+                  )}
                 </div>
 
                 <Separator />
@@ -266,12 +480,16 @@ export function AdminTrialDetailsPageClient({
                       value={showDash(trial.trialId)}
                     />
                     <FieldRow
-                      label={t("admin.trials.detail.fields.sourceKey")}
-                      value={showDash(trial.sourceKey)}
+                      label={t("admin.trials.detail.fields.sklKoeId")}
+                      value={showDash(trial.sklKoeId)}
+                    />
+                    <FieldRow
+                      label={t("admin.trials.detail.fields.entryKey")}
+                      value={showDash(trial.entryKey)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.legacyFlag")}
-                      value={showDash(trial.legacyFlag)}
+                      value={showDash(trial.notes)}
                     />
                     <FieldRow
                       label={t("admin.trials.detail.fields.createdAt")}
@@ -290,12 +508,12 @@ export function AdminTrialDetailsPageClient({
                   <SectionTitle>
                     {t("admin.trials.detail.sections.raw")}
                   </SectionTitle>
-                  <details>
+                  <details open={Boolean(trial.rawPayloadJson)}>
                     <summary className="cursor-pointer text-sm underline-offset-2 hover:underline">
                       {t("admin.trials.detail.raw.toggle")}
                     </summary>
                     <div className="mt-3">
-                      {trial.rawPayloadAvailable && trial.rawPayloadJson ? (
+                      {trial.rawPayloadJson ? (
                         <pre className="overflow-x-auto rounded-md bg-muted p-3 text-xs">
                           {trial.rawPayloadJson}
                         </pre>

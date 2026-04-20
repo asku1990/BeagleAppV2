@@ -92,8 +92,8 @@ Use this format for new entries:
 ## 2026-04-14 - AJOK additional/conditions detail gap follow-up
 
 - Area: AJOK lisatiedot and condition-detail completeness.
-- Issue: `lisatiedotJson`, `paljasMaa`, `lumikeli`, `rokotusOk`, and `tunnistusOk` remain outside typed read-path parity in the current model.
-- Impact: Detail-level validation and future PDF/structured rendering remain partial until these fields are carried through canonical storage and read adapters.
-- Suggested fix: Preserve and normalize additional/condition detail fields during schema/import steps, then update BEJ-82 gap panel to consume new typed sources.
-- Trigger to revisit: BEJ-82 panel/read-path migration update.
+- Issue: `lisatiedotJson` remains outside typed read-path parity even after BEJ-82 moved `paljasMaa`, `lumikeli`, `rokotusOk`, and `tunnistusOk` into typed detail-read + gap evaluation.
+- Impact: Additional-detail reporting and future PDF/structured rendering remain partial while `lisatiedotJson` is still raw-only.
+- Suggested fix: Preserve and normalize lisätiedot into typed read adapters and update the gap catalog status for `lisatiedotJson` when canonical mapping is ready.
+- Trigger to revisit: next AJOK additional-field parity task after BEJ-82.
 - Ticket: BEJ-82.

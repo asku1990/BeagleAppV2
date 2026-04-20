@@ -63,13 +63,14 @@ vi.mock("@/queries/admin/trials", () => ({
           trialId: "trial-1",
           dogName: "Rex",
           registrationNo: "FI123",
-          sourceKey: "src-1",
+          sklKoeId: 12345,
+          entryKey: "entry-1",
           eventDate: "2026-04-14",
           eventPlace: "Helsinki",
-          judge: "Judge",
-          piste: 98.5,
-          pa: "1",
-          sija: "2",
+          ylituomariNimi: "Judge",
+          loppupisteet: 98.5,
+          palkinto: "1",
+          sijoitus: "2",
         },
       ],
     },
@@ -99,9 +100,8 @@ describe("AdminTrialsPageClient", () => {
     expect(html).toContain("admin.trials.validation.title");
     expect(html).toContain("admin.trials.validation.sections.missing");
     expect(html).toContain("admin.trials.validation.incomplete.notEvaluated");
-    expect(html).toContain("sklKoeId");
     expect(html).toContain("Rex");
     expect(html).toContain("FI123");
-    expect(html).toContain("src-1");
+    expect(html).toContain("12345");
   });
 });
