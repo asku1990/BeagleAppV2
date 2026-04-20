@@ -221,6 +221,8 @@ Rules:
 - Current rendering also uses `koodi = 30-36` in the `haukku` block.
 - `30-35` render with one decimal place.
 - `36` renders as the raw value.
+- Current rendering also uses `koodi = 40-42` in the `metsästysinto` block.
+- All three rows render with one decimal place.
 
 ## Registration rule
 
