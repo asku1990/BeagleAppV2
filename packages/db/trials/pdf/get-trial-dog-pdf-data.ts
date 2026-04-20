@@ -11,6 +11,12 @@ export type TrialDogPdfDataDbInput = {
 
 export type TrialDogPdfDataDbDogSex = "MALE" | "FEMALE" | "UNKNOWN";
 
+export type TrialDogPdfDataDbLisatietoRow = {
+  koodi: string;
+  era1Arvo: string | null;
+  era2Arvo: string | null;
+};
+
 export type TrialDogPdfDataDbRow = {
   trialId: string;
   registrationNo: string;
@@ -66,10 +72,19 @@ export type TrialDogPdfDataDbRow = {
   palkintotuomariNimi: string | null;
   ylituomariNumeroSnapshot: string | null;
   ylituomariNimiSnapshot: string | null;
-
-  lisatieto11Era1Arvo: string | null;
-  lisatieto11Era2Arvo: string | null;
+  lisatiedotRows: TrialDogPdfDataDbLisatietoRow[];
 };
+
+const OLOSUHDE_KOODIT = [
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+  "17",
+  "18",
+] as const;
 
 export async function getTrialDogPdfDataDb(
   input: TrialDogPdfDataDbInput,
@@ -169,13 +184,18 @@ export async function getTrialDogPdfDataDb(
       ylituomariNimiSnapshot: true,
       lisatiedot: {
         where: {
-          koodi: "11",
+          koodi: {
+            in: [...OLOSUHDE_KOODIT],
+          },
         },
         select: {
+          koodi: true,
           era1Arvo: true,
           era2Arvo: true,
         },
-        take: 1,
+        orderBy: {
+          koodi: "asc",
+        },
       },
     },
   });
@@ -239,7 +259,10 @@ export async function getTrialDogPdfDataDb(
     palkintotuomariNimi: row.palkintotuomariNimi ?? null,
     ylituomariNumeroSnapshot: row.ylituomariNumeroSnapshot ?? null,
     ylituomariNimiSnapshot: row.ylituomariNimiSnapshot ?? null,
-    lisatieto11Era1Arvo: row.lisatiedot[0]?.era1Arvo ?? null,
-    lisatieto11Era2Arvo: row.lisatiedot[0]?.era2Arvo ?? null,
+    lisatiedotRows: row.lisatiedot.map((item) => ({
+      koodi: item.koodi,
+      era1Arvo: item.era1Arvo ?? null,
+      era2Arvo: item.era2Arvo ?? null,
+    })),
   };
 }

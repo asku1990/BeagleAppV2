@@ -2,17 +2,53 @@ import type { PDFFont, PDFPage } from "pdf-lib";
 import type { TrialDogPdfLisatiedot } from "@contracts";
 import { drawText, formatKoeEraValue } from "../koe-erat-common";
 
-const LISATIETO_11_ERA1_FIELD = {
-  x: 592,
-  y: 487.5,
-  size: 12,
-} as const;
+// Renders olosuhteet rows (11-18) from lisätiedot onto fixed PDF coordinates.
+// Marker rows show X for true (1/X); numeric rows show their raw number values.
+const OLOSUHDE_ERA1_X = 592;
+const OLOSUHDE_ERA2_X = 609;
+const OLOSUHDE_TEXT_SIZE = 12;
+const NUMERIC_ERA1_X = 591;
+const NUMERIC_ERA2_X = 608;
+const NUMERIC_TEXT_SIZE = 10;
+const LUMIKELI_Y = 474.5;
 
-const LISATIETO_11_ERA2_FIELD = {
-  x: 609,
-  y: 487.5,
-  size: 12,
-} as const;
+type OlosuhdeRowKind = "MARKER" | "NUMBER";
+
+type OlosuhdeRowConfig = {
+  koodi: string;
+  y: number;
+  kind: OlosuhdeRowKind;
+};
+
+const OLOSUHDE_ROWS: OlosuhdeRowConfig[] = [
+  { koodi: "11", y: 487.5, kind: "MARKER" },
+  { koodi: "12", y: 473.5, kind: "NUMBER" },
+  { koodi: "13", y: 459.5, kind: "MARKER" },
+  { koodi: "14", y: 445.5, kind: "MARKER" },
+  { koodi: "15", y: 430.5, kind: "MARKER" },
+  { koodi: "16", y: 416.5, kind: "MARKER" },
+  { koodi: "17", y: 402.5, kind: "NUMBER" },
+  { koodi: "18", y: 388.5, kind: "NUMBER" },
+];
+
+function normalizeMarkerValue(raw: string | null | undefined): string {
+  const value = formatKoeEraValue(raw).trim().toUpperCase();
+  return value === "1" || value === "X" ? "X" : "";
+}
+
+function normalizeCentimeterValue(raw: string | null | undefined): string {
+  const value = formatKoeEraValue(raw).trim();
+  return value === "-" ? "" : value;
+}
+
+function normalizeRowValue(
+  kind: OlosuhdeRowKind,
+  raw: string | null | undefined,
+): string {
+  return kind === "NUMBER"
+    ? normalizeCentimeterValue(raw)
+    : normalizeMarkerValue(raw);
+}
 
 // Olosuhteet group (11-18). Currently draws only koodi 11.
 export function drawTrialDogPdfLisatiedotOlosuhteet(
@@ -21,16 +57,31 @@ export function drawTrialDogPdfLisatiedotOlosuhteet(
     font: PDFFont;
   },
 ): void {
-  const row11 = input.lisatiedotRows?.find((row) => row.koodi === "11");
-  const era1Source = formatKoeEraValue(row11?.era1).trim().toUpperCase();
-  const era2Source = formatKoeEraValue(row11?.era2).trim().toUpperCase();
-  const era1 = era1Source === "1" || era1Source === "X" ? "X" : "";
-  const era2 = era2Source === "1" || era2Source === "X" ? "X" : "";
+  const rowsByCode = new Map(
+    (input.lisatiedotRows ?? []).map((row) => [row.koodi, row]),
+  );
 
-  if (!era1 && !era2) {
-    return;
+  for (const rowConfig of OLOSUHDE_ROWS) {
+    const row = rowsByCode.get(rowConfig.koodi);
+    const era1 = normalizeRowValue(rowConfig.kind, row?.era1);
+    const era2 = normalizeRowValue(rowConfig.kind, row?.era2);
+
+    if (era1) {
+      const isNumeric = rowConfig.kind === "NUMBER";
+      drawText(input.page, input.font, era1, {
+        x: isNumeric ? NUMERIC_ERA1_X : OLOSUHDE_ERA1_X,
+        y: isNumeric && rowConfig.koodi === "12" ? LUMIKELI_Y : rowConfig.y,
+        size: isNumeric ? NUMERIC_TEXT_SIZE : OLOSUHDE_TEXT_SIZE,
+      });
+    }
+
+    if (era2) {
+      const isNumeric = rowConfig.kind === "NUMBER";
+      drawText(input.page, input.font, era2, {
+        x: isNumeric ? NUMERIC_ERA2_X : OLOSUHDE_ERA2_X,
+        y: isNumeric && rowConfig.koodi === "12" ? LUMIKELI_Y : rowConfig.y,
+        size: isNumeric ? NUMERIC_TEXT_SIZE : OLOSUHDE_TEXT_SIZE,
+      });
+    }
   }
-
-  drawText(input.page, input.font, era1, LISATIETO_11_ERA1_FIELD);
-  drawText(input.page, input.font, era2, LISATIETO_11_ERA2_FIELD);
 }

@@ -12,17 +12,23 @@ describe("drawTrialDogPdfLisatiedotOlosuhteet", () => {
     vi.clearAllMocks();
   });
 
-  it("renders lisatieto 11 era values with separate coordinates", () => {
+  it("renders olosuhteet 11-18 with marker and numeric rules", () => {
     drawTrialDogPdfLisatiedotOlosuhteet({
       lisatiedotRows: [
         { koodi: "11", era1: "1", era2: null },
-        { koodi: "12", era1: "5", era2: "7" },
+        { koodi: "12", era1: "0", era2: "0" },
+        { koodi: "13", era1: "0", era2: "1" },
+        { koodi: "14", era1: "1", era2: "1" },
+        { koodi: "15", era1: "0", era2: "0" },
+        { koodi: "16", era1: "0", era2: "0" },
+        { koodi: "17", era1: "5", era2: "0" },
+        { koodi: "18", era1: "0", era2: "5" },
       ],
       page,
       font,
     });
 
-    expect(page.drawText).toHaveBeenCalledTimes(2);
+    expect(page.drawText).toHaveBeenCalledTimes(10);
     expect(page.drawText).toHaveBeenNthCalledWith(1, "X", {
       x: 592,
       y: 487.5,
@@ -30,10 +36,66 @@ describe("drawTrialDogPdfLisatiedotOlosuhteet", () => {
       font,
       color: expect.any(Object),
     });
-    expect(page.drawText).toHaveBeenNthCalledWith(2, "", {
+    expect(page.drawText).toHaveBeenNthCalledWith(2, "0", {
+      x: 591,
+      y: 474.5,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(3, "0", {
+      x: 608,
+      y: 474.5,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(4, "X", {
       x: 609,
-      y: 487.5,
+      y: 459.5,
       size: 12,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(5, "X", {
+      x: 592,
+      y: 445.5,
+      size: 12,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(6, "X", {
+      x: 609,
+      y: 445.5,
+      size: 12,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(7, "5", {
+      x: 591,
+      y: 402.5,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(8, "0", {
+      x: 608,
+      y: 402.5,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(9, "0", {
+      x: 591,
+      y: 388.5,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(10, "5", {
+      x: 608,
+      y: 388.5,
+      size: 10,
       font,
       color: expect.any(Object),
     });
@@ -63,12 +125,6 @@ describe("drawTrialDogPdfLisatiedotOlosuhteet", () => {
       font,
       color: expect.any(Object),
     });
-    expect(page.drawText).toHaveBeenNthCalledWith(2, "", {
-      x: 609,
-      y: 487.5,
-      size: 12,
-      font,
-      color: expect.any(Object),
-    });
+    expect(page.drawText).toHaveBeenCalledTimes(1);
   });
 });

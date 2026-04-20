@@ -212,8 +212,9 @@ Input data:
 Rules:
 
 - Each row contains `koodi`, `era1`, and `era2`.
-- Current rendering uses row `koodi = 11` only (`paljas maa` markers).
-- If `koodi = 11` is missing or both eras are false/empty, nothing is drawn.
+- Current rendering uses `koodi = 11-18` in the `olosuhteet` block.
+- Marker rows (`11`, `13`, `14`, `15`, `16`) render `1`/`X` as `X`.
+- Numeric rows (`12`, `17`, `18`) render their raw number values.
 
 ## Registration rule
 
