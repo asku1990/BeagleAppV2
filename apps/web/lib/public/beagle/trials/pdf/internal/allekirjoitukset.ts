@@ -1,6 +1,7 @@
 import type { PDFFont, PDFPage } from "pdf-lib";
 import { rgb } from "pdf-lib";
 import type { TrialDogPdfAllekirjoitukset } from "@contracts/trials/trial-dog-pdf";
+import { drawText, formatKoeEraValue } from "./koe-erat-common";
 
 const RYHMATUOMARI_FIELD = {
   x: 513,
@@ -14,21 +15,6 @@ const PALKINTOTUOMARI_FIELD = {
   size: 10,
 } as const;
 
-function drawText(
-  page: PDFPage,
-  font: PDFFont,
-  text: string,
-  field: { x: number; y: number; size: number },
-): void {
-  page.drawText(text, {
-    x: field.x,
-    y: field.y,
-    size: field.size,
-    font,
-    color: rgb(0, 0, 0),
-  });
-}
-
 export function drawTrialDogPdfAllekirjoitukset(
   input: TrialDogPdfAllekirjoitukset & {
     page: PDFPage;
@@ -37,11 +23,17 @@ export function drawTrialDogPdfAllekirjoitukset(
 ): void {
   const { page, font } = input;
 
-  if (input.ryhmatuomariNimi) {
-    drawText(page, font, input.ryhmatuomariNimi, RYHMATUOMARI_FIELD);
-  }
+  drawText(
+    page,
+    font,
+    formatKoeEraValue(input.ryhmatuomariNimi),
+    RYHMATUOMARI_FIELD,
+  );
 
-  if (input.palkintotuomariNimi) {
-    drawText(page, font, input.palkintotuomariNimi, PALKINTOTUOMARI_FIELD);
-  }
+  drawText(
+    page,
+    font,
+    formatKoeEraValue(input.palkintotuomariNimi),
+    PALKINTOTUOMARI_FIELD,
+  );
 }
