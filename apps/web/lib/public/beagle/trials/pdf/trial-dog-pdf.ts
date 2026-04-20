@@ -11,7 +11,7 @@ import { drawTrialDogPdfKoiranTausta } from "./internal/koiran-tausta";
 import { drawTrialDogPdfTappiopisteet } from "./internal/tappiopisteet";
 import { drawTrialDogPdfLoppuppisteet } from "./internal/loppupisteet";
 import { drawTrialDogPdfAllekirjoitukset } from "./internal/allekirjoitukset";
-import { Omega } from "lucide-react";
+import { drawTrialDogPdfLisatieto11 } from "./internal/lisatieto-11";
 
 export { DOG_REGISTRATION_NO_FIELD } from "./internal/koiran-tiedot";
 
@@ -43,6 +43,9 @@ async function resolveTemplatePath(): Promise<string> {
 export async function renderTrialDogPdf(
   input: TrialDogPdfPayload,
 ): Promise<Uint8Array> {
+  const lisatiedotRows = input.lisatiedotRows ?? [];
+  void lisatiedotRows;
+
   const templatePath = await resolveTemplatePath();
   const templateBytes = await readFile(templatePath);
   const pdfDocument = await PDFDocument.load(templateBytes);
@@ -133,6 +136,12 @@ export async function renderTrialDogPdf(
 
   drawTrialDogPdfHuomautus({
     huomautusTeksti: input.huomautusTeksti,
+    page,
+    font,
+  });
+
+  drawTrialDogPdfLisatieto11({
+    lisatiedotRows,
     page,
     font,
   });

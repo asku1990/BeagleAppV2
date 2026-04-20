@@ -203,6 +203,18 @@ Rules:
   wrapping can be tuned independently from the result block.
 - Missing values render as nothing.
 
+### 9) `lisätiedot` rows
+
+Input data:
+
+- `lisatiedotRows` (optional)
+
+Rules:
+
+- Each row contains `koodi`, `era1`, and `era2`.
+- Current rendering uses row `koodi = 11` only (`paljas maa` markers).
+- If `koodi = 11` is missing or both eras are false/empty, nothing is drawn.
+
 ## Registration rule
 
 The PDF uses the primary registration number for the dog itself.

@@ -18,6 +18,8 @@ export type {
   TrialDogPdfKoiranTausta,
   TrialDogPdfKoiranTiedot,
   TrialDogPdfHuomautus,
+  TrialDogPdfLisatiedot,
+  TrialDogPdfLisatietoRow,
   TrialDogPdfPayload,
   TrialDogPdfPayloadWithTrialId,
   TrialDogPdfTappiopisteet,

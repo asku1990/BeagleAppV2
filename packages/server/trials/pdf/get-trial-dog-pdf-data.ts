@@ -128,6 +128,13 @@ export async function getTrialDogPdfDataService(
           palkintotuomariNimi: result.palkintotuomariNimi,
           ylituomariNumeroSnapshot: result.ylituomariNumeroSnapshot,
           ylituomariNimiSnapshot: result.ylituomariNimiSnapshot,
+          lisatiedotRows: [
+            {
+              koodi: "11",
+              era1: result.lisatieto11Era1Arvo,
+              era2: result.lisatieto11Era2Arvo,
+            },
+          ],
         },
       },
     };

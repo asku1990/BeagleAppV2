@@ -66,6 +66,9 @@ export type TrialDogPdfDataDbRow = {
   palkintotuomariNimi: string | null;
   ylituomariNumeroSnapshot: string | null;
   ylituomariNimiSnapshot: string | null;
+
+  lisatieto11Era1Arvo: string | null;
+  lisatieto11Era2Arvo: string | null;
 };
 
 export async function getTrialDogPdfDataDb(
@@ -164,6 +167,16 @@ export async function getTrialDogPdfDataDb(
       palkintotuomariNimi: true,
       ylituomariNumeroSnapshot: true,
       ylituomariNimiSnapshot: true,
+      lisatiedot: {
+        where: {
+          koodi: "11",
+        },
+        select: {
+          era1Arvo: true,
+          era2Arvo: true,
+        },
+        take: 1,
+      },
     },
   });
 
@@ -226,5 +239,7 @@ export async function getTrialDogPdfDataDb(
     palkintotuomariNimi: row.palkintotuomariNimi ?? null,
     ylituomariNumeroSnapshot: row.ylituomariNumeroSnapshot ?? null,
     ylituomariNimiSnapshot: row.ylituomariNimiSnapshot ?? null,
+    lisatieto11Era1Arvo: row.lisatiedot[0]?.era1Arvo ?? null,
+    lisatieto11Era2Arvo: row.lisatiedot[0]?.era2Arvo ?? null,
   };
 }

@@ -6,7 +6,8 @@ export type TrialDogPdfPayload = TrialDogPdfKokeenTiedot &
   TrialDogPdfTappiopisteet &
   TrialDogPdfLoppupisteet &
   TrialDogPdfHuomautus &
-  TrialDogPdfAllekirjoitukset;
+  TrialDogPdfAllekirjoitukset &
+  TrialDogPdfLisatiedot;
 
 export type TrialDogSex = "MALE" | "FEMALE" | "UNKNOWN";
 
@@ -84,6 +85,16 @@ export type TrialDogPdfLoppupisteet = {
 
 export type TrialDogPdfHuomautus = {
   huomautusTeksti: string | null;
+};
+
+export type TrialDogPdfLisatietoRow = {
+  koodi: string;
+  era1: string | null;
+  era2: string | null;
+};
+
+export type TrialDogPdfLisatiedot = {
+  lisatiedotRows?: TrialDogPdfLisatietoRow[];
 };
 
 export type TrialDogPdfPayloadWithTrialId = TrialDogPdfPayload & {
