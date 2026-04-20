@@ -1,8 +1,8 @@
 import type { PDFFont, PDFPage } from "pdf-lib";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { drawTrialDogPdfLisatieto11 } from "../internal/lisatieto-11";
+import { drawTrialDogPdfLisatiedotOlosuhteet } from "../internal/lisatiedot/olosuhteet";
 
-describe("drawTrialDogPdfLisatieto11", () => {
+describe("drawTrialDogPdfLisatiedotOlosuhteet", () => {
   const page = {
     drawText: vi.fn(),
   } as unknown as PDFPage;
@@ -13,7 +13,7 @@ describe("drawTrialDogPdfLisatieto11", () => {
   });
 
   it("renders lisatieto 11 era values with separate coordinates", () => {
-    drawTrialDogPdfLisatieto11({
+    drawTrialDogPdfLisatiedotOlosuhteet({
       lisatiedotRows: [
         { koodi: "11", era1: "1", era2: null },
         { koodi: "12", era1: "5", era2: "7" },
@@ -40,7 +40,7 @@ describe("drawTrialDogPdfLisatieto11", () => {
   });
 
   it("does not render when paljas maa marker is missing", () => {
-    drawTrialDogPdfLisatieto11({
+    drawTrialDogPdfLisatiedotOlosuhteet({
       lisatiedotRows: [{ koodi: "11", era1: null, era2: null }],
       page,
       font,
@@ -50,7 +50,7 @@ describe("drawTrialDogPdfLisatieto11", () => {
   });
 
   it("renders empty text for zero marker values", () => {
-    drawTrialDogPdfLisatieto11({
+    drawTrialDogPdfLisatiedotOlosuhteet({
       lisatiedotRows: [{ koodi: "11", era1: "1", era2: "0" }],
       page,
       font,

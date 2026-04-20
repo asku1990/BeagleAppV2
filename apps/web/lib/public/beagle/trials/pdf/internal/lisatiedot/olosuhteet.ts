@@ -1,6 +1,6 @@
 import type { PDFFont, PDFPage } from "pdf-lib";
 import type { TrialDogPdfLisatiedot } from "@contracts";
-import { drawText, formatKoeEraValue } from "./koe-erat-common";
+import { drawText, formatKoeEraValue } from "../koe-erat-common";
 
 const LISATIETO_11_ERA1_FIELD = {
   x: 592,
@@ -14,8 +14,8 @@ const LISATIETO_11_ERA2_FIELD = {
   size: 12,
 } as const;
 
-// Draws lisätieto 11 values near the signatures block for quick visibility.
-export function drawTrialDogPdfLisatieto11(
+// Olosuhteet group (11-18). Currently draws only koodi 11.
+export function drawTrialDogPdfLisatiedotOlosuhteet(
   input: TrialDogPdfLisatiedot & {
     page: PDFPage;
     font: PDFFont;

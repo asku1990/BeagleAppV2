@@ -11,7 +11,14 @@ import { drawTrialDogPdfKoiranTausta } from "./internal/koiran-tausta";
 import { drawTrialDogPdfTappiopisteet } from "./internal/tappiopisteet";
 import { drawTrialDogPdfLoppuppisteet } from "./internal/loppupisteet";
 import { drawTrialDogPdfAllekirjoitukset } from "./internal/allekirjoitukset";
-import { drawTrialDogPdfLisatieto11 } from "./internal/lisatieto-11";
+import {
+  drawTrialDogPdfLisatiedotAjo,
+  drawTrialDogPdfLisatiedotHaku,
+  drawTrialDogPdfLisatiedotHaukku,
+  drawTrialDogPdfLisatiedotMetsastysinto,
+  drawTrialDogPdfLisatiedotMuutOminaisuudet,
+  drawTrialDogPdfLisatiedotOlosuhteet,
+} from "./internal/lisatiedot";
 
 export { DOG_REGISTRATION_NO_FIELD } from "./internal/koiran-tiedot";
 
@@ -140,11 +147,16 @@ export async function renderTrialDogPdf(
     font,
   });
 
-  drawTrialDogPdfLisatieto11({
+  drawTrialDogPdfLisatiedotOlosuhteet({
     lisatiedotRows,
     page,
     font,
   });
+  drawTrialDogPdfLisatiedotHaku({ lisatiedotRows, page, font });
+  drawTrialDogPdfLisatiedotHaukku({ lisatiedotRows, page, font });
+  drawTrialDogPdfLisatiedotMetsastysinto({ lisatiedotRows, page, font });
+  drawTrialDogPdfLisatiedotAjo({ lisatiedotRows, page, font });
+  drawTrialDogPdfLisatiedotMuutOminaisuudet({ lisatiedotRows, page, font });
 
   drawTrialDogPdfAllekirjoitukset({
     ryhmatuomariNimi: input.ryhmatuomariNimi,
