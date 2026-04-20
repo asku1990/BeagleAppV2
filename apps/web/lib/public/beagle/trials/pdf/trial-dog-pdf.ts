@@ -138,6 +138,7 @@ export async function renderTrialDogPdf(
 
   drawTrialDogPdfAllekirjoitukset({
     ryhmatuomariNimi: input.ryhmatuomariNimi,
+    palkintotuomariNimi: input.palkintotuomariNimi,
     page,
     font,
   });

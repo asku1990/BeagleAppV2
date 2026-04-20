@@ -92,4 +92,5 @@ export type TrialDogPdfPayloadWithTrialId = TrialDogPdfPayload & {
 
 export type TrialDogPdfAllekirjoitukset = {
   ryhmatuomariNimi: string | null;
+  palkintotuomariNimi: string | null;
 };

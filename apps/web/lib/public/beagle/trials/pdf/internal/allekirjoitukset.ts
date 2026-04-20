@@ -8,6 +8,12 @@ const RYHMATUOMARI_FIELD = {
   size: 10,
 } as const;
 
+const PALKINTOTUOMARI_FIELD = {
+  x: 513,
+  y: 122.6,
+  size: 10,
+} as const;
+
 function drawText(
   page: PDFPage,
   font: PDFFont,
@@ -33,5 +39,9 @@ export function drawTrialDogPdfAllekirjoitukset(
 
   if (input.ryhmatuomariNimi) {
     drawText(page, font, input.ryhmatuomariNimi, RYHMATUOMARI_FIELD);
+  }
+
+  if (input.palkintotuomariNimi) {
+    drawText(page, font, input.palkintotuomariNimi, PALKINTOTUOMARI_FIELD);
   }
 }

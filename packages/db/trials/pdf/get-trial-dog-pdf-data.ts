@@ -63,6 +63,7 @@ export type TrialDogPdfDataDbRow = {
   huomautusTeksti: string | null;
 
   ryhmatuomariNimi: string | null;
+  palkintotuomariNimi: string | null;
 };
 
 export async function getTrialDogPdfDataDb(
@@ -158,6 +159,7 @@ export async function getTrialDogPdfDataDb(
       palkinto: true,
       huomautusTeksti: true,
       ryhmatuomariNimi: true,
+      palkintotuomariNimi: true,
     },
   });
 
@@ -217,5 +219,6 @@ export async function getTrialDogPdfDataDb(
     palkinto: row.palkinto,
     huomautusTeksti: row.huomautusTeksti,
     ryhmatuomariNimi: row.ryhmatuomariNimi ?? null,
+    palkintotuomariNimi: row.palkintotuomariNimi ?? null,
   };
 }

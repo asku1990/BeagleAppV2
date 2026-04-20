@@ -107,6 +107,7 @@ export async function GET(
     const huomautusTeksti = result.body.data.huomautusTeksti;
 
     const ryhmatuomariNimi = result.body.data.ryhmatuomariNimi;
+    const palkintotuomariNimi = result.body.data.palkintotuomariNimi;
 
     const pdfBytes = await renderTrialDogPdf({
       registrationNo,
@@ -158,6 +159,7 @@ export async function GET(
       Palkinto,
       huomautusTeksti,
       ryhmatuomariNimi,
+      palkintotuomariNimi,
     });
 
     log.info(
