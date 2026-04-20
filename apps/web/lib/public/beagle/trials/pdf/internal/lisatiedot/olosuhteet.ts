@@ -4,11 +4,11 @@ import { drawText, formatKoeEraValue } from "../koe-erat-common";
 
 // Renders olosuhteet rows (11-18) from lisätiedot onto fixed PDF coordinates.
 // Marker rows show X for true (1/X); numeric rows show their raw number values.
-const OLOSUHDE_ERA1_X = 592;
-const OLOSUHDE_ERA2_X = 609;
+const OLOSUHDE_ERA1_X = 591;
+const OLOSUHDE_ERA2_X = 608;
 const OLOSUHDE_TEXT_SIZE = 12;
-const NUMERIC_ERA1_X = 591;
-const NUMERIC_ERA2_X = 608;
+const NUMERIC_ERA1_X = 590;
+const NUMERIC_ERA2_X = 607;
 const NUMERIC_TEXT_SIZE = 10;
 const LUMIKELI_Y = 474.5;
 

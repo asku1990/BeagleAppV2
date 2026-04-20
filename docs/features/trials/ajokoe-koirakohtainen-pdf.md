@@ -215,6 +215,9 @@ Rules:
 - Current rendering uses `koodi = 11-18` in the `olosuhteet` block.
 - Marker rows (`11`, `13`, `14`, `15`, `16`) render `1`/`X` as `X`.
 - Numeric rows (`12`, `17`, `18`) render their raw number values.
+- Current rendering also uses `koodi = 20-22` in the `haku` block.
+- `20` renders as the raw value.
+- `21` and `22` render with one decimal place.
 
 ## Registration rule
 
