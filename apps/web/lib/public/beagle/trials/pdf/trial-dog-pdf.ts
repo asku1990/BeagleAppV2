@@ -10,6 +10,15 @@ import { drawTrialDogPdfKoiranTiedot } from "./internal/koiran-tiedot";
 import { drawTrialDogPdfKoiranTausta } from "./internal/koiran-tausta";
 import { drawTrialDogPdfTappiopisteet } from "./internal/tappiopisteet";
 import { drawTrialDogPdfLoppuppisteet } from "./internal/loppupisteet";
+import { drawTrialDogPdfAllekirjoitukset } from "./internal/allekirjoitukset";
+import {
+  drawTrialDogPdfLisatiedotAjo,
+  drawTrialDogPdfLisatiedotHaku,
+  drawTrialDogPdfLisatiedotHaukku,
+  drawTrialDogPdfLisatiedotMetsastysinto,
+  drawTrialDogPdfLisatiedotMuutOminaisuudet,
+  drawTrialDogPdfLisatiedotOlosuhteet,
+} from "./internal/lisatiedot";
 
 export { DOG_REGISTRATION_NO_FIELD } from "./internal/koiran-tiedot";
 
@@ -41,6 +50,8 @@ async function resolveTemplatePath(): Promise<string> {
 export async function renderTrialDogPdf(
   input: TrialDogPdfPayload,
 ): Promise<Uint8Array> {
+  const lisatiedotRows = input.lisatiedotRows ?? [];
+
   const templatePath = await resolveTemplatePath();
   const templateBytes = await readFile(templatePath);
   const pdfDocument = await PDFDocument.load(templateBytes);
@@ -134,5 +145,26 @@ export async function renderTrialDogPdf(
     page,
     font,
   });
+
+  drawTrialDogPdfLisatiedotOlosuhteet({
+    lisatiedotRows,
+    page,
+    font,
+  });
+  drawTrialDogPdfLisatiedotHaku({ lisatiedotRows, page, font });
+  drawTrialDogPdfLisatiedotHaukku({ lisatiedotRows, page, font });
+  drawTrialDogPdfLisatiedotMetsastysinto({ lisatiedotRows, page, font });
+  drawTrialDogPdfLisatiedotAjo({ lisatiedotRows, page, font });
+  drawTrialDogPdfLisatiedotMuutOminaisuudet({ lisatiedotRows, page, font });
+
+  drawTrialDogPdfAllekirjoitukset({
+    ryhmatuomariNimi: input.ryhmatuomariNimi,
+    palkintotuomariNimi: input.palkintotuomariNimi,
+    ylituomariNumeroSnapshot: input.ylituomariNumeroSnapshot,
+    ylituomariNimiSnapshot: input.ylituomariNimiSnapshot,
+    page,
+    font,
+  });
+
   return pdfDocument.save();
 }

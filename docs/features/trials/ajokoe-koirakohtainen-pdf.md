@@ -203,6 +203,31 @@ Rules:
   wrapping can be tuned independently from the result block.
 - Missing values render as nothing.
 
+### 9) `lisätiedot` rows
+
+Input data:
+
+- `lisatiedotRows` (optional)
+
+Rules:
+
+- Each row contains `koodi`, `era1`, and `era2`.
+- Current rendering uses `koodi = 11-18` in the `olosuhteet` block.
+- Marker rows (`11`, `13`, `14`, `15`, `16`) render `1`/`X` as `X`.
+- Numeric rows (`12`, `17`, `18`) render their raw number values.
+- Current rendering also uses `koodi = 20-22` in the `haku` block.
+- `20` renders as the raw value.
+- `21` and `22` render with one decimal place.
+- Current rendering also uses `koodi = 30-36` in the `haukku` block.
+- `30-35` render with one decimal place.
+- `36` renders as the raw value.
+- Current rendering also uses `koodi = 40-42` in the `metsästysinto` block.
+- All three rows render with one decimal place.
+- Current rendering also uses `koodi = 50-56` in the `ajo` block.
+- All seven rows render with one decimal place.
+- Current rendering also uses `koodi = 60-61` in the `muut ominaisuudet` block.
+- Both rows render with one decimal place.
+
 ## Registration rule
 
 The PDF uses the primary registration number for the dog itself.

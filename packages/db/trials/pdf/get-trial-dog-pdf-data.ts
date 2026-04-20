@@ -11,6 +11,12 @@ export type TrialDogPdfDataDbInput = {
 
 export type TrialDogPdfDataDbDogSex = "MALE" | "FEMALE" | "UNKNOWN";
 
+export type TrialDogPdfDataDbLisatietoRow = {
+  koodi: string;
+  era1Arvo: string | null;
+  era2Arvo: string | null;
+};
+
 export type TrialDogPdfDataDbRow = {
   trialId: string;
   registrationNo: string;
@@ -61,7 +67,30 @@ export type TrialDogPdfDataDbRow = {
   koiriaLuokassa: number | null;
   palkinto: string | null;
   huomautusTeksti: string | null;
+
+  ryhmatuomariNimi: string | null;
+  palkintotuomariNimi: string | null;
+  ylituomariNumeroSnapshot: string | null;
+  ylituomariNimiSnapshot: string | null;
+  lisatiedotRows: TrialDogPdfDataDbLisatietoRow[];
 };
+
+const OLOSUHDE_KOODIT = [
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+  "17",
+  "18",
+] as const;
+
+const HAKU_KOODIT = ["20", "21", "22"] as const;
+const HAUKKU_KOODIT = ["30", "31", "32", "33", "34", "35", "36"] as const;
+const METSASTYSINTO_KOODIT = ["40", "41", "42"] as const;
+const AJO_KOODIT = ["50", "51", "52", "53", "54", "55", "56"] as const;
+const MUUT_OMINAISUUDET_KOODIT = ["60", "61"] as const;
 
 export async function getTrialDogPdfDataDb(
   input: TrialDogPdfDataDbInput,
@@ -155,6 +184,32 @@ export async function getTrialDogPdfDataDb(
       koiriaLuokassa: true,
       palkinto: true,
       huomautusTeksti: true,
+      ryhmatuomariNimi: true,
+      palkintotuomariNimi: true,
+      ylituomariNumeroSnapshot: true,
+      ylituomariNimiSnapshot: true,
+      lisatiedot: {
+        where: {
+          koodi: {
+            in: [
+              ...OLOSUHDE_KOODIT,
+              ...HAKU_KOODIT,
+              ...HAUKKU_KOODIT,
+              ...METSASTYSINTO_KOODIT,
+              ...AJO_KOODIT,
+              ...MUUT_OMINAISUUDET_KOODIT,
+            ],
+          },
+        },
+        select: {
+          koodi: true,
+          era1Arvo: true,
+          era2Arvo: true,
+        },
+        orderBy: {
+          koodi: "asc",
+        },
+      },
     },
   });
 
@@ -213,5 +268,14 @@ export async function getTrialDogPdfDataDb(
     koiriaLuokassa: row.koiriaLuokassa,
     palkinto: row.palkinto,
     huomautusTeksti: row.huomautusTeksti,
+    ryhmatuomariNimi: row.ryhmatuomariNimi ?? null,
+    palkintotuomariNimi: row.palkintotuomariNimi ?? null,
+    ylituomariNumeroSnapshot: row.ylituomariNumeroSnapshot ?? null,
+    ylituomariNimiSnapshot: row.ylituomariNimiSnapshot ?? null,
+    lisatiedotRows: row.lisatiedot.map((item) => ({
+      koodi: item.koodi,
+      era1Arvo: item.era1Arvo ?? null,
+      era2Arvo: item.era2Arvo ?? null,
+    })),
   };
 }

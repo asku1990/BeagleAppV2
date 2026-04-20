@@ -106,6 +106,12 @@ export async function GET(
     const Palkinto = result.body.data.Palkinto;
     const huomautusTeksti = result.body.data.huomautusTeksti;
 
+    const ryhmatuomariNimi = result.body.data.ryhmatuomariNimi;
+    const palkintotuomariNimi = result.body.data.palkintotuomariNimi;
+    const ylituomariNumeroSnapshot = result.body.data.ylituomariNumeroSnapshot;
+    const ylituomariNimiSnapshot = result.body.data.ylituomariNimiSnapshot;
+    const lisatiedotRows = result.body.data.lisatiedotRows;
+
     const pdfBytes = await renderTrialDogPdf({
       registrationNo,
       dogName,
@@ -155,6 +161,11 @@ export async function GET(
       koiriaLuokassa,
       Palkinto,
       huomautusTeksti,
+      ryhmatuomariNimi,
+      palkintotuomariNimi,
+      ylituomariNumeroSnapshot,
+      ylituomariNimiSnapshot,
+      lisatiedotRows,
     });
 
     log.info(

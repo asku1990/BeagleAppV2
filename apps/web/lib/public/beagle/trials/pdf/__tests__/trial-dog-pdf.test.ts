@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { renderTrialDogPdf } from "../trial-dog-pdf";
 
 describe("renderTrialDogPdf", () => {
-  it("renders pdf bytes from a registration number", async () => {
+  it("renders pdf bytes when lisatiedot sections are omitted", async () => {
     const bytes = await renderTrialDogPdf({
       registrationNo: "FI12345/21",
       dogName: null,
@@ -52,6 +52,10 @@ describe("renderTrialDogPdf", () => {
       koiriaLuokassa: null,
       Palkinto: "1",
       huomautusTeksti: null,
+      ryhmatuomariNimi: null,
+      palkintotuomariNimi: null,
+      ylituomariNumeroSnapshot: null,
+      ylituomariNimiSnapshot: null,
     });
 
     expect(Buffer.from(bytes).toString("latin1", 0, 4)).toBe("%PDF");

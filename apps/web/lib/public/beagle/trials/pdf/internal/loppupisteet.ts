@@ -53,7 +53,7 @@ const KOIRIA_LUOKASSA_FIELD = {
 const PALKINTO = {
   x: 220,
   y: 110.3,
-  size: 12,
+  size: 14,
 } as const;
 
 export function drawTrialDogPdfLoppuppisteet(

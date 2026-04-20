@@ -124,6 +124,15 @@ export async function getTrialDogPdfDataService(
           koiriaLuokassa: result.koiriaLuokassa,
           Palkinto: result.palkinto,
           huomautusTeksti: result.huomautusTeksti,
+          ryhmatuomariNimi: result.ryhmatuomariNimi,
+          palkintotuomariNimi: result.palkintotuomariNimi,
+          ylituomariNumeroSnapshot: result.ylituomariNumeroSnapshot,
+          ylituomariNimiSnapshot: result.ylituomariNimiSnapshot,
+          lisatiedotRows: result.lisatiedotRows.map((row) => ({
+            koodi: row.koodi,
+            era1: row.era1Arvo,
+            era2: row.era2Arvo,
+          })),
         },
       },
     };
