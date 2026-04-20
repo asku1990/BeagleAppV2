@@ -223,6 +223,8 @@ Rules:
 - `36` renders as the raw value.
 - Current rendering also uses `koodi = 40-42` in the `metsästysinto` block.
 - All three rows render with one decimal place.
+- Current rendering also uses `koodi = 50-56` in the `ajo` block.
+- All seven rows render with one decimal place.
 
 ## Registration rule
 
