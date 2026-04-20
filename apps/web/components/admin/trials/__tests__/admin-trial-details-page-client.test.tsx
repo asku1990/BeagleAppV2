@@ -244,12 +244,10 @@ describe("AdminTrialDetailsPageClient", () => {
     expect(html).toContain("54321");
     expect(html).toContain("entry-1");
     expect(html).toContain("source");
-    expect(html).not.toContain("/api/trials/trial-1/pdf");
+    expect(html).toContain('href="/api/trials/trial-1/pdf"');
   });
 
-  it("shows the dev-only pdf link in development", () => {
-    vi.stubEnv("NODE_ENV", "development");
-
+  it("renders the pdf link", () => {
     useAdminTrialQueryMock.mockReturnValue({
       data: {
         trial: {
