@@ -50,7 +50,7 @@ function normalizeRowValue(
     : normalizeMarkerValue(raw);
 }
 
-// Olosuhteet group (11-18). Currently draws only koodi 11.
+// Olosuhteet group (11-18). Renders marker rows and numeric rows on fixed positions.
 export function drawTrialDogPdfLisatiedotOlosuhteet(
   input: TrialDogPdfLisatiedot & {
     page: PDFPage;

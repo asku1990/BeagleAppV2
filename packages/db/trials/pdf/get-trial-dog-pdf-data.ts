@@ -87,6 +87,7 @@ const OLOSUHDE_KOODIT = [
 ] as const;
 
 const HAKU_KOODIT = ["20", "21", "22"] as const;
+const HAUKKU_KOODIT = ["30", "31", "32", "33", "34", "35", "36"] as const;
 
 export async function getTrialDogPdfDataDb(
   input: TrialDogPdfDataDbInput,
@@ -187,7 +188,7 @@ export async function getTrialDogPdfDataDb(
       lisatiedot: {
         where: {
           koodi: {
-            in: [...OLOSUHDE_KOODIT, ...HAKU_KOODIT],
+            in: [...OLOSUHDE_KOODIT, ...HAKU_KOODIT, ...HAUKKU_KOODIT],
           },
         },
         select: {

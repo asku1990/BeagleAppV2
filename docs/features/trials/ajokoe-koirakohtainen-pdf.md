@@ -218,6 +218,9 @@ Rules:
 - Current rendering also uses `koodi = 20-22` in the `haku` block.
 - `20` renders as the raw value.
 - `21` and `22` render with one decimal place.
+- Current rendering also uses `koodi = 30-36` in the `haukku` block.
+- `30-35` render with one decimal place.
+- `36` renders as the raw value.
 
 ## Registration rule
 

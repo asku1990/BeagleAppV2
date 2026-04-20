@@ -30,70 +30,70 @@ describe("drawTrialDogPdfLisatiedotOlosuhteet", () => {
 
     expect(page.drawText).toHaveBeenCalledTimes(10);
     expect(page.drawText).toHaveBeenNthCalledWith(1, "X", {
-      x: 592,
+      x: 591,
       y: 487.5,
       size: 12,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(2, "0", {
-      x: 591,
+      x: 590,
       y: 474.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(3, "0", {
-      x: 608,
+      x: 607,
       y: 474.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(4, "X", {
-      x: 609,
+      x: 608,
       y: 459.5,
       size: 12,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(5, "X", {
-      x: 592,
+      x: 591,
       y: 445.5,
       size: 12,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(6, "X", {
-      x: 609,
+      x: 608,
       y: 445.5,
       size: 12,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(7, "5", {
-      x: 591,
+      x: 590,
       y: 402.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(8, "0", {
-      x: 608,
+      x: 607,
       y: 402.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(9, "0", {
-      x: 591,
+      x: 590,
       y: 388.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(10, "5", {
-      x: 608,
+      x: 607,
       y: 388.5,
       size: 10,
       font,
@@ -119,7 +119,7 @@ describe("drawTrialDogPdfLisatiedotOlosuhteet", () => {
     });
 
     expect(page.drawText).toHaveBeenNthCalledWith(1, "X", {
-      x: 592,
+      x: 591,
       y: 487.5,
       size: 12,
       font,
