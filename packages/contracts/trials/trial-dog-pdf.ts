@@ -1,3 +1,13 @@
+export type TrialDogPdfPayload = TrialDogPdfKokeenTiedot &
+  TrialDogPdfKoiranTiedot &
+  TrialDogPdfKoiranTausta &
+  TrialDogPdfAjoajanPisteytys &
+  TrialDogPdfAnsiopisteet &
+  TrialDogPdfTappiopisteet &
+  TrialDogPdfLoppupisteet &
+  TrialDogPdfHuomautus &
+  TrialDogPdfAllekirjoitukset;
+
 export type TrialDogSex = "MALE" | "FEMALE" | "UNKNOWN";
 
 export type TrialDogPdfDataRequest = {
@@ -76,15 +86,10 @@ export type TrialDogPdfHuomautus = {
   huomautusTeksti: string | null;
 };
 
-export type TrialDogPdfPayload = TrialDogPdfKokeenTiedot &
-  TrialDogPdfKoiranTiedot &
-  TrialDogPdfKoiranTausta &
-  TrialDogPdfAjoajanPisteytys &
-  TrialDogPdfAnsiopisteet &
-  TrialDogPdfTappiopisteet &
-  TrialDogPdfLoppupisteet &
-  TrialDogPdfHuomautus;
-
 export type TrialDogPdfPayloadWithTrialId = TrialDogPdfPayload & {
   trialId: string;
+};
+
+export type TrialDogPdfAllekirjoitukset = {
+  ryhmatuomariNimi: string | null;
 };

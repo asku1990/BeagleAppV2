@@ -10,6 +10,7 @@ import { drawTrialDogPdfKoiranTiedot } from "./internal/koiran-tiedot";
 import { drawTrialDogPdfKoiranTausta } from "./internal/koiran-tausta";
 import { drawTrialDogPdfTappiopisteet } from "./internal/tappiopisteet";
 import { drawTrialDogPdfLoppuppisteet } from "./internal/loppupisteet";
+import { drawTrialDogPdfAllekirjoitukset } from "./internal/allekirjoitukset";
 
 export { DOG_REGISTRATION_NO_FIELD } from "./internal/koiran-tiedot";
 
@@ -134,5 +135,12 @@ export async function renderTrialDogPdf(
     page,
     font,
   });
+
+  drawTrialDogPdfAllekirjoitukset({
+    ryhmatuomariNimi: input.ryhmatuomariNimi,
+    page,
+    font,
+  });
+
   return pdfDocument.save();
 }
