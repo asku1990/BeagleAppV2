@@ -70,7 +70,8 @@ result upsert contract.
 - `AJOLOYSYYSPISTEET` -> `ajoloysyysTappioYhteensa`
 - `TAPPIOPISTEET` -> `tappiopisteetYhteensa`
 - `LOPPUPISTEET` -> `loppupisteet`
-- `PALKINTOSIJA` -> `palkinto`
+- `PALKINTOSIJA` -> `palkinto` (stored as text; live values currently include
+  `0`, `1`, `2`, `3`, `L`, `S`, and `-`)
 - `SIJOITUS_LUOKASSA` -> `sijoitus`
 - `KOIRIA_LUOKASSA` -> `koiriaLuokassa`
 - `KELI` -> `keli`

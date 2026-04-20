@@ -14,6 +14,7 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+- Ajokokeen koirakohtainen PDF näyttää nyt valitun koerivin rekisterinumeron AJOK-pöytäkirjan testitäyttönä.
 - Lisättiin Koiratietokannan AJOK-tulosten integraatio-upsert, joka vastaanottaa yhden hyväksytyn tuloksen kerrallaan, säilyttää alkuperäisen payloadin raakadatana ja normalisoi lisätiedot erillisiksi riveiksi.
 - Ylläpidon ajokokeisiin lisättiin uusi koetulosten detaljisivu (`/admin/trials/[trialId]`), joka näyttää yhden nykyisen `TrialResult`-rivin kentät read-only-muodossa.
 - Ylläpidon ajokokeiden listalta avataan nyt koetuloksen detaljinäkymä suoraan yhtenäisellä rivi-/korttivalinnalla.
@@ -24,6 +25,8 @@ This project uses a user-facing changelog format.
 ### Changed
 
 ### Fixed
+
+- Ajokokeen koirakohtainen PDF näyttää nyt koiran oman primary-rekisterinumeron eli ensimmäisenä lisätyn rekisterinumeron.
 
 ### Removed
 

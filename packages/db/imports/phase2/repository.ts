@@ -1,5 +1,5 @@
 import { TrialSourceTag } from "@prisma/client";
-import { prisma } from "../../core/prisma";
+import { prisma } from "@db/core/prisma";
 
 // Phase2-specific Prisma adapters for canonical AJOK trial bootstrap writes.
 // Keeps database shape changes isolated from the server-side import mapping.

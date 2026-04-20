@@ -64,6 +64,7 @@ export const fiAdminTrialsMessages = {
   "admin.trials.detail.section.title": "Koetuloksen tiedot",
   "admin.trials.detail.section.subtitle":
     "Read-only detaljinäkymä AJOK uuden skeeman riville.",
+  "admin.trials.detail.pdf.open": "Avaa PDF",
   "admin.trials.detail.state.loading": "Ladataan koetuloksen detaljia...",
   "admin.trials.detail.state.error": "Koetuloksen detaljin lataus epäonnistui.",
   "admin.trials.detail.state.notFound": "Koetulosta ei löytynyt.",
@@ -215,6 +216,7 @@ export const svAdminTrialsMessages = {
   "admin.trials.detail.section.title": "Provresultatets uppgifter",
   "admin.trials.detail.section.subtitle":
     "Skrivskyddad detaljvy för en rad i AJOK nya schema.",
+  "admin.trials.detail.pdf.open": "Öppna PDF",
   "admin.trials.detail.state.loading": "Laddar provresultatdetalj...",
   "admin.trials.detail.state.error":
     "Det gick inte att ladda provresultatdetaljen.",

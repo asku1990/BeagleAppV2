@@ -1,0 +1,59 @@
+import { describe, expect, it } from "vitest";
+import { renderTrialDogPdf } from "../trial-dog-pdf";
+
+describe("renderTrialDogPdf", () => {
+  it("renders pdf bytes from a registration number", async () => {
+    const bytes = await renderTrialDogPdf({
+      registrationNo: "FI12345/21",
+      dogName: null,
+      dogSex: "MALE",
+      sireName: null,
+      sireRegistrationNo: null,
+      damName: null,
+      damRegistrationNo: null,
+      omistaja: null,
+      omistajanKotikunta: null,
+      kennelpiiri: null,
+      kennelpiirinro: null,
+      koekunta: null,
+      koepaiva: new Date("2025-09-07T00:00:00.000Z"),
+      jarjestaja: null,
+      era1Alkoi: null,
+      era2Alkoi: null,
+      hakuMin1: null,
+      hakuMin2: null,
+      ajoMin1: null,
+      ajoMin2: null,
+      hyvaksytytAjominuutit: null,
+      ajoajanPisteet: null,
+      hakuEra1: null,
+      hakuEra2: null,
+      hakuKeskiarvo: null,
+      haukkuEra1: null,
+      haukkuEra2: null,
+      haukkuKeskiarvo: null,
+      hakuloysyysTappioEra1: null,
+      hakuloysyysTappioEra2: null,
+      hakuloysyysTappioYhteensa: null,
+      ajoloysyysTappioEra1: null,
+      ajoloysyysTappioEra2: null,
+      ajoloysyysTappioYhteensa: null,
+      tappiopisteetYhteensa: null,
+      ajotaitoEra1: 4,
+      ajotaitoEra2: 2,
+      ajotaitoKeskiarvo: 3,
+      ansiopisteetYhteensa: 0,
+      loppupisteet: 0,
+      paljasMaaTaiLumi: null,
+      luopui: false,
+      suljettu: false,
+      keskeytetty: false,
+      sijoitus: null,
+      koiriaLuokassa: null,
+      Palkinto: "1",
+      huomautusTeksti: null,
+    });
+
+    expect(Buffer.from(bytes).toString("latin1", 0, 4)).toBe("%PDF");
+  });
+});

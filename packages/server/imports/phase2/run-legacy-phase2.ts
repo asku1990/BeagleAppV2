@@ -12,10 +12,10 @@ import {
   markImportRunRunning,
 } from "@beagle/db";
 import type { ImportRunResponse } from "@beagle/contracts";
-import type { ServiceResult } from "../../core/result";
-import { upsertCanonicalTrialRows } from "../internal";
-import { formatLegacyImportSummary } from "../runs/phase-summary";
-import { toImportRunResponse } from "../runs/transform";
+import type { ServiceResult } from "@server/core/result";
+import { upsertCanonicalTrialRows } from "@server/imports/internal";
+import { formatLegacyImportSummary } from "@server/imports/runs/phase-summary";
+import { toImportRunResponse } from "@server/imports/runs/transform";
 
 // Orchestrates the one-shot legacy phase2 bootstrap for canonical AJOK trials.
 // Stage boundaries, issue buffering, and summary counters live here; writes stay in helpers.
