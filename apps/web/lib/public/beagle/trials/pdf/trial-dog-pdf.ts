@@ -51,7 +51,6 @@ export async function renderTrialDogPdf(
   input: TrialDogPdfPayload,
 ): Promise<Uint8Array> {
   const lisatiedotRows = input.lisatiedotRows ?? [];
-  void lisatiedotRows;
 
   const templatePath = await resolveTemplatePath();
   const templateBytes = await readFile(templatePath);

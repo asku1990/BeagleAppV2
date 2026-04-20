@@ -1,5 +1,4 @@
 import type { PDFFont, PDFPage } from "pdf-lib";
-import { rgb } from "pdf-lib";
 import type { TrialDogPdfAllekirjoitukset } from "@contracts/trials/trial-dog-pdf";
 import { drawText, formatKoeEraValue } from "./koe-erat-common";
 
