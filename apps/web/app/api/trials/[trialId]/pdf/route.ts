@@ -6,7 +6,7 @@ import {
   optionsResponse,
   withCorsHeaders,
 } from "@/lib/server/cors";
-import { renderTrialDogPdf } from "@/lib/server/trials";
+import { renderTrialDogPdf } from "@/lib/public/beagle/trials/pdf";
 
 const METHODS = "GET,OPTIONS";
 

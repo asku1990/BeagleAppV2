@@ -2,8 +2,6 @@
   "extends": "../config-typescript/base.json",
   "compilerOptions": {
     "paths": {
-      "@contracts": ["../contracts/index.ts"],
-      "@contracts/*": ["../contracts/*"],
       "@db/*": ["./*"]
     }
   },

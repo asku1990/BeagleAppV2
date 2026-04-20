@@ -76,7 +76,7 @@ export async function renderTrialDogPdf(
     font,
   });
 
-  const ajoajanPisteytys = {
+  drawTrialDogPdfAjoajanPisteytys({
     era1Alkoi: input.era1Alkoi,
     era2Alkoi: input.era2Alkoi,
     hakuMin1: input.hakuMin1,
@@ -87,10 +87,9 @@ export async function renderTrialDogPdf(
     ajoajanPisteet: input.ajoajanPisteet,
     page,
     font,
-  } satisfies Parameters<typeof drawTrialDogPdfAjoajanPisteytys>[0];
-  drawTrialDogPdfAjoajanPisteytys(ajoajanPisteytys);
+  });
 
-  const ansiopisteet = {
+  drawTrialDogPdfAnsiopisteet({
     hakuEra1: input.hakuEra1,
     hakuEra2: input.hakuEra2,
     hakuKeskiarvo: input.hakuKeskiarvo,
@@ -103,10 +102,9 @@ export async function renderTrialDogPdf(
     ansiopisteetYhteensa: input.ansiopisteetYhteensa,
     page,
     font,
-  } satisfies Parameters<typeof drawTrialDogPdfAnsiopisteet>[0];
-  drawTrialDogPdfAnsiopisteet(ansiopisteet);
+  });
 
-  const tappiopisteet = {
+  drawTrialDogPdfTappiopisteet({
     hakuloysyysTappioEra1: input.hakuloysyysTappioEra1,
     hakuloysyysTappioEra2: input.hakuloysyysTappioEra2,
     hakuloysyysTappioYhteensa: input.hakuloysyysTappioYhteensa,
@@ -116,10 +114,9 @@ export async function renderTrialDogPdf(
     tappiopisteetYhteensa: input.tappiopisteetYhteensa,
     page,
     font,
-  } satisfies Parameters<typeof drawTrialDogPdfTappiopisteet>[0];
-  drawTrialDogPdfTappiopisteet(tappiopisteet);
+  });
 
-  const loppupisteet = {
+  drawTrialDogPdfLoppuppisteet({
     loppupisteet: input.loppupisteet,
     paljasMaaTaiLumi: input.paljasMaaTaiLumi,
     luopui: input.luopui,
@@ -130,8 +127,8 @@ export async function renderTrialDogPdf(
     Palkinto: input.Palkinto,
     page,
     font,
-  } satisfies Parameters<typeof drawTrialDogPdfLoppuppisteet>[0];
-  drawTrialDogPdfLoppuppisteet(loppupisteet);
+  });
+
   drawTrialDogPdfHuomautus({
     huomautusTeksti: input.huomautusTeksti,
     page,

@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useI18n } from "@/hooks/i18n";
 import { formatDateForFinland } from "@/lib/admin/core/date";
-import { getTrialPdfHref } from "@/lib/trials";
+import { getTrialPdfHref } from "@/lib/public/beagle/trials";
 import {
   isAdminTrialQueryError,
   useAdminTrialQuery,
@@ -96,17 +96,15 @@ export function AdminTrialDetailsPageClient({
             ? `${formatDateForFinland(trial.eventDate)} • ${showDash(trial.eventPlace)}`
             : t("admin.trials.detail.header.placeholder")}
         </p>
-        {process.env.NODE_ENV === "development" ? (
-          <Button asChild variant="outline" size="sm" className="w-fit">
-            <Link
-              href={getTrialPdfHref(normalizedTrialId)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {t("admin.trials.detail.pdf.open")}
-            </Link>
-          </Button>
-        ) : null}
+        <Button asChild variant="outline" size="sm" className="w-fit">
+          <Link
+            href={getTrialPdfHref(normalizedTrialId)}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {t("admin.trials.detail.pdf.open")}
+          </Link>
+        </Button>
       </div>
 
       <ListingSectionShell
