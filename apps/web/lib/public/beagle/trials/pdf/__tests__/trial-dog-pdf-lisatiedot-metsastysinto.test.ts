@@ -25,42 +25,42 @@ describe("drawTrialDogPdfLisatiedotMetsastysinto", () => {
 
     expect(page.drawText).toHaveBeenCalledTimes(6);
     expect(page.drawText).toHaveBeenNthCalledWith(1, "4.0", {
-      x: 670,
+      x: 782,
       y: 487.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(2, "0.0", {
-      x: 687,
+      x: 799,
       y: 487.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(3, "3.0", {
-      x: 670,
+      x: 782,
       y: 473.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(4, "0.0", {
-      x: 687,
+      x: 799,
       y: 473.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(5, "3.0", {
-      x: 670,
+      x: 782,
       y: 459.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(6, "0.0", {
-      x: 687,
+      x: 799,
       y: 459.5,
       size: 10,
       font,

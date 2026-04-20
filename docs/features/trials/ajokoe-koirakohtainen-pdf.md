@@ -225,6 +225,8 @@ Rules:
 - All three rows render with one decimal place.
 - Current rendering also uses `koodi = 50-56` in the `ajo` block.
 - All seven rows render with one decimal place.
+- Current rendering also uses `koodi = 60-61` in the `muut ominaisuudet` block.
+- Both rows render with one decimal place.
 
 ## Registration rule
 

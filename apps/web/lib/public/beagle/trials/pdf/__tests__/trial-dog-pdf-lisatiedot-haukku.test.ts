@@ -30,98 +30,98 @@ describe("drawTrialDogPdfLisatiedotHaukku", () => {
     expect(page.drawText).toHaveBeenCalledTimes(14);
     expect(page.drawText).toHaveBeenNthCalledWith(1, "4.0", {
       x: 590,
-      y: 304.5,
+      y: 303.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(2, "0.0", {
       x: 607,
-      y: 304.5,
+      y: 303.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(3, "3.0", {
       x: 590,
-      y: 290.5,
+      y: 289.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(4, "0.0", {
       x: 607,
-      y: 290.5,
+      y: 289.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(5, "3.0", {
       x: 590,
-      y: 276.5,
+      y: 275.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(6, "0.0", {
       x: 607,
-      y: 276.5,
+      y: 275.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(7, "3.0", {
       x: 590,
-      y: 262.5,
+      y: 261.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(8, "0.0", {
       x: 607,
-      y: 262.5,
+      y: 261.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(9, "3.0", {
       x: 590,
-      y: 248.5,
+      y: 247.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(10, "0.0", {
       x: 607,
-      y: 248.5,
+      y: 247.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(11, "5.0", {
       x: 590,
-      y: 234.5,
+      y: 233.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(12, "0.0", {
       x: 607,
-      y: 234.5,
+      y: 233.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(13, "4", {
       x: 590,
-      y: 220.5,
+      y: 219.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(14, "0", {
       x: 607,
-      y: 220.5,
+      y: 219.5,
       size: 10,
       font,
       color: expect.any(Object),

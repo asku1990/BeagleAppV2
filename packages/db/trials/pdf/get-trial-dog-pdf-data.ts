@@ -90,6 +90,7 @@ const HAKU_KOODIT = ["20", "21", "22"] as const;
 const HAUKKU_KOODIT = ["30", "31", "32", "33", "34", "35", "36"] as const;
 const METSASTYSINTO_KOODIT = ["40", "41", "42"] as const;
 const AJO_KOODIT = ["50", "51", "52", "53", "54", "55", "56"] as const;
+const MUUT_OMINAISUUDET_KOODIT = ["60", "61"] as const;
 
 export async function getTrialDogPdfDataDb(
   input: TrialDogPdfDataDbInput,
@@ -196,6 +197,7 @@ export async function getTrialDogPdfDataDb(
               ...HAUKKU_KOODIT,
               ...METSASTYSINTO_KOODIT,
               ...AJO_KOODIT,
+              ...MUUT_OMINAISUUDET_KOODIT,
             ],
           },
         },

@@ -64,7 +64,7 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
     expect(drawTextMock).toHaveBeenNthCalledWith(5, page, font, "1", {
       x: 220,
       y: 110.3,
-      size: 12,
+      size: 14,
     });
   });
 
@@ -106,7 +106,7 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
     expect(drawTextMock).toHaveBeenNthCalledWith(5, page, font, "1", {
       x: 220,
       y: 110.3,
-      size: 12,
+      size: 14,
     });
   });
 
@@ -143,7 +143,7 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
     expect(drawTextMock).toHaveBeenNthCalledWith(4, page, font, "1", {
       x: 220,
       y: 110.3,
-      size: 12,
+      size: 14,
     });
   });
 
@@ -190,7 +190,7 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
     expect(drawTextMock).toHaveBeenNthCalledWith(7, page, font, "1", {
       x: 220,
       y: 110.3,
-      size: 12,
+      size: 14,
     });
   });
 
