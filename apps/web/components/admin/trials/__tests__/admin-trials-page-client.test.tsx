@@ -13,78 +13,75 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-vi.mock("next/link", () => ({
-  default: ({
-    href,
-    children,
-    ...props
-  }: {
-    href: string;
-    children: React.ReactNode;
-    [key: string]: unknown;
-  }) => React.createElement("a", { href, ...props }, children),
-}));
-
 vi.mock("@/hooks/i18n", () => ({
   useI18n: () => ({
     t: (key: string) => key,
   }),
 }));
 
-vi.mock("@/components/listing", () => ({
-  ListingResponsiveResults: ({
-    desktop,
-    mobile,
+vi.mock("../admin-trial-events-filters", () => ({
+  AdminTrialEventsFilters: ({
+    mode,
+    query,
+    yearInput,
+    dateFrom,
+    dateTo,
+    sort,
+    filterError,
   }: {
-    desktop: React.ReactNode;
-    mobile: React.ReactNode;
-  }) => React.createElement(React.Fragment, null, desktop, mobile),
-  ListingSectionShell: ({
-    title,
-    subtitle,
-    count,
-    children,
-  }: {
-    title: React.ReactNode;
-    subtitle?: React.ReactNode;
-    count?: React.ReactNode;
-    children: React.ReactNode;
-  }) => React.createElement("section", null, title, subtitle, count, children),
-}));
-
-vi.mock("@/components/ui/card", () => ({
-  Card: ({ children }: { children: React.ReactNode }) =>
-    React.createElement("section", null, children),
-  CardContent: ({ children }: { children: React.ReactNode }) =>
-    React.createElement("div", null, children),
-}));
-
-vi.mock("@/components/ui/input", () => ({
-  Input: (props: React.ComponentProps<"input">) =>
-    React.createElement("input", props),
-}));
-
-vi.mock("@/components/ui/button", () => ({
-  Button: ({
-    children,
-    asChild,
-    ...props
-  }: {
-    children: React.ReactNode;
-    asChild?: boolean;
-    [key: string]: unknown;
+    mode: string;
+    query: string;
+    yearInput: string;
+    dateFrom: string;
+    dateTo: string;
+    sort: string;
+    filterError: string | null;
   }) =>
-    asChild
-      ? React.createElement(React.Fragment, null, children)
-      : React.createElement(
-          "button",
-          props as Record<string, string>,
-          children,
-        ),
+    React.createElement(
+      "section",
+      { "data-testid": "filters" },
+      `${mode}|${query}|${yearInput}|${dateFrom}|${dateTo}|${sort}|${filterError ?? ""}`,
+    ),
 }));
 
-vi.mock("@/lib/admin/core/date", () => ({
-  formatDateForFinland: (value: string | null | undefined) => value ?? "-",
+vi.mock("../admin-trial-events-results", () => ({
+  AdminTrialEventsResults: ({
+    totalCount,
+    page,
+    totalPages,
+    selectedEventId,
+    errorText,
+  }: {
+    totalCount: number;
+    page: number;
+    totalPages: number;
+    selectedEventId?: string;
+    errorText: string;
+  }) =>
+    React.createElement(
+      "section",
+      { "data-testid": "events" },
+      `${totalCount}|${page}|${totalPages}|${selectedEventId ?? ""}|${errorText}`,
+    ),
+}));
+
+vi.mock("../admin-trial-selected-event-panel", () => ({
+  AdminTrialSelectedEventPanel: ({
+    selectedEvent,
+    isLoading,
+    isError,
+    errorText,
+  }: {
+    selectedEvent: { trialEventId: string } | null;
+    isLoading: boolean;
+    isError: boolean;
+    errorText: string;
+  }) =>
+    React.createElement(
+      "section",
+      { "data-testid": "selected" },
+      `${selectedEvent?.trialEventId ?? ""}|${isLoading}|${isError}|${errorText}`,
+    ),
 }));
 
 vi.mock("@/queries/admin/trials", () => ({
@@ -108,6 +105,7 @@ vi.mock("@/queries/admin/trials", () => ({
     },
     isLoading: false,
     isError: false,
+    error: null,
   }),
   useAdminTrialEventQuery: () => ({
     data: {
@@ -121,19 +119,7 @@ vi.mock("@/queries/admin/trials", () => ({
         sklKoeId: 12345,
         koemuoto: "AJOK",
         dogCount: 2,
-        entries: [
-          {
-            trialId: "trial-1",
-            dogId: null,
-            dogName: "Rex",
-            registrationNo: "FI123",
-            entryKey: "entry-1",
-            rank: "2",
-            award: "VOI1",
-            points: 98.5,
-            judge: "Judge",
-          },
-        ],
+        entries: [],
       },
     },
     isLoading: false,
@@ -143,26 +129,17 @@ vi.mock("@/queries/admin/trials", () => ({
 }));
 
 describe("AdminTrialsPageClient", () => {
-  it("renders event-first admin trials flow with event and row actions", () => {
+  it("passes coordinator state into the split admin trials panels", () => {
     const html = renderToStaticMarkup(
       React.createElement(AdminTrialsPageClient),
     );
 
     expect(html).toContain("admin.trials.title");
-    expect(html).toContain("admin.trials.manage.events.title");
-    expect(html).toContain("admin.trials.manage.events.columns.date");
-    expect(html).toContain("admin.trials.manage.events.columns.place");
-    expect(html).toContain("admin.trials.manage.selected.title");
-    expect(html).toContain("admin.trials.manage.selected.columns.dog");
-    expect(html).toContain("admin.trials.manage.selected.columns.registration");
-    expect(html).toContain("admin.trials.manage.selected.columns.actions");
-    expect(html).toContain("admin.trials.manage.selected.actions.openDetail");
-    expect(html).toContain("admin.trials.manage.selected.actions.openPdf");
-    expect(html).toContain("admin.trials.manage.filters.mode.year");
-    expect(html).toContain("admin.trials.manage.filters.mode.range");
-    expect(html).toContain("admin.trials.manage.filters.sort.dateDesc");
-    expect(html).toContain("Rex");
-    expect(html).toContain("FI123");
-    expect(html).toContain('href="/api/trials/trial-1/pdf"');
+    expect(html).toContain("admin.trials.description");
+    expect(html).toContain("year|||");
+    expect(html).toContain("1|1|1|event-1|admin.trials.manage.error");
+    expect(html).toContain(
+      "event-1|false|false|admin.trials.manage.selected.error",
+    );
   });
 });
