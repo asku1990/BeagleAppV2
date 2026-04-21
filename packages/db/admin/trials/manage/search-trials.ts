@@ -1,13 +1,13 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@db/core/prisma";
 import type {
-  AdminTrialSearchRequestDb,
-  AdminTrialSearchResponseDb,
-  AdminTrialSummaryDb,
-  AdminTrialSearchSortDb,
+  AdminTrialEventSearchRequestDb,
+  AdminTrialEventSearchResponseDb,
+  AdminTrialEventSearchSortDb,
+  AdminTrialEventSummaryDb,
 } from "./types";
 
-const ALLOWED_SORTS: ReadonlySet<AdminTrialSearchSortDb> = new Set([
+const ALLOWED_SORTS: ReadonlySet<AdminTrialEventSearchSortDb> = new Set([
   "date-desc",
   "date-asc",
 ]);
@@ -27,8 +27,8 @@ function parsePageSize(value: number | undefined): number {
 }
 
 function normalizeSort(
-  value: AdminTrialSearchSortDb | undefined,
-): AdminTrialSearchSortDb {
+  value: AdminTrialEventSearchSortDb | undefined,
+): AdminTrialEventSearchSortDb {
   if (!value || !ALLOWED_SORTS.has(value)) {
     return "date-desc";
   }
@@ -57,152 +57,156 @@ function resolvePagination(
   };
 }
 
-function buildWhere(query: string): Prisma.TrialEntryWhereInput {
+function buildDateWhere(
+  input: AdminTrialEventSearchRequestDb,
+): Prisma.TrialEventWhereInput {
+  if (input.dateFrom && input.dateTo) {
+    return {
+      koepaiva: {
+        gte: input.dateFrom,
+        lt: input.dateTo,
+      },
+    };
+  }
+
+  return {};
+}
+
+function buildTextWhere(query: string): Prisma.TrialEventWhereInput {
   if (!query) {
     return {};
   }
 
   const parsedSklKoeId = Number(query);
   const hasSklKoeId = Number.isInteger(parsedSklKoeId) && parsedSklKoeId >= 0;
+  const entryTextWhere: Prisma.TrialEntryListRelationFilter = {
+    some: {
+      OR: [
+        {
+          rekisterinumeroSnapshot: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+        {
+          koiranNimiSnapshot: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+        {
+          dog: {
+            is: {
+              name: {
+                contains: query,
+                mode: "insensitive",
+              },
+            },
+          },
+        },
+        {
+          dog: {
+            is: {
+              registrations: {
+                some: {
+                  registrationNo: {
+                    contains: query,
+                    mode: "insensitive",
+                  },
+                },
+              },
+            },
+          },
+        },
+      ],
+    },
+  };
 
   return {
     OR: [
-      ...(hasSklKoeId
-        ? [
-            {
-              trialEvent: {
-                is: { sklKoeId: parsedSklKoeId },
-              },
-            },
-          ]
-        : []),
-      {
-        trialEvent: {
-          is: { koekunta: { contains: query, mode: "insensitive" } },
-        },
-      },
-      {
-        trialEvent: {
-          is: { ylituomariNimi: { contains: query, mode: "insensitive" } },
-        },
-      },
-      {
-        trialEvent: {
-          is: { jarjestaja: { contains: query, mode: "insensitive" } },
-        },
-      },
-      {
-        trialEvent: {
-          is: { legacyEventKey: { contains: query, mode: "insensitive" } },
-        },
-      },
-      { yksilointiAvain: { contains: query, mode: "insensitive" } },
-      { rekisterinumeroSnapshot: { contains: query, mode: "insensitive" } },
-      { koiranNimiSnapshot: { contains: query, mode: "insensitive" } },
-      {
-        dog: {
-          is: {
-            name: { contains: query, mode: "insensitive" },
-          },
-        },
-      },
-      {
-        dog: {
-          is: {
-            registrations: {
-              some: {
-                registrationNo: { contains: query, mode: "insensitive" },
-              },
-            },
-          },
-        },
-      },
+      ...(hasSklKoeId ? [{ sklKoeId: parsedSklKoeId }] : []),
+      { koekunta: { contains: query, mode: "insensitive" } },
+      { jarjestaja: { contains: query, mode: "insensitive" } },
+      { ylituomariNimi: { contains: query, mode: "insensitive" } },
+      { legacyEventKey: { contains: query, mode: "insensitive" } },
+      { koemuoto: { contains: query, mode: "insensitive" } },
+      { rotukoodi: { contains: query, mode: "insensitive" } },
+      { kennelpiiri: { contains: query, mode: "insensitive" } },
+      { kennelpiirinro: { contains: query, mode: "insensitive" } },
+      { entries: entryTextWhere },
     ],
   };
 }
 
-function toNumberOrNull(value: Prisma.Decimal | null): number | null {
-  if (value === null) {
-    return null;
-  }
-
-  const numeric = Number(value);
-  return Number.isFinite(numeric) ? numeric : null;
+function buildWhere(
+  input: AdminTrialEventSearchRequestDb,
+): Prisma.TrialEventWhereInput {
+  const query = normalizeQuery(input.query);
+  const dateWhere = buildDateWhere(input);
+  const textWhere = buildTextWhere(query);
+  return {
+    AND: [dateWhere, textWhere],
+  };
 }
 
 export async function searchAdminTrialsDb(
-  input: AdminTrialSearchRequestDb,
-): Promise<AdminTrialSearchResponseDb> {
-  const query = normalizeQuery(input.query);
+  input: AdminTrialEventSearchRequestDb,
+): Promise<AdminTrialEventSearchResponseDb> {
   const page = parsePage(input.page);
   const pageSize = parsePageSize(input.pageSize);
   const sort = normalizeSort(input.sort);
-  const where = buildWhere(query);
-  const orderBy: Prisma.TrialEntryOrderByWithRelationInput[] = [
-    { trialEvent: { koepaiva: sort === "date-asc" ? "asc" : "desc" } },
-    { trialEvent: { koekunta: "asc" } },
-    { yksilointiAvain: "asc" },
+  const where = buildWhere(input);
+  const orderBy: Prisma.TrialEventOrderByWithRelationInput[] = [
+    { koepaiva: sort === "date-asc" ? "asc" : "desc" },
+    { koekunta: "asc" },
+    { id: "asc" },
   ];
 
-  const total = await prisma.trialEntry.count({ where });
+  const [years, total] = await Promise.all([
+    prisma.trialEvent.findMany({
+      select: { koepaiva: true },
+      orderBy: [{ koepaiva: "desc" }],
+    }),
+    prisma.trialEvent.count({ where }),
+  ]);
+
+  const availableEventDates = years.map((row) => row.koepaiva);
   const pagination = resolvePagination(total, page, pageSize);
-  const rows = await prisma.trialEntry.findMany({
+
+  const rows = await prisma.trialEvent.findMany({
     where,
     orderBy,
     skip: pagination.skip,
     take: pageSize,
     select: {
       id: true,
-      yksilointiAvain: true,
-      rekisterinumeroSnapshot: true,
-      koiranNimiSnapshot: true,
-      loppupisteet: true,
-      palkinto: true,
-      sijoitus: true,
-      trialEvent: {
+      sklKoeId: true,
+      koepaiva: true,
+      koekunta: true,
+      jarjestaja: true,
+      koemuoto: true,
+      ylituomariNimi: true,
+      _count: {
         select: {
-          sklKoeId: true,
-          koepaiva: true,
-          koekunta: true,
-          ylituomariNimi: true,
-        },
-      },
-      dog: {
-        select: {
-          name: true,
-          registrations: {
-            select: {
-              registrationNo: true,
-            },
-            orderBy: [{ createdAt: "asc" }, { id: "asc" }],
-            take: 1,
-          },
+          entries: true,
         },
       },
     },
   });
 
-  const items: AdminTrialSummaryDb[] = rows.map((row) => ({
-    trialId: row.id,
-    dogName:
-      row.dog?.name?.trim() ||
-      row.koiranNimiSnapshot?.trim() ||
-      row.rekisterinumeroSnapshot,
-    registrationNo:
-      row.rekisterinumeroSnapshot ||
-      row.dog?.registrations[0]?.registrationNo ||
-      null,
-    sklKoeId: row.trialEvent.sklKoeId ?? null,
-    entryKey: row.yksilointiAvain,
-    eventDate: row.trialEvent.koepaiva,
-    eventPlace: row.trialEvent.koekunta,
-    ylituomariNimi: row.trialEvent.ylituomariNimi,
-    loppupisteet: toNumberOrNull(row.loppupisteet),
-    palkinto: row.palkinto,
-    sijoitus: row.sijoitus,
+  const items: AdminTrialEventSummaryDb[] = rows.map((row) => ({
+    trialEventId: row.id,
+    eventDate: row.koepaiva,
+    eventPlace: row.koekunta,
+    eventName: row.jarjestaja,
+    organizer: row.jarjestaja,
+    judge: row.ylituomariNimi,
+    sklKoeId: row.sklKoeId ?? null,
+    dogCount: row._count.entries,
   }));
 
   return {
+    availableEventDates,
     total,
     totalPages: pagination.totalPages,
     page: pagination.page,

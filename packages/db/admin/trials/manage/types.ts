@@ -1,4 +1,4 @@
-export type AdminTrialSearchSortDb = "date-desc" | "date-asc";
+export type AdminTrialEventSearchSortDb = "date-desc" | "date-asc";
 
 export type AdminTrialDetailsRequestDb = {
   trialId: string;
@@ -77,30 +77,58 @@ export type AdminTrialLisatietoDb = {
   jarjestys: number;
 };
 
-export type AdminTrialSearchRequestDb = {
+export type AdminTrialEventSearchRequestDb = {
   query?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
   page?: number;
   pageSize?: number;
-  sort?: AdminTrialSearchSortDb;
+  sort?: AdminTrialEventSearchSortDb;
 };
 
-export type AdminTrialSummaryDb = {
-  trialId: string;
-  dogName: string;
-  registrationNo: string | null;
-  sklKoeId: number | null;
-  entryKey: string;
+export type AdminTrialEventSummaryDb = {
+  trialEventId: string;
   eventDate: Date;
   eventPlace: string;
-  ylituomariNimi: string | null;
-  loppupisteet: number | null;
-  palkinto: string | null;
-  sijoitus: string | null;
+  eventName: string | null;
+  organizer: string | null;
+  judge: string | null;
+  sklKoeId: number | null;
+  dogCount: number;
 };
 
-export type AdminTrialSearchResponseDb = {
+export type AdminTrialEventSearchResponseDb = {
+  availableEventDates: Date[];
   total: number;
   totalPages: number;
   page: number;
-  items: AdminTrialSummaryDb[];
+  items: AdminTrialEventSummaryDb[];
+};
+
+export type AdminTrialEventDetailsRequestDb = {
+  trialEventId: string;
+};
+
+export type AdminTrialEventEntryDb = {
+  trialId: string;
+  dogId: string | null;
+  dogName: string;
+  registrationNo: string | null;
+  entryKey: string;
+  rank: string | null;
+  award: string | null;
+  points: number | null;
+  judge: string | null;
+};
+
+export type AdminTrialEventDetailsDb = {
+  trialEventId: string;
+  eventDate: Date;
+  eventPlace: string;
+  eventName: string | null;
+  organizer: string | null;
+  judge: string | null;
+  sklKoeId: number | null;
+  koemuoto: string | null;
+  entries: AdminTrialEventEntryDb[];
 };

@@ -1,2 +1,3 @@
 export { getAdminTrial } from "./get-trial";
-export { listAdminTrials } from "./list-trials";
+export { getAdminTrialEvent } from "./get-trial-event";
+export { listAdminTrialEvents } from "./list-trials";

@@ -121,7 +121,6 @@ export {
   type BeagleTrialDetailsResponseDb,
   type BeagleTrialDetailsRowDb,
   type BeagleTrialDogRowDb,
-  type BeagleTrialSearchModeDb,
   type BeagleTrialSearchRequestDb,
   type BeagleTrialSearchResponseDb,
   type BeagleTrialSearchRowDb,
@@ -134,13 +133,17 @@ export {
 } from "./trials";
 export {
   getAdminTrialDetailsDb,
+  getAdminTrialEventDetailsDb,
   searchAdminTrialsDb,
   type AdminTrialDetailsDb,
   type AdminTrialDetailsRequestDb,
-  type AdminTrialSearchRequestDb,
-  type AdminTrialSearchResponseDb,
-  type AdminTrialSearchSortDb,
-  type AdminTrialSummaryDb,
+  type AdminTrialEventDetailsDb,
+  type AdminTrialEventDetailsRequestDb,
+  type AdminTrialEventEntryDb,
+  type AdminTrialEventSearchRequestDb,
+  type AdminTrialEventSearchResponseDb,
+  type AdminTrialEventSearchSortDb,
+  type AdminTrialEventSummaryDb,
 } from "./admin/trials";
 
 export {

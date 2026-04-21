@@ -237,10 +237,16 @@ export type {
   AdminTrialDetails,
   AdminTrialDetailsRequest,
   AdminTrialDetailsResponse,
-  AdminTrialSearchRequest,
-  AdminTrialSearchResponse,
-  AdminTrialSearchSort,
-  AdminTrialSummary,
+  AdminTrialEventDetails,
+  AdminTrialEventDetailsRequest,
+  AdminTrialEventDetailsResponse,
+  AdminTrialEventEntry,
+  AdminTrialEventSearchFilters,
+  AdminTrialEventSearchMode,
+  AdminTrialEventSearchRequest,
+  AdminTrialEventSearchResponse,
+  AdminTrialEventSearchSort,
+  AdminTrialEventSummary,
 } from "./admin";
 export type { HomeStatisticsResponse } from "./home";
 export {

@@ -34,7 +34,7 @@ describe("searchBeagleTrialsDb", () => {
     trialResultFindManyMock.mockReset();
   });
 
-  it("groups trial rows by eventDate+eventPlace and returns available years", async () => {
+  it("groups trial rows by eventDate+eventPlace and returns available event dates", async () => {
     trialResultGroupByMock
       .mockResolvedValueOnce([
         { eventDate: new Date("2025-08-01T00:00:00.000Z") },
@@ -68,14 +68,16 @@ describe("searchBeagleTrialsDb", () => {
     ]);
 
     const result = await searchBeagleTrialsDb({
-      mode: "year",
-      year: 2025,
+      dateFrom: new Date("2024-12-31T22:00:00.000Z"),
+      dateTo: new Date("2025-12-31T22:00:00.000Z"),
       sort: "date-desc",
       page: 1,
       pageSize: 10,
     });
 
-    expect(result.availableYears).toEqual([2025, 2024]);
+    expect(
+      result.availableEventDates.map((value) => value.toISOString()),
+    ).toEqual(["2025-08-01T00:00:00.000Z", "2024-07-01T00:00:00.000Z"]);
     expect(result.items.map((row) => row.eventPlace)).toEqual([
       "Turku",
       "Helsinki",
@@ -123,7 +125,6 @@ describe("searchBeagleTrialsDb", () => {
     ]);
 
     const result = await searchBeagleTrialsDb({
-      mode: "range",
       dateFrom,
       dateTo,
       sort: "date-asc",
@@ -161,8 +162,8 @@ describe("searchBeagleTrialsDb", () => {
     ]);
 
     const result = await searchBeagleTrialsDb({
-      mode: "year",
-      year: 2025,
+      dateFrom: new Date("2024-12-31T22:00:00.000Z"),
+      dateTo: new Date("2025-12-31T22:00:00.000Z"),
       sort: "date-desc",
       page: 1,
       pageSize: 10,
@@ -182,7 +183,8 @@ describe("getBeagleTrialDetailsDb", () => {
     trialResultFindManyMock.mockResolvedValue([]);
 
     const result = await getBeagleTrialDetailsDb({
-      eventDate: new Date("2025-06-01T00:00:00.000Z"),
+      eventDateStart: new Date("2025-05-31T21:00:00.000Z"),
+      eventDateEndExclusive: new Date("2025-06-01T21:00:00.000Z"),
       eventPlace: "Helsinki",
     });
 
@@ -278,7 +280,8 @@ describe("getBeagleTrialDetailsDb", () => {
     ]);
 
     const result = await getBeagleTrialDetailsDb({
-      eventDate: new Date("2025-06-01T00:00:00.000Z"),
+      eventDateStart: new Date("2025-05-31T21:00:00.000Z"),
+      eventDateEndExclusive: new Date("2025-06-01T21:00:00.000Z"),
       eventPlace: "Helsinki",
     });
 

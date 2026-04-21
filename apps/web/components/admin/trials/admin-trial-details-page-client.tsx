@@ -12,7 +12,6 @@ import {
   isAdminTrialQueryError,
   useAdminTrialQuery,
 } from "@/queries/admin/trials";
-import { AdminTrialValidationPanel } from "./admin-trial-validation-panel";
 
 function showDash(value: string | number | boolean | null | undefined): string {
   if (value === null || value === undefined) {
@@ -540,11 +539,6 @@ export function AdminTrialDetailsPageClient({
               </CardContent>
             </Card>
           )}
-
-          <AdminTrialValidationPanel
-            context="detail"
-            trial={!trialQuery.isError && !trialQuery.isLoading ? trial : null}
-          />
         </div>
       </ListingSectionShell>
     </div>

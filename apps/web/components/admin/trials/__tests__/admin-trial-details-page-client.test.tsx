@@ -234,12 +234,8 @@ describe("AdminTrialDetailsPageClient", () => {
     expect(html).toContain("admin.trials.detail.sections.scoreBreakdown");
     expect(html).toContain("admin.trials.detail.sections.metadata");
     expect(html).toContain("admin.trials.detail.sections.raw");
-    expect(html).toContain("admin.trials.validation.title");
-    expect(html).toContain("admin.trials.validation.sections.missing");
-    expect(html).toContain("admin.trials.validation.sections.incomplete");
     expect(html).toContain("admin.trials.detail.fields.sklKoeId");
     expect(html).toContain("admin.trials.detail.fields.entryKey");
-    expect(html).toContain("kennelpiiri");
     expect(html).toContain("Rex");
     expect(html).toContain("54321");
     expect(html).toContain("entry-1");
