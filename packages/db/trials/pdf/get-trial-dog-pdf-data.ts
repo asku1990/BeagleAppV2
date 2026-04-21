@@ -64,6 +64,7 @@ export type TrialDogPdfDataDbRow = {
   luopui: boolean | null;
   suljettu: boolean | null;
   keskeytetty: boolean | null;
+  kokokaudenkoe: boolean | null;
   sijoitus: string | null;
   koiriaLuokassa: number | null;
   palkinto: string | null;
@@ -182,6 +183,7 @@ export async function getTrialDogPdfDataDb(
       luopui: true,
       suljettu: true,
       keskeytetty: true,
+      kokokaudenkoe: true,
       sijoitus: true,
       koiriaLuokassa: true,
       palkinto: true,
@@ -267,6 +269,7 @@ export async function getTrialDogPdfDataDb(
     luopui: row.luopui,
     suljettu: row.suljettu,
     keskeytetty: row.keskeytetty,
+    kokokaudenkoe: row.kokokaudenkoe,
     sijoitus: row.sijoitus,
     koiriaLuokassa: row.koiriaLuokassa,
     palkinto: row.palkinto,

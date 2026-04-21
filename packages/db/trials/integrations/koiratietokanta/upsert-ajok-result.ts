@@ -67,6 +67,7 @@ export type KoiratietokantaAjokEntryDbInput = {
   palkinto: string | null;
   sijoitus: string | null;
   koiriaLuokassa: number | null;
+  kokokaudenkoe: boolean | null;
   keli: string | null;
   luopui: boolean | null;
   suljettu: boolean | null;
@@ -207,6 +208,7 @@ export async function upsertKoiratietokantaAjokResultDb(
       palkinto: input.entry.palkinto,
       sijoitus: input.entry.sijoitus,
       koiriaLuokassa: input.entry.koiriaLuokassa,
+      kokokaudenkoe: input.entry.kokokaudenkoe,
       keli: input.entry.keli,
       luopui: input.entry.luopui,
       suljettu: input.entry.suljettu,

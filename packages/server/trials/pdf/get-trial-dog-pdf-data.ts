@@ -121,6 +121,7 @@ export async function getTrialDogPdfDataService(
           luopui: result.luopui,
           suljettu: result.suljettu,
           keskeytetty: result.keskeytetty,
+          kokokaudenkoe: result.kokokaudenkoe,
           sijoitus: result.sijoitus,
           koiriaLuokassa: result.koiriaLuokassa,
           Palkinto: result.palkinto,

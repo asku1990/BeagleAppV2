@@ -26,6 +26,7 @@ import {
 describe("upsertTrialEventByLegacyKeyDb", () => {
   beforeEach(() => {
     trialEventUpsertMock.mockReset();
+    prismaMock.trialEntry.upsert.mockReset();
     trialEventUpsertMock.mockResolvedValue({ id: "event-1" });
   });
 
@@ -65,7 +66,7 @@ describe("upsertTrialEventByLegacyKeyDb", () => {
       yksilointiAvain: "event-1|FI-1/24",
       raakadataJson: "{}",
       palkinto: null,
-      sijoitus: null,
+      legacySijoitusRaw: null,
       loppupisteet: null,
       hakuKeskiarvo: null,
       haukkuKeskiarvo: null,
@@ -88,5 +89,37 @@ describe("upsertTrialEventByLegacyKeyDb", () => {
       tieJaEstetyoskentelyPisteet: null,
       metsastysintoPisteet: null,
     });
+  });
+
+  it("writes legacy sijoitus into the raw column only", async () => {
+    await upsertTrialEntryByEventAndRegistrationDb({
+      trialEventId: "event-1",
+      dogId: null,
+      rekisterinumeroSnapshot: "FI-1/24",
+      yksilointiAvain: "event-1|FI-1/24",
+      raakadataJson: "{}",
+      palkinto: null,
+      legacySijoitusRaw: "PK|1",
+      loppupisteet: null,
+      hakuKeskiarvo: null,
+      haukkuKeskiarvo: null,
+      yleisvaikutelmaPisteet: null,
+      hakuloysyysTappioYhteensa: null,
+      ajoloysyysTappioYhteensa: null,
+      tieJaEstetyoskentelyPisteet: null,
+      metsastysintoPisteet: null,
+      keli: null,
+      luopui: null,
+      suljettu: null,
+      keskeytetty: null,
+      notes: null,
+    });
+
+    const call = prismaMock.trialEntry.upsert.mock.calls[0]?.[0];
+    expect(call.create).toMatchObject({
+      legacySijoitusRaw: "PK|1",
+    });
+    expect(call.create).not.toHaveProperty("sijoitus");
+    expect(call.update).not.toHaveProperty("sijoitus");
   });
 });

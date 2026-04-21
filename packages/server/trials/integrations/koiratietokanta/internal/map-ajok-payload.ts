@@ -238,6 +238,7 @@ export function mapKoiratietokantaAjokPayload(
         "KOIRIA_LUOKASSA",
         warnings,
       ),
+      kokokaudenkoe: parseBooleanFlag(payload.koekaudenkoe),
       keli: normalizeText(payload.KELI),
       luopui: parseBooleanFlag(payload.luopui),
       suljettu: parseBooleanFlag(payload.suljettu),

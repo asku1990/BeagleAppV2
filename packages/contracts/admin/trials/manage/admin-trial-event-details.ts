@@ -14,6 +14,7 @@ export type AdminTrialEventEntry = {
   award: string | null;
   points: number | null;
   judge: string | null;
+  kokokaudenkoe?: boolean | null;
 };
 
 export type AdminTrialEventDetails = AdminTrialEventSummary & {

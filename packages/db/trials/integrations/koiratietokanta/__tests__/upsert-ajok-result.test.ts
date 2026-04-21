@@ -74,6 +74,7 @@ const entryInput = {
   palkinto: null,
   sijoitus: null,
   koiriaLuokassa: null,
+  kokokaudenkoe: null,
   keli: null,
   luopui: null,
   suljettu: null,
@@ -143,6 +144,7 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
       expect.objectContaining({
         create: expect.objectContaining({
           koemaasto: null,
+          kokokaudenkoe: null,
         }),
       }),
     );

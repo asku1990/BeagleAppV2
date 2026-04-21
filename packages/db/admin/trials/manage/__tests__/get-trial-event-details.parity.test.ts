@@ -50,6 +50,8 @@ describe("getAdminTrialEventDetailsDb parity", () => {
           yksilointiAvain: "entry-1",
           rekisterinumeroSnapshot: "FI123",
           sijoitus: "1",
+          legacySijoitusRaw: null,
+          kokokaudenkoe: true,
           palkinto: "VOI1",
           loppupisteet: { valueOf: () => 92.5 },
           ryhmatuomariNimi: "Group Judge",
@@ -85,6 +87,7 @@ describe("getAdminTrialEventDetailsDb parity", () => {
           award: "VOI1",
           points: 92.5,
           judge: "Group Judge",
+          kokokaudenkoe: true,
         },
       ],
     });

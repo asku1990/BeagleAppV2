@@ -202,7 +202,7 @@ export async function upsertCanonicalTrialRows(
       yksilointiAvain,
       raakadataJson: payloadJson,
       palkinto: normalizeNullable(row.pa),
-      sijoitus: normalizeNullable(row.sija),
+      legacySijoitusRaw: normalizeNullable(row.sija),
       loppupisteet: parseLegacyScore(row.piste),
       hakuKeskiarvo: parseLegacyScore(row.haku),
       haukkuKeskiarvo: parseLegacyScore(row.hauk),

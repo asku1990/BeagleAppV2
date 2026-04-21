@@ -63,6 +63,8 @@ export function drawTrialDogPdfLoppuppisteet(
   },
 ): void {
   const { page, font } = input;
+  const sijoitus = input.kokokaudenkoe ? "-" : input.sijoitus;
+  const koiriaLuokassa = input.kokokaudenkoe ? "KK" : input.koiriaLuokassa;
 
   drawText(page, font, formatKoeEraValue(input.loppupisteet), LOPPUPISTEET);
 
@@ -84,12 +86,12 @@ export function drawTrialDogPdfLoppuppisteet(
     drawText(page, font, "X", KESKEYTETTY_X_FIELD);
   }
 
-  drawText(page, font, formatKoeEraValue(input.sijoitus), SIJOITUS_FIELD);
+  drawText(page, font, formatKoeEraValue(sijoitus), SIJOITUS_FIELD);
 
   drawText(
     page,
     font,
-    formatKoeEraValue(input.koiriaLuokassa),
+    formatKoeEraValue(koiriaLuokassa),
     KOIRIA_LUOKASSA_FIELD,
   );
 

@@ -74,6 +74,7 @@ result upsert contract.
   `0`, `1`, `2`, `3`, `L`, `S`, and `-`)
 - `SIJOITUS_LUOKASSA` -> `sijoitus`
 - `KOIRIA_LUOKASSA` -> `koiriaLuokassa`
+- `koekaudenkoe` -> `kokokaudenkoe` (`"1"` => `true`, `"0"` => `false`)
 - `KELI` -> `keli`
 - `luopui` -> `luopui`
 - `suljettu` -> `suljettu`

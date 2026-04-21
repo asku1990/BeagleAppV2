@@ -36,7 +36,9 @@ export async function getAdminTrialEventDetailsDb(
           dogId: true,
           yksilointiAvain: true,
           rekisterinumeroSnapshot: true,
+          legacySijoitusRaw: true,
           sijoitus: true,
+          kokokaudenkoe: true,
           palkinto: true,
           loppupisteet: true,
           ryhmatuomariNimi: true,
@@ -79,10 +81,11 @@ export async function getAdminTrialEventDetailsDb(
         entry.dog?.registrations[0]?.registrationNo ||
         null,
       entryKey: entry.yksilointiAvain,
-      rank: entry.sijoitus,
+      rank: entry.sijoitus ?? entry.legacySijoitusRaw,
       award: entry.palkinto,
       points: toNumberOrNull(entry.loppupisteet),
       judge: entry.ryhmatuomariNimi || row.ylituomariNimi,
+      kokokaudenkoe: entry.kokokaudenkoe,
     })),
   };
 }

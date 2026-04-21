@@ -82,6 +82,7 @@ Huomio:
 | `PALKINTOSIJA`                     | `TrialEntry.palkinto` (stored as text; live values include `0`, `1`, `2`, `3`, `L`, `S`, and `-`) |
 | `SIJOITUS_LUOKASSA`                | `TrialEntry.sijoitus`                                                                             |
 | `KOIRIA_LUOKASSA`                  | `TrialEntry.koiriaLuokassa`                                                                       |
+| `koekaudenkoe`                     | `TrialEntry.kokokaudenkoe`                                                                        |
 | `KELI`                             | `TrialEntry.keli`                                                                                 |
 | `111_PALJAS_MAA`..`113_PALJAS_MAA` | `TrialLisatietoItem` code `11` (`Paljas maa`)                                                     |
 | `121_LUMIKELI`..`123_LUMIKELI`     | `TrialLisatietoItem` code `12` (`Lumikeli`)                                                       |

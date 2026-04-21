@@ -19,7 +19,9 @@ type TrialEntryUpsertInput = {
   yksilointiAvain: string;
   raakadataJson: string;
   palkinto: string | null;
-  sijoitus: string | null;
+  // Phase2 preserves the raw legacy SIJA text separately from the canonical
+  // `sijoitus` field used by modern AJOK writes.
+  legacySijoitusRaw: string | null;
   loppupisteet: number | null;
   hakuKeskiarvo: number | null;
   haukkuKeskiarvo: number | null;
@@ -102,7 +104,7 @@ export async function upsertTrialEntryByEventAndRegistrationDb(
       raakadataJson: input.raakadataJson,
       omistajaSnapshot: null,
       palkinto: input.palkinto,
-      sijoitus: input.sijoitus,
+      legacySijoitusRaw: input.legacySijoitusRaw,
       koiriaLuokassa: null,
       loppupisteet: input.loppupisteet,
       hakuMin1: null,
@@ -133,7 +135,7 @@ export async function upsertTrialEntryByEventAndRegistrationDb(
       lahde: TrialSourceTag.LEGACY_AKOEALL,
       raakadataJson: input.raakadataJson,
       palkinto: input.palkinto,
-      sijoitus: input.sijoitus,
+      legacySijoitusRaw: input.legacySijoitusRaw,
       loppupisteet: input.loppupisteet,
       hakuKeskiarvo: input.hakuKeskiarvo,
       haukkuKeskiarvo: input.haukkuKeskiarvo,
