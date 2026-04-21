@@ -88,6 +88,7 @@ export async function getTrialDogPdfDataService(
           kennelpiiri: result.kennelpiiri,
           kennelpiirinro: result.kennelpiirinro,
           koekunta: result.koekunta,
+          koemaasto: result.koemaasto,
           koepaiva: result.koepaiva,
           jarjestaja: result.jarjestaja,
           era1Alkoi: result.era1Alkoi,

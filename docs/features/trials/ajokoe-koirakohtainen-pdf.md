@@ -50,6 +50,7 @@ Input data:
 - `kennelpiiri`
 - `kennelpiirinro`
 - `koekunta`
+- `koemaasto` (entry-level maasto; may differ by dog row)
 - `koepaiva`
 - `jarjestaja`
 

@@ -96,6 +96,7 @@ CREATE TABLE "TrialEntry" (
     "tieJaEstetyoskentelyPisteet" DECIMAL(6,2),
     "metsastysintoPisteet" DECIMAL(6,2),
     "keli" TEXT,
+    "koemaasto" TEXT,
     "paljasMaa" BOOLEAN,
     "lumikeli" TEXT,
     "luopui" BOOLEAN,
@@ -234,6 +235,7 @@ COMMENT ON COLUMN "TrialEntry"."yleisvaikutelmaPisteet" IS 'AJOK yleisvaikutelma
 COMMENT ON COLUMN "TrialEntry"."tieJaEstetyoskentelyPisteet" IS 'AJOK tie- ja estetyoskentely (legacy TJA).';
 COMMENT ON COLUMN "TrialEntry"."metsastysintoPisteet" IS 'AJOK metsastysinto (legacy PIN).';
 COMMENT ON COLUMN "TrialEntry"."keli" IS 'Kelitunnus (esim. P).';
+COMMENT ON COLUMN "TrialEntry"."koemaasto" IS 'Kokeen maasto, snapshot per entry.';
 COMMENT ON COLUMN "TrialEntry"."paljasMaa" IS 'Poytakirjan olosuhderasti: paljas maa.';
 COMMENT ON COLUMN "TrialEntry"."lumikeli" IS 'Lumikelin arvo (esim. cm).';
 COMMENT ON COLUMN "TrialEntry"."luopui" IS 'Koe keskeytetty luopumisen vuoksi.';

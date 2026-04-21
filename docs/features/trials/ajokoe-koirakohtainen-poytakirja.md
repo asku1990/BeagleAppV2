@@ -23,6 +23,7 @@ Alla oleva ryhmittely on suunniteltu AJOK-koirakohtaisen pöytäkirjan näkymän
 - `kennelpiiri`
 - `kennelpiirinro`
 - `koekunta` (koepaikkakunta)
+- `koemaasto`
 - `koepaiva`
 - `jarjestaja`
 - `koemuoto` (valinnainen, jos lähde lähettää erikseen; ei pakollinen tässä otsikkolistassa)

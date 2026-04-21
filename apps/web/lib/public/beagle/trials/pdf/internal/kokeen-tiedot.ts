@@ -20,6 +20,18 @@ export const KOEKUNTA_FIELD = {
   size: 12,
 } as const;
 
+export const KOEMAASTO_FIELD = {
+  x: 122,
+  y: 504,
+  size: 12,
+} as const;
+
+export const KOEMAASTO_SEPARATOR_FIELD = {
+  x: 115.5,
+  y: 504,
+  size: 12,
+} as const;
+
 export const KOEPAIVA_FIELD = {
   x: 258,
   y: 504,
@@ -69,12 +81,28 @@ export function drawTrialDogPdfKokeenTiedot(
     });
   }
 
-  // koemaasto will be added later when schema changes are done.
   if (input.koekunta) {
-    page.drawText(`${input.koekunta}\\koemaasto`, {
+    page.drawText(input.koekunta, {
       x: KOEKUNTA_FIELD.x,
       y: KOEKUNTA_FIELD.y,
       size: KOEKUNTA_FIELD.size,
+      font,
+      color: rgb(0, 0, 0),
+    });
+  }
+
+  if (input.koemaasto) {
+    page.drawText("/", {
+      x: KOEMAASTO_SEPARATOR_FIELD.x,
+      y: KOEMAASTO_SEPARATOR_FIELD.y,
+      size: KOEMAASTO_SEPARATOR_FIELD.size,
+      font,
+      color: rgb(0, 0, 0),
+    });
+    page.drawText(input.koemaasto, {
+      x: KOEMAASTO_FIELD.x,
+      y: KOEMAASTO_FIELD.y,
+      size: KOEMAASTO_FIELD.size,
       font,
       color: rgb(0, 0, 0),
     });

@@ -16,6 +16,7 @@ describe("renderTrialDogPdf", () => {
       kennelpiiri: null,
       kennelpiirinro: null,
       koekunta: null,
+      koemaasto: null,
       koepaiva: new Date("2025-09-07T00:00:00.000Z"),
       jarjestaja: null,
       era1Alkoi: null,

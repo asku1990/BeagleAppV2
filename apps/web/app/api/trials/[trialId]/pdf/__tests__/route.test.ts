@@ -58,6 +58,7 @@ describe("trial pdf api route", () => {
           trialId: "entry-1",
           registrationNo: "FI12345/21",
           dogSex: "MALE",
+          koemaasto: "Ristijärvi",
           sireName: "KIMNOBLE PONTE",
           sireRegistrationNo: "FI30688/14",
           damName: "ERÄSOINNUN TUKSU",

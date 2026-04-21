@@ -341,6 +341,7 @@ model TrialEntry {
   lahde                     TrialSourceTag
 
   // 2) koiran tiedot
+  koemaasto                 String?
   rekisterinumeroSnapshot   String
   luokka                    String?
   koiranNimiSnapshot        String?      // Not used anywhere as source of truth.

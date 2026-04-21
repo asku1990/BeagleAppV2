@@ -62,6 +62,7 @@ export async function renderTrialDogPdf(
     kennelpiiri: input.kennelpiiri,
     kennelpiirinro: input.kennelpiirinro,
     koekunta: input.koekunta,
+    koemaasto: input.koemaasto,
     koepaiva: input.koepaiva,
     jarjestaja: input.jarjestaja,
     page,

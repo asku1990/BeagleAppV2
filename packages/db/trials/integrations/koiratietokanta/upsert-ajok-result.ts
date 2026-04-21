@@ -21,6 +21,7 @@ export type KoiratietokantaAjokEntryDbInput = {
   luokka: string | null;
   omistajaSnapshot: string | null;
   omistajanKotikuntaSnapshot: string | null;
+  koemaasto: string | null;
   era1Alkoi: string | null;
   era2Alkoi: string | null;
   era3Alkoi: string | null;
@@ -160,6 +161,7 @@ export async function upsertKoiratietokantaAjokResultDb(
       luokka: input.entry.luokka,
       omistajaSnapshot: input.entry.omistajaSnapshot,
       omistajanKotikuntaSnapshot: input.entry.omistajanKotikuntaSnapshot,
+      koemaasto: input.entry.koemaasto,
       era1Alkoi: input.entry.era1Alkoi,
       era2Alkoi: input.entry.era2Alkoi,
       era3Alkoi: input.entry.era3Alkoi,

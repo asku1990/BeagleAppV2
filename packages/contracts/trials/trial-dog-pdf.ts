@@ -19,6 +19,7 @@ export type TrialDogPdfKokeenTiedot = {
   kennelpiiri: string | null;
   kennelpiirinro: string | null;
   koekunta: string | null;
+  koemaasto: string | null;
   koepaiva: Date;
   jarjestaja: string | null;
 };

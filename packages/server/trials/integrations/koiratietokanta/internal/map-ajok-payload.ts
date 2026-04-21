@@ -132,6 +132,7 @@ export function mapKoiratietokantaAjokPayload(
       luokka: normalizeText(payload.LUOKKA),
       omistajaSnapshot: normalizeText(payload.Omistaja),
       omistajanKotikuntaSnapshot: normalizeText(payload.Omistajankotipaikka),
+      koemaasto: normalizeText(payload.koemaasto),
       era1Alkoi: normalizeText(payload.I_ERA_KLO),
       era2Alkoi: normalizeText(payload.II_ERA_KLO),
       era3Alkoi: normalizeText(payload.III_ERA_KLO),
