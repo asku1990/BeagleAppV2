@@ -1,13 +1,15 @@
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { listAdminTrialsMock, getSessionCurrentUserMock } = vi.hoisted(() => ({
-  listAdminTrialsMock: vi.fn(),
-  getSessionCurrentUserMock: vi.fn(),
-}));
+const { listAdminTrialEventsMock, getSessionCurrentUserMock } = vi.hoisted(
+  () => ({
+    listAdminTrialEventsMock: vi.fn(),
+    getSessionCurrentUserMock: vi.fn(),
+  }),
+);
 
 vi.mock("@beagle/server", () => ({
-  listAdminTrials: listAdminTrialsMock,
+  listAdminTrialEvents: listAdminTrialEventsMock,
 }));
 
 vi.mock("@/lib/server/current-user", () => ({
@@ -44,7 +46,7 @@ vi.mock("@/lib/server/cors", () => ({
 
 describe("admin trials api route", () => {
   beforeEach(() => {
-    listAdminTrialsMock.mockReset();
+    listAdminTrialEventsMock.mockReset();
     getSessionCurrentUserMock.mockReset();
   });
 
@@ -57,14 +59,14 @@ describe("admin trials api route", () => {
       createdAt: null,
       sessionId: null,
     });
-    listAdminTrialsMock.mockResolvedValue({
+    listAdminTrialEventsMock.mockResolvedValue({
       status: 200,
       body: { ok: true, data: { items: [], total: 0, totalPages: 0, page: 1 } },
     });
 
     const { GET } = await import("../route");
     const request = new NextRequest(
-      "http://localhost/api/admin/trials?query=beagle&page=2&pageSize=10&sort=date-asc",
+      "http://localhost/api/admin/trials?query=beagle&year=2026&dateFrom=2026-01-01&dateTo=2026-12-31&page=2&pageSize=10&sort=date-asc",
       {
         headers: { origin: "http://localhost:3000" },
       },
@@ -72,9 +74,12 @@ describe("admin trials api route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(200);
-    expect(listAdminTrialsMock).toHaveBeenCalledWith(
+    expect(listAdminTrialEventsMock).toHaveBeenCalledWith(
       {
         query: "beagle",
+        year: 2026,
+        dateFrom: "2026-01-01",
+        dateTo: "2026-12-31",
         page: 2,
         pageSize: 10,
         sort: "date-asc",
@@ -97,7 +102,7 @@ describe("admin trials api route", () => {
       createdAt: null,
       sessionId: null,
     });
-    listAdminTrialsMock.mockRejectedValue(new Error("boom"));
+    listAdminTrialEventsMock.mockRejectedValue(new Error("boom"));
 
     const { GET } = await import("../route");
     const request = new NextRequest("http://localhost/api/admin/trials", {
@@ -108,7 +113,7 @@ describe("admin trials api route", () => {
     expect(response.status).toBe(500);
     await expect(response.json()).resolves.toEqual({
       ok: false,
-      error: "Failed to load admin trials.",
+      error: "Failed to load admin trial events.",
       code: "INTERNAL_ERROR",
     });
   });
@@ -122,7 +127,7 @@ describe("admin trials api route", () => {
       createdAt: null,
       sessionId: null,
     });
-    listAdminTrialsMock.mockResolvedValue({
+    listAdminTrialEventsMock.mockResolvedValue({
       status: 400,
       body: { ok: false, error: "Invalid sort value.", code: "INVALID_SORT" },
     });
@@ -137,9 +142,12 @@ describe("admin trials api route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(400);
-    expect(listAdminTrialsMock).toHaveBeenCalledWith(
+    expect(listAdminTrialEventsMock).toHaveBeenCalledWith(
       {
         query: undefined,
+        year: undefined,
+        dateFrom: undefined,
+        dateTo: undefined,
         page: undefined,
         pageSize: undefined,
         sort: "broken-sort",

@@ -3,10 +3,26 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { AdminTrialsPageClient } from "../admin-trials-page-client";
 
+const { pushMock } = vi.hoisted(() => ({
+  pushMock: vi.fn(),
+}));
+
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
-    push: vi.fn(),
+    push: pushMock,
   }),
+}));
+
+vi.mock("next/link", () => ({
+  default: ({
+    href,
+    children,
+    ...props
+  }: {
+    href: string;
+    children: React.ReactNode;
+    [key: string]: unknown;
+  }) => React.createElement("a", { href, ...props }, children),
 }));
 
 vi.mock("@/hooks/i18n", () => ({
@@ -48,57 +64,105 @@ vi.mock("@/components/ui/input", () => ({
     React.createElement("input", props),
 }));
 
+vi.mock("@/components/ui/button", () => ({
+  Button: ({
+    children,
+    asChild,
+    ...props
+  }: {
+    children: React.ReactNode;
+    asChild?: boolean;
+    [key: string]: unknown;
+  }) =>
+    asChild
+      ? React.createElement(React.Fragment, null, children)
+      : React.createElement(
+          "button",
+          props as Record<string, string>,
+          children,
+        ),
+}));
+
 vi.mock("@/lib/admin/core/date", () => ({
   formatDateForFinland: (value: string | null | undefined) => value ?? "-",
 }));
 
 vi.mock("@/queries/admin/trials", () => ({
-  useAdminTrialsQuery: () => ({
+  useAdminTrialEventsQuery: () => ({
     data: {
       total: 1,
       totalPages: 1,
       page: 1,
       items: [
         {
-          trialId: "trial-1",
-          dogName: "Rex",
-          registrationNo: "FI123",
-          sklKoeId: 12345,
-          entryKey: "entry-1",
+          trialEventId: "event-1",
           eventDate: "2026-04-14",
           eventPlace: "Helsinki",
-          ylituomariNimi: "Judge",
-          loppupisteet: 98.5,
-          palkinto: "1",
-          sijoitus: "2",
+          eventName: "Kevatkoe",
+          organizer: "Jarjestaja",
+          judge: "Judge",
+          sklKoeId: 12345,
+          dogCount: 2,
         },
       ],
     },
     isLoading: false,
     isError: false,
   }),
+  useAdminTrialEventQuery: () => ({
+    data: {
+      event: {
+        trialEventId: "event-1",
+        eventDate: "2026-04-14",
+        eventPlace: "Helsinki",
+        eventName: "Kevatkoe",
+        organizer: "Jarjestaja",
+        judge: "Judge",
+        sklKoeId: 12345,
+        koemuoto: "AJOK",
+        dogCount: 2,
+        entries: [
+          {
+            trialId: "trial-1",
+            dogId: null,
+            dogName: "Rex",
+            registrationNo: "FI123",
+            entryKey: "entry-1",
+            rank: "2",
+            award: "VOI1",
+            points: 98.5,
+            judge: "Judge",
+          },
+        ],
+      },
+    },
+    isLoading: false,
+    isError: false,
+    error: null,
+  }),
 }));
 
 describe("AdminTrialsPageClient", () => {
-  it("renders the admin trials list with the expected columns", () => {
+  it("renders event-first admin trials flow with event and row actions", () => {
     const html = renderToStaticMarkup(
       React.createElement(AdminTrialsPageClient),
     );
 
     expect(html).toContain("admin.trials.title");
-    expect(html).toContain("admin.trials.manage.title");
-    expect(html).toContain("admin.trials.manage.columns.dog");
-    expect(html).toContain("admin.trials.manage.columns.registration");
-    expect(html).toContain("admin.trials.manage.columns.date");
-    expect(html).toContain("admin.trials.manage.columns.place");
-    expect(html).toContain("admin.trials.manage.columns.piste");
-    expect(html).toContain("admin.trials.manage.columns.pa");
-    expect(html).toContain("admin.trials.manage.columns.sija");
-    expect(html).toContain("admin.trials.manage.columns.judge");
-    expect(html).toContain("admin.trials.manage.results.openDetailHint");
-    expect(html).toContain("admin.trials.manage.results.openDetailAriaPrefix");
+    expect(html).toContain("admin.trials.manage.events.title");
+    expect(html).toContain("admin.trials.manage.events.columns.date");
+    expect(html).toContain("admin.trials.manage.events.columns.place");
+    expect(html).toContain("admin.trials.manage.selected.title");
+    expect(html).toContain("admin.trials.manage.selected.columns.dog");
+    expect(html).toContain("admin.trials.manage.selected.columns.registration");
+    expect(html).toContain("admin.trials.manage.selected.columns.actions");
+    expect(html).toContain("admin.trials.manage.selected.actions.openDetail");
+    expect(html).toContain("admin.trials.manage.selected.actions.openPdf");
+    expect(html).toContain("admin.trials.manage.filters.mode.year");
+    expect(html).toContain("admin.trials.manage.filters.mode.range");
+    expect(html).toContain("admin.trials.manage.filters.sort.dateDesc");
     expect(html).toContain("Rex");
     expect(html).toContain("FI123");
-    expect(html).toContain("12345");
+    expect(html).toContain('href="/api/trials/trial-1/pdf"');
   });
 });

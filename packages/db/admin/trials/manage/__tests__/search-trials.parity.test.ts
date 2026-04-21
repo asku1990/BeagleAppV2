@@ -1,21 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  ADMIN_TRIAL_LIST_PARITY_EXPECTED,
-  ADMIN_TRIAL_LIST_PARITY_ROWS,
-} from "./fixtures/parity-samples";
 
-const { trialEntryCountMock, trialEntryFindManyMock, prismaMock } = vi.hoisted(
+const { trialEventFindManyMock, trialEventCountMock, prismaMock } = vi.hoisted(
   () => {
-    const trialEntryCount = vi.fn();
-    const trialEntryFindMany = vi.fn();
+    const trialEventFindMany = vi.fn();
+    const trialEventCount = vi.fn();
 
     return {
-      trialEntryCountMock: trialEntryCount,
-      trialEntryFindManyMock: trialEntryFindMany,
+      trialEventFindManyMock: trialEventFindMany,
+      trialEventCountMock: trialEventCount,
       prismaMock: {
-        trialEntry: {
-          count: trialEntryCount,
-          findMany: trialEntryFindMany,
+        trialEvent: {
+          findMany: trialEventFindMany,
+          count: trialEventCount,
         },
       },
     };
@@ -28,85 +24,88 @@ vi.mock("../../../../core/prisma", () => ({
 
 import { searchAdminTrialsDb } from "../search-trials";
 
-describe("searchAdminTrialsDb parity sample", () => {
+describe("searchAdminTrialsDb event parity", () => {
   beforeEach(() => {
-    trialEntryCountMock.mockReset();
-    trialEntryFindManyMock.mockReset();
+    trialEventFindManyMock.mockReset();
+    trialEventCountMock.mockReset();
   });
 
-  it("maps canonical rows to BEJ-75 visible list fields with parity samples", async () => {
-    trialEntryCountMock.mockResolvedValue(ADMIN_TRIAL_LIST_PARITY_ROWS.length);
-    trialEntryFindManyMock.mockResolvedValue(ADMIN_TRIAL_LIST_PARITY_ROWS);
+  it("maps canonical trial events to event-summary rows", async () => {
+    trialEventFindManyMock
+      .mockResolvedValueOnce([
+        { koepaiva: new Date("2026-03-01T00:00:00.000Z") },
+        { koepaiva: new Date("2025-03-01T00:00:00.000Z") },
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: "event-1",
+          sklKoeId: 1001,
+          koepaiva: new Date("2026-03-01T00:00:00.000Z"),
+          koekunta: "Helsinki",
+          jarjestaja: "Talvikoe",
+          koemuoto: "AJOK",
+          ylituomariNimi: "Judge One",
+          _count: { entries: 22 },
+        },
+      ]);
+    trialEventCountMock.mockResolvedValue(1);
 
     const result = await searchAdminTrialsDb({
-      query: undefined,
+      mode: "year",
+      year: 2026,
       page: 1,
       pageSize: 50,
       sort: "date-desc",
     });
 
-    expect(result.total).toBe(3);
-    expect(result.totalPages).toBe(1);
-    expect(result.page).toBe(1);
-    expect(result.items).toEqual(ADMIN_TRIAL_LIST_PARITY_EXPECTED);
-
-    expect(result.items[1]?.sklKoeId).toBeNull();
-    expect(result.items[1]?.entryKey).toBe("LEGACY:2026-01-13|REG:FI22222/20");
-    expect(result.items[2]?.registrationNo).toBe("FI33333/19");
-  });
-
-  it("searches by trial organizer name on the canonical relation", async () => {
-    trialEntryCountMock.mockResolvedValue(0);
-    trialEntryFindManyMock.mockResolvedValue([]);
-
-    await searchAdminTrialsDb({
-      query: "Talvikoe",
+    expect(result).toEqual({
+      mode: "year",
+      year: 2026,
+      dateFrom: null,
+      dateTo: null,
+      availableYears: [2026, 2025],
+      total: 1,
+      totalPages: 1,
       page: 1,
-      pageSize: 50,
-      sort: "date-desc",
+      items: [
+        {
+          trialEventId: "event-1",
+          eventDate: new Date("2026-03-01T00:00:00.000Z"),
+          eventPlace: "Helsinki",
+          eventName: "Talvikoe",
+          organizer: "Talvikoe",
+          judge: "Judge One",
+          sklKoeId: 1001,
+          dogCount: 22,
+        },
+      ],
     });
-
-    expect(trialEntryFindManyMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: expect.objectContaining({
-          OR: expect.arrayContaining([
-            expect.objectContaining({
-              trialEvent: {
-                is: {
-                  jarjestaja: {
-                    contains: "Talvikoe",
-                    mode: "insensitive",
-                  },
-                },
-              },
-            }),
-          ]),
-        }),
-      }),
-    );
   });
 
-  it("searches by canonical SKL trial id when the query is numeric", async () => {
-    trialEntryCountMock.mockResolvedValue(0);
-    trialEntryFindManyMock.mockResolvedValue([]);
+  it("searches by event organizer and SKL id", async () => {
+    trialEventFindManyMock.mockResolvedValue([]);
+    trialEventCountMock.mockResolvedValue(0);
 
     await searchAdminTrialsDb({
       query: "1001",
+      mode: "year",
+      year: 2026,
       page: 1,
       pageSize: 50,
       sort: "date-desc",
     });
 
-    expect(trialEntryFindManyMock).toHaveBeenCalledWith(
+    const secondCall = trialEventFindManyMock.mock.calls[1]?.[0];
+    expect(secondCall).toEqual(
       expect.objectContaining({
         where: expect.objectContaining({
-          OR: expect.arrayContaining([
+          AND: expect.arrayContaining([
             expect.objectContaining({
-              trialEvent: {
-                is: {
+              OR: expect.arrayContaining([
+                expect.objectContaining({
                   sklKoeId: 1001,
-                },
-              },
+                }),
+              ]),
             }),
           ]),
         }),

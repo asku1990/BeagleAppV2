@@ -134,13 +134,18 @@ export {
 } from "./trials";
 export {
   getAdminTrialDetailsDb,
+  getAdminTrialEventDetailsDb,
   searchAdminTrialsDb,
   type AdminTrialDetailsDb,
   type AdminTrialDetailsRequestDb,
-  type AdminTrialSearchRequestDb,
-  type AdminTrialSearchResponseDb,
-  type AdminTrialSearchSortDb,
-  type AdminTrialSummaryDb,
+  type AdminTrialEventDetailsDb,
+  type AdminTrialEventDetailsRequestDb,
+  type AdminTrialEventEntryDb,
+  type AdminTrialEventSearchModeDb,
+  type AdminTrialEventSearchRequestDb,
+  type AdminTrialEventSearchResponseDb,
+  type AdminTrialEventSearchSortDb,
+  type AdminTrialEventSummaryDb,
 } from "./admin/trials";
 
 export {
