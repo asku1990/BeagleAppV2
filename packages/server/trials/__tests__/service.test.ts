@@ -59,22 +59,17 @@ describe("trials service", () => {
   it("uses latest year by default and maps encoded trialId", async () => {
     searchBeagleTrialsDbMock
       .mockResolvedValueOnce({
-        mode: "range",
-        year: null,
-        dateFrom: null,
-        dateTo: null,
-        availableYears: [2025, 2024],
+        availableEventDates: [new Date("2025-06-01T00:00:00.000Z")],
         total: 0,
         totalPages: 0,
         page: 1,
         items: [],
       })
       .mockResolvedValueOnce({
-        mode: "year",
-        year: 2025,
-        dateFrom: null,
-        dateTo: null,
-        availableYears: [2025, 2024],
+        availableEventDates: [
+          new Date("2025-06-01T00:00:00.000Z"),
+          new Date("2024-06-01T00:00:00.000Z"),
+        ],
         total: 1,
         totalPages: 1,
         page: 1,
@@ -98,6 +93,18 @@ describe("trials service", () => {
       eventDateIsoDate: "2025-06-01",
       eventDate: new Date("2025-06-01T00:00:00.000Z"),
       eventPlace: "Helsinki",
+    });
+    expect(searchBeagleTrialsDbMock).toHaveBeenNthCalledWith(1, {
+      page: 1,
+      pageSize: 1,
+      sort: "date-desc",
+    });
+    expect(searchBeagleTrialsDbMock).toHaveBeenNthCalledWith(2, {
+      dateFrom: new Date("2024-12-31T22:00:00.000Z"),
+      dateTo: new Date("2025-12-31T22:00:00.000Z"),
+      page: 1,
+      pageSize: 10,
+      sort: "date-desc",
     });
   });
 
@@ -156,6 +163,11 @@ describe("trials service", () => {
 
     expect(result.body.data.items[0]?.award).toBe("Voi 1");
     expect(result.body.data.trial.trialId).toBe(trialId);
+    expect(getBeagleTrialDetailsDbMock).toHaveBeenCalledWith({
+      eventDateStart: new Date("2025-05-31T21:00:00.000Z"),
+      eventDateEndExclusive: new Date("2025-06-01T21:00:00.000Z"),
+      eventPlace: "Helsinki",
+    });
   });
 
   it("returns 500 when db throws", async () => {
