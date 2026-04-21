@@ -4,7 +4,7 @@ import {
   getTrialBusinessDateUtcRange,
   getTrialBusinessYearUtcRange,
   toTrialBusinessYear,
-} from "../business-date";
+} from "../../core/business-date";
 
 describe("business-date helpers", () => {
   it("builds a business date start from an iso date", () => {

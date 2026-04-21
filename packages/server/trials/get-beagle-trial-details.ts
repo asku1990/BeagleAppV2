@@ -4,7 +4,7 @@ import { toBusinessDateOnly } from "../core/date-only";
 import { toErrorLog, withLogContext } from "../core/logger";
 import type { ServiceResult } from "../core/result";
 import { formatTrialAward } from "./core";
-import { getTrialBusinessDateUtcRange } from "./internal/business-date";
+import { getTrialBusinessDateUtcRange } from "./core/business-date";
 import { encodeTrialId, parseTrialId } from "./internal/trial-id";
 import type { TrialsServiceLogContext } from "./types";
 

@@ -2,7 +2,7 @@ import { searchAdminTrialsDb } from "@beagle/db";
 import {
   getTrialBusinessYearUtcRange,
   toTrialBusinessYear,
-} from "../../../../trials/internal/business-date";
+} from "../../../../trials/core/business-date";
 import type { ParsedAdminTrialEventSearchInput } from "./parse-admin-trial-event-search-input";
 
 export type ResolvedAdminTrialEventSearch = {
@@ -22,6 +22,8 @@ function collectAvailableYears(availableEventDates: Date[]): number[] {
 export async function resolveAdminTrialEventSearchResponseDb(
   input: ParsedAdminTrialEventSearchInput,
 ): Promise<ResolvedAdminTrialEventSearch> {
+  const hasQuery = input.query.length > 0;
+
   if (input.mode === "year") {
     const yearRange = getTrialBusinessYearUtcRange(input.year ?? 0);
     if (!yearRange) {
@@ -58,6 +60,22 @@ export async function resolveAdminTrialEventSearchResponseDb(
       year: null,
       dateFromIso: input.dateFromIso,
       dateToIso: input.dateToIso,
+      result,
+    };
+  }
+
+  if (hasQuery) {
+    const result = await searchAdminTrialsDb({
+      query: input.query,
+      page: input.page,
+      pageSize: input.pageSize,
+      sort: input.sort,
+    });
+    return {
+      mode: "year",
+      year: null,
+      dateFromIso: null,
+      dateToIso: null,
       result,
     };
   }

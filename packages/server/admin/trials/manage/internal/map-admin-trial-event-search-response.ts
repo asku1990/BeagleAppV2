@@ -6,7 +6,7 @@ import type {
 import type { AdminTrialEventSearchResponseDb } from "@beagle/db";
 import type { ParsedAdminTrialEventSearchInput } from "./parse-admin-trial-event-search-input";
 import type { ResolvedAdminTrialEventSearch } from "./resolve-admin-trial-event-defaults";
-import { toTrialBusinessYear } from "../../../../trials/internal/business-date";
+import { toTrialBusinessYear } from "../../../../trials/core/business-date";
 
 function resolveFilters(
   input: ParsedAdminTrialEventSearchInput,

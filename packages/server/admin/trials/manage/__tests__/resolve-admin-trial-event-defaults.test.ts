@@ -14,6 +14,56 @@ describe("resolveAdminTrialEventSearchResponseDb", () => {
     searchAdminTrialsDbMock.mockReset();
   });
 
+  it("searches the full dataset when only text query is provided", async () => {
+    searchAdminTrialsDbMock.mockResolvedValue({
+      availableEventDates: [
+        new Date("2026-03-01T00:00:00.000Z"),
+        new Date("2025-03-01T00:00:00.000Z"),
+      ],
+      total: 1,
+      totalPages: 1,
+      page: 2,
+      items: [],
+    });
+
+    await expect(
+      resolveAdminTrialEventSearchResponseDb({
+        query: "helsinki",
+        page: 2,
+        pageSize: 20,
+        sort: "date-desc",
+        mode: null,
+        year: null,
+        dateFromIso: null,
+        dateToIso: null,
+        rangeFromDate: null,
+        rangeToExclusive: null,
+      }),
+    ).resolves.toMatchObject({
+      mode: "year",
+      year: null,
+      dateFromIso: null,
+      dateToIso: null,
+      result: {
+        availableEventDates: [
+          new Date("2026-03-01T00:00:00.000Z"),
+          new Date("2025-03-01T00:00:00.000Z"),
+        ],
+        total: 1,
+        totalPages: 1,
+        page: 2,
+        items: [],
+      },
+    });
+
+    expect(searchAdminTrialsDbMock).toHaveBeenCalledWith({
+      query: "helsinki",
+      page: 2,
+      pageSize: 20,
+      sort: "date-desc",
+    });
+  });
+
   it("falls back to the latest available year when no temporal filter is provided", async () => {
     searchAdminTrialsDbMock
       .mockResolvedValueOnce({

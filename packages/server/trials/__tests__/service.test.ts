@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createTrialsService } from "../service";
+import { getTrialBusinessDateStartUtc } from "../core/business-date";
 import { encodeTrialId, parseTrialId } from "../internal/trial-id";
 
 const { searchBeagleTrialsDbMock, getBeagleTrialDetailsDbMock } = vi.hoisted(
@@ -134,8 +135,8 @@ describe("trials service", () => {
       dateTo: "2026-06-30",
     });
     expect(searchBeagleTrialsDbMock).toHaveBeenCalledWith({
-      dateFrom: new Date("2026-05-31T21:00:00.000Z"),
-      dateTo: new Date("2026-06-30T21:00:00.000Z"),
+      dateFrom: getTrialBusinessDateStartUtc("2026-06-01"),
+      dateTo: getTrialBusinessDateStartUtc("2026-07-01"),
       page: 1,
       pageSize: 10,
       sort: "date-asc",
@@ -198,8 +199,8 @@ describe("trials service", () => {
     expect(result.body.data.items[0]?.award).toBe("Voi 1");
     expect(result.body.data.trial.trialId).toBe(trialId);
     expect(getBeagleTrialDetailsDbMock).toHaveBeenCalledWith({
-      eventDateStart: new Date("2025-05-31T21:00:00.000Z"),
-      eventDateEndExclusive: new Date("2025-06-01T21:00:00.000Z"),
+      eventDateStart: getTrialBusinessDateStartUtc("2025-06-01"),
+      eventDateEndExclusive: getTrialBusinessDateStartUtc("2025-06-02"),
       eventPlace: "Helsinki",
     });
   });
