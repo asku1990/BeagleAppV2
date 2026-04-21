@@ -90,13 +90,11 @@ describe("AdminTrialSelectedEventPanel", () => {
         isLoading: false,
         isError: false,
         errorText: "error",
-        onOpenTrialDetail: vi.fn(),
       }),
     );
 
     expect(html).toContain("admin.trials.manage.selected.title");
     expect(html).toContain("Rex");
-    expect(html).toContain("admin.trials.manage.selected.actions.openDetail");
     expect(html).toContain("admin.trials.manage.selected.actions.openPdf");
   });
 });

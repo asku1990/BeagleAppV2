@@ -2,7 +2,6 @@ import type { AdminTrialEventSearchRequest } from "@beagle/contracts";
 
 export const adminTrialEventsQueryKeyRoot = ["admin-trials", "events"] as const;
 export const adminTrialEventQueryKeyRoot = ["admin-trials", "event"] as const;
-export const adminTrialQueryKeyRoot = ["admin-trials", "detail"] as const;
 
 export function adminTrialEventsQueryKey(
   filters: AdminTrialEventSearchRequest,
@@ -21,8 +20,4 @@ export function adminTrialEventsQueryKey(
 
 export function adminTrialEventQueryKey(trialEventId: string) {
   return [...adminTrialEventQueryKeyRoot, trialEventId] as const;
-}
-
-export function adminTrialQueryKey(trialId: string) {
-  return [...adminTrialQueryKeyRoot, trialId] as const;
 }

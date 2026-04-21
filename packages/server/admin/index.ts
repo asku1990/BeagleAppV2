@@ -13,7 +13,6 @@ export { listAdminDogs } from "./dogs";
 export { listAdminOwnerOptions } from "./dogs";
 export { listAdminTrialEvents } from "./trials";
 export { getAdminTrialEvent } from "./trials";
-export { getAdminTrial } from "./trials";
 export { previewAdminShowWorkbookImport } from "./shows";
 export { applyAdminShowWorkbookImport } from "./shows";
 export { listAdminShowWorkbookSchemaRules } from "./shows";

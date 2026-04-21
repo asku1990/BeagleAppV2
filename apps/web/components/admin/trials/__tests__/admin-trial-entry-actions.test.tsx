@@ -37,15 +37,13 @@ vi.mock("next/link", () => ({
 }));
 
 describe("AdminTrialEntryActions", () => {
-  it("renders detail and pdf actions", () => {
+  it("renders the pdf action", () => {
     const html = renderToStaticMarkup(
       React.createElement(AdminTrialEntryActions, {
         trialId: "trial-1",
-        onOpenTrialDetail: vi.fn(),
       }),
     );
 
-    expect(html).toContain("admin.trials.manage.selected.actions.openDetail");
     expect(html).toContain("admin.trials.manage.selected.actions.openPdf");
     expect(html).toContain('href="/api/trials/trial-1/pdf"');
   });

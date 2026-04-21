@@ -1,9 +1,4 @@
 export type {
-  AdminTrialDetails,
-  AdminTrialDetailsRequest,
-  AdminTrialDetailsResponse,
-} from "./admin-trial-details";
-export type {
   AdminTrialEventSearchFilters,
   AdminTrialEventSearchMode,
   AdminTrialEventSearchRequest,

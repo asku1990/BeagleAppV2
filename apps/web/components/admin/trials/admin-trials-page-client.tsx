@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import type { AdminTrialEventSearchRequest } from "@beagle/contracts";
 import { useI18n } from "@/hooks/i18n";
 import { AdminTrialEventsFilters } from "./admin-trial-events-filters";
@@ -20,7 +19,6 @@ import {
 
 export function AdminTrialsPageClient() {
   const { t } = useI18n();
-  const router = useRouter();
   const [mode, setMode] = useState<AdminTrialSearchMode>("year");
   const [query, setQuery] = useState("");
   const [yearInput, setYearInput] = useState("");
@@ -179,9 +177,6 @@ export function AdminTrialsPageClient() {
         isLoading={eventQuery.isLoading}
         isError={eventQuery.isError}
         errorText={selectedErrorText}
-        onOpenTrialDetail={(trialId) =>
-          router.push(`/admin/trials/${encodeURIComponent(trialId)}`)
-        }
       />
     </div>
   );

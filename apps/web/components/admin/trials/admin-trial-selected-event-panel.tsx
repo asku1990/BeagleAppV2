@@ -20,7 +20,6 @@ type AdminTrialSelectedEventPanelProps = {
   isLoading: boolean;
   isError: boolean;
   errorText: string;
-  onOpenTrialDetail: (trialId: string) => void;
 };
 
 const EMPTY_ENTRIES: AdminTrialEventEntry[] = [];
@@ -30,7 +29,6 @@ export function AdminTrialSelectedEventPanel({
   isLoading,
   isError,
   errorText,
-  onOpenTrialDetail,
 }: AdminTrialSelectedEventPanelProps) {
   const { t } = useI18n();
   const selectedEntries = selectedEvent?.entries ?? EMPTY_ENTRIES;
@@ -66,10 +64,7 @@ export function AdminTrialSelectedEventPanel({
                 {t("admin.trials.manage.selected.countSuffix")}
               </p>
             </div>
-            <SelectedEventEntries
-              entries={selectedEntries}
-              onOpenTrialDetail={onOpenTrialDetail}
-            />
+            <SelectedEventEntries entries={selectedEntries} />
           </>
         ) : (
           <Card>
@@ -85,10 +80,8 @@ export function AdminTrialSelectedEventPanel({
 
 function SelectedEventEntries({
   entries,
-  onOpenTrialDetail,
 }: {
   entries: AdminTrialEventEntry[];
-  onOpenTrialDetail: (trialId: string) => void;
 }) {
   const { t } = useI18n();
 
@@ -143,10 +136,7 @@ function SelectedEventEntries({
                 <td className="px-2 py-2">{showDash(entry.rank)}</td>
                 <td className="px-2 py-2">{showDash(entry.judge)}</td>
                 <td className="px-2 py-2">
-                  <AdminTrialEntryActions
-                    trialId={entry.trialId}
-                    onOpenTrialDetail={onOpenTrialDetail}
-                  />
+                  <AdminTrialEntryActions trialId={entry.trialId} />
                 </td>
               </tr>
             ))}
@@ -187,10 +177,7 @@ function SelectedEventEntries({
               </span>{" "}
               {showDash(entry.judge)}
             </p>
-            <AdminTrialEntryActions
-              trialId={entry.trialId}
-              onOpenTrialDetail={onOpenTrialDetail}
-            />
+            <AdminTrialEntryActions trialId={entry.trialId} />
           </CardContent>
         </Card>
       ))}
