@@ -7,7 +7,7 @@ export const fiAdminTrialsManageMessages = {
     "Hae ja selaa tapahtumia sekä niiden koirarivejä read-only-näkymässä.",
   "admin.trials.manage.countSuffix": "tulosta",
   "admin.trials.manage.filters.placeholder":
-    "Hae tapahtumaa paikalla, järjestäjällä, tuomarilla tai SKL-koeavaimella",
+    "Hae tapahtumaa, koiraa tai rekisterinumeroa paikalla, järjestäjällä, tuomarilla tai SKL-koeavaimella",
   "admin.trials.manage.filters.aria": "Hae ajokoetapahtumia",
   "admin.trials.manage.filters.sort.label": "Lajittelu",
   "admin.trials.manage.filters.sort.dateDesc": "Uusin ensin",
@@ -92,7 +92,7 @@ export const svAdminTrialsManageMessages = {
     "Sök och bläddra evenemang och deras hundrader i en read-only-vy.",
   "admin.trials.manage.countSuffix": "resultat",
   "admin.trials.manage.filters.placeholder":
-    "Sök evenemang via plats, arrangör, domare eller SKL-provnyckel",
+    "Sök evenemang, hund eller registreringsnummer via plats, arrangör, domare eller SKL-provnyckel",
   "admin.trials.manage.filters.aria": "Sök jaktprovsevenemang",
   "admin.trials.manage.filters.sort.label": "Sortering",
   "admin.trials.manage.filters.sort.dateDesc": "Nyaste först",

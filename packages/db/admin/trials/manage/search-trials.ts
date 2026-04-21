@@ -79,6 +79,48 @@ function buildTextWhere(query: string): Prisma.TrialEventWhereInput {
 
   const parsedSklKoeId = Number(query);
   const hasSklKoeId = Number.isInteger(parsedSklKoeId) && parsedSklKoeId >= 0;
+  const entryTextWhere: Prisma.TrialEntryListRelationFilter = {
+    some: {
+      OR: [
+        {
+          rekisterinumeroSnapshot: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+        {
+          koiranNimiSnapshot: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+        {
+          dog: {
+            is: {
+              name: {
+                contains: query,
+                mode: "insensitive",
+              },
+            },
+          },
+        },
+        {
+          dog: {
+            is: {
+              registrations: {
+                some: {
+                  registrationNo: {
+                    contains: query,
+                    mode: "insensitive",
+                  },
+                },
+              },
+            },
+          },
+        },
+      ],
+    },
+  };
 
   return {
     OR: [
@@ -91,6 +133,7 @@ function buildTextWhere(query: string): Prisma.TrialEventWhereInput {
       { rotukoodi: { contains: query, mode: "insensitive" } },
       { kennelpiiri: { contains: query, mode: "insensitive" } },
       { kennelpiirinro: { contains: query, mode: "insensitive" } },
+      { entries: entryTextWhere },
     ],
   };
 }

@@ -111,4 +111,72 @@ describe("searchAdminTrialsDb event parity", () => {
       }),
     );
   });
+
+  it("searches by dog snapshot names and registration numbers", async () => {
+    trialEventFindManyMock.mockResolvedValue([]);
+    trialEventCountMock.mockResolvedValue(0);
+
+    await searchAdminTrialsDb({
+      query: "Fido",
+      dateFrom: new Date("2025-01-01T00:00:00.000Z"),
+      dateTo: new Date("2026-01-01T00:00:00.000Z"),
+      page: 1,
+      pageSize: 50,
+      sort: "date-desc",
+    });
+
+    const secondCall = trialEventFindManyMock.mock.calls[1]?.[0];
+    expect(secondCall).toEqual(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          AND: expect.arrayContaining([
+            expect.objectContaining({
+              OR: expect.arrayContaining([
+                expect.objectContaining({
+                  entries: expect.objectContaining({
+                    some: expect.objectContaining({
+                      OR: expect.arrayContaining([
+                        expect.objectContaining({
+                          rekisterinumeroSnapshot: expect.objectContaining({
+                            contains: "Fido",
+                          }),
+                        }),
+                        expect.objectContaining({
+                          koiranNimiSnapshot: expect.objectContaining({
+                            contains: "Fido",
+                          }),
+                        }),
+                        expect.objectContaining({
+                          dog: expect.objectContaining({
+                            is: expect.objectContaining({
+                              name: expect.objectContaining({
+                                contains: "Fido",
+                              }),
+                            }),
+                          }),
+                        }),
+                        expect.objectContaining({
+                          dog: expect.objectContaining({
+                            is: expect.objectContaining({
+                              registrations: expect.objectContaining({
+                                some: expect.objectContaining({
+                                  registrationNo: expect.objectContaining({
+                                    contains: "Fido",
+                                  }),
+                                }),
+                              }),
+                            }),
+                          }),
+                        }),
+                      ]),
+                    }),
+                  }),
+                }),
+              ]),
+            }),
+          ]),
+        }),
+      }),
+    );
+  });
 });
