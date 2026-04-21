@@ -1,7 +1,7 @@
 export const fiAdminTrialsManageMessages = {
   "admin.trials.title": "Ylläpito: ajokokeet",
   "admin.trials.description":
-    "Selaa AJOK-kokeita tapahtumittain: valitse koe, tarkista koirat ja avaa detalji tai PDF.",
+    "Selaa AJOK-kokeita tapahtumittain: valitse koe, tarkista koirat ja avaa pöytäkirja PDF:nä.",
   "admin.trials.manage.title": "Ajokokeiden koetulokset",
   "admin.trials.manage.description":
     "Hae ja selaa tapahtumia sekä niiden koirarivejä read-only-näkymässä.",
@@ -58,8 +58,7 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.selected.columns.rank": "Sija",
   "admin.trials.manage.selected.columns.judge": "Tuomari",
   "admin.trials.manage.selected.columns.actions": "Toiminnot",
-  "admin.trials.manage.selected.actions.openDetail": "Avaa detalji",
-  "admin.trials.manage.selected.actions.openPdf": "Avaa PDF",
+  "admin.trials.manage.selected.actions.openPdf": "Avaa pöytäkirja",
   "admin.trials.manage.pagination.previous": "Edellinen",
   "admin.trials.manage.pagination.page": "Sivu",
   "admin.trials.manage.pagination.next": "Seuraava",
@@ -71,10 +70,6 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.columns.pa": "Pa",
   "admin.trials.manage.columns.sija": "Sija",
   "admin.trials.manage.columns.judge": "Tuomari",
-  "admin.trials.manage.results.openDetailHint":
-    "Avaa detalji napauttamalla riviä.",
-  "admin.trials.manage.results.openDetailAriaPrefix":
-    "Avaa koetuloksen detalji",
   "admin.trials.manage.mobile.date": "Päivä",
   "admin.trials.manage.mobile.place": "Paikka",
   "admin.trials.manage.mobile.piste": "Pisteet",
@@ -86,7 +81,7 @@ export const fiAdminTrialsManageMessages = {
 export const svAdminTrialsManageMessages = {
   "admin.trials.title": "Admin: jaktprov",
   "admin.trials.description":
-    "Bläddra AJOK-prov per evenemang: välj prov, granska hundrader och öppna detalj eller PDF.",
+    "Bläddra AJOK-prov per evenemang: välj prov, granska hundrader och öppna protokollet som PDF.",
   "admin.trials.manage.title": "Jaktprovresultat",
   "admin.trials.manage.description":
     "Sök och bläddra evenemang och deras hundrader i en read-only-vy.",
@@ -142,8 +137,7 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.selected.columns.rank": "Placering",
   "admin.trials.manage.selected.columns.judge": "Domare",
   "admin.trials.manage.selected.columns.actions": "Åtgärder",
-  "admin.trials.manage.selected.actions.openDetail": "Öppna detalj",
-  "admin.trials.manage.selected.actions.openPdf": "Öppna PDF",
+  "admin.trials.manage.selected.actions.openPdf": "Öppna protokoll",
   "admin.trials.manage.pagination.previous": "Föregående",
   "admin.trials.manage.pagination.page": "Sida",
   "admin.trials.manage.pagination.next": "Nästa",
@@ -155,10 +149,6 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.columns.pa": "Pa",
   "admin.trials.manage.columns.sija": "Placering",
   "admin.trials.manage.columns.judge": "Domare",
-  "admin.trials.manage.results.openDetailHint":
-    "Öppna detaljen genom att trycka på raden.",
-  "admin.trials.manage.results.openDetailAriaPrefix":
-    "Öppna provresultatdetalj",
   "admin.trials.manage.mobile.date": "Datum",
   "admin.trials.manage.mobile.place": "Plats",
   "admin.trials.manage.mobile.piste": "Poäng",

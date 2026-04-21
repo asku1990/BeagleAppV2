@@ -2,27 +2,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   adminTrialEventQueryKey,
   adminTrialEventsQueryKey,
-  adminTrialQueryKey,
 } from "../query-keys";
 import { useAdminTrialEventQuery } from "../use-admin-trial-event-query";
-import {
-  AdminTrialQueryError,
-  isAdminTrialQueryError,
-  useAdminTrialQuery,
-} from "../use-admin-trial-query";
 import { useAdminTrialEventsQuery } from "../use-admin-trial-events-query";
 
-const {
-  useQueryMock,
-  listAdminTrialsMock,
-  getAdminTrialEventMock,
-  getAdminTrialMock,
-} = vi.hoisted(() => ({
-  useQueryMock: vi.fn(),
-  listAdminTrialsMock: vi.fn(),
-  getAdminTrialEventMock: vi.fn(),
-  getAdminTrialMock: vi.fn(),
-}));
+const { useQueryMock, listAdminTrialsMock, getAdminTrialEventMock } =
+  vi.hoisted(() => ({
+    useQueryMock: vi.fn(),
+    listAdminTrialsMock: vi.fn(),
+    getAdminTrialEventMock: vi.fn(),
+  }));
 
 vi.mock("@tanstack/react-query", () => ({
   useQuery: useQueryMock,
@@ -32,7 +21,6 @@ vi.mock("@beagle/api-client", () => ({
   createAdminTrialsApiClient: () => ({
     listAdminTrials: listAdminTrialsMock,
     getAdminTrialEvent: getAdminTrialEventMock,
-    getAdminTrial: getAdminTrialMock,
   }),
 }));
 
@@ -217,67 +205,6 @@ describe("useAdminTrialEventQuery", () => {
       message,
       errorCode: code,
       name: "AdminTrialEventQueryError",
-    });
-  });
-});
-
-describe("useAdminTrialQuery", () => {
-  beforeEach(() => {
-    useQueryMock.mockReset();
-    getAdminTrialMock.mockReset();
-  });
-
-  it("uses the expected detail query key and options", () => {
-    useQueryMock.mockImplementation((options) => options);
-
-    useAdminTrialQuery({
-      trialId: " trial-1 ",
-    });
-
-    const options = useQueryMock.mock.calls[0]?.[0] as {
-      queryKey: unknown[];
-      staleTime: number;
-      refetchOnWindowFocus: boolean;
-      enabled: boolean;
-    };
-
-    expect(options.queryKey).toEqual(adminTrialQueryKey("trial-1"));
-    expect(options.staleTime).toBe(30_000);
-    expect(options.refetchOnWindowFocus).toBe(true);
-    expect(options.enabled).toBe(true);
-  });
-
-  it("isAdminTrialQueryError narrows known error type", () => {
-    const error = new Error("failed");
-    expect(isAdminTrialQueryError(error)).toBe(false);
-  });
-
-  it("returns true for AdminTrialQueryError instances", () => {
-    expect(
-      isAdminTrialQueryError(new AdminTrialQueryError("failed", "X")),
-    ).toBe(true);
-  });
-
-  it("maps error codes to expected messages", async () => {
-    useQueryMock.mockImplementation((options) => options);
-    getAdminTrialMock.mockResolvedValue({
-      ok: false,
-      code: "TRIAL_NOT_FOUND",
-      error: "Trial not found.",
-    });
-
-    useAdminTrialQuery({
-      trialId: "trial-1",
-    });
-
-    const options = useQueryMock.mock.calls[0]?.[0] as {
-      queryFn: () => Promise<unknown>;
-    };
-
-    await expect(options.queryFn()).rejects.toMatchObject({
-      message: "Trial not found.",
-      errorCode: "TRIAL_NOT_FOUND",
-      name: "AdminTrialQueryError",
     });
   });
 });

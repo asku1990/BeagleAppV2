@@ -132,11 +132,8 @@ export {
   type KoiratietokantaAjokUpsertDbResult,
 } from "./trials";
 export {
-  getAdminTrialDetailsDb,
   getAdminTrialEventDetailsDb,
   searchAdminTrialsDb,
-  type AdminTrialDetailsDb,
-  type AdminTrialDetailsRequestDb,
   type AdminTrialEventDetailsDb,
   type AdminTrialEventDetailsRequestDb,
   type AdminTrialEventEntryDb,
