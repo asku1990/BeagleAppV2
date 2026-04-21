@@ -89,12 +89,6 @@ function buildTextWhere(query: string): Prisma.TrialEventWhereInput {
           },
         },
         {
-          koiranNimiSnapshot: {
-            contains: query,
-            mode: "insensitive",
-          },
-        },
-        {
           dog: {
             is: {
               name: {

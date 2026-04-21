@@ -37,16 +37,8 @@ CREATE TABLE "TrialEntry" (
     "lahde" "TrialSourceTag" NOT NULL,
     "raakadataJson" TEXT,
     "luokka" TEXT,
-    "koiranNimiSnapshot" TEXT,
-    "isanNimiSnapshot" TEXT,
-    "isanRekisterinumeroSnapshot" TEXT,
-    "emanNimiSnapshot" TEXT,
-    "emanRekisterinumeroSnapshot" TEXT,
     "omistajaSnapshot" TEXT,
     "omistajanKotikuntaSnapshot" TEXT,
-    "sukupuoliSnapshot" TEXT,
-    "rokotusOk" BOOLEAN,
-    "tunnistusOk" BOOLEAN,
     "era1Alkoi" TEXT,
     "era2Alkoi" TEXT,
     "era3Alkoi" TEXT,
@@ -97,8 +89,6 @@ CREATE TABLE "TrialEntry" (
     "metsastysintoPisteet" DECIMAL(6,2),
     "keli" TEXT,
     "koemaasto" TEXT,
-    "paljasMaa" BOOLEAN,
-    "lumikeli" TEXT,
     "luopui" BOOLEAN,
     "suljettu" BOOLEAN,
     "keskeytetty" BOOLEAN,
@@ -189,16 +179,8 @@ COMMENT ON COLUMN "TrialEntry"."yksilointiAvain" IS 'Tekninen yksilointiavain im
 COMMENT ON COLUMN "TrialEntry"."lahde" IS 'Lahdetunniste (legacy/API).';
 COMMENT ON COLUMN "TrialEntry"."raakadataJson" IS 'Koko alkuperainen payload audit/debug/replay-kayttoon.';
 COMMENT ON COLUMN "TrialEntry"."luokka" IS 'Koirakohtainen AJOK-luokka.';
-COMMENT ON COLUMN "TrialEntry"."koiranNimiSnapshot" IS 'Koiran nimen snapshot upsert-hetkella.';
-COMMENT ON COLUMN "TrialEntry"."isanNimiSnapshot" IS 'Koiran isan nimen snapshot.';
-COMMENT ON COLUMN "TrialEntry"."isanRekisterinumeroSnapshot" IS 'Koiran isan rekisterinumeron snapshot.';
-COMMENT ON COLUMN "TrialEntry"."emanNimiSnapshot" IS 'Koiran eman nimen snapshot.';
-COMMENT ON COLUMN "TrialEntry"."emanRekisterinumeroSnapshot" IS 'Koiran eman rekisterinumeron snapshot.';
 COMMENT ON COLUMN "TrialEntry"."omistajaSnapshot" IS 'Omistajatieto snapshot-muodossa.';
 COMMENT ON COLUMN "TrialEntry"."omistajanKotikuntaSnapshot" IS 'Omistajan kotikunta snapshot-muodossa.';
-COMMENT ON COLUMN "TrialEntry"."sukupuoliSnapshot" IS 'Koiran sukupuolitieto payloadista.';
-COMMENT ON COLUMN "TrialEntry"."rokotusOk" IS 'Rokotuksen tarkistus (poytakirjan rasti).';
-COMMENT ON COLUMN "TrialEntry"."tunnistusOk" IS 'Tunnistuksen tarkistus (poytakirjan rasti).';
 COMMENT ON COLUMN "TrialEntry"."era1Alkoi" IS 'Koe-eran 1 aloitusaika tekstimuodossa.';
 COMMENT ON COLUMN "TrialEntry"."era2Alkoi" IS 'Koe-eran 2 aloitusaika tekstimuodossa.';
 COMMENT ON COLUMN "TrialEntry"."era3Alkoi" IS 'Koe-eran 3 aloitusaika tekstimuodossa.';
@@ -236,8 +218,6 @@ COMMENT ON COLUMN "TrialEntry"."tieJaEstetyoskentelyPisteet" IS 'AJOK tie- ja es
 COMMENT ON COLUMN "TrialEntry"."metsastysintoPisteet" IS 'AJOK metsastysinto (legacy PIN).';
 COMMENT ON COLUMN "TrialEntry"."keli" IS 'Kelitunnus (esim. P).';
 COMMENT ON COLUMN "TrialEntry"."koemaasto" IS 'Kokeen maasto, snapshot per entry.';
-COMMENT ON COLUMN "TrialEntry"."paljasMaa" IS 'Poytakirjan olosuhderasti: paljas maa.';
-COMMENT ON COLUMN "TrialEntry"."lumikeli" IS 'Lumikelin arvo (esim. cm).';
 COMMENT ON COLUMN "TrialEntry"."luopui" IS 'Koe keskeytetty luopumisen vuoksi.';
 COMMENT ON COLUMN "TrialEntry"."suljettu" IS 'Koe suljettu.';
 COMMENT ON COLUMN "TrialEntry"."keskeytetty" IS 'Koe keskeytetty.';

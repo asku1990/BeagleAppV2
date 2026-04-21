@@ -100,7 +100,6 @@ export async function upsertTrialEntryByEventAndRegistrationDb(
       yksilointiAvain: input.yksilointiAvain,
       lahde: TrialSourceTag.LEGACY_AKOEALL,
       raakadataJson: input.raakadataJson,
-      koiranNimiSnapshot: null,
       omistajaSnapshot: null,
       palkinto: input.palkinto,
       sijoitus: input.sijoitus,

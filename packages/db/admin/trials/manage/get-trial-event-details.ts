@@ -36,7 +36,6 @@ export async function getAdminTrialEventDetailsDb(
           dogId: true,
           yksilointiAvain: true,
           rekisterinumeroSnapshot: true,
-          koiranNimiSnapshot: true,
           sijoitus: true,
           palkinto: true,
           loppupisteet: true,
@@ -74,10 +73,7 @@ export async function getAdminTrialEventDetailsDb(
     entries: row.entries.map((entry) => ({
       trialId: entry.id,
       dogId: entry.dogId,
-      dogName:
-        entry.dog?.name?.trim() ||
-        entry.koiranNimiSnapshot?.trim() ||
-        entry.rekisterinumeroSnapshot,
+      dogName: entry.dog?.name?.trim() || entry.rekisterinumeroSnapshot,
       registrationNo:
         entry.rekisterinumeroSnapshot ||
         entry.dog?.registrations[0]?.registrationNo ||

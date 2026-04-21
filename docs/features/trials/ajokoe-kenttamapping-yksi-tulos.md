@@ -98,7 +98,6 @@ Huomio:
 - `ylituomari` on event-tason tieto.
 - Jos saman `sklKoeId` tapahtuman riveillä on ristiriitainen ylituomari, ristiriita kirjataan issueksi ja eventille jätetään ensimmäinen ei-null arvo.
 - Top-level weather uses `TrialEntry.keli`.
-- `TrialEntry.paljasMaa` and `TrialEntry.lumikeli` are unused columns.
 
 ## Lisätietojen mapping
 

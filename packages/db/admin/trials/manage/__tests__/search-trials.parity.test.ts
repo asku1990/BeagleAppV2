@@ -112,7 +112,7 @@ describe("searchAdminTrialsDb event parity", () => {
     );
   });
 
-  it("searches by dog snapshot names and registration numbers", async () => {
+  it("searches by dog names and registration numbers", async () => {
     trialEventFindManyMock.mockResolvedValue([]);
     trialEventCountMock.mockResolvedValue(0);
 
@@ -138,11 +138,6 @@ describe("searchAdminTrialsDb event parity", () => {
                       OR: expect.arrayContaining([
                         expect.objectContaining({
                           rekisterinumeroSnapshot: expect.objectContaining({
-                            contains: "Fido",
-                          }),
-                        }),
-                        expect.objectContaining({
-                          koiranNimiSnapshot: expect.objectContaining({
                             contains: "Fido",
                           }),
                         }),

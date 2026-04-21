@@ -49,7 +49,6 @@ describe("getAdminTrialEventDetailsDb parity", () => {
           dogId: "dog-1",
           yksilointiAvain: "entry-1",
           rekisterinumeroSnapshot: "FI123",
-          koiranNimiSnapshot: "Rex Snapshot",
           sijoitus: "1",
           palkinto: "VOI1",
           loppupisteet: { valueOf: () => 92.5 },
