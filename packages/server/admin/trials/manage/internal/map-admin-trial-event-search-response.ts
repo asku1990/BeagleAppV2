@@ -3,22 +3,16 @@ import type {
   AdminTrialEventSearchFilters,
   AdminTrialEventSearchResponse,
 } from "@beagle/contracts";
-import type {
-  AdminTrialEventSearchResponseDb,
-  AdminTrialEventSearchModeDb,
-} from "@beagle/db";
+import type { AdminTrialEventSearchResponseDb } from "@beagle/db";
 import type { ParsedAdminTrialEventSearchInput } from "./parse-admin-trial-event-search-input";
+import type { ResolvedAdminTrialEventSearch } from "./resolve-admin-trial-event-defaults";
+import { toTrialBusinessYear } from "../../../../trials/internal/business-date";
 
 function resolveFilters(
   input: ParsedAdminTrialEventSearchInput,
-  result: AdminTrialEventSearchResponseDb,
+  resolved: ResolvedAdminTrialEventSearch,
 ): AdminTrialEventSearchFilters {
-  const mode: AdminTrialEventSearchModeDb =
-    input.mode != null
-      ? input.mode
-      : result.mode === "range"
-        ? "range"
-        : "year";
+  const mode = input.mode ?? resolved.mode;
 
   if (input.mode === "year") {
     return {
@@ -40,7 +34,7 @@ function resolveFilters(
 
   return {
     mode,
-    year: result.year,
+    year: resolved.year,
     dateFrom: null,
     dateTo: null,
   };
@@ -48,11 +42,18 @@ function resolveFilters(
 
 export function mapAdminTrialEventSearchResponse(
   input: ParsedAdminTrialEventSearchInput,
-  result: AdminTrialEventSearchResponseDb,
+  resolved: ResolvedAdminTrialEventSearch,
 ): AdminTrialEventSearchResponse {
+  const result = resolved.result;
+  const availableYears = Array.from(
+    new Set(
+      result.availableEventDates.map((value) => toTrialBusinessYear(value)),
+    ),
+  ).sort((left, right) => right - left);
+
   return {
-    filters: resolveFilters(input, result),
-    availableYears: result.availableYears,
+    filters: resolveFilters(input, resolved),
+    availableYears,
     total: result.total,
     totalPages: result.totalPages,
     page: result.page,

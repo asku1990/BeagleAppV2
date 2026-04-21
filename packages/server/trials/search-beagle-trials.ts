@@ -10,6 +10,7 @@ import type { ServiceResult } from "../core/result";
 import { parseIsoDateOnly } from "./internal/iso-date";
 import { encodeTrialId } from "./internal/trial-id";
 import {
+  getTrialBusinessDateUtcRange,
   getTrialBusinessYearUtcRange,
   toTrialBusinessYear,
 } from "./internal/business-date";
@@ -45,16 +46,6 @@ function parseYear(value: number | undefined): number | null {
   const year = Math.floor(value ?? 0);
   if (year < 1900 || year > 2100) return null;
   return year;
-}
-
-function toUtcDateStart(isoDate: string): Date {
-  return new Date(`${isoDate}T00:00:00.000Z`);
-}
-
-function addUtcDays(value: Date, days: number): Date {
-  const next = new Date(value.getTime());
-  next.setUTCDate(next.getUTCDate() + days);
-  return next;
 }
 
 function collectAvailableYears(availableEventDates: Date[]): number[] {
@@ -196,9 +187,13 @@ export async function searchBeagleTrialsService(
   );
 
   try {
-    const rangeFromDate = dateFromIso ? toUtcDateStart(dateFromIso) : null;
+    const rangeFromDate = dateFromIso
+      ? getTrialBusinessDateUtcRange(new Date(`${dateFromIso}T00:00:00.000Z`))
+          .start
+      : null;
     const rangeToExclusive = dateToIso
-      ? addUtcDays(toUtcDateStart(dateToIso), 1)
+      ? getTrialBusinessDateUtcRange(new Date(`${dateToIso}T00:00:00.000Z`))
+          .endExclusive
       : null;
 
     const resolvedMode = year != null ? "year" : hasRangeInput ? "range" : null;

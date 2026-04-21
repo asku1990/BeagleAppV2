@@ -1,7 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@db/core/prisma";
 import type {
-  AdminTrialEventSearchModeDb,
   AdminTrialEventSearchRequestDb,
   AdminTrialEventSearchResponseDb,
   AdminTrialEventSearchSortDb,
@@ -59,22 +58,9 @@ function resolvePagination(
 }
 
 function buildDateWhere(
-  mode: AdminTrialEventSearchModeDb | undefined,
   input: AdminTrialEventSearchRequestDb,
 ): Prisma.TrialEventWhereInput {
-  if (mode === "year" && Number.isFinite(input.year)) {
-    const year = Math.floor(input.year ?? 0);
-    const start = new Date(Date.UTC(year, 0, 1, 0, 0, 0, 0));
-    const end = new Date(Date.UTC(year + 1, 0, 1, 0, 0, 0, 0));
-    return {
-      koepaiva: {
-        gte: start,
-        lt: end,
-      },
-    };
-  }
-
-  if (mode === "range" && input.dateFrom && input.dateTo) {
+  if (input.dateFrom && input.dateTo) {
     return {
       koepaiva: {
         gte: input.dateFrom,
@@ -113,15 +99,11 @@ function buildWhere(
   input: AdminTrialEventSearchRequestDb,
 ): Prisma.TrialEventWhereInput {
   const query = normalizeQuery(input.query);
-  const dateWhere = buildDateWhere(input.mode, input);
+  const dateWhere = buildDateWhere(input);
   const textWhere = buildTextWhere(query);
   return {
     AND: [dateWhere, textWhere],
   };
-}
-
-function toYear(value: Date): number {
-  return value.getUTCFullYear();
 }
 
 export async function searchAdminTrialsDb(
@@ -145,9 +127,7 @@ export async function searchAdminTrialsDb(
     prisma.trialEvent.count({ where }),
   ]);
 
-  const availableYears = Array.from(
-    new Set(years.map((row) => toYear(row.koepaiva))),
-  );
+  const availableEventDates = years.map((row) => row.koepaiva);
   const pagination = resolvePagination(total, page, pageSize);
 
   const rows = await prisma.trialEvent.findMany({
@@ -183,14 +163,7 @@ export async function searchAdminTrialsDb(
   }));
 
   return {
-    mode: input.mode ?? "year",
-    year:
-      input.mode === "year" && Number.isFinite(input.year)
-        ? Math.floor(input.year ?? 0)
-        : null,
-    dateFrom: input.mode === "range" ? (input.dateFrom ?? null) : null,
-    dateTo: input.mode === "range" ? (input.dateTo ?? null) : null,
-    availableYears,
+    availableEventDates,
     total,
     totalPages: pagination.totalPages,
     page: pagination.page,

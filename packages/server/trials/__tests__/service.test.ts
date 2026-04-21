@@ -108,6 +108,40 @@ describe("trials service", () => {
     });
   });
 
+  it("normalizes range searches to business-timezone boundaries", async () => {
+    searchBeagleTrialsDbMock.mockResolvedValue({
+      availableEventDates: [new Date("2026-06-01T00:00:00.000Z")],
+      total: 1,
+      totalPages: 1,
+      page: 1,
+      items: [],
+    });
+
+    const service = createTrialsService();
+    const result = await service.searchBeagleTrials({
+      dateFrom: "2026-06-01",
+      dateTo: "2026-06-30",
+      sort: "date-asc",
+    });
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) throw new Error("Expected ok=true");
+
+    expect(result.body.data.filters).toEqual({
+      mode: "range",
+      year: null,
+      dateFrom: "2026-06-01",
+      dateTo: "2026-06-30",
+    });
+    expect(searchBeagleTrialsDbMock).toHaveBeenCalledWith({
+      dateFrom: new Date("2026-05-31T21:00:00.000Z"),
+      dateTo: new Date("2026-06-30T21:00:00.000Z"),
+      page: 1,
+      pageSize: 10,
+      sort: "date-asc",
+    });
+  });
+
   it("returns 404 when trial details are missing", async () => {
     getBeagleTrialDetailsDbMock.mockResolvedValue(null);
     const service = createTrialsService();

@@ -28,6 +28,29 @@ describe("parseAdminTrialEventSearchInput", () => {
     });
   });
 
+  it("normalizes range searches to business-timezone boundaries", () => {
+    const result = parseAdminTrialEventSearchInput({
+      dateFrom: "2026-06-01",
+      dateTo: "2026-06-30",
+    });
+
+    expect(result).toEqual({
+      ok: true,
+      value: {
+        query: "",
+        page: 1,
+        pageSize: 20,
+        sort: "date-desc",
+        mode: "range",
+        year: null,
+        dateFromIso: "2026-06-01",
+        dateToIso: "2026-06-30",
+        rangeFromDate: new Date("2026-05-31T21:00:00.000Z"),
+        rangeToExclusive: new Date("2026-06-30T21:00:00.000Z"),
+      },
+    });
+  });
+
   it("rejects invalid date ranges", () => {
     const result = parseAdminTrialEventSearchInput({
       dateFrom: "2026-05-01",

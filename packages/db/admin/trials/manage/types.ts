@@ -1,5 +1,4 @@
 export type AdminTrialEventSearchSortDb = "date-desc" | "date-asc";
-export type AdminTrialEventSearchModeDb = "year" | "range";
 
 export type AdminTrialDetailsRequestDb = {
   trialId: string;
@@ -80,8 +79,6 @@ export type AdminTrialLisatietoDb = {
 
 export type AdminTrialEventSearchRequestDb = {
   query?: string;
-  mode?: AdminTrialEventSearchModeDb;
-  year?: number;
   dateFrom?: Date;
   dateTo?: Date;
   page?: number;
@@ -101,11 +98,7 @@ export type AdminTrialEventSummaryDb = {
 };
 
 export type AdminTrialEventSearchResponseDb = {
-  mode: AdminTrialEventSearchModeDb;
-  year: number | null;
-  dateFrom: Date | null;
-  dateTo: Date | null;
-  availableYears: number[];
+  availableEventDates: Date[];
   total: number;
   totalPages: number;
   page: number;

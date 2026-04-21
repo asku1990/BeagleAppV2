@@ -16,11 +16,10 @@ describe("listAdminTrialEvents", () => {
 
   it("returns event summaries from db in contract format", async () => {
     searchAdminTrialsDbMock.mockResolvedValue({
-      mode: "year",
-      year: 2026,
-      dateFrom: null,
-      dateTo: null,
-      availableYears: [2026, 2025],
+      availableEventDates: [
+        new Date("2026-04-14T08:00:00.000Z"),
+        new Date("2025-03-01T00:00:00.000Z"),
+      ],
       total: 2,
       totalPages: 1,
       page: 1,
@@ -86,9 +85,9 @@ describe("listAdminTrialEvents", () => {
     });
 
     expect(searchAdminTrialsDbMock).toHaveBeenCalledWith({
-      mode: "year",
       query: "helsinki",
-      year: 2026,
+      dateFrom: new Date("2025-12-31T22:00:00.000Z"),
+      dateTo: new Date("2026-12-31T22:00:00.000Z"),
       page: 2,
       pageSize: 100,
       sort: "date-asc",

@@ -3,6 +3,7 @@ import type {
   AdminTrialEventSearchSort,
 } from "@beagle/contracts";
 import type { AdminTrialEventSearchSortDb } from "@beagle/db";
+import { getTrialBusinessDateUtcRange } from "../../../../trials/internal/business-date";
 
 export type ParsedAdminTrialEventSearchInput = {
   query: string;
@@ -97,10 +98,6 @@ function parseIsoDateOnly(value: string | undefined): string | null {
   }
 
   return normalized;
-}
-
-function toUtcDateStart(isoDate: string): Date {
-  return new Date(`${isoDate}T00:00:00.000Z`);
 }
 
 export function parseAdminTrialEventSearchInput(
@@ -203,14 +200,14 @@ export function parseAdminTrialEventSearchInput(
   const pageSize = parsePageSize(input.pageSize);
   const query = normalizeQuery(input.query);
   const mode = year != null ? "year" : hasRangeInput ? "range" : null;
-  const rangeFromDate = dateFromIso ? toUtcDateStart(dateFromIso) : null;
-  const rangeToExclusive = dateToIso
-    ? new Date(`${dateToIso}T00:00:00.000Z`)
+  const rangeFromDate = dateFromIso
+    ? getTrialBusinessDateUtcRange(new Date(`${dateFromIso}T00:00:00.000Z`))
+        .start
     : null;
-
-  if (rangeToExclusive) {
-    rangeToExclusive.setUTCDate(rangeToExclusive.getUTCDate() + 1);
-  }
+  const rangeToExclusive = dateToIso
+    ? getTrialBusinessDateUtcRange(new Date(`${dateToIso}T00:00:00.000Z`))
+        .endExclusive
+    : null;
 
   return {
     ok: true,

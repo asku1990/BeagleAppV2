@@ -51,19 +51,18 @@ describe("searchAdminTrialsDb event parity", () => {
     trialEventCountMock.mockResolvedValue(1);
 
     const result = await searchAdminTrialsDb({
-      mode: "year",
-      year: 2026,
+      dateFrom: new Date("2025-01-01T00:00:00.000Z"),
+      dateTo: new Date("2026-01-01T00:00:00.000Z"),
       page: 1,
       pageSize: 50,
       sort: "date-desc",
     });
 
     expect(result).toEqual({
-      mode: "year",
-      year: 2026,
-      dateFrom: null,
-      dateTo: null,
-      availableYears: [2026, 2025],
+      availableEventDates: [
+        new Date("2026-03-01T00:00:00.000Z"),
+        new Date("2025-03-01T00:00:00.000Z"),
+      ],
       total: 1,
       totalPages: 1,
       page: 1,
@@ -88,8 +87,8 @@ describe("searchAdminTrialsDb event parity", () => {
 
     await searchAdminTrialsDb({
       query: "1001",
-      mode: "year",
-      year: 2026,
+      dateFrom: new Date("2025-01-01T00:00:00.000Z"),
+      dateTo: new Date("2026-01-01T00:00:00.000Z"),
       page: 1,
       pageSize: 50,
       sort: "date-desc",

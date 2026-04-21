@@ -67,8 +67,8 @@ export async function listAdminTrialEvents(
   );
 
   try {
-    const result = await resolveAdminTrialEventSearchResponseDb(parsedInput);
-    const data = mapAdminTrialEventSearchResponse(parsedInput, result);
+    const resolved = await resolveAdminTrialEventSearchResponseDb(parsedInput);
+    const data = mapAdminTrialEventSearchResponse(parsedInput, resolved);
 
     log.info(
       {

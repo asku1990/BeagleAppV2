@@ -7,7 +7,6 @@ export type {
   AdminTrialEventDetailsDb,
   AdminTrialEventDetailsRequestDb,
   AdminTrialEventEntryDb,
-  AdminTrialEventSearchModeDb,
   AdminTrialEventSearchRequestDb,
   AdminTrialEventSearchResponseDb,
   AdminTrialEventSearchSortDb,

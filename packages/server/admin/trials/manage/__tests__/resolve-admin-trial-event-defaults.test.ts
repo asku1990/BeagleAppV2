@@ -17,22 +17,20 @@ describe("resolveAdminTrialEventSearchResponseDb", () => {
   it("falls back to the latest available year when no temporal filter is provided", async () => {
     searchAdminTrialsDbMock
       .mockResolvedValueOnce({
-        mode: "range",
-        year: null,
-        dateFrom: null,
-        dateTo: null,
-        availableYears: [2026, 2025],
+        availableEventDates: [
+          new Date("2026-03-01T00:00:00.000Z"),
+          new Date("2025-03-01T00:00:00.000Z"),
+        ],
         total: 0,
         totalPages: 0,
         page: 1,
         items: [],
       })
       .mockResolvedValueOnce({
-        mode: "year",
-        year: 2026,
-        dateFrom: null,
-        dateTo: null,
-        availableYears: [2026, 2025],
+        availableEventDates: [
+          new Date("2026-03-01T00:00:00.000Z"),
+          new Date("2025-03-01T00:00:00.000Z"),
+        ],
         total: 1,
         totalPages: 1,
         page: 1,
@@ -52,16 +50,36 @@ describe("resolveAdminTrialEventSearchResponseDb", () => {
         rangeFromDate: null,
         rangeToExclusive: null,
       }),
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       mode: "year",
       year: 2026,
-      dateFrom: null,
-      dateTo: null,
-      availableYears: [2026, 2025],
-      total: 1,
-      totalPages: 1,
+      dateFromIso: null,
+      dateToIso: null,
+      result: {
+        availableEventDates: [
+          new Date("2026-03-01T00:00:00.000Z"),
+          new Date("2025-03-01T00:00:00.000Z"),
+        ],
+        total: 1,
+        totalPages: 1,
+        page: 1,
+        items: [],
+      },
+    });
+
+    expect(searchAdminTrialsDbMock).toHaveBeenNthCalledWith(1, {
+      query: "",
       page: 1,
-      items: [],
+      pageSize: 1,
+      sort: "date-desc",
+    });
+    expect(searchAdminTrialsDbMock).toHaveBeenNthCalledWith(2, {
+      query: "",
+      dateFrom: new Date("2025-12-31T22:00:00.000Z"),
+      dateTo: new Date("2026-12-31T22:00:00.000Z"),
+      page: 1,
+      pageSize: 20,
+      sort: "date-desc",
     });
   });
 });

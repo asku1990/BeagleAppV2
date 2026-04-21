@@ -140,7 +140,6 @@ export {
   type AdminTrialEventDetailsDb,
   type AdminTrialEventDetailsRequestDb,
   type AdminTrialEventEntryDb,
-  type AdminTrialEventSearchModeDb,
   type AdminTrialEventSearchRequestDb,
   type AdminTrialEventSearchResponseDb,
   type AdminTrialEventSearchSortDb,
