@@ -74,6 +74,7 @@ result upsert contract.
   `0`, `1`, `2`, `3`, `L`, `S`, and `-`)
 - `SIJOITUS_LUOKASSA` -> `sijoitus`
 - `KOIRIA_LUOKASSA` -> `koiriaLuokassa`
+- `koekaudenkoe` -> `kokokaudenkoe` (`"1"` => `true`, `"0"` => `false`)
 - `KELI` -> `keli`
 - `luopui` -> `luopui`
 - `suljettu` -> `suljettu`
@@ -86,8 +87,6 @@ result upsert contract.
 
 ### Compatibility columns
 
-- `TrialEntry.paljasMaa` and `TrialEntry.lumikeli` are unused columns.
-- This API-upsert does not populate them.
 - Top-level weather value is written to `TrialEntry.keli` from `KELI`.
 - The numbered source rows below are stored as lisätieto instead.
 

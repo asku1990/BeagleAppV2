@@ -31,6 +31,7 @@ export type TrialDogPdfDataDbRow = {
   kennelpiiri: string | null;
   kennelpiirinro: string | null;
   koekunta: string | null;
+  koemaasto: string | null;
   koepaiva: Date;
   jarjestaja: string | null;
   era1Alkoi: string | null;
@@ -63,6 +64,7 @@ export type TrialDogPdfDataDbRow = {
   luopui: boolean | null;
   suljettu: boolean | null;
   keskeytetty: boolean | null;
+  kokokaudenkoe: boolean | null;
   sijoitus: string | null;
   koiriaLuokassa: number | null;
   palkinto: string | null;
@@ -104,6 +106,7 @@ export async function getTrialDogPdfDataDb(
       rekisterinumeroSnapshot: true,
       omistajaSnapshot: true,
       omistajanKotikuntaSnapshot: true,
+      koemaasto: true,
       dog: {
         select: {
           name: true,
@@ -180,6 +183,7 @@ export async function getTrialDogPdfDataDb(
       luopui: true,
       suljettu: true,
       keskeytetty: true,
+      kokokaudenkoe: true,
       sijoitus: true,
       koiriaLuokassa: true,
       palkinto: true,
@@ -232,6 +236,7 @@ export async function getTrialDogPdfDataDb(
     kennelpiiri: row.trialEvent.kennelpiiri ?? null,
     kennelpiirinro: row.trialEvent.kennelpiirinro ?? null,
     koekunta: row.trialEvent.koekunta ?? null,
+    koemaasto: row.koemaasto ?? null,
     koepaiva: row.trialEvent.koepaiva,
     jarjestaja: row.trialEvent.jarjestaja ?? null,
     era1Alkoi: row.era1Alkoi ?? null,
@@ -264,6 +269,7 @@ export async function getTrialDogPdfDataDb(
     luopui: row.luopui,
     suljettu: row.suljettu,
     keskeytetty: row.keskeytetty,
+    kokokaudenkoe: row.kokokaudenkoe,
     sijoitus: row.sijoitus,
     koiriaLuokassa: row.koiriaLuokassa,
     palkinto: row.palkinto,

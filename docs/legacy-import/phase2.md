@@ -54,7 +54,7 @@ This is the current phase2 write mapping for legacy `akoeall` rows.
 | ------------------- | ------------------------------------------------ | ----------------------------------------------------------- |
 | `REKNO`             | `TrialEntry.rekisterinumeroSnapshot`             | Registration number snapshot                                |
 | `PA`                | `TrialEntry.palkinto`                            | Award / prize                                               |
-| `SIJA`              | `TrialEntry.sijoitus`                            | Placement                                                   |
+| `SIJA`              | `TrialEntry.legacySijoitusRaw`                   | Raw legacy placement text                                   |
 | `PISTE`             | `TrialEntry.loppupisteet`                        | Total points                                                |
 | `HAKU`              | `TrialEntry.hakuKeskiarvo`                       | Haku score                                                  |
 | `HAUK`              | `TrialEntry.haukkuKeskiarvo`                     | Haukku score                                                |

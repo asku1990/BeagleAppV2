@@ -21,6 +21,7 @@ export type KoiratietokantaAjokEntryDbInput = {
   luokka: string | null;
   omistajaSnapshot: string | null;
   omistajanKotikuntaSnapshot: string | null;
+  koemaasto: string | null;
   era1Alkoi: string | null;
   era2Alkoi: string | null;
   era3Alkoi: string | null;
@@ -66,6 +67,7 @@ export type KoiratietokantaAjokEntryDbInput = {
   palkinto: string | null;
   sijoitus: string | null;
   koiriaLuokassa: number | null;
+  kokokaudenkoe: boolean | null;
   keli: string | null;
   luopui: boolean | null;
   suljettu: boolean | null;
@@ -160,6 +162,7 @@ export async function upsertKoiratietokantaAjokResultDb(
       luokka: input.entry.luokka,
       omistajaSnapshot: input.entry.omistajaSnapshot,
       omistajanKotikuntaSnapshot: input.entry.omistajanKotikuntaSnapshot,
+      koemaasto: input.entry.koemaasto,
       era1Alkoi: input.entry.era1Alkoi,
       era2Alkoi: input.entry.era2Alkoi,
       era3Alkoi: input.entry.era3Alkoi,
@@ -205,6 +208,7 @@ export async function upsertKoiratietokantaAjokResultDb(
       palkinto: input.entry.palkinto,
       sijoitus: input.entry.sijoitus,
       koiriaLuokassa: input.entry.koiriaLuokassa,
+      kokokaudenkoe: input.entry.kokokaudenkoe,
       keli: input.entry.keli,
       luopui: input.entry.luopui,
       suljettu: input.entry.suljettu,

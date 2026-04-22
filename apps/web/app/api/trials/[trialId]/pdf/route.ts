@@ -67,6 +67,7 @@ export async function GET(
     const kennelpiiri = result.body.data.kennelpiiri?.trim() ?? null;
     const kennelpiirinro = result.body.data.kennelpiirinro?.trim() ?? null;
     const koekunta = result.body.data.koekunta?.trim() ?? null;
+    const koemaasto = result.body.data.koemaasto?.trim() ?? null;
     const koepaiva = result.body.data.koepaiva;
     const jarjestaja = result.body.data.jarjestaja?.trim() ?? null;
     const dogSex = result.body.data.dogSex;
@@ -101,6 +102,7 @@ export async function GET(
     const luopui = result.body.data.luopui;
     const suljettu = result.body.data.suljettu;
     const keskeytetty = result.body.data.keskeytetty;
+    const kokokaudenkoe = result.body.data.kokokaudenkoe;
     const sijoitus = result.body.data.sijoitus;
     const koiriaLuokassa = result.body.data.koiriaLuokassa;
     const Palkinto = result.body.data.Palkinto;
@@ -125,6 +127,7 @@ export async function GET(
       kennelpiiri,
       kennelpiirinro,
       koekunta,
+      koemaasto,
       koepaiva,
       jarjestaja,
       era1Alkoi,
@@ -157,6 +160,7 @@ export async function GET(
       luopui,
       suljettu,
       keskeytetty,
+      kokokaudenkoe,
       sijoitus,
       koiriaLuokassa,
       Palkinto,

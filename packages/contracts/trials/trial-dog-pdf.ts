@@ -19,6 +19,7 @@ export type TrialDogPdfKokeenTiedot = {
   kennelpiiri: string | null;
   kennelpiirinro: string | null;
   koekunta: string | null;
+  koemaasto: string | null;
   koepaiva: Date;
   jarjestaja: string | null;
 };
@@ -78,6 +79,7 @@ export type TrialDogPdfLoppupisteet = {
   luopui: boolean | null;
   suljettu: boolean | null;
   keskeytetty: boolean | null;
+  kokokaudenkoe: boolean | null;
   sijoitus: string | null;
   koiriaLuokassa: number | null;
   Palkinto: string | null;

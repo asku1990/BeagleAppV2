@@ -82,6 +82,7 @@ Huomio:
 | `PALKINTOSIJA`                     | `TrialEntry.palkinto` (stored as text; live values include `0`, `1`, `2`, `3`, `L`, `S`, and `-`) |
 | `SIJOITUS_LUOKASSA`                | `TrialEntry.sijoitus`                                                                             |
 | `KOIRIA_LUOKASSA`                  | `TrialEntry.koiriaLuokassa`                                                                       |
+| `koekaudenkoe`                     | `TrialEntry.kokokaudenkoe`                                                                        |
 | `KELI`                             | `TrialEntry.keli`                                                                                 |
 | `111_PALJAS_MAA`..`113_PALJAS_MAA` | `TrialLisatietoItem` code `11` (`Paljas maa`)                                                     |
 | `121_LUMIKELI`..`123_LUMIKELI`     | `TrialLisatietoItem` code `12` (`Lumikeli`)                                                       |
@@ -98,7 +99,6 @@ Huomio:
 - `ylituomari` on event-tason tieto.
 - Jos saman `sklKoeId` tapahtuman riveillä on ristiriitainen ylituomari, ristiriita kirjataan issueksi ja eventille jätetään ensimmäinen ei-null arvo.
 - Top-level weather uses `TrialEntry.keli`.
-- `TrialEntry.paljasMaa` and `TrialEntry.lumikeli` are unused columns.
 
 ## Lisätietojen mapping
 

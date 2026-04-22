@@ -28,6 +28,7 @@ const entryInput = {
   luokka: null,
   omistajaSnapshot: null,
   omistajanKotikuntaSnapshot: null,
+  koemaasto: null,
   era1Alkoi: null,
   era2Alkoi: null,
   era3Alkoi: null,
@@ -73,6 +74,7 @@ const entryInput = {
   palkinto: null,
   sijoitus: null,
   koiriaLuokassa: null,
+  kokokaudenkoe: null,
   keli: null,
   luopui: null,
   suljettu: null,
@@ -138,6 +140,14 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
       created: true,
       updated: false,
     });
+    expect(txMock.trialEntry.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.objectContaining({
+          koemaasto: null,
+          kokokaudenkoe: null,
+        }),
+      }),
+    );
     expect(txMock.trialLisatietoItem.deleteMany).toHaveBeenCalledWith({
       where: { trialEntryId: "entry-1" },
     });

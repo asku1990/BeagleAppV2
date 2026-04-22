@@ -32,6 +32,7 @@ describe("upsertKoiratietokantaAjokResultService", () => {
       REKISTERINUMERO: " fi33413/18 ",
       Koepvm: "2025-09-07 00:00:00",
       KOEPAIKKA: "Ristijärvi",
+      koemaasto: "Ristijärvi",
       JARJESTAJA: "Kainuun Ajokoirakerho",
       KENNELPIIRI: "Kainuun kennelpiiri ry",
       KENNELPIIRINRO: "3",
@@ -80,6 +81,7 @@ describe("upsertKoiratietokantaAjokResultService", () => {
         yksilointiAvain: "SKL:431477|REG:FI33413/18",
         raakadataJson: JSON.stringify(payload),
         omistajaSnapshot: "Marja ja Kari Virtanen",
+        koemaasto: "Ristijärvi",
         era1Alkoi: "5:49",
         hakuMin1: 201,
         ajoMin1: 51,
@@ -138,6 +140,7 @@ describe("upsertKoiratietokantaAjokResultService", () => {
       REKISTERINUMERO: "FI33413/18",
       Koepvm: "2025-09-07",
       KOEPAIKKA: "Ristijärvi",
+      koemaasto: "Ristijärvi",
       II_AJO_MIN: "not-a-number",
     });
 
@@ -187,6 +190,7 @@ describe("upsertKoiratietokantaAjokResultService", () => {
       REKISTERINUMERO: "FI33413/18",
       Koepvm: "2025-09-07",
       KOEPAIKKA: "Ristijärvi",
+      koemaasto: "Ristijärvi",
       yt: "Different Judge",
     });
 

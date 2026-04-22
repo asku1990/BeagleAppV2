@@ -341,18 +341,11 @@ model TrialEntry {
   lahde                     TrialSourceTag
 
   // 2) koiran tiedot
+  koemaasto                 String?
   rekisterinumeroSnapshot   String
   luokka                    String?
-  koiranNimiSnapshot        String?      // Not used anywhere as source of truth.
-  isanNimiSnapshot          String?      // Not used anywhere as source of truth.
-  isanRekisterinumeroSnapshot String?    // Not used anywhere as source of truth.
-  emanNimiSnapshot          String?      // Not used anywhere as source of truth.
-  emanRekisterinumeroSnapshot String?    // Not used anywhere as source of truth.
   omistajaSnapshot          String?
   omistajanKotikuntaSnapshot String?
-  sukupuoliSnapshot         String?      // Not used anywhere as source of truth.
-  rokotusOk                 Boolean?     // Not used anywhere as source of truth.
-  tunnistusOk               Boolean?     // Not used anywhere as source of truth.
 
   // 3) koe-erat
   era1Alkoi                 String?
@@ -407,13 +400,13 @@ model TrialEntry {
   // 6) pisteet ja tulos
   loppupisteet              Decimal?       @db.Decimal(6, 2)
   palkinto                  String?
-  sijoitus                  String?
+  legacySijoitusRaw         String?        // Raw legacy SIJA text from akoeall.
+  sijoitus                  String?        // Canonical placement for modern AJOK writes.
   koiriaLuokassa            Int?
+  kokokaudenkoe             Boolean?       // Entry-level whole-season trial flag.
 
   // 7) olosuhteet
   keli                      String?
-  paljasMaa                 Boolean?   // Not used anywhere as source of truth.
-  lumikeli                  String?    // Not used anywhere as source of truth.
 
   // 8) huomautukset ja tilat
   luopui                    Boolean?
