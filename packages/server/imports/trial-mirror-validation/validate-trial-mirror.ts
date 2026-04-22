@@ -316,8 +316,7 @@ export function validateLegacyTrialMirrorRows(
       addIssue(issues, {
         severity: "INFO",
         code: "TRIAL_MIRROR_DETAIL_OUTSIDE_DATE_RULE_TABLE",
-        message:
-          "Detail row is in a bealt rule table that V1 would not select for this trial date.",
+        message: `Detail row is stored in ${row.sourceTable}, but V1 date rule for TAPPV ${row.tappv} selects ${expectedTable}.`,
         sourceTable: row.sourceTable,
         key: eraKey,
         field: "tappv",

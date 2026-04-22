@@ -170,6 +170,8 @@ describe("validateLegacyTrialMirrorRows", () => {
         expect.objectContaining({
           severity: "INFO",
           code: "TRIAL_MIRROR_DETAIL_OUTSIDE_DATE_RULE_TABLE",
+          message:
+            "Detail row is stored in bealt2, but V1 date rule for TAPPV 20240101 selects bealt3.",
         }),
       ]),
     );
