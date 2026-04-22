@@ -149,7 +149,7 @@ pass-cli run --env-file .env.local -- pnpm legacy:restore /path/to/beagle.sql be
 Note: `legacy:restore` drops the target MariaDB database if it exists, recreates it, and restores the dump into it.
 Use `CONFIRM_PROD=YES` for any prod-targeted restore.
 
-Phase-2 import:
+Phase-2 trial mirror import:
 
 ```bash
 pass-cli run --env-file .env.local -- pnpm import:phase2

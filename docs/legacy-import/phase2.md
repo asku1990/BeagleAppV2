@@ -5,22 +5,35 @@
 This is the detailed implementation reference for phase2.
 For overall flow and ordering, see `docs/legacy-import/import-flow.md`.
 
-Phase 2 currently imports trial rows from `akoeall` into canonical AJOK tables.
-The schema also has frozen legacy AJOK mirror tables for the follow-up
-mirror/import/projection flow; those mirror tables are validation and audit
-source memory, not runtime read models.
+Phase 2 imports legacy AJOK trial source rows into frozen mirror tables only.
+It does not write `TrialEvent`, `TrialEntry`, `TrialLisatietoItem`, or other
+runtime trial tables.
+
+The mirror checkpoint is intentionally separate from runtime projection:
+
+```text
+v1 MariaDB -> legacy_* mirror tables -> later canonical runtime projection
+```
 
 ## Command
 
 `pnpm import:phase2 [USER_ID]`
 
-## Primary source table
+## Source tables
 
 - `akoeall`
+- `bealt`
+- `bealt0`
+- `bealt1`
+- `bealt2`
+- `bealt3`
 
-## Legacy mirror foundation
+`MUOKATTU` is read as raw text with `CAST(MUOKATTU AS CHAR)`, so zero-date
+values such as `0000-00-00 00:00:00` are preserved.
 
-The additive mirror schema contains:
+## Mirror writes
+
+Phase 2 writes:
 
 - `legacy_akoeall`
 - `legacy_bealt`
@@ -29,116 +42,40 @@ The additive mirror schema contains:
 - `legacy_bealt2`
 - `legacy_bealt3`
 
-These tables preserve v1 composite keys and source-column names through Prisma
-mappings. `MUOKATTU` is stored as raw text so `bealt3` zero-date values can be
-imported without timestamp coercion. Later phases should import legacy source
-rows into these tables first, validate mirror completeness, and then project
-from the mirrors into canonical runtime tables.
+Write rules:
 
-## Source row mapping (high level)
+- Upsert by the legacy composite key:
+  - `akoeall`: `REKNO + TAPPA + TAPPV`
+  - `bealt*`: `REKNO + TAPPA + TAPPV + ERA`
+- Preserve v1 source columns through Prisma field mappings.
+- Store the full source row snapshot in `rawPayloadJson`.
+- Store `sourceHash` from the raw payload for later comparison.
+- Do not normalize registrations, link dogs, group events, or calculate runtime fields.
 
-`akoeall` rows are mapped into canonical `TrialEvent` + `TrialEntry` rows, including:
+`ImportRun.kind` is `LEGACY_TRIAL_MIRROR`. The total mirror rows written are
+stored in `ImportRun.trialResultsUpserted` because the shared import run model
+does not yet have a trial-mirror-specific counter.
 
-- identity and event fields:
-  - `REKNO` -> registration key
-  - `TAPPA` -> event place
-  - `TAPPV` -> event date
-- result payload fields:
-  - class/award/rank/points fields (`LK`, `PA`, `SIJA`, `PISTE`)
-  - trial metric fields (`HAKU`, `HAUK`, `YVA`, `HLO`, `ALO`, `TJA`, `PIN`)
-  - judge and legacy flag (`TUOM1`, `VARA`)
+## Validation
 
-The canonical AJOK entry stores the metric scores as:
+Phase 2 validates:
 
-- `YVA` -> `TrialEntry.yleisvaikutelmaPisteet`
-- `TJA` -> `TrialEntry.tieJaEstetyoskentelyPisteet`
-- `PIN` -> `TrialEntry.metsastysintoPisteet`
+- source row count vs mirror table row count per table
+- blank or invalid legacy primary-key parts
+- zero-date `MUOKATTU` rows are counted and preserved
 
-## Source row mapping (field-by-field)
-
-This is the current phase2 write mapping for legacy `akoeall` rows.
-
-### TrialEvent
-
-| Legacy source field | Canonical target            | Note                                         |
-| ------------------- | --------------------------- | -------------------------------------------- |
-| `TAPPV`             | `TrialEvent.koepaiva`       | Event date                                   |
-| `TAPPA`             | `TrialEvent.koekunta`       | Event place                                  |
-| `KENNELPIIRI`       | `TrialEvent.kennelpiiri`    | Kennel district                              |
-| `KENNELPIIRINRO`    | `TrialEvent.kennelpiirinro` | Kennel district number                       |
-| `TUOM1`             | `TrialEvent.ylituomariNimi` | First non-null judge wins when rows disagree |
-
-### TrialEntry
-
-| Legacy source field | Canonical target                                 | Note                                                        |
-| ------------------- | ------------------------------------------------ | ----------------------------------------------------------- |
-| `REKNO`             | `TrialEntry.rekisterinumeroSnapshot`             | Registration number snapshot                                |
-| `PA`                | `TrialEntry.palkinto`                            | Award / prize                                               |
-| `SIJA`              | `TrialEntry.legacySijoitusRaw`                   | Raw legacy placement text                                   |
-| `PISTE`             | `TrialEntry.loppupisteet`                        | Total points                                                |
-| `HAKU`              | `TrialEntry.hakuKeskiarvo`                       | Haku score                                                  |
-| `HAUK`              | `TrialEntry.haukkuKeskiarvo`                     | Haukku score                                                |
-| `YVA`               | `TrialEntry.yleisvaikutelmaPisteet`              | General impression score                                    |
-| `HLO`               | `TrialEntry.hakuloysyysTappioYhteensa`           | Haku löysyys penalty total                                  |
-| `ALO`               | `TrialEntry.ajoloysyysTappioYhteensa`            | Ajo löysyys penalty total                                   |
-| `TJA`               | `TrialEntry.tieJaEstetyoskentelyPisteet`         | Tie- ja estetyöskentely score                               |
-| `PIN`               | `TrialEntry.metsastysintoPisteet`                | Metsästysinto score                                         |
-| `KE`                | `TrialEntry.keli`                                | Weather / conditions                                        |
-| `VARA`              | `TrialEntry.notes`                               | Raw legacy flag kept as note text                           |
-| `VARA`              | `TrialEntry.luopui` / `suljettu` / `keskeytetty` | Parsed from the legacy flag letters                         |
-| full row JSON       | `TrialEntry.raakadataJson`                       | Preserves the original source payload, including `MUOKATTU` |
-
-## Main writes
-
-- `TrialEvent`
-- `TrialEntry`
-
-Dog linkage is resolved through `DogRegistration` (`registrationNo -> dogId`).
-
-## Linking and write rules
-
-- Phase2 builds a registration-to-dog index before row processing.
-- Each trial row uses that index to set `dogId` when possible (`dogId` may remain `null`).
-- `TrialEvent` is upserted with deterministic `legacyEventKey` fallback when `sklKoeId` is unknown.
-- `TrialEntry` is upserted by unique `(trialEventId, rekisterinumeroSnapshot)`.
-- `raakadataJson` preserves the full legacy source row, including `MUOKATTU`.
-- Invalid registration format or missing required event fields are written as issues.
-
-## Idempotency and rerun behavior
-
-- Canonical event writes are duplicate-safe by `sklKoeId` (when present) or `legacyEventKey` fallback.
-- Canonical entry writes are duplicate-safe by `(trialEventId, rekisterinumeroSnapshot)`.
-- Re-running phase2 updates/keeps existing canonical trial rows instead of creating duplicates.
-
-## Issue codes
-
-- `TRIAL_CANONICAL_REGISTRATION_INVALID_FORMAT`
-- `TRIAL_CANONICAL_MISSING_REQUIRED_FIELDS`
-- `TRIAL_CANONICAL_DOG_NOT_FOUND`
-- `TRIAL_CANONICAL_JUDGE_CONFLICT`
-- run-level fallback: `UNEXPECTED_EXCEPTION`
-
-Issue rows are written to `ImportRunIssue` with `kind=LEGACY_PHASE2`.
-
-## Error handling detail
-
-- Row-level validation issues are recorded and import continues.
-- If a registration cannot be resolved to a local dog, phase2 keeps the trial
-  row with `dogId = null` and records `TRIAL_CANONICAL_DOG_NOT_FOUND`.
-- If the same event row yields multiple non-null judges, phase2 keeps the first
-  judge value and records `TRIAL_CANONICAL_JUDGE_CONFLICT` as a warning.
-- Run finishes `SUCCEEDED` with warnings when row issues exist.
-- Unexpected exceptions mark run as `FAILED` with `UNEXPECTED_EXCEPTION`.
+Count mismatch records `TRIAL_MIRROR_COUNT_MISMATCH` and marks the run failed.
+Blank or invalid key parts record `TRIAL_MIRROR_MISSING_KEY_PART` as warnings.
+Unexpected exceptions record `UNEXPECTED_EXCEPTION`.
 
 ## Implementation references
 
 - Phase use-case: `packages/server/imports/phase2/run-legacy-phase2.ts`
 - Source loader: `packages/db/imports/phase2/source.ts`
-- Canonical trial upsert logic: `packages/server/imports/internal/upsert-canonical-trial-rows.ts`
-- Event identity key helper: `packages/server/imports/internal/trial-event-identity-key.ts`
 - DB persistence adapters: `packages/db/imports/phase2/repository.ts`
 
 ## Operational notes
 
-- Requires phase1 foundation data to maximize dog linking.
+- Phase 2 is safe to rerun against the same source; rows are upserted by legacy key.
+- Runtime trial projection is intentionally deferred to a later phase.
 - Phase 2 belongs to the initial migration flow and is included in `import:bootstrap`.

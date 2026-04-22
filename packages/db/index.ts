@@ -29,12 +29,13 @@ export {
   type ImportRunSummary,
 } from "./imports/repository";
 
-export { fetchLegacyTrialRows } from "./imports/phase2";
 export {
-  countTrialEntryRowsDb,
-  listPhase2DogRegistrationsDb,
-  upsertTrialEntryByEventAndRegistrationDb,
-  upsertTrialEventByLegacyKeyDb,
+  fetchLegacyTrialMirrorRows,
+  TRIAL_MIRROR_TABLES,
+} from "./imports/phase2";
+export {
+  countLegacyTrialMirrorRowsDb,
+  upsertLegacyTrialMirrorRowsDb,
 } from "./imports/phase2";
 export { fetchLegacyShowRows } from "./imports/phase3";
 export { fetchLegacyPhase1Rows } from "./imports/phase1";
@@ -46,7 +47,11 @@ export {
   type LegacyEkRow,
   type LegacyDogTitleRow,
   type LegacyOwnerRow,
-  type LegacyTrialResultRow,
+  type LegacyTrialMirrorAkoeallRow,
+  type LegacyTrialMirrorBealtCommonRow,
+  type LegacyTrialMirrorCounts,
+  type LegacyTrialMirrorRows,
+  type LegacyTrialMirrorTableName,
   type LegacyShowResultRow,
   type LegacySamakoiraRow,
   type LegacyPhase1Rows,

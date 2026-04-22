@@ -79,12 +79,11 @@ Issue tooling:
    grouped by dog via canonical registration resolution.
    Same-value aliases are deduplicated; conflicting alias values create import issues.
 
-3. `phase2` currently imports trial rows from `akoeall` into canonical AJOK
-   schema (`TrialEvent` + `TrialEntry`). The schema also contains frozen
-   legacy AJOK mirror tables (`legacy_akoeall`, `legacy_bealt`,
-   `legacy_bealt0`, `legacy_bealt1`, `legacy_bealt2`, `legacy_bealt3`) for the
-   approved follow-up mirror/import/projection flow. Those tables are source
-   memory and validation inputs, not runtime read models.
+3. `phase2` imports legacy AJOK trial source rows into frozen mirror tables
+   only (`legacy_akoeall`, `legacy_bealt`, `legacy_bealt0`, `legacy_bealt1`,
+   `legacy_bealt2`, `legacy_bealt3`). Runtime projection into `TrialEvent`,
+   `TrialEntry`, and trial detail tables is intentionally deferred to a later
+   phase.
 
 4. `phase3` imports show rows into canonical show tables (`ShowEvent`, `ShowEntry`,
    `ShowResultItem`) using merged legacy sources (`nay9599`, `beanay`, optional
@@ -139,9 +138,8 @@ Each phase creates its own `ImportRun` with its own `runId`.
 
 - `phase1` -> `kind=LEGACY_PHASE1`
 - `phase1.5` -> `kind=LEGACY_PHASE1_5`
-- `phase2` -> `kind=LEGACY_PHASE2`
+- `phase2` -> `kind=LEGACY_TRIAL_MIRROR`
 - `phase3` -> `kind=LEGACY_PHASE3`
-- future trial mirror import -> `kind=LEGACY_TRIAL_MIRROR`
 
 Issue rows are written to shared `ImportRunIssue` storage per run.
 

@@ -1,157 +1,169 @@
-import { TrialSourceTag } from "@prisma/client";
 import { prisma } from "@db/core/prisma";
+import type {
+  LegacyTrialMirrorCounts,
+  LegacyTrialMirrorRows,
+  LegacyTrialMirrorTableName,
+} from "../types";
 
-// Phase2-specific Prisma adapters for canonical AJOK trial bootstrap writes.
-// Keeps database shape changes isolated from the server-side import mapping.
-type TrialEventUpsertInput = {
-  legacyEventKey: string;
-  koepaiva: Date;
-  koekunta: string;
-  kennelpiiri: string | null;
-  kennelpiirinro: string | null;
-  ylituomariNimi: string | null;
+type LegacyMirrorDelegate<Row> = {
+  count(): Promise<number>;
+  upsert(args: {
+    where: Record<string, unknown>;
+    create: Row;
+    update: Partial<Row> & { importedAt: Date };
+  }): Promise<unknown>;
 };
 
-type TrialEntryUpsertInput = {
-  trialEventId: string;
-  dogId: string | null;
-  rekisterinumeroSnapshot: string;
-  yksilointiAvain: string;
-  raakadataJson: string;
-  palkinto: string | null;
-  // Phase2 preserves the raw legacy SIJA text separately from the canonical
-  // `sijoitus` field used by modern AJOK writes.
-  legacySijoitusRaw: string | null;
-  loppupisteet: number | null;
-  hakuKeskiarvo: number | null;
-  haukkuKeskiarvo: number | null;
-  yleisvaikutelmaPisteet: number | null;
-  hakuloysyysTappioYhteensa: number | null;
-  ajoloysyysTappioYhteensa: number | null;
-  tieJaEstetyoskentelyPisteet: number | null;
-  metsastysintoPisteet: number | null;
-  keli: string | null;
-  luopui: boolean | null;
-  suljettu: boolean | null;
-  keskeytetty: boolean | null;
-  notes: string | null;
+type LegacyMirrorPrisma = {
+  legacyAkoeall: LegacyMirrorDelegate<LegacyTrialMirrorRows["akoeall"][number]>;
+  legacyBealt: LegacyMirrorDelegate<LegacyTrialMirrorRows["bealt"][number]>;
+  legacyBealt0: LegacyMirrorDelegate<LegacyTrialMirrorRows["bealt0"][number]>;
+  legacyBealt1: LegacyMirrorDelegate<LegacyTrialMirrorRows["bealt1"][number]>;
+  legacyBealt2: LegacyMirrorDelegate<LegacyTrialMirrorRows["bealt2"][number]>;
+  legacyBealt3: LegacyMirrorDelegate<LegacyTrialMirrorRows["bealt3"][number]>;
+  $transaction(promises: Promise<unknown>[]): Promise<unknown[]>;
 };
 
-export async function listPhase2DogRegistrationsDb(): Promise<
-  Array<{ registrationNo: string; dogId: string }>
-> {
-  return prisma.dogRegistration.findMany({
-    select: { registrationNo: true, dogId: true },
-  });
+const MIRROR_BATCH_SIZE = 250;
+
+function getLegacyMirrorPrisma(): LegacyMirrorPrisma {
+  return prisma as unknown as LegacyMirrorPrisma;
 }
 
-export async function countTrialEntryRowsDb(): Promise<number> {
-  return prisma.trialEntry.count();
+function omitKeys<Row extends object>(
+  row: Row,
+  keys: readonly string[],
+): Partial<Row> {
+  const next: Partial<Row> = {};
+  for (const [key, value] of Object.entries(row)) {
+    if (!keys.includes(key)) {
+      next[key as keyof Row] = value as Row[keyof Row];
+    }
+  }
+  return next;
 }
 
-export async function upsertTrialEventByLegacyKeyDb(
-  input: TrialEventUpsertInput,
-): Promise<{ id: string }> {
-  return prisma.trialEvent.upsert({
-    where: { legacyEventKey: input.legacyEventKey },
-    create: {
-      sklKoeId: null,
-      legacyEventKey: input.legacyEventKey,
-      koepaiva: input.koepaiva,
-      koekunta: input.koekunta,
-      jarjestaja: null,
-      kennelpiiri: input.kennelpiiri,
-      kennelpiirinro: input.kennelpiirinro,
-      koemuoto: "AJOK",
-      rotukoodi: null,
-      ylituomariNimi: input.ylituomariNimi,
-      ylituomariNumero: null,
-      ytKertomus: null,
-    },
-    update: {
-      koepaiva: input.koepaiva,
-      koekunta: input.koekunta,
-      kennelpiiri: input.kennelpiiri,
-      kennelpiirinro: input.kennelpiirinro,
-      koemuoto: "AJOK",
-      // Phase2 is a one-shot bootstrap, but multiple rows can map to the same
-      // event. Keep an existing judge unless the current import row actually
-      // provides one.
-      ...(input.ylituomariNimi !== null
-        ? { ylituomariNimi: input.ylituomariNimi }
-        : {}),
-    },
-    select: { id: true },
-  });
+async function upsertMirrorRows<Row extends object>(
+  delegate: LegacyMirrorDelegate<Row>,
+  rows: Row[],
+  uniqueKeyName: string,
+  uniqueKeys: readonly string[],
+  options?: {
+    onProgress?: (processed: number, total: number) => void;
+  },
+): Promise<number> {
+  let processed = 0;
+  for (let index = 0; index < rows.length; index += MIRROR_BATCH_SIZE) {
+    const batch = rows.slice(index, index + MIRROR_BATCH_SIZE);
+    const importedAt = new Date();
+    await getLegacyMirrorPrisma().$transaction(
+      batch.map((row) => {
+        const uniqueValue: Record<string, unknown> = {};
+        for (const key of uniqueKeys) {
+          uniqueValue[key] = (row as Record<string, unknown>)[key];
+        }
+        return delegate.upsert({
+          where: { [uniqueKeyName]: uniqueValue },
+          create: row,
+          update: {
+            ...omitKeys(row, uniqueKeys),
+            importedAt,
+          },
+        }) as Promise<unknown>;
+      }),
+    );
+    processed += batch.length;
+    options?.onProgress?.(processed, rows.length);
+  }
+  options?.onProgress?.(processed, rows.length);
+  return rows.length;
 }
 
-export async function upsertTrialEntryByEventAndRegistrationDb(
-  input: TrialEntryUpsertInput,
-): Promise<void> {
-  await prisma.trialEntry.upsert({
-    where: {
-      trialEventId_rekisterinumeroSnapshot: {
-        trialEventId: input.trialEventId,
-        rekisterinumeroSnapshot: input.rekisterinumeroSnapshot,
+export async function upsertLegacyTrialMirrorRowsDb(
+  rows: LegacyTrialMirrorRows,
+  options?: {
+    onProgress?: (
+      table: LegacyTrialMirrorTableName,
+      processed: number,
+      total: number,
+    ) => void;
+  },
+): Promise<LegacyTrialMirrorCounts> {
+  const db = getLegacyMirrorPrisma();
+  const counts: LegacyTrialMirrorCounts = {
+    akoeall: await upsertMirrorRows(
+      db.legacyAkoeall,
+      rows.akoeall,
+      "rekno_tappa_tappv",
+      ["rekno", "tappa", "tappv"],
+      {
+        onProgress: (processed, total) =>
+          options?.onProgress?.("akoeall", processed, total),
       },
-    },
-    create: {
-      trialEventId: input.trialEventId,
-      dogId: input.dogId,
-      rekisterinumeroSnapshot: input.rekisterinumeroSnapshot,
-      yksilointiAvain: input.yksilointiAvain,
-      lahde: TrialSourceTag.LEGACY_AKOEALL,
-      raakadataJson: input.raakadataJson,
-      omistajaSnapshot: null,
-      palkinto: input.palkinto,
-      legacySijoitusRaw: input.legacySijoitusRaw,
-      koiriaLuokassa: null,
-      loppupisteet: input.loppupisteet,
-      hakuMin1: null,
-      hakuMin2: null,
-      hakuMin3: null,
-      hakuMin4: null,
-      ajoMin1: null,
-      ajoMin2: null,
-      ajoMin3: null,
-      ajoMin4: null,
-      hakuKeskiarvo: input.hakuKeskiarvo,
-      haukkuKeskiarvo: input.haukkuKeskiarvo,
-      yleisvaikutelmaPisteet: input.yleisvaikutelmaPisteet,
-      ajotaitoKeskiarvo: null,
-      hakuloysyysTappioYhteensa: input.hakuloysyysTappioYhteensa,
-      ajoloysyysTappioYhteensa: input.ajoloysyysTappioYhteensa,
-      tieJaEstetyoskentelyPisteet: input.tieJaEstetyoskentelyPisteet,
-      metsastysintoPisteet: input.metsastysintoPisteet,
-      keli: input.keli,
-      luopui: input.luopui,
-      suljettu: input.suljettu,
-      keskeytetty: input.keskeytetty,
-      huomautusTeksti: null,
-      notes: input.notes,
-    },
-    update: {
-      yksilointiAvain: input.yksilointiAvain,
-      lahde: TrialSourceTag.LEGACY_AKOEALL,
-      raakadataJson: input.raakadataJson,
-      palkinto: input.palkinto,
-      legacySijoitusRaw: input.legacySijoitusRaw,
-      loppupisteet: input.loppupisteet,
-      hakuKeskiarvo: input.hakuKeskiarvo,
-      haukkuKeskiarvo: input.haukkuKeskiarvo,
-      yleisvaikutelmaPisteet: input.yleisvaikutelmaPisteet,
-      hakuloysyysTappioYhteensa: input.hakuloysyysTappioYhteensa,
-      ajoloysyysTappioYhteensa: input.ajoloysyysTappioYhteensa,
-      tieJaEstetyoskentelyPisteet: input.tieJaEstetyoskentelyPisteet,
-      metsastysintoPisteet: input.metsastysintoPisteet,
-      keli: input.keli,
-      luopui: input.luopui,
-      suljettu: input.suljettu,
-      keskeytetty: input.keskeytetty,
-      notes: input.notes,
-      // Dog lookup can be missing on individual rows; do not erase a previously
-      // resolved link unless the import row supplies a concrete replacement.
-      ...(input.dogId !== null ? { dogId: input.dogId } : {}),
-    },
-  });
+    ),
+    bealt: await upsertMirrorRows(
+      db.legacyBealt,
+      rows.bealt,
+      "rekno_tappa_tappv_era",
+      ["rekno", "tappa", "tappv", "era"],
+      {
+        onProgress: (processed, total) =>
+          options?.onProgress?.("bealt", processed, total),
+      },
+    ),
+    bealt0: await upsertMirrorRows(
+      db.legacyBealt0,
+      rows.bealt0,
+      "rekno_tappa_tappv_era",
+      ["rekno", "tappa", "tappv", "era"],
+      {
+        onProgress: (processed, total) =>
+          options?.onProgress?.("bealt0", processed, total),
+      },
+    ),
+    bealt1: await upsertMirrorRows(
+      db.legacyBealt1,
+      rows.bealt1,
+      "rekno_tappa_tappv_era",
+      ["rekno", "tappa", "tappv", "era"],
+      {
+        onProgress: (processed, total) =>
+          options?.onProgress?.("bealt1", processed, total),
+      },
+    ),
+    bealt2: await upsertMirrorRows(
+      db.legacyBealt2,
+      rows.bealt2,
+      "rekno_tappa_tappv_era",
+      ["rekno", "tappa", "tappv", "era"],
+      {
+        onProgress: (processed, total) =>
+          options?.onProgress?.("bealt2", processed, total),
+      },
+    ),
+    bealt3: await upsertMirrorRows(
+      db.legacyBealt3,
+      rows.bealt3,
+      "rekno_tappa_tappv_era",
+      ["rekno", "tappa", "tappv", "era"],
+      {
+        onProgress: (processed, total) =>
+          options?.onProgress?.("bealt3", processed, total),
+      },
+    ),
+  };
+
+  return counts;
+}
+
+export async function countLegacyTrialMirrorRowsDb(): Promise<LegacyTrialMirrorCounts> {
+  const db = getLegacyMirrorPrisma();
+  return {
+    akoeall: await db.legacyAkoeall.count(),
+    bealt: await db.legacyBealt.count(),
+    bealt0: await db.legacyBealt0.count(),
+    bealt1: await db.legacyBealt1.count(),
+    bealt2: await db.legacyBealt2.count(),
+    bealt3: await db.legacyBealt3.count(),
+  };
 }

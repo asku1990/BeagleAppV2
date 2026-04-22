@@ -1,7 +1,7 @@
 -- Add frozen legacy trial mirror tables for source validation and later projection.
 
 -- AlterEnum
-ALTER TYPE "ImportKind" ADD VALUE 'LEGACY_TRIAL_MIRROR';
+ALTER TYPE "ImportKind" RENAME VALUE 'LEGACY_PHASE2' TO 'LEGACY_TRIAL_MIRROR';
 
 -- CreateTable
 CREATE TABLE "legacy_akoeall" (

@@ -77,7 +77,7 @@ describe("imports runs service", () => {
   it("delegates runLegacyPhase2 to phase2 runner", async () => {
     const expected = {
       status: 202,
-      body: { ok: true, data: { id: "run-2", kind: "LEGACY_PHASE2" } },
+      body: { ok: true, data: { id: "run-2", kind: "LEGACY_TRIAL_MIRROR" } },
     };
     runLegacyPhase2Mock.mockResolvedValue(expected);
 

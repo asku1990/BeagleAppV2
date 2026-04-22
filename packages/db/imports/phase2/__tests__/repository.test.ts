@@ -1,15 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { trialEventUpsertMock, prismaMock } = vi.hoisted(() => {
-  const trialEventUpsert = vi.fn();
+const { prismaMock } = vi.hoisted(() => {
+  const legacyAkoeallUpsert = vi.fn();
 
   return {
-    trialEventUpsertMock: trialEventUpsert,
     prismaMock: {
-      trialEvent: { upsert: trialEventUpsert },
-      trialEntry: { upsert: vi.fn() },
-      trialResult: { count: vi.fn() },
-      dogRegistration: { findMany: vi.fn() },
+      legacyAkoeall: { upsert: legacyAkoeallUpsert, count: vi.fn() },
+      legacyBealt: { upsert: vi.fn(), count: vi.fn() },
+      legacyBealt0: { upsert: vi.fn(), count: vi.fn() },
+      legacyBealt1: { upsert: vi.fn(), count: vi.fn() },
+      legacyBealt2: { upsert: vi.fn(), count: vi.fn() },
+      legacyBealt3: { upsert: vi.fn(), count: vi.fn() },
+      $transaction: vi.fn((promises) => Promise.all(promises)),
     },
   };
 });
@@ -18,108 +20,72 @@ vi.mock("../../../core/prisma", () => ({
   prisma: prismaMock,
 }));
 
-import {
-  upsertTrialEntryByEventAndRegistrationDb,
-  upsertTrialEventByLegacyKeyDb,
-} from "../repository";
+import { upsertLegacyTrialMirrorRowsDb } from "../repository";
 
-describe("upsertTrialEventByLegacyKeyDb", () => {
+describe("upsertLegacyTrialMirrorRowsDb", () => {
   beforeEach(() => {
-    trialEventUpsertMock.mockReset();
-    prismaMock.trialEntry.upsert.mockReset();
-    trialEventUpsertMock.mockResolvedValue({ id: "event-1" });
+    prismaMock.legacyAkoeall.upsert.mockReset();
+    prismaMock.legacyBealt.upsert.mockReset();
+    prismaMock.legacyBealt0.upsert.mockReset();
+    prismaMock.legacyBealt1.upsert.mockReset();
+    prismaMock.legacyBealt2.upsert.mockReset();
+    prismaMock.legacyBealt3.upsert.mockReset();
+    prismaMock.$transaction.mockClear();
   });
 
-  it("does not overwrite existing judge with null on update", async () => {
-    await upsertTrialEventByLegacyKeyDb({
-      legacyEventKey: "2024-01-07|oulu|pk|08",
-      koepaiva: new Date("2024-01-07T00:00:00.000Z"),
-      koekunta: "Oulu",
-      kennelpiiri: "PK",
-      kennelpiirinro: "08",
-      ylituomariNimi: null,
+  it("upserts mirror akoeall rows by legacy composite key", async () => {
+    await upsertLegacyTrialMirrorRowsDb({
+      akoeall: [
+        {
+          rekno: "FI1/24",
+          tappa: "Oulu",
+          tappv: "20240101",
+          kennelpiiri: null,
+          kennelpiirinro: null,
+          ke: null,
+          lk: null,
+          pa: null,
+          piste: null,
+          sija: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          tja: null,
+          pin: null,
+          tuom1: null,
+          muokattuRaw: "2024-01-01 12:00:00",
+          vara: null,
+          rawPayloadJson: '{"REKNO":"FI1/24"}',
+          sourceHash: "a".repeat(64),
+        },
+      ],
+      bealt: [],
+      bealt0: [],
+      bealt1: [],
+      bealt2: [],
+      bealt3: [],
     });
 
-    const call = trialEventUpsertMock.mock.calls[0]?.[0];
-    expect(call.update).not.toHaveProperty("ylituomariNimi");
-  });
-
-  it("updates judge when a non-null value is provided", async () => {
-    await upsertTrialEventByLegacyKeyDb({
-      legacyEventKey: "2024-01-07|oulu|pk|08",
-      koepaiva: new Date("2024-01-07T00:00:00.000Z"),
-      koekunta: "Oulu",
-      kennelpiiri: "PK",
-      kennelpiirinro: "08",
-      ylituomariNimi: "Matti Meikalainen",
-    });
-
-    const call = trialEventUpsertMock.mock.calls[0]?.[0];
-    expect(call.update.ylituomariNimi).toBe("Matti Meikalainen");
-  });
-
-  it("does not clear an existing dog link when the lookup is missing", async () => {
-    await upsertTrialEntryByEventAndRegistrationDb({
-      trialEventId: "event-1",
-      dogId: null,
-      rekisterinumeroSnapshot: "FI-1/24",
-      yksilointiAvain: "event-1|FI-1/24",
-      raakadataJson: "{}",
-      palkinto: null,
-      legacySijoitusRaw: null,
-      loppupisteet: null,
-      hakuKeskiarvo: null,
-      haukkuKeskiarvo: null,
-      yleisvaikutelmaPisteet: null,
-      hakuloysyysTappioYhteensa: null,
-      ajoloysyysTappioYhteensa: null,
-      tieJaEstetyoskentelyPisteet: null,
-      metsastysintoPisteet: null,
-      keli: null,
-      luopui: null,
-      suljettu: null,
-      keskeytetty: null,
-      notes: null,
-    });
-
-    const call = prismaMock.trialEntry.upsert.mock.calls[0]?.[0];
-    expect(call.update).not.toHaveProperty("dogId");
-    expect(call.create).toMatchObject({
-      yleisvaikutelmaPisteet: null,
-      tieJaEstetyoskentelyPisteet: null,
-      metsastysintoPisteet: null,
-    });
-  });
-
-  it("writes legacy sijoitus into the raw column only", async () => {
-    await upsertTrialEntryByEventAndRegistrationDb({
-      trialEventId: "event-1",
-      dogId: null,
-      rekisterinumeroSnapshot: "FI-1/24",
-      yksilointiAvain: "event-1|FI-1/24",
-      raakadataJson: "{}",
-      palkinto: null,
-      legacySijoitusRaw: "PK|1",
-      loppupisteet: null,
-      hakuKeskiarvo: null,
-      haukkuKeskiarvo: null,
-      yleisvaikutelmaPisteet: null,
-      hakuloysyysTappioYhteensa: null,
-      ajoloysyysTappioYhteensa: null,
-      tieJaEstetyoskentelyPisteet: null,
-      metsastysintoPisteet: null,
-      keli: null,
-      luopui: null,
-      suljettu: null,
-      keskeytetty: null,
-      notes: null,
-    });
-
-    const call = prismaMock.trialEntry.upsert.mock.calls[0]?.[0];
-    expect(call.create).toMatchObject({
-      legacySijoitusRaw: "PK|1",
-    });
-    expect(call.create).not.toHaveProperty("sijoitus");
-    expect(call.update).not.toHaveProperty("sijoitus");
+    expect(prismaMock.legacyAkoeall.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          rekno_tappa_tappv: {
+            rekno: "FI1/24",
+            tappa: "Oulu",
+            tappv: "20240101",
+          },
+        },
+        create: expect.objectContaining({
+          rawPayloadJson: '{"REKNO":"FI1/24"}',
+        }),
+        update: expect.not.objectContaining({
+          rekno: expect.anything(),
+          tappa: expect.anything(),
+          tappv: expect.anything(),
+        }),
+      }),
+    );
   });
 });
