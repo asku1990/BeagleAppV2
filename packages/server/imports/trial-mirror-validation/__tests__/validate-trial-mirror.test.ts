@@ -101,16 +101,22 @@ describe("validateLegacyTrialMirrorRows", () => {
     );
   });
 
-  it("does not report orphan detail rows from non-projected rule tables", () => {
+  it("reports orphan detail rows with table-specific codes", () => {
     const report = validate({
       akoeall: [akoeall({ rekno: "FI-1/24" })],
-      details: [detail({ sourceTable: "bealt0", rekno: "FI-2/24" })],
+      details: [
+        detail({ sourceTable: "bealt0", rekno: "FI-2/24" }),
+        detail({ sourceTable: "bealt3", rekno: "FI-3/24" }),
+      ],
     });
 
-    expect(report.issues).not.toEqual(
+    expect(report.issues).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           code: "TRIAL_MIRROR_BEALT0_WITHOUT_AKOEALL",
+        }),
+        expect.objectContaining({
+          code: "TRIAL_MIRROR_BEALT3_WITHOUT_AKOEALL",
         }),
       ]),
     );

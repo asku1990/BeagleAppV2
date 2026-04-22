@@ -47,11 +47,6 @@ const COMMON_SCORE_FIELDS = [
   "pin",
 ] as const;
 
-const PROJECTED_DETAIL_TABLES = new Set<LegacyTrialMirrorDetailTableName>([
-  "bealt2",
-  "bealt3",
-]);
-
 const HASH_PATTERN = /^[a-f0-9]{64}$/;
 const MUOKATTU_PATTERN = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
 
@@ -270,9 +265,6 @@ export function validateLegacyTrialMirrorRows(
   const issues: TrialMirrorValidationIssue[] = [];
   const akoeallKeys = new Set(rows.akoeall.map(rowKey));
   const akoeallKeysWithDetails = new Set<string>();
-  const projectedDetails = rows.details.filter((row) =>
-    PROJECTED_DETAIL_TABLES.has(row.sourceTable),
-  );
 
   const counts: TrialMirrorValidationReport["counts"] = {
     akoeall: rows.akoeall.length,
@@ -292,9 +284,8 @@ export function validateLegacyTrialMirrorRows(
     validateCommonRow(row, issues);
     const key = rowKey(row);
     const eraKey = detailKey(row);
-    const isProjectedDetail = PROJECTED_DETAIL_TABLES.has(row.sourceTable);
 
-    if (isProjectedDetail && !akoeallKeys.has(key)) {
+    if (!akoeallKeys.has(key)) {
       addIssue(issues, {
         severity: "WARNING",
         code: detailWithoutAkoeallCode(row.sourceTable),
@@ -304,7 +295,7 @@ export function validateLegacyTrialMirrorRows(
         field: null,
         value: null,
       });
-    } else if (isProjectedDetail) {
+    } else {
       akoeallKeysWithDetails.add(key);
     }
 
@@ -321,11 +312,7 @@ export function validateLegacyTrialMirrorRows(
     }
 
     const expectedTable = expectedDetailTableForDate(row.tappv);
-    if (
-      isProjectedDetail &&
-      expectedTable !== null &&
-      row.sourceTable !== expectedTable
-    ) {
+    if (expectedTable !== null && row.sourceTable !== expectedTable) {
       addIssue(issues, {
         severity: "INFO",
         code: "TRIAL_MIRROR_DETAIL_OUTSIDE_DATE_RULE_TABLE",
@@ -357,7 +344,7 @@ export function validateLegacyTrialMirrorRows(
   return {
     counts,
     totalRows: rows.akoeall.length + rows.details.length,
-    detailRowsWithAkoeall: projectedDetails.filter((row) =>
+    detailRowsWithAkoeall: rows.details.filter((row) =>
       akoeallKeys.has(rowKey(row)),
     ).length,
     akoeallRowsWithDetails: akoeallKeysWithDetails.size,

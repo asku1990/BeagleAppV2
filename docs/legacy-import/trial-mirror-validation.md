@@ -53,9 +53,9 @@ The command reads only the app database mirror tables:
 The validation report includes:
 
 - row counts per mirror table
-- projected detail rows with matching `akoeall`
-- `akoeall` rows without projected detail rows
-- projected detail rows stored in a `bealt*` table outside the v1 date-selected rule table
+- detail rows with matching `akoeall`
+- `akoeall` rows without detail rows
+- detail rows stored in a `bealt*` table outside the v1 date-selected rule table
 - blank key parts
 - invalid `TAPPV` dates
 - invalid registration number shape
@@ -63,13 +63,13 @@ The validation report includes:
 - missing or malformed `sourceHash`
 - invalid `rawPayloadJson`
 - broad score range warnings
-- projected detail rows without matching `akoeall`, reported with table-specific codes
+- detail rows without matching `akoeall`, reported with table-specific codes
 - suspicious `ERA` values
 
-The current runtime projection validation treats only `bealt2` and `bealt3` as
-projected detail tables. Older detail tables (`bealt`, `bealt0`, `bealt1`) are
-still counted and checked for row shape, but parent/detail relationship warnings
-are deferred until those rule tables are explicitly selected for runtime use.
+Parent/detail relationship issues are intentionally split by source table, for
+example `TRIAL_MIRROR_BEALT0_WITHOUT_AKOEALL` and
+`TRIAL_MIRROR_BEALT3_WITHOUT_AKOEALL`, so each rule table can be reviewed or
+fixed independently.
 
 V1 selects the visible detail table by `TAPPV`:
 
