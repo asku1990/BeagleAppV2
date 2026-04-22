@@ -10,7 +10,7 @@ For show-domain deep details, see:
 
 - `Role`: `USER`, `ADMIN`
 - `DogSex`: `MALE`, `FEMALE`, `UNKNOWN`
-- `ImportKind`: `LEGACY_PHASE1`, `LEGACY_PHASE1_5`, `LEGACY_PHASE2`, `LEGACY_PHASE3`
+- `ImportKind`: `LEGACY_PHASE1`, `LEGACY_PHASE1_5`, `LEGACY_PHASE2`, `LEGACY_PHASE3`, `LEGACY_TRIAL_MIRROR`
 - `ImportStatus`: `PENDING`, `RUNNING`, `SUCCEEDED`, `FAILED`
 - `ImportIssueSeverity`: `INFO`, `WARNING`, `ERROR`
 - `ShowSourceTag`: source tagging for legacy/workbook/manual show data
@@ -35,6 +35,11 @@ erDiagram
   Dog ||--o{ TrialEntry : "canonical trial entries (optional)"
   TrialEvent ||--o{ TrialEntry : "canonical AJOK entries"
   TrialEntry ||--o{ TrialLisatietoItem : "canonical AJOK lisatieto rows"
+  LegacyAkoeall ||--o{ LegacyBealt : "legacy key match"
+  LegacyAkoeall ||--o{ LegacyBealt0 : "legacy key match"
+  LegacyAkoeall ||--o{ LegacyBealt1 : "legacy key match"
+  LegacyAkoeall ||--o{ LegacyBealt2 : "legacy key match"
+  LegacyAkoeall ||--o{ LegacyBealt3 : "legacy key match"
   Dog ||--o{ ShowEntry : "canonical show entries (optional)"
 
   ImportRun ||--o{ ImportRunIssue : "issues"
@@ -77,6 +82,13 @@ erDiagram
   - `TrialEntry.keli` stores the main top-level condition value from `KELI`.
   - `TrialLisatietoItem` stores detailed 11-61 code rows as typed `era1..era4`
     values for report/PDF rendering without decoding raw payload JSON.
+- `LegacyAkoeall`, `LegacyBealt`, `LegacyBealt0`, `LegacyBealt1`,
+  `LegacyBealt2`, `LegacyBealt3`: frozen v1 AJOK mirror tables used for
+  source validation and later projection into canonical runtime tables.
+  These tables preserve the legacy composite keys and source column names via
+  Prisma mappings, store legacy `MUOKATTU` as raw text to support zero-date
+  values, and include import metadata (`rawPayloadJson`, `sourceHash`,
+  `importedAt`). Runtime application reads should not use these tables directly.
 - `ShowEvent`: canonical show event.
 - `ShowEntry`: canonical show participation row; `dogId` nullable.
 - `ShowResultCategory`: UI/admin managed grouping for show definitions.
@@ -115,6 +127,8 @@ erDiagram
 - `TrialEntry.yksilointiAvain` unique
 - `TrialEntry.[trialEventId, rekisterinumeroSnapshot]` unique
 - `TrialLisatietoItem.[trialEntryId, koodi]` unique
+- `LegacyAkoeall.[REKNO, TAPPA, TAPPV]` composite primary key
+- `LegacyBealt*.[REKNO, TAPPA, TAPPV, ERA]` composite primary key
 - `ShowEvent.eventLookupKey` unique
 - `ShowEntry.entryLookupKey` unique
 - `ShowResultItem.itemLookupKey` unique

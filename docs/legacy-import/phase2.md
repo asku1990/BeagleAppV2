@@ -5,7 +5,10 @@
 This is the detailed implementation reference for phase2.
 For overall flow and ordering, see `docs/legacy-import/import-flow.md`.
 
-Phase 2 imports trial rows from `akoeall` into canonical AJOK tables.
+Phase 2 currently imports trial rows from `akoeall` into canonical AJOK tables.
+The schema also has frozen legacy AJOK mirror tables for the follow-up
+mirror/import/projection flow; those mirror tables are validation and audit
+source memory, not runtime read models.
 
 ## Command
 
@@ -14,6 +17,23 @@ Phase 2 imports trial rows from `akoeall` into canonical AJOK tables.
 ## Primary source table
 
 - `akoeall`
+
+## Legacy mirror foundation
+
+The additive mirror schema contains:
+
+- `legacy_akoeall`
+- `legacy_bealt`
+- `legacy_bealt0`
+- `legacy_bealt1`
+- `legacy_bealt2`
+- `legacy_bealt3`
+
+These tables preserve v1 composite keys and source-column names through Prisma
+mappings. `MUOKATTU` is stored as raw text so `bealt3` zero-date values can be
+imported without timestamp coercion. Later phases should import legacy source
+rows into these tables first, validate mirror completeness, and then project
+from the mirrors into canonical runtime tables.
 
 ## Source row mapping (high level)
 
