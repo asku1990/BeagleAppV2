@@ -153,6 +153,62 @@ export type LegacyTrialMirrorCounts = Record<
   number
 >;
 
+export type LegacyTrialMirrorDetailTableName = Exclude<
+  LegacyTrialMirrorTableName,
+  "akoeall"
+>;
+
+export type LegacyTrialMirrorAkoeallValidationRow = {
+  sourceTable: "akoeall";
+  rekno: string;
+  tappa: string;
+  tappv: string;
+  kennelpiiri: string | null;
+  kennelpiirinro: string | null;
+  ke: string | null;
+  lk: string | null;
+  pa: string | null;
+  piste: string | null;
+  sija: string | null;
+  haku: string | null;
+  hauk: string | null;
+  yva: string | null;
+  hlo: string | null;
+  alo: string | null;
+  tja: string | null;
+  pin: string | null;
+  tuom1: string | null;
+  muokattuRaw: string;
+  vara: string | null;
+  rawPayloadJson: string;
+  sourceHash: string | null;
+};
+
+export type LegacyTrialMirrorDetailValidationRow = {
+  sourceTable: LegacyTrialMirrorDetailTableName;
+  rekno: string;
+  tappa: string;
+  tappv: string;
+  era: number;
+  hakumin: number | null;
+  ajomin: number | null;
+  haku: string | null;
+  hauk: string | null;
+  yva: string | null;
+  hlo: string | null;
+  alo: string | null;
+  tja: string | null;
+  pin: string | null;
+  muokattuRaw: string;
+  rawPayloadJson: string;
+  sourceHash: string | null;
+};
+
+export type LegacyTrialMirrorValidationRows = {
+  akoeall: LegacyTrialMirrorAkoeallValidationRow[];
+  details: LegacyTrialMirrorDetailValidationRow[];
+};
+
 export type LegacyShowResultRow = {
   registrationNo: string;
   eventDateRaw: string | null;

@@ -157,6 +157,22 @@ pass-cli run --env-file .env.staging -- pnpm import:phase2
 CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:phase2
 ```
 
+Trial mirror validation:
+
+```bash
+pass-cli run --env-file .env.local -- pnpm import:trials:validate-mirror
+pass-cli run --env-file .env.staging -- pnpm import:trials:validate-mirror
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:trials:validate-mirror
+```
+
+Trial mirror validation CSV export:
+
+```bash
+pass-cli run --env-file .env.local -- pnpm import:trials:validate-mirror:csv
+pass-cli run --env-file .env.staging -- pnpm import:trials:validate-mirror:csv
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:trials:validate-mirror:csv
+```
+
 Phase-3 import:
 
 ```bash

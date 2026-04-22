@@ -12,6 +12,7 @@ Phase-specific docs:
 - `docs/legacy-import/phase1.md`
 - `docs/legacy-import/phase1.5.md`
 - `docs/legacy-import/phase2.md`
+- `docs/legacy-import/trial-mirror-validation.md`
 - `docs/legacy-import/phase3.md`
 
 ## Commands
@@ -19,6 +20,7 @@ Phase-specific docs:
 - Phase 1 (foundation only): `pnpm import:phase1`
 - Phase 1.5 (dog titles): `pnpm import:phase1.5`
 - Phase 2 (trials): `pnpm import:phase2`
+- Trial mirror validation: `pnpm import:trials:validate-mirror`
 - Phase 3 (shows): `pnpm import:phase3`
 - Show result definition seed (canonical awards, one-shot flow): `pnpm --filter @beagle/db seed:show-result-definitions`
 - Show workbook import schema seed (Kennelliitto workbook metadata, one-shot flow): `pnpm --filter @beagle/db seed:show-workbook-import-schema`
@@ -85,16 +87,20 @@ Issue tooling:
    `TrialEntry`, and trial detail tables is intentionally deferred to a later
    phase.
 
-4. `phase3` imports show rows into canonical show tables (`ShowEvent`, `ShowEntry`,
+4. `import:trials:validate-mirror` validates the frozen trial mirror tables
+   before runtime trial projection. It is read-only and does not create an
+   `ImportRun`.
+
+5. `phase3` imports show rows into canonical show tables (`ShowEvent`, `ShowEntry`,
    `ShowResultItem`) using merged legacy sources (`nay9599`, `beanay`, optional
    `nay9599_rd_ud`) plus `beanay_text` critique join.
    The phase3 runtime path does not write legacy `ShowResult`.
 
-5. `seed:show-result-definitions` bootstraps canonical `ShowResultDefinition` rows used by both
+6. `seed:show-result-definitions` bootstraps canonical `ShowResultDefinition` rows used by both
    legacy and Kennelliitto workbook mappings (for example `ROP`, `VSP`, `SERT`, `varaSERT`,
    `CACIB`, `varaCACIB`, `PUPN`, `SIJOITUS`, `JUN-ROP`, `JUN-VSP`, `VET-ROP`, `VET-VSP`, `SA`, `KP`).
 
-6. `seed:show-workbook-import-schema` bootstraps `ShowWorkbookColumnRule` metadata used by the
+7. `seed:show-workbook-import-schema` bootstraps `ShowWorkbookColumnRule` metadata used by the
    Kennelliitto workbook validator to resolve headers into imported, ignored, or blocked columns.
    This seed is the bootstrap baseline only; future admin-managed workbook
    schema edits should update the metadata directly instead of reseeding.
@@ -156,6 +162,7 @@ Issue code details are maintained in phase docs:
 - `docs/legacy-import/phase1.md`
 - `docs/legacy-import/phase1.5.md`
 - `docs/legacy-import/phase2.md`
+- `docs/legacy-import/trial-mirror-validation.md`
 - `docs/legacy-import/phase3.md`
 
 ## Execution model

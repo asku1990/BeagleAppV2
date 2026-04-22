@@ -77,5 +77,7 @@ Unexpected exceptions record `UNEXPECTED_EXCEPTION`.
 ## Operational notes
 
 - Phase 2 is safe to rerun against the same source; rows are upserted by legacy key.
+- Run `pnpm import:trials:validate-mirror` after Phase 2 to inspect mirror
+  integrity before designing runtime projection.
 - Runtime trial projection is intentionally deferred to a later phase.
 - Phase 2 belongs to the initial migration flow and is included in `import:bootstrap`.

@@ -38,6 +38,8 @@
     "import:phase1": "pnpm --filter @beagle/server import:phase1 --",
     "import:phase1.5": "pnpm --filter @beagle/server import:phase1.5 --",
     "import:phase2": "pnpm --filter @beagle/server import:phase2 --",
+    "import:trials:validate-mirror": "pnpm --filter @beagle/server import:trials:validate-mirror --",
+    "import:trials:validate-mirror:csv": "pnpm --filter @beagle/server import:trials:validate-mirror:csv --",
     "import:phase3": "pnpm --filter @beagle/server import:phase3 --",
     "import:bootstrap": "pnpm --filter @beagle/server import:bootstrap --",
     "import:issues": "pnpm --filter @beagle/server import:issues --",
