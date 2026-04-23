@@ -42,7 +42,42 @@ export function parseLegacySija(
     };
   }
 
-  const parts = normalized
+  if (normalized === "-") {
+    return {
+      sija: null,
+      koiriaLuokassa: null,
+      koetyyppi: TrialEntryKoetyyppi.NORMAL,
+      unclear: false,
+    };
+  }
+
+  if (normalized.toUpperCase() === "KK") {
+    return {
+      sija: null,
+      koiriaLuokassa: null,
+      koetyyppi: TrialEntryKoetyyppi.KOKOKAUDENKOE,
+      unclear: false,
+    };
+  }
+
+  if (/^-+\d+$/.test(normalized)) {
+    const koiriaLuokassa = parseNullableInteger(normalized.replace(/^-+/, ""));
+    if (koiriaLuokassa !== null && koiriaLuokassa > 0) {
+      return {
+        sija: null,
+        koiriaLuokassa,
+        koetyyppi: TrialEntryKoetyyppi.NORMAL,
+        unclear: false,
+      };
+    }
+  }
+
+  const separatorNormalized = normalized.replace(
+    /(?<=[\p{L}\p{N}])(?:[.\-]+)(?=[\p{L}\p{N}])/gu,
+    "|",
+  );
+
+  const parts = separatorNormalized
     .split("|")
     .map((part) => normalizePart(part))
     .filter((part): part is string => part !== null);
@@ -52,16 +87,16 @@ export function parseLegacySija(
     const leftUpper = left.toUpperCase();
     const rightUpper = right.toUpperCase();
 
-    if (leftUpper === "PK") {
+    if (leftUpper.startsWith("PK") || rightUpper.startsWith("PK")) {
       return {
         sija: null,
-        koiriaLuokassa: parseNullableInteger(right),
+        koiriaLuokassa: null,
         koetyyppi: TrialEntryKoetyyppi.PITKAKOE,
-        unclear: parseNullableInteger(right) === null,
+        unclear: false,
       };
     }
 
-    if ((leftUpper === "-" || leftUpper === "") && rightUpper === "KK") {
+    if (leftUpper.startsWith("KK") || rightUpper.startsWith("KK")) {
       return {
         sija: null,
         koiriaLuokassa: null,

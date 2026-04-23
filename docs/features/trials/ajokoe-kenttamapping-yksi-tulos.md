@@ -108,11 +108,24 @@ Huomio:
 
 ## Legacy `SIJA` normalisointi phase 5:ssä
 
-- `1|3` -> `sija="1"`, `koiriaLuokassa=3`, `koetyyppi=NORMAL`
-- `PK|4` -> `sija=null`, `koiriaLuokassa=4`, `koetyyppi=PITKAKOE`
-- `-|KK` -> `sija=null`, `koiriaLuokassa=null`, `koetyyppi=KOKOKAUDENKOE`
-- epäselvä arvo -> entry silti projisoidaan, mutta kirjoitetaan warning issue
-  `TRIAL_PHASE5_UNCLEAR_SIJA`
+Phase 5 mapittaa `SIJA`-arvon seuraavassa järjestyksessä:
+
+1. Tyhjä arvo -> `sija=null`, `koiriaLuokassa=null`, `koetyyppi=NORMAL`
+2. Pelkkä `-` -> `sija=null`, `koiriaLuokassa=null`, `koetyyppi=NORMAL`
+3. Pelkkä `KK` -> `sija=null`, `koiriaLuokassa=null`, `koetyyppi=KOKOKAUDENKOE`
+4. Dash-prefiksi + numero, esimerkiksi `-12` tai `--3`
+   -> `sija=null`, `koiriaLuokassa=<numero>`, `koetyyppi=NORMAL`
+5. Kahden osan arvo erotinmerkistä riippumatta, kun vasen tai oikea osa on
+   `PK` tai `KK`
+   - `PK|4`, `PK.1`, `PK|-`, `-|PK3` -> `sija=null`,
+     `koiriaLuokassa=null`, `koetyyppi=PITKAKOE`
+   - `-|KK` -> `sija=null`, `koiriaLuokassa=null`, `koetyyppi=KOKOKAUDENKOE`
+6. Tavallinen sijoitus + luokkakoko, esimerkiksi `1|3` tai `7-9`
+   -> `sija="<vasen osa>"`, `koiriaLuokassa=<oikea numero>`,
+   `koetyyppi=NORMAL`
+
+Epäselvä arvo -> entry silti projisoidaan, mutta kirjoitetaan warning issue
+`TRIAL_PHASE5_UNCLEAR_SIJA`
 
 ## Lisätietojen mapping
 

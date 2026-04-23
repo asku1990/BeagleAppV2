@@ -14,7 +14,7 @@ describe("parseLegacySija", () => {
   it("maps pitkakoe rows", () => {
     expect(parseLegacySija("PK|4")).toEqual({
       sija: null,
-      koiriaLuokassa: 4,
+      koiriaLuokassa: null,
       koetyyppi: "PITKAKOE",
       unclear: false,
     });
@@ -25,6 +25,59 @@ describe("parseLegacySija", () => {
       sija: null,
       koiriaLuokassa: null,
       koetyyppi: "KOKOKAUDENKOE",
+      unclear: false,
+    });
+  });
+
+  it("accepts common legacy separator variants", () => {
+    expect(parseLegacySija("PK.1")).toEqual({
+      sija: null,
+      koiriaLuokassa: null,
+      koetyyppi: "PITKAKOE",
+      unclear: false,
+    });
+
+    expect(parseLegacySija("7-9")).toEqual({
+      sija: "7",
+      koiriaLuokassa: 9,
+      koetyyppi: "NORMAL",
+      unclear: false,
+    });
+
+    expect(parseLegacySija("PK|-")).toEqual({
+      sija: null,
+      koiriaLuokassa: null,
+      koetyyppi: "PITKAKOE",
+      unclear: false,
+    });
+
+    expect(parseLegacySija("-|PK3")).toEqual({
+      sija: null,
+      koiriaLuokassa: null,
+      koetyyppi: "PITKAKOE",
+      unclear: false,
+    });
+  });
+
+  it("accepts dash-prefixed legacy forms", () => {
+    expect(parseLegacySija("-")).toEqual({
+      sija: null,
+      koiriaLuokassa: null,
+      koetyyppi: "NORMAL",
+      unclear: false,
+    });
+
+    expect(parseLegacySija("--3")).toEqual({
+      sija: null,
+      koiriaLuokassa: 3,
+      koetyyppi: "NORMAL",
+      unclear: false,
+    });
+
+    expect(parseLegacySija("-12")).toEqual({
+      sija: null,
+      koiriaLuokassa: 12,
+      koetyyppi: "NORMAL",
       unclear: false,
     });
   });
