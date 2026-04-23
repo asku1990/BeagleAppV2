@@ -55,8 +55,8 @@ result upsert contract.
 - `I_ERA_KLO` / `II_ERA_KLO` / `III_ERA_KLO` / `IV_ERA_KLO` -> `era1Alkoi` .. `era4Alkoi`
 - `i_haku_min` / `II_HAKU_MIN` / `III_HAKU_MIN` / `IV_HAKU_MIN` -> `hakuMin1` .. `hakuMin4`
 - `I_AJO_MIN` / `II_AJO_MIN` / `III_AJO_MIN` / `IV_AJO_MIN` -> `ajoMin1` .. `ajoMin4`
-- `HYV_AJOT_MIN` -> `hyvaksytytAjominuutit`
-- `AJOPISTEET` -> `ajoajanPisteet`
+- `HYV_AJOT_MIN` -> `TrialEntry.hyvaksytytAjominuutit`
+- `AJOPISTEET` -> `TrialEntry.ajoajanPisteet`
 - `I_HAKU` / `II_HAKU` / `III_HAKU` / `IV_HAKU` -> `hakuEra1` .. `hakuEra4`
 - `HAKUPISTEET` -> `hakuKeskiarvo`
 - `I_HAUKKU` / `II_HAUKKU` / `III_HAUKKU` / `IV_HAUKKU` -> `haukkuEra1` .. `haukkuEra4`

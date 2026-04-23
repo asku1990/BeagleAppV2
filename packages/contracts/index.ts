@@ -45,7 +45,8 @@ export type ImportRunKind =
   | "LEGACY_PHASE1"
   | "LEGACY_PHASE1_5"
   | "LEGACY_PHASE3"
-  | "LEGACY_TRIAL_MIRROR";
+  | "LEGACY_TRIAL_MIRROR"
+  | "LEGACY_PHASE5";
 
 export type ImportRunStatus = "PENDING" | "RUNNING" | "SUCCEEDED" | "FAILED";
 

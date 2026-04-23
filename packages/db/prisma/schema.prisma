@@ -22,6 +22,7 @@ enum ImportKind {
   LEGACY_PHASE1_5
   LEGACY_PHASE3
   LEGACY_TRIAL_MIRROR
+  LEGACY_PHASE5
 }
 
 enum ImportStatus {
@@ -315,21 +316,23 @@ model TrialEvent {
   kennelpiiri    String?
   kennelpiirinro String?
   koemuoto       String?
-  rotukoodi      String? // This should be moved to entry level.
 
   // 10) tuomarit ja vahvistus (event-taso)
   ylituomariNimi   String?
   ylituomariNumero String?
 
   // technical/event metadata
-  legacyEventKey String?      @unique
-  ytKertomus     String?      @db.Text
-  entries        TrialEntry[]
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  legacyEventKey    String?          @unique
+  trialRuleWindowId String?
+  ytKertomus        String?          @db.Text
+  trialRuleWindow   TrialRuleWindow? @relation(fields: [trialRuleWindowId], references: [id], onDelete: SetNull)
+  entries           TrialEntry[]
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 
   @@index([koepaiva])
   @@index([koekunta, koepaiva])
+  @@index([trialRuleWindowId])
 }
 
 model TrialEntry {
@@ -343,117 +346,97 @@ model TrialEntry {
   // 2) koiran tiedot
   koemaasto                  String?
   rekisterinumeroSnapshot    String
-  luokka                     String?
+  rotukoodi                  String?
+  ke                         String?
+  lk                         String?
+  pa                         String?
+  piste                      Decimal? @db.Decimal(6, 2)
+  sija                       String?
+  hyvaksytytAjominuutit      Int?
+  ajoajanPisteet             Decimal? @db.Decimal(6, 2)
+  haku                       Decimal? @db.Decimal(6, 2)
+  hauk                       Decimal? @db.Decimal(6, 2)
+  yva                        Decimal? @db.Decimal(6, 2)
+  hlo                        Decimal? @db.Decimal(6, 2)
+  alo                        Decimal? @db.Decimal(6, 2)
+  tja                        Decimal? @db.Decimal(6, 2)
+  pin                        Decimal? @db.Decimal(6, 2)
+  tuom1                      String?
+  vara                       String?
   omistajaSnapshot           String?
   omistajanKotikuntaSnapshot String?
 
-  // 3) koe-erat
-  era1Alkoi             String?
-  era2Alkoi             String?
-  era3Alkoi             String?
-  era4Alkoi             String?
-  hakuMin1              Int?
-  hakuMin2              Int?
-  hakuMin3              Int?
-  hakuMin4              Int?
-  ajoMin1               Int?
-  ajoMin2               Int?
-  ajoMin3               Int?
-  ajoMin4               Int?
-  hyvaksytytAjominuutit Int?
-  ajoajanPisteet        Decimal? @db.Decimal(6, 2)
-
-  // 4) ansiopisteiden keskiarvot ja yhteensa
-  hakuEra1                    Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  hakuEra2                    Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  hakuEra3                    Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  hakuEra4                    Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  hakuKeskiarvo               Decimal? @db.Decimal(6, 2)
-  haukkuEra1                  Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  haukkuEra2                  Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  haukkuEra3                  Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  haukkuEra4                  Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  haukkuKeskiarvo             Decimal? @db.Decimal(6, 2)
-  ajotaitoEra1                Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  ajotaitoEra2                Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  ajotaitoEra3                Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  ajotaitoEra4                Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  yleisvaikutelmaPisteet      Decimal? @db.Decimal(6, 2)
-  ajotaitoKeskiarvo           Decimal? @db.Decimal(6, 2)
-  ansiopisteetYhteensa        Decimal? @db.Decimal(6, 2)
-  tieJaEstetyoskentelyPisteet Decimal? @db.Decimal(6, 2)
-  metsastysintoPisteet        Decimal? @db.Decimal(6, 2)
-
-  // 5) tappiopisteiden summat
-  hakuloysyysTappioEra1     Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  hakuloysyysTappioEra2     Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  hakuloysyysTappioEra3     Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  hakuloysyysTappioEra4     Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  hakuloysyysTappioYhteensa Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  ajoloysyysTappioEra1      Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  ajoloysyysTappioEra2      Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  ajoloysyysTappioEra3      Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  ajoloysyysTappioEra4      Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  ajoloysyysTappioYhteensa  Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  tappiopisteetYhteensa     Decimal? @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-
-  // 6) pisteet ja tulos
-  loppupisteet      Decimal? @db.Decimal(6, 2)
-  palkinto          String?
-  legacySijoitusRaw String? // Raw legacy SIJA text from akoeall.
-  sijoitus          String? // Canonical placement for modern AJOK writes.
-  koiriaLuokassa    Int?
-  kokokaudenkoe     Boolean? // Entry-level whole-season trial flag.
-
-  // 7) olosuhteet
-  keli String?
-
-  // 8) huomautukset ja tilat
-  luopui          Boolean?
-  suljettu        Boolean?
-  keskeytetty     Boolean?
-  huomautusTeksti String?  @db.Text
-
-  // 10) tuomarit ja vahvistus (entry-taso)
-  ylituomariNimiSnapshot   String?
-  ylituomariNumeroSnapshot String? // this should be int i think?
-  ryhmatuomariNimi         String?
-  palkintotuomariNimi      String?
-
   // technical storage
   raakadataJson String? @db.Text
-  notes         String? @db.Text
 
   // 9) lisatiedot (asteikko/rastit)
-  lisatiedot TrialLisatietoItem[]
-  trialEvent TrialEvent           @relation(fields: [trialEventId], references: [id], onDelete: Cascade)
-  dog        Dog?                 @relation(fields: [dogId], references: [id], onDelete: SetNull)
-  createdAt  DateTime             @default(now())
-  updatedAt  DateTime             @updatedAt
+  eras       TrialEra[]
+  trialEvent TrialEvent @relation(fields: [trialEventId], references: [id], onDelete: Cascade)
+  dog        Dog?       @relation(fields: [dogId], references: [id], onDelete: SetNull)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 
   @@unique([trialEventId, rekisterinumeroSnapshot])
   @@index([dogId])
   @@index([trialEventId])
-  @@index([loppupisteet])
 }
 
-model TrialLisatietoItem {
-  id           String     @id @default(cuid())
-  trialEntryId String
-  koodi        String
-  nimi         String
-  era1Arvo     String?
-  era2Arvo     String?
-  era3Arvo     String?
-  era4Arvo     String?
-  jarjestys    Int?
-  trialEntry   TrialEntry @relation(fields: [trialEntryId], references: [id], onDelete: Cascade)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+model TrialEra {
+  id            String              @id @default(cuid())
+  trialEntryId  String
+  era           Int
+  alkoi         String?
+  hakumin       Int?
+  ajomin        Int?
+  haku          Decimal?            @db.Decimal(6, 2)
+  hauk          Decimal?            @db.Decimal(6, 2)
+  yva           Decimal?            @db.Decimal(6, 2)
+  hlo           Decimal?            @db.Decimal(6, 2)
+  alo           Decimal?            @db.Decimal(6, 2)
+  tja           Decimal?            @db.Decimal(6, 2)
+  pin           Decimal?            @db.Decimal(6, 2)
+  raakadataJson String?             @db.Text
+  trialEntry    TrialEntry          @relation(fields: [trialEntryId], references: [id], onDelete: Cascade)
+  lisatiedot    TrialEraLisatieto[]
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
 
-  @@unique([trialEntryId, koodi])
-  @@index([koodi])
+  @@unique([trialEntryId, era])
   @@index([trialEntryId])
+  @@index([era])
+}
+
+model TrialEraLisatieto {
+  id         String   @id @default(cuid())
+  trialEraId String
+  koodi      String
+  arvo       String
+  nimi       String?
+  jarjestys  Int?
+  trialEra   TrialEra @relation(fields: [trialEraId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([trialEraId, koodi])
+  @@index([koodi])
+  @@index([trialEraId])
+}
+
+model TrialRuleWindow {
+  id          String       @id @default(cuid())
+  fromYmd     Int?         @map("from_ymd")
+  toYmd       Int?         @map("to_ymd")
+  label       String
+  sortOrder   Int          @default(0) @map("sort_order")
+  isActive    Boolean      @default(true) @map("is_active")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  trialEvents TrialEvent[]
+
+  @@index([fromYmd, toYmd])
+  @@index([sortOrder])
+  @@index([isActive])
+  @@map("trial_rule_window")
 }
 
 model LegacyAkoeall {

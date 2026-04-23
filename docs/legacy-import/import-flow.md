@@ -1,4 +1,4 @@
-# Legacy Import Flow (Phases 1, 1.5, 2, 3)
+# Legacy Import Flow (Phases 1, 1.5, 2, 3, 5-spec)
 
 This document describes the current initial legacy-to-canonical migration flow after split-phase cutover.
 
@@ -14,6 +14,7 @@ Phase-specific docs:
 - `docs/legacy-import/phase2.md`
 - `docs/legacy-import/trial-mirror-validation.md`
 - `docs/legacy-import/phase3.md`
+- `docs/legacy-import/phase5-trial-runtime-projection.md`
 
 ## Commands
 
@@ -24,7 +25,7 @@ Phase-specific docs:
 - Phase 3 (shows): `pnpm import:phase3`
 - Show result definition seed (canonical awards, one-shot flow): `pnpm --filter @beagle/db seed:show-result-definitions`
 - Show workbook import schema seed (Kennelliitto workbook metadata, one-shot flow): `pnpm --filter @beagle/db seed:show-workbook-import-schema`
-- Optional full bootstrap (`auth:bootstrap-admin` -> `seed:show-result-definitions` -> `seed:show-workbook-import-schema` -> `phase1` -> `phase1.5` -> `phase2` -> `phase3`): `pnpm import:bootstrap`
+- Optional full bootstrap (`auth:bootstrap-admin` -> `seed:show-result-definitions` -> `seed:show-workbook-import-schema` -> `phase1` -> `phase1.5` -> `phase2` -> `phase3` -> `phase5`): `pnpm import:bootstrap`
 
 Optional actor id for phase commands:
 
@@ -32,6 +33,7 @@ Optional actor id for phase commands:
 - `pnpm import:phase1.5 <USER_ID>`
 - `pnpm import:phase2 <USER_ID>`
 - `pnpm import:phase3 <USER_ID>`
+- `pnpm import:phase5 <USER_ID>`
 
 Legacy source restore:
 
@@ -83,9 +85,7 @@ Issue tooling:
 
 3. `phase2` imports legacy AJOK trial source rows into frozen mirror tables
    only (`legacy_akoeall`, `legacy_bealt`, `legacy_bealt0`, `legacy_bealt1`,
-   `legacy_bealt2`, `legacy_bealt3`). Runtime projection into `TrialEvent`,
-   `TrialEntry`, and trial detail tables is intentionally deferred to a later
-   phase.
+   `legacy_bealt2`, `legacy_bealt3`).
 
 4. `import:trials:validate-mirror` validates the frozen trial mirror tables
    before runtime trial projection. It is read-only and does not create an
@@ -96,11 +96,20 @@ Issue tooling:
    `nay9599_rd_ud`) plus `beanay_text` critique join.
    The phase3 runtime path does not write legacy `ShowResult`.
 
-6. `seed:show-result-definitions` bootstraps canonical `ShowResultDefinition` rows used by both
+6. `phase5-trial-runtime-projection` is a documentation-only trial projection
+   specification. It freezes how mirror rows are projected into redesigned
+   runtime trial tables in later implementation phases. It does not run writes
+   or create an `ImportRun`.
+
+7. `phase5` rebuilds runtime trial projection tables from the phase2 mirror.
+   It creates runtime `TrialEvent`, `TrialEntry`, `TrialEra`, and
+   `TrialEraLisatieto` rows using the documented projection rules.
+
+8. `seed:show-result-definitions` bootstraps canonical `ShowResultDefinition` rows used by both
    legacy and Kennelliitto workbook mappings (for example `ROP`, `VSP`, `SERT`, `varaSERT`,
    `CACIB`, `varaCACIB`, `PUPN`, `SIJOITUS`, `JUN-ROP`, `JUN-VSP`, `VET-ROP`, `VET-VSP`, `SA`, `KP`).
 
-7. `seed:show-workbook-import-schema` bootstraps `ShowWorkbookColumnRule` metadata used by the
+9. `seed:show-workbook-import-schema` bootstraps `ShowWorkbookColumnRule` metadata used by the
    Kennelliitto workbook validator to resolve headers into imported, ignored, or blocked columns.
    This seed is the bootstrap baseline only; future admin-managed workbook
    schema edits should update the metadata directly instead of reseeding.
@@ -108,8 +117,8 @@ Issue tooling:
 Lifecycle note:
 
 - The entire legacy import flow is one-shot: `seed:show-result-definitions`,
-  `seed:show-workbook-import-schema`, `phase1`, `phase1.5`, `phase2`, `phase3`, and
-  `import:bootstrap` all belong to the same initial canonical
+  `seed:show-workbook-import-schema`, `phase1`, `phase1.5`, `phase2`, `phase3`,
+  `phase5`, and `import:bootstrap` all belong to the same initial canonical
   bootstrap/migration.
 - None of these commands are documented as upgrade, replay, or reconciliation steps for an
   already bootstrapped legacy-import environment.
@@ -137,6 +146,7 @@ Bootstrap invariants:
 5. `phase1.5`
 6. `phase2`
 7. `phase3`
+8. `phase5`
 
 ## ImportRun and issues model
 
@@ -146,6 +156,7 @@ Each phase creates its own `ImportRun` with its own `runId`.
 - `phase1.5` -> `kind=LEGACY_PHASE1_5`
 - `phase2` -> `kind=LEGACY_TRIAL_MIRROR`
 - `phase3` -> `kind=LEGACY_PHASE3`
+- `phase5` -> `kind=LEGACY_TRIAL_PROJECTION`
 
 Issue rows are written to shared `ImportRunIssue` storage per run.
 
@@ -164,6 +175,7 @@ Issue code details are maintained in phase docs:
 - `docs/legacy-import/phase2.md`
 - `docs/legacy-import/trial-mirror-validation.md`
 - `docs/legacy-import/phase3.md`
+- `docs/legacy-import/phase5-trial-runtime-projection.md`
 
 ## Execution model
 
@@ -171,6 +183,9 @@ This import flow is intended for initial migration, run in order
 (`seed:show-result-definitions` -> `seed:show-workbook-import-schema` -> `phase1` -> `phase1.5` -> `phase2` -> `phase3`).
 Treat it as a one-time bootstrap/migration flow, not as an ongoing sync,
 replay, or upgrade pipeline.
+
+Phase 4 trial projection is a design/spec step in this same migration effort.
+It has no runtime command and therefore is not part of the executable bootstrap chain.
 
 ## Implementation references
 

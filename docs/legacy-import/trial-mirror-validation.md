@@ -5,6 +5,9 @@
 Trial mirror validation checks the frozen legacy AJOK mirror tables after
 `import:phase2` and before any runtime trial projection is added.
 
+Projection decisions after validation are defined in
+`docs/legacy-import/phase5-trial-runtime-projection.md`.
+
 It is read-only:
 
 - does not connect to v1 MariaDB

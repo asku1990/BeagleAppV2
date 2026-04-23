@@ -181,6 +181,14 @@ pass-cli run --env-file .env.staging -- pnpm import:phase3
 CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:phase3
 ```
 
+Phase-5 trial runtime projection:
+
+```bash
+pass-cli run --env-file .env.local -- pnpm import:phase5
+pass-cli run --env-file .env.staging -- pnpm import:phase5
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:phase5
+```
+
 Show result definition seed (canonical awards):
 
 ```bash
@@ -201,13 +209,15 @@ This seed is the bootstrap baseline for `ShowWorkbookColumnRule` /
 `ShowWorkbookColumnValueMap` metadata. It is not intended as the long-term
 editing path once admin-managed workbook schema settings exist.
 
-Bootstrap import (`auth:bootstrap-admin` -> `seed:show-result-definitions` -> `seed:show-workbook-import-schema` -> `phase1` -> `phase1.5` -> `phase2` -> `phase3`):
+Bootstrap import (`auth:bootstrap-admin` -> `seed:show-result-definitions` -> `seed:show-workbook-import-schema` -> `phase1` -> `phase1.5` -> `phase2` -> `phase3` -> `phase5`):
 
 ```bash
 pass-cli run --env-file .env.local -- pnpm import:bootstrap
 pass-cli run --env-file .env.staging -- pnpm import:bootstrap
 CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:bootstrap
 ```
+
+Note: bootstrap now includes `phase5`, which rebuilds runtime trial projection tables from the phase 2 mirror.
 
 Inspect phase-1 import issues:
 

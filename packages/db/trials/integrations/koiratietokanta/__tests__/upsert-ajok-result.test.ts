@@ -5,7 +5,8 @@ const { prismaMock, txMock } = vi.hoisted(() => {
     trialEvent: { upsert: vi.fn() },
     dogRegistration: { findUnique: vi.fn() },
     trialEntry: { findUnique: vi.fn(), upsert: vi.fn() },
-    trialLisatietoItem: { deleteMany: vi.fn(), createMany: vi.fn() },
+    trialEra: { deleteMany: vi.fn(), create: vi.fn() },
+    trialEraLisatieto: { createMany: vi.fn() },
   };
   return {
     txMock: tx,
@@ -86,6 +87,35 @@ const entryInput = {
   palkintotuomariNimi: null,
 };
 
+const eraInputs = [
+  {
+    era: 1,
+    alkoi: null,
+    hakumin: null,
+    ajomin: null,
+    haku: null,
+    hauk: null,
+    alo: null,
+    lisatiedot: [
+      { koodi: "11", nimi: "Paljas maa", arvo: "1", jarjestys: 1 },
+      { koodi: "17", nimi: "Lämpötila", arvo: "13", jarjestys: 7 },
+    ],
+  },
+  {
+    era: 2,
+    alkoi: null,
+    hakumin: null,
+    ajomin: null,
+    haku: null,
+    hauk: null,
+    alo: null,
+    lisatiedot: [
+      { koodi: "11", nimi: "Paljas maa", arvo: "1", jarjestys: 1 },
+      { koodi: "17", nimi: "Lämpötila", arvo: "19", jarjestys: 7 },
+    ],
+  },
+];
+
 describe("upsertKoiratietokantaAjokResultDb", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -94,8 +124,11 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
     txMock.dogRegistration.findUnique.mockResolvedValue({ dogId: "dog-1" });
     txMock.trialEntry.findUnique.mockResolvedValue(null);
     txMock.trialEntry.upsert.mockResolvedValue({ id: "entry-1" });
-    txMock.trialLisatietoItem.deleteMany.mockResolvedValue({ count: 0 });
-    txMock.trialLisatietoItem.createMany.mockResolvedValue({ count: 2 });
+    txMock.trialEra.deleteMany.mockResolvedValue({ count: 0 });
+    txMock.trialEra.create
+      .mockResolvedValueOnce({ id: "era-1", era: 1 })
+      .mockResolvedValueOnce({ id: "era-2", era: 2 });
+    txMock.trialEraLisatieto.createMany.mockResolvedValue({ count: 2 });
   });
 
   it("replaces lisatieto rows after entry upsert", async () => {
@@ -108,31 +141,16 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
         kennelpiiri: null,
         kennelpiirinro: null,
         koemuoto: "AJOK",
-        ylituomariNimi: null,
+        ylituomariNimi: "Ylituomari",
         ylituomariNumero: null,
         ytKertomus: null,
       },
-      entry: entryInput,
-      lisatiedot: [
-        {
-          koodi: "11",
-          nimi: "Paljas maa",
-          era1Arvo: "1",
-          era2Arvo: "1",
-          era3Arvo: null,
-          era4Arvo: null,
-          jarjestys: 1,
-        },
-        {
-          koodi: "17",
-          nimi: "Lämpötila",
-          era1Arvo: "13",
-          era2Arvo: "19",
-          era3Arvo: null,
-          era4Arvo: null,
-          jarjestys: 7,
-        },
-      ],
+      entry: {
+        ...entryInput,
+        hyvaksytytAjominuutit: 51,
+        ajoajanPisteet: 14.88,
+      },
+      eras: eraInputs,
     });
 
     expect(result).toMatchObject({
@@ -144,37 +162,58 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
       expect.objectContaining({
         create: expect.objectContaining({
           koemaasto: null,
-          kokokaudenkoe: null,
+          hyvaksytytAjominuutit: 51,
+          ajoajanPisteet: 14.88,
+          lk: null,
+          tuom1: "Ylituomari",
         }),
       }),
     );
-    expect(txMock.trialLisatietoItem.deleteMany).toHaveBeenCalledWith({
+    expect(txMock.trialEra.deleteMany).toHaveBeenCalledWith({
       where: { trialEntryId: "entry-1" },
     });
-    expect(txMock.trialLisatietoItem.createMany).toHaveBeenCalledWith({
-      data: [
-        expect.objectContaining({
-          trialEntryId: "entry-1",
-          koodi: "11",
-          era1Arvo: "1",
-          era2Arvo: "1",
-        }),
-        expect.objectContaining({
-          trialEntryId: "entry-1",
-          koodi: "17",
-          era1Arvo: "13",
-          era2Arvo: "19",
-        }),
-      ],
-    });
+    expect(txMock.trialEra.create).toHaveBeenCalledTimes(2);
+    expect(txMock.trialEraLisatieto.createMany).toHaveBeenCalledTimes(2);
+    expect(txMock.trialEraLisatieto.createMany).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            trialEraId: "era-1",
+            koodi: "11",
+            arvo: "1",
+          }),
+          expect.objectContaining({
+            trialEraId: "era-1",
+            koodi: "17",
+            arvo: "13",
+          }),
+        ]),
+      }),
+    );
+    expect(txMock.trialEraLisatieto.createMany).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            trialEraId: "era-2",
+            koodi: "11",
+            arvo: "1",
+          }),
+          expect.objectContaining({
+            trialEraId: "era-2",
+            koodi: "17",
+            arvo: "19",
+          }),
+        ]),
+      }),
+    );
     expect(
-      txMock.trialLisatietoItem.deleteMany.mock.invocationCallOrder[0],
+      txMock.trialEra.deleteMany.mock.invocationCallOrder[0],
     ).toBeGreaterThan(txMock.trialEntry.upsert.mock.invocationCallOrder[0]);
     expect(
-      txMock.trialLisatietoItem.createMany.mock.invocationCallOrder[0],
-    ).toBeGreaterThan(
-      txMock.trialLisatietoItem.deleteMany.mock.invocationCallOrder[0],
-    );
+      txMock.trialEraLisatieto.createMany.mock.invocationCallOrder[0],
+    ).toBeGreaterThan(txMock.trialEra.deleteMany.mock.invocationCallOrder[0]);
   });
 
   it("deletes old lisatieto rows and skips createMany when no rows are mapped", async () => {
@@ -192,12 +231,12 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
         ytKertomus: null,
       },
       entry: entryInput,
-      lisatiedot: [],
+      eras: [],
     });
 
-    expect(txMock.trialLisatietoItem.deleteMany).toHaveBeenCalledWith({
+    expect(txMock.trialEra.deleteMany).toHaveBeenCalledWith({
       where: { trialEntryId: "entry-1" },
     });
-    expect(txMock.trialLisatietoItem.createMany).not.toHaveBeenCalled();
+    expect(txMock.trialEraLisatieto.createMany).not.toHaveBeenCalled();
   });
 });

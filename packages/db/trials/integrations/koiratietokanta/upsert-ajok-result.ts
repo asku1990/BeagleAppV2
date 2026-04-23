@@ -89,10 +89,28 @@ export type KoiratietokantaAjokLisatietoDbInput = {
   jarjestys: number | null;
 };
 
+export type KoiratietokantaAjokEraLisatietoDbInput = {
+  koodi: string;
+  nimi: string;
+  arvo: string;
+  jarjestys: number | null;
+};
+
+export type KoiratietokantaAjokEraDbInput = {
+  era: number;
+  alkoi: string | null;
+  hakumin: number | null;
+  ajomin: number | null;
+  haku: number | null;
+  hauk: number | null;
+  alo: number | null;
+  lisatiedot: KoiratietokantaAjokEraLisatietoDbInput[];
+};
+
 export type KoiratietokantaAjokUpsertDbInput = {
   event: KoiratietokantaAjokEventDbInput;
   entry: KoiratietokantaAjokEntryDbInput;
-  lisatiedot: KoiratietokantaAjokLisatietoDbInput[];
+  eras: KoiratietokantaAjokEraDbInput[];
 };
 
 export type KoiratietokantaAjokUpsertDbResult = {
@@ -120,7 +138,6 @@ export async function upsertKoiratietokantaAjokResultDb(
         kennelpiiri: input.event.kennelpiiri,
         kennelpiirinro: input.event.kennelpiirinro,
         koemuoto: input.event.koemuoto,
-        rotukoodi: null,
         ylituomariNimi: input.event.ylituomariNimi,
         ylituomariNumero: input.event.ylituomariNumero,
         ytKertomus: input.event.ytKertomus,
@@ -159,65 +176,17 @@ export async function upsertKoiratietokantaAjokResultDb(
       yksilointiAvain: input.entry.yksilointiAvain,
       lahde: TrialSourceTag.KOIRATIETOKANTA_API,
       raakadataJson: input.entry.raakadataJson,
-      luokka: input.entry.luokka,
+      lk: input.entry.luokka,
       omistajaSnapshot: input.entry.omistajaSnapshot,
       omistajanKotikuntaSnapshot: input.entry.omistajanKotikuntaSnapshot,
       koemaasto: input.entry.koemaasto,
-      era1Alkoi: input.entry.era1Alkoi,
-      era2Alkoi: input.entry.era2Alkoi,
-      era3Alkoi: input.entry.era3Alkoi,
-      era4Alkoi: input.entry.era4Alkoi,
-      hakuMin1: input.entry.hakuMin1,
-      hakuMin2: input.entry.hakuMin2,
-      hakuMin3: input.entry.hakuMin3,
-      hakuMin4: input.entry.hakuMin4,
-      ajoMin1: input.entry.ajoMin1,
-      ajoMin2: input.entry.ajoMin2,
-      ajoMin3: input.entry.ajoMin3,
-      ajoMin4: input.entry.ajoMin4,
+      rotukoodi: null,
+      pa: input.entry.palkinto,
+      piste: input.entry.loppupisteet,
+      sija: input.entry.sijoitus,
       hyvaksytytAjominuutit: input.entry.hyvaksytytAjominuutit,
       ajoajanPisteet: input.entry.ajoajanPisteet,
-      hakuEra1: input.entry.hakuEra1,
-      hakuEra2: input.entry.hakuEra2,
-      hakuEra3: input.entry.hakuEra3,
-      hakuEra4: input.entry.hakuEra4,
-      hakuKeskiarvo: input.entry.hakuKeskiarvo,
-      haukkuEra1: input.entry.haukkuEra1,
-      haukkuEra2: input.entry.haukkuEra2,
-      haukkuEra3: input.entry.haukkuEra3,
-      haukkuEra4: input.entry.haukkuEra4,
-      haukkuKeskiarvo: input.entry.haukkuKeskiarvo,
-      ajotaitoEra1: input.entry.ajotaitoEra1,
-      ajotaitoEra2: input.entry.ajotaitoEra2,
-      ajotaitoEra3: input.entry.ajotaitoEra3,
-      ajotaitoEra4: input.entry.ajotaitoEra4,
-      ajotaitoKeskiarvo: input.entry.ajotaitoKeskiarvo,
-      ansiopisteetYhteensa: input.entry.ansiopisteetYhteensa,
-      hakuloysyysTappioEra1: input.entry.hakuloysyysTappioEra1,
-      hakuloysyysTappioEra2: input.entry.hakuloysyysTappioEra2,
-      hakuloysyysTappioEra3: input.entry.hakuloysyysTappioEra3,
-      hakuloysyysTappioEra4: input.entry.hakuloysyysTappioEra4,
-      hakuloysyysTappioYhteensa: input.entry.hakuloysyysTappioYhteensa,
-      ajoloysyysTappioEra1: input.entry.ajoloysyysTappioEra1,
-      ajoloysyysTappioEra2: input.entry.ajoloysyysTappioEra2,
-      ajoloysyysTappioEra3: input.entry.ajoloysyysTappioEra3,
-      ajoloysyysTappioEra4: input.entry.ajoloysyysTappioEra4,
-      ajoloysyysTappioYhteensa: input.entry.ajoloysyysTappioYhteensa,
-      tappiopisteetYhteensa: input.entry.tappiopisteetYhteensa,
-      loppupisteet: input.entry.loppupisteet,
-      palkinto: input.entry.palkinto,
-      sijoitus: input.entry.sijoitus,
-      koiriaLuokassa: input.entry.koiriaLuokassa,
-      kokokaudenkoe: input.entry.kokokaudenkoe,
-      keli: input.entry.keli,
-      luopui: input.entry.luopui,
-      suljettu: input.entry.suljettu,
-      keskeytetty: input.entry.keskeytetty,
-      huomautusTeksti: input.entry.huomautusTeksti,
-      ylituomariNimiSnapshot: input.entry.ylituomariNimiSnapshot,
-      ylituomariNumeroSnapshot: input.entry.ylituomariNumeroSnapshot,
-      ryhmatuomariNimi: input.entry.ryhmatuomariNimi,
-      palkintotuomariNimi: input.entry.palkintotuomariNimi,
+      tuom1: input.event.ylituomariNimi,
       ...(dogId ? { dogId } : {}),
     };
 
@@ -238,22 +207,39 @@ export async function upsertKoiratietokantaAjokResultDb(
       select: { id: true },
     });
 
-    await tx.trialLisatietoItem.deleteMany({
+    await tx.trialEra.deleteMany({
       where: { trialEntryId: trialEntry.id },
     });
-    if (input.lisatiedot.length > 0) {
-      await tx.trialLisatietoItem.createMany({
-        data: input.lisatiedot.map((item) => ({
+
+    for (const eraWrite of input.eras) {
+      const era = await tx.trialEra.create({
+        data: {
           trialEntryId: trialEntry.id,
-          koodi: item.koodi,
-          nimi: item.nimi,
-          era1Arvo: item.era1Arvo,
-          era2Arvo: item.era2Arvo,
-          era3Arvo: item.era3Arvo,
-          era4Arvo: item.era4Arvo,
-          jarjestys: item.jarjestys,
-        })),
+          era: eraWrite.era,
+          alkoi: eraWrite.alkoi,
+          hakumin: eraWrite.hakumin,
+          ajomin: eraWrite.ajomin,
+          haku: eraWrite.haku,
+          hauk: eraWrite.hauk,
+          alo: eraWrite.alo,
+          raakadataJson: null,
+        },
+        select: { id: true, era: true },
       });
+
+      const eraLisatiedot = eraWrite.lisatiedot.map((item) => ({
+        trialEraId: era.id,
+        koodi: item.koodi,
+        arvo: item.arvo,
+        nimi: item.nimi,
+        jarjestys: item.jarjestys,
+      }));
+
+      if (eraLisatiedot.length > 0) {
+        await tx.trialEraLisatieto.createMany({
+          data: eraLisatiedot,
+        });
+      }
     }
 
     return {

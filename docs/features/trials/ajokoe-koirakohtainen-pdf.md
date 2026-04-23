@@ -110,6 +110,10 @@ Input data:
 
 Rules:
 
+- `hyvaksytytAjominuutit` uses the stored `TrialEntry` value first; legacy rows
+  without it derive the value from the sum of available `TrialEra.ajomin` values.
+- `ajoajanPisteet` uses the stored `TrialEntry` value first; legacy rows without
+  it derive the value with the v1 formula `round(70 / 240 * ajominuutit, 2)`.
 - The current renderer places the two era-start values on the first line and
   the haku-minute values on the second line, the ajo-minute values on the
   third line, the accepted-minute / score values on the right side of the

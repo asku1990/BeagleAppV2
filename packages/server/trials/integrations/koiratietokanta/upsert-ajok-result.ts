@@ -37,7 +37,7 @@ export async function upsertKoiratietokantaAjokResultService(
     const result = await upsertKoiratietokantaAjokResultDb({
       event: mapped.event,
       entry: mapped.entry,
-      lisatiedot: mapped.lisatiedot,
+      eras: mapped.eras,
     });
     const warnings = [...mapped.warnings];
 

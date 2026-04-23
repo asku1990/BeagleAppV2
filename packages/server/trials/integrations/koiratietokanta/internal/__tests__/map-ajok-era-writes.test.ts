@@ -1,0 +1,118 @@
+import { describe, expect, it } from "vitest";
+
+import { mapKoiratietokantaAjokEraWrites } from "../map-ajok-era-writes";
+
+describe("mapKoiratietokantaAjokEraWrites", () => {
+  it("maps flat era source fields into runtime era rows", () => {
+    const eras = mapKoiratietokantaAjokEraWrites(
+      {
+        era1Alkoi: "08:10",
+        era2Alkoi: null,
+        era3Alkoi: null,
+        era4Alkoi: null,
+        hakuMin1: 12,
+        hakuMin2: null,
+        hakuMin3: null,
+        hakuMin4: null,
+        ajoMin1: 31,
+        ajoMin2: null,
+        ajoMin3: null,
+        ajoMin4: null,
+        hakuEra1: 7,
+        hakuEra2: null,
+        hakuEra3: null,
+        hakuEra4: null,
+        haukkuEra1: 6,
+        haukkuEra2: null,
+        haukkuEra3: null,
+        haukkuEra4: null,
+        ajotaitoEra1: 8,
+        ajotaitoEra2: null,
+        ajotaitoEra3: null,
+        ajotaitoEra4: null,
+      },
+      [
+        {
+          koodi: "11",
+          nimi: "Paljas maa",
+          era1Arvo: "1",
+          era2Arvo: "2",
+          era3Arvo: null,
+          era4Arvo: null,
+          jarjestys: 1,
+        },
+        {
+          koodi: "17",
+          nimi: "Lämpötila",
+          era1Arvo: "13",
+          era2Arvo: null,
+          era3Arvo: null,
+          era4Arvo: null,
+          jarjestys: 7,
+        },
+      ],
+    );
+
+    expect(eras).toEqual([
+      {
+        era: 1,
+        alkoi: "08:10",
+        hakumin: 12,
+        ajomin: 31,
+        haku: 7,
+        hauk: 6,
+        alo: 8,
+        lisatiedot: [
+          { koodi: "11", nimi: "Paljas maa", arvo: "1", jarjestys: 1 },
+          { koodi: "17", nimi: "Lämpötila", arvo: "13", jarjestys: 7 },
+        ],
+      },
+      {
+        era: 2,
+        alkoi: null,
+        hakumin: null,
+        ajomin: null,
+        haku: null,
+        hauk: null,
+        alo: null,
+        lisatiedot: [
+          { koodi: "11", nimi: "Paljas maa", arvo: "2", jarjestys: 1 },
+        ],
+      },
+    ]);
+  });
+
+  it("skips eras without core data or lisätiedot", () => {
+    expect(
+      mapKoiratietokantaAjokEraWrites(
+        {
+          era1Alkoi: null,
+          era2Alkoi: null,
+          era3Alkoi: null,
+          era4Alkoi: null,
+          hakuMin1: null,
+          hakuMin2: null,
+          hakuMin3: null,
+          hakuMin4: null,
+          ajoMin1: null,
+          ajoMin2: null,
+          ajoMin3: null,
+          ajoMin4: null,
+          hakuEra1: null,
+          hakuEra2: null,
+          hakuEra3: null,
+          hakuEra4: null,
+          haukkuEra1: null,
+          haukkuEra2: null,
+          haukkuEra3: null,
+          haukkuEra4: null,
+          ajotaitoEra1: null,
+          ajotaitoEra2: null,
+          ajotaitoEra3: null,
+          ajotaitoEra4: null,
+        },
+        [],
+      ),
+    ).toEqual([]);
+  });
+});

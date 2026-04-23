@@ -96,37 +96,67 @@ describe("upsertKoiratietokantaAjokResultService", () => {
         ryhmatuomariNimi: "Mikko Kemppainen",
         palkintotuomariNimi: null,
       }),
-      lisatiedot: expect.arrayContaining([
+      eras: expect.arrayContaining([
         expect.objectContaining({
-          koodi: "11",
-          nimi: "Paljas maa",
-          era1Arvo: "1",
-          era2Arvo: "1",
-          era3Arvo: null,
+          era: 1,
+          alkoi: "5:49",
+          hakumin: 201,
+          ajomin: 51,
+          haku: 5,
+          hauk: 7,
+          lisatiedot: expect.arrayContaining([
+            expect.objectContaining({
+              koodi: "11",
+              nimi: "Paljas maa",
+              arvo: "1",
+            }),
+            expect.objectContaining({
+              koodi: "17",
+              nimi: "Lämpötila",
+              arvo: "13",
+            }),
+            expect.objectContaining({
+              koodi: "30",
+              nimi: "Kuuluvuus",
+              arvo: "4.00",
+            }),
+            expect.objectContaining({
+              koodi: "36",
+              nimi: "Beaglen haukku",
+              arvo: "4",
+            }),
+          ]),
         }),
         expect.objectContaining({
-          koodi: "17",
-          nimi: "Lämpötila",
-          era1Arvo: "13",
-          era2Arvo: "19",
-        }),
-        expect.objectContaining({
-          koodi: "30",
-          nimi: "Kuuluvuus",
-          era1Arvo: "4.00",
-          era2Arvo: "0.00",
-        }),
-        expect.objectContaining({
-          koodi: "36",
-          nimi: "Beaglen haukku",
-          era1Arvo: "4",
-          era2Arvo: "0",
+          era: 2,
+          lisatiedot: expect.arrayContaining([
+            expect.objectContaining({
+              koodi: "11",
+              nimi: "Paljas maa",
+              arvo: "1",
+            }),
+            expect.objectContaining({
+              koodi: "17",
+              nimi: "Lämpötila",
+              arvo: "19",
+            }),
+            expect.objectContaining({
+              koodi: "30",
+              nimi: "Kuuluvuus",
+              arvo: "0.00",
+            }),
+            expect.objectContaining({
+              koodi: "36",
+              nimi: "Beaglen haukku",
+              arvo: "0",
+            }),
+          ]),
         }),
       ]),
     });
     const call = upsertDbMock.mock.calls[0]?.[0];
-    expect(call.lisatiedot).not.toEqual(
-      expect.arrayContaining([expect.objectContaining({ koodi: "12" })]),
+    expect(call.eras).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ era: 3 })]),
     );
     expect(result.body.ok).toBe(true);
     if (result.body.ok) {
