@@ -11,18 +11,19 @@ Lähde:
 
 ## Mapping-periaatteet
 
-1. Sama lähderivi jaetaan kolmeen tasoon:
+1. Sama lähderivi jaetaan neljään tasoon:
 
 - `TrialEvent` (kokeen yhteiset tiedot)
 - `TrialEntry` (yksi koira yhdessä kokeessa)
-- `TrialLisatietoItem` (11-61 / Pxx lisätietorivit)
+- `TrialEra` (eräkohtaiset piste- ja minuuttirivit)
+- `TrialEraLisatieto` (11-61 lisätietorivit per erä)
 
 2. Arvo `"-"` mapataan `null`:iksi.
 
 3. Lähdearvot säilytetään lisäksi `TrialEntry.raakadataJson`-kentässä.
 
-4. Lisätiedot toteutetaan tuotannossa normalisoituna `TrialLisatietoItem`-malliin
-   (ei `lisatiedotJson`-välivaihetta).
+4. Lisätiedot toteutetaan tuotannossa normalisoituna `TrialEra` +
+   `TrialEraLisatieto` -malliin (ei `lisatiedotJson`-välivaihetta).
 
 ## Event-mapping
 
@@ -53,39 +54,39 @@ Huomio:
 | `LUOKKA`                           | `TrialEntry.luokka`                                                                               |
 | `Omistaja`                         | `TrialEntry.omistajaSnapshot`                                                                     |
 | `Omistajankotipaikka`              | `TrialEntry.omistajanKotikuntaSnapshot`                                                           |
-| `I_ERA_KLO`                        | `TrialEntry.era1Alkoi`                                                                            |
-| `II_ERA_KLO`                       | `TrialEntry.era2Alkoi`                                                                            |
-| `i_haku_min`                       | `TrialEntry.hakuMin1`                                                                             |
-| `II_HAKU_MIN`                      | `TrialEntry.hakuMin2`                                                                             |
-| `I_AJO_MIN`                        | `TrialEntry.ajoMin1`                                                                              |
-| `II_AJO_MIN`                       | `TrialEntry.ajoMin2`                                                                              |
+| `I_ERA_KLO`                        | `TrialEra(era=1).alkoi`                                                                           |
+| `II_ERA_KLO`                       | `TrialEra(era=2).alkoi`                                                                           |
+| `i_haku_min`                       | `TrialEra(era=1).hakumin`                                                                         |
+| `II_HAKU_MIN`                      | `TrialEra(era=2).hakumin`                                                                         |
+| `I_AJO_MIN`                        | `TrialEra(era=1).ajomin`                                                                          |
+| `II_AJO_MIN`                       | `TrialEra(era=2).ajomin`                                                                          |
 | `HYV_AJOT_MIN`                     | `TrialEntry.hyvaksytytAjominuutit`                                                                |
 | `AJOPISTEET`                       | `TrialEntry.ajoajanPisteet`                                                                       |
-| `I_HAKU`                           | `TrialEntry.hakuEra1`                                                                             |
-| `II_HAKU`                          | `TrialEntry.hakuEra2`                                                                             |
-| `HAKUPISTEET`                      | `TrialEntry.hakuKeskiarvo`                                                                        |
-| `I_HAUKKU`                         | `TrialEntry.haukkuEra1`                                                                           |
-| `II_HAUKKU`                        | `TrialEntry.haukkuEra2`                                                                           |
-| `HAUKKUPISTEET`                    | `TrialEntry.haukkuKeskiarvo`                                                                      |
-| `I_AJOTAITO`                       | `TrialEntry.ajotaitoEra1`                                                                         |
-| `II_AJOTAITO`                      | `TrialEntry.ajotaitoEra2`                                                                         |
-| `AJOTAITOPISTEET`                  | `TrialEntry.ajotaitoKeskiarvo`                                                                    |
+| `I_HAKU`                           | `TrialEra(era=1).haku`                                                                            |
+| `II_HAKU`                          | `TrialEra(era=2).haku`                                                                            |
+| `HAKUPISTEET`                      | `TrialEntry.haku`                                                                                 |
+| `I_HAUKKU`                         | `TrialEra(era=1).hauk`                                                                            |
+| `II_HAUKKU`                        | `TrialEra(era=2).hauk`                                                                            |
+| `HAUKKUPISTEET`                    | `TrialEntry.hauk`                                                                                 |
+| `I_AJOTAITO`                       | `TrialEra(era=1).yva`                                                                             |
+| `II_AJOTAITO`                      | `TrialEra(era=2).yva`                                                                             |
+| `AJOTAITOPISTEET`                  | `TrialEntry.yva`                                                                                  |
 | `ANSIOPISTEET`                     | `TrialEntry.ansiopisteetYhteensa`                                                                 |
-| `I_HAKULOYSYYS`                    | `TrialEntry.hakuloysyysTappioEra1`                                                                |
-| `II_HAKULOYSYYS`                   | `TrialEntry.hakuloysyysTappioEra2`                                                                |
-| `HAKULOYSYYSPISTEET`               | `TrialEntry.hakuloysyysTappioYhteensa`                                                            |
-| `I_AJOLOYSYYS`                     | `TrialEntry.ajoloysyysTappioEra1`                                                                 |
-| `II_AJOLOYSYYS`                    | `TrialEntry.ajoloysyysTappioEra2`                                                                 |
-| `AJOLOYSYYSPISTEET`                | `TrialEntry.ajoloysyysTappioYhteensa`                                                             |
+| `I_HAKULOYSYYS`                    | `TrialEra(era=1).hlo`                                                                             |
+| `II_HAKULOYSYYS`                   | `TrialEra(era=2).hlo`                                                                             |
+| `HAKULOYSYYSPISTEET`               | `TrialEntry.hlo`                                                                                  |
+| `I_AJOLOYSYYS`                     | `TrialEra(era=1).alo`                                                                             |
+| `II_AJOLOYSYYS`                    | `TrialEra(era=2).alo`                                                                             |
+| `AJOLOYSYYSPISTEET`                | `TrialEntry.alo`                                                                                  |
 | `TAPPIOPISTEET`                    | `TrialEntry.tappiopisteetYhteensa`                                                                |
 | `LOPPUPISTEET`                     | `TrialEntry.loppupisteet`                                                                         |
 | `PALKINTOSIJA`                     | `TrialEntry.palkinto` (stored as text; live values include `0`, `1`, `2`, `3`, `L`, `S`, and `-`) |
 | `SIJOITUS_LUOKASSA`                | `TrialEntry.sijoitus`                                                                             |
 | `KOIRIA_LUOKASSA`                  | `TrialEntry.koiriaLuokassa`                                                                       |
-| `koekaudenkoe`                     | `TrialEntry.kokokaudenkoe`                                                                        |
-| `KELI`                             | `TrialEntry.keli`                                                                                 |
-| `111_PALJAS_MAA`..`113_PALJAS_MAA` | `TrialLisatietoItem` code `11` (`Paljas maa`)                                                     |
-| `121_LUMIKELI`..`123_LUMIKELI`     | `TrialLisatietoItem` code `12` (`Lumikeli`)                                                       |
+| `koekaudenkoe`                     | mapper compatibility field; not persisted in current runtime `TrialEntry`                         |
+| `KELI`                             | compatibility input `keli`, persisted to `TrialEntry.ke`                                          |
+| `111_PALJAS_MAA`..`113_PALJAS_MAA` | `TrialEraLisatieto` code `11` (`Paljas maa`)                                                      |
+| `121_LUMIKELI`..`123_LUMIKELI`     | `TrialEraLisatieto` code `12` (`Lumikeli`)                                                        |
 | `luopui`                           | `TrialEntry.luopui`                                                                               |
 | `suljettu`                         | `TrialEntry.suljettu`                                                                             |
 | `keskeytti`                        | `TrialEntry.keskeytetty`                                                                          |
@@ -98,11 +99,11 @@ Huomio:
 
 - `ylituomari` on event-tason tieto.
 - Jos saman `sklKoeId` tapahtuman riveillä on ristiriitainen ylituomari, ristiriita kirjataan issueksi ja eventille jätetään ensimmäinen ei-null arvo.
-- Top-level weather uses `TrialEntry.keli`.
+- Top-level weather uses `TrialEntry.ke`.
 
 ## Lisätietojen mapping
 
-`TrialLisatietoItem`-rivit muodostetaan kooditetuista lisätietokentistä.
+`TrialEraLisatieto`-rivit muodostetaan kooditetuista lisätietokentistä.
 Ensimmäinen numero on pöytäkirjan virallinen lisätietokoodi; raw payloadin
 avainprefix voi olla eri numero, koska `yksi_tulos` käyttää omaa
 transport-avaimistustaan.
@@ -116,11 +117,10 @@ Lukutapa:
 
 Kaikki lisätiedot mapataan samaan kohteeseen:
 
-- `TrialLisatietoItem.koodi`
-- `TrialLisatietoItem.nimi`
-- `TrialLisatietoItem.era1Arvo`
-- `TrialLisatietoItem.era2Arvo`
-- `TrialLisatietoItem.era3Arvo`
+- `TrialEraLisatieto.koodi`
+- `TrialEraLisatieto.nimi`
+- `TrialEraLisatieto.arvo`
+- parent `TrialEra.era`
 
 ### Kuvaava mapping-lista
 

@@ -86,10 +86,10 @@ Alla oleva ryhmittely on suunniteltu AJOK-koirakohtaisen pöytäkirjan näkymän
 
 ### 7) Olosuhteet
 
-- `keli` (esim. `P`) on pöytäkirjan top-level olosuhdearvo.
+- `ke` (source `KELI`, esim. `P`) on pöytäkirjan top-level olosuhdearvo.
 
 Lisäolotiedot, kuten `111_PALJAS_MAA`, `121_LUMIKELI`, `171_LAMPOTILA` ja muut
-11-18-/20-61-rivit, tallennetaan `TrialLisatietoItem`-riveiksi.
+11-18-/20-61-rivit, tallennetaan `TrialEraLisatieto`-riveiksi.
 
 ### 8) Huomautukset ja tilat
 
@@ -100,11 +100,13 @@ Lisäolotiedot, kuten `111_PALJAS_MAA`, `121_LUMIKELI`, `171_LAMPOTILA` ja muut
 
 ### 9) Lisätiedot (asteikko/rastit)
 
-Lisätiedot sisältävät suuren määrän pöytäkirjan rivejä (esim. 11-61), joissa on eräkohtaisia arvoja ja rastituksia.
+Lisätiedot sisältävät suuren määrän pöytäkirjan rivejä (esim. 11-61), joissa
+on eräkohtaisia arvoja ja rastituksia.
 
-Nämä kannattaa tallentaa rakenteisena koontina:
+Nykyisessä runtime-mallissa nämä tallennetaan normalisoituina:
 
-- `lisatiedotJson`
+- `TrialEra`
+- `TrialEraLisatieto`
 
 Yleinen arvorakenne lisätietoriveille:
 

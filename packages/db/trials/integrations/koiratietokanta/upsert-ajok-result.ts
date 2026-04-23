@@ -181,6 +181,7 @@ export async function upsertKoiratietokantaAjokResultDb(
       yksilointiAvain: input.entry.yksilointiAvain,
       lahde: TrialSourceTag.KOIRATIETOKANTA_API,
       raakadataJson: input.entry.raakadataJson,
+      ke: input.entry.keli,
       lk: input.entry.luokka,
       omistajaSnapshot: input.entry.omistajaSnapshot,
       omistajanKotikuntaSnapshot: input.entry.omistajanKotikuntaSnapshot,

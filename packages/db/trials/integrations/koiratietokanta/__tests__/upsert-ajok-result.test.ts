@@ -154,6 +154,7 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
       },
       entry: {
         ...entryInput,
+        keli: "P",
         hyvaksytytAjominuutit: 51,
         ajoajanPisteet: 14.88,
         yva: 9.25,
@@ -170,6 +171,7 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
       expect.objectContaining({
         create: expect.objectContaining({
           koemaasto: null,
+          ke: "P",
           hyvaksytytAjominuutit: 51,
           ajoajanPisteet: 14.88,
           pin: null,

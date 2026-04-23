@@ -11,7 +11,8 @@ result upsert contract.
 - Storage model:
   - `TrialEvent`
   - `TrialEntry`
-  - `TrialLisatietoItem`
+  - `TrialEra`
+  - `TrialEraLisatieto`
 
 ## Auth
 
@@ -75,7 +76,7 @@ result upsert contract.
 - `SIJOITUS_LUOKASSA` -> `sijoitus`
 - `KOIRIA_LUOKASSA` -> `koiriaLuokassa`
 - `koekaudenkoe` -> `kokokaudenkoe` (`"1"` => `true`, `"0"` => `false`)
-- `KELI` -> `keli`
+- `KELI` -> compatibility input `keli`, persisted to `TrialEntry.ke`
 - `luopui` -> `luopui`
 - `suljettu` -> `suljettu`
 - `keskeytti` -> `keskeytetty`
@@ -87,12 +88,12 @@ result upsert contract.
 
 ### Compatibility columns
 
-- Top-level weather value is written to `TrialEntry.keli` from `KELI`.
-- The numbered source rows below are stored as lisätieto instead.
+- Top-level weather value is written to `TrialEntry.ke` from `KELI`.
+- The numbered source rows below are stored as `TrialEraLisatieto` instead.
 
 ## Lisätieto mapping
 
-- `TrialLisatietoItem` rows are created for koodit `11-61`.
+- `TrialEraLisatieto` rows are created for koodit `11-61`.
 - The first number is the official pöytäkirja lisätieto code.
 - The `yksi_tulos` source key prefix may be different from the official code;
   for example, official code `36` is carried in raw keys `531_*` / `532_*` /
