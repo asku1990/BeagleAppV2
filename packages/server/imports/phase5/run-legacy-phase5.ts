@@ -2,17 +2,21 @@ import {
   TrialSourceTag,
   createImportRun,
   createImportRunIssue,
+  createImportRunIssuesBulk,
   markImportRunFinished,
   markImportRunRunning,
   prisma,
   type AuditContextDb,
   type ImportKind,
+  type ImportIssueSeverity,
 } from "@beagle/db";
 import type { ImportRunResponse } from "@beagle/contracts";
 import type { ServiceResult } from "@server/core/result";
 import { formatLegacyImportSummary } from "@server/imports/runs/phase-summary";
 import { toImportRunResponse } from "@server/imports/runs/transform";
+import { resolveTrialRuleWindowId } from "@server/trials/core";
 import { parseLegacyDate } from "../core";
+import { parseLegacySija } from "./internal/parse-legacy-sija";
 
 type LegacyDetailSourceTable =
   | "bealt"
@@ -131,6 +135,16 @@ async function loadAllLegacyDetails(): Promise<LegacyDetailRow[]> {
   ];
 }
 
+type BufferedIssue = {
+  stage: string;
+  severity?: ImportIssueSeverity;
+  code: string;
+  message: string;
+  registrationNo?: string | null;
+  sourceTable?: string | null;
+  payloadJson?: string | null;
+};
+
 async function resetRuntimeProjection() {
   // Phase 5 is a one-shot bootstrap projection for empty runtime trial tables.
   // It intentionally wipes runtime trial rows before rebuilding from frozen
@@ -165,6 +179,11 @@ export async function runLegacyPhase5(
       `[stage:${name}] done in ${elapsedSeconds}s${summary ? ` ${summary}` : ""}`,
     );
   };
+  const logProgress = (name: string, processed: number, total: number) => {
+    const percent =
+      total > 0 ? Math.min(100, Math.round((processed / total) * 100)) : 100;
+    log(`[stage:${name}] progress ${processed}/${total} (${percent}%)`);
+  };
   const auditContext: AuditContextDb = {
     actorUserId: createdByUserId ?? null,
     source: options?.auditSource ?? "SYSTEM",
@@ -181,6 +200,19 @@ export async function runLegacyPhase5(
     unresolvedRules: 0,
   };
   let errorsCount = 0;
+  const issueBuffer: BufferedIssue[] = [];
+  const ISSUE_BUFFER_SIZE = 250;
+  const flushIssueBuffer = async () => {
+    if (!runId || issueBuffer.length === 0) return;
+    const next = issueBuffer.splice(0, issueBuffer.length);
+    await createImportRunIssuesBulk(runId, next, auditContext);
+  };
+  const recordIssue = async (issue: BufferedIssue) => {
+    issueBuffer.push({ ...issue, severity: issue.severity ?? "WARNING" });
+    if (issueBuffer.length >= ISSUE_BUFFER_SIZE) {
+      await flushIssueBuffer();
+    }
+  };
 
   try {
     const run = await createImportRun({
@@ -248,150 +280,168 @@ export async function runLegacyPhase5(
     startStage("project-runtime");
     const eventIdByKey = new Map<string, string>();
     const totalRows = akoeallRows.length;
-    const PROGRESS_EVERY = 250;
-    for (let index = 0; index < akoeallRows.length; index += 1) {
-      const row = akoeallRows[index];
-      if (index > 0 && index % PROGRESS_EVERY === 0) {
-        const percent = Math.min(100, Math.round((index / totalRows) * 100));
-        log(
-          `[stage:project-runtime] progress ${index}/${totalRows} (${percent}%) events=${counters.eventsProjected} entries=${counters.entriesProjected} eras=${counters.erasProjected}`,
-        );
-      }
-      const parsedDate = parseLegacyDate(row.tappv);
-      if (!parsedDate) {
-        errorsCount += 1;
-        if (runId) {
-          await createImportRunIssue(
-            runId,
-            {
-              stage: "project-runtime",
-              severity: "ERROR",
-              code: "TRIAL_PHASE5_INVALID_DATE",
-              message: "Legacy akoeall row has invalid TAPPV date.",
-              registrationNo: row.rekno,
-              sourceTable: "legacy_akoeall",
-              payloadJson: row.rawPayloadJson,
-            },
-            auditContext,
-          );
-        }
-        continue;
-      }
+    const BATCH_SIZE = 1000;
+    for (
+      let batchStart = 0;
+      batchStart < akoeallRows.length;
+      batchStart += BATCH_SIZE
+    ) {
+      const batch = akoeallRows.slice(batchStart, batchStart + BATCH_SIZE);
 
-      const ymd = Number.parseInt(row.tappv, 10);
-      const matchedRule = activeRuleWindows.find((rule) => {
-        if (rule.fromYmd != null && ymd < rule.fromYmd) return false;
-        if (rule.toYmd != null && ymd > rule.toYmd) return false;
-        return true;
-      });
-      if (!matchedRule) {
-        counters.unresolvedRules += 1;
-      }
-
-      const eventKey = eventLookupKey(row.tappv, row.tappa);
-      let eventId = eventIdByKey.get(eventKey);
-      if (!eventId) {
-        const event = await prisma.trialEvent.create({
-          data: {
-            legacyEventKey: eventKey,
-            sklKoeId: null,
-            koepaiva: parsedDate,
-            koekunta: row.tappa,
-            jarjestaja: null,
-            kennelpiiri: row.kennelpiiri,
-            kennelpiirinro: row.kennelpiirinro,
-            koemuoto: null,
-            ylituomariNimi: row.tuom1,
-            ylituomariNumero: null,
-            trialRuleWindowId: matchedRule?.id ?? null,
-            ytKertomus: null,
-          },
-          select: { id: true },
-        });
-        eventId = event.id;
-        eventIdByKey.set(eventKey, event.id);
-        counters.eventsProjected += 1;
-      }
-
-      const entryKey = entryLookupKey(row.tappv, row.tappa, row.rekno);
-      const dogRegistration = await prisma.dogRegistration.findUnique({
-        where: { registrationNo: row.rekno },
-        select: { dogId: true },
-      });
-      const entry = await prisma.trialEntry.create({
-        data: {
-          trialEventId: eventId,
-          dogId: dogRegistration?.dogId ?? null,
-          yksilointiAvain: entryKey,
-          lahde: TrialSourceTag.LEGACY_AKOEALL,
-          koemaasto: null,
-          rekisterinumeroSnapshot: row.rekno,
-          rotukoodi: null,
-          ke: row.ke,
-          lk: row.lk,
-          pa: row.pa,
-          piste: toDecimalOrNull(row.piste),
-          sija: row.sija,
-          haku: toDecimalOrNull(row.haku),
-          hauk: toDecimalOrNull(row.hauk),
-          yva: toDecimalOrNull(row.yva),
-          hlo: toDecimalOrNull(row.hlo),
-          alo: toDecimalOrNull(row.alo),
-          tja: toDecimalOrNull(row.tja),
-          pin: toDecimalOrNull(row.pin),
-          tuom1: row.tuom1,
-          vara: row.vara,
-          omistajaSnapshot: null,
-          omistajanKotikuntaSnapshot: null,
-          raakadataJson: row.rawPayloadJson,
-        },
-        select: { id: true },
-      });
-      counters.entriesProjected += 1;
-
-      const key = legacyEntryKey(row.rekno, row.tappa, row.tappv);
-      const details = selectedDetailsByKey.get(key) ?? [];
-      details.sort((a, b) => a.era - b.era);
-
-      const seenEras = new Set<number>();
-      for (const detail of details) {
-        if (seenEras.has(detail.era)) continue;
-        seenEras.add(detail.era);
-
-        const era = await prisma.trialEra.create({
-          data: {
-            trialEntryId: entry.id,
-            era: detail.era,
-            alkoi: detail.alkoi,
-            hakumin: detail.hakumin,
-            ajomin: detail.ajomin,
-            haku: toDecimalOrNull(detail.haku),
-            hauk: toDecimalOrNull(detail.hauk),
-            yva: toDecimalOrNull(detail.yva),
-            hlo: toDecimalOrNull(detail.hlo),
-            alo: toDecimalOrNull(detail.alo),
-            tja: toDecimalOrNull(detail.tja),
-            pin: toDecimalOrNull(detail.pin),
-            raakadataJson: detail.rawPayloadJson,
-          },
-          select: { id: true },
-        });
-        counters.erasProjected += 1;
-
-        const lisatiedot = readLisatiedot(detail);
-        if (lisatiedot.length > 0) {
-          await prisma.trialEraLisatieto.createMany({
-            data: lisatiedot.map((item, index) => ({
-              trialEraId: era.id,
-              koodi: item.koodi,
-              arvo: item.arvo,
-              nimi: null,
-              jarjestys: index + 1,
-            })),
+      for (const row of batch) {
+        const parsedDate = parseLegacyDate(row.tappv);
+        if (!parsedDate) {
+          errorsCount += 1;
+          await recordIssue({
+            stage: "project-runtime",
+            severity: "ERROR",
+            code: "TRIAL_PHASE5_INVALID_DATE",
+            message: "Legacy akoeall row has invalid TAPPV date.",
+            registrationNo: row.rekno,
+            sourceTable: "legacy_akoeall",
+            payloadJson: row.rawPayloadJson,
           });
-          counters.eraLisatiedotProjected += lisatiedot.length;
+          continue;
+        }
+
+        const trialRuleWindowId = resolveTrialRuleWindowId(
+          activeRuleWindows,
+          parsedDate,
+        );
+        if (!trialRuleWindowId) {
+          counters.unresolvedRules += 1;
+        }
+
+        const eventKey = eventLookupKey(row.tappv, row.tappa);
+        let eventId = eventIdByKey.get(eventKey);
+        if (!eventId) {
+          const event = await prisma.trialEvent.create({
+            data: {
+              legacyEventKey: eventKey,
+              sklKoeId: null,
+              koepaiva: parsedDate,
+              koekunta: row.tappa,
+              jarjestaja: null,
+              kennelpiiri: row.kennelpiiri,
+              kennelpiirinro: row.kennelpiirinro,
+              koemuoto: null,
+              ylituomariNimi: row.tuom1,
+              ylituomariNumero: null,
+              trialRuleWindowId,
+              ytKertomus: null,
+            },
+            select: { id: true },
+          });
+          eventId = event.id;
+          eventIdByKey.set(eventKey, event.id);
+          counters.eventsProjected += 1;
+        }
+
+        const parsedSija = parseLegacySija(row.sija);
+        if (parsedSija.unclear) {
+          await recordIssue({
+            stage: "project-runtime",
+            code: "TRIAL_PHASE5_UNCLEAR_SIJA",
+            message: `Legacy SIJA value could not be mapped: ${row.sija ?? "<null>"}`,
+            registrationNo: row.rekno,
+            sourceTable: "legacy_akoeall",
+            payloadJson: row.rawPayloadJson,
+          });
+        }
+
+        const entryKey = entryLookupKey(row.tappv, row.tappa, row.rekno);
+        const dogRegistration = await prisma.dogRegistration.findUnique({
+          where: { registrationNo: row.rekno },
+          select: { dogId: true },
+        });
+        const entry = await prisma.trialEntry.create({
+          data: {
+            trialEventId: eventId,
+            dogId: dogRegistration?.dogId ?? null,
+            yksilointiAvain: entryKey,
+            lahde: TrialSourceTag.LEGACY_AKOEALL,
+            koemaasto: null,
+            rekisterinumeroSnapshot: row.rekno,
+            koemuoto: null,
+            koiriaLuokassa: parsedSija.koiriaLuokassa,
+            koetyyppi: parsedSija.koetyyppi,
+            rotukoodi: null,
+            ke: row.ke,
+            lk: row.lk,
+            pa: row.pa,
+            piste: toDecimalOrNull(row.piste),
+            sija: parsedSija.sija,
+            haku: toDecimalOrNull(row.haku),
+            hauk: toDecimalOrNull(row.hauk),
+            yva: toDecimalOrNull(row.yva),
+            hlo: toDecimalOrNull(row.hlo),
+            alo: toDecimalOrNull(row.alo),
+            tja: toDecimalOrNull(row.tja),
+            pin: toDecimalOrNull(row.pin),
+            tuom1: row.tuom1,
+            vara: row.vara,
+            omistajaSnapshot: null,
+            omistajanKotikuntaSnapshot: null,
+            raakadataJson: row.rawPayloadJson,
+          },
+          select: { id: true },
+        });
+        counters.entriesProjected += 1;
+
+        const key = legacyEntryKey(row.rekno, row.tappa, row.tappv);
+        const details = selectedDetailsByKey.get(key) ?? [];
+        details.sort((a, b) => a.era - b.era);
+
+        const seenEras = new Set<number>();
+        for (const detail of details) {
+          if (seenEras.has(detail.era)) continue;
+          seenEras.add(detail.era);
+
+          const era = await prisma.trialEra.create({
+            data: {
+              trialEntryId: entry.id,
+              era: detail.era,
+              alkoi: detail.alkoi,
+              hakumin: detail.hakumin,
+              ajomin: detail.ajomin,
+              haku: toDecimalOrNull(detail.haku),
+              hauk: toDecimalOrNull(detail.hauk),
+              yva: toDecimalOrNull(detail.yva),
+              hlo: toDecimalOrNull(detail.hlo),
+              alo: toDecimalOrNull(detail.alo),
+              tja: toDecimalOrNull(detail.tja),
+              pin: toDecimalOrNull(detail.pin),
+              raakadataJson: detail.rawPayloadJson,
+            },
+            select: { id: true },
+          });
+          counters.erasProjected += 1;
+
+          const lisatiedot = readLisatiedot(detail);
+          if (lisatiedot.length > 0) {
+            await prisma.trialEraLisatieto.createMany({
+              data: lisatiedot.map((item, index) => ({
+                trialEraId: era.id,
+                koodi: item.koodi,
+                arvo: item.arvo,
+                nimi: null,
+                jarjestys: index + 1,
+              })),
+            });
+            counters.eraLisatiedotProjected += lisatiedot.length;
+          }
         }
       }
+
+      await flushIssueBuffer();
+      logProgress(
+        "project-runtime",
+        Math.min(totalRows, batchStart + batch.length),
+        totalRows,
+      );
+      log(
+        `[stage:project-runtime] batch events=${counters.eventsProjected} entries=${counters.entriesProjected} eras=${counters.erasProjected} eraLisatiedot=${counters.eraLisatiedotProjected}`,
+      );
     }
     finishStage(
       "project-runtime",
@@ -399,6 +449,7 @@ export async function runLegacyPhase5(
     );
 
     startStage("finalize");
+    await flushIssueBuffer();
     const finished = await markImportRunFinished(
       run.id,
       {

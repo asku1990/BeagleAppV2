@@ -71,7 +71,6 @@ describe("AdminTrialSelectedEventPanel", () => {
           organizer: "Jarjestaja",
           judge: "Judge",
           sklKoeId: 12345,
-          koemuoto: "AJOK",
           dogCount: 1,
           entries: [
             {
@@ -80,6 +79,8 @@ describe("AdminTrialSelectedEventPanel", () => {
               dogName: "Rex",
               registrationNo: "FI123",
               entryKey: "entry-1",
+              koemuoto: "AJOK",
+              koetyyppi: "NORMAL",
               rank: "2",
               award: "VOI1",
               points: 98.5,

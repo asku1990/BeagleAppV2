@@ -38,11 +38,12 @@ export type AdminTrialEventEntryDb = {
   dogName: string;
   registrationNo: string | null;
   entryKey: string;
+  koemuoto: string | null;
+  koetyyppi: "NORMAL" | "KOKOKAUDENKOE" | "PITKAKOE";
   rank: string | null;
   award: string | null;
   points: number | null;
   judge: string | null;
-  kokokaudenkoe: boolean | null;
 };
 
 export type AdminTrialEventDetailsDb = {
@@ -53,6 +54,5 @@ export type AdminTrialEventDetailsDb = {
   organizer: string | null;
   judge: string | null;
   sklKoeId: number | null;
-  koemuoto: string | null;
   entries: AdminTrialEventEntryDb[];
 };

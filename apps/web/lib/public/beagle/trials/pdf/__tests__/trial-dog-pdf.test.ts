@@ -49,7 +49,7 @@ describe("renderTrialDogPdf", () => {
       luopui: false,
       suljettu: false,
       keskeytetty: false,
-      kokokaudenkoe: false,
+      koetyyppi: "NORMAL",
       sijoitus: null,
       koiriaLuokassa: null,
       Palkinto: "1",

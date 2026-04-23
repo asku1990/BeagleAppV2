@@ -182,7 +182,7 @@ Input data:
 - `luopui`
 - `suljettu`
 - `keskeytetty`
-- `kokokaudenkoe`
+- `koetyyppi` (`NORMAL` | `KOKOKAUDENKOE` | `PITKAKOE`)
 - `sijoitus`
 - `koiriaLuokassa`
 - `Palkinto`
@@ -191,8 +191,9 @@ Rules:
 
 - `paljasMaaTaiLumi` maps to `PALJAS_MAA` or `LUMI` markers, or nothing.
 - `luopui`, `suljettu`, and `keskeytetty` render as `X` markers when true.
-- `kokokaudenkoe` overrides the visible result row: `sijoitus` renders as `-`
-  and `koiriaLuokassa` renders as `KK`.
+- `koetyyppi=KOKOKAUDENKOE` renders `sijoitus` as `-` and `koiriaLuokassa` as `KK`.
+- `koetyyppi=PITKAKOE` renders `sijoitus` as `PK` and keeps `koiriaLuokassa`.
+- `koetyyppi=NORMAL` renders the stored `sijoitus` and `koiriaLuokassa` values.
 - Otherwise `sijoitus` renders under the status markers and `koiriaLuokassa`
   renders next to `sijoitus`.
 - `Palkinto` continues to render in the lower-right payout field.

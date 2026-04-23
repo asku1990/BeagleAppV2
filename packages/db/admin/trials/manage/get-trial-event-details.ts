@@ -27,7 +27,6 @@ export async function getAdminTrialEventDetailsDb(
       koepaiva: true,
       koekunta: true,
       jarjestaja: true,
-      koemuoto: true,
       ylituomariNimi: true,
       entries: {
         orderBy: [{ rekisterinumeroSnapshot: "asc" }, { id: "asc" }],
@@ -36,6 +35,8 @@ export async function getAdminTrialEventDetailsDb(
           dogId: true,
           yksilointiAvain: true,
           rekisterinumeroSnapshot: true,
+          koemuoto: true,
+          koetyyppi: true,
           sija: true,
           pa: true,
           piste: true,
@@ -69,7 +70,6 @@ export async function getAdminTrialEventDetailsDb(
     organizer: row.jarjestaja,
     judge: row.ylituomariNimi,
     sklKoeId: row.sklKoeId,
-    koemuoto: row.koemuoto,
     entries: row.entries.map((entry) => ({
       trialId: entry.id,
       dogId: entry.dogId,
@@ -79,11 +79,12 @@ export async function getAdminTrialEventDetailsDb(
         entry.dog?.registrations[0]?.registrationNo ||
         null,
       entryKey: entry.yksilointiAvain,
+      koemuoto: entry.koemuoto,
+      koetyyppi: entry.koetyyppi,
       rank: entry.sija,
       award: entry.pa,
       points: toNumberOrNull(entry.piste),
       judge: entry.tuom1 || row.ylituomariNimi,
-      kokokaudenkoe: null,
     })),
   };
 }

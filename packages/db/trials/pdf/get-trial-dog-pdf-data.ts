@@ -58,7 +58,9 @@ export type TrialDogPdfDataDbRow = {
   tappiopisteetYhteensa: number | null;
   loppupisteet: number | null;
   ke: string | null;
+  koetyyppi: "NORMAL" | "KOKOKAUDENKOE" | "PITKAKOE";
   sijoitus: string | null;
+  koiriaLuokassa: number | null;
   palkinto: string | null;
   ylituomariNimi: string | null;
   eras: TrialDogPdfDataDbEraRow[];
@@ -78,9 +80,11 @@ export async function getTrialDogPdfDataDb(
       omistajanKotikuntaSnapshot: true,
       koemaasto: true,
       ke: true,
+      koetyyppi: true,
       pa: true,
       piste: true,
       sija: true,
+      koiriaLuokassa: true,
       hyvaksytytAjominuutit: true,
       ajoajanPisteet: true,
       haku: true,
@@ -200,7 +204,9 @@ export async function getTrialDogPdfDataDb(
     tappiopisteetYhteensa: toNumberOrNull(row.tappiopisteetYhteensa),
     loppupisteet: toNumberOrNull(row.piste),
     ke: row.ke,
+    koetyyppi: row.koetyyppi,
     sijoitus: row.sija ?? null,
+    koiriaLuokassa: row.koiriaLuokassa,
     palkinto: row.pa ?? null,
     ylituomariNimi: row.tuom1 ?? null,
     eras: row.eras.map((era) => ({

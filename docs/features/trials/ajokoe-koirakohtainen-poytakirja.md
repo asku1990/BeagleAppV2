@@ -83,6 +83,7 @@ Alla oleva ryhmittely on suunniteltu AJOK-koirakohtaisen pöytäkirjan näkymän
   `L`, `S`, and `-`)
 - `sijoitus`
 - `koiriaLuokassa`
+- `koetyyppi` (`NORMAL` | `KOKOKAUDENKOE` | `PITKAKOE`)
 
 ### 7) Olosuhteet
 

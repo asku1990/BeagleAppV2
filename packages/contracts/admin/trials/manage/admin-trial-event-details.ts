@@ -10,15 +10,15 @@ export type AdminTrialEventEntry = {
   dogName: string;
   registrationNo: string | null;
   entryKey: string;
+  koemuoto: string | null;
+  koetyyppi: "NORMAL" | "KOKOKAUDENKOE" | "PITKAKOE";
   rank: string | null;
   award: string | null;
   points: number | null;
   judge: string | null;
-  kokokaudenkoe?: boolean | null;
 };
 
 export type AdminTrialEventDetails = AdminTrialEventSummary & {
-  koemuoto: string | null;
   entries: AdminTrialEventEntry[];
 };
 

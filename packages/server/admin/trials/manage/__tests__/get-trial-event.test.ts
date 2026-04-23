@@ -61,7 +61,6 @@ describe("getAdminTrialEvent", () => {
       organizer: "Talvikoe",
       judge: "Judge One",
       sklKoeId: 1234,
-      koemuoto: "AJOK",
       entries: [
         {
           trialId: "trial-1",
@@ -69,6 +68,8 @@ describe("getAdminTrialEvent", () => {
           dogName: "Rex",
           registrationNo: "FI123",
           entryKey: "entry-1",
+          koemuoto: "AJOK",
+          koetyyppi: "NORMAL",
           rank: "1",
           award: "VOI1",
           points: 92.5,
@@ -101,7 +102,6 @@ describe("getAdminTrialEvent", () => {
             judge: "Judge One",
             sklKoeId: 1234,
             dogCount: 1,
-            koemuoto: "AJOK",
             entries: [
               {
                 trialId: "trial-1",
@@ -109,6 +109,8 @@ describe("getAdminTrialEvent", () => {
                 dogName: "Rex",
                 registrationNo: "FI123",
                 entryKey: "entry-1",
+                koemuoto: "AJOK",
+                koetyyppi: "NORMAL",
                 rank: "1",
                 award: "VOI1",
                 points: 92.5,

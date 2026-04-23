@@ -8,6 +8,7 @@ import type {
   KoiratietokantaAjokEraDbInput,
   KoiratietokantaAjokEventDbInput,
 } from "@beagle/db";
+import { TrialEntryKoetyyppi } from "@beagle/db";
 import {
   isValidRegistrationNo,
   normalizeRegistrationNo,
@@ -27,7 +28,7 @@ import { mapKoiratietokantaAjokLisatiedot } from "./map-ajok-lisatiedot";
 type MapperResult =
   | {
       ok: true;
-      event: KoiratietokantaAjokEventDbInput;
+      event: Omit<KoiratietokantaAjokEventDbInput, "trialRuleWindowId">;
       entry: KoiratietokantaAjokEntryDbInput;
       eras: KoiratietokantaAjokEraDbInput[];
       lisatiedot: ReturnType<typeof mapKoiratietokantaAjokLisatiedot>;
@@ -109,6 +110,29 @@ export function mapKoiratietokantaAjokPayload(
   const ylituomariNimi = normalizeText(payload.yt);
   const ylituomariNumero = normalizeText(payload.ytnro);
   const lisatiedot = mapKoiratietokantaAjokLisatiedot(payload);
+  const koekaudenkoe = parseBooleanFlag(payload.koekaudenkoe);
+  const pitkakoe = parseBooleanFlag(payload.pitkakoe);
+
+  if (koekaudenkoe === true && pitkakoe === true) {
+    return {
+      ok: false,
+      issues: [
+        {
+          field: "koekaudenkoe",
+          code: "INVALID",
+          message:
+            "koekaudenkoe and pitkakoe cannot both be true for the same entry.",
+        },
+      ],
+    };
+  }
+
+  const koetyyppi =
+    koekaudenkoe === true
+      ? TrialEntryKoetyyppi.KOKOKAUDENKOE
+      : pitkakoe === true
+        ? TrialEntryKoetyyppi.PITKAKOE
+        : TrialEntryKoetyyppi.NORMAL;
   const entry: KoiratietokantaAjokEntryDbInput = {
     rekisterinumeroSnapshot: registrationNo,
     yksilointiAvain: `SKL:${sklKoeId}|REG:${registrationNo}`,
@@ -216,8 +240,9 @@ export function mapKoiratietokantaAjokPayload(
     loppupisteet: parseOptionalDecimal(payload, "LOPPUPISTEET", warnings),
     palkinto: normalizeText(payload.PALKINTOSIJA),
     sijoitus: normalizeText(payload.SIJOITUS_LUOKASSA),
+    koemuoto: normalizeText(payload.SKLkoemuoto),
     koiriaLuokassa: parseOptionalInteger(payload, "KOIRIA_LUOKASSA", warnings),
-    kokokaudenkoe: parseBooleanFlag(payload.koekaudenkoe),
+    koetyyppi,
     keli: normalizeText(payload.KELI),
     luopui: parseBooleanFlag(payload.luopui),
     suljettu: parseBooleanFlag(payload.suljettu),
@@ -243,8 +268,6 @@ export function mapKoiratietokantaAjokPayload(
       kennelpiirinro:
         normalizeText(payload.KENNELPIIRINRO) ??
         normalizeText(payload.SKLkennelpiiri),
-      koemuoto:
-        normalizeText(payload.SKLkoemuoto) ?? normalizeText(payload.KOEMUOTO),
       ylituomariNimi,
       ylituomariNumero,
       ytKertomus: normalizeText(payload.YTkertomus),

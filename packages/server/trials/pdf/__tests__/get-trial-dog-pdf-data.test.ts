@@ -40,7 +40,9 @@ function dbRow(overrides: Record<string, unknown> = {}) {
     tappiopisteetYhteensa: 4,
     loppupisteet: null,
     ke: null,
+    koetyyppi: "NORMAL",
     sijoitus: null,
+    koiriaLuokassa: null,
     palkinto: null,
     ylituomariNimi: null,
     eras: [

@@ -33,7 +33,7 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
       luopui: false,
       suljettu: false,
       keskeytetty: false,
-      kokokaudenkoe: false,
+      koetyyppi: "NORMAL",
       sijoitus: "1",
       koiriaLuokassa: 2,
       Palkinto: "1",
@@ -76,7 +76,7 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
       luopui: false,
       suljettu: false,
       keskeytetty: false,
-      kokokaudenkoe: false,
+      koetyyppi: "NORMAL",
       sijoitus: "1",
       koiriaLuokassa: 2,
       Palkinto: "1",
@@ -119,7 +119,7 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
       luopui: false,
       suljettu: false,
       keskeytetty: false,
-      kokokaudenkoe: false,
+      koetyyppi: "NORMAL",
       sijoitus: "1",
       koiriaLuokassa: 2,
       Palkinto: "1",
@@ -157,7 +157,7 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
       luopui: true,
       suljettu: true,
       keskeytetty: true,
-      kokokaudenkoe: false,
+      koetyyppi: "NORMAL",
       sijoitus: "1",
       koiriaLuokassa: 2,
       Palkinto: "1",
@@ -205,7 +205,7 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
       luopui: false,
       suljettu: false,
       keskeytetty: false,
-      kokokaudenkoe: false,
+      koetyyppi: "NORMAL",
       sijoitus: "",
       koiriaLuokassa: 2,
       Palkinto: "1",
@@ -221,14 +221,14 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
     });
   });
 
-  it("renders kokokaudenkoe override as dash and KK", () => {
+  it("renders KOKOKAUDENKOE as dash and KK", () => {
     drawTrialDogPdfLoppuppisteet({
       loppupisteet: 12,
       paljasMaaTaiLumi: null,
       luopui: false,
       suljettu: false,
       keskeytetty: false,
-      kokokaudenkoe: true,
+      koetyyppi: "KOKOKAUDENKOE",
       sijoitus: "1",
       koiriaLuokassa: 2,
       Palkinto: "1",
@@ -243,6 +243,34 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
       size: 12,
     });
     expect(drawTextMock).toHaveBeenNthCalledWith(3, page, font, "KK", {
+      x: 382.5,
+      y: 106,
+      size: 12,
+    });
+  });
+
+  it("renders PITKAKOE as PK and class count", () => {
+    drawTrialDogPdfLoppuppisteet({
+      loppupisteet: 12,
+      paljasMaaTaiLumi: null,
+      luopui: false,
+      suljettu: false,
+      keskeytetty: false,
+      koetyyppi: "PITKAKOE",
+      sijoitus: "1",
+      koiriaLuokassa: 4,
+      Palkinto: "1",
+      page,
+      font,
+    });
+
+    expect(drawTextMock).toHaveBeenCalledTimes(4);
+    expect(drawTextMock).toHaveBeenNthCalledWith(2, page, font, "PK", {
+      x: 355.5,
+      y: 106,
+      size: 12,
+    });
+    expect(drawTextMock).toHaveBeenNthCalledWith(3, page, font, "4", {
       x: 382.5,
       y: 106,
       size: 12,

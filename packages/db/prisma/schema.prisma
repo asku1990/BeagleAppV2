@@ -51,6 +51,12 @@ enum TrialSourceTag {
   KOIRATIETOKANTA_API
 }
 
+enum TrialEntryKoetyyppi {
+  NORMAL
+  KOKOKAUDENKOE
+  PITKAKOE
+}
+
 enum ShowResultValueType {
   FLAG
   CODE
@@ -315,7 +321,6 @@ model TrialEvent {
   jarjestaja     String?
   kennelpiiri    String?
   kennelpiirinro String?
-  koemuoto       String?
 
   // 10) tuomarit ja vahvistus (event-taso)
   ylituomariNimi   String?
@@ -346,6 +351,9 @@ model TrialEntry {
   // 2) koiran tiedot
   koemaasto                  String?
   rekisterinumeroSnapshot    String
+  koemuoto                   String?
+  koiriaLuokassa             Int?
+  koetyyppi                  TrialEntryKoetyyppi @default(NORMAL)
   rotukoodi                  String?
   ke                         String?
   lk                         String?

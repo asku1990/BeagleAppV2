@@ -42,14 +42,18 @@ result upsert contract.
 - `JARJESTAJA` -> `TrialEvent.jarjestaja`
 - `KENNELPIIRI` -> `TrialEvent.kennelpiiri`
 - `KENNELPIIRINRO` / `SKLkennelpiiri` -> `TrialEvent.kennelpiirinro`
-- `SKLkoemuoto` / `KOEMUOTO` -> `TrialEvent.koemuoto`
 - `yt` -> `TrialEvent.ylituomariNimi`
 - `ytnro` -> `TrialEvent.ylituomariNumero`
 - `YTkertomus` -> `TrialEvent.ytKertomus`
 
+`TrialEvent` does not store `koemuoto`; the entry-level `koemuoto` value is the
+canonical source for AJOK result rows. Mixed entry-level `koemuoto` values
+inside one event are allowed.
+
 ### `TrialEntry`
 
 - `REKISTERINUMERO` -> `TrialEntry.rekisterinumeroSnapshot`
+- `SKLkoemuoto` -> `TrialEntry.koemuoto`
 - `LUOKKA` -> `TrialEntry.luokka`
 - `Omistaja` -> `TrialEntry.omistajaSnapshot`
 - `Omistajankotipaikka` -> `TrialEntry.omistajanKotikuntaSnapshot`
@@ -75,7 +79,9 @@ result upsert contract.
   `0`, `1`, `2`, `3`, `L`, `S`, and `-`)
 - `SIJOITUS_LUOKASSA` -> `sijoitus`
 - `KOIRIA_LUOKASSA` -> `koiriaLuokassa`
-- `koekaudenkoe` -> `kokokaudenkoe` (`"1"` => `true`, `"0"` => `false`)
+- `koekaudenkoe` -> `koetyyppi=KOKOKAUDENKOE`
+- `pitkakoe` -> `koetyyppi=PITKAKOE`
+- otherwise -> `koetyyppi=NORMAL`
 - `KELI` -> compatibility input `keli`, persisted to `TrialEntry.ke`
 - `luopui` -> `luopui`
 - `suljettu` -> `suljettu`
@@ -85,6 +91,16 @@ result upsert contract.
 - `palkintotuomari2` -> `palkintotuomariNimi`
 - `yt` / `ytnro` are also copied into `ylituomariNimiSnapshot` /
   `ylituomariNumeroSnapshot`
+
+### Placement semantics
+
+- `TrialEntry.sija` stores the normalized placement token/value.
+- `TrialEntry.koiriaLuokassa` stores the class-size column.
+- `TrialEntry.koetyyppi` stores the result-row mode:
+  - `NORMAL`
+  - `KOKOKAUDENKOE`
+  - `PITKAKOE`
+- The API rejects payloads where both `koekaudenkoe` and `pitkakoe` are true.
 
 ### Compatibility columns
 

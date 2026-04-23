@@ -63,8 +63,14 @@ export function drawTrialDogPdfLoppuppisteet(
   },
 ): void {
   const { page, font } = input;
-  const sijoitus = input.kokokaudenkoe ? "-" : input.sijoitus;
-  const koiriaLuokassa = input.kokokaudenkoe ? "KK" : input.koiriaLuokassa;
+  const sijoitus =
+    input.koetyyppi === "KOKOKAUDENKOE"
+      ? "-"
+      : input.koetyyppi === "PITKAKOE"
+        ? "PK"
+        : input.sijoitus;
+  const koiriaLuokassa =
+    input.koetyyppi === "KOKOKAUDENKOE" ? "KK" : input.koiriaLuokassa;
 
   drawText(page, font, formatKoeEraValue(input.loppupisteet), LOPPUPISTEET);
 

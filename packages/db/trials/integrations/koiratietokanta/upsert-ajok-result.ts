@@ -1,4 +1,4 @@
-import { TrialSourceTag } from "@prisma/client";
+import { TrialEntryKoetyyppi, TrialSourceTag } from "@prisma/client";
 import { prisma } from "@db/core/prisma";
 
 export type KoiratietokantaAjokEventDbInput = {
@@ -8,7 +8,7 @@ export type KoiratietokantaAjokEventDbInput = {
   jarjestaja: string | null;
   kennelpiiri: string | null;
   kennelpiirinro: string | null;
-  koemuoto: string | null;
+  trialRuleWindowId: string | null;
   ylituomariNimi: string | null;
   ylituomariNumero: string | null;
   ytKertomus: string | null;
@@ -69,8 +69,9 @@ export type KoiratietokantaAjokEntryDbInput = {
   loppupisteet: number | null;
   palkinto: string | null;
   sijoitus: string | null;
+  koemuoto: string | null;
   koiriaLuokassa: number | null;
-  kokokaudenkoe: boolean | null;
+  koetyyppi: TrialEntryKoetyyppi;
   keli: string | null;
   luopui: boolean | null;
   suljettu: boolean | null;
@@ -142,7 +143,7 @@ export async function upsertKoiratietokantaAjokResultDb(
         jarjestaja: input.event.jarjestaja,
         kennelpiiri: input.event.kennelpiiri,
         kennelpiirinro: input.event.kennelpiirinro,
-        koemuoto: input.event.koemuoto,
+        trialRuleWindowId: input.event.trialRuleWindowId,
         ylituomariNimi: input.event.ylituomariNimi,
         ylituomariNumero: input.event.ylituomariNumero,
         ytKertomus: input.event.ytKertomus,
@@ -153,7 +154,7 @@ export async function upsertKoiratietokantaAjokResultDb(
         jarjestaja: input.event.jarjestaja,
         kennelpiiri: input.event.kennelpiiri,
         kennelpiirinro: input.event.kennelpiirinro,
-        koemuoto: input.event.koemuoto,
+        trialRuleWindowId: input.event.trialRuleWindowId,
         ytKertomus: input.event.ytKertomus,
         ylituomariNimi: input.event.ylituomariNimi,
         ylituomariNumero: input.event.ylituomariNumero,
@@ -183,6 +184,9 @@ export async function upsertKoiratietokantaAjokResultDb(
       raakadataJson: input.entry.raakadataJson,
       ke: input.entry.keli,
       lk: input.entry.luokka,
+      koemuoto: input.entry.koemuoto,
+      koiriaLuokassa: input.entry.koiriaLuokassa,
+      koetyyppi: input.entry.koetyyppi,
       omistajaSnapshot: input.entry.omistajaSnapshot,
       omistajanKotikuntaSnapshot: input.entry.omistajanKotikuntaSnapshot,
       koemaasto: input.entry.koemaasto,

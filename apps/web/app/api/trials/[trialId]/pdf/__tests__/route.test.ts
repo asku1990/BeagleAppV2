@@ -77,7 +77,7 @@ describe("trial pdf api route", () => {
           luopui: false,
           suljettu: false,
           keskeytetty: false,
-          kokokaudenkoe: false,
+          koetyyppi: "NORMAL",
           sijoitus: "1",
           koiriaLuokassa: 2,
           huomautusTeksti: "Huomautus testiin.",

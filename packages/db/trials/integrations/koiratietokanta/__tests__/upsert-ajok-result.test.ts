@@ -77,8 +77,9 @@ const entryInput = {
   loppupisteet: null,
   palkinto: null,
   sijoitus: null,
+  koemuoto: null,
   koiriaLuokassa: null,
-  kokokaudenkoe: null,
+  koetyyppi: "NORMAL" as const,
   keli: null,
   luopui: null,
   suljettu: null,
@@ -138,7 +139,7 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
     txMock.trialEraLisatieto.createMany.mockResolvedValue({ count: 2 });
   });
 
-  it("replaces lisatieto rows after entry upsert", async () => {
+  it("writes entry-level koemuoto, koetyyppi, ke and class count", async () => {
     const result = await upsertKoiratietokantaAjokResultDb({
       event: {
         sklKoeId: 431477,
@@ -147,13 +148,17 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
         jarjestaja: null,
         kennelpiiri: null,
         kennelpiirinro: null,
-        koemuoto: "AJOK",
+        trialRuleWindowId: null,
         ylituomariNimi: "Ylituomari",
         ylituomariNumero: null,
         ytKertomus: null,
       },
       entry: {
         ...entryInput,
+        koemuoto: "AJOK",
+        koetyyppi: "PITKAKOE",
+        koiriaLuokassa: 4,
+        sijoitus: "1",
         keli: "P",
         hyvaksytytAjominuutit: 51,
         ajoajanPisteet: 14.88,
@@ -167,11 +172,21 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
       created: true,
       updated: false,
     });
+    expect(txMock.trialEvent.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.not.objectContaining({ koemuoto: expect.anything() }),
+        update: expect.not.objectContaining({ koemuoto: expect.anything() }),
+      }),
+    );
     expect(txMock.trialEntry.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         create: expect.objectContaining({
           koemaasto: null,
+          koemuoto: "AJOK",
+          koetyyppi: "PITKAKOE",
+          koiriaLuokassa: 4,
           ke: "P",
+          sija: "1",
           hyvaksytytAjominuutit: 51,
           ajoajanPisteet: 14.88,
           pin: null,
@@ -192,46 +207,6 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
     });
     expect(txMock.trialEra.create).toHaveBeenCalledTimes(2);
     expect(txMock.trialEraLisatieto.createMany).toHaveBeenCalledTimes(2);
-    expect(txMock.trialEraLisatieto.createMany).toHaveBeenNthCalledWith(
-      1,
-      expect.objectContaining({
-        data: expect.arrayContaining([
-          expect.objectContaining({
-            trialEraId: "era-1",
-            koodi: "11",
-            arvo: "1",
-          }),
-          expect.objectContaining({
-            trialEraId: "era-1",
-            koodi: "17",
-            arvo: "13",
-          }),
-        ]),
-      }),
-    );
-    expect(txMock.trialEraLisatieto.createMany).toHaveBeenNthCalledWith(
-      2,
-      expect.objectContaining({
-        data: expect.arrayContaining([
-          expect.objectContaining({
-            trialEraId: "era-2",
-            koodi: "11",
-            arvo: "1",
-          }),
-          expect.objectContaining({
-            trialEraId: "era-2",
-            koodi: "17",
-            arvo: "19",
-          }),
-        ]),
-      }),
-    );
-    expect(
-      txMock.trialEra.deleteMany.mock.invocationCallOrder[0],
-    ).toBeGreaterThan(txMock.trialEntry.upsert.mock.invocationCallOrder[0]);
-    expect(
-      txMock.trialEraLisatieto.createMany.mock.invocationCallOrder[0],
-    ).toBeGreaterThan(txMock.trialEra.deleteMany.mock.invocationCallOrder[0]);
   });
 
   it("deletes old lisatieto rows and skips createMany when no rows are mapped", async () => {
@@ -243,7 +218,7 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
         jarjestaja: null,
         kennelpiiri: null,
         kennelpiirinro: null,
-        koemuoto: "AJOK",
+        trialRuleWindowId: null,
         ylituomariNimi: null,
         ylituomariNumero: null,
         ytKertomus: null,

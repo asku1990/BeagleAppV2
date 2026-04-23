@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { upsertKoiratietokantaAjokResultService } from "../upsert-ajok-result";
 
-const { upsertDbMock } = vi.hoisted(() => ({
+const { upsertDbMock, trialRuleWindowFindManyMock } = vi.hoisted(() => ({
   upsertDbMock: vi.fn(),
+  trialRuleWindowFindManyMock: vi.fn(),
 }));
 
 vi.mock("@beagle/db", () => ({
@@ -11,12 +12,30 @@ vi.mock("@beagle/db", () => ({
     FEMALE: "FEMALE",
     UNKNOWN: "UNKNOWN",
   },
+  TrialEntryKoetyyppi: {
+    NORMAL: "NORMAL",
+    KOKOKAUDENKOE: "KOKOKAUDENKOE",
+    PITKAKOE: "PITKAKOE",
+  },
+  prisma: {
+    trialRuleWindow: {
+      findMany: trialRuleWindowFindManyMock,
+    },
+  },
   upsertKoiratietokantaAjokResultDb: upsertDbMock,
 }));
 
 describe("upsertKoiratietokantaAjokResultService", () => {
   beforeEach(() => {
     upsertDbMock.mockReset();
+    trialRuleWindowFindManyMock.mockReset();
+    trialRuleWindowFindManyMock.mockResolvedValue([
+      {
+        id: "window-1",
+        fromYmd: 20200101,
+        toYmd: null,
+      },
+    ]);
     upsertDbMock.mockResolvedValue({
       trialEventId: "event-1",
       trialEntryId: "entry-1",
@@ -76,11 +95,14 @@ describe("upsertKoiratietokantaAjokResultService", () => {
         jarjestaja: "Kainuun Ajokoirakerho",
         ylituomariNimi: "Fors Jari",
         ylituomariNumero: "402762",
+        trialRuleWindowId: "window-1",
       }),
       entry: expect.objectContaining({
         rekisterinumeroSnapshot: "FI33413/18",
         yksilointiAvain: "SKL:431477|REG:FI33413/18",
         raakadataJson: JSON.stringify(payload),
+        koemuoto: "AJOK",
+        koetyyppi: "NORMAL",
         omistajaSnapshot: "Marja ja Kari Virtanen",
         koemaasto: "Ristijärvi",
         era1Alkoi: "5:49",

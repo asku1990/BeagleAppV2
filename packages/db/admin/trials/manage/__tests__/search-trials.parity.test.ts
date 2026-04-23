@@ -43,7 +43,6 @@ describe("searchAdminTrialsDb event parity", () => {
           koepaiva: new Date("2026-03-01T00:00:00.000Z"),
           koekunta: "Helsinki",
           jarjestaja: "Talvikoe",
-          koemuoto: "AJOK",
           ylituomariNimi: "Judge One",
           _count: { entries: 22 },
         },

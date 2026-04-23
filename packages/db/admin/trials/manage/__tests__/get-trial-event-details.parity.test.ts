@@ -41,7 +41,6 @@ describe("getAdminTrialEventDetailsDb parity", () => {
       koepaiva: new Date("2026-03-01T00:00:00.000Z"),
       koekunta: "Helsinki",
       jarjestaja: "Talvikoe",
-      koemuoto: "AJOK",
       ylituomariNimi: "Judge One",
       entries: [
         {
@@ -49,6 +48,8 @@ describe("getAdminTrialEventDetailsDb parity", () => {
           dogId: "dog-1",
           yksilointiAvain: "entry-1",
           rekisterinumeroSnapshot: "FI123",
+          koemuoto: "AJOK",
+          koetyyppi: "NORMAL",
           sija: "1",
           pa: "VOI1",
           piste: { valueOf: () => 92.5 },
@@ -73,7 +74,6 @@ describe("getAdminTrialEventDetailsDb parity", () => {
       organizer: "Talvikoe",
       judge: "Judge One",
       sklKoeId: 1001,
-      koemuoto: "AJOK",
       entries: [
         {
           trialId: "trial-1",
@@ -81,11 +81,12 @@ describe("getAdminTrialEventDetailsDb parity", () => {
           dogName: "Rex",
           registrationNo: "FI123",
           entryKey: "entry-1",
+          koemuoto: "AJOK",
+          koetyyppi: "NORMAL",
           rank: "1",
           award: "VOI1",
           points: 92.5,
           judge: "Group Judge",
-          kokokaudenkoe: null,
         },
       ],
     });

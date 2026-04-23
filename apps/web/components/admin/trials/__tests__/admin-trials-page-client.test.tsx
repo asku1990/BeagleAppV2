@@ -117,7 +117,6 @@ vi.mock("@/queries/admin/trials", () => ({
         organizer: "Jarjestaja",
         judge: "Judge",
         sklKoeId: 12345,
-        koemuoto: "AJOK",
         dogCount: 2,
         entries: [],
       },
