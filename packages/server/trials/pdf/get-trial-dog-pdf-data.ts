@@ -46,6 +46,13 @@ function calculateAnsiopisteet(
   return sumNullableNumbers([haku, hauk, pin, yva]);
 }
 
+function calculateTappiopisteet(
+  hlo: number | null,
+  alo: number | null,
+): number | null {
+  return sumNullableNumbers([hlo, alo]);
+}
+
 function calculateAjoajanPisteet(ajominuutit: number | null): number | null {
   if (ajominuutit === null) {
     return null;
@@ -167,6 +174,9 @@ export async function getTrialDogPdfDataService(
     const ansiopisteetYhteensa =
       result.ansiopisteetYhteensa ??
       calculateAnsiopisteet(result.haku, result.hauk, result.pin, result.yva);
+    const tappiopisteetYhteensa =
+      result.tappiopisteetYhteensa ??
+      calculateTappiopisteet(result.hlo, result.alo);
     const lisatiedotRows = pivotLisatiedot(result.eras);
 
     log.info(
@@ -217,13 +227,13 @@ export async function getTrialDogPdfDataService(
           ajotaitoEra1: era1?.yva ?? null,
           ajotaitoEra2: era2?.yva ?? null,
           ajotaitoKeskiarvo: result.yva,
-          hakuloysyysTappioEra1: null,
-          hakuloysyysTappioEra2: null,
-          hakuloysyysTappioYhteensa: null,
-          ajoloysyysTappioEra1: null,
-          ajoloysyysTappioEra2: null,
-          ajoloysyysTappioYhteensa: null,
-          tappiopisteetYhteensa: null,
+          hakuloysyysTappioEra1: era1?.hlo ?? null,
+          hakuloysyysTappioEra2: era2?.hlo ?? null,
+          hakuloysyysTappioYhteensa: result.hlo,
+          ajoloysyysTappioEra1: era1?.alo ?? null,
+          ajoloysyysTappioEra2: era2?.alo ?? null,
+          ajoloysyysTappioYhteensa: result.alo,
+          tappiopisteetYhteensa,
           ansiopisteetYhteensa,
           loppupisteet: result.loppupisteet,
           paljasMaaTaiLumi: mapKeliToPaljasMaaTaiLumi(result.ke),

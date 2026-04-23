@@ -52,6 +52,8 @@ export type KoiratietokantaAjokEntryDbInput = {
   ajotaitoEra3: number | null;
   ajotaitoEra4: number | null;
   yva: number | null;
+  hlo: number | null;
+  alo: number | null;
   ansiopisteetYhteensa: number | null;
   hakuloysyysTappioEra1: number | null;
   hakuloysyysTappioEra2: number | null;
@@ -105,6 +107,8 @@ export type KoiratietokantaAjokEraDbInput = {
   haku: number | null;
   hauk: number | null;
   yva: number | null;
+  hlo: number | null;
+  alo: number | null;
   lisatiedot: KoiratietokantaAjokEraLisatietoDbInput[];
 };
 
@@ -191,7 +195,10 @@ export async function upsertKoiratietokantaAjokResultDb(
       haku: input.entry.haku,
       hauk: input.entry.hauk,
       yva: input.entry.yva,
+      hlo: input.entry.hlo,
+      alo: input.entry.alo,
       ansiopisteetYhteensa: input.entry.ansiopisteetYhteensa,
+      tappiopisteetYhteensa: input.entry.tappiopisteetYhteensa,
       tuom1: input.event.ylituomariNimi,
       ...(dogId ? { dogId } : {}),
     };
@@ -228,6 +235,8 @@ export async function upsertKoiratietokantaAjokResultDb(
           haku: eraWrite.haku,
           hauk: eraWrite.hauk,
           yva: eraWrite.yva,
+          hlo: eraWrite.hlo,
+          alo: eraWrite.alo,
           raakadataJson: null,
         },
         select: { id: true, era: true },

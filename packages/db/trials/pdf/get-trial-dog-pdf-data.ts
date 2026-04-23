@@ -24,6 +24,8 @@ export type TrialDogPdfDataDbEraRow = {
   haku: number | null;
   hauk: number | null;
   yva: number | null;
+  hlo: number | null;
+  alo: number | null;
   lisatiedot: TrialDogPdfDataDbEraLisatietoRow[];
 };
 
@@ -49,8 +51,11 @@ export type TrialDogPdfDataDbRow = {
   haku: number | null;
   hauk: number | null;
   yva: number | null;
+  hlo: number | null;
+  alo: number | null;
   pin: number | null;
   ansiopisteetYhteensa: number | null;
+  tappiopisteetYhteensa: number | null;
   loppupisteet: number | null;
   ke: string | null;
   sijoitus: string | null;
@@ -81,8 +86,11 @@ export async function getTrialDogPdfDataDb(
       haku: true,
       hauk: true,
       yva: true,
+      hlo: true,
+      alo: true,
       pin: true,
       ansiopisteetYhteensa: true,
+      tappiopisteetYhteensa: true,
       tuom1: true,
       dog: {
         select: {
@@ -142,6 +150,8 @@ export async function getTrialDogPdfDataDb(
           haku: true,
           hauk: true,
           yva: true,
+          hlo: true,
+          alo: true,
           lisatiedot: {
             orderBy: {
               koodi: "asc",
@@ -183,8 +193,11 @@ export async function getTrialDogPdfDataDb(
     haku: toNumberOrNull(row.haku),
     hauk: toNumberOrNull(row.hauk),
     yva: toNumberOrNull(row.yva),
+    hlo: toNumberOrNull(row.hlo),
+    alo: toNumberOrNull(row.alo),
     pin: toNumberOrNull(row.pin),
     ansiopisteetYhteensa: toNumberOrNull(row.ansiopisteetYhteensa),
+    tappiopisteetYhteensa: toNumberOrNull(row.tappiopisteetYhteensa),
     loppupisteet: toNumberOrNull(row.piste),
     ke: row.ke,
     sijoitus: row.sija ?? null,
@@ -198,6 +211,8 @@ export async function getTrialDogPdfDataDb(
       haku: toNumberOrNull(era.haku),
       hauk: toNumberOrNull(era.hauk),
       yva: toNumberOrNull(era.yva),
+      hlo: toNumberOrNull(era.hlo),
+      alo: toNumberOrNull(era.alo),
       lisatiedot: era.lisatiedot,
     })),
   };

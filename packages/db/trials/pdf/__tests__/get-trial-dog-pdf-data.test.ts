@@ -35,8 +35,11 @@ function trialRow(overrides: Record<string, unknown> = {}) {
     haku: decimal(8.5),
     hauk: decimal(6.75),
     yva: decimal(9.25),
+    hlo: decimal(2.5),
+    alo: decimal(1.5),
     pin: decimal(12.5),
     ansiopisteetYhteensa: decimal(36.75),
+    tappiopisteetYhteensa: decimal(4),
     tuom1: null,
     dog: null,
     trialEvent: {
@@ -55,6 +58,8 @@ function trialRow(overrides: Record<string, unknown> = {}) {
         haku: null,
         hauk: null,
         yva: null,
+        hlo: null,
+        alo: null,
         lisatiedot: [],
       },
       {
@@ -65,6 +70,8 @@ function trialRow(overrides: Record<string, unknown> = {}) {
         haku: null,
         hauk: null,
         yva: null,
+        hlo: null,
+        alo: null,
         lisatiedot: [],
       },
     ],
@@ -93,8 +100,11 @@ describe("getTrialDogPdfDataDb", () => {
       haku: 8.5,
       hauk: 6.75,
       yva: 9.25,
+      hlo: 2.5,
+      alo: 1.5,
       pin: 12.5,
       ansiopisteetYhteensa: 36.75,
+      tappiopisteetYhteensa: 4,
     });
   });
 
@@ -104,8 +114,11 @@ describe("getTrialDogPdfDataDb", () => {
         haku: null,
         hauk: null,
         yva: null,
+        hlo: null,
+        alo: null,
         pin: null,
         ansiopisteetYhteensa: null,
+        tappiopisteetYhteensa: null,
       }),
     );
 
@@ -117,8 +130,11 @@ describe("getTrialDogPdfDataDb", () => {
       haku: null,
       hauk: null,
       yva: null,
+      hlo: null,
+      alo: null,
       pin: null,
       ansiopisteetYhteensa: null,
+      tappiopisteetYhteensa: null,
     });
   });
 });

@@ -33,8 +33,11 @@ function dbRow(overrides: Record<string, unknown> = {}) {
     haku: 8.5,
     hauk: 6.75,
     yva: 9.25,
+    hlo: 2.5,
+    alo: 1.5,
     pin: 12.5,
     ansiopisteetYhteensa: 36.75,
+    tappiopisteetYhteensa: 4,
     loppupisteet: null,
     ke: null,
     sijoitus: null,
@@ -49,6 +52,8 @@ function dbRow(overrides: Record<string, unknown> = {}) {
         haku: null,
         hauk: null,
         yva: null,
+        hlo: null,
+        alo: null,
         lisatiedot: [],
       },
       {
@@ -59,6 +64,8 @@ function dbRow(overrides: Record<string, unknown> = {}) {
         haku: null,
         hauk: null,
         yva: null,
+        hlo: null,
+        alo: null,
         lisatiedot: [],
       },
     ],
@@ -89,6 +96,9 @@ describe("getTrialDogPdfDataService", () => {
       hakuKeskiarvo: 8.5,
       haukkuKeskiarvo: 6.75,
       ajotaitoKeskiarvo: 9.25,
+      hakuloysyysTappioYhteensa: 2.5,
+      ajoloysyysTappioYhteensa: 1.5,
+      tappiopisteetYhteensa: 4,
       ansiopisteetYhteensa: 36.75,
     });
   });
@@ -106,6 +116,9 @@ describe("getTrialDogPdfDataService", () => {
       hakuKeskiarvo: 8.5,
       haukkuKeskiarvo: 6.75,
       ajotaitoKeskiarvo: 9.25,
+      hakuloysyysTappioYhteensa: 2.5,
+      ajoloysyysTappioYhteensa: 1.5,
+      tappiopisteetYhteensa: 4,
       ansiopisteetYhteensa: 36.75,
     });
   });

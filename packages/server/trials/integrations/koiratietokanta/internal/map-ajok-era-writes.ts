@@ -31,6 +31,14 @@ type KoiratietokantaAjokEraSourceInput = Pick<
   | "ajotaitoEra2"
   | "ajotaitoEra3"
   | "ajotaitoEra4"
+  | "hakuloysyysTappioEra1"
+  | "hakuloysyysTappioEra2"
+  | "hakuloysyysTappioEra3"
+  | "hakuloysyysTappioEra4"
+  | "ajoloysyysTappioEra1"
+  | "ajoloysyysTappioEra2"
+  | "ajoloysyysTappioEra3"
+  | "ajoloysyysTappioEra4"
 >;
 
 type KoiratietokantaAjokEraSourceRow = {
@@ -41,6 +49,8 @@ type KoiratietokantaAjokEraSourceRow = {
   haku: number | null;
   hauk: number | null;
   yva: number | null;
+  hlo: number | null;
+  alo: number | null;
   lisatiedot: KoiratietokantaAjokLisatietoDbInput[];
 };
 
@@ -59,6 +69,8 @@ export function mapKoiratietokantaAjokEraWrites(
       haku: entry.hakuEra1,
       hauk: entry.haukkuEra1,
       yva: entry.ajotaitoEra1,
+      hlo: entry.hakuloysyysTappioEra1,
+      alo: entry.ajoloysyysTappioEra1,
       lisatiedot,
     },
     {
@@ -69,6 +81,8 @@ export function mapKoiratietokantaAjokEraWrites(
       haku: entry.hakuEra2,
       hauk: entry.haukkuEra2,
       yva: entry.ajotaitoEra2,
+      hlo: entry.hakuloysyysTappioEra2,
+      alo: entry.ajoloysyysTappioEra2,
       lisatiedot,
     },
     {
@@ -79,6 +93,8 @@ export function mapKoiratietokantaAjokEraWrites(
       haku: entry.hakuEra3,
       hauk: entry.haukkuEra3,
       yva: entry.ajotaitoEra3,
+      hlo: entry.hakuloysyysTappioEra3,
+      alo: entry.ajoloysyysTappioEra3,
       lisatiedot,
     },
     {
@@ -89,6 +105,8 @@ export function mapKoiratietokantaAjokEraWrites(
       haku: entry.hakuEra4,
       hauk: entry.haukkuEra4,
       yva: entry.ajotaitoEra4,
+      hlo: entry.hakuloysyysTappioEra4,
+      alo: entry.ajoloysyysTappioEra4,
       lisatiedot,
     },
   ];
@@ -124,7 +142,9 @@ export function mapKoiratietokantaAjokEraWrites(
         era.ajomin !== null ||
         era.haku !== null ||
         era.hauk !== null ||
-        era.yva !== null;
+        era.yva !== null ||
+        era.hlo !== null ||
+        era.alo !== null;
       return hasCoreData || era.lisatiedot.length > 0;
     });
 }

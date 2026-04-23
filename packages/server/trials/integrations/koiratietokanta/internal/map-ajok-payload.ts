@@ -151,6 +151,8 @@ export function mapKoiratietokantaAjokPayload(
     ajotaitoEra3: parseOptionalDecimal(payload, "III_AJOTAITO", warnings),
     ajotaitoEra4: parseOptionalDecimal(payload, "IV_AJOTAITO", warnings),
     yva: parseOptionalDecimal(payload, "AJOTAITOPISTEET", warnings),
+    hlo: parseOptionalDecimal(payload, "HAKULOYSYYSPISTEET", warnings),
+    alo: parseOptionalDecimal(payload, "AJOLOYSYYSPISTEET", warnings),
     ansiopisteetYhteensa: parseOptionalDecimal(
       payload,
       "ANSIOPISTEET",

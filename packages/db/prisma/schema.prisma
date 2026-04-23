@@ -356,12 +356,13 @@ model TrialEntry {
   ajoajanPisteet             Decimal? @db.Decimal(6, 2)
   haku                       Decimal? @db.Decimal(6, 2)
   hauk                       Decimal? @db.Decimal(6, 2)
-  yva                        Decimal? @db.Decimal(6, 2)
+  yva                        Decimal? @db.Decimal(6, 2) // nykyinen ajotaito
   hlo                        Decimal? @db.Decimal(6, 2)
   alo                        Decimal? @db.Decimal(6, 2)
   tja                        Decimal? @db.Decimal(6, 2)
   pin                        Decimal? @db.Decimal(6, 2)
   ansiopisteetYhteensa       Decimal? @db.Decimal(6, 2)
+  tappiopisteetYhteensa      Decimal? @db.Decimal(6, 2)
   tuom1                      String?
   vara                       String?
   omistajaSnapshot           String?
@@ -391,7 +392,7 @@ model TrialEra {
   ajomin        Int?
   haku          Decimal?            @db.Decimal(6, 2)
   hauk          Decimal?            @db.Decimal(6, 2)
-  yva           Decimal?            @db.Decimal(6, 2)
+  yva           Decimal?            @db.Decimal(6, 2) // nykyinen ajotaito
   hlo           Decimal?            @db.Decimal(6, 2)
   alo           Decimal?            @db.Decimal(6, 2)
   tja           Decimal?            @db.Decimal(6, 2)
