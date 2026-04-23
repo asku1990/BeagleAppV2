@@ -86,6 +86,8 @@ describe("upsertKoiratietokantaAjokResultService", () => {
         hakuMin1: 201,
         ajoMin1: 51,
         ajoMin2: null,
+        haku: null,
+        hauk: null,
         hakuEra1: 5,
         haukkuEra1: 7,
         ajoajanPisteet: 14.88,

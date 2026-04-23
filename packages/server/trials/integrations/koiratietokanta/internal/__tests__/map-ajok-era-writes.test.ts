@@ -61,7 +61,7 @@ describe("mapKoiratietokantaAjokEraWrites", () => {
         ajomin: 31,
         haku: 7,
         hauk: 6,
-        alo: 8,
+        yva: 8,
         lisatiedot: [
           { koodi: "11", nimi: "Paljas maa", arvo: "1", jarjestys: 1 },
           { koodi: "17", nimi: "Lämpötila", arvo: "13", jarjestys: 7 },
@@ -74,7 +74,7 @@ describe("mapKoiratietokantaAjokEraWrites", () => {
         ajomin: null,
         haku: null,
         hauk: null,
-        alo: null,
+        yva: null,
         lisatiedot: [
           { koodi: "11", nimi: "Paljas maa", arvo: "2", jarjestys: 1 },
         ],

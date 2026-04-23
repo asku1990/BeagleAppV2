@@ -32,6 +32,11 @@ function trialRow(overrides: Record<string, unknown> = {}) {
     sija: null,
     hyvaksytytAjominuutit: null,
     ajoajanPisteet: null,
+    haku: decimal(8.5),
+    hauk: decimal(6.75),
+    yva: decimal(9.25),
+    pin: decimal(12.5),
+    ansiopisteetYhteensa: decimal(36.75),
     tuom1: null,
     dog: null,
     trialEvent: {
@@ -49,7 +54,7 @@ function trialRow(overrides: Record<string, unknown> = {}) {
         ajomin: 51,
         haku: null,
         hauk: null,
-        alo: null,
+        yva: null,
         lisatiedot: [],
       },
       {
@@ -59,7 +64,7 @@ function trialRow(overrides: Record<string, unknown> = {}) {
         ajomin: null,
         haku: null,
         hauk: null,
-        alo: null,
+        yva: null,
         lisatiedot: [],
       },
     ],
@@ -85,17 +90,35 @@ describe("getTrialDogPdfDataDb", () => {
     expect(result).toMatchObject({
       hyvaksytytAjominuutit: 60,
       ajoajanPisteet: 17.5,
+      haku: 8.5,
+      hauk: 6.75,
+      yva: 9.25,
+      pin: 12.5,
+      ansiopisteetYhteensa: 36.75,
     });
   });
 
   it("returns null stored driving totals for legacy rows without source values", async () => {
-    prismaMock.trialEntry.findUnique.mockResolvedValue(trialRow());
+    prismaMock.trialEntry.findUnique.mockResolvedValue(
+      trialRow({
+        haku: null,
+        hauk: null,
+        yva: null,
+        pin: null,
+        ansiopisteetYhteensa: null,
+      }),
+    );
 
     const result = await getTrialDogPdfDataDb({ trialId: "entry-1" });
 
     expect(result).toMatchObject({
       hyvaksytytAjominuutit: null,
       ajoajanPisteet: null,
+      haku: null,
+      hauk: null,
+      yva: null,
+      pin: null,
+      ansiopisteetYhteensa: null,
     });
   });
 });

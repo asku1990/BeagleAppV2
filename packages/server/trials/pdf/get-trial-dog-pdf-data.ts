@@ -37,6 +37,15 @@ function sumNullableNumbers(values: Array<number | null>): number | null {
   return hasValue ? sum : null;
 }
 
+function calculateAnsiopisteet(
+  haku: number | null,
+  hauk: number | null,
+  pin: number | null,
+  yva: number | null,
+): number | null {
+  return sumNullableNumbers([haku, hauk, pin, yva]);
+}
+
 function calculateAjoajanPisteet(ajominuutit: number | null): number | null {
   if (ajominuutit === null) {
     return null;
@@ -155,6 +164,9 @@ export async function getTrialDogPdfDataService(
       sumNullableNumbers([era1?.ajomin ?? null, era2?.ajomin ?? null]);
     const ajoajanPisteet =
       result.ajoajanPisteet ?? calculateAjoajanPisteet(hyvaksytytAjominuutit);
+    const ansiopisteetYhteensa =
+      result.ansiopisteetYhteensa ??
+      calculateAnsiopisteet(result.haku, result.hauk, result.pin, result.yva);
     const lisatiedotRows = pivotLisatiedot(result.eras);
 
     log.info(
@@ -198,13 +210,13 @@ export async function getTrialDogPdfDataService(
           ajoajanPisteet,
           hakuEra1: era1?.haku ?? null,
           hakuEra2: era2?.haku ?? null,
-          hakuKeskiarvo: null,
+          hakuKeskiarvo: result.haku,
           haukkuEra1: era1?.hauk ?? null,
           haukkuEra2: era2?.hauk ?? null,
-          haukkuKeskiarvo: null,
-          ajotaitoEra1: era1?.alo ?? null,
-          ajotaitoEra2: era2?.alo ?? null,
-          ajotaitoKeskiarvo: null,
+          haukkuKeskiarvo: result.hauk,
+          ajotaitoEra1: era1?.yva ?? null,
+          ajotaitoEra2: era2?.yva ?? null,
+          ajotaitoKeskiarvo: result.yva,
           hakuloysyysTappioEra1: null,
           hakuloysyysTappioEra2: null,
           hakuloysyysTappioYhteensa: null,
@@ -212,7 +224,7 @@ export async function getTrialDogPdfDataService(
           ajoloysyysTappioEra2: null,
           ajoloysyysTappioYhteensa: null,
           tappiopisteetYhteensa: null,
-          ansiopisteetYhteensa: null,
+          ansiopisteetYhteensa,
           loppupisteet: result.loppupisteet,
           paljasMaaTaiLumi: mapKeliToPaljasMaaTaiLumi(result.ke),
           luopui: null,

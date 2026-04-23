@@ -40,7 +40,7 @@ type KoiratietokantaAjokEraSourceRow = {
   ajomin: number | null;
   haku: number | null;
   hauk: number | null;
-  alo: number | null;
+  yva: number | null;
   lisatiedot: KoiratietokantaAjokLisatietoDbInput[];
 };
 
@@ -58,7 +58,7 @@ export function mapKoiratietokantaAjokEraWrites(
       ajomin: entry.ajoMin1,
       haku: entry.hakuEra1,
       hauk: entry.haukkuEra1,
-      alo: entry.ajotaitoEra1,
+      yva: entry.ajotaitoEra1,
       lisatiedot,
     },
     {
@@ -68,7 +68,7 @@ export function mapKoiratietokantaAjokEraWrites(
       ajomin: entry.ajoMin2,
       haku: entry.hakuEra2,
       hauk: entry.haukkuEra2,
-      alo: entry.ajotaitoEra2,
+      yva: entry.ajotaitoEra2,
       lisatiedot,
     },
     {
@@ -78,7 +78,7 @@ export function mapKoiratietokantaAjokEraWrites(
       ajomin: entry.ajoMin3,
       haku: entry.hakuEra3,
       hauk: entry.haukkuEra3,
-      alo: entry.ajotaitoEra3,
+      yva: entry.ajotaitoEra3,
       lisatiedot,
     },
     {
@@ -88,7 +88,7 @@ export function mapKoiratietokantaAjokEraWrites(
       ajomin: entry.ajoMin4,
       haku: entry.hakuEra4,
       hauk: entry.haukkuEra4,
-      alo: entry.ajotaitoEra4,
+      yva: entry.ajotaitoEra4,
       lisatiedot,
     },
   ];
@@ -124,7 +124,7 @@ export function mapKoiratietokantaAjokEraWrites(
         era.ajomin !== null ||
         era.haku !== null ||
         era.hauk !== null ||
-        era.alo !== null;
+        era.yva !== null;
       return hasCoreData || era.lisatiedot.length > 0;
     });
 }

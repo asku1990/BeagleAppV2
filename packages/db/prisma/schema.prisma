@@ -361,6 +361,7 @@ model TrialEntry {
   alo                        Decimal? @db.Decimal(6, 2)
   tja                        Decimal? @db.Decimal(6, 2)
   pin                        Decimal? @db.Decimal(6, 2)
+  ansiopisteetYhteensa       Decimal? @db.Decimal(6, 2)
   tuom1                      String?
   vara                       String?
   omistajaSnapshot           String?

@@ -30,6 +30,11 @@ function dbRow(overrides: Record<string, unknown> = {}) {
     jarjestaja: null,
     hyvaksytytAjominuutit: null,
     ajoajanPisteet: null,
+    haku: 8.5,
+    hauk: 6.75,
+    yva: 9.25,
+    pin: 12.5,
+    ansiopisteetYhteensa: 36.75,
     loppupisteet: null,
     ke: null,
     sijoitus: null,
@@ -43,7 +48,7 @@ function dbRow(overrides: Record<string, unknown> = {}) {
         ajomin: 51,
         haku: null,
         hauk: null,
-        alo: null,
+        yva: null,
         lisatiedot: [],
       },
       {
@@ -53,7 +58,7 @@ function dbRow(overrides: Record<string, unknown> = {}) {
         ajomin: null,
         haku: null,
         hauk: null,
-        alo: null,
+        yva: null,
         lisatiedot: [],
       },
     ],
@@ -81,6 +86,10 @@ describe("getTrialDogPdfDataService", () => {
     expect(result.body.data).toMatchObject({
       hyvaksytytAjominuutit: 60,
       ajoajanPisteet: 17.5,
+      hakuKeskiarvo: 8.5,
+      haukkuKeskiarvo: 6.75,
+      ajotaitoKeskiarvo: 9.25,
+      ansiopisteetYhteensa: 36.75,
     });
   });
 
@@ -94,6 +103,10 @@ describe("getTrialDogPdfDataService", () => {
     expect(result.body.data).toMatchObject({
       hyvaksytytAjominuutit: 51,
       ajoajanPisteet: 14.88,
+      hakuKeskiarvo: 8.5,
+      haukkuKeskiarvo: 6.75,
+      ajotaitoKeskiarvo: 9.25,
+      ansiopisteetYhteensa: 36.75,
     });
   });
 });
