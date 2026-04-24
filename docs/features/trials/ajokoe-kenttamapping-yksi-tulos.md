@@ -102,7 +102,9 @@ Huomio:
 
 Huomio:
 
-- `KOEMUOTO` ei ole fallback entry-tason `koemuoto`-kenttään.
+- `KOEMUOTO` on lähdedatan koetason tieto. Sitä ei käytetä
+  `TrialEntry.koemuoto`-kentän fallback-arvona; entry-tason `koemuoto`
+  täytetään vain `SKLkoemuoto`-kentästä.
 - Jos sekä `koekaudenkoe` että `pitkakoe` ovat totta, payload hylätään.
 - Top-level weather uses `TrialEntry.ke`.
 
