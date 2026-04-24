@@ -173,4 +173,21 @@ describe("searchAdminTrialsDb event parity", () => {
       }),
     );
   });
+
+  it("does not search by rotukoodi", async () => {
+    trialEventFindManyMock.mockResolvedValue([]);
+    trialEventCountMock.mockResolvedValue(0);
+
+    await searchAdminTrialsDb({
+      query: "161/1",
+      dateFrom: new Date("2025-01-01T00:00:00.000Z"),
+      dateTo: new Date("2026-01-01T00:00:00.000Z"),
+      page: 1,
+      pageSize: 50,
+      sort: "date-desc",
+    });
+
+    const secondCall = trialEventFindManyMock.mock.calls[1]?.[0];
+    expect(JSON.stringify(secondCall?.where)).not.toContain("rotukoodi");
+  });
 });

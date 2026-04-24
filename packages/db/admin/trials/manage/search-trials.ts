@@ -123,16 +123,6 @@ function buildTextWhere(query: string): Prisma.TrialEventWhereInput {
       { jarjestaja: { contains: query, mode: "insensitive" } },
       { ylituomariNimi: { contains: query, mode: "insensitive" } },
       { legacyEventKey: { contains: query, mode: "insensitive" } },
-      {
-        entries: {
-          some: {
-            rotukoodi: {
-              contains: query,
-              mode: "insensitive",
-            },
-          },
-        },
-      },
       { kennelpiiri: { contains: query, mode: "insensitive" } },
       { kennelpiirinro: { contains: query, mode: "insensitive" } },
       { entries: entryTextWhere },
