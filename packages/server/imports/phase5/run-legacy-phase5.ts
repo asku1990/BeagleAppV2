@@ -324,7 +324,6 @@ export async function runLegacyPhase5(
               jarjestaja: null,
               kennelpiiri: row.kennelpiiri,
               kennelpiirinro: row.kennelpiirinro,
-              koemuoto: null,
               ylituomariNimi: row.tuom1,
               ylituomariNumero: null,
               trialRuleWindowId,
