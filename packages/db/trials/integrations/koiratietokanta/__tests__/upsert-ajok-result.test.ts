@@ -5,7 +5,8 @@ const { prismaMock, txMock } = vi.hoisted(() => {
     trialEvent: { upsert: vi.fn() },
     dogRegistration: { findUnique: vi.fn() },
     trialEntry: { findUnique: vi.fn(), upsert: vi.fn() },
-    trialLisatietoItem: { deleteMany: vi.fn(), createMany: vi.fn() },
+    trialEra: { deleteMany: vi.fn(), create: vi.fn() },
+    trialEraLisatieto: { createMany: vi.fn() },
   };
   return {
     txMock: tx,
@@ -43,21 +44,24 @@ const entryInput = {
   ajoMin4: null,
   hyvaksytytAjominuutit: null,
   ajoajanPisteet: null,
+  pin: null,
   hakuEra1: null,
   hakuEra2: null,
   hakuEra3: null,
   hakuEra4: null,
-  hakuKeskiarvo: null,
+  haku: null,
   haukkuEra1: null,
   haukkuEra2: null,
   haukkuEra3: null,
   haukkuEra4: null,
-  haukkuKeskiarvo: null,
+  hauk: null,
   ajotaitoEra1: null,
   ajotaitoEra2: null,
   ajotaitoEra3: null,
   ajotaitoEra4: null,
-  ajotaitoKeskiarvo: null,
+  yva: null,
+  hlo: null,
+  alo: null,
   ansiopisteetYhteensa: null,
   hakuloysyysTappioEra1: null,
   hakuloysyysTappioEra2: null,
@@ -73,18 +77,50 @@ const entryInput = {
   loppupisteet: null,
   palkinto: null,
   sijoitus: null,
+  koemuoto: null,
   koiriaLuokassa: null,
-  kokokaudenkoe: null,
+  koetyyppi: "NORMAL" as const,
   keli: null,
-  luopui: null,
-  suljettu: null,
-  keskeytetty: null,
+  huomautus: null,
   huomautusTeksti: null,
   ylituomariNimiSnapshot: null,
   ylituomariNumeroSnapshot: null,
   ryhmatuomariNimi: null,
   palkintotuomariNimi: null,
 };
+
+const eraInputs = [
+  {
+    era: 1,
+    alkoi: null,
+    hakumin: null,
+    ajomin: null,
+    haku: null,
+    hauk: null,
+    yva: null,
+    hlo: null,
+    alo: null,
+    lisatiedot: [
+      { koodi: "11", osa: "", nimi: "Paljas maa", arvo: "1", jarjestys: 1 },
+      { koodi: "17", osa: "", nimi: "Lämpötila", arvo: "13", jarjestys: 7 },
+    ],
+  },
+  {
+    era: 2,
+    alkoi: null,
+    hakumin: null,
+    ajomin: null,
+    haku: null,
+    hauk: null,
+    yva: null,
+    hlo: null,
+    alo: null,
+    lisatiedot: [
+      { koodi: "11", osa: "", nimi: "Paljas maa", arvo: "1", jarjestys: 1 },
+      { koodi: "17", osa: "", nimi: "Lämpötila", arvo: "19", jarjestys: 7 },
+    ],
+  },
+];
 
 describe("upsertKoiratietokantaAjokResultDb", () => {
   beforeEach(() => {
@@ -94,11 +130,14 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
     txMock.dogRegistration.findUnique.mockResolvedValue({ dogId: "dog-1" });
     txMock.trialEntry.findUnique.mockResolvedValue(null);
     txMock.trialEntry.upsert.mockResolvedValue({ id: "entry-1" });
-    txMock.trialLisatietoItem.deleteMany.mockResolvedValue({ count: 0 });
-    txMock.trialLisatietoItem.createMany.mockResolvedValue({ count: 2 });
+    txMock.trialEra.deleteMany.mockResolvedValue({ count: 0 });
+    txMock.trialEra.create
+      .mockResolvedValueOnce({ id: "era-1", era: 1 })
+      .mockResolvedValueOnce({ id: "era-2", era: 2 });
+    txMock.trialEraLisatieto.createMany.mockResolvedValue({ count: 2 });
   });
 
-  it("replaces lisatieto rows after entry upsert", async () => {
+  it("writes entry-level koemuoto, koetyyppi, ke and class count", async () => {
     const result = await upsertKoiratietokantaAjokResultDb({
       event: {
         sklKoeId: 431477,
@@ -107,32 +146,23 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
         jarjestaja: null,
         kennelpiiri: null,
         kennelpiirinro: null,
-        koemuoto: "AJOK",
-        ylituomariNimi: null,
+        trialRuleWindowId: null,
+        ylituomariNimi: "Ylituomari",
         ylituomariNumero: null,
         ytKertomus: null,
       },
-      entry: entryInput,
-      lisatiedot: [
-        {
-          koodi: "11",
-          nimi: "Paljas maa",
-          era1Arvo: "1",
-          era2Arvo: "1",
-          era3Arvo: null,
-          era4Arvo: null,
-          jarjestys: 1,
-        },
-        {
-          koodi: "17",
-          nimi: "Lämpötila",
-          era1Arvo: "13",
-          era2Arvo: "19",
-          era3Arvo: null,
-          era4Arvo: null,
-          jarjestys: 7,
-        },
-      ],
+      entry: {
+        ...entryInput,
+        koemuoto: "AJOK",
+        koetyyppi: "PITKAKOE",
+        koiriaLuokassa: 4,
+        sijoitus: "1",
+        keli: "P",
+        hyvaksytytAjominuutit: 51,
+        ajoajanPisteet: 14.88,
+        yva: 9.25,
+      },
+      eras: eraInputs,
     });
 
     expect(result).toMatchObject({
@@ -140,41 +170,67 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
       created: true,
       updated: false,
     });
+    expect(txMock.trialEvent.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.not.objectContaining({ koemuoto: expect.anything() }),
+        update: expect.not.objectContaining({ koemuoto: expect.anything() }),
+      }),
+    );
     expect(txMock.trialEntry.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         create: expect.objectContaining({
           koemaasto: null,
-          kokokaudenkoe: null,
+          koemuoto: "AJOK",
+          koetyyppi: "PITKAKOE",
+          koiriaLuokassa: 4,
+          ke: "P",
+          sija: "1",
+          hyvaksytytAjominuutit: 51,
+          ajoajanPisteet: 14.88,
+          pin: null,
+          haku: null,
+          hauk: null,
+          yva: 9.25,
+          hlo: null,
+          alo: null,
+          ansiopisteetYhteensa: null,
+          tappiopisteetYhteensa: null,
+          lk: null,
+          tuom1: "Ylituomari",
+          huomautus: null,
+          huomautusTeksti: null,
+          ylituomariNimiSnapshot: null,
+          ylituomariNumeroSnapshot: null,
+          ryhmatuomariNimi: null,
+          palkintotuomariNimi: null,
         }),
       }),
     );
-    expect(txMock.trialLisatietoItem.deleteMany).toHaveBeenCalledWith({
+    expect(txMock.trialEra.deleteMany).toHaveBeenCalledWith({
       where: { trialEntryId: "entry-1" },
     });
-    expect(txMock.trialLisatietoItem.createMany).toHaveBeenCalledWith({
+    expect(txMock.trialEra.create).toHaveBeenCalledTimes(2);
+    expect(txMock.trialEraLisatieto.createMany).toHaveBeenCalledTimes(2);
+    expect(txMock.trialEraLisatieto.createMany).toHaveBeenCalledWith({
       data: [
-        expect.objectContaining({
-          trialEntryId: "entry-1",
+        {
+          trialEraId: "era-1",
           koodi: "11",
-          era1Arvo: "1",
-          era2Arvo: "1",
-        }),
-        expect.objectContaining({
-          trialEntryId: "entry-1",
+          osa: "",
+          arvo: "1",
+          nimi: "Paljas maa",
+          jarjestys: 1,
+        },
+        {
+          trialEraId: "era-1",
           koodi: "17",
-          era1Arvo: "13",
-          era2Arvo: "19",
-        }),
+          osa: "",
+          arvo: "13",
+          nimi: "Lämpötila",
+          jarjestys: 7,
+        },
       ],
     });
-    expect(
-      txMock.trialLisatietoItem.deleteMany.mock.invocationCallOrder[0],
-    ).toBeGreaterThan(txMock.trialEntry.upsert.mock.invocationCallOrder[0]);
-    expect(
-      txMock.trialLisatietoItem.createMany.mock.invocationCallOrder[0],
-    ).toBeGreaterThan(
-      txMock.trialLisatietoItem.deleteMany.mock.invocationCallOrder[0],
-    );
   });
 
   it("deletes old lisatieto rows and skips createMany when no rows are mapped", async () => {
@@ -186,18 +242,126 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
         jarjestaja: null,
         kennelpiiri: null,
         kennelpiirinro: null,
-        koemuoto: "AJOK",
+        trialRuleWindowId: null,
         ylituomariNimi: null,
         ylituomariNumero: null,
         ytKertomus: null,
       },
       entry: entryInput,
-      lisatiedot: [],
+      eras: [],
     });
 
-    expect(txMock.trialLisatietoItem.deleteMany).toHaveBeenCalledWith({
+    expect(txMock.trialEra.deleteMany).toHaveBeenCalledWith({
       where: { trialEntryId: "entry-1" },
     });
-    expect(txMock.trialLisatietoItem.createMany).not.toHaveBeenCalled();
+    expect(txMock.trialEraLisatieto.createMany).not.toHaveBeenCalled();
+  });
+
+  it("writes canonical huomautus status", async () => {
+    await upsertKoiratietokantaAjokResultDb({
+      event: {
+        sklKoeId: 431477,
+        koepaiva: new Date("2025-09-07T00:00:00.000Z"),
+        koekunta: "Ristijarvi",
+        jarjestaja: null,
+        kennelpiiri: null,
+        kennelpiirinro: null,
+        trialRuleWindowId: null,
+        ylituomariNimi: null,
+        ylituomariNumero: null,
+        ytKertomus: null,
+      },
+      entry: {
+        ...entryInput,
+        huomautus: "KESKEYTETTY",
+      },
+      eras: [],
+    });
+
+    expect(txMock.trialEntry.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.objectContaining({
+          huomautus: "KESKEYTETTY",
+        }),
+        update: expect.objectContaining({
+          huomautus: "KESKEYTETTY",
+        }),
+      }),
+    );
+  });
+
+  it("writes free-text huomautus text", async () => {
+    await upsertKoiratietokantaAjokResultDb({
+      event: {
+        sklKoeId: 431477,
+        koepaiva: new Date("2025-09-07T00:00:00.000Z"),
+        koekunta: "Ristijarvi",
+        jarjestaja: null,
+        kennelpiiri: null,
+        kennelpiirinro: null,
+        trialRuleWindowId: null,
+        ylituomariNimi: null,
+        ylituomariNumero: null,
+        ytKertomus: null,
+      },
+      entry: {
+        ...entryInput,
+        huomautusTeksti: "Koira kävi tiellä.",
+      },
+      eras: [],
+    });
+
+    expect(txMock.trialEntry.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.objectContaining({
+          huomautusTeksti: "Koira kävi tiellä.",
+        }),
+        update: expect.objectContaining({
+          huomautusTeksti: "Koira kävi tiellä.",
+        }),
+      }),
+    );
+  });
+
+  it("writes signature name fields", async () => {
+    await upsertKoiratietokantaAjokResultDb({
+      event: {
+        sklKoeId: 431477,
+        koepaiva: new Date("2025-09-07T00:00:00.000Z"),
+        koekunta: "Ristijarvi",
+        jarjestaja: null,
+        kennelpiiri: null,
+        kennelpiirinro: null,
+        trialRuleWindowId: null,
+        ylituomariNimi: "Ylituomari",
+        ylituomariNumero: "123",
+        ytKertomus: null,
+      },
+      entry: {
+        ...entryInput,
+        ylituomariNimiSnapshot: "Ylituomari",
+        ylituomariNumeroSnapshot: "123",
+        ryhmatuomariNimi: "Ryhmätuomari",
+        palkintotuomariNimi: "Palkintotuomari",
+      },
+      eras: [],
+    });
+
+    expect(txMock.trialEntry.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.objectContaining({
+          ylituomariNimiSnapshot: "Ylituomari",
+          ylituomariNumeroSnapshot: "123",
+          ryhmatuomariNimi: "Ryhmätuomari",
+          palkintotuomariNimi: "Palkintotuomari",
+        }),
+        update: expect.objectContaining({
+          ylituomariNimiSnapshot: "Ylituomari",
+          ylituomariNumeroSnapshot: "123",
+          ryhmatuomariNimi: "Ryhmätuomari",
+          palkintotuomariNimi: "Palkintotuomari",
+        }),
+      }),
+    );
   });
 });

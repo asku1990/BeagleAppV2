@@ -83,7 +83,7 @@ Use this format for new entries:
 ## 2026-04-14 - AJOK missing era/result/status contract fields
 
 - Area: AJOK result/era/status read parity.
-- Issue: Current read model lacks era-level timing/score fields and explicit status flags (`luopui`, `suljettu`, `keskeytetty`, `huomautusTeksti`) expected by the future poytakirja contract.
+- Issue: Current read model lacks some era-level timing/score fields and explicit status flag read parity (`luopui`, `suljettu`, `keskeytetty`) expected by the future poytakirja contract.
 - Impact: Read-path switch readiness cannot be expanded beyond the BEJ-78 minimum set until these fields are typed and validated.
 - Suggested fix: Implement missing result/status fields in BEJ-79 schema and BEJ-80 import mapping, then re-run BEJ-78 flow-gate tests with updated statuses.
 - Trigger to revisit: BEJ-80 backfill/import mapping work and BEJ-82 read-switch preparation.

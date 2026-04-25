@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { upsertKoiratietokantaAjokResultService } from "../upsert-ajok-result";
 
-const { upsertDbMock } = vi.hoisted(() => ({
+const { upsertDbMock, trialRuleWindowFindManyMock } = vi.hoisted(() => ({
   upsertDbMock: vi.fn(),
+  trialRuleWindowFindManyMock: vi.fn(),
 }));
 
 vi.mock("@beagle/db", () => ({
@@ -11,12 +12,35 @@ vi.mock("@beagle/db", () => ({
     FEMALE: "FEMALE",
     UNKNOWN: "UNKNOWN",
   },
+  TrialEntryKoetyyppi: {
+    NORMAL: "NORMAL",
+    KOKOKAUDENKOE: "KOKOKAUDENKOE",
+    PITKAKOE: "PITKAKOE",
+  },
+  TrialEntryHuomautus: {
+    LUOPUI: "LUOPUI",
+    SULJETTU: "SULJETTU",
+    KESKEYTETTY: "KESKEYTETTY",
+  },
+  prisma: {
+    trialRuleWindow: {
+      findMany: trialRuleWindowFindManyMock,
+    },
+  },
   upsertKoiratietokantaAjokResultDb: upsertDbMock,
 }));
 
 describe("upsertKoiratietokantaAjokResultService", () => {
   beforeEach(() => {
     upsertDbMock.mockReset();
+    trialRuleWindowFindManyMock.mockReset();
+    trialRuleWindowFindManyMock.mockResolvedValue([
+      {
+        id: "window-1",
+        fromYmd: 20200101,
+        toYmd: null,
+      },
+    ]);
     upsertDbMock.mockResolvedValue({
       trialEventId: "event-1",
       trialEntryId: "entry-1",
@@ -39,6 +63,7 @@ describe("upsertKoiratietokantaAjokResultService", () => {
       SKLkoemuoto: "AJOK",
       yt: "Fors Jari",
       ytnro: "402762",
+      KELI: "P",
       Omistaja: "Marja ja Kari Virtanen",
       Omistajankotipaikka: "Hyrynsalmi",
       I_ERA_KLO: " 5:49",
@@ -75,58 +100,92 @@ describe("upsertKoiratietokantaAjokResultService", () => {
         jarjestaja: "Kainuun Ajokoirakerho",
         ylituomariNimi: "Fors Jari",
         ylituomariNumero: "402762",
+        trialRuleWindowId: "window-1",
       }),
       entry: expect.objectContaining({
         rekisterinumeroSnapshot: "FI33413/18",
         yksilointiAvain: "SKL:431477|REG:FI33413/18",
         raakadataJson: JSON.stringify(payload),
+        koemuoto: "AJOK",
+        koetyyppi: "NORMAL",
         omistajaSnapshot: "Marja ja Kari Virtanen",
         koemaasto: "Ristijärvi",
         era1Alkoi: "5:49",
         hakuMin1: 201,
         ajoMin1: 51,
         ajoMin2: null,
+        haku: null,
+        hauk: null,
         hakuEra1: 5,
         haukkuEra1: 7,
         ajoajanPisteet: 14.88,
         loppupisteet: 29.38,
-        luopui: false,
-        suljettu: false,
-        keskeytetty: false,
+        keli: "P",
+        huomautus: null,
         ryhmatuomariNimi: "Mikko Kemppainen",
         palkintotuomariNimi: null,
       }),
-      lisatiedot: expect.arrayContaining([
+      eras: expect.arrayContaining([
         expect.objectContaining({
-          koodi: "11",
-          nimi: "Paljas maa",
-          era1Arvo: "1",
-          era2Arvo: "1",
-          era3Arvo: null,
+          era: 1,
+          alkoi: "5:49",
+          hakumin: 201,
+          ajomin: 51,
+          haku: 5,
+          hauk: 7,
+          lisatiedot: expect.arrayContaining([
+            expect.objectContaining({
+              koodi: "11",
+              nimi: "Paljas maa",
+              arvo: "1",
+            }),
+            expect.objectContaining({
+              koodi: "17",
+              nimi: "Lämpötila",
+              arvo: "13",
+            }),
+            expect.objectContaining({
+              koodi: "30",
+              nimi: "Kuuluvuus",
+              arvo: "4.00",
+            }),
+            expect.objectContaining({
+              koodi: "36",
+              nimi: "Beaglen haukku",
+              arvo: "4",
+            }),
+          ]),
         }),
         expect.objectContaining({
-          koodi: "17",
-          nimi: "Lämpötila",
-          era1Arvo: "13",
-          era2Arvo: "19",
-        }),
-        expect.objectContaining({
-          koodi: "30",
-          nimi: "Kuuluvuus",
-          era1Arvo: "4.00",
-          era2Arvo: "0.00",
-        }),
-        expect.objectContaining({
-          koodi: "36",
-          nimi: "Beaglen haukku",
-          era1Arvo: "4",
-          era2Arvo: "0",
+          era: 2,
+          lisatiedot: expect.arrayContaining([
+            expect.objectContaining({
+              koodi: "11",
+              nimi: "Paljas maa",
+              arvo: "1",
+            }),
+            expect.objectContaining({
+              koodi: "17",
+              nimi: "Lämpötila",
+              arvo: "19",
+            }),
+            expect.objectContaining({
+              koodi: "30",
+              nimi: "Kuuluvuus",
+              arvo: "0.00",
+            }),
+            expect.objectContaining({
+              koodi: "36",
+              nimi: "Beaglen haukku",
+              arvo: "0",
+            }),
+          ]),
         }),
       ]),
     });
     const call = upsertDbMock.mock.calls[0]?.[0];
-    expect(call.lisatiedot).not.toEqual(
-      expect.arrayContaining([expect.objectContaining({ koodi: "12" })]),
+    expect(call.eras).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ era: 3 })]),
     );
     expect(result.body.ok).toBe(true);
     if (result.body.ok) {
@@ -154,6 +213,44 @@ describe("upsertKoiratietokantaAjokResultService", () => {
         }),
       ]);
     }
+  });
+
+  it("maps a single status flag to canonical huomautus", async () => {
+    const payload = {
+      SKLid: "431477",
+      REKISTERINUMERO: "FI33413/18",
+      Koepvm: "2025-09-07 00:00:00",
+      KOEPAIKKA: "Ristijärvi",
+      luopui: "1",
+      suljettu: "0",
+      keskeytti: "0",
+    };
+
+    const result = await upsertKoiratietokantaAjokResultService(payload);
+
+    expect(result.status).toBe(201);
+    expect(upsertDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        entry: expect.objectContaining({
+          huomautus: "LUOPUI",
+        }),
+      }),
+    );
+  });
+
+  it("rejects multiple true status flags", async () => {
+    const result = await upsertKoiratietokantaAjokResultService({
+      SKLid: "431477",
+      REKISTERINUMERO: "FI33413/18",
+      Koepvm: "2025-09-07 00:00:00",
+      KOEPAIKKA: "Ristijärvi",
+      luopui: "1",
+      suljettu: "1",
+      keskeytti: "0",
+    });
+
+    expect(result.status).toBe(400);
+    expect(upsertDbMock).not.toHaveBeenCalled();
   });
 
   it("rejects payloads missing required identity fields", async () => {

@@ -110,6 +110,10 @@ Input data:
 
 Rules:
 
+- `hyvaksytytAjominuutit` uses the stored `TrialEntry` value first; legacy rows
+  without it derive the value from the sum of available `TrialEra.ajomin` values.
+- `ajoajanPisteet` uses the stored `TrialEntry` value first; legacy rows without
+  it derive the value with the v1 formula `round(70 / 240 * ajominuutit, 2)`.
 - The current renderer places the two era-start values on the first line and
   the haku-minute values on the second line, the ajo-minute values on the
   third line, the accepted-minute / score values on the right side of the
@@ -178,7 +182,7 @@ Input data:
 - `luopui`
 - `suljettu`
 - `keskeytetty`
-- `kokokaudenkoe`
+- `koetyyppi` (`NORMAL` | `KOKOKAUDENKOE` | `PITKAKOE`)
 - `sijoitus`
 - `koiriaLuokassa`
 - `Palkinto`
@@ -186,9 +190,12 @@ Input data:
 Rules:
 
 - `paljasMaaTaiLumi` maps to `PALJAS_MAA` or `LUMI` markers, or nothing.
-- `luopui`, `suljettu`, and `keskeytetty` render as `X` markers when true.
-- `kokokaudenkoe` overrides the visible result row: `sijoitus` renders as `-`
-  and `koiriaLuokassa` renders as `KK`.
+- `luopui`, `suljettu`, and `keskeytetty` are derived from
+  `TrialEntry.huomautus` (`LUOPUI`, `SULJETTU`, `KESKEYTETTY`) and render as
+  `X` markers when true.
+- `koetyyppi=KOKOKAUDENKOE` renders `sijoitus` as `-` and `koiriaLuokassa` as `KK`.
+- `koetyyppi=PITKAKOE` renders `sijoitus` as `-` and `koiriaLuokassa` as `PK`.
+- `koetyyppi=NORMAL` renders the stored `sijoitus` and `koiriaLuokassa` values.
 - Otherwise `sijoitus` renders under the status markers and `koiriaLuokassa`
   renders next to `sijoitus`.
 - `Palkinto` continues to render in the lower-right payout field.

@@ -3,11 +3,17 @@ import { normalizeText } from "./parse-ajok-payload";
 
 type LisatietoMapping = {
   koodi: string;
+  osa?: string;
   nimi: string;
   keys: readonly [string, string, string?, string?];
 };
 
 const LISATIETO_MAPPINGS: LisatietoMapping[] = [
+  {
+    koodi: "10",
+    nimi: "Vaativat olosuhteet",
+    keys: ["P10A1", "P10A2"],
+  },
   {
     koodi: "11",
     nimi: "Paljas maa",
@@ -57,6 +63,11 @@ const LISATIETO_MAPPINGS: LisatietoMapping[] = [
     keys: ["181_MAASTO", "182_MAASTO", "183_MAASTO"],
   },
   {
+    koodi: "19",
+    nimi: "Lumipeitteen laatu",
+    keys: ["P19A1", "P19A2"],
+  },
+  {
     koodi: "20",
     nimi: "Haun laajuus ilman yöjälkeä",
     keys: ["201_LAAJUUS", "202_LAAJUUS", "203_LAAJUUS"],
@@ -70,6 +81,57 @@ const LISATIETO_MAPPINGS: LisatietoMapping[] = [
     koodi: "22",
     nimi: "Hakulöysyyden laatu",
     keys: ["221_HAKULOYSYYS", "222_HAKULOYSYYS", "223_HAKULOYSYYS"],
+  },
+  {
+    koodi: "23",
+    nimi: "Hakukuvio",
+    keys: ["P23A1", "P23A2"],
+  },
+  {
+    koodi: "24",
+    nimi: "Suurin etäisyys",
+    keys: ["P24A1", "P24A2"],
+  },
+  {
+    koodi: "25",
+    osa: "a",
+    nimi: "Yöjälki löytyi",
+    keys: ["P25A1a", "P25A2a"],
+  },
+  {
+    koodi: "25",
+    osa: "b",
+    nimi: "Yöjälki löytyi",
+    keys: ["P25A1b", "P25A2b"],
+  },
+  {
+    koodi: "25",
+    osa: "c",
+    nimi: "Yöjälki löytyi",
+    keys: ["P25A1c", "P25A2c"],
+  },
+  {
+    koodi: "26",
+    nimi: "Eteneminen yöjäljellä",
+    keys: ["P26A1", "P26A2"],
+  },
+  {
+    koodi: "27",
+    osa: "a",
+    nimi: "Aika yöjäljellä",
+    keys: ["P27A1a", "P27A2a"],
+  },
+  {
+    koodi: "27",
+    osa: "b",
+    nimi: "Aika yöjäljellä",
+    keys: ["P27A1b", "P27A2b"],
+  },
+  {
+    koodi: "27",
+    osa: "c",
+    nimi: "Aika yöjäljellä",
+    keys: ["P27A1c", "P27A2c"],
   },
   {
     koodi: "30",
@@ -105,6 +167,11 @@ const LISATIETO_MAPPINGS: LisatietoMapping[] = [
     koodi: "36",
     nimi: "Beaglen haukku",
     keys: ["531_BEAGLEN_HAUKKU", "532_BEAGLEN_HAUKKU", "533_BEAGLEN_HAUKKU"],
+  },
+  {
+    koodi: "37",
+    nimi: "Todettu kuuluvuus",
+    keys: ["P37A1", "P37A2"],
   },
   {
     koodi: "40",
@@ -157,6 +224,21 @@ const LISATIETO_MAPPINGS: LisatietoMapping[] = [
     keys: ["561_AJETTAVA_NAHTY", "562_AJETTAVA_NAHTY"],
   },
   {
+    koodi: "57",
+    nimi: "Tie ja esteajoa",
+    keys: ["P57A1", "P57A2"],
+  },
+  {
+    koodi: "58",
+    nimi: "Todellinen ajoaika",
+    keys: ["P58A1", "P58A2"],
+  },
+  {
+    koodi: "59",
+    nimi: "Hukkatyöskentely",
+    keys: ["P59A1", "P59A2"],
+  },
+  {
     koodi: "60",
     nimi: "Muiden eläinten ajo",
     keys: ["601_MUIDEN_EL_AJO", "602_MUIDEN_EL_AJO"],
@@ -165,6 +247,11 @@ const LISATIETO_MAPPINGS: LisatietoMapping[] = [
     koodi: "61",
     nimi: "Hallittavuus",
     keys: ["611_HALLITTAVUUS", "612_HALLITTAVUUS"],
+  },
+  {
+    koodi: "62",
+    nimi: "Matka ajoerässä",
+    keys: ["P62A1", "P62A2"],
   },
 ];
 
@@ -177,6 +264,7 @@ export function mapKoiratietokantaAjokLisatiedot(
     const [era1Key, era2Key, era3Key, era4Key] = mapping.keys;
     const row = {
       koodi: mapping.koodi,
+      osa: mapping.osa ?? "",
       nimi: mapping.nimi,
       era1Arvo: normalizeText(payload[era1Key]),
       era2Arvo: normalizeText(payload[era2Key]),

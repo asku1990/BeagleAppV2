@@ -10,6 +10,7 @@ export type TrialDogPdfPayload = TrialDogPdfKokeenTiedot &
   TrialDogPdfLisatiedot;
 
 export type TrialDogSex = "MALE" | "FEMALE" | "UNKNOWN";
+export type TrialDogPdfKoetyyppi = "NORMAL" | "KOKOKAUDENKOE" | "PITKAKOE";
 
 export type TrialDogPdfDataRequest = {
   trialId: string;
@@ -79,7 +80,7 @@ export type TrialDogPdfLoppupisteet = {
   luopui: boolean | null;
   suljettu: boolean | null;
   keskeytetty: boolean | null;
-  kokokaudenkoe: boolean | null;
+  koetyyppi: TrialDogPdfKoetyyppi;
   sijoitus: string | null;
   koiriaLuokassa: number | null;
   Palkinto: string | null;

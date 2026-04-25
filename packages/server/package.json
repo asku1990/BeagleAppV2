@@ -15,7 +15,10 @@
     "import:phase1": "node --import tsx/esm scripts/imports/phase1/run.ts",
     "import:phase1.5": "node --import tsx/esm scripts/imports/phase1_5/run.ts",
     "import:phase2": "node --import tsx/esm scripts/imports/phase2/run.ts",
+    "import:trials:validate-mirror": "node --import tsx/esm scripts/imports/trial-mirror-validation/run.ts",
+    "import:trials:validate-mirror:csv": "node --import tsx/esm scripts/imports/trial-mirror-validation/export-csv.ts",
     "import:phase3": "node --import tsx/esm scripts/imports/phase3/run.ts",
+    "import:phase5": "node --import tsx/esm scripts/imports/phase5/run.ts",
     "import:bootstrap": "node --import tsx/esm scripts/imports/bootstrap/run.ts",
     "import:issues": "node --import tsx/esm scripts/list-import-issues.ts",
     "import:issues:csv": "node --import tsx/esm scripts/export-import-issues-csv.ts"

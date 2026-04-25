@@ -1,5 +1,6 @@
 import type { TrialDogPdfPayloadWithTrialId } from "@contracts";
 import { getTrialDogPdfDataDb } from "@db/trials/pdf";
+import type { TrialDogPdfDataDbEraRow } from "@db/trials/pdf";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
 
@@ -19,6 +20,120 @@ function mapKeliToPaljasMaaTaiLumi(
   }
 
   return null;
+}
+
+function mapHuomautusToStatusMarkers(huomautus: string | null): {
+  luopui: boolean;
+  suljettu: boolean;
+  keskeytetty: boolean;
+} {
+  return {
+    luopui: huomautus === "LUOPUI",
+    suljettu: huomautus === "SULJETTU",
+    keskeytetty: huomautus === "KESKEYTETTY",
+  };
+}
+
+function sumNullableNumbers(values: Array<number | null>): number | null {
+  let sum = 0;
+  let hasValue = false;
+
+  for (const value of values) {
+    if (value === null) {
+      continue;
+    }
+    sum += value;
+    hasValue = true;
+  }
+
+  return hasValue ? sum : null;
+}
+
+function calculateAnsiopisteet(
+  haku: number | null,
+  hauk: number | null,
+  pin: number | null,
+  yva: number | null,
+): number | null {
+  return sumNullableNumbers([haku, hauk, pin, yva]);
+}
+
+function calculateTappiopisteet(
+  hlo: number | null,
+  alo: number | null,
+): number | null {
+  return sumNullableNumbers([hlo, alo]);
+}
+
+function calculateAjoajanPisteet(ajominuutit: number | null): number | null {
+  if (ajominuutit === null) {
+    return null;
+  }
+
+  return Math.round((70 / 240) * ajominuutit * 100) / 100;
+}
+
+const OLOSUHDE_KOODIT = [
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+  "17",
+  "18",
+] as const;
+
+const HAKU_KOODIT = ["20", "21", "22"] as const;
+const HAUKKU_KOODIT = ["30", "31", "32", "33", "34", "35", "36"] as const;
+const METSASTYSINTO_KOODIT = ["40", "41", "42"] as const;
+const AJO_KOODIT = ["50", "51", "52", "53", "54", "55", "56"] as const;
+const MUUT_OMINAISUUDET_KOODIT = ["60", "61"] as const;
+const LISATIETO_KOODIT: ReadonlySet<string> = new Set([
+  ...OLOSUHDE_KOODIT,
+  ...HAKU_KOODIT,
+  ...HAUKKU_KOODIT,
+  ...METSASTYSINTO_KOODIT,
+  ...AJO_KOODIT,
+  ...MUUT_OMINAISUUDET_KOODIT,
+]);
+
+function toEraMap(
+  eras: TrialDogPdfDataDbEraRow[],
+): Map<number, TrialDogPdfDataDbEraRow> {
+  return new Map(eras.map((era) => [era.era, era]));
+}
+
+function pivotLisatiedot(
+  eras: TrialDogPdfDataDbEraRow[],
+): Array<{ koodi: string; era1: string | null; era2: string | null }> {
+  const byCode = new Map<
+    string,
+    { era1: string | null; era2: string | null }
+  >();
+
+  for (const era of eras) {
+    if (era.era !== 1 && era.era !== 2) {
+      continue;
+    }
+
+    for (const item of era.lisatiedot) {
+      if (!LISATIETO_KOODIT.has(item.koodi)) {
+        continue;
+      }
+      if (!byCode.has(item.koodi)) {
+        byCode.set(item.koodi, { era1: null, era2: null });
+      }
+      const current = byCode.get(item.koodi);
+      if (!current) continue;
+      if (era.era === 1) current.era1 = item.arvo;
+      if (era.era === 2) current.era2 = item.arvo;
+    }
+  }
+
+  return Array.from(byCode.entries())
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([koodi, values]) => ({ koodi, ...values }));
 }
 
 export async function getTrialDogPdfDataService(
@@ -60,6 +175,23 @@ export async function getTrialDogPdfDataService(
       };
     }
 
+    const eraByNumber = toEraMap(result.eras);
+    const era1 = eraByNumber.get(1);
+    const era2 = eraByNumber.get(2);
+    const hyvaksytytAjominuutit =
+      result.hyvaksytytAjominuutit ??
+      sumNullableNumbers([era1?.ajomin ?? null, era2?.ajomin ?? null]);
+    const ajoajanPisteet =
+      result.ajoajanPisteet ?? calculateAjoajanPisteet(hyvaksytytAjominuutit);
+    const ansiopisteetYhteensa =
+      result.ansiopisteetYhteensa ??
+      calculateAnsiopisteet(result.haku, result.hauk, result.pin, result.yva);
+    const tappiopisteetYhteensa =
+      result.tappiopisteetYhteensa ??
+      calculateTappiopisteet(result.hlo, result.alo);
+    const lisatiedotRows = pivotLisatiedot(result.eras);
+    const huomautusMarkers = mapHuomautusToStatusMarkers(result.huomautus);
+
     log.info(
       {
         event: "success",
@@ -91,37 +223,37 @@ export async function getTrialDogPdfDataService(
           koemaasto: result.koemaasto,
           koepaiva: result.koepaiva,
           jarjestaja: result.jarjestaja,
-          era1Alkoi: result.era1Alkoi,
-          era2Alkoi: result.era2Alkoi,
-          hakuMin1: result.hakuMin1,
-          hakuMin2: result.hakuMin2,
-          ajoMin1: result.ajoMin1,
-          ajoMin2: result.ajoMin2,
-          hyvaksytytAjominuutit: result.hyvaksytytAjominuutit,
-          ajoajanPisteet: result.ajoajanPisteet,
-          hakuEra1: result.hakuEra1,
-          hakuEra2: result.hakuEra2,
-          hakuKeskiarvo: result.hakuKeskiarvo,
-          haukkuEra1: result.haukkuEra1,
-          haukkuEra2: result.haukkuEra2,
-          haukkuKeskiarvo: result.haukkuKeskiarvo,
-          ajotaitoEra1: result.ajotaitoEra1,
-          ajotaitoEra2: result.ajotaitoEra2,
-          ajotaitoKeskiarvo: result.ajotaitoKeskiarvo,
-          hakuloysyysTappioEra1: result.hakuloysyysTappioEra1,
-          hakuloysyysTappioEra2: result.hakuloysyysTappioEra2,
-          hakuloysyysTappioYhteensa: result.hakuloysyysTappioYhteensa,
-          ajoloysyysTappioEra1: result.ajoloysyysTappioEra1,
-          ajoloysyysTappioEra2: result.ajoloysyysTappioEra2,
-          ajoloysyysTappioYhteensa: result.ajoloysyysTappioYhteensa,
-          tappiopisteetYhteensa: result.tappiopisteetYhteensa,
-          ansiopisteetYhteensa: result.ansiopisteetYhteensa,
+          era1Alkoi: era1?.alkoi ?? null,
+          era2Alkoi: era2?.alkoi ?? null,
+          hakuMin1: era1?.hakumin ?? null,
+          hakuMin2: era2?.hakumin ?? null,
+          ajoMin1: era1?.ajomin ?? null,
+          ajoMin2: era2?.ajomin ?? null,
+          hyvaksytytAjominuutit,
+          ajoajanPisteet,
+          hakuEra1: era1?.haku ?? null,
+          hakuEra2: era2?.haku ?? null,
+          hakuKeskiarvo: result.haku,
+          haukkuEra1: era1?.hauk ?? null,
+          haukkuEra2: era2?.hauk ?? null,
+          haukkuKeskiarvo: result.hauk,
+          ajotaitoEra1: era1?.yva ?? null,
+          ajotaitoEra2: era2?.yva ?? null,
+          ajotaitoKeskiarvo: result.yva,
+          hakuloysyysTappioEra1: era1?.hlo ?? null,
+          hakuloysyysTappioEra2: era2?.hlo ?? null,
+          hakuloysyysTappioYhteensa: result.hlo,
+          ajoloysyysTappioEra1: era1?.alo ?? null,
+          ajoloysyysTappioEra2: era2?.alo ?? null,
+          ajoloysyysTappioYhteensa: result.alo,
+          tappiopisteetYhteensa,
+          ansiopisteetYhteensa,
           loppupisteet: result.loppupisteet,
-          paljasMaaTaiLumi: mapKeliToPaljasMaaTaiLumi(result.keli),
-          luopui: result.luopui,
-          suljettu: result.suljettu,
-          keskeytetty: result.keskeytetty,
-          kokokaudenkoe: result.kokokaudenkoe,
+          paljasMaaTaiLumi: mapKeliToPaljasMaaTaiLumi(result.ke),
+          luopui: huomautusMarkers.luopui,
+          suljettu: huomautusMarkers.suljettu,
+          keskeytetty: huomautusMarkers.keskeytetty,
+          koetyyppi: result.koetyyppi,
           sijoitus: result.sijoitus,
           koiriaLuokassa: result.koiriaLuokassa,
           Palkinto: result.palkinto,
@@ -129,12 +261,9 @@ export async function getTrialDogPdfDataService(
           ryhmatuomariNimi: result.ryhmatuomariNimi,
           palkintotuomariNimi: result.palkintotuomariNimi,
           ylituomariNumeroSnapshot: result.ylituomariNumeroSnapshot,
-          ylituomariNimiSnapshot: result.ylituomariNimiSnapshot,
-          lisatiedotRows: result.lisatiedotRows.map((row) => ({
-            koodi: row.koodi,
-            era1: row.era1Arvo,
-            era2: row.era2Arvo,
-          })),
+          ylituomariNimiSnapshot:
+            result.ylituomariNimiSnapshot ?? result.ylituomariNimi,
+          lisatiedotRows,
         },
       },
     };

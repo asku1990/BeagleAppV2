@@ -1,7 +1,5 @@
-export { fetchLegacyTrialRows } from "./source";
+export { fetchLegacyTrialMirrorRows, TRIAL_MIRROR_TABLES } from "./source";
 export {
-  countTrialEntryRowsDb,
-  listPhase2DogRegistrationsDb,
-  upsertTrialEntryByEventAndRegistrationDb,
-  upsertTrialEventByLegacyKeyDb,
+  countLegacyTrialMirrorRowsDb,
+  upsertLegacyTrialMirrorRowsDb,
 } from "./repository";

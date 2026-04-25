@@ -102,7 +102,7 @@ export async function GET(
     const luopui = result.body.data.luopui;
     const suljettu = result.body.data.suljettu;
     const keskeytetty = result.body.data.keskeytetty;
-    const kokokaudenkoe = result.body.data.kokokaudenkoe;
+    const koetyyppi = result.body.data.koetyyppi;
     const sijoitus = result.body.data.sijoitus;
     const koiriaLuokassa = result.body.data.koiriaLuokassa;
     const Palkinto = result.body.data.Palkinto;
@@ -160,7 +160,7 @@ export async function GET(
       luopui,
       suljettu,
       keskeytetty,
-      kokokaudenkoe,
+      koetyyppi,
       sijoitus,
       koiriaLuokassa,
       Palkinto,

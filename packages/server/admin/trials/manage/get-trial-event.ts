@@ -81,7 +81,6 @@ export async function getAdminTrialEvent(
             judge: result.judge,
             sklKoeId: result.sklKoeId,
             dogCount: result.entries.length,
-            koemuoto: result.koemuoto,
             entries: result.entries,
           },
         },

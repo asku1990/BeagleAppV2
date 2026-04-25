@@ -20,8 +20,9 @@ enum DogSex {
 enum ImportKind {
   LEGACY_PHASE1
   LEGACY_PHASE1_5
-  LEGACY_PHASE2
   LEGACY_PHASE3
+  LEGACY_TRIAL_MIRROR
+  LEGACY_PHASE5
 }
 
 enum ImportStatus {
@@ -48,6 +49,18 @@ enum ShowSourceTag {
 enum TrialSourceTag {
   LEGACY_AKOEALL
   KOIRATIETOKANTA_API
+}
+
+enum TrialEntryKoetyyppi {
+  NORMAL
+  KOKOKAUDENKOE
+  PITKAKOE
+}
+
+enum TrialEntryHuomautus {
+  LUOPUI
+  SULJETTU
+  KESKEYTETTY
 }
 
 enum ShowResultValueType {
@@ -203,15 +216,15 @@ model Dog {
 }
 
 model DogTitle {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   dogId     String
   awardedOn DateTime?
   titleCode String
   titleName String?
-  sortOrder Int      @default(0)
-  dog       Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  sortOrder Int       @default(0)
+  dog       Dog       @relation(fields: [dogId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@index([dogId])
   @@index([dogId, sortOrder])
@@ -307,153 +320,450 @@ model TrialResult {
 
 model TrialEvent {
   // 1) kokeen tiedot
-  id               String       @id @default(cuid())
-  sklKoeId         Int?         @unique
-  koepaiva         DateTime
-  koekunta         String
-  jarjestaja       String?
-  kennelpiiri      String?
-  kennelpiirinro   String?
-  koemuoto         String?
-  rotukoodi        String?
+  id             String   @id @default(cuid())
+  sklKoeId       Int?     @unique
+  koepaiva       DateTime
+  koekunta       String
+  jarjestaja     String?
+  kennelpiiri    String?
+  kennelpiirinro String?
 
   // 10) tuomarit ja vahvistus (event-taso)
   ylituomariNimi   String?
   ylituomariNumero String?
 
   // technical/event metadata
-  legacyEventKey   String?      @unique
-  ytKertomus       String?      @db.Text
-  entries          TrialEntry[]
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
+  legacyEventKey    String?          @unique
+  trialRuleWindowId String?
+  ytKertomus        String?          @db.Text
+  trialRuleWindow   TrialRuleWindow? @relation(fields: [trialRuleWindowId], references: [id], onDelete: SetNull)
+  entries           TrialEntry[]
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 
   @@index([koepaiva])
   @@index([koekunta, koepaiva])
+  @@index([trialRuleWindowId])
 }
 
 model TrialEntry {
   // identity and relations
-  id                        String         @id @default(cuid())
-  trialEventId              String
-  dogId                     String?
-  yksilointiAvain           String         @unique
-  lahde                     TrialSourceTag
+  id              String         @id @default(cuid())
+  trialEventId    String
+  dogId           String?
+  yksilointiAvain String         @unique
+  lahde           TrialSourceTag
 
   // 2) koiran tiedot
-  koemaasto                 String?
-  rekisterinumeroSnapshot   String
-  luokka                    String?
-  omistajaSnapshot          String?
+  koemaasto                  String?
+  rekisterinumeroSnapshot    String
+  koemuoto                   String?
+  koiriaLuokassa             Int?
+  koetyyppi                  TrialEntryKoetyyppi @default(NORMAL)
+  rotukoodi                  String?
+  ke                         String?
+  lk                         String?
+  pa                         String?
+  piste                      Decimal? @db.Decimal(6, 2)
+  sija                       String?
+  hyvaksytytAjominuutit      Int?
+  ajoajanPisteet             Decimal? @db.Decimal(6, 2)
+  haku                       Decimal? @db.Decimal(6, 2)
+  hauk                       Decimal? @db.Decimal(6, 2)
+  yva                        Decimal? @db.Decimal(6, 2) // nykyinen ajotaito
+  hlo                        Decimal? @db.Decimal(6, 2)
+  alo                        Decimal? @db.Decimal(6, 2)
+  tja                        Decimal? @db.Decimal(6, 2)
+  pin                        Decimal? @db.Decimal(6, 2)
+  ansiopisteetYhteensa       Decimal? @db.Decimal(6, 2)
+  tappiopisteetYhteensa      Decimal? @db.Decimal(6, 2)
+  tuom1                      String?
+  huomautus                  TrialEntryHuomautus?
+  huomautusTeksti            String?  @db.Text
+  ylituomariNimiSnapshot     String?
+  ylituomariNumeroSnapshot   String?
+  ryhmatuomariNimi           String?
+  palkintotuomariNimi        String?
+  omistajaSnapshot           String?
   omistajanKotikuntaSnapshot String?
 
-  // 3) koe-erat
-  era1Alkoi                 String?
-  era2Alkoi                 String?
-  era3Alkoi                 String?
-  era4Alkoi                 String?
-  hakuMin1                  Int?
-  hakuMin2                  Int?
-  hakuMin3                  Int?
-  hakuMin4                  Int?
-  ajoMin1                   Int?
-  ajoMin2                   Int?
-  ajoMin3                   Int?
-  ajoMin4                   Int?
-  hyvaksytytAjominuutit     Int?
-  ajoajanPisteet            Decimal?       @db.Decimal(6, 2)
-
-  // 4) ansiopisteiden keskiarvot ja yhteensa
-  hakuEra1                  Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  hakuEra2                  Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  hakuEra3                  Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  hakuEra4                  Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  hakuKeskiarvo             Decimal?       @db.Decimal(6, 2)
-  haukkuEra1                Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  haukkuEra2                Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  haukkuEra3                Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  haukkuEra4                Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  haukkuKeskiarvo           Decimal?       @db.Decimal(6, 2)
-  ajotaitoEra1              Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  ajotaitoEra2              Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  ajotaitoEra3              Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  ajotaitoEra4              Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  yleisvaikutelmaPisteet    Decimal?       @db.Decimal(6, 2)
-  ajotaitoKeskiarvo         Decimal?       @db.Decimal(6, 2)
-  ansiopisteetYhteensa      Decimal?       @db.Decimal(6, 2)
-  tieJaEstetyoskentelyPisteet Decimal?      @db.Decimal(6, 2)
-  metsastysintoPisteet      Decimal?       @db.Decimal(6, 2)
-
-  // 5) tappiopisteiden summat
-  hakuloysyysTappioEra1     Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  hakuloysyysTappioEra2     Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  hakuloysyysTappioEra3     Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  hakuloysyysTappioEra4     Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  hakuloysyysTappioYhteensa Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  ajoloysyysTappioEra1      Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  ajoloysyysTappioEra2      Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  ajoloysyysTappioEra3      Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  ajoloysyysTappioEra4      Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  ajoloysyysTappioYhteensa  Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-  tappiopisteetYhteensa     Decimal?       @db.Decimal(6, 2) // Whole-number AJOK source value; candidate for Int conversion.
-
-  // 6) pisteet ja tulos
-  loppupisteet              Decimal?       @db.Decimal(6, 2)
-  palkinto                  String?
-  legacySijoitusRaw         String?        // Raw legacy SIJA text from akoeall.
-  sijoitus                  String?        // Canonical placement for modern AJOK writes.
-  koiriaLuokassa            Int?
-  kokokaudenkoe             Boolean?       // Entry-level whole-season trial flag.
-
-  // 7) olosuhteet
-  keli                      String?
-
-  // 8) huomautukset ja tilat
-  luopui                    Boolean?
-  suljettu                  Boolean?
-  keskeytetty               Boolean?
-  huomautusTeksti           String?        @db.Text
-
-  // 10) tuomarit ja vahvistus (entry-taso)
-  ylituomariNimiSnapshot    String?
-  ylituomariNumeroSnapshot  String?  // this should be int i think?
-  ryhmatuomariNimi          String?
-  palkintotuomariNimi       String?
-
   // technical storage
-  raakadataJson             String?        @db.Text
-  notes                     String?        @db.Text
+  raakadataJson String? @db.Text
 
   // 9) lisatiedot (asteikko/rastit)
-  lisatiedot                TrialLisatietoItem[]
-  trialEvent                TrialEvent     @relation(fields: [trialEventId], references: [id], onDelete: Cascade)
-  dog                       Dog?           @relation(fields: [dogId], references: [id], onDelete: SetNull)
-  createdAt                 DateTime       @default(now())
-  updatedAt                 DateTime       @updatedAt
+  eras       TrialEra[]
+  trialEvent TrialEvent @relation(fields: [trialEventId], references: [id], onDelete: Cascade)
+  dog        Dog?       @relation(fields: [dogId], references: [id], onDelete: SetNull)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 
   @@unique([trialEventId, rekisterinumeroSnapshot])
   @@index([dogId])
   @@index([trialEventId])
-  @@index([loppupisteet])
 }
 
-model TrialLisatietoItem {
-  id           String     @id @default(cuid())
-  trialEntryId String
-  koodi        String
-  nimi         String
-  era1Arvo     String?
-  era2Arvo     String?
-  era3Arvo     String?
-  era4Arvo     String?
-  jarjestys    Int?
-  trialEntry   TrialEntry @relation(fields: [trialEntryId], references: [id], onDelete: Cascade)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+model TrialEra {
+  id            String              @id @default(cuid())
+  trialEntryId  String
+  era           Int
+  alkoi         String?
+  hakumin       Int?
+  ajomin        Int?
+  haku          Decimal?            @db.Decimal(6, 2)
+  hauk          Decimal?            @db.Decimal(6, 2)
+  yva           Decimal?            @db.Decimal(6, 2) // nykyinen ajotaito
+  hlo           Decimal?            @db.Decimal(6, 2)
+  alo           Decimal?            @db.Decimal(6, 2)
+  tja           Decimal?            @db.Decimal(6, 2)
+  pin           Decimal?            @db.Decimal(6, 2)
+  raakadataJson String?             @db.Text
+  trialEntry    TrialEntry          @relation(fields: [trialEntryId], references: [id], onDelete: Cascade)
+  lisatiedot    TrialEraLisatieto[]
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
 
-  @@unique([trialEntryId, koodi])
-  @@index([koodi])
+  @@unique([trialEntryId, era])
   @@index([trialEntryId])
+  @@index([era])
+}
+
+model TrialEraLisatieto {
+  id         String   @id @default(cuid())
+  trialEraId String
+  koodi      String
+  osa        String   @default("")
+  arvo       String
+  nimi       String?
+  jarjestys  Int?
+  trialEra   TrialEra @relation(fields: [trialEraId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([trialEraId, koodi, osa])
+  @@index([koodi])
+  @@index([trialEraId])
+}
+
+model TrialRuleWindow {
+  id          String       @id @default(cuid())
+  fromYmd     Int?         @map("from_ymd")
+  toYmd       Int?         @map("to_ymd")
+  label       String
+  sortOrder   Int          @default(0) @map("sort_order")
+  isActive    Boolean      @default(true) @map("is_active")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  trialEvents TrialEvent[]
+
+  @@index([fromYmd, toYmd])
+  @@index([sortOrder])
+  @@index([isActive])
+  @@map("trial_rule_window")
+}
+
+model LegacyAkoeall {
+  rekno          String   @map("REKNO") @db.VarChar(20)
+  tappa          String   @map("TAPPA") @db.VarChar(50)
+  tappv          String   @map("TAPPV") @db.VarChar(8)
+  kennelpiiri    String?  @map("KENNELPIIRI") @db.VarChar(50)
+  kennelpiirinro String?  @map("KENNELPIIRINRO") @db.Char(3)
+  ke             String?  @map("KE") @db.Char(1)
+  lk             String?  @map("LK") @db.Char(1)
+  pa             String?  @map("PA") @db.Char(1)
+  piste          Decimal? @map("PISTE") @db.Decimal(6, 2)
+  sija           String?  @map("SIJA") @db.VarChar(5)
+  haku           Decimal? @map("HAKU") @db.Decimal(6, 2)
+  hauk           Decimal? @map("HAUK") @db.Decimal(6, 2)
+  yva            Decimal? @map("YVA") @db.Decimal(6, 2)
+  hlo            Decimal? @map("HLO") @db.Decimal(6, 2)
+  alo            Decimal? @map("ALO") @db.Decimal(6, 2)
+  tja            Decimal? @map("TJA") @db.Decimal(6, 2)
+  pin            Decimal? @map("PIN") @db.Decimal(6, 2)
+  tuom1          String?  @map("TUOM1") @db.VarChar(20)
+  muokattuRaw    String   @map("MUOKATTU") @db.VarChar(19)
+  vara           String?  @map("VARA") @db.Char(3)
+  rawPayloadJson String   @map("raw_payload_json") @db.Text
+  sourceHash     String?  @map("source_hash") @db.VarChar(64)
+  importedAt     DateTime @default(now()) @map("imported_at")
+
+  @@id([rekno, tappa, tappv])
+  @@index([rekno])
+  @@index([tappa, tappv])
+  @@index([tappv, tappa])
+  @@map("legacy_akoeall")
+}
+
+model LegacyBealt {
+  rekno          String   @map("REKNO") @db.VarChar(20)
+  tappa          String   @map("TAPPA") @db.VarChar(20)
+  tappv          String   @map("TAPPV") @db.VarChar(8)
+  era            Int      @map("ERA") @db.SmallInt
+  hakumin        Int?     @map("HAKUMIN") @db.SmallInt
+  ajomin         Int?     @map("AJOMIN") @db.SmallInt
+  haku           Decimal? @map("HAKU") @db.Decimal(6, 2)
+  hauk           Decimal? @map("HAUK") @db.Decimal(6, 2)
+  yva            Decimal? @map("YVA") @db.Decimal(6, 2)
+  hlo            Decimal? @map("HLO") @db.Decimal(6, 2)
+  alo            Decimal? @map("ALO") @db.Decimal(6, 2)
+  tja            Decimal? @map("TJA") @db.Decimal(6, 2)
+  pin            Decimal? @map("PIN") @db.Decimal(6, 2)
+  lt11           String?  @map("LT11") @db.Char(1)
+  lt12           Int?     @map("LT12") @db.SmallInt
+  lt13           String?  @map("LT13") @db.Char(1)
+  lt14           String?  @map("LT14") @db.Char(1)
+  lt15           String?  @map("LT15") @db.Char(1)
+  lt16           String?  @map("LT16") @db.Char(1)
+  lt17           String?  @map("LT17") @db.VarChar(5)
+  lt18           Decimal? @map("LT18") @db.Decimal(3, 1)
+  lt20           Decimal? @map("LT20") @db.Decimal(3, 1)
+  lt21           Decimal? @map("LT21") @db.Decimal(3, 1)
+  lt30           Decimal? @map("LT30") @db.Decimal(3, 1)
+  lt31           Decimal? @map("LT31") @db.Decimal(3, 1)
+  lt32           Decimal? @map("LT32") @db.Decimal(3, 1)
+  lt33           Decimal? @map("LT33") @db.Decimal(3, 1)
+  lt34           Decimal? @map("LT34") @db.Decimal(3, 1)
+  lt40           Decimal? @map("LT40") @db.Decimal(3, 1)
+  lt41           Decimal? @map("LT41") @db.Decimal(3, 1)
+  lt42           Decimal? @map("LT42") @db.Decimal(3, 1)
+  lt43           Decimal? @map("LT43") @db.Decimal(3, 1)
+  lt44           Decimal? @map("LT44") @db.Decimal(3, 1)
+  lt50           Decimal? @map("LT50") @db.Decimal(3, 1)
+  lt51           Decimal? @map("LT51") @db.Decimal(3, 1)
+  lt52           Decimal? @map("LT52") @db.Decimal(3, 1)
+  lt53           Decimal? @map("LT53") @db.Decimal(3, 1)
+  viite          String?  @map("VIITE") @db.VarChar(255)
+  muokattuRaw    String   @map("MUOKATTU") @db.VarChar(19)
+  rawPayloadJson String   @map("raw_payload_json") @db.Text
+  sourceHash     String?  @map("source_hash") @db.VarChar(64)
+  importedAt     DateTime @default(now()) @map("imported_at")
+
+  @@id([rekno, tappa, tappv, era])
+  @@index([rekno, tappa, tappv])
+  @@index([tappv, tappa])
+  @@map("legacy_bealt")
+}
+
+model LegacyBealt0 {
+  rekno          String   @map("REKNO") @db.VarChar(20)
+  tappa          String   @map("TAPPA") @db.VarChar(20)
+  tappv          String   @map("TAPPV") @db.VarChar(8)
+  era            Int      @map("ERA") @db.SmallInt
+  alkoi          String?  @map("ALKOI") @db.VarChar(5)
+  hakumin        Int?     @map("HAKUMIN") @db.SmallInt
+  ajomin         Int?     @map("AJOMIN") @db.SmallInt
+  haku           Decimal? @map("HAKU") @db.Decimal(6, 2)
+  hauk           Decimal? @map("HAUK") @db.Decimal(6, 2)
+  yva            Decimal? @map("YVA") @db.Decimal(6, 2)
+  hlo            Decimal? @map("HLO") @db.Decimal(6, 2)
+  alo            Decimal? @map("ALO") @db.Decimal(6, 2)
+  tja            Decimal? @map("TJA") @db.Decimal(6, 2)
+  pin            Decimal? @map("PIN") @db.Decimal(6, 2)
+  lt11           Decimal? @map("LT11") @db.Decimal(3, 1)
+  lt12           Decimal? @map("LT12") @db.Decimal(3, 1)
+  lt13           Decimal? @map("LT13") @db.Decimal(3, 1)
+  lt21           Decimal? @map("LT21") @db.Decimal(3, 1)
+  lt22           Decimal? @map("LT22") @db.Decimal(3, 1)
+  lt31           Decimal? @map("LT31") @db.Decimal(3, 1)
+  lt32           Decimal? @map("LT32") @db.Decimal(3, 1)
+  lt33           Decimal? @map("LT33") @db.Decimal(3, 1)
+  lt34           Decimal? @map("LT34") @db.Decimal(3, 1)
+  lt41           Decimal? @map("LT41") @db.Decimal(3, 1)
+  lt42           Decimal? @map("LT42") @db.Decimal(3, 1)
+  lt43           Decimal? @map("LT43") @db.Decimal(3, 1)
+  lt44           Decimal? @map("LT44") @db.Decimal(3, 1)
+  lt51           Decimal? @map("LT51") @db.Decimal(3, 1)
+  lt52           Decimal? @map("LT52") @db.Decimal(3, 1)
+  lt61           Decimal? @map("LT61") @db.Decimal(3, 1)
+  lt62           Decimal? @map("LT62") @db.Decimal(3, 1)
+  lt63           Decimal? @map("LT63") @db.Decimal(3, 1)
+  lt64           Decimal? @map("LT64") @db.Decimal(3, 1)
+  lt65           Decimal? @map("LT65") @db.Decimal(3, 1)
+  lt66           Decimal? @map("LT66") @db.Decimal(3, 1)
+  lt71           Decimal? @map("LT71") @db.Decimal(3, 1)
+  lt72           Decimal? @map("LT72") @db.Decimal(3, 1)
+  lt73           Decimal? @map("LT73") @db.Decimal(3, 1)
+  lt74           Decimal? @map("LT74") @db.Decimal(3, 1)
+  lt75           Decimal? @map("LT75") @db.Decimal(3, 1)
+  lt76           Decimal? @map("LT76") @db.Decimal(3, 1)
+  lt77           Decimal? @map("LT77") @db.Decimal(3, 1)
+  lt78           Decimal? @map("LT78") @db.Decimal(3, 1)
+  lt79           Decimal? @map("LT79") @db.Decimal(3, 1)
+  lt80           Decimal? @map("LT80") @db.Decimal(3, 1)
+  lt81           Decimal? @map("LT81") @db.Decimal(3, 1)
+  viite          String?  @map("VIITE") @db.VarChar(255)
+  muokattuRaw    String   @map("MUOKATTU") @db.VarChar(19)
+  rawPayloadJson String   @map("raw_payload_json") @db.Text
+  sourceHash     String?  @map("source_hash") @db.VarChar(64)
+  importedAt     DateTime @default(now()) @map("imported_at")
+
+  @@id([rekno, tappa, tappv, era])
+  @@index([rekno, tappa, tappv])
+  @@index([tappv, tappa])
+  @@map("legacy_bealt0")
+}
+
+model LegacyBealt1 {
+  rekno          String   @map("REKNO") @db.VarChar(20)
+  tappa          String   @map("TAPPA") @db.VarChar(20)
+  tappv          String   @map("TAPPV") @db.VarChar(8)
+  era            Int      @map("ERA") @db.SmallInt
+  alkoi          String?  @map("ALKOI") @db.VarChar(5)
+  hakumin        Int?     @map("HAKUMIN") @db.SmallInt
+  ajomin         Int?     @map("AJOMIN") @db.SmallInt
+  haku           Decimal? @map("HAKU") @db.Decimal(6, 2)
+  hauk           Decimal? @map("HAUK") @db.Decimal(6, 2)
+  yva            Decimal? @map("YVA") @db.Decimal(6, 2)
+  hlo            Decimal? @map("HLO") @db.Decimal(6, 2)
+  alo            Decimal? @map("ALO") @db.Decimal(6, 2)
+  tja            Decimal? @map("TJA") @db.Decimal(6, 2)
+  pin            Decimal? @map("PIN") @db.Decimal(6, 2)
+  lt11           String?  @map("LT11") @db.Char(1)
+  lt12           Int?     @map("LT12") @db.SmallInt
+  lt13           String?  @map("LT13") @db.Char(1)
+  lt14           String?  @map("LT14") @db.Char(1)
+  lt15           String?  @map("LT15") @db.Char(1)
+  lt16           String?  @map("LT16") @db.Char(1)
+  lt17           String?  @map("LT17") @db.VarChar(5)
+  lt18           Decimal? @map("LT18") @db.Decimal(3, 1)
+  lt20           Decimal? @map("LT20") @db.Decimal(3, 1)
+  lt21           Decimal? @map("LT21") @db.Decimal(3, 1)
+  lt30           Decimal? @map("LT30") @db.Decimal(3, 1)
+  lt31           Decimal? @map("LT31") @db.Decimal(3, 1)
+  lt32           Decimal? @map("LT32") @db.Decimal(3, 1)
+  lt33           Decimal? @map("LT33") @db.Decimal(3, 1)
+  lt34           Decimal? @map("LT34") @db.Decimal(3, 1)
+  lt40           Decimal? @map("LT40") @db.Decimal(3, 1)
+  lt41           Decimal? @map("LT41") @db.Decimal(3, 1)
+  lt42           Decimal? @map("LT42") @db.Decimal(3, 1)
+  lt43           Decimal? @map("LT43") @db.Decimal(3, 1)
+  lt44           Decimal? @map("LT44") @db.Decimal(3, 1)
+  lt50           Decimal? @map("LT50") @db.Decimal(3, 1)
+  lt51           Decimal? @map("LT51") @db.Decimal(3, 1)
+  lt52           Decimal? @map("LT52") @db.Decimal(3, 1)
+  lt53           Decimal? @map("LT53") @db.Decimal(3, 1)
+  viite          String?  @map("VIITE") @db.VarChar(255)
+  muokattuRaw    String   @map("MUOKATTU") @db.VarChar(19)
+  rawPayloadJson String   @map("raw_payload_json") @db.Text
+  sourceHash     String?  @map("source_hash") @db.VarChar(64)
+  importedAt     DateTime @default(now()) @map("imported_at")
+
+  @@id([rekno, tappa, tappv, era])
+  @@index([rekno, tappa, tappv])
+  @@index([tappv, tappa])
+  @@map("legacy_bealt1")
+}
+
+model LegacyBealt2 {
+  rekno          String   @map("REKNO") @db.VarChar(20)
+  tappa          String   @map("TAPPA") @db.VarChar(50)
+  tappv          String   @map("TAPPV") @db.VarChar(8)
+  era            Int      @map("ERA") @db.SmallInt
+  alkoi          String?  @map("ALKOI") @db.VarChar(5)
+  hakumin        Int?     @map("HAKUMIN") @db.SmallInt
+  ajomin         Int?     @map("AJOMIN") @db.SmallInt
+  haku           Decimal? @map("HAKU") @db.Decimal(6, 2)
+  hauk           Decimal? @map("HAUK") @db.Decimal(6, 2)
+  yva            Decimal? @map("YVA") @db.Decimal(6, 2)
+  hlo            Decimal? @map("HLO") @db.Decimal(6, 2)
+  alo            Decimal? @map("ALO") @db.Decimal(6, 2)
+  tja            Decimal? @map("TJA") @db.Decimal(6, 2)
+  pin            Decimal? @map("PIN") @db.Decimal(6, 2)
+  lt11           String?  @map("LT11") @db.Char(1)
+  lt12           Int?     @map("LT12") @db.SmallInt
+  lt13           String?  @map("LT13") @db.Char(1)
+  lt14           String?  @map("LT14") @db.Char(1)
+  lt15           String?  @map("LT15") @db.Char(1)
+  lt16           String?  @map("LT16") @db.Char(1)
+  lt17           String?  @map("LT17") @db.VarChar(5)
+  lt18           Decimal? @map("LT18") @db.Decimal(3, 1)
+  lt20           Decimal? @map("LT20") @db.Decimal(3, 1)
+  lt21           Decimal? @map("LT21") @db.Decimal(3, 1)
+  lt22           Decimal? @map("LT22") @db.Decimal(3, 1)
+  lt30           Decimal? @map("LT30") @db.Decimal(3, 1)
+  lt31           Decimal? @map("LT31") @db.Decimal(3, 1)
+  lt32           Decimal? @map("LT32") @db.Decimal(3, 1)
+  lt33           Decimal? @map("LT33") @db.Decimal(3, 1)
+  lt34           Decimal? @map("LT34") @db.Decimal(3, 1)
+  lt35           Decimal? @map("LT35") @db.Decimal(3, 1)
+  lt36           Decimal? @map("LT36") @db.Decimal(3, 1)
+  lt40           Decimal? @map("LT40") @db.Decimal(3, 1)
+  lt41           Decimal? @map("LT41") @db.Decimal(3, 1)
+  lt50           Decimal? @map("LT50") @db.Decimal(3, 1)
+  lt51           Decimal? @map("LT51") @db.Decimal(3, 1)
+  lt52           Decimal? @map("LT52") @db.Decimal(3, 1)
+  lt53           Decimal? @map("LT53") @db.Decimal(3, 1)
+  lt54           Decimal? @map("LT54") @db.Decimal(3, 1)
+  lt55           Decimal? @map("LT55") @db.Decimal(3, 1)
+  lt56           Decimal? @map("LT56") @db.Decimal(3, 1)
+  lt60           Decimal? @map("LT60") @db.Decimal(3, 1)
+  lt61           Decimal? @map("LT61") @db.Decimal(3, 1)
+  viite          String?  @map("VIITE") @db.VarChar(255)
+  muokattuRaw    String   @map("MUOKATTU") @db.VarChar(19)
+  rawPayloadJson String   @map("raw_payload_json") @db.Text
+  sourceHash     String?  @map("source_hash") @db.VarChar(64)
+  importedAt     DateTime @default(now()) @map("imported_at")
+
+  @@id([rekno, tappa, tappv, era])
+  @@index([rekno, tappa, tappv])
+  @@index([tappv, tappa])
+  @@map("legacy_bealt2")
+}
+
+model LegacyBealt3 {
+  rekno          String   @map("REKNO") @db.VarChar(20)
+  tappa          String   @map("TAPPA") @db.VarChar(50)
+  tappv          String   @map("TAPPV") @db.VarChar(8)
+  era            Int      @map("ERA") @db.SmallInt
+  alkoi          String?  @map("ALKOI") @db.VarChar(5)
+  hakumin        Int?     @map("HAKUMIN") @db.SmallInt
+  ajomin         Int?     @map("AJOMIN") @db.SmallInt
+  haku           Decimal? @map("HAKU") @db.Decimal(6, 2)
+  hauk           Decimal? @map("HAUK") @db.Decimal(6, 2)
+  yva            Decimal? @map("YVA") @db.Decimal(6, 2)
+  hlo            Decimal? @map("HLO") @db.Decimal(6, 2)
+  alo            Decimal? @map("ALO") @db.Decimal(6, 2)
+  tja            Decimal? @map("TJA") @db.Decimal(6, 2)
+  pin            Decimal? @map("PIN") @db.Decimal(6, 2)
+  lt11           String?  @map("LT11") @db.Char(1)
+  lt12           Int?     @map("LT12") @db.SmallInt
+  lt13           String?  @map("LT13") @db.Char(1)
+  lt14           String?  @map("LT14") @db.Char(1)
+  lt15           String?  @map("LT15") @db.Char(1)
+  lt16           String?  @map("LT16") @db.Char(1)
+  lt17           String?  @map("LT17") @db.VarChar(5)
+  lt18           Decimal? @map("LT18") @db.Decimal(3, 1)
+  lt20           Decimal? @map("LT20") @db.Decimal(3, 1)
+  lt21           Decimal? @map("LT21") @db.Decimal(3, 1)
+  lt22           Decimal? @map("LT22") @db.Decimal(3, 1)
+  lt30           Decimal? @map("LT30") @db.Decimal(3, 1)
+  lt31           Decimal? @map("LT31") @db.Decimal(3, 1)
+  lt32           Decimal? @map("LT32") @db.Decimal(3, 1)
+  lt33           Decimal? @map("LT33") @db.Decimal(3, 1)
+  lt34           Decimal? @map("LT34") @db.Decimal(3, 1)
+  lt35           Decimal? @map("LT35") @db.Decimal(3, 1)
+  lt36           Decimal? @map("LT36") @db.Decimal(3, 1)
+  lt40           Decimal? @map("LT40") @db.Decimal(3, 1)
+  lt41           Decimal? @map("LT41") @db.Decimal(3, 1)
+  lt42           Decimal? @map("LT42") @db.Decimal(3, 1)
+  lt50           Decimal? @map("LT50") @db.Decimal(3, 1)
+  lt51           Decimal? @map("LT51") @db.Decimal(3, 1)
+  lt52           Decimal? @map("LT52") @db.Decimal(3, 1)
+  lt53           Decimal? @map("LT53") @db.Decimal(3, 1)
+  lt54           Decimal? @map("LT54") @db.Decimal(3, 1)
+  lt55           Decimal? @map("LT55") @db.Decimal(3, 1)
+  lt56           Decimal? @map("LT56") @db.Decimal(3, 1)
+  lt60           Decimal? @map("LT60") @db.Decimal(3, 1)
+  lt61           Decimal? @map("LT61") @db.Decimal(3, 1)
+  viite          String?  @map("VIITE") @db.VarChar(255)
+  muokattuRaw    String   @map("MUOKATTU") @db.VarChar(19)
+  rawPayloadJson String   @map("raw_payload_json") @db.Text
+  sourceHash     String?  @map("source_hash") @db.VarChar(64)
+  importedAt     DateTime @default(now()) @map("imported_at")
+
+  @@id([rekno, tappa, tappv, era])
+  @@index([rekno, tappa, tappv])
+  @@index([tappv, tappa])
+  @@map("legacy_bealt3")
 }
 
 model ShowEvent {
@@ -541,10 +851,10 @@ model ShowResultCategory {
   isEnabled     Boolean @default(true) // Onko kategoria käytössä.
 
   // relations / timestamps
-  definitions    ShowResultDefinition[] @relation("ShowResultDefinitionCategory") // Kategoriaan kuuluvat määritelmät.
-  workbookRules  ShowWorkbookColumnRule[] @relation("ShowWorkbookRuleAllowedCategory") // Workbook-säännöt, jotka saavat resolvoida tähän kategoriaan.
-  createdAt      DateTime               @default(now()) // Luontiaika.
-  updatedAt      DateTime               @updatedAt // Päivitysaika.
+  definitions   ShowResultDefinition[]   @relation("ShowResultDefinitionCategory") // Kategoriaan kuuluvat määritelmät.
+  workbookRules ShowWorkbookColumnRule[] @relation("ShowWorkbookRuleAllowedCategory") // Workbook-säännöt, jotka saavat resolvoida tähän kategoriaan.
+  createdAt     DateTime                 @default(now()) // Luontiaika.
+  updatedAt     DateTime                 @updatedAt // Päivitysaika.
 
   @@index([isEnabled, sortOrder])
 }
@@ -566,12 +876,12 @@ model ShowResultDefinition {
   isEnabled          Boolean             @default(true) // Onko määritelmä käytössä.
 
   // relations / timestamps
-  category             ShowResultCategory         @relation("ShowResultDefinitionCategory", fields: [categoryId], references: [id], onDelete: Restrict) // Relaatio tuloskategoriaan.
+  category             ShowResultCategory           @relation("ShowResultDefinitionCategory", fields: [categoryId], references: [id], onDelete: Restrict) // Relaatio tuloskategoriaan.
   resultItems          ShowResultItem[] // Tähän määritelmään viittaavat tulosrivit.
-  workbookRuleFixedFor ShowWorkbookColumnRule[]   @relation("ShowWorkbookRuleFixedDefinition") // Workbook-säännöt, jotka viittaavat tähän määritelmään suoraan.
+  workbookRuleFixedFor ShowWorkbookColumnRule[]     @relation("ShowWorkbookRuleFixedDefinition") // Workbook-säännöt, jotka viittaavat tähän määritelmään suoraan.
   workbookValueMaps    ShowWorkbookColumnValueMap[] @relation("ShowWorkbookValueMapDefinition") // Workbook-arvomapit, jotka viittaavat tähän määritelmään.
-  createdAt            DateTime                   @default(now()) // Luontiaika.
-  updatedAt            DateTime                   @updatedAt // Päivitysaika.
+  createdAt            DateTime                     @default(now()) // Luontiaika.
+  updatedAt            DateTime                     @updatedAt // Päivitysaika.
 
   @@index([isEnabled, sortOrder])
   @@index([categoryId])
@@ -583,35 +893,35 @@ model ShowWorkbookColumnRule {
   code String @unique
 
   // workbook matching / behavior
-  headerName                 String
-  policy                     ShowWorkbookColumnPolicy          @default(IMPORT)
-  destinationKind            ShowWorkbookColumnDestinationKind?
-  targetField                ShowWorkbookTargetField?
-  parseMode                  ShowWorkbookColumnParseMode
-  fixedDefinitionCode        String?
+  headerName                    String
+  policy                        ShowWorkbookColumnPolicy           @default(IMPORT)
+  destinationKind               ShowWorkbookColumnDestinationKind?
+  targetField                   ShowWorkbookTargetField?
+  parseMode                     ShowWorkbookColumnParseMode
+  fixedDefinitionCode           String?
   allowedDefinitionCategoryCode String?
-  headerRequired             Boolean @default(false)
-  rowValueRequired           Boolean @default(false)
-  sortOrder                  Int     @default(0)
-  isEnabled                  Boolean @default(true)
+  headerRequired                Boolean                            @default(false)
+  rowValueRequired              Boolean                            @default(false)
+  sortOrder                     Int                                @default(0)
+  isEnabled                     Boolean                            @default(true)
 
   // relations / timestamps
-  fixedDefinition        ShowResultDefinition?    @relation("ShowWorkbookRuleFixedDefinition", fields: [fixedDefinitionCode], references: [code], onDelete: Restrict)
-  allowedDefinitionCategory ShowResultCategory?   @relation("ShowWorkbookRuleAllowedCategory", fields: [allowedDefinitionCategoryCode], references: [code], onDelete: Restrict)
-  valueMaps              ShowWorkbookColumnValueMap[]
-  createdAt              DateTime                  @default(now())
-  updatedAt              DateTime                  @updatedAt
+  fixedDefinition           ShowResultDefinition?        @relation("ShowWorkbookRuleFixedDefinition", fields: [fixedDefinitionCode], references: [code], onDelete: Restrict)
+  allowedDefinitionCategory ShowResultCategory?          @relation("ShowWorkbookRuleAllowedCategory", fields: [allowedDefinitionCategoryCode], references: [code], onDelete: Restrict)
+  valueMaps                 ShowWorkbookColumnValueMap[]
+  createdAt                 DateTime                     @default(now())
+  updatedAt                 DateTime                     @updatedAt
 
   @@unique([headerName])
   @@index([isEnabled, sortOrder])
 }
 
 model ShowWorkbookColumnValueMap {
-  id             String @id @default(cuid())
+  id             String   @id @default(cuid())
   ruleId         String
   workbookValue  String
   definitionCode String
-  sortOrder      Int     @default(0)
+  sortOrder      Int      @default(0)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

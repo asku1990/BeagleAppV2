@@ -1,24 +1,91 @@
 import {
   type AuditContextDb,
   type ImportIssueSeverity,
-  ImportKind,
+  type ImportKind,
+  type LegacyTrialMirrorCounts,
+  type LegacyTrialMirrorRows,
+  TRIAL_MIRROR_TABLES,
+  countLegacyTrialMirrorRowsDb,
   createImportRun,
   createImportRunIssue,
   createImportRunIssuesBulk,
-  countTrialEntryRowsDb,
-  fetchLegacyTrialRows,
-  listPhase2DogRegistrationsDb,
+  fetchLegacyTrialMirrorRows,
   markImportRunFinished,
   markImportRunRunning,
+  upsertLegacyTrialMirrorRowsDb,
 } from "@beagle/db";
 import type { ImportRunResponse } from "@beagle/contracts";
 import type { ServiceResult } from "@server/core/result";
-import { upsertCanonicalTrialRows } from "@server/imports/internal";
 import { formatLegacyImportSummary } from "@server/imports/runs/phase-summary";
 import { toImportRunResponse } from "@server/imports/runs/transform";
 
-// Orchestrates the one-shot legacy phase2 bootstrap for canonical AJOK trials.
-// Stage boundaries, issue buffering, and summary counters live here; writes stay in helpers.
+type IssueInput = {
+  stage: string;
+  severity?: ImportIssueSeverity;
+  code: string;
+  message: string;
+  registrationNo?: string | null;
+  sourceTable?: string | null;
+  payloadJson?: string | null;
+};
+
+function countMirrorRows(rows: LegacyTrialMirrorRows): LegacyTrialMirrorCounts {
+  return {
+    akoeall: rows.akoeall.length,
+    bealt: rows.bealt.length,
+    bealt0: rows.bealt0.length,
+    bealt1: rows.bealt1.length,
+    bealt2: rows.bealt2.length,
+    bealt3: rows.bealt3.length,
+  };
+}
+
+function sumCounts(counts: LegacyTrialMirrorCounts): number {
+  return TRIAL_MIRROR_TABLES.reduce((total, table) => total + counts[table], 0);
+}
+
+function countZeroDateRows(rows: LegacyTrialMirrorRows): number {
+  return TRIAL_MIRROR_TABLES.reduce((total, table) => {
+    const tableRows = rows[table];
+    return (
+      total +
+      tableRows.filter(
+        (row) => row.muokattuRaw.trim() === "0000-00-00 00:00:00",
+      ).length
+    );
+  }, 0);
+}
+
+function collectKeyIssues(rows: LegacyTrialMirrorRows): IssueInput[] {
+  const issues: IssueInput[] = [];
+
+  for (const table of TRIAL_MIRROR_TABLES) {
+    for (const row of rows[table]) {
+      const hasMissingKey =
+        !row.rekno.trim() ||
+        !row.tappa.trim() ||
+        !row.tappv.trim() ||
+        ("era" in row && !Number.isFinite(row.era));
+      if (!hasMissingKey) continue;
+
+      issues.push({
+        stage: "validate-source",
+        severity: "WARNING",
+        code: "TRIAL_MIRROR_MISSING_KEY_PART",
+        message:
+          "Legacy trial mirror source row has a blank or invalid primary-key part.",
+        registrationNo: row.rekno || null,
+        sourceTable: table,
+        payloadJson: row.rawPayloadJson,
+      });
+    }
+  }
+
+  return issues;
+}
+
+// Orchestrates the phase2 legacy AJOK mirror import.
+// This phase writes only frozen legacy mirror tables; runtime projection is a later phase.
 export async function runLegacyPhase2(
   createdByUserId?: string,
   options?: {
@@ -43,41 +110,30 @@ export async function runLegacyPhase2(
       `[stage:${name}] done in ${elapsedSeconds}s${summary ? ` ${summary}` : ""}`,
     );
   };
-  const logProgress = (name: string, processed: number, total: number) => {
+  const logProgress = (table: string, processed: number, total: number) => {
     const percent =
       total > 0 ? Math.min(100, Math.round((processed / total) * 100)) : 100;
-    log(`[stage:${name}] progress ${processed}/${total} (${percent}%)`);
+    log(`[stage:mirror] ${table} progress ${processed}/${total} (${percent}%)`);
   };
+
   let runId: string | null = null;
-  let canonicalEntriesUpserted = 0;
+  let mirrorRowsUpserted = 0;
   let errorsCount = 0;
   let warningsCount = 0;
-  let canonicalEntryTotalCount = 0;
-  const issueBuffer: Array<{
-    stage: string;
-    severity?: ImportIssueSeverity;
-    code: string;
-    message: string;
-    registrationNo?: string | null;
-    sourceTable?: string | null;
-    payloadJson?: string | null;
-  }> = [];
+  let sourceCounts: LegacyTrialMirrorCounts | null = null;
+  let mirrorCounts: LegacyTrialMirrorCounts | null = null;
+  const issueBuffer: IssueInput[] = [];
   const ISSUE_BUFFER_SIZE = 250;
   const flushIssueBuffer = async () => {
     if (!runId || issueBuffer.length === 0) return;
     const next = issueBuffer.splice(0, issueBuffer.length);
     await createImportRunIssuesBulk(runId, next, auditContext);
   };
-  const recordIssue = async (issue: {
-    stage: string;
-    severity?: ImportIssueSeverity;
-    code: string;
-    message: string;
-    registrationNo?: string | null;
-    sourceTable?: string | null;
-    payloadJson?: string | null;
-  }) => {
-    issueBuffer.push({ ...issue, severity: issue.severity ?? "WARNING" });
+  const recordIssue = async (issue: IssueInput) => {
+    const severity = issue.severity ?? "WARNING";
+    if (severity === "ERROR") errorsCount += 1;
+    if (severity === "WARNING") warningsCount += 1;
+    issueBuffer.push({ ...issue, severity });
     if (issueBuffer.length >= ISSUE_BUFFER_SIZE) {
       await flushIssueBuffer();
     }
@@ -85,7 +141,7 @@ export async function runLegacyPhase2(
 
   try {
     const run = await createImportRun({
-      kind: ImportKind.LEGACY_PHASE2,
+      kind: "LEGACY_TRIAL_MIRROR" as ImportKind,
       createdByUserId,
       auditContext,
     });
@@ -95,78 +151,84 @@ export async function runLegacyPhase2(
     log("Marked run as RUNNING");
 
     startStage("load");
-    const trialRows = await fetchLegacyTrialRows({
+    const rows = await fetchLegacyTrialMirrorRows({
       log: (message) => log(`[stage:load] ${message}`),
     });
-    log(`Loaded legacy trial source rows: total=${trialRows.length}`);
+    sourceCounts = countMirrorRows(rows);
+    const zeroDateRows = countZeroDateRows(rows);
+    log(
+      `Loaded legacy trial mirror rows: total=${sumCounts(sourceCounts)}, zeroDateMuokattu=${zeroDateRows}`,
+    );
     finishStage("load");
 
-    startStage("index");
-    const registrations = await listPhase2DogRegistrationsDb();
-    const dogIdByRegistration = new Map(
-      registrations.map((registration) => [
-        registration.registrationNo,
-        registration.dogId,
-      ]),
-    );
-    log(`Indexed dogs by registration: ${dogIdByRegistration.size}`);
-    finishStage("index");
-
-    startStage("trials");
-    const trialResult = await upsertCanonicalTrialRows(
-      trialRows,
-      dogIdByRegistration,
-      {
-        onProgress: (processed, total) =>
-          logProgress("trials", processed, total),
-      },
-    );
-    canonicalEntriesUpserted = trialResult.upserted;
-    errorsCount += trialResult.errors;
-    warningsCount += trialResult.issues.filter(
-      (issue) => issue.severity === "WARNING",
-    ).length;
-    for (const issue of trialResult.issues) {
-      await recordIssue({
-        stage: "trials",
-        severity: issue.severity,
-        code: issue.code,
-        message: issue.message,
-        registrationNo: issue.registrationNo,
-        sourceTable: issue.sourceTable,
-        payloadJson: issue.payloadJson,
-      });
+    startStage("validate-source");
+    for (const issue of collectKeyIssues(rows)) {
+      await recordIssue(issue);
     }
-    log(
-      `Canonical trial entries upserted=${canonicalEntriesUpserted}, trial warnings=${warningsCount}, trial errors=${trialResult.errors}`,
-    );
-    finishStage("trials");
+    finishStage("validate-source", `warnings=${warningsCount}`);
 
-    canonicalEntryTotalCount = await countTrialEntryRowsDb();
-    log(`Canonical TrialEntry count=${canonicalEntryTotalCount}`);
+    startStage("mirror");
+    const upsertedCounts = await upsertLegacyTrialMirrorRowsDb(rows, {
+      onProgress: logProgress,
+    });
+    mirrorRowsUpserted = sumCounts(upsertedCounts);
+    finishStage("mirror", `upserted=${mirrorRowsUpserted}`);
+
+    startStage("validate-mirror");
+    mirrorCounts = await countLegacyTrialMirrorRowsDb();
+    for (const table of TRIAL_MIRROR_TABLES) {
+      if (sourceCounts[table] !== mirrorCounts[table]) {
+        await recordIssue({
+          stage: "validate-mirror",
+          severity: "ERROR",
+          code: "TRIAL_MIRROR_COUNT_MISMATCH",
+          message: `Legacy trial mirror count mismatch for ${table}: source=${sourceCounts[table]}, mirror=${mirrorCounts[table]}.`,
+          sourceTable: table,
+          payloadJson: JSON.stringify({
+            table,
+            sourceCount: sourceCounts[table],
+            mirrorCount: mirrorCounts[table],
+          }),
+        });
+      }
+    }
+    finishStage("validate-mirror", `errors=${errorsCount}`);
 
     await flushIssueBuffer();
 
     const finished = await markImportRunFinished(
       run.id,
       {
-        status: "SUCCEEDED",
+        status: errorsCount > 0 ? "FAILED" : "SUCCEEDED",
         dogsUpserted: 0,
         ownersUpserted: 0,
         ownershipsUpserted: 0,
-        trialResultsUpserted: canonicalEntriesUpserted,
+        trialResultsUpserted: mirrorRowsUpserted,
         showResultsUpserted: 0,
         errorsCount,
         errorSummary: formatLegacyImportSummary({
-          kind: "LEGACY_PHASE2",
-          trialResultsUpserted: canonicalEntriesUpserted,
+          kind: "LEGACY_TRIAL_MIRROR",
+          mirrorRowsUpserted,
           errorsCount,
-          canonicalTrialEntryCount: canonicalEntryTotalCount,
           warningsCount,
+          sourceCounts,
+          mirrorCounts,
+          zeroDateRows,
         }),
       },
       auditContext,
     );
+
+    if (errorsCount > 0) {
+      return {
+        status: 500,
+        body: {
+          ok: false,
+          code: "IMPORT_VALIDATION_FAILED",
+          error: `Legacy trial mirror validation failed (runId=${finished.id}).`,
+        },
+      };
+    }
 
     return {
       status: 202,
@@ -207,12 +269,12 @@ export async function runLegacyPhase2(
         dogsUpserted: 0,
         ownersUpserted: 0,
         ownershipsUpserted: 0,
-        trialResultsUpserted: canonicalEntriesUpserted,
+        trialResultsUpserted: mirrorRowsUpserted,
         showResultsUpserted: 0,
         errorsCount: errorsCount + 1,
         errorSummary:
-          canonicalEntryTotalCount > 0
-            ? `${message} (canonicalTrialEntry=${canonicalEntryTotalCount})`
+          sourceCounts || mirrorCounts
+            ? `${message} (sourceRows=${sourceCounts ? sumCounts(sourceCounts) : 0}, mirrorRows=${mirrorCounts ? sumCounts(mirrorCounts) : 0})`
             : message,
       },
       auditContext,

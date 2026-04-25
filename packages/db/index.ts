@@ -3,6 +3,8 @@ export {
   ImportKind,
   ImportStatus,
   Role,
+  TrialEntryHuomautus,
+  TrialEntryKoetyyppi,
   TrialSourceTag,
 } from "@prisma/client";
 
@@ -29,13 +31,15 @@ export {
   type ImportRunSummary,
 } from "./imports/repository";
 
-export { fetchLegacyTrialRows } from "./imports/phase2";
 export {
-  countTrialEntryRowsDb,
-  listPhase2DogRegistrationsDb,
-  upsertTrialEntryByEventAndRegistrationDb,
-  upsertTrialEventByLegacyKeyDb,
+  fetchLegacyTrialMirrorRows,
+  TRIAL_MIRROR_TABLES,
 } from "./imports/phase2";
+export {
+  countLegacyTrialMirrorRowsDb,
+  upsertLegacyTrialMirrorRowsDb,
+} from "./imports/phase2";
+export { loadLegacyTrialMirrorValidationRowsDb } from "./imports/trial-mirror-validation";
 export { fetchLegacyShowRows } from "./imports/phase3";
 export { fetchLegacyPhase1Rows } from "./imports/phase1";
 export { fetchLegacyPhase1_5Rows } from "./imports/phase1_5";
@@ -46,7 +50,15 @@ export {
   type LegacyEkRow,
   type LegacyDogTitleRow,
   type LegacyOwnerRow,
-  type LegacyTrialResultRow,
+  type LegacyTrialMirrorAkoeallRow,
+  type LegacyTrialMirrorAkoeallValidationRow,
+  type LegacyTrialMirrorBealtCommonRow,
+  type LegacyTrialMirrorCounts,
+  type LegacyTrialMirrorDetailTableName,
+  type LegacyTrialMirrorDetailValidationRow,
+  type LegacyTrialMirrorRows,
+  type LegacyTrialMirrorTableName,
+  type LegacyTrialMirrorValidationRows,
   type LegacyShowResultRow,
   type LegacySamakoiraRow,
   type LegacyPhase1Rows,
@@ -127,6 +139,8 @@ export {
   type BeagleTrialSearchSortDb,
   type KoiratietokantaAjokEntryDbInput,
   type KoiratietokantaAjokEventDbInput,
+  type KoiratietokantaAjokEraDbInput,
+  type KoiratietokantaAjokEraLisatietoDbInput,
   type KoiratietokantaAjokLisatietoDbInput,
   type KoiratietokantaAjokUpsertDbInput,
   type KoiratietokantaAjokUpsertDbResult,
