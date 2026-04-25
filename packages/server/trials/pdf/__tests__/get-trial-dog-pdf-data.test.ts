@@ -41,11 +41,16 @@ function dbRow(overrides: Record<string, unknown> = {}) {
     loppupisteet: null,
     ke: null,
     huomautus: null,
+    huomautusTeksti: null,
     koetyyppi: "NORMAL",
     sijoitus: null,
     koiriaLuokassa: null,
     palkinto: null,
     ylituomariNimi: null,
+    ylituomariNimiSnapshot: null,
+    ylituomariNumeroSnapshot: null,
+    ryhmatuomariNimi: null,
+    palkintotuomariNimi: null,
     eras: [
       {
         era: 1,
@@ -143,4 +148,39 @@ describe("getTrialDogPdfDataService", () => {
       expect(result.body.data).toMatchObject(expected);
     },
   );
+
+  it("passes free-text huomautus through to PDF data", async () => {
+    getTrialDogPdfDataDbMock.mockResolvedValue(
+      dbRow({ huomautusTeksti: "Koira kävi tiellä." }),
+    );
+
+    const result = await getTrialDogPdfDataService("entry-1");
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) throw new Error("Expected ok=true");
+    expect(result.body.data.huomautusTeksti).toBe("Koira kävi tiellä.");
+  });
+
+  it("passes signature name fields through to PDF data", async () => {
+    getTrialDogPdfDataDbMock.mockResolvedValue(
+      dbRow({
+        ylituomariNimi: "Fallback Ylituomari",
+        ylituomariNimiSnapshot: "Ylituomari",
+        ylituomariNumeroSnapshot: "123",
+        ryhmatuomariNimi: "Ryhmätuomari",
+        palkintotuomariNimi: "Palkintotuomari",
+      }),
+    );
+
+    const result = await getTrialDogPdfDataService("entry-1");
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) throw new Error("Expected ok=true");
+    expect(result.body.data).toMatchObject({
+      ylituomariNimiSnapshot: "Ylituomari",
+      ylituomariNumeroSnapshot: "123",
+      ryhmatuomariNimi: "Ryhmätuomari",
+      palkintotuomariNimi: "Palkintotuomari",
+    });
+  });
 });

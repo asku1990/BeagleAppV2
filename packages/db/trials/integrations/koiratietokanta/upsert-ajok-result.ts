@@ -208,6 +208,11 @@ export async function upsertKoiratietokantaAjokResultDb(
       tappiopisteetYhteensa: input.entry.tappiopisteetYhteensa,
       tuom1: input.event.ylituomariNimi,
       huomautus: input.entry.huomautus,
+      huomautusTeksti: input.entry.huomautusTeksti,
+      ylituomariNimiSnapshot: input.entry.ylituomariNimiSnapshot,
+      ylituomariNumeroSnapshot: input.entry.ylituomariNumeroSnapshot,
+      ryhmatuomariNimi: input.entry.ryhmatuomariNimi,
+      palkintotuomariNimi: input.entry.palkintotuomariNimi,
       ...(dogId ? { dogId } : {}),
     };
 

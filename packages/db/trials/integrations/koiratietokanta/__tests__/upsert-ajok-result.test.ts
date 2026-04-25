@@ -198,6 +198,11 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
           lk: null,
           tuom1: "Ylituomari",
           huomautus: null,
+          huomautusTeksti: null,
+          ylituomariNimiSnapshot: null,
+          ylituomariNumeroSnapshot: null,
+          ryhmatuomariNimi: null,
+          palkintotuomariNimi: null,
         }),
       }),
     );
@@ -260,6 +265,81 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
         }),
         update: expect.objectContaining({
           huomautus: "KESKEYTETTY",
+        }),
+      }),
+    );
+  });
+
+  it("writes free-text huomautus text", async () => {
+    await upsertKoiratietokantaAjokResultDb({
+      event: {
+        sklKoeId: 431477,
+        koepaiva: new Date("2025-09-07T00:00:00.000Z"),
+        koekunta: "Ristijarvi",
+        jarjestaja: null,
+        kennelpiiri: null,
+        kennelpiirinro: null,
+        trialRuleWindowId: null,
+        ylituomariNimi: null,
+        ylituomariNumero: null,
+        ytKertomus: null,
+      },
+      entry: {
+        ...entryInput,
+        huomautusTeksti: "Koira kävi tiellä.",
+      },
+      eras: [],
+    });
+
+    expect(txMock.trialEntry.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.objectContaining({
+          huomautusTeksti: "Koira kävi tiellä.",
+        }),
+        update: expect.objectContaining({
+          huomautusTeksti: "Koira kävi tiellä.",
+        }),
+      }),
+    );
+  });
+
+  it("writes signature name fields", async () => {
+    await upsertKoiratietokantaAjokResultDb({
+      event: {
+        sklKoeId: 431477,
+        koepaiva: new Date("2025-09-07T00:00:00.000Z"),
+        koekunta: "Ristijarvi",
+        jarjestaja: null,
+        kennelpiiri: null,
+        kennelpiirinro: null,
+        trialRuleWindowId: null,
+        ylituomariNimi: "Ylituomari",
+        ylituomariNumero: "123",
+        ytKertomus: null,
+      },
+      entry: {
+        ...entryInput,
+        ylituomariNimiSnapshot: "Ylituomari",
+        ylituomariNumeroSnapshot: "123",
+        ryhmatuomariNimi: "Ryhmätuomari",
+        palkintotuomariNimi: "Palkintotuomari",
+      },
+      eras: [],
+    });
+
+    expect(txMock.trialEntry.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.objectContaining({
+          ylituomariNimiSnapshot: "Ylituomari",
+          ylituomariNumeroSnapshot: "123",
+          ryhmatuomariNimi: "Ryhmätuomari",
+          palkintotuomariNimi: "Palkintotuomari",
+        }),
+        update: expect.objectContaining({
+          ylituomariNimiSnapshot: "Ylituomari",
+          ylituomariNumeroSnapshot: "123",
+          ryhmatuomariNimi: "Ryhmätuomari",
+          palkintotuomariNimi: "Palkintotuomari",
         }),
       }),
     );

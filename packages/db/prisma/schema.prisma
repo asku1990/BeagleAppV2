@@ -379,6 +379,11 @@ model TrialEntry {
   tappiopisteetYhteensa      Decimal? @db.Decimal(6, 2)
   tuom1                      String?
   huomautus                  TrialEntryHuomautus?
+  huomautusTeksti            String?  @db.Text
+  ylituomariNimiSnapshot     String?
+  ylituomariNumeroSnapshot   String?
+  ryhmatuomariNimi           String?
+  palkintotuomariNimi        String?
   omistajaSnapshot           String?
   omistajanKotikuntaSnapshot String?
 
