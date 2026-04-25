@@ -88,6 +88,7 @@ CREATE TABLE "TrialEraLisatieto" (
     "id" TEXT NOT NULL,
     "trialEraId" TEXT NOT NULL,
     "koodi" TEXT NOT NULL,
+    "osa" TEXT NOT NULL DEFAULT '',
     "arvo" TEXT NOT NULL,
     "nimi" TEXT,
     "jarjestys" INTEGER,
@@ -107,7 +108,7 @@ CREATE INDEX "TrialEra_trialEntryId_idx" ON "TrialEra"("trialEntryId");
 CREATE INDEX "TrialEra_era_idx" ON "TrialEra"("era");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "TrialEraLisatieto_trialEraId_koodi_key" ON "TrialEraLisatieto"("trialEraId", "koodi");
+CREATE UNIQUE INDEX "TrialEraLisatieto_trialEraId_koodi_osa_key" ON "TrialEraLisatieto"("trialEraId", "koodi", "osa");
 
 -- CreateIndex
 CREATE INDEX "TrialEraLisatieto_koodi_idx" ON "TrialEraLisatieto"("koodi");
@@ -270,6 +271,7 @@ COMMENT ON TABLE "TrialEraLisatieto" IS 'One additional legacy/detail value atta
 COMMENT ON COLUMN "TrialEraLisatieto"."id" IS 'Technical identifier for the era additional value.';
 COMMENT ON COLUMN "TrialEraLisatieto"."trialEraId" IS 'Parent trial era identifier.';
 COMMENT ON COLUMN "TrialEraLisatieto"."koodi" IS 'Legacy/detail code for the additional value.';
+COMMENT ON COLUMN "TrialEraLisatieto"."osa" IS 'Optional subpart key for additional values sharing the same official code.';
 COMMENT ON COLUMN "TrialEraLisatieto"."arvo" IS 'Stored value for the additional code.';
 COMMENT ON COLUMN "TrialEraLisatieto"."nimi" IS 'Optional display name for the code.';
 COMMENT ON COLUMN "TrialEraLisatieto"."jarjestys" IS 'Optional display order for the code.';

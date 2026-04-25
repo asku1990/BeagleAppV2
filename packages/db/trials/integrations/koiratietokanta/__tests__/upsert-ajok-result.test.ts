@@ -101,8 +101,8 @@ const eraInputs = [
     hlo: null,
     alo: null,
     lisatiedot: [
-      { koodi: "11", nimi: "Paljas maa", arvo: "1", jarjestys: 1 },
-      { koodi: "17", nimi: "Lämpötila", arvo: "13", jarjestys: 7 },
+      { koodi: "11", osa: "", nimi: "Paljas maa", arvo: "1", jarjestys: 1 },
+      { koodi: "17", osa: "", nimi: "Lämpötila", arvo: "13", jarjestys: 7 },
     ],
   },
   {
@@ -116,8 +116,8 @@ const eraInputs = [
     hlo: null,
     alo: null,
     lisatiedot: [
-      { koodi: "11", nimi: "Paljas maa", arvo: "1", jarjestys: 1 },
-      { koodi: "17", nimi: "Lämpötila", arvo: "19", jarjestys: 7 },
+      { koodi: "11", osa: "", nimi: "Paljas maa", arvo: "1", jarjestys: 1 },
+      { koodi: "17", osa: "", nimi: "Lämpötila", arvo: "19", jarjestys: 7 },
     ],
   },
 ];
@@ -211,6 +211,26 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
     });
     expect(txMock.trialEra.create).toHaveBeenCalledTimes(2);
     expect(txMock.trialEraLisatieto.createMany).toHaveBeenCalledTimes(2);
+    expect(txMock.trialEraLisatieto.createMany).toHaveBeenCalledWith({
+      data: [
+        {
+          trialEraId: "era-1",
+          koodi: "11",
+          osa: "",
+          arvo: "1",
+          nimi: "Paljas maa",
+          jarjestys: 1,
+        },
+        {
+          trialEraId: "era-1",
+          koodi: "17",
+          osa: "",
+          arvo: "13",
+          nimi: "Lämpötila",
+          jarjestys: 7,
+        },
+      ],
+    });
   });
 
   it("deletes old lisatieto rows and skips createMany when no rows are mapped", async () => {

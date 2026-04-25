@@ -81,10 +81,14 @@ erDiagram
   - `TrialEntry.ke` stores the top-level weather/condition value from source
     `KELI` / legacy `KE`.
 - `TrialEra`: canonical AJOK era row per `trialEntryId + era`.
-- `TrialEraLisatieto`: canonical AJOK lisatieto row per `trialEraId + koodi`.
+- `TrialEraLisatieto`: canonical AJOK lisatieto row per
+  `trialEraId + koodi + osa`.
   - `TrialEra` stores per-era timing and score fields.
-  - `TrialEraLisatieto` stores detailed code rows such as `11-61` for report/PDF
+  - `TrialEraLisatieto` stores detailed code rows such as `10-62` for report/PDF
     rendering without decoding raw payload JSON.
+  - `TrialEraLisatieto.osa` is empty for normal one-value codes and stores a
+    subpart key such as `a`, `b`, or `c` when one official code has multiple
+    values for the same era.
 - `LegacyAkoeall`, `LegacyBealt`, `LegacyBealt0`, `LegacyBealt1`,
   `LegacyBealt2`, `LegacyBealt3`: frozen v1 AJOK mirror tables used for
   source validation and later projection into canonical runtime tables.
@@ -131,7 +135,7 @@ erDiagram
 - `TrialEntry.yksilointiAvain` unique
 - `TrialEntry.[trialEventId, rekisterinumeroSnapshot]` unique
 - `TrialEra.[trialEntryId, era]` unique
-- `TrialEraLisatieto.[trialEraId, koodi]` unique
+- `TrialEraLisatieto.[trialEraId, koodi, osa]` unique
 - `LegacyAkoeall.[REKNO, TAPPA, TAPPV]` composite primary key
 - `LegacyBealt*.[REKNO, TAPPA, TAPPV, ERA]` composite primary key
 - `ShowEvent.eventLookupKey` unique

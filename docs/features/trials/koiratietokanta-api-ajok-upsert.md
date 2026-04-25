@@ -112,18 +112,23 @@ inside one event are allowed.
 
 ## Lisätieto mapping
 
-- `TrialEraLisatieto` rows are created for koodit `11-61`.
+- `TrialEraLisatieto` rows are currently created for the mapped codes listed
+  below.
 - The first number is the official pöytäkirja lisätieto code.
 - The `yksi_tulos` source key prefix may be different from the official code;
   for example, official code `36` is carried in raw keys `531_*` / `532_*` /
   `533_*` in the sample payload.
-- Each lisätieto row stores `koodi`, `nimi`, `era1Arvo` .. `era4Arvo`, and
-  `jarjestys`.
-- Rows are idempotent per `TrialEntry + koodi`; existing lisätieto rows are
-  replaced on each upsert.
+- Each lisätieto row stores `koodi`, `osa`, `nimi`, `era1Arvo` .. `era4Arvo`,
+  and `jarjestys`.
+- `osa` is empty for normal one-value rows. Codes `25` and `27` use separate
+  `a`, `b`, and `c` subpart rows because the source payload has multiple values
+  for the same official code and era.
+- Rows are idempotent per `TrialEra + koodi + osa`; existing era/lisätieto rows
+  are replaced on each upsert.
 
 ### Olosuhteet and detailed rows
 
+- `P10A*` -> official code `10` (`Vaativat olosuhteet`)
 - `11_*` -> official code `11` (`Paljas maa`)
 - `12_*` -> official code `12` (`Lumikeli`)
 - `13_*` -> official code `13` (`Kohtalainen tai kova tuuli`)
@@ -132,9 +137,27 @@ inside one event are allowed.
 - `16_*` -> official code `16` (`Kohtalainen tai kova sade`)
 - `17_*` -> official code `17` (`Lämpötila`)
 - `18_*` -> official code `18` (`Maasto`)
+- `P19A*` -> official code `19` (`Lumipeitteen laatu`)
 
 Additional groups follow the same numbered source-to-lisatieto pattern for
-`20-61`.
+currently mapped codes `20`, `21`, `22`, `23`, `24`, `25`, `26`, `27`, `30`,
+`31`, `32`, `33`, `34`, `35`, `36`, `37`, `40`, `41`, `42`, `50`, `51`, `52`,
+`53`, `54`, `55`, `56`, `57`, `58`, `59`, `60`, `61`, and `62`.
+
+### P-coded official rows
+
+- `P23A*` -> official code `23` (`Hakukuvio`)
+- `P24A*` -> official code `24` (`Suurin etäisyys`)
+- `P25A*a` / `P25A*b` / `P25A*c` -> official code `25` (`Yöjälki löytyi`)
+  with `osa` values `a`, `b`, and `c`
+- `P26A*` -> official code `26` (`Eteneminen yöjäljellä`)
+- `P27A*a` / `P27A*b` / `P27A*c` -> official code `27`
+  (`Aika yöjäljellä`) with `osa` values `a`, `b`, and `c`
+- `P37A*` -> official code `37` (`Todettu kuuluvuus`)
+- `P57A*` -> official code `57` (`Tie ja esteajoa`)
+- `P58A*` -> official code `58` (`Todellinen ajoaika`)
+- `P59A*` -> official code `59` (`Hukkatyöskentely`)
+- `P62A*` -> official code `62` (`Matka ajoerässä`)
 
 ## Validation and warnings
 

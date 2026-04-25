@@ -33,7 +33,8 @@ Canonical runtime behavior:
 - `TrialEvent` stores the resolved `trialRuleWindowId` for the projected event
 - `TrialEntry`: one dog summary row per event (from `legacy_akoeall`)
 - `TrialEra`: one selected detail row per `trialEntryId + era`
-- `TrialEraLisatieto`: one non-null `LTxx` value per `trialEraId + koodi`
+- `TrialEraLisatieto`: one non-null `LTxx` value per
+  `trialEraId + koodi + osa`
 
 Reader compatibility note:
 
@@ -46,7 +47,7 @@ Reader compatibility note:
 - `TrialEvent.legacyEventKey = LEGACY_AKOEALL|EVENT|<TAPPV>|<TAPPA>`
 - `TrialEntry.yksilointiAvain = LEGACY_AKOEALL|ENTRY|<TAPPV>|<TAPPA>|<REKNO>`
 - `TrialEra` unique key: `trialEntryId + era`
-- `TrialEraLisatieto` unique key: `trialEraId + koodi`
+- `TrialEraLisatieto` unique key: `trialEraId + koodi + osa`
 
 ## Detail Table Selection Rule
 

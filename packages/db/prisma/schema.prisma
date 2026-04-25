@@ -431,6 +431,7 @@ model TrialEraLisatieto {
   id         String   @id @default(cuid())
   trialEraId String
   koodi      String
+  osa        String   @default("")
   arvo       String
   nimi       String?
   jarjestys  Int?
@@ -438,7 +439,7 @@ model TrialEraLisatieto {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  @@unique([trialEraId, koodi])
+  @@unique([trialEraId, koodi, osa])
   @@index([koodi])
   @@index([trialEraId])
 }

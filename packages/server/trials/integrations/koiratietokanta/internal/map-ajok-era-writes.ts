@@ -125,6 +125,7 @@ export function mapKoiratietokantaAjokEraWrites(
           }
           return {
             koodi: item.koodi,
+            osa: item.osa,
             nimi: item.nimi,
             arvo: String(arvo),
             jarjestys: item.jarjestys,

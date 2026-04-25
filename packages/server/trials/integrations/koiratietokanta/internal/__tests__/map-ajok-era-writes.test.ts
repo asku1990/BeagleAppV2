@@ -42,6 +42,7 @@ describe("mapKoiratietokantaAjokEraWrites", () => {
       [
         {
           koodi: "11",
+          osa: "",
           nimi: "Paljas maa",
           era1Arvo: "1",
           era2Arvo: "2",
@@ -51,6 +52,7 @@ describe("mapKoiratietokantaAjokEraWrites", () => {
         },
         {
           koodi: "17",
+          osa: "",
           nimi: "Lämpötila",
           era1Arvo: "13",
           era2Arvo: null,
@@ -73,8 +75,20 @@ describe("mapKoiratietokantaAjokEraWrites", () => {
         hlo: null,
         alo: null,
         lisatiedot: [
-          { koodi: "11", nimi: "Paljas maa", arvo: "1", jarjestys: 1 },
-          { koodi: "17", nimi: "Lämpötila", arvo: "13", jarjestys: 7 },
+          {
+            koodi: "11",
+            osa: "",
+            nimi: "Paljas maa",
+            arvo: "1",
+            jarjestys: 1,
+          },
+          {
+            koodi: "17",
+            osa: "",
+            nimi: "Lämpötila",
+            arvo: "13",
+            jarjestys: 7,
+          },
         ],
       },
       {
@@ -88,7 +102,13 @@ describe("mapKoiratietokantaAjokEraWrites", () => {
         hlo: null,
         alo: null,
         lisatiedot: [
-          { koodi: "11", nimi: "Paljas maa", arvo: "2", jarjestys: 1 },
+          {
+            koodi: "11",
+            osa: "",
+            nimi: "Paljas maa",
+            arvo: "2",
+            jarjestys: 1,
+          },
         ],
       },
     ]);

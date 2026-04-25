@@ -87,6 +87,7 @@ export type KoiratietokantaAjokEntryDbInput = {
 
 export type KoiratietokantaAjokLisatietoDbInput = {
   koodi: string;
+  osa: string;
   nimi: string;
   era1Arvo: string | null;
   era2Arvo: string | null;
@@ -97,6 +98,7 @@ export type KoiratietokantaAjokLisatietoDbInput = {
 
 export type KoiratietokantaAjokEraLisatietoDbInput = {
   koodi: string;
+  osa: string;
   nimi: string;
   arvo: string;
   jarjestys: number | null;
@@ -258,6 +260,7 @@ export async function upsertKoiratietokantaAjokResultDb(
       const eraLisatiedot = eraWrite.lisatiedot.map((item) => ({
         trialEraId: era.id,
         koodi: item.koodi,
+        osa: item.osa,
         arvo: item.arvo,
         nimi: item.nimi,
         jarjestys: item.jarjestys,

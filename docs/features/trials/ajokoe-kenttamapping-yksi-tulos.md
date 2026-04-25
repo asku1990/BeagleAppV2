@@ -146,6 +146,8 @@ Lukutapa:
 Kaikki lisätiedot mapataan samaan kohteeseen:
 
 - `TrialEraLisatieto.koodi`
+- `TrialEraLisatieto.osa` (tyhjä normaaliriveillä, aliosan tunniste kuten
+  `a`/`b`/`c` moniosaisilla virallisilla koodeilla)
 - `TrialEraLisatieto.nimi`
 - `TrialEraLisatieto.arvo`
 - parent `TrialEra.era`
