@@ -57,6 +57,12 @@ enum TrialEntryKoetyyppi {
   PITKAKOE
 }
 
+enum TrialEntryHuomautus {
+  LUOPUI
+  SULJETTU
+  KESKEYTETTY
+}
+
 enum ShowResultValueType {
   FLAG
   CODE
@@ -372,7 +378,7 @@ model TrialEntry {
   ansiopisteetYhteensa       Decimal? @db.Decimal(6, 2)
   tappiopisteetYhteensa      Decimal? @db.Decimal(6, 2)
   tuom1                      String?
-  vara                       String?
+  huomautus                  TrialEntryHuomautus?
   omistajaSnapshot           String?
   omistajanKotikuntaSnapshot String?
 

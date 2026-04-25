@@ -92,9 +92,9 @@ Huomio:
 | `KELI`                             | compatibility input `keli`, persisted to `TrialEntry.ke` |
 | `111_PALJAS_MAA`..`113_PALJAS_MAA` | `TrialEraLisatieto` code `11` (`Paljas maa`)             |
 | `121_LUMIKELI`..`123_LUMIKELI`     | `TrialEraLisatieto` code `12` (`Lumikeli`)               |
-| `luopui`                           | `TrialEntry.luopui`                                      |
-| `suljettu`                         | `TrialEntry.suljettu`                                    |
-| `keskeytti`                        | `TrialEntry.keskeytetty`                                 |
+| `luopui`                           | `TrialEntry.huomautus = LUOPUI`                          |
+| `suljettu`                         | `TrialEntry.huomautus = SULJETTU`                        |
+| `keskeytti`                        | `TrialEntry.huomautus = KESKEYTETTY`                     |
 | `HUOMAUTUS`                        | `TrialEntry.huomautusTeksti`                             |
 | `palkintotuomari1`                 | `TrialEntry.ryhmatuomariNimi`                            |
 | `palkintotuomari2`                 | `TrialEntry.palkintotuomariNimi`                         |

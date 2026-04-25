@@ -1,5 +1,5 @@
 import { prisma } from "@db/core/prisma";
-import type { Prisma } from "@prisma/client";
+import type { Prisma, TrialEntryHuomautus } from "@prisma/client";
 
 function toNumberOrNull(value: Prisma.Decimal | null): number | null {
   return value === null ? null : value.toNumber();
@@ -58,6 +58,7 @@ export type TrialDogPdfDataDbRow = {
   tappiopisteetYhteensa: number | null;
   loppupisteet: number | null;
   ke: string | null;
+  huomautus: TrialEntryHuomautus | null;
   koetyyppi: "NORMAL" | "KOKOKAUDENKOE" | "PITKAKOE";
   sijoitus: string | null;
   koiriaLuokassa: number | null;
@@ -80,6 +81,7 @@ export async function getTrialDogPdfDataDb(
       omistajanKotikuntaSnapshot: true,
       koemaasto: true,
       ke: true,
+      huomautus: true,
       koetyyppi: true,
       pa: true,
       piste: true,
@@ -204,6 +206,7 @@ export async function getTrialDogPdfDataDb(
     tappiopisteetYhteensa: toNumberOrNull(row.tappiopisteetYhteensa),
     loppupisteet: toNumberOrNull(row.piste),
     ke: row.ke,
+    huomautus: row.huomautus,
     koetyyppi: row.koetyyppi,
     sijoitus: row.sija ?? null,
     koiriaLuokassa: row.koiriaLuokassa,

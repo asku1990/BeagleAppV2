@@ -83,9 +83,9 @@ inside one event are allowed.
 - `pitkakoe` -> `koetyyppi=PITKAKOE`
 - otherwise -> `koetyyppi=NORMAL`
 - `KELI` -> compatibility input `keli`, persisted to `TrialEntry.ke`
-- `luopui` -> `luopui`
-- `suljettu` -> `suljettu`
-- `keskeytti` -> `keskeytetty`
+- `luopui=true` -> `TrialEntry.huomautus = LUOPUI`
+- `suljettu=true` -> `TrialEntry.huomautus = SULJETTU`
+- `keskeytti=true` -> `TrialEntry.huomautus = KESKEYTETTY`
 - `HUOMAUTUS` -> `huomautusTeksti`
 - `palkintotuomari1` -> `ryhmatuomariNimi`
 - `palkintotuomari2` -> `palkintotuomariNimi`
@@ -101,6 +101,9 @@ inside one event are allowed.
   - `KOKOKAUDENKOE`
   - `PITKAKOE`
 - The API rejects payloads where both `koekaudenkoe` and `pitkakoe` are true.
+- The API rejects payloads where more than one of `luopui`, `suljettu`, and
+  `keskeytti` is true because `TrialEntry.huomautus` stores one canonical
+  marker.
 
 ### Compatibility columns
 

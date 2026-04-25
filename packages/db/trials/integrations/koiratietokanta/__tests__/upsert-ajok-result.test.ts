@@ -81,9 +81,7 @@ const entryInput = {
   koiriaLuokassa: null,
   koetyyppi: "NORMAL" as const,
   keli: null,
-  luopui: null,
-  suljettu: null,
-  keskeytetty: null,
+  huomautus: null,
   huomautusTeksti: null,
   ylituomariNimiSnapshot: null,
   ylituomariNumeroSnapshot: null,
@@ -199,6 +197,7 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
           tappiopisteetYhteensa: null,
           lk: null,
           tuom1: "Ylituomari",
+          huomautus: null,
         }),
       }),
     );
@@ -231,5 +230,38 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
       where: { trialEntryId: "entry-1" },
     });
     expect(txMock.trialEraLisatieto.createMany).not.toHaveBeenCalled();
+  });
+
+  it("writes canonical huomautus status", async () => {
+    await upsertKoiratietokantaAjokResultDb({
+      event: {
+        sklKoeId: 431477,
+        koepaiva: new Date("2025-09-07T00:00:00.000Z"),
+        koekunta: "Ristijarvi",
+        jarjestaja: null,
+        kennelpiiri: null,
+        kennelpiirinro: null,
+        trialRuleWindowId: null,
+        ylituomariNimi: null,
+        ylituomariNumero: null,
+        ytKertomus: null,
+      },
+      entry: {
+        ...entryInput,
+        huomautus: "KESKEYTETTY",
+      },
+      eras: [],
+    });
+
+    expect(txMock.trialEntry.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.objectContaining({
+          huomautus: "KESKEYTETTY",
+        }),
+        update: expect.objectContaining({
+          huomautus: "KESKEYTETTY",
+        }),
+      }),
+    );
   });
 });

@@ -1,4 +1,8 @@
-import { TrialEntryKoetyyppi, TrialSourceTag } from "@prisma/client";
+import {
+  TrialEntryHuomautus,
+  TrialEntryKoetyyppi,
+  TrialSourceTag,
+} from "@prisma/client";
 import { prisma } from "@db/core/prisma";
 
 export type KoiratietokantaAjokEventDbInput = {
@@ -73,9 +77,7 @@ export type KoiratietokantaAjokEntryDbInput = {
   koiriaLuokassa: number | null;
   koetyyppi: TrialEntryKoetyyppi;
   keli: string | null;
-  luopui: boolean | null;
-  suljettu: boolean | null;
-  keskeytetty: boolean | null;
+  huomautus: TrialEntryHuomautus | null;
   huomautusTeksti: string | null;
   ylituomariNimiSnapshot: string | null;
   ylituomariNumeroSnapshot: string | null;
@@ -205,6 +207,7 @@ export async function upsertKoiratietokantaAjokResultDb(
       ansiopisteetYhteensa: input.entry.ansiopisteetYhteensa,
       tappiopisteetYhteensa: input.entry.tappiopisteetYhteensa,
       tuom1: input.event.ylituomariNimi,
+      huomautus: input.entry.huomautus,
       ...(dogId ? { dogId } : {}),
     };
 

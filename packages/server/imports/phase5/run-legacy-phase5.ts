@@ -16,6 +16,7 @@ import { formatLegacyImportSummary } from "@server/imports/runs/phase-summary";
 import { toImportRunResponse } from "@server/imports/runs/transform";
 import { resolveTrialRuleWindowId } from "@server/trials/core";
 import { parseLegacyDate } from "../core";
+import { normalizeLegacyVara } from "./internal/normalize-legacy-vara";
 import { parseLegacySija } from "./internal/parse-legacy-sija";
 
 type LegacyDetailSourceTable =
@@ -53,6 +54,7 @@ type ProjectionCounters = {
   skippedOrphanDetails: number;
   skippedNonSelectedDetails: number;
   unresolvedRules: number;
+  unknownVaraValues: number;
 };
 
 function legacyEntryKey(rekno: string, tappa: string, tappv: string): string {
@@ -198,6 +200,7 @@ export async function runLegacyPhase5(
     skippedOrphanDetails: 0,
     skippedNonSelectedDetails: 0,
     unresolvedRules: 0,
+    unknownVaraValues: 0,
   };
   let errorsCount = 0;
   const issueBuffer: BufferedIssue[] = [];
@@ -348,6 +351,19 @@ export async function runLegacyPhase5(
           });
         }
 
+        const normalizedVara = normalizeLegacyVara(row.vara);
+        if (normalizedVara.unknownRawValue) {
+          counters.unknownVaraValues += 1;
+          await recordIssue({
+            stage: "project-runtime",
+            code: "TRIAL_PHASE5_UNKNOWN_VARA",
+            message: `Legacy VARA value could not be mapped: ${normalizedVara.unknownRawValue}`,
+            registrationNo: row.rekno,
+            sourceTable: "legacy_akoeall",
+            payloadJson: row.rawPayloadJson,
+          });
+        }
+
         const entryKey = entryLookupKey(row.tappv, row.tappa, row.rekno);
         const dogRegistration = await prisma.dogRegistration.findUnique({
           where: { registrationNo: row.rekno },
@@ -378,7 +394,7 @@ export async function runLegacyPhase5(
             tja: toDecimalOrNull(row.tja),
             pin: toDecimalOrNull(row.pin),
             tuom1: row.tuom1,
-            vara: row.vara,
+            huomautus: normalizedVara.huomautus,
             omistajaSnapshot: null,
             omistajanKotikuntaSnapshot: null,
             raakadataJson: row.rawPayloadJson,
@@ -444,7 +460,7 @@ export async function runLegacyPhase5(
     }
     finishStage(
       "project-runtime",
-      `events=${counters.eventsProjected} entries=${counters.entriesProjected} eras=${counters.erasProjected} eraLisatiedot=${counters.eraLisatiedotProjected} unresolvedRules=${counters.unresolvedRules}`,
+      `events=${counters.eventsProjected} entries=${counters.entriesProjected} eras=${counters.erasProjected} eraLisatiedot=${counters.eraLisatiedotProjected} unresolvedRules=${counters.unresolvedRules} unknownVaraValues=${counters.unknownVaraValues}`,
     );
 
     startStage("finalize");

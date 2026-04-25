@@ -86,7 +86,27 @@ These remain mirror-validation concerns and are tracked by
 Keep `legacy_akoeall` summary values on `TrialEntry`:
 
 - `PA`, `PISTE`, `SIJA`, `HAKU`, `HAUK`, `YVA`, `HLO`, `ALO`, `TJA`, `PIN`
-- plus core row fields (`REKNO`, `LK`, `KE`, `TUOM1`, `VARA`, etc.)
+- plus core row fields (`REKNO`, `LK`, `KE`, `TUOM1`, etc.)
+- `VARA` is normalized into `TrialEntry.huomautus`:
+  - `L`, `L;;` -> `LUOPUI`
+  - `S`, `S;;` -> `SULJETTU`
+  - `K`, `K;;` -> `KESKEYTETTY`
+  - `NUL`, `;;;`, empty, null -> `null`
+  - unknown non-empty values produce an import warning and project as `null`
+
+Trial rule timeline:
+
+- Rule windows are seeded by migration before phase 5 runs.
+- `trw_pre_20020801`: `AJOKOKEEN SÄÄNNÖT JA OHJEET (AJOK ja BEAJ), voimassa ennen 1.8.2002`
+- `trw_range_2002_2005`: `AJOKOKEEN SÄÄNNÖT JA OHJEET (AJOK ja BEAJ), voimassa 1.8.2002-31.7.2005`
+- `trw_range_2005_2011`: `AJOKOKEEN SÄÄNNÖT JA OHJEET (AJOK ja BEAJ), voimassa 1.8.2005-31.7.2011`
+- `trw_post_20110801`: `AJOKOKEEN SÄÄNNÖT JA OHJEET (AJOK ja BEAJ), voimassa 1.8.2011-31.7.2023`
+- Current rule window:
+  - `id = trw_post_20230801`
+  - `fromYmd = 20230801`
+  - `toYmd = null`
+  - `sortOrder = 50`
+  - `label = AJOKOKEEN SÄÄNNÖT JA OHJEET (AJOK ja BEAJ), voimassa 1.8.2023 alkaen`
 
 Map selected `bealt*` era fields to `TrialEra`:
 

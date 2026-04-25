@@ -22,6 +22,18 @@ function mapKeliToPaljasMaaTaiLumi(
   return null;
 }
 
+function mapHuomautusToStatusMarkers(huomautus: string | null): {
+  luopui: boolean;
+  suljettu: boolean;
+  keskeytetty: boolean;
+} {
+  return {
+    luopui: huomautus === "LUOPUI",
+    suljettu: huomautus === "SULJETTU",
+    keskeytetty: huomautus === "KESKEYTETTY",
+  };
+}
+
 function sumNullableNumbers(values: Array<number | null>): number | null {
   let sum = 0;
   let hasValue = false;
@@ -178,6 +190,7 @@ export async function getTrialDogPdfDataService(
       result.tappiopisteetYhteensa ??
       calculateTappiopisteet(result.hlo, result.alo);
     const lisatiedotRows = pivotLisatiedot(result.eras);
+    const huomautusMarkers = mapHuomautusToStatusMarkers(result.huomautus);
 
     log.info(
       {
@@ -237,9 +250,9 @@ export async function getTrialDogPdfDataService(
           ansiopisteetYhteensa,
           loppupisteet: result.loppupisteet,
           paljasMaaTaiLumi: mapKeliToPaljasMaaTaiLumi(result.ke),
-          luopui: null,
-          suljettu: null,
-          keskeytetty: null,
+          luopui: huomautusMarkers.luopui,
+          suljettu: huomautusMarkers.suljettu,
+          keskeytetty: huomautusMarkers.keskeytetty,
           koetyyppi: result.koetyyppi,
           sijoitus: result.sijoitus,
           koiriaLuokassa: result.koiriaLuokassa,

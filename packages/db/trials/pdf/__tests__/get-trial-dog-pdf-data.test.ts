@@ -30,6 +30,7 @@ function trialRow(overrides: Record<string, unknown> = {}) {
     pa: null,
     piste: null,
     sija: null,
+    huomautus: null,
     hyvaksytytAjominuutit: null,
     ajoajanPisteet: null,
     haku: decimal(8.5),

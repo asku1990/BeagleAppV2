@@ -4,6 +4,7 @@ const {
   createImportRunMock,
   createImportRunIssueMock,
   createImportRunIssuesBulkMock,
+  legacyRows,
   markImportRunFinishedMock,
   markImportRunRunningMock,
   prismaMock,
@@ -38,6 +39,7 @@ const {
     createImportRunMock: vi.fn().mockResolvedValue({ id: "run-1" }),
     createImportRunIssueMock: vi.fn(),
     createImportRunIssuesBulkMock: vi.fn(),
+    legacyRows,
     markImportRunFinishedMock: vi
       .fn()
       .mockImplementation(async (_id, input) => ({
@@ -69,7 +71,13 @@ const {
       legacyBealt2: { findMany: vi.fn().mockResolvedValue([]) },
       legacyBealt3: { findMany: vi.fn().mockResolvedValue([]) },
       trialRuleWindow: {
-        findMany: vi.fn().mockResolvedValue([]),
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: "trw_post_20230801",
+            fromYmd: 20230801,
+            toYmd: null,
+          },
+        ]),
       },
       $transaction: vi.fn().mockResolvedValue(undefined),
       trialEraLisatieto: {
@@ -105,6 +113,11 @@ vi.mock("@beagle/db", () => ({
   TrialSourceTag: {
     LEGACY_AKOEALL: "LEGACY_AKOEALL",
   },
+  TrialEntryHuomautus: {
+    LUOPUI: "LUOPUI",
+    SULJETTU: "SULJETTU",
+    KESKEYTETTY: "KESKEYTETTY",
+  },
   TrialEntryKoetyyppi: {
     NORMAL: "NORMAL",
     KOKOKAUDENKOE: "KOKOKAUDENKOE",
@@ -123,6 +136,7 @@ import { runLegacyPhase5 } from "../run-legacy-phase5";
 describe("runLegacyPhase5", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    prismaMock.legacyAkoeall.findMany.mockResolvedValue(legacyRows);
   });
 
   it("buffers unclear SIJA warnings and logs batch progress at 1000 rows", async () => {
@@ -144,6 +158,96 @@ describe("runLegacyPhase5", () => {
     );
     expect(log).toHaveBeenCalledWith(
       expect.stringContaining("[stage:project-runtime] progress 1000/1001"),
+    );
+  });
+
+  it("resolves events through loaded active rule windows", async () => {
+    await runLegacyPhase5();
+
+    expect(prismaMock.trialEvent.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          trialRuleWindowId: "trw_post_20230801",
+        }),
+      }),
+    );
+  });
+
+  it("normalizes legacy VARA into canonical huomautus and warns on unknown values", async () => {
+    prismaMock.legacyAkoeall.findMany.mockResolvedValueOnce([
+      {
+        rekno: "FI00001/21",
+        tappa: "Lahti",
+        tappv: "20260115",
+        kennelpiiri: null,
+        kennelpiirinro: null,
+        tuom1: "Judge One",
+        ke: null,
+        lk: null,
+        pa: null,
+        piste: null,
+        sija: "1|3",
+        haku: null,
+        hauk: null,
+        yva: null,
+        hlo: null,
+        alo: null,
+        tja: null,
+        pin: null,
+        vara: "K;;",
+        rawPayloadJson: "{}",
+      },
+      {
+        rekno: "FI00002/21",
+        tappa: "Lahti",
+        tappv: "20260115",
+        kennelpiiri: null,
+        kennelpiirinro: null,
+        tuom1: "Judge One",
+        ke: null,
+        lk: null,
+        pa: null,
+        piste: null,
+        sija: "2|3",
+        haku: null,
+        hauk: null,
+        yva: null,
+        hlo: null,
+        alo: null,
+        tja: null,
+        pin: null,
+        vara: "X;;",
+        rawPayloadJson: "{}",
+      },
+    ]);
+
+    await runLegacyPhase5();
+
+    expect(prismaMock.trialEntry.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          rekisterinumeroSnapshot: "FI00001/21",
+          huomautus: "KESKEYTETTY",
+        }),
+      }),
+    );
+    expect(prismaMock.trialEntry.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          rekisterinumeroSnapshot: "FI00002/21",
+          huomautus: null,
+        }),
+      }),
+    );
+    expect(createImportRunIssuesBulkMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "TRIAL_PHASE5_UNKNOWN_VARA",
+          registrationNo: "FI00002/21",
+        }),
+      ]),
+      expect.any(Object),
     );
   });
 });

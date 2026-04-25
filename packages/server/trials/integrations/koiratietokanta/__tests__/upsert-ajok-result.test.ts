@@ -17,6 +17,11 @@ vi.mock("@beagle/db", () => ({
     KOKOKAUDENKOE: "KOKOKAUDENKOE",
     PITKAKOE: "PITKAKOE",
   },
+  TrialEntryHuomautus: {
+    LUOPUI: "LUOPUI",
+    SULJETTU: "SULJETTU",
+    KESKEYTETTY: "KESKEYTETTY",
+  },
   prisma: {
     trialRuleWindow: {
       findMany: trialRuleWindowFindManyMock,
@@ -116,9 +121,7 @@ describe("upsertKoiratietokantaAjokResultService", () => {
         ajoajanPisteet: 14.88,
         loppupisteet: 29.38,
         keli: "P",
-        luopui: false,
-        suljettu: false,
-        keskeytetty: false,
+        huomautus: null,
         ryhmatuomariNimi: "Mikko Kemppainen",
         palkintotuomariNimi: null,
       }),
@@ -210,6 +213,44 @@ describe("upsertKoiratietokantaAjokResultService", () => {
         }),
       ]);
     }
+  });
+
+  it("maps a single status flag to canonical huomautus", async () => {
+    const payload = {
+      SKLid: "431477",
+      REKISTERINUMERO: "FI33413/18",
+      Koepvm: "2025-09-07 00:00:00",
+      KOEPAIKKA: "Ristijärvi",
+      luopui: "1",
+      suljettu: "0",
+      keskeytti: "0",
+    };
+
+    const result = await upsertKoiratietokantaAjokResultService(payload);
+
+    expect(result.status).toBe(201);
+    expect(upsertDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        entry: expect.objectContaining({
+          huomautus: "LUOPUI",
+        }),
+      }),
+    );
+  });
+
+  it("rejects multiple true status flags", async () => {
+    const result = await upsertKoiratietokantaAjokResultService({
+      SKLid: "431477",
+      REKISTERINUMERO: "FI33413/18",
+      Koepvm: "2025-09-07 00:00:00",
+      KOEPAIKKA: "Ristijärvi",
+      luopui: "1",
+      suljettu: "1",
+      keskeytti: "0",
+    });
+
+    expect(result.status).toBe(400);
+    expect(upsertDbMock).not.toHaveBeenCalled();
   });
 
   it("rejects payloads missing required identity fields", async () => {

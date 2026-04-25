@@ -3,6 +3,7 @@ export {
   ImportKind,
   ImportStatus,
   Role,
+  TrialEntryHuomautus,
   TrialEntryKoetyyppi,
   TrialSourceTag,
 } from "@prisma/client";

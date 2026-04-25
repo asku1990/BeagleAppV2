@@ -40,6 +40,7 @@ function dbRow(overrides: Record<string, unknown> = {}) {
     tappiopisteetYhteensa: 4,
     loppupisteet: null,
     ke: null,
+    huomautus: null,
     koetyyppi: "NORMAL",
     sijoitus: null,
     koiriaLuokassa: null,
@@ -124,4 +125,22 @@ describe("getTrialDogPdfDataService", () => {
       ansiopisteetYhteensa: 36.75,
     });
   });
+
+  it.each([
+    ["LUOPUI", { luopui: true, suljettu: false, keskeytetty: false }],
+    ["SULJETTU", { luopui: false, suljettu: true, keskeytetty: false }],
+    ["KESKEYTETTY", { luopui: false, suljettu: false, keskeytetty: true }],
+    [null, { luopui: false, suljettu: false, keskeytetty: false }],
+  ])(
+    "derives status markers from huomautus %s",
+    async (huomautus, expected) => {
+      getTrialDogPdfDataDbMock.mockResolvedValue(dbRow({ huomautus }));
+
+      const result = await getTrialDogPdfDataService("entry-1");
+
+      expect(result.status).toBe(200);
+      if (!result.body.ok) throw new Error("Expected ok=true");
+      expect(result.body.data).toMatchObject(expected);
+    },
+  );
 });

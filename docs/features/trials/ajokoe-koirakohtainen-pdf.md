@@ -190,7 +190,9 @@ Input data:
 Rules:
 
 - `paljasMaaTaiLumi` maps to `PALJAS_MAA` or `LUMI` markers, or nothing.
-- `luopui`, `suljettu`, and `keskeytetty` render as `X` markers when true.
+- `luopui`, `suljettu`, and `keskeytetty` are derived from
+  `TrialEntry.huomautus` (`LUOPUI`, `SULJETTU`, `KESKEYTETTY`) and render as
+  `X` markers when true.
 - `koetyyppi=KOKOKAUDENKOE` renders `sijoitus` as `-` and `koiriaLuokassa` as `KK`.
 - `koetyyppi=PITKAKOE` renders `sijoitus` as `-` and `koiriaLuokassa` as `PK`.
 - `koetyyppi=NORMAL` renders the stored `sijoitus` and `koiriaLuokassa` values.

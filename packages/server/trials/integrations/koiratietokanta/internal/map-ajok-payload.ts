@@ -8,7 +8,7 @@ import type {
   KoiratietokantaAjokEraDbInput,
   KoiratietokantaAjokEventDbInput,
 } from "@beagle/db";
-import { TrialEntryKoetyyppi } from "@beagle/db";
+import { TrialEntryHuomautus, TrialEntryKoetyyppi } from "@beagle/db";
 import {
   isValidRegistrationNo,
   normalizeRegistrationNo,
@@ -112,6 +112,9 @@ export function mapKoiratietokantaAjokPayload(
   const lisatiedot = mapKoiratietokantaAjokLisatiedot(payload);
   const koekaudenkoe = parseBooleanFlag(payload.koekaudenkoe);
   const pitkakoe = parseBooleanFlag(payload.pitkakoe);
+  const luopui = parseBooleanFlag(payload.luopui);
+  const suljettu = parseBooleanFlag(payload.suljettu);
+  const keskeytetty = parseBooleanFlag(payload.keskeytti);
 
   if (koekaudenkoe === true && pitkakoe === true) {
     return {
@@ -127,12 +130,40 @@ export function mapKoiratietokantaAjokPayload(
     };
   }
 
+  const activeHuomautusFlags = [
+    { field: "luopui", value: luopui },
+    { field: "suljettu", value: suljettu },
+    { field: "keskeytti", value: keskeytetty },
+  ].filter((flag) => flag.value === true);
+
+  if (activeHuomautusFlags.length > 1) {
+    return {
+      ok: false,
+      issues: [
+        {
+          field: activeHuomautusFlags.map((flag) => flag.field).join(","),
+          code: "INVALID",
+          message:
+            "luopui, suljettu and keskeytti are mutually exclusive for the same entry.",
+        },
+      ],
+    };
+  }
+
   const koetyyppi =
     koekaudenkoe === true
       ? TrialEntryKoetyyppi.KOKOKAUDENKOE
       : pitkakoe === true
         ? TrialEntryKoetyyppi.PITKAKOE
         : TrialEntryKoetyyppi.NORMAL;
+  const huomautus =
+    luopui === true
+      ? TrialEntryHuomautus.LUOPUI
+      : suljettu === true
+        ? TrialEntryHuomautus.SULJETTU
+        : keskeytetty === true
+          ? TrialEntryHuomautus.KESKEYTETTY
+          : null;
   const entry: KoiratietokantaAjokEntryDbInput = {
     rekisterinumeroSnapshot: registrationNo,
     yksilointiAvain: `SKL:${sklKoeId}|REG:${registrationNo}`,
@@ -244,9 +275,7 @@ export function mapKoiratietokantaAjokPayload(
     koiriaLuokassa: parseOptionalInteger(payload, "KOIRIA_LUOKASSA", warnings),
     koetyyppi,
     keli: normalizeText(payload.KELI),
-    luopui: parseBooleanFlag(payload.luopui),
-    suljettu: parseBooleanFlag(payload.suljettu),
-    keskeytetty: parseBooleanFlag(payload.keskeytti),
+    huomautus,
     huomautusTeksti: normalizeText(payload.HUOMAUTUS),
     ylituomariNimiSnapshot: ylituomariNimi,
     ylituomariNumeroSnapshot: ylituomariNumero,
