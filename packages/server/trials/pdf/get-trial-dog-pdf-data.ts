@@ -208,6 +208,7 @@ export async function getTrialDogPdfDataService(
         ok: true,
         data: {
           trialId: result.trialId,
+          trialRuleWindowId: result.trialRuleWindowId,
           registrationNo: result.registrationNo,
           dogName: result.dogName,
           dogSex: result.dogSex,

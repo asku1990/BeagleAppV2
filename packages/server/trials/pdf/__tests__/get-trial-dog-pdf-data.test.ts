@@ -13,6 +13,7 @@ import { getTrialDogPdfDataService } from "../get-trial-dog-pdf-data";
 function dbRow(overrides: Record<string, unknown> = {}) {
   return {
     trialId: "entry-1",
+    trialRuleWindowId: "trw_post_20230801",
     registrationNo: "FI123",
     dogName: null,
     dogSex: null,
@@ -108,7 +109,20 @@ describe("getTrialDogPdfDataService", () => {
       ajoloysyysTappioYhteensa: 1.5,
       tappiopisteetYhteensa: 4,
       ansiopisteetYhteensa: 36.75,
+      trialRuleWindowId: "trw_post_20230801",
     });
+  });
+
+  it("passes the resolved trial rule window through to PDF data", async () => {
+    getTrialDogPdfDataDbMock.mockResolvedValue(
+      dbRow({ trialRuleWindowId: "trw_range_2005_2011" }),
+    );
+
+    const result = await getTrialDogPdfDataService("entry-1");
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) throw new Error("Expected ok=true");
+    expect(result.body.data.trialRuleWindowId).toBe("trw_range_2005_2011");
   });
 
   it("derives accepted driving minutes and driving time points for legacy rows", async () => {

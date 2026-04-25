@@ -1,0 +1,91 @@
+import path from "node:path";
+import { renderLegacy2011To2023TrialDogPdfFields } from "./legacy-2011-2023";
+import type { TrialDogPdfRuleSet } from "./types";
+
+export type { TrialDogPdfRuleSet, TrialDogPdfRuleSetStatus } from "./types";
+
+export const TRIAL_RULE_WINDOW_IDS = {
+  PRE_2002: "trw_pre_20020801",
+  RANGE_2002_2005: "trw_range_2002_2005",
+  RANGE_2005_2011: "trw_range_2005_2011",
+  RANGE_2011_2023: "trw_post_20110801",
+  POST_2023: "trw_post_20230801",
+} as const;
+
+const DEFAULT_TEMPLATE_RELATIVE_PATH = path.join(
+  "public",
+  "templates",
+  "ajok-koirakohtainen-poytakirja.pdf",
+);
+const TEMPLATE_2005_2011_RELATIVE_PATH = path.join(
+  "public",
+  "templates",
+  "ajok-koirakohtainen-poytakirja-2005-2011.pdf",
+);
+
+const UNSUPPORTED_RULE_SET: TrialDogPdfRuleSet = {
+  id: "unsupported",
+  templateRelativePath: DEFAULT_TEMPLATE_RELATIVE_PATH,
+  status: "blank-only",
+};
+
+const LEGACY_2011_2023_RULE_SET: TrialDogPdfRuleSet = {
+  id: "legacy-2011-2023",
+  templateRelativePath: DEFAULT_TEMPLATE_RELATIVE_PATH,
+  status: "implemented",
+  renderFields: renderLegacy2011To2023TrialDogPdfFields,
+};
+
+const TRIAL_DOG_PDF_RULE_SETS = {
+  [TRIAL_RULE_WINDOW_IDS.PRE_2002]: {
+    id: "legacy-pre-2002",
+    templateRelativePath: DEFAULT_TEMPLATE_RELATIVE_PATH,
+    status: "blank-only",
+  },
+  [TRIAL_RULE_WINDOW_IDS.RANGE_2002_2005]: {
+    id: "legacy-2002-2005",
+    templateRelativePath: DEFAULT_TEMPLATE_RELATIVE_PATH,
+    status: "blank-only",
+  },
+  [TRIAL_RULE_WINDOW_IDS.RANGE_2005_2011]: {
+    id: "legacy-2005-2011",
+    templateRelativePath: TEMPLATE_2005_2011_RELATIVE_PATH,
+    status: "blank-only",
+  },
+  [TRIAL_RULE_WINDOW_IDS.RANGE_2011_2023]: LEGACY_2011_2023_RULE_SET,
+  [TRIAL_RULE_WINDOW_IDS.POST_2023]: {
+    id: "post-2023-unimplemented",
+    templateRelativePath: DEFAULT_TEMPLATE_RELATIVE_PATH,
+    status: "blank-only",
+  },
+} as const satisfies Record<string, TrialDogPdfRuleSet>;
+
+export function resolveTrialDogPdfRuleSet(
+  ruleWindowId: string | null,
+): TrialDogPdfRuleSet {
+  if (ruleWindowId && ruleWindowId in TRIAL_DOG_PDF_RULE_SETS) {
+    return TRIAL_DOG_PDF_RULE_SETS[
+      ruleWindowId as keyof typeof TRIAL_DOG_PDF_RULE_SETS
+    ];
+  }
+
+  return UNSUPPORTED_RULE_SET;
+}
+
+export function getTrialDogPdfRuleSetId(ruleWindowId: string | null): string {
+  return resolveTrialDogPdfRuleSet(ruleWindowId).id;
+}
+
+export function getTrialDogPdfRuleSetStatus(
+  ruleWindowId: string | null,
+): TrialDogPdfRuleSet["status"] {
+  return resolveTrialDogPdfRuleSet(ruleWindowId).status;
+}
+
+export function canRenderTrialDogPdf(ruleWindowId: string | null): boolean {
+  return getTrialDogPdfRuleSetStatus(ruleWindowId) === "implemented";
+}
+
+export function getSeededTrialDogPdfRuleWindowIds(): string[] {
+  return Object.values(TRIAL_RULE_WINDOW_IDS);
+}

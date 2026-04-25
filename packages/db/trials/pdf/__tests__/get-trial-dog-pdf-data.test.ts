@@ -49,6 +49,7 @@ function trialRow(overrides: Record<string, unknown> = {}) {
     tuom1: null,
     dog: null,
     trialEvent: {
+      trialRuleWindowId: "trw_post_20230801",
       kennelpiiri: null,
       kennelpiirinro: null,
       koekunta: "Koe",
@@ -111,7 +112,27 @@ describe("getTrialDogPdfDataDb", () => {
       pin: 12.5,
       ansiopisteetYhteensa: 36.75,
       tappiopisteetYhteensa: 4,
+      trialRuleWindowId: "trw_post_20230801",
     });
+  });
+
+  it("returns the trial event rule window id", async () => {
+    prismaMock.trialEntry.findUnique.mockResolvedValue(
+      trialRow({
+        trialEvent: {
+          trialRuleWindowId: "trw_range_2005_2011",
+          kennelpiiri: null,
+          kennelpiirinro: null,
+          koekunta: "Koe",
+          koepaiva: new Date("2008-09-07T00:00:00.000Z"),
+          jarjestaja: null,
+        },
+      }),
+    );
+
+    const result = await getTrialDogPdfDataDb({ trialId: "entry-1" });
+
+    expect(result?.trialRuleWindowId).toBe("trw_range_2005_2011");
   });
 
   it("returns null stored driving totals for legacy rows without source values", async () => {

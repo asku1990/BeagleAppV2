@@ -31,6 +31,7 @@ export type TrialDogPdfDataDbEraRow = {
 
 export type TrialDogPdfDataDbRow = {
   trialId: string;
+  trialRuleWindowId: string | null;
   registrationNo: string;
   dogName: string | null;
   dogSex: TrialDogPdfDataDbDogSex | null;
@@ -147,6 +148,7 @@ export async function getTrialDogPdfDataDb(
       },
       trialEvent: {
         select: {
+          trialRuleWindowId: true,
           kennelpiiri: true,
           kennelpiirinro: true,
           koekunta: true,
@@ -188,6 +190,7 @@ export async function getTrialDogPdfDataDb(
 
   return {
     trialId: row.id,
+    trialRuleWindowId: row.trialEvent.trialRuleWindowId,
     registrationNo:
       row.dog?.registrations[0]?.registrationNo || row.rekisterinumeroSnapshot,
     dogName: row.dog?.name || null,

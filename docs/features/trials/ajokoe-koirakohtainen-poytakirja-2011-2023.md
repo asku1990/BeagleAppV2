@@ -1,27 +1,37 @@
-# AJOK koirakohtainen PDF
+# AJOK koirakohtainen pöytäkirja 2011-2023
 
-This document describes the code structure and data rules for the AJOK
-dog-specific PDF generator.
+This document describes the code structure and data rules for the implemented
+AJOK dog-specific PDF renderer for the rule period 1.8.2011-31.7.2023
+(`trw_post_20110801`).
 
 PDF template:
 
 - `/Users/akikuivas/personal-projects/beagle/beagle-app-v2/apps/web/public/templates/ajok-koirakohtainen-poytakirja.pdf`
 
+Other AJOK PDF rule-period availability and template selection are tracked in
+`docs/features/trials/ajokoe-pdf-rule-periods.md`.
+
 ## Module layout
 
 Main orchestrator:
 
-- `apps/web/lib/server/trials/trial-dog-pdf.ts`
+- `apps/web/lib/public/beagle/trials/pdf/trial-dog-pdf.ts`
+
+Rule-set registry and renderers:
+
+- `apps/web/lib/public/beagle/trials/pdf/rule-sets/index.ts`
+- `apps/web/lib/public/beagle/trials/pdf/rule-sets/legacy-2011-2023.ts`
+- `apps/web/lib/public/beagle/trials/pdf/rule-sets/types.ts`
 
 Internal helper blocks:
 
-- `apps/web/lib/server/trials/internal/kokeen-tiedot.ts`
-- `apps/web/lib/server/trials/internal/koiran-tiedot.ts`
-- `apps/web/lib/server/trials/internal/koiran-tausta.ts`
-- `apps/web/lib/server/trials/internal/ajoajan-pisteytys.ts`
-- `apps/web/lib/server/trials/internal/ansiopisteet.ts`
-- `apps/web/lib/server/trials/internal/tappiopisteet.ts`
-- `apps/web/lib/server/trials/internal/loppupisteet.ts`
+- `apps/web/lib/public/beagle/trials/pdf/internal/kokeen-tiedot.ts`
+- `apps/web/lib/public/beagle/trials/pdf/internal/koiran-tiedot.ts`
+- `apps/web/lib/public/beagle/trials/pdf/internal/koiran-tausta.ts`
+- `apps/web/lib/public/beagle/trials/pdf/internal/ajoajan-pisteytys.ts`
+- `apps/web/lib/public/beagle/trials/pdf/internal/ansiopisteet.ts`
+- `apps/web/lib/public/beagle/trials/pdf/internal/tappiopisteet.ts`
+- `apps/web/lib/public/beagle/trials/pdf/internal/loppupisteet.ts`
 
 The orchestrator loads the template, embeds the font, and delegates each block
 to the internal helpers. The helpers are intentionally internal and are not
@@ -34,7 +44,7 @@ The PDF data path is:
 1. `apps/web/app/api/trials/[trialId]/pdf/route.ts`
 2. `packages/server/trials/pdf/get-trial-dog-pdf-data.ts`
 3. `packages/db/trials/pdf/get-trial-dog-pdf-data.ts`
-4. `apps/web/lib/server/trials/trial-dog-pdf.ts`
+4. `apps/web/lib/public/beagle/trials/pdf/trial-dog-pdf.ts`
 
 The API route passes normalized values into the server service.
 The service returns the DTO that the web renderer consumes.

@@ -7,13 +7,18 @@ export type TrialDogPdfPayload = TrialDogPdfKokeenTiedot &
   TrialDogPdfLoppupisteet &
   TrialDogPdfHuomautus &
   TrialDogPdfAllekirjoitukset &
-  TrialDogPdfLisatiedot;
+  TrialDogPdfLisatiedot &
+  TrialDogPdfTemplateSelection;
 
 export type TrialDogSex = "MALE" | "FEMALE" | "UNKNOWN";
 export type TrialDogPdfKoetyyppi = "NORMAL" | "KOKOKAUDENKOE" | "PITKAKOE";
 
 export type TrialDogPdfDataRequest = {
   trialId: string;
+};
+
+export type TrialDogPdfTemplateSelection = {
+  trialRuleWindowId: string | null;
 };
 
 export type TrialDogPdfKokeenTiedot = {
