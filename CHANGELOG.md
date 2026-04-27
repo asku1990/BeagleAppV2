@@ -22,6 +22,7 @@ This project uses a user-facing changelog format.
 - Koetuloksen detaljisivu ryhmittelee kentät pöytäkirjamaisesti osioihin ja näyttää mahdollisen raw/source-datan kollapsoitavana read-only-näkymänä.
 - Ylläpidon AJOK-listaus ja detalji (`/admin/trials`) lukevat nyt uutta kanonista AJOK-skeemaa (`TrialEvent` + `TrialEntry`) read-only-polussa. Näkymän tunnistekentissä käytetään SKL-koeavainta ja entry-avainta vanhan `sourceKey`-esityksen sijaan.
 - Ylläpidon ajokokeiden `/admin/trials`-näkymä uudistettiin tapahtumapohjaiseksi master-detail-virraksi: ensin haetaan tapahtumia (vuosi tai päivämääräväli), sitten valitun tapahtuman koirariveiltä voi avata olemassa olevan detaljisivun tai koirakohtaisen PDF:n. Nykyinen `/admin/trials/[trialId]` detaljisivu säilyy ennallaan.
+- AJOK 2005-2011 -sääntökaudelle lisättiin koirakohtaisen PDF:n ensimmäinen renderöintirunko nykyisellä koetulosdatalla.
 
 ### Changed
 

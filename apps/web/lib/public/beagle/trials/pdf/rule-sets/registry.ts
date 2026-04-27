@@ -1,4 +1,5 @@
 import path from "node:path";
+import { renderLegacy2005To2011TrialDogPdfFields } from "./legacy-2005-2011";
 import { renderLegacy2011To2023TrialDogPdfFields } from "./legacy-2011-2023";
 import type { TrialDogPdfRuleSet } from "./types";
 
@@ -34,6 +35,13 @@ const LEGACY_2011_2023_RULE_SET: TrialDogPdfRuleSet = {
   renderFields: renderLegacy2011To2023TrialDogPdfFields,
 };
 
+const LEGACY_2005_2011_RULE_SET: TrialDogPdfRuleSet = {
+  id: "legacy-2005-2011",
+  templateRelativePath: TEMPLATE_2005_2011_RELATIVE_PATH,
+  status: "implemented",
+  renderFields: renderLegacy2005To2011TrialDogPdfFields,
+};
+
 const TRIAL_DOG_PDF_RULE_SETS = {
   [TRIAL_RULE_WINDOW_IDS.PRE_2002]: {
     id: "legacy-pre-2002",
@@ -45,11 +53,7 @@ const TRIAL_DOG_PDF_RULE_SETS = {
     templateRelativePath: null,
     status: "blank-only",
   },
-  [TRIAL_RULE_WINDOW_IDS.RANGE_2005_2011]: {
-    id: "legacy-2005-2011",
-    templateRelativePath: TEMPLATE_2005_2011_RELATIVE_PATH,
-    status: "blank-only",
-  },
+  [TRIAL_RULE_WINDOW_IDS.RANGE_2005_2011]: LEGACY_2005_2011_RULE_SET,
   [TRIAL_RULE_WINDOW_IDS.RANGE_2011_2023]: LEGACY_2011_2023_RULE_SET,
   [TRIAL_RULE_WINDOW_IDS.POST_2023]: {
     id: "post-2023-unimplemented",

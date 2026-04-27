@@ -71,11 +71,11 @@ describe("renderTrialDogPdf", () => {
     expect(Buffer.from(bytes).toString("latin1", 0, 4)).toBe("%PDF");
   });
 
-  it("does not overlay dynamic fields on the unfinished 2005-2011 template", async () => {
+  it("renders pdf bytes for the 2005-2011 renderer skeleton", async () => {
     const bytes = await renderTrialDogPdf({
       trialRuleWindowId: "trw_range_2005_2011",
-      registrationNo: "SHOULD-NOT-RENDER-2005",
-      dogName: "SHOULD-NOT-RENDER-DOG",
+      registrationNo: "FI12345/08",
+      dogName: "Skeleton Test Dog",
       dogSex: "MALE",
       sireName: null,
       sireRegistrationNo: null,
@@ -133,8 +133,6 @@ describe("renderTrialDogPdf", () => {
     const rawPdf = Buffer.from(bytes).toString("latin1");
 
     expect(rawPdf.slice(0, 4)).toBe("%PDF");
-    expect(rawPdf).not.toContain("SHOULD-NOT-RENDER-2005");
-    expect(rawPdf).not.toContain("SHOULD-NOT-RENDER-DOG");
   });
 
   it.each([
@@ -167,15 +165,15 @@ describe("renderTrialDogPdf", () => {
     expect(getTrialDogPdfRuleSetStatus("trw_range_2002_2005")).toBe(
       "blank-only",
     );
-    expect(getTrialDogPdfRuleSetStatus("trw_range_2005_2011")).toBe(
-      "blank-only",
-    );
     expect(getTrialDogPdfRuleSetStatus("trw_post_20230801")).toBe("blank-only");
   });
 
-  it("only marks the 2011-2023 timeline as implemented", () => {
+  it("marks template-backed timelines as renderable", () => {
+    expect(getTrialDogPdfRuleSetId("trw_range_2005_2011")).toBe(
+      "legacy-2005-2011",
+    );
     expect(getTrialDogPdfRuleSetStatus("trw_range_2005_2011")).toBe(
-      "blank-only",
+      "implemented",
     );
     expect(canRenderTrialDogPdf("trw_range_2005_2011")).toBe(true);
     expect(getTrialDogPdfRuleSetId("trw_post_20110801")).toBe(

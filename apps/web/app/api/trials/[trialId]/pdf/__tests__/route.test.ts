@@ -103,7 +103,7 @@ describe("trial pdf api route", () => {
     ).toBe("%PDF");
   });
 
-  it("returns a blank-only pdf for the 2005-2011 rule window", async () => {
+  it("returns a generated pdf for the 2005-2011 rule window", async () => {
     getTrialDogPdfDataServiceMock.mockResolvedValue({
       status: 200,
       body: {
@@ -111,8 +111,8 @@ describe("trial pdf api route", () => {
         data: {
           trialId: "entry-1",
           trialRuleWindowId: "trw_range_2005_2011",
-          registrationNo: "SHOULD-NOT-RENDER-2005",
-          dogName: "SHOULD-NOT-RENDER-DOG",
+          registrationNo: "FI12345/08",
+          dogName: "Skeleton Test Dog",
           dogSex: "MALE",
           koepaiva: new Date("2008-09-07T00:00:00.000Z"),
           hakuKeskiarvo: null,
@@ -143,8 +143,6 @@ describe("trial pdf api route", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toBe("application/pdf");
     expect(rawPdf.slice(0, 4)).toBe("%PDF");
-    expect(rawPdf).not.toContain("SHOULD-NOT-RENDER-2005");
-    expect(rawPdf).not.toContain("SHOULD-NOT-RENDER-DOG");
   });
 
   it("passes data lookup errors through as json", async () => {
