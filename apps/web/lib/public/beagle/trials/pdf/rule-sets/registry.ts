@@ -81,7 +81,7 @@ export function getTrialDogPdfRuleSetStatus(
 }
 
 export function canRenderTrialDogPdf(ruleWindowId: string | null): boolean {
-  return getTrialDogPdfRuleSetStatus(ruleWindowId) === "implemented";
+  return resolveTrialDogPdfRuleSet(ruleWindowId).templateRelativePath != null;
 }
 
 export function getSeededTrialDogPdfRuleWindowIds(): string[] {

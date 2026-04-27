@@ -132,6 +132,7 @@ describe("renderTrialDogPdf", () => {
 
     const rawPdf = Buffer.from(bytes).toString("latin1");
 
+    expect(rawPdf.slice(0, 4)).toBe("%PDF");
     expect(rawPdf).not.toContain("SHOULD-NOT-RENDER-2005");
     expect(rawPdf).not.toContain("SHOULD-NOT-RENDER-DOG");
   });
@@ -173,6 +174,10 @@ describe("renderTrialDogPdf", () => {
   });
 
   it("only marks the 2011-2023 timeline as implemented", () => {
+    expect(getTrialDogPdfRuleSetStatus("trw_range_2005_2011")).toBe(
+      "blank-only",
+    );
+    expect(canRenderTrialDogPdf("trw_range_2005_2011")).toBe(true);
     expect(getTrialDogPdfRuleSetId("trw_post_20110801")).toBe(
       "legacy-2011-2023",
     );

@@ -84,7 +84,7 @@ export async function GET(
           ruleSetId,
           durationMs: Date.now() - startedAt,
         },
-        "trial pdf generation rejected because rule window has no renderer",
+        "trial pdf generation rejected because rule window has no template",
       );
 
       return jsonResponse(
