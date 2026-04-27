@@ -12,7 +12,7 @@ export type TrialDogPdfRenderContext = {
 
 export type TrialDogPdfRuleSet = {
   id: string;
-  templateRelativePath: string;
+  templateRelativePath: string | null;
   status: TrialDogPdfRuleSetStatus;
   renderFields?: (context: TrialDogPdfRenderContext) => void;
 };

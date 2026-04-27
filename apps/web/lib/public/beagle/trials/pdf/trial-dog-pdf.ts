@@ -15,17 +15,23 @@ export {
 
 export function getTrialDogPdfTemplateFileName(
   ruleWindowId: string | null,
-): string {
-  return path.basename(
-    resolveTrialDogPdfRuleSet(ruleWindowId).templateRelativePath,
-  );
+): string | null {
+  const templateRelativePath =
+    resolveTrialDogPdfRuleSet(ruleWindowId).templateRelativePath;
+
+  return templateRelativePath ? path.basename(templateRelativePath) : null;
 }
 
 async function resolveTemplatePath(
   ruleWindowId: string | null,
 ): Promise<string> {
-  const templateRelativePath =
-    resolveTrialDogPdfRuleSet(ruleWindowId).templateRelativePath;
+  const ruleSet = resolveTrialDogPdfRuleSet(ruleWindowId);
+  const templateRelativePath = ruleSet.templateRelativePath;
+
+  if (!templateRelativePath) {
+    throw new Error(`PDF rule set ${ruleSet.id} has no template.`);
+  }
+
   const candidates = [
     path.join(process.cwd(), templateRelativePath),
     path.join(process.cwd(), "apps", "web", templateRelativePath),
