@@ -63,6 +63,9 @@ export type TrialDogPdfAnsiopisteet = {
   haukkuEra1: number | null;
   haukkuEra2: number | null;
   haukkuKeskiarvo: number | null;
+  metsastysintoEra1: number | null;
+  metsastysintoEra2: number | null;
+  metsastysintoKeskiarvo: number | null;
   ajotaitoEra1: number | null;
   ajotaitoEra2: number | null;
   ajotaitoKeskiarvo: number | null;

@@ -23,6 +23,7 @@ export type TrialDogPdfDataDbEraRow = {
   ajomin: number | null;
   haku: number | null;
   hauk: number | null;
+  pin: number | null;
   yva: number | null;
   hlo: number | null;
   alo: number | null;
@@ -167,6 +168,7 @@ export async function getTrialDogPdfDataDb(
           ajomin: true,
           haku: true,
           hauk: true,
+          pin: true,
           yva: true,
           hlo: true,
           alo: true,
@@ -237,6 +239,7 @@ export async function getTrialDogPdfDataDb(
       ajomin: era.ajomin,
       haku: toNumberOrNull(era.haku),
       hauk: toNumberOrNull(era.hauk),
+      pin: toNumberOrNull(era.pin),
       yva: toNumberOrNull(era.yva),
       hlo: toNumberOrNull(era.hlo),
       alo: toNumberOrNull(era.alo),

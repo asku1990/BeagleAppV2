@@ -53,6 +53,30 @@ const LEGACY_2005_2011_HAUKKU_KESKIARVO_BOX = {
   size: 12,
 } as const;
 
+const LEGACY_2005_2011_METSASTYSINTO_ERA1_BOX = {
+  x: 150,
+  y: 457,
+  width: 36,
+  height: 14,
+  size: 12,
+} as const;
+
+const LEGACY_2005_2011_METSASTYSINTO_ERA2_BOX = {
+  x: 215,
+  y: 457,
+  width: 36,
+  height: 14,
+  size: 12,
+} as const;
+
+const LEGACY_2005_2011_METSASTYSINTO_KESKIARVO_BOX = {
+  x: 290,
+  y: 457,
+  width: 36,
+  height: 14,
+  size: 12,
+} as const;
+
 const LEGACY_2005_2011_AJOTAITO_ERA1_BOX = {
   x: 150,
   y: 437,
@@ -128,6 +152,24 @@ export function drawLegacy2005To2011Ansiopisteet(
     font,
     formatLegacy2005To2011Score(input.haukkuKeskiarvo),
     LEGACY_2005_2011_HAUKKU_KESKIARVO_BOX,
+  );
+  drawLegacy2005To2011CenteredText(
+    page,
+    font,
+    formatLegacy2005To2011Score(input.metsastysintoEra1),
+    LEGACY_2005_2011_METSASTYSINTO_ERA1_BOX,
+  );
+  drawLegacy2005To2011CenteredText(
+    page,
+    font,
+    formatLegacy2005To2011Score(input.metsastysintoEra2),
+    LEGACY_2005_2011_METSASTYSINTO_ERA2_BOX,
+  );
+  drawLegacy2005To2011CenteredText(
+    page,
+    font,
+    formatLegacy2005To2011Score(input.metsastysintoKeskiarvo),
+    LEGACY_2005_2011_METSASTYSINTO_KESKIARVO_BOX,
   );
   drawLegacy2005To2011CenteredText(
     page,

@@ -117,6 +117,9 @@ export async function GET(
     const haukkuEra1 = result.body.data.haukkuEra1;
     const haukkuEra2 = result.body.data.haukkuEra2;
     const haukkuKeskiarvo = result.body.data.haukkuKeskiarvo;
+    const metsastysintoEra1 = result.body.data.metsastysintoEra1;
+    const metsastysintoEra2 = result.body.data.metsastysintoEra2;
+    const metsastysintoKeskiarvo = result.body.data.metsastysintoKeskiarvo;
     const ajotaitoEra1 = result.body.data.ajotaitoEra1;
     const ajotaitoEra2 = result.body.data.ajotaitoEra2;
     const ajotaitoKeskiarvo = result.body.data.ajotaitoKeskiarvo;
@@ -177,6 +180,9 @@ export async function GET(
       haukkuEra1,
       haukkuEra2,
       haukkuKeskiarvo,
+      metsastysintoEra1,
+      metsastysintoEra2,
+      metsastysintoKeskiarvo,
       ajotaitoEra1,
       ajotaitoEra2,
       ajotaitoKeskiarvo,
