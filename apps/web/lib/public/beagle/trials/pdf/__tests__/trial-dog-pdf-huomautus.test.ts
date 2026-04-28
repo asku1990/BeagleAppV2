@@ -1,6 +1,6 @@
 import type { PDFFont, PDFPage } from "pdf-lib";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { drawTrialDogPdfHuomautus } from "../internal/huomautus";
+import { drawTrialDogPdfHuomautus } from "../rule-sets/legacy-2011-2023/huomautus";
 
 describe("drawTrialDogPdfHuomautus", () => {
   const page = {

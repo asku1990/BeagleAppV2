@@ -5,10 +5,10 @@ const { drawTextMock } = vi.hoisted(() => ({
   drawTextMock: vi.fn(),
 }));
 
-vi.mock("../internal/koe-erat-common", async () => {
+vi.mock("../rule-sets/legacy-2011-2023/koe-erat-common", async () => {
   const actual = await vi.importActual<
-    typeof import("../internal/koe-erat-common")
-  >("../internal/koe-erat-common");
+    typeof import("../rule-sets/legacy-2011-2023/koe-erat-common")
+  >("../rule-sets/legacy-2011-2023/koe-erat-common");
 
   return {
     ...actual,
@@ -16,7 +16,7 @@ vi.mock("../internal/koe-erat-common", async () => {
   };
 });
 
-import { drawTrialDogPdfLoppuppisteet } from "../internal/loppupisteet";
+import { drawTrialDogPdfLoppuppisteet } from "../rule-sets/legacy-2011-2023/loppupisteet";
 
 describe("drawTrialDogPdfLoppuppisteet", () => {
   const page = {} as PDFPage;

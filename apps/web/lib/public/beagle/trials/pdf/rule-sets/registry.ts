@@ -1,6 +1,6 @@
 import path from "node:path";
-import { renderLegacy2005To2011TrialDogPdfFields } from "./legacy-2005-2011";
-import { renderLegacy2011To2023TrialDogPdfFields } from "./legacy-2011-2023";
+import { renderLegacy2005To2011TrialDogPdfFields } from "./legacy-2005-2011/index";
+import { renderLegacy2011To2023TrialDogPdfFields } from "./legacy-2011-2023/index";
 import type { TrialDogPdfRuleSet } from "./types";
 
 export const TRIAL_RULE_WINDOW_IDS = {

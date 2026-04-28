@@ -1,10 +1,10 @@
-import { drawTrialDogPdfAjoajanPisteytys } from "../internal/ajoajan-pisteytys";
-import { drawTrialDogPdfAllekirjoitukset } from "../internal/allekirjoitukset";
-import { drawTrialDogPdfAnsiopisteet } from "../internal/ansiopisteet";
-import { drawTrialDogPdfHuomautus } from "../internal/huomautus";
-import { drawTrialDogPdfKokeenTiedot } from "../internal/kokeen-tiedot";
-import { drawTrialDogPdfKoiranTausta } from "../internal/koiran-tausta";
-import { drawTrialDogPdfKoiranTiedot } from "../internal/koiran-tiedot";
+import { drawTrialDogPdfAjoajanPisteytys } from "./ajoajan-pisteytys";
+import { drawTrialDogPdfAllekirjoitukset } from "./allekirjoitukset";
+import { drawTrialDogPdfAnsiopisteet } from "./ansiopisteet";
+import { drawTrialDogPdfHuomautus } from "./huomautus";
+import { drawTrialDogPdfKokeenTiedot } from "./kokeen-tiedot";
+import { drawTrialDogPdfKoiranTausta } from "./koiran-tausta";
+import { drawTrialDogPdfKoiranTiedot } from "./koiran-tiedot";
 import {
   drawTrialDogPdfLisatiedotAjo,
   drawTrialDogPdfLisatiedotHaku,
@@ -12,10 +12,10 @@ import {
   drawTrialDogPdfLisatiedotMetsastysinto,
   drawTrialDogPdfLisatiedotMuutOminaisuudet,
   drawTrialDogPdfLisatiedotOlosuhteet,
-} from "../internal/lisatiedot";
-import { drawTrialDogPdfLoppuppisteet } from "../internal/loppupisteet";
-import { drawTrialDogPdfTappiopisteet } from "../internal/tappiopisteet";
-import type { TrialDogPdfRenderContext } from "./types";
+} from "./lisatiedot";
+import { drawTrialDogPdfLoppuppisteet } from "./loppupisteet";
+import { drawTrialDogPdfTappiopisteet } from "./tappiopisteet";
+import type { TrialDogPdfRenderContext } from "../types";
 
 export function renderLegacy2011To2023TrialDogPdfFields({
   input,

@@ -1,6 +1,6 @@
 import type { PDFFont, PDFPage } from "pdf-lib";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { drawTrialDogPdfLisatiedotOlosuhteet } from "../internal/lisatiedot/olosuhteet";
+import { drawTrialDogPdfLisatiedotOlosuhteet } from "../rule-sets/legacy-2011-2023/lisatiedot/olosuhteet";
 
 describe("drawTrialDogPdfLisatiedotOlosuhteet", () => {
   const page = {

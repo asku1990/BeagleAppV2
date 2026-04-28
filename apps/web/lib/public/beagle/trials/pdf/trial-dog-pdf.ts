@@ -4,7 +4,7 @@ import type { TrialDogPdfPayload } from "@contracts";
 import { PDFDocument, StandardFonts } from "pdf-lib";
 import { resolveTrialDogPdfRuleSet } from "./rule-sets";
 
-export { DOG_REGISTRATION_NO_FIELD } from "./internal/koiran-tiedot";
+export { DOG_REGISTRATION_NO_FIELD } from "./rule-sets/legacy-2011-2023/koiran-tiedot";
 export {
   canRenderTrialDogPdf,
   getSeededTrialDogPdfRuleWindowIds,
