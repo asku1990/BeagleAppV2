@@ -6,6 +6,7 @@ import { drawLegacy2005To2011Ansiopisteet } from "./ansiopisteet";
 import { drawLegacy2005To2011KoiranTausta } from "./koiran-tausta";
 import { drawLegacy2005To2011KoiranTiedot } from "./koiran-tiedot";
 import { drawLegacy2005To2011KokeenTiedot } from "./kokeen-tiedot";
+import { drawLegacy2005To2011Tappiopisteet } from "./tappiopisteet";
 
 export function renderLegacy2005To2011TrialDogPdfFields({
   input,
@@ -69,6 +70,18 @@ export function renderLegacy2005To2011TrialDogPdfFields({
     ajotaitoEra2: input.ajotaitoEra2,
     ajotaitoKeskiarvo: input.ajotaitoKeskiarvo,
     ansiopisteetYhteensa: input.ansiopisteetYhteensa,
+    page,
+    font,
+  });
+
+  drawLegacy2005To2011Tappiopisteet({
+    hakuloysyysTappioEra1: input.hakuloysyysTappioEra1,
+    hakuloysyysTappioEra2: input.hakuloysyysTappioEra2,
+    hakuloysyysTappioYhteensa: input.hakuloysyysTappioYhteensa,
+    ajoloysyysTappioEra1: input.ajoloysyysTappioEra1,
+    ajoloysyysTappioEra2: input.ajoloysyysTappioEra2,
+    ajoloysyysTappioYhteensa: input.ajoloysyysTappioYhteensa,
+    tappiopisteetYhteensa: input.tappiopisteetYhteensa,
     page,
     font,
   });
