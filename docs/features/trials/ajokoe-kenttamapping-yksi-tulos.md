@@ -95,7 +95,8 @@ Huomio:
 | `luopui`                           | `TrialEntry.huomautus = LUOPUI`                          |
 | `suljettu`                         | `TrialEntry.huomautus = SULJETTU`                        |
 | `keskeytti`                        | `TrialEntry.huomautus = KESKEYTETTY`                     |
-| `HUOMAUTUS`                        | `TrialEntry.huomautusTeksti`                             |
+| `HUOMAUTUS` + plain `VIITE`        | `TrialEntry.huomautusTeksti`                             |
+| `I_VIITE`..`IV_VIITE`              | `TrialEra.huomautusTeksti`                               |
 | `palkintotuomari1`                 | `TrialEntry.ryhmatuomariNimi`                            |
 | `palkintotuomari2`                 | `TrialEntry.palkintotuomariNimi`                         |
 | Koko JSON-rivi                     | `TrialEntry.raakadataJson`                               |

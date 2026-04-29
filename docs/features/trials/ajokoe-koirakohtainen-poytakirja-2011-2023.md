@@ -217,7 +217,8 @@ Renders the free-text note in its own sized block.
 
 Input data:
 
-- `huomautusTeksti`
+- `huomautusTeksti`, assembled from entry-level `HUOMAUTUS`/`VIITE` and per-era
+  `TrialEra.huomautusTeksti`
 
 Rules:
 

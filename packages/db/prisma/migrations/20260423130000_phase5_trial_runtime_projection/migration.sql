@@ -76,6 +76,7 @@ CREATE TABLE "TrialEra" (
     "alo" DECIMAL(6,2),
     "tja" DECIMAL(6,2),
     "pin" DECIMAL(6,2),
+    "huomautusTeksti" TEXT,
     "raakadataJson" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -263,6 +264,7 @@ COMMENT ON COLUMN "TrialEra"."hlo" IS 'Search looseness points/penalty value for
 COMMENT ON COLUMN "TrialEra"."alo" IS 'Ajolöysyys or driving looseness value for the era.';
 COMMENT ON COLUMN "TrialEra"."tja" IS 'Trail/backtrack work value for the era.';
 COMMENT ON COLUMN "TrialEra"."pin" IS 'Metsästysinto or merit value for the era.';
+COMMENT ON COLUMN "TrialEra"."huomautusTeksti" IS 'Per-era free-text note rendered in the PDF huomautus section; sourced from API *_VIITE fields or legacy bealt*.VIITE.';
 COMMENT ON COLUMN "TrialEra"."raakadataJson" IS 'Raw source payload for this era/detail row.';
 COMMENT ON COLUMN "TrialEra"."createdAt" IS 'Row creation timestamp.';
 COMMENT ON COLUMN "TrialEra"."updatedAt" IS 'Row update timestamp.';

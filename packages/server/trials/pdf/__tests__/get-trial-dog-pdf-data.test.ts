@@ -64,6 +64,7 @@ function dbRow(overrides: Record<string, unknown> = {}) {
         yva: null,
         hlo: null,
         alo: null,
+        huomautusTeksti: null,
         lisatiedot: [],
       },
       {
@@ -77,6 +78,7 @@ function dbRow(overrides: Record<string, unknown> = {}) {
         yva: null,
         hlo: null,
         alo: null,
+        huomautusTeksti: null,
         lisatiedot: [],
       },
     ],
@@ -181,6 +183,52 @@ describe("getTrialDogPdfDataService", () => {
     expect(result.status).toBe(200);
     if (!result.body.ok) throw new Error("Expected ok=true");
     expect(result.body.data.huomautusTeksti).toBe("Koira kävi tiellä.");
+  });
+
+  it("joins entry and era huomautus texts for PDF data", async () => {
+    getTrialDogPdfDataDbMock.mockResolvedValue(
+      dbRow({
+        huomautusTeksti: "Koira kävi tiellä.",
+        eras: [
+          {
+            era: 1,
+            alkoi: null,
+            hakumin: null,
+            ajomin: 51,
+            haku: null,
+            hauk: null,
+            pin: 3.5,
+            yva: null,
+            hlo: null,
+            alo: null,
+            huomautusTeksti: "Ensimmäisen erän huomautus.",
+            lisatiedot: [],
+          },
+          {
+            era: 2,
+            alkoi: null,
+            hakumin: null,
+            ajomin: null,
+            haku: null,
+            hauk: null,
+            pin: 4.5,
+            yva: null,
+            hlo: null,
+            alo: null,
+            huomautusTeksti: "Ensimmäisen erän huomautus.",
+            lisatiedot: [],
+          },
+        ],
+      }),
+    );
+
+    const result = await getTrialDogPdfDataService("entry-1");
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) throw new Error("Expected ok=true");
+    expect(result.body.data.huomautusTeksti).toBe(
+      "Koira kävi tiellä. Ensimmäisen erän huomautus.",
+    );
   });
 
   it("passes signature name fields through to PDF data", async () => {

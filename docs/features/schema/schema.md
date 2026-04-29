@@ -83,7 +83,7 @@ erDiagram
 - `TrialEra`: canonical AJOK era row per `trialEntryId + era`.
 - `TrialEraLisatieto`: canonical AJOK lisatieto row per
   `trialEraId + koodi + osa`.
-  - `TrialEra` stores per-era timing and score fields.
+  - `TrialEra` stores per-era timing, score, and free-text note fields.
   - `TrialEraLisatieto` stores detailed code rows such as `10-62` for report/PDF
     rendering without decoding raw payload JSON.
   - `TrialEraLisatieto.osa` is empty for normal one-value codes and stores a

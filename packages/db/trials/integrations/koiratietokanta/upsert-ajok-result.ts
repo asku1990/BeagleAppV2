@@ -30,6 +30,10 @@ export type KoiratietokantaAjokEntryDbInput = {
   era2Alkoi: string | null;
   era3Alkoi: string | null;
   era4Alkoi: string | null;
+  era1HuomautusTeksti: string | null;
+  era2HuomautusTeksti: string | null;
+  era3HuomautusTeksti: string | null;
+  era4HuomautusTeksti: string | null;
   hakuMin1: number | null;
   hakuMin2: number | null;
   hakuMin3: number | null;
@@ -114,6 +118,7 @@ export type KoiratietokantaAjokEraDbInput = {
   yva: number | null;
   hlo: number | null;
   alo: number | null;
+  huomautusTeksti: string | null;
   lisatiedot: KoiratietokantaAjokEraLisatietoDbInput[];
 };
 
@@ -252,6 +257,7 @@ export async function upsertKoiratietokantaAjokResultDb(
           yva: eraWrite.yva,
           hlo: eraWrite.hlo,
           alo: eraWrite.alo,
+          huomautusTeksti: eraWrite.huomautusTeksti,
           raakadataJson: null,
         },
         select: { id: true, era: true },

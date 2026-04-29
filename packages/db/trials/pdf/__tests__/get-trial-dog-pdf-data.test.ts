@@ -68,6 +68,7 @@ function trialRow(overrides: Record<string, unknown> = {}) {
         yva: null,
         hlo: null,
         alo: null,
+        huomautusTeksti: "Ensimmäisen erän huomautus",
         lisatiedot: [],
       },
       {
@@ -81,6 +82,7 @@ function trialRow(overrides: Record<string, unknown> = {}) {
         yva: null,
         hlo: null,
         alo: null,
+        huomautusTeksti: null,
         lisatiedot: [],
       },
     ],
@@ -113,7 +115,11 @@ describe("getTrialDogPdfDataDb", () => {
       alo: 1.5,
       pin: 12.5,
       eras: [
-        expect.objectContaining({ era: 1, pin: 3.5 }),
+        expect.objectContaining({
+          era: 1,
+          pin: 3.5,
+          huomautusTeksti: "Ensimmäisen erän huomautus",
+        }),
         expect.objectContaining({ era: 2, pin: 4.5 }),
       ],
       ansiopisteetYhteensa: 36.75,

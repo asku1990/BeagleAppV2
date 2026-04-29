@@ -34,6 +34,10 @@ const entryInput = {
   era2Alkoi: null,
   era3Alkoi: null,
   era4Alkoi: null,
+  era1HuomautusTeksti: null,
+  era2HuomautusTeksti: null,
+  era3HuomautusTeksti: null,
+  era4HuomautusTeksti: null,
   hakuMin1: null,
   hakuMin2: null,
   hakuMin3: null,
@@ -100,6 +104,7 @@ const eraInputs = [
     yva: null,
     hlo: null,
     alo: null,
+    huomautusTeksti: "Ensimmäisen erän huomautus",
     lisatiedot: [
       { koodi: "11", osa: "", nimi: "Paljas maa", arvo: "1", jarjestys: 1 },
       { koodi: "17", osa: "", nimi: "Lämpötila", arvo: "13", jarjestys: 7 },
@@ -115,6 +120,7 @@ const eraInputs = [
     yva: null,
     hlo: null,
     alo: null,
+    huomautusTeksti: null,
     lisatiedot: [
       { koodi: "11", osa: "", nimi: "Paljas maa", arvo: "1", jarjestys: 1 },
       { koodi: "17", osa: "", nimi: "Lämpötila", arvo: "19", jarjestys: 7 },
@@ -210,6 +216,14 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
       where: { trialEntryId: "entry-1" },
     });
     expect(txMock.trialEra.create).toHaveBeenCalledTimes(2);
+    expect(txMock.trialEra.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          era: 1,
+          huomautusTeksti: "Ensimmäisen erän huomautus",
+        }),
+      }),
+    );
     expect(txMock.trialEraLisatieto.createMany).toHaveBeenCalledTimes(2);
     expect(txMock.trialEraLisatieto.createMany).toHaveBeenCalledWith({
       data: [

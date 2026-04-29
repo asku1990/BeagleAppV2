@@ -97,7 +97,8 @@ Lisäolotiedot, kuten `111_PALJAS_MAA`, `121_LUMIKELI`, `171_LAMPOTILA` ja muut
 - `luopui` (boolean)
 - `suljettu` (boolean)
 - `keskeytetty` (boolean)
-- `huomautusTeksti`
+- `huomautusTeksti`, assembled from entry-level `HUOMAUTUS`/`VIITE` and per-era
+  `TrialEra.huomautusTeksti`
 
 ### 9) Lisätiedot (asteikko/rastit)
 

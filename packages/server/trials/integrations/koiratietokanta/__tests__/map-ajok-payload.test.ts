@@ -76,4 +76,36 @@ describe("mapKoiratietokantaAjokPayload", () => {
       }),
     ]);
   });
+
+  it("maps top-level and per-era viite fields to huomautus text", () => {
+    const result = mapKoiratietokantaAjokPayload({
+      SKLid: 123,
+      REKISTERINUMERO: "FI12345/21",
+      Koepvm: "2026-03-01",
+      KOEPAIKKA: "Helsinki",
+      HUOMAUTUS: "Koira kävi tiellä.",
+      VIITE: "Koettelupäivä lisätty.",
+      I_VIITE: "Ensimmäisen erän huomautus.",
+      II_VIITE: "Toisen erän huomautus.",
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("Expected payload mapping to succeed.");
+    }
+
+    expect(result.entry.huomautusTeksti).toBe(
+      "Koira kävi tiellä. Koettelupäivä lisätty.",
+    );
+    expect(result.eras).toEqual([
+      expect.objectContaining({
+        era: 1,
+        huomautusTeksti: "Ensimmäisen erän huomautus.",
+      }),
+      expect.objectContaining({
+        era: 2,
+        huomautusTeksti: "Toisen erän huomautus.",
+      }),
+    ]);
+  });
 });

@@ -359,27 +359,27 @@ model TrialEntry {
   rekisterinumeroSnapshot    String
   koemuoto                   String?
   koiriaLuokassa             Int?
-  koetyyppi                  TrialEntryKoetyyppi @default(NORMAL)
+  koetyyppi                  TrialEntryKoetyyppi  @default(NORMAL)
   rotukoodi                  String?
   ke                         String?
   lk                         String?
   pa                         String?
-  piste                      Decimal? @db.Decimal(6, 2)
+  piste                      Decimal?             @db.Decimal(6, 2)
   sija                       String?
   hyvaksytytAjominuutit      Int?
-  ajoajanPisteet             Decimal? @db.Decimal(6, 2)
-  haku                       Decimal? @db.Decimal(6, 2)
-  hauk                       Decimal? @db.Decimal(6, 2)
-  yva                        Decimal? @db.Decimal(6, 2) // nykyinen ajotaito
-  hlo                        Decimal? @db.Decimal(6, 2)
-  alo                        Decimal? @db.Decimal(6, 2)
-  tja                        Decimal? @db.Decimal(6, 2)
-  pin                        Decimal? @db.Decimal(6, 2)
-  ansiopisteetYhteensa       Decimal? @db.Decimal(6, 2)
-  tappiopisteetYhteensa      Decimal? @db.Decimal(6, 2)
+  ajoajanPisteet             Decimal?             @db.Decimal(6, 2)
+  haku                       Decimal?             @db.Decimal(6, 2)
+  hauk                       Decimal?             @db.Decimal(6, 2)
+  yva                        Decimal?             @db.Decimal(6, 2) // nykyinen ajotaito
+  hlo                        Decimal?             @db.Decimal(6, 2)
+  alo                        Decimal?             @db.Decimal(6, 2)
+  tja                        Decimal?             @db.Decimal(6, 2)
+  pin                        Decimal?             @db.Decimal(6, 2)
+  ansiopisteetYhteensa       Decimal?             @db.Decimal(6, 2)
+  tappiopisteetYhteensa      Decimal?             @db.Decimal(6, 2)
   tuom1                      String?
   huomautus                  TrialEntryHuomautus?
-  huomautusTeksti            String?  @db.Text
+  huomautusTeksti            String?              @db.Text
   ylituomariNimiSnapshot     String?
   ylituomariNumeroSnapshot   String?
   ryhmatuomariNimi           String?
@@ -403,24 +403,25 @@ model TrialEntry {
 }
 
 model TrialEra {
-  id            String              @id @default(cuid())
-  trialEntryId  String
-  era           Int
-  alkoi         String?
-  hakumin       Int?
-  ajomin        Int?
-  haku          Decimal?            @db.Decimal(6, 2)
-  hauk          Decimal?            @db.Decimal(6, 2)
-  yva           Decimal?            @db.Decimal(6, 2) // nykyinen ajotaito
-  hlo           Decimal?            @db.Decimal(6, 2)
-  alo           Decimal?            @db.Decimal(6, 2)
-  tja           Decimal?            @db.Decimal(6, 2)
-  pin           Decimal?            @db.Decimal(6, 2)
-  raakadataJson String?             @db.Text
-  trialEntry    TrialEntry          @relation(fields: [trialEntryId], references: [id], onDelete: Cascade)
-  lisatiedot    TrialEraLisatieto[]
-  createdAt     DateTime            @default(now())
-  updatedAt     DateTime            @updatedAt
+  id              String              @id @default(cuid())
+  trialEntryId    String
+  era             Int
+  alkoi           String?
+  hakumin         Int?
+  ajomin          Int?
+  haku            Decimal?            @db.Decimal(6, 2)
+  hauk            Decimal?            @db.Decimal(6, 2)
+  yva             Decimal?            @db.Decimal(6, 2) // nykyinen ajotaito
+  hlo             Decimal?            @db.Decimal(6, 2)
+  alo             Decimal?            @db.Decimal(6, 2)
+  tja             Decimal?            @db.Decimal(6, 2)
+  pin             Decimal?            @db.Decimal(6, 2)
+  huomautusTeksti String?             @db.Text
+  raakadataJson   String?             @db.Text
+  trialEntry      TrialEntry          @relation(fields: [trialEntryId], references: [id], onDelete: Cascade)
+  lisatiedot      TrialEraLisatieto[]
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
 
   @@unique([trialEntryId, era])
   @@index([trialEntryId])

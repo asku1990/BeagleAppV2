@@ -49,6 +49,22 @@ function sumNullableNumbers(values: Array<number | null>): number | null {
   return hasValue ? sum : null;
 }
 
+function joinUniqueText(values: Array<string | null>): string | null {
+  const seen = new Set<string>();
+  const parts: string[] = [];
+
+  for (const value of values) {
+    const normalized = value?.trim();
+    if (!normalized || seen.has(normalized)) {
+      continue;
+    }
+    seen.add(normalized);
+    parts.push(normalized);
+  }
+
+  return parts.length > 0 ? parts.join(" ") : null;
+}
+
 function calculateAnsiopisteet(
   haku: number | null,
   hauk: number | null,
@@ -191,6 +207,10 @@ export async function getTrialDogPdfDataService(
       calculateTappiopisteet(result.hlo, result.alo);
     const lisatiedotRows = pivotLisatiedot(result.eras);
     const huomautusMarkers = mapHuomautusToStatusMarkers(result.huomautus);
+    const huomautusTeksti = joinUniqueText([
+      result.huomautusTeksti,
+      ...result.eras.map((era) => era.huomautusTeksti),
+    ]);
 
     log.info(
       {
@@ -261,7 +281,7 @@ export async function getTrialDogPdfDataService(
           sijoitus: result.sijoitus,
           koiriaLuokassa: result.koiriaLuokassa,
           Palkinto: result.palkinto,
-          huomautusTeksti: result.huomautusTeksti,
+          huomautusTeksti,
           ryhmatuomariNimi: result.ryhmatuomariNimi,
           palkintotuomariNimi: result.palkintotuomariNimi,
           ylituomariNumeroSnapshot: result.ylituomariNumeroSnapshot,

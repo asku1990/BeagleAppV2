@@ -27,6 +27,7 @@ export type TrialDogPdfDataDbEraRow = {
   yva: number | null;
   hlo: number | null;
   alo: number | null;
+  huomautusTeksti: string | null;
   lisatiedot: TrialDogPdfDataDbEraLisatietoRow[];
 };
 
@@ -172,6 +173,7 @@ export async function getTrialDogPdfDataDb(
           yva: true,
           hlo: true,
           alo: true,
+          huomautusTeksti: true,
           lisatiedot: {
             orderBy: {
               koodi: "asc",
@@ -243,6 +245,7 @@ export async function getTrialDogPdfDataDb(
       yva: toNumberOrNull(era.yva),
       hlo: toNumberOrNull(era.hlo),
       alo: toNumberOrNull(era.alo),
+      huomautusTeksti: era.huomautusTeksti,
       lisatiedot: era.lisatiedot,
     })),
   };

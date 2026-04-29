@@ -86,7 +86,9 @@ inside one event are allowed.
 - `luopui=true` -> `TrialEntry.huomautus = LUOPUI`
 - `suljettu=true` -> `TrialEntry.huomautus = SULJETTU`
 - `keskeytti=true` -> `TrialEntry.huomautus = KESKEYTETTY`
-- `HUOMAUTUS` -> `huomautusTeksti`
+- `HUOMAUTUS` + plain `VIITE` -> `TrialEntry.huomautusTeksti`
+- `I_VIITE`, `II_VIITE`, `III_VIITE`, `IV_VIITE` ->
+  `TrialEra.huomautusTeksti` for the matching era
 - `palkintotuomari1` -> `ryhmatuomariNimi`
 - `palkintotuomari2` -> `palkintotuomariNimi`
 - `yt` / `ytnro` are also copied into `ylituomariNimiSnapshot` /
@@ -104,6 +106,8 @@ inside one event are allowed.
 - The API rejects payloads where more than one of `luopui`, `suljettu`, and
   `keskeytti` is true because `TrialEntry.huomautus` stores one canonical
   marker.
+- PDF huomautukset are assembled from entry-level `huomautusTeksti` and the
+  per-era `TrialEra.huomautusTeksti` values.
 
 ### Compatibility columns
 
