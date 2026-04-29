@@ -102,6 +102,11 @@ export function drawLegacy2005To2011Loppupisteet(
         : input.sijoitus;
   const koiriaLuokassa =
     input.koetyyppi === "KOKOKAUDENKOE" ? "KK" : input.koiriaLuokassa;
+  const shouldDrawSijoitusSeparator =
+    input.koetyyppi !== "KOKOKAUDENKOE" &&
+    sijoitus !== null &&
+    sijoitus !== "" &&
+    koiriaLuokassa !== null;
 
   drawLegacy2005To2011CenteredText(
     page,
@@ -159,7 +164,7 @@ export function drawLegacy2005To2011Loppupisteet(
     sijoitus,
     LEGACY_2005_2011_SIJOITUS_BOX,
   );
-  if (input.koetyyppi === "PITKAKOE" && koiriaLuokassa !== null) {
+  if (shouldDrawSijoitusSeparator) {
     drawLegacy2005To2011CenteredText(
       page,
       font,

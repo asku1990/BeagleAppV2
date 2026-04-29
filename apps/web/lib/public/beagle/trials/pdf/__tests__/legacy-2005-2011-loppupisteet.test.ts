@@ -38,7 +38,7 @@ describe("drawLegacy2005To2011Loppupisteet", () => {
       font,
     });
 
-    expect(page.drawText).toHaveBeenCalledTimes(5);
+    expect(page.drawText).toHaveBeenCalledTimes(6);
     expect(page.drawText).toHaveBeenNthCalledWith(
       1,
       "72,50",
@@ -56,11 +56,16 @@ describe("drawLegacy2005To2011Loppupisteet", () => {
     );
     expect(page.drawText).toHaveBeenNthCalledWith(
       4,
+      "/",
+      centeredIn(LEGACY_2005_2011_SIJOITUS_SEPARATOR_BOX),
+    );
+    expect(page.drawText).toHaveBeenNthCalledWith(
+      5,
       "5",
       centeredIn(LEGACY_2005_2011_KOIRIA_LUOKASSA_BOX),
     );
     expect(page.drawText).toHaveBeenNthCalledWith(
-      5,
+      6,
       "1",
       centeredIn(LEGACY_2005_2011_PALKINTO_BOX),
     );
