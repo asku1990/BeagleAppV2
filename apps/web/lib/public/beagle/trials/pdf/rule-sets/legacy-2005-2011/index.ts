@@ -2,6 +2,7 @@
 // while coordinates are tuned against the template.
 import type { TrialDogPdfRenderContext } from "../types";
 import { drawLegacy2005To2011AjoajanPisteytys } from "./ajoajan-pisteytys";
+import { drawLegacy2005To2011Allekirjoitukset } from "./allekirjoitukset";
 import { drawLegacy2005To2011Ansiopisteet } from "./ansiopisteet";
 import { drawLegacy2005To2011Huomautus } from "./huomautus";
 import { drawLegacy2005To2011KoiranTausta } from "./koiran-tausta";
@@ -104,6 +105,15 @@ export function renderLegacy2005To2011TrialDogPdfFields({
 
   drawLegacy2005To2011Huomautus({
     huomautusTeksti: input.huomautusTeksti,
+    page,
+    font,
+  });
+
+  drawLegacy2005To2011Allekirjoitukset({
+    ryhmatuomariNimi: input.ryhmatuomariNimi,
+    palkintotuomariNimi: input.palkintotuomariNimi,
+    ylituomariNumeroSnapshot: input.ylituomariNumeroSnapshot,
+    ylituomariNimiSnapshot: input.ylituomariNimiSnapshot,
     page,
     font,
   });
