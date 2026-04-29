@@ -56,6 +56,7 @@ describe("trial pdf api route", () => {
         ok: true,
         data: {
           trialId: "entry-1",
+          trialRuleWindowId: "trw_post_20110801",
           registrationNo: "FI12345/21",
           dogSex: "MALE",
           koemaasto: "Ristijärvi",
@@ -102,6 +103,48 @@ describe("trial pdf api route", () => {
     ).toBe("%PDF");
   });
 
+  it("returns a generated pdf for the 2005-2011 rule window", async () => {
+    getTrialDogPdfDataServiceMock.mockResolvedValue({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          trialId: "entry-1",
+          trialRuleWindowId: "trw_range_2005_2011",
+          registrationNo: "FI12345/08",
+          dogName: "Skeleton Test Dog",
+          dogSex: "MALE",
+          koepaiva: new Date("2008-09-07T00:00:00.000Z"),
+          hakuKeskiarvo: null,
+          haukkuKeskiarvo: null,
+          hakuloysyysTappioEra1: null,
+          hakuloysyysTappioEra2: null,
+          hakuloysyysTappioYhteensa: null,
+          ajoloysyysTappioEra1: null,
+          ajoloysyysTappioEra2: null,
+          ajoloysyysTappioYhteensa: null,
+          tappiopisteetYhteensa: null,
+          luopui: false,
+          suljettu: false,
+          keskeytetty: false,
+          koetyyppi: "NORMAL",
+          ajotaitoEra1: null,
+          ajotaitoEra2: null,
+        },
+      },
+    });
+
+    const { GET } = await import("../route");
+    const response = await GET(request(), {
+      params: Promise.resolve({ trialId: "entry-1" }),
+    });
+    const rawPdf = Buffer.from(await response.arrayBuffer()).toString("latin1");
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe("application/pdf");
+    expect(rawPdf.slice(0, 4)).toBe("%PDF");
+  });
+
   it("passes data lookup errors through as json", async () => {
     getTrialDogPdfDataServiceMock.mockResolvedValue({
       status: 404,
@@ -124,4 +167,52 @@ describe("trial pdf api route", () => {
       code: "TRIAL_NOT_FOUND",
     });
   });
+
+  it.each(["trw_range_2002_2005", "trw_post_20230801", null, "unknown-window"])(
+    "rejects unavailable pdf rule window %s",
+    async (trialRuleWindowId) => {
+      getTrialDogPdfDataServiceMock.mockResolvedValue({
+        status: 200,
+        body: {
+          ok: true,
+          data: {
+            trialId: "entry-1",
+            trialRuleWindowId,
+            registrationNo: "FI12345/21",
+            dogSex: "MALE",
+            koepaiva: new Date("2025-09-07T00:00:00.000Z"),
+            hakuKeskiarvo: null,
+            haukkuKeskiarvo: null,
+            hakuloysyysTappioEra1: null,
+            hakuloysyysTappioEra2: null,
+            hakuloysyysTappioYhteensa: null,
+            ajoloysyysTappioEra1: null,
+            ajoloysyysTappioEra2: null,
+            ajoloysyysTappioYhteensa: null,
+            tappiopisteetYhteensa: null,
+            luopui: false,
+            suljettu: false,
+            keskeytetty: false,
+            koetyyppi: "NORMAL",
+            ajotaitoEra1: null,
+            ajotaitoEra2: null,
+          },
+        },
+      });
+
+      const { GET } = await import("../route");
+      const response = await GET(request(), {
+        params: Promise.resolve({ trialId: "entry-1" }),
+      });
+
+      expect(response.status).toBe(404);
+      expect(response.headers.get("content-type")).toContain(
+        "application/json",
+      );
+      await expect(response.json()).resolves.toMatchObject({
+        ok: false,
+        code: "TRIAL_PDF_NOT_AVAILABLE",
+      });
+    },
+  );
 });

@@ -426,6 +426,7 @@ export async function runLegacyPhase5(
               alo: toDecimalOrNull(detail.alo),
               tja: toDecimalOrNull(detail.tja),
               pin: toDecimalOrNull(detail.pin),
+              huomautusTeksti: toStringOrNull(detail.viite),
               raakadataJson: detail.rawPayloadJson,
             },
             select: { id: true },

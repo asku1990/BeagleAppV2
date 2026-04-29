@@ -70,7 +70,7 @@ describe("upsertKoiratietokantaAjokResultService", () => {
       i_haku_min: "201",
       I_AJO_MIN: "51",
       II_AJO_MIN: "-",
-      I_HAKU: "5",
+      I_HAKU: "5,60",
       I_HAUKKU: "7",
       AJOPISTEET: "14.88",
       LOPPUPISTEET: "29.38",
@@ -116,7 +116,7 @@ describe("upsertKoiratietokantaAjokResultService", () => {
         ajoMin2: null,
         haku: null,
         hauk: null,
-        hakuEra1: 5,
+        hakuEra1: 5.6,
         haukkuEra1: 7,
         ajoajanPisteet: 14.88,
         loppupisteet: 29.38,
@@ -131,7 +131,7 @@ describe("upsertKoiratietokantaAjokResultService", () => {
           alkoi: "5:49",
           hakumin: 201,
           ajomin: 51,
-          haku: 5,
+          haku: 5.6,
           hauk: 7,
           lisatiedot: expect.arrayContaining([
             expect.objectContaining({

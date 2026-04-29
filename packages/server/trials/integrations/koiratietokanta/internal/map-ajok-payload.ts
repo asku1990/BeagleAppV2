@@ -39,6 +39,21 @@ type MapperResult =
       issues: KoiratietokantaAjokValidationIssue[];
     };
 
+function joinUniqueText(values: Array<string | null>): string | null {
+  const seen = new Set<string>();
+  const parts: string[] = [];
+
+  for (const value of values) {
+    if (!value || seen.has(value)) {
+      continue;
+    }
+    seen.add(value);
+    parts.push(value);
+  }
+
+  return parts.length > 0 ? parts.join(" ") : null;
+}
+
 // Maps one raw yksi_tulos-style payload into the canonical AJOK event/entry
 // write model while preserving optional parse issues as warnings.
 export function mapKoiratietokantaAjokPayload(
@@ -164,6 +179,10 @@ export function mapKoiratietokantaAjokPayload(
         : keskeytetty === true
           ? TrialEntryHuomautus.KESKEYTETTY
           : null;
+  const huomautusTeksti = joinUniqueText([
+    normalizeText(payload.HUOMAUTUS),
+    normalizeText(payload.VIITE),
+  ]);
   const entry: KoiratietokantaAjokEntryDbInput = {
     rekisterinumeroSnapshot: registrationNo,
     yksilointiAvain: `SKL:${sklKoeId}|REG:${registrationNo}`,
@@ -176,6 +195,10 @@ export function mapKoiratietokantaAjokPayload(
     era2Alkoi: normalizeText(payload.II_ERA_KLO),
     era3Alkoi: normalizeText(payload.III_ERA_KLO),
     era4Alkoi: normalizeText(payload.IV_ERA_KLO),
+    era1HuomautusTeksti: normalizeText(payload.I_VIITE),
+    era2HuomautusTeksti: normalizeText(payload.II_VIITE),
+    era3HuomautusTeksti: normalizeText(payload.III_VIITE),
+    era4HuomautusTeksti: normalizeText(payload.IV_VIITE),
     hakuMin1: parseOptionalInteger(payload, "i_haku_min", warnings),
     hakuMin2: parseOptionalInteger(payload, "II_HAKU_MIN", warnings),
     hakuMin3: parseOptionalInteger(payload, "III_HAKU_MIN", warnings),
@@ -191,8 +214,8 @@ export function mapKoiratietokantaAjokPayload(
     ),
     ajoajanPisteet: parseOptionalDecimal(payload, "AJOPISTEET", warnings),
     pin: parseOptionalDecimal(payload, "PIN", warnings),
-    hakuEra1: parseOptionalInteger(payload, "I_HAKU", warnings),
-    hakuEra2: parseOptionalInteger(payload, "II_HAKU", warnings),
+    hakuEra1: parseOptionalDecimal(payload, "I_HAKU", warnings),
+    hakuEra2: parseOptionalDecimal(payload, "II_HAKU", warnings),
     hakuEra3: parseOptionalDecimal(payload, "III_HAKU", warnings),
     hakuEra4: parseOptionalDecimal(payload, "IV_HAKU", warnings),
     haku: parseOptionalDecimal(payload, "HAKUPISTEET", warnings),
@@ -276,7 +299,7 @@ export function mapKoiratietokantaAjokPayload(
     koetyyppi,
     keli: normalizeText(payload.KELI),
     huomautus,
-    huomautusTeksti: normalizeText(payload.HUOMAUTUS),
+    huomautusTeksti,
     ylituomariNimiSnapshot: ylituomariNimi,
     ylituomariNumeroSnapshot: ylituomariNumero,
     ryhmatuomariNimi: normalizeText(payload.palkintotuomari1),

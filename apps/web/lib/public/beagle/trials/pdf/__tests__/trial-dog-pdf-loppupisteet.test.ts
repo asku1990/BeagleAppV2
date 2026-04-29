@@ -5,10 +5,10 @@ const { drawTextMock } = vi.hoisted(() => ({
   drawTextMock: vi.fn(),
 }));
 
-vi.mock("../internal/koe-erat-common", async () => {
+vi.mock("../rule-sets/legacy-2011-2023/koe-erat-common", async () => {
   const actual = await vi.importActual<
-    typeof import("../internal/koe-erat-common")
-  >("../internal/koe-erat-common");
+    typeof import("../rule-sets/legacy-2011-2023/koe-erat-common")
+  >("../rule-sets/legacy-2011-2023/koe-erat-common");
 
   return {
     ...actual,
@@ -16,7 +16,7 @@ vi.mock("../internal/koe-erat-common", async () => {
   };
 });
 
-import { drawTrialDogPdfLoppuppisteet } from "../internal/loppupisteet";
+import { drawTrialDogPdfLoppuppisteet } from "../rule-sets/legacy-2011-2023/loppupisteet";
 
 describe("drawTrialDogPdfLoppuppisteet", () => {
   const page = {} as PDFPage;
@@ -249,7 +249,7 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
     });
   });
 
-  it("renders PITKAKOE as dash and PK", () => {
+  it("renders PITKAKOE as PK and class count", () => {
     drawTrialDogPdfLoppuppisteet({
       loppupisteet: 12,
       paljasMaaTaiLumi: null,
@@ -265,12 +265,12 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
     });
 
     expect(drawTextMock).toHaveBeenCalledTimes(4);
-    expect(drawTextMock).toHaveBeenNthCalledWith(2, page, font, "-", {
+    expect(drawTextMock).toHaveBeenNthCalledWith(2, page, font, "PK", {
       x: 355.5,
       y: 106,
       size: 12,
     });
-    expect(drawTextMock).toHaveBeenNthCalledWith(3, page, font, "PK", {
+    expect(drawTextMock).toHaveBeenNthCalledWith(3, page, font, "4", {
       x: 382.5,
       y: 106,
       size: 12,

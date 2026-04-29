@@ -9,7 +9,7 @@ import {
   KOEMAASTO_SEPARATOR_FIELD,
   KOEPAIVA_FIELD,
   drawTrialDogPdfKokeenTiedot,
-} from "../internal/kokeen-tiedot";
+} from "../rule-sets/legacy-2011-2023/kokeen-tiedot";
 
 describe("drawTrialDogPdfKokeenTiedot", () => {
   const page = {

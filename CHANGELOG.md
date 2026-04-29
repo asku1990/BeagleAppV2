@@ -15,6 +15,11 @@ This project uses a user-facing changelog format.
 ### Added
 
 - Ajokokeen koirakohtainen PDF näyttää nyt valitun koerivin rekisterinumeron AJOK-pöytäkirjan testitäyttönä.
+- AJOK 2005-2011 -sääntökauden koirakohtaiseen PDF:ään lisättiin tappiopisteiden renderöinti.
+- AJOK 2005-2011 -sääntökauden koirakohtaiseen PDF:ään lisättiin loppupisteiden ja tulosmerkintöjen renderöinti.
+- AJOK 2005-2011 -sääntökauden koirakohtaiseen PDF:ään lisättiin huomautustekstin renderöinti.
+- AJOK-huomautukset säilyttävät nyt myös Koiratietokannan `VIITE`- ja eräkohtaiset `*_VIITE`-tekstit sekä legacy `bealt*.VIITE`-tekstit.
+- Pitkäkokeen legacy-sijoitus, kuten `PK|4`, säilyttää nyt luokkakoon ja näkyy koirakohtaisessa PDF:ssä muodossa `PK / 4`.
 - Lisättiin Koiratietokannan AJOK-tulosten integraatio-upsert, joka vastaanottaa yhden hyväksytyn tuloksen kerrallaan, säilyttää alkuperäisen payloadin raakadatana ja normalisoi lisätiedot erillisiksi riveiksi.
 - Ylläpidon ajokokeisiin lisättiin uusi koetulosten detaljisivu (`/admin/trials/[trialId]`), joka näyttää yhden nykyisen `TrialResult`-rivin kentät read-only-muodossa.
 - Ylläpidon ajokokeiden listalta avataan nyt koetuloksen detaljinäkymä suoraan yhtenäisellä rivi-/korttivalinnalla.
@@ -22,6 +27,7 @@ This project uses a user-facing changelog format.
 - Koetuloksen detaljisivu ryhmittelee kentät pöytäkirjamaisesti osioihin ja näyttää mahdollisen raw/source-datan kollapsoitavana read-only-näkymänä.
 - Ylläpidon AJOK-listaus ja detalji (`/admin/trials`) lukevat nyt uutta kanonista AJOK-skeemaa (`TrialEvent` + `TrialEntry`) read-only-polussa. Näkymän tunnistekentissä käytetään SKL-koeavainta ja entry-avainta vanhan `sourceKey`-esityksen sijaan.
 - Ylläpidon ajokokeiden `/admin/trials`-näkymä uudistettiin tapahtumapohjaiseksi master-detail-virraksi: ensin haetaan tapahtumia (vuosi tai päivämääräväli), sitten valitun tapahtuman koirariveiltä voi avata olemassa olevan detaljisivun tai koirakohtaisen PDF:n. Nykyinen `/admin/trials/[trialId]` detaljisivu säilyy ennallaan.
+- AJOK 2005-2011 -sääntökaudelle lisättiin koirakohtaisen PDF:n ensimmäinen renderöintirunko nykyisellä koetulosdatalla.
 
 ### Changed
 

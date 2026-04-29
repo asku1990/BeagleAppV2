@@ -13,6 +13,7 @@ import { getTrialDogPdfDataService } from "../get-trial-dog-pdf-data";
 function dbRow(overrides: Record<string, unknown> = {}) {
   return {
     trialId: "entry-1",
+    trialRuleWindowId: "trw_post_20230801",
     registrationNo: "FI123",
     dogName: null,
     dogSex: null,
@@ -59,9 +60,11 @@ function dbRow(overrides: Record<string, unknown> = {}) {
         ajomin: 51,
         haku: null,
         hauk: null,
+        pin: 3.5,
         yva: null,
         hlo: null,
         alo: null,
+        huomautusTeksti: null,
         lisatiedot: [],
       },
       {
@@ -71,9 +74,11 @@ function dbRow(overrides: Record<string, unknown> = {}) {
         ajomin: null,
         haku: null,
         hauk: null,
+        pin: 4.5,
         yva: null,
         hlo: null,
         alo: null,
+        huomautusTeksti: null,
         lisatiedot: [],
       },
     ],
@@ -103,12 +108,28 @@ describe("getTrialDogPdfDataService", () => {
       ajoajanPisteet: 17.5,
       hakuKeskiarvo: 8.5,
       haukkuKeskiarvo: 6.75,
+      metsastysintoEra1: 3.5,
+      metsastysintoEra2: 4.5,
+      metsastysintoKeskiarvo: 12.5,
       ajotaitoKeskiarvo: 9.25,
       hakuloysyysTappioYhteensa: 2.5,
       ajoloysyysTappioYhteensa: 1.5,
       tappiopisteetYhteensa: 4,
       ansiopisteetYhteensa: 36.75,
+      trialRuleWindowId: "trw_post_20230801",
     });
+  });
+
+  it("passes the resolved trial rule window through to PDF data", async () => {
+    getTrialDogPdfDataDbMock.mockResolvedValue(
+      dbRow({ trialRuleWindowId: "trw_range_2005_2011" }),
+    );
+
+    const result = await getTrialDogPdfDataService("entry-1");
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) throw new Error("Expected ok=true");
+    expect(result.body.data.trialRuleWindowId).toBe("trw_range_2005_2011");
   });
 
   it("derives accepted driving minutes and driving time points for legacy rows", async () => {
@@ -123,6 +144,9 @@ describe("getTrialDogPdfDataService", () => {
       ajoajanPisteet: 14.88,
       hakuKeskiarvo: 8.5,
       haukkuKeskiarvo: 6.75,
+      metsastysintoEra1: 3.5,
+      metsastysintoEra2: 4.5,
+      metsastysintoKeskiarvo: 12.5,
       ajotaitoKeskiarvo: 9.25,
       hakuloysyysTappioYhteensa: 2.5,
       ajoloysyysTappioYhteensa: 1.5,
@@ -159,6 +183,52 @@ describe("getTrialDogPdfDataService", () => {
     expect(result.status).toBe(200);
     if (!result.body.ok) throw new Error("Expected ok=true");
     expect(result.body.data.huomautusTeksti).toBe("Koira kävi tiellä.");
+  });
+
+  it("joins entry and era huomautus texts for PDF data", async () => {
+    getTrialDogPdfDataDbMock.mockResolvedValue(
+      dbRow({
+        huomautusTeksti: "Koira kävi tiellä.",
+        eras: [
+          {
+            era: 1,
+            alkoi: null,
+            hakumin: null,
+            ajomin: 51,
+            haku: null,
+            hauk: null,
+            pin: 3.5,
+            yva: null,
+            hlo: null,
+            alo: null,
+            huomautusTeksti: "Ensimmäisen erän huomautus.",
+            lisatiedot: [],
+          },
+          {
+            era: 2,
+            alkoi: null,
+            hakumin: null,
+            ajomin: null,
+            haku: null,
+            hauk: null,
+            pin: 4.5,
+            yva: null,
+            hlo: null,
+            alo: null,
+            huomautusTeksti: "Ensimmäisen erän huomautus.",
+            lisatiedot: [],
+          },
+        ],
+      }),
+    );
+
+    const result = await getTrialDogPdfDataService("entry-1");
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) throw new Error("Expected ok=true");
+    expect(result.body.data.huomautusTeksti).toBe(
+      "Koira kävi tiellä. Ensimmäisen erän huomautus.",
+    );
   });
 
   it("passes signature name fields through to PDF data", async () => {

@@ -10,6 +10,10 @@ describe("mapKoiratietokantaAjokEraWrites", () => {
         era2Alkoi: null,
         era3Alkoi: null,
         era4Alkoi: null,
+        era1HuomautusTeksti: "Ensimmäisen erän huomautus",
+        era2HuomautusTeksti: null,
+        era3HuomautusTeksti: null,
+        era4HuomautusTeksti: null,
         hakuMin1: 12,
         hakuMin2: null,
         hakuMin3: null,
@@ -67,6 +71,7 @@ describe("mapKoiratietokantaAjokEraWrites", () => {
       {
         era: 1,
         alkoi: "08:10",
+        huomautusTeksti: "Ensimmäisen erän huomautus",
         hakumin: 12,
         ajomin: 31,
         haku: 7,
@@ -94,6 +99,7 @@ describe("mapKoiratietokantaAjokEraWrites", () => {
       {
         era: 2,
         alkoi: null,
+        huomautusTeksti: null,
         hakumin: null,
         ajomin: null,
         haku: null,
@@ -122,6 +128,10 @@ describe("mapKoiratietokantaAjokEraWrites", () => {
           era2Alkoi: null,
           era3Alkoi: null,
           era4Alkoi: null,
+          era1HuomautusTeksti: null,
+          era2HuomautusTeksti: null,
+          era3HuomautusTeksti: null,
+          era4HuomautusTeksti: null,
           hakuMin1: null,
           hakuMin2: null,
           hakuMin3: null,
@@ -154,5 +164,56 @@ describe("mapKoiratietokantaAjokEraWrites", () => {
         [],
       ),
     ).toEqual([]);
+  });
+
+  it("keeps eras that only have per-era huomautus text", () => {
+    expect(
+      mapKoiratietokantaAjokEraWrites(
+        {
+          era1Alkoi: null,
+          era2Alkoi: null,
+          era3Alkoi: null,
+          era4Alkoi: null,
+          era1HuomautusTeksti: "Haku päättyi tielle.",
+          era2HuomautusTeksti: null,
+          era3HuomautusTeksti: null,
+          era4HuomautusTeksti: null,
+          hakuMin1: null,
+          hakuMin2: null,
+          hakuMin3: null,
+          hakuMin4: null,
+          ajoMin1: null,
+          ajoMin2: null,
+          ajoMin3: null,
+          ajoMin4: null,
+          hakuEra1: null,
+          hakuEra2: null,
+          hakuEra3: null,
+          hakuEra4: null,
+          haukkuEra1: null,
+          haukkuEra2: null,
+          haukkuEra3: null,
+          haukkuEra4: null,
+          ajotaitoEra1: null,
+          ajotaitoEra2: null,
+          ajotaitoEra3: null,
+          ajotaitoEra4: null,
+          hakuloysyysTappioEra1: null,
+          hakuloysyysTappioEra2: null,
+          hakuloysyysTappioEra3: null,
+          hakuloysyysTappioEra4: null,
+          ajoloysyysTappioEra1: null,
+          ajoloysyysTappioEra2: null,
+          ajoloysyysTappioEra3: null,
+          ajoloysyysTappioEra4: null,
+        },
+        [],
+      ),
+    ).toEqual([
+      expect.objectContaining({
+        era: 1,
+        huomautusTeksti: "Haku päättyi tielle.",
+      }),
+    ]);
   });
 });

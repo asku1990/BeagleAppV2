@@ -6,7 +6,11 @@ import {
   optionsResponse,
   withCorsHeaders,
 } from "@/lib/server/cors";
-import { renderTrialDogPdf } from "@/lib/public/beagle/trials/pdf";
+import {
+  canRenderTrialDogPdf,
+  getTrialDogPdfRuleSetId,
+  renderTrialDogPdf,
+} from "@/lib/public/beagle/trials/pdf";
 
 const METHODS = "GET,OPTIONS";
 
@@ -69,6 +73,34 @@ export async function GET(
     const koekunta = result.body.data.koekunta?.trim() ?? null;
     const koemaasto = result.body.data.koemaasto?.trim() ?? null;
     const koepaiva = result.body.data.koepaiva;
+    const trialRuleWindowId = result.body.data.trialRuleWindowId;
+    if (!canRenderTrialDogPdf(trialRuleWindowId)) {
+      const ruleSetId = getTrialDogPdfRuleSetId(trialRuleWindowId);
+      log.warn(
+        {
+          event: "unsupported_rule_window",
+          trialId: normalizedTrialId,
+          trialRuleWindowId,
+          ruleSetId,
+          durationMs: Date.now() - startedAt,
+        },
+        "trial pdf generation rejected because rule window has no template",
+      );
+
+      return jsonResponse(
+        {
+          ok: false,
+          error: "Trial PDF is not available for this rule window.",
+          code: "TRIAL_PDF_NOT_AVAILABLE",
+        },
+        {
+          status: 404,
+          methods: METHODS,
+          origin: request.headers.get("origin"),
+        },
+      );
+    }
+
     const jarjestaja = result.body.data.jarjestaja?.trim() ?? null;
     const dogSex = result.body.data.dogSex;
     const era1Alkoi = result.body.data.era1Alkoi?.trim() ?? null;
@@ -85,6 +117,9 @@ export async function GET(
     const haukkuEra1 = result.body.data.haukkuEra1;
     const haukkuEra2 = result.body.data.haukkuEra2;
     const haukkuKeskiarvo = result.body.data.haukkuKeskiarvo;
+    const metsastysintoEra1 = result.body.data.metsastysintoEra1;
+    const metsastysintoEra2 = result.body.data.metsastysintoEra2;
+    const metsastysintoKeskiarvo = result.body.data.metsastysintoKeskiarvo;
     const ajotaitoEra1 = result.body.data.ajotaitoEra1;
     const ajotaitoEra2 = result.body.data.ajotaitoEra2;
     const ajotaitoKeskiarvo = result.body.data.ajotaitoKeskiarvo;
@@ -115,6 +150,7 @@ export async function GET(
     const lisatiedotRows = result.body.data.lisatiedotRows;
 
     const pdfBytes = await renderTrialDogPdf({
+      trialRuleWindowId,
       registrationNo,
       dogName,
       dogSex,
@@ -144,6 +180,9 @@ export async function GET(
       haukkuEra1,
       haukkuEra2,
       haukkuKeskiarvo,
+      metsastysintoEra1,
+      metsastysintoEra2,
+      metsastysintoKeskiarvo,
       ajotaitoEra1,
       ajotaitoEra2,
       ajotaitoKeskiarvo,

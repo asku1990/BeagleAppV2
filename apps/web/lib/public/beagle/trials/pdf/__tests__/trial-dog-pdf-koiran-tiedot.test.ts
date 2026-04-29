@@ -1,6 +1,6 @@
 import { PDFDocument, StandardFonts } from "pdf-lib";
 import { describe, expect, it } from "vitest";
-import { drawTrialDogPdfKoiranTiedot } from "../internal/koiran-tiedot";
+import { drawTrialDogPdfKoiranTiedot } from "../rule-sets/legacy-2011-2023/koiran-tiedot";
 
 describe("drawTrialDogPdfKoiranTiedot", () => {
   it("draws the trial dog details block", async () => {

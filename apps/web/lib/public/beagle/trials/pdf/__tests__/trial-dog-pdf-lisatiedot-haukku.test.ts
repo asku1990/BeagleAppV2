@@ -1,12 +1,15 @@
 import type { PDFFont, PDFPage } from "pdf-lib";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { drawTrialDogPdfLisatiedotHaukku } from "../internal/lisatiedot/haukku";
+import { drawTrialDogPdfLisatiedotHaukku } from "../rule-sets/legacy-2011-2023/lisatiedot/haukku";
 
 describe("drawTrialDogPdfLisatiedotHaukku", () => {
   const page = {
     drawText: vi.fn(),
   } as unknown as PDFPage;
-  const font = {} as PDFFont;
+  const font = {
+    widthOfTextAtSize: vi.fn((text: string) => text.length * 5),
+    heightAtSize: vi.fn(() => 8),
+  } as unknown as PDFFont;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -29,98 +32,98 @@ describe("drawTrialDogPdfLisatiedotHaukku", () => {
 
     expect(page.drawText).toHaveBeenCalledTimes(14);
     expect(page.drawText).toHaveBeenNthCalledWith(1, "4.0", {
-      x: 590,
+      x: 589,
       y: 303.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(2, "0.0", {
-      x: 607,
+      x: 606,
       y: 303.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(3, "3.0", {
-      x: 590,
+      x: 589,
       y: 289.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(4, "0.0", {
-      x: 607,
+      x: 606,
       y: 289.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(5, "3.0", {
-      x: 590,
+      x: 589,
       y: 275.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(6, "0.0", {
-      x: 607,
+      x: 606,
       y: 275.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(7, "3.0", {
-      x: 590,
+      x: 589,
       y: 261.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(8, "0.0", {
-      x: 607,
+      x: 606,
       y: 261.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(9, "3.0", {
-      x: 590,
+      x: 589,
       y: 247.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(10, "0.0", {
-      x: 607,
+      x: 606,
       y: 247.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(11, "5.0", {
-      x: 590,
+      x: 589,
       y: 233.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(12, "0.0", {
-      x: 607,
+      x: 606,
       y: 233.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(13, "4", {
-      x: 590,
+      x: 594,
       y: 219.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(14, "0", {
-      x: 607,
+      x: 611,
       y: 219.5,
       size: 10,
       font,

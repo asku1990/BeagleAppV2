@@ -95,7 +95,8 @@ Huomio:
 | `luopui`                           | `TrialEntry.huomautus = LUOPUI`                          |
 | `suljettu`                         | `TrialEntry.huomautus = SULJETTU`                        |
 | `keskeytti`                        | `TrialEntry.huomautus = KESKEYTETTY`                     |
-| `HUOMAUTUS`                        | `TrialEntry.huomautusTeksti`                             |
+| `HUOMAUTUS` + plain `VIITE`        | `TrialEntry.huomautusTeksti`                             |
+| `I_VIITE`..`IV_VIITE`              | `TrialEra.huomautusTeksti`                               |
 | `palkintotuomari1`                 | `TrialEntry.ryhmatuomariNimi`                            |
 | `palkintotuomari2`                 | `TrialEntry.palkintotuomariNimi`                         |
 | Koko JSON-rivi                     | `TrialEntry.raakadataJson`                               |
@@ -119,8 +120,8 @@ Phase 5 mapittaa `SIJA`-arvon seuraavassa järjestyksessä:
    -> `sija=null`, `koiriaLuokassa=<numero>`, `koetyyppi=NORMAL`
 5. Kahden osan arvo erotinmerkistä riippumatta, kun vasen tai oikea osa on
    `PK` tai `KK`
-   - `PK|4`, `PK.1`, `PK|-`, `-|PK3` -> `sija=null`,
-     `koiriaLuokassa=null`, `koetyyppi=PITKAKOE`
+   - `PK|4`, `PK.1`, `PK|-`, `-|PK3` -> `sija=PK`,
+     `koiriaLuokassa=<numero jos saatavilla>`, `koetyyppi=PITKAKOE`
    - `-|KK` -> `sija=null`, `koiriaLuokassa=null`, `koetyyppi=KOKOKAUDENKOE`
 6. Tavallinen sijoitus + luokkakoko, esimerkiksi `1|3` tai `7-9`
    -> `sija="<vasen osa>"`, `koiriaLuokassa=<oikea numero>`,
@@ -128,6 +129,14 @@ Phase 5 mapittaa `SIJA`-arvon seuraavassa järjestyksessä:
 
 Epäselvä arvo -> entry silti projisoidaan, mutta kirjoitetaan warning issue
 `TRIAL_PHASE5_UNCLEAR_SIJA`
+
+Local legacy mirror findings on 2026-04-29:
+
+- `PK` values exist as `PK|1` through `PK|8`, plus `PK|-`, `-|PK`,
+  `-|PK3`, `-|PK4`, `PK.1`, and case variants such as `Pk|1`.
+  Count-bearing `PK` values preserve `koiriaLuokassa`.
+- `KK` values exist only as `-|KK` and plain `KK`; no count-bearing
+  `KK|4`, `KK.4`, or `-|KK4` values were present in `legacy_akoeall.SIJA`.
 
 ## Lisätietojen mapping
 

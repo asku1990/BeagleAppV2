@@ -49,6 +49,7 @@ function trialRow(overrides: Record<string, unknown> = {}) {
     tuom1: null,
     dog: null,
     trialEvent: {
+      trialRuleWindowId: "trw_post_20230801",
       kennelpiiri: null,
       kennelpiirinro: null,
       koekunta: "Koe",
@@ -63,9 +64,11 @@ function trialRow(overrides: Record<string, unknown> = {}) {
         ajomin: 51,
         haku: null,
         hauk: null,
+        pin: decimal(3.5),
         yva: null,
         hlo: null,
         alo: null,
+        huomautusTeksti: "Ensimmäisen erän huomautus",
         lisatiedot: [],
       },
       {
@@ -75,9 +78,11 @@ function trialRow(overrides: Record<string, unknown> = {}) {
         ajomin: null,
         haku: null,
         hauk: null,
+        pin: decimal(4.5),
         yva: null,
         hlo: null,
         alo: null,
+        huomautusTeksti: null,
         lisatiedot: [],
       },
     ],
@@ -109,9 +114,37 @@ describe("getTrialDogPdfDataDb", () => {
       hlo: 2.5,
       alo: 1.5,
       pin: 12.5,
+      eras: [
+        expect.objectContaining({
+          era: 1,
+          pin: 3.5,
+          huomautusTeksti: "Ensimmäisen erän huomautus",
+        }),
+        expect.objectContaining({ era: 2, pin: 4.5 }),
+      ],
       ansiopisteetYhteensa: 36.75,
       tappiopisteetYhteensa: 4,
+      trialRuleWindowId: "trw_post_20230801",
     });
+  });
+
+  it("returns the trial event rule window id", async () => {
+    prismaMock.trialEntry.findUnique.mockResolvedValue(
+      trialRow({
+        trialEvent: {
+          trialRuleWindowId: "trw_range_2005_2011",
+          kennelpiiri: null,
+          kennelpiirinro: null,
+          koekunta: "Koe",
+          koepaiva: new Date("2008-09-07T00:00:00.000Z"),
+          jarjestaja: null,
+        },
+      }),
+    );
+
+    const result = await getTrialDogPdfDataDb({ trialId: "entry-1" });
+
+    expect(result?.trialRuleWindowId).toBe("trw_range_2005_2011");
   });
 
   it("returns null stored driving totals for legacy rows without source values", async () => {

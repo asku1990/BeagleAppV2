@@ -29,6 +29,15 @@ function parseNullableInteger(value: string | null): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function parsePrefixedInteger(value: string, prefix: string): number | null {
+  const match = new RegExp(`^${prefix}\\s*(\\d+)$`, "i").exec(value);
+  if (!match) {
+    return null;
+  }
+
+  return parseNullableInteger(match[1] ?? null);
+}
+
 export function parseLegacySija(
   rawValue: string | null | undefined,
 ): ParsedLegacySija {
@@ -88,9 +97,14 @@ export function parseLegacySija(
     const rightUpper = right.toUpperCase();
 
     if (leftUpper.startsWith("PK") || rightUpper.startsWith("PK")) {
+      const pkPart = leftUpper.startsWith("PK") ? left : right;
+      const otherPart = leftUpper.startsWith("PK") ? right : left;
+      const koiriaLuokassa =
+        parseNullableInteger(otherPart) ?? parsePrefixedInteger(pkPart, "PK");
+
       return {
-        sija: null,
-        koiriaLuokassa: null,
+        sija: "PK",
+        koiriaLuokassa,
         koetyyppi: TrialEntryKoetyyppi.PITKAKOE,
         unclear: false,
       };

@@ -11,6 +11,10 @@ type KoiratietokantaAjokEraSourceInput = Pick<
   | "era2Alkoi"
   | "era3Alkoi"
   | "era4Alkoi"
+  | "era1HuomautusTeksti"
+  | "era2HuomautusTeksti"
+  | "era3HuomautusTeksti"
+  | "era4HuomautusTeksti"
   | "hakuMin1"
   | "hakuMin2"
   | "hakuMin3"
@@ -51,6 +55,7 @@ type KoiratietokantaAjokEraSourceRow = {
   yva: number | null;
   hlo: number | null;
   alo: number | null;
+  huomautusTeksti: string | null;
   lisatiedot: KoiratietokantaAjokLisatietoDbInput[];
 };
 
@@ -64,6 +69,7 @@ export function mapKoiratietokantaAjokEraWrites(
     {
       era: 1,
       alkoi: entry.era1Alkoi,
+      huomautusTeksti: entry.era1HuomautusTeksti,
       hakumin: entry.hakuMin1,
       ajomin: entry.ajoMin1,
       haku: entry.hakuEra1,
@@ -76,6 +82,7 @@ export function mapKoiratietokantaAjokEraWrites(
     {
       era: 2,
       alkoi: entry.era2Alkoi,
+      huomautusTeksti: entry.era2HuomautusTeksti,
       hakumin: entry.hakuMin2,
       ajomin: entry.ajoMin2,
       haku: entry.hakuEra2,
@@ -88,6 +95,7 @@ export function mapKoiratietokantaAjokEraWrites(
     {
       era: 3,
       alkoi: entry.era3Alkoi,
+      huomautusTeksti: entry.era3HuomautusTeksti,
       hakumin: entry.hakuMin3,
       ajomin: entry.ajoMin3,
       haku: entry.hakuEra3,
@@ -100,6 +108,7 @@ export function mapKoiratietokantaAjokEraWrites(
     {
       era: 4,
       alkoi: entry.era4Alkoi,
+      huomautusTeksti: entry.era4HuomautusTeksti,
       hakumin: entry.hakuMin4,
       ajomin: entry.ajoMin4,
       haku: entry.hakuEra4,
@@ -145,7 +154,8 @@ export function mapKoiratietokantaAjokEraWrites(
         era.hauk !== null ||
         era.yva !== null ||
         era.hlo !== null ||
-        era.alo !== null;
+        era.alo !== null ||
+        era.huomautusTeksti !== null;
       return hasCoreData || era.lisatiedot.length > 0;
     });
 }

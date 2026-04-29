@@ -1,12 +1,15 @@
 import type { PDFFont, PDFPage } from "pdf-lib";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { drawTrialDogPdfLisatiedotOlosuhteet } from "../internal/lisatiedot/olosuhteet";
+import { drawTrialDogPdfLisatiedotOlosuhteet } from "../rule-sets/legacy-2011-2023/lisatiedot/olosuhteet";
 
 describe("drawTrialDogPdfLisatiedotOlosuhteet", () => {
   const page = {
     drawText: vi.fn(),
   } as unknown as PDFPage;
-  const font = {} as PDFFont;
+  const font = {
+    widthOfTextAtSize: vi.fn((text: string) => text.length * 5),
+    heightAtSize: vi.fn(() => 8),
+  } as unknown as PDFFont;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -30,70 +33,70 @@ describe("drawTrialDogPdfLisatiedotOlosuhteet", () => {
 
     expect(page.drawText).toHaveBeenCalledTimes(10);
     expect(page.drawText).toHaveBeenNthCalledWith(1, "X", {
-      x: 591,
+      x: 593,
       y: 487.5,
       size: 12,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(2, "0", {
-      x: 590,
+      x: 594,
       y: 474.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(3, "0", {
-      x: 607,
+      x: 611,
       y: 474.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(4, "X", {
-      x: 608,
+      x: 611,
       y: 459.5,
       size: 12,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(5, "X", {
-      x: 591,
+      x: 593,
       y: 445.5,
       size: 12,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(6, "X", {
-      x: 608,
+      x: 611,
       y: 445.5,
       size: 12,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(7, "5", {
-      x: 590,
+      x: 594,
       y: 402.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(8, "0", {
-      x: 607,
+      x: 611,
       y: 402.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(9, "0", {
-      x: 590,
+      x: 594,
       y: 388.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(10, "5", {
-      x: 607,
+      x: 611,
       y: 388.5,
       size: 10,
       font,
@@ -119,7 +122,7 @@ describe("drawTrialDogPdfLisatiedotOlosuhteet", () => {
     });
 
     expect(page.drawText).toHaveBeenNthCalledWith(1, "X", {
-      x: 591,
+      x: 593,
       y: 487.5,
       size: 12,
       font,
