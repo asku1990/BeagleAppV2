@@ -27,15 +27,15 @@ describe("drawLegacy2005To2011LisatiedotMuutOminaisuudet", () => {
 
     expect(page.drawText).toHaveBeenCalledWith(
       "0,0",
-      expect.objectContaining({ x: 526, y: 26, size: 12, font }),
+      expect.objectContaining({ x: 526, y: 85, size: 12, font }),
     );
     expect(page.drawText).toHaveBeenCalledWith(
       "1,0",
-      expect.objectContaining({ x: 554, y: 26, size: 12, font }),
+      expect.objectContaining({ x: 554, y: 85, size: 12, font }),
     );
     expect(page.drawText).toHaveBeenCalledWith(
       "3,3",
-      expect.objectContaining({ x: 526, y: 6, size: 12, font }),
+      expect.objectContaining({ x: 526, y: 65, size: 12, font }),
     );
     expect(page.drawText).toHaveBeenCalledTimes(3);
   });

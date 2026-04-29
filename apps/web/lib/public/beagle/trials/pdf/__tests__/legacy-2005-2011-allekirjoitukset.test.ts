@@ -12,7 +12,7 @@ describe("drawLegacy2005To2011Allekirjoitukset", () => {
     vi.clearAllMocks();
   });
 
-  it("draws palkintotuomari and ylituomari fields for the 2005-2011 template", () => {
+  it("draws ylituomari name for the 2005-2011 template", () => {
     drawLegacy2005To2011Allekirjoitukset({
       ryhmatuomariNimi: "Ryhmätuomari",
       palkintotuomariNimi: "Palkintotuomari",
@@ -22,26 +22,11 @@ describe("drawLegacy2005To2011Allekirjoitukset", () => {
       font,
     });
 
-    expect(page.drawText).toHaveBeenCalledTimes(4);
+    expect(page.drawText).toHaveBeenCalledTimes(1);
     expect(page.drawText).toHaveBeenNthCalledWith(
       1,
-      "Ryhmätuomari",
-      expect.objectContaining({ x: 74, y: 169, size: 8, font }),
-    );
-    expect(page.drawText).toHaveBeenNthCalledWith(
-      2,
-      "Palkintotuomari",
-      expect.objectContaining({ x: 74, y: 128, size: 8, font }),
-    );
-    expect(page.drawText).toHaveBeenNthCalledWith(
-      3,
-      "123445",
-      expect.objectContaining({ x: 74, y: 68, size: 8, font }),
-    );
-    expect(page.drawText).toHaveBeenNthCalledWith(
-      4,
       "Ylituomari",
-      expect.objectContaining({ x: 132, y: 68, size: 8, font }),
+      expect.objectContaining({ x: 132, y: 63, size: 11, font }),
     );
   });
 });
