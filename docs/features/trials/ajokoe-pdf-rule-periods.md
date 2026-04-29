@@ -9,8 +9,8 @@ does not define field mapping for any single pöytäkirja renderer.
 - `trw_range_2002_2005`: not implemented.
 - `trw_range_2005_2011`: implemented through the `legacy-2005-2011` renderer
   skeleton. The current renderer fills the core header, dog details, driving
-  time, merit points, loss-point, and final-points sections while coordinates
-  are tuned section by section.
+  time, merit points, loss-point, final-points, and note sections while
+  coordinates are tuned section by section.
 - `trw_post_20110801`: implemented through the `legacy-2011-2023` renderer.
   Field mapping and renderer details are documented in
   `docs/features/trials/ajokoe-koirakohtainen-poytakirja-2011-2023.md`.

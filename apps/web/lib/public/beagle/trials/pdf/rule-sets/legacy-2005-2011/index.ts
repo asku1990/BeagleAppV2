@@ -3,6 +3,7 @@
 import type { TrialDogPdfRenderContext } from "../types";
 import { drawLegacy2005To2011AjoajanPisteytys } from "./ajoajan-pisteytys";
 import { drawLegacy2005To2011Ansiopisteet } from "./ansiopisteet";
+import { drawLegacy2005To2011Huomautus } from "./huomautus";
 import { drawLegacy2005To2011KoiranTausta } from "./koiran-tausta";
 import { drawLegacy2005To2011KoiranTiedot } from "./koiran-tiedot";
 import { drawLegacy2005To2011KokeenTiedot } from "./kokeen-tiedot";
@@ -97,6 +98,12 @@ export function renderLegacy2005To2011TrialDogPdfFields({
     sijoitus: input.sijoitus,
     koiriaLuokassa: input.koiriaLuokassa,
     Palkinto: input.Palkinto,
+    page,
+    font,
+  });
+
+  drawLegacy2005To2011Huomautus({
+    huomautusTeksti: input.huomautusTeksti,
     page,
     font,
   });

@@ -17,6 +17,7 @@ This project uses a user-facing changelog format.
 - Ajokokeen koirakohtainen PDF näyttää nyt valitun koerivin rekisterinumeron AJOK-pöytäkirjan testitäyttönä.
 - AJOK 2005-2011 -sääntökauden koirakohtaiseen PDF:ään lisättiin tappiopisteiden renderöinti.
 - AJOK 2005-2011 -sääntökauden koirakohtaiseen PDF:ään lisättiin loppupisteiden ja tulosmerkintöjen renderöinti.
+- AJOK 2005-2011 -sääntökauden koirakohtaiseen PDF:ään lisättiin huomautustekstin renderöinti.
 - Pitkäkokeen legacy-sijoitus, kuten `PK|4`, säilyttää nyt luokkakoon ja näkyy koirakohtaisessa PDF:ssä muodossa `PK / 4`.
 - Lisättiin Koiratietokannan AJOK-tulosten integraatio-upsert, joka vastaanottaa yhden hyväksytyn tuloksen kerrallaan, säilyttää alkuperäisen payloadin raakadatana ja normalisoi lisätiedot erillisiksi riveiksi.
 - Ylläpidon ajokokeisiin lisättiin uusi koetulosten detaljisivu (`/admin/trials/[trialId]`), joka näyttää yhden nykyisen `TrialResult`-rivin kentät read-only-muodossa.
