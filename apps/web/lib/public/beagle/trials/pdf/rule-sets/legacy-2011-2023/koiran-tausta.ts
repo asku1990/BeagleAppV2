@@ -3,31 +3,31 @@ import { rgb } from "pdf-lib";
 import type { TrialDogPdfKoiranTausta } from "@contracts";
 
 const SIRE_NAME_FIELD = {
-  x: 62.3,
+  x: 70,
   y: 407.3228,
   size: 12,
 } as const;
 
 const SIRE_REGISTRATION_NO_FIELD = {
-  x: 286.3,
+  x: 300.3,
   y: 407.3228,
   size: 12,
 } as const;
 
 const DAM_NAME_FIELD = {
-  x: 62.3,
+  x: 70,
   y: 384.6454,
   size: 12,
 } as const;
 
 const DAM_REGISTRATION_NO_FIELD = {
-  x: 286.3,
+  x: 300.3,
   y: 384.6454,
   size: 12,
 } as const;
 
 const OWNER_FIELD = {
-  x: 62.3,
+  x: 70,
   y: 362.3,
   size: 12,
 } as const;

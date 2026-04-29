@@ -1,11 +1,12 @@
 import type { PDFFont, PDFPage } from "pdf-lib";
 import type { TrialDogPdfLisatiedot } from "@contracts";
-import { drawText, formatKoeEraValue } from "../koe-erat-common";
+import {
+  drawTrialDogPdfCenteredLisatietoValue,
+  normalizeTrialDogPdfOneDecimalValue,
+} from "./common";
 
 // Renders ajo rows (50-56) from lisätiedot onto fixed PDF coordinates.
 // All rows use one decimal formatting.
-const AJO_ERA1_X = 782;
-const AJO_ERA2_X = 799;
 const AJO_TEXT_SIZE = 10;
 
 type AjoRowConfig = {
@@ -23,16 +24,6 @@ const AJO_ROWS: AjoRowConfig[] = [
   { koodi: "56", y: 347 },
 ];
 
-function normalizeOneDecimalValue(raw: string | null | undefined): string {
-  const value = formatKoeEraValue(raw).trim();
-  if (value === "-") {
-    return "";
-  }
-
-  const parsed = Number.parseFloat(value.replace(",", "."));
-  return Number.isFinite(parsed) ? parsed.toFixed(1) : value;
-}
-
 export function drawTrialDogPdfLisatiedotAjo(
   input: TrialDogPdfLisatiedot & {
     page: PDFPage;
@@ -45,23 +36,20 @@ export function drawTrialDogPdfLisatiedotAjo(
 
   for (const rowConfig of AJO_ROWS) {
     const row = rowsByCode.get(rowConfig.koodi);
-    const era1 = normalizeOneDecimalValue(row?.era1);
-    const era2 = normalizeOneDecimalValue(row?.era2);
+    const era1 = normalizeTrialDogPdfOneDecimalValue(row?.era1);
+    const era2 = normalizeTrialDogPdfOneDecimalValue(row?.era2);
 
-    if (era1) {
-      drawText(input.page, input.font, era1, {
-        x: AJO_ERA1_X,
-        y: rowConfig.y,
-        size: AJO_TEXT_SIZE,
-      });
-    }
-
-    if (era2) {
-      drawText(input.page, input.font, era2, {
-        x: AJO_ERA2_X,
-        y: rowConfig.y,
-        size: AJO_TEXT_SIZE,
-      });
-    }
+    drawTrialDogPdfCenteredLisatietoValue(input, era1, {
+      columnGroup: "RIGHT",
+      era: 1,
+      y: rowConfig.y,
+      size: AJO_TEXT_SIZE,
+    });
+    drawTrialDogPdfCenteredLisatietoValue(input, era2, {
+      columnGroup: "RIGHT",
+      era: 2,
+      y: rowConfig.y,
+      size: AJO_TEXT_SIZE,
+    });
   }
 }

@@ -6,7 +6,10 @@ describe("drawTrialDogPdfLisatiedotHaku", () => {
   const page = {
     drawText: vi.fn(),
   } as unknown as PDFPage;
-  const font = {} as PDFFont;
+  const font = {
+    widthOfTextAtSize: vi.fn((text: string) => text.length * 5),
+    heightAtSize: vi.fn(() => 8),
+  } as unknown as PDFFont;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -25,42 +28,42 @@ describe("drawTrialDogPdfLisatiedotHaku", () => {
 
     expect(page.drawText).toHaveBeenCalledTimes(6);
     expect(page.drawText).toHaveBeenNthCalledWith(1, "4", {
-      x: 590,
+      x: 594,
       y: 360.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(2, "0", {
-      x: 607,
+      x: 611,
       y: 360.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(3, "3.0", {
-      x: 590,
+      x: 589,
       y: 346.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(4, "0.0", {
-      x: 607,
+      x: 606,
       y: 346.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(5, "2.3", {
-      x: 590,
+      x: 589,
       y: 332.5,
       size: 10,
       font,
       color: expect.any(Object),
     });
     expect(page.drawText).toHaveBeenNthCalledWith(6, "1.0", {
-      x: 607,
+      x: 606,
       y: 332.5,
       size: 10,
       font,

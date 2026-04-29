@@ -1,14 +1,14 @@
 import type { PDFFont, PDFPage } from "pdf-lib";
 import type { TrialDogPdfLisatiedot } from "@contracts";
-import { drawText, formatKoeEraValue } from "../koe-erat-common";
+import {
+  drawTrialDogPdfCenteredLisatietoValue,
+  normalizeTrialDogPdfIntegerValue,
+  normalizeTrialDogPdfMarkerValue,
+} from "./common";
 
 // Renders olosuhteet rows (11-18) from lisätiedot onto fixed PDF coordinates.
 // Marker rows show X for true (1/X); numeric rows show their raw number values.
-const OLOSUHDE_ERA1_X = 591;
-const OLOSUHDE_ERA2_X = 608;
 const OLOSUHDE_TEXT_SIZE = 12;
-const NUMERIC_ERA1_X = 590;
-const NUMERIC_ERA2_X = 607;
 const NUMERIC_TEXT_SIZE = 10;
 const LUMIKELI_Y = 474.5;
 
@@ -31,23 +31,13 @@ const OLOSUHDE_ROWS: OlosuhdeRowConfig[] = [
   { koodi: "18", y: 388.5, kind: "NUMBER" },
 ];
 
-function normalizeMarkerValue(raw: string | null | undefined): string {
-  const value = formatKoeEraValue(raw).trim().toUpperCase();
-  return value === "1" || value === "X" ? "X" : "";
-}
-
-function normalizeCentimeterValue(raw: string | null | undefined): string {
-  const value = formatKoeEraValue(raw).trim();
-  return value === "-" ? "" : value;
-}
-
 function normalizeRowValue(
   kind: OlosuhdeRowKind,
   raw: string | null | undefined,
 ): string {
   return kind === "NUMBER"
-    ? normalizeCentimeterValue(raw)
-    : normalizeMarkerValue(raw);
+    ? normalizeTrialDogPdfIntegerValue(raw)
+    : normalizeTrialDogPdfMarkerValue(raw);
 }
 
 // Olosuhteet group (11-18). Renders marker rows and numeric rows on fixed positions.
@@ -65,23 +55,22 @@ export function drawTrialDogPdfLisatiedotOlosuhteet(
     const row = rowsByCode.get(rowConfig.koodi);
     const era1 = normalizeRowValue(rowConfig.kind, row?.era1);
     const era2 = normalizeRowValue(rowConfig.kind, row?.era2);
+    const isNumeric = rowConfig.kind === "NUMBER";
+    const y = isNumeric && rowConfig.koodi === "12" ? LUMIKELI_Y : rowConfig.y;
 
-    if (era1) {
-      const isNumeric = rowConfig.kind === "NUMBER";
-      drawText(input.page, input.font, era1, {
-        x: isNumeric ? NUMERIC_ERA1_X : OLOSUHDE_ERA1_X,
-        y: isNumeric && rowConfig.koodi === "12" ? LUMIKELI_Y : rowConfig.y,
-        size: isNumeric ? NUMERIC_TEXT_SIZE : OLOSUHDE_TEXT_SIZE,
-      });
-    }
-
-    if (era2) {
-      const isNumeric = rowConfig.kind === "NUMBER";
-      drawText(input.page, input.font, era2, {
-        x: isNumeric ? NUMERIC_ERA2_X : OLOSUHDE_ERA2_X,
-        y: isNumeric && rowConfig.koodi === "12" ? LUMIKELI_Y : rowConfig.y,
-        size: isNumeric ? NUMERIC_TEXT_SIZE : OLOSUHDE_TEXT_SIZE,
-      });
-    }
+    drawTrialDogPdfCenteredLisatietoValue(input, era1, {
+      columnGroup: "LEFT",
+      era: 1,
+      y,
+      size: isNumeric ? NUMERIC_TEXT_SIZE : OLOSUHDE_TEXT_SIZE,
+      leftCellKind: isNumeric ? "NUMERIC" : "MARKER",
+    });
+    drawTrialDogPdfCenteredLisatietoValue(input, era2, {
+      columnGroup: "LEFT",
+      era: 2,
+      y,
+      size: isNumeric ? NUMERIC_TEXT_SIZE : OLOSUHDE_TEXT_SIZE,
+      leftCellKind: isNumeric ? "NUMERIC" : "MARKER",
+    });
   }
 }

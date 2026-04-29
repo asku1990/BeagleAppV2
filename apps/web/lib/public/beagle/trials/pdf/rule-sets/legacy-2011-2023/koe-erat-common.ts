@@ -16,6 +16,26 @@ export function drawText(
   });
 }
 
+export function drawCenteredText(
+  page: PDFPage,
+  font: PDFFont,
+  text: string,
+  box: { x: number; y: number; width: number; height: number; size: number },
+): void {
+  if (!text) return;
+
+  const textWidth = font.widthOfTextAtSize(text, box.size);
+  const textHeight = font.heightAtSize(box.size);
+
+  page.drawText(text, {
+    x: box.x + (box.width - textWidth) / 2,
+    y: box.y + (box.height - textHeight) / 2,
+    size: box.size,
+    font,
+    color: rgb(0, 0, 0),
+  });
+}
+
 export function formatKoeEraValue(
   value: string | number | null | undefined,
 ): string {

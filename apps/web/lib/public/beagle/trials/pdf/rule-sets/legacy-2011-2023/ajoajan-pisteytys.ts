@@ -1,54 +1,58 @@
 import type { PDFFont, PDFPage } from "pdf-lib";
 import type { TrialDogPdfAjoajanPisteytys } from "@contracts";
-import { drawText, formatKoeEraValue } from "./koe-erat-common";
+import {
+  createLegacy2011To2023ScoreBox,
+  drawLegacy2011To2023CenteredScoreValue,
+  LEGACY_2011_2023_SCORE_COLUMNS,
+} from "./score-boxes";
 
-const ERA1_ALKOI_VALUE_FIELD = {
-  x: 142,
+const ERA1_ALKOI_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.ERA1,
   y: 322.3,
   size: 12,
-} as const;
+});
 
-const ERA2_ALKOI_VALUE_FIELD = {
-  x: 215,
+const ERA2_ALKOI_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.ERA2,
   y: 322.3,
   size: 12,
-} as const;
+});
 
-const HAKU_MIN1_VALUE_FIELD = {
-  x: 147,
+const HAKU_MIN1_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.ERA1,
   y: 305.3,
   size: 12,
-} as const;
+});
 
-const HAKU_MIN2_VALUE_FIELD = {
-  x: 221,
+const HAKU_MIN2_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.ERA2,
   y: 305.3,
   size: 12,
-} as const;
+});
 
-const AJO_MIN1_VALUE_FIELD = {
-  x: 147,
+const AJO_MIN1_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.ERA1,
   y: 285.3,
   size: 12,
-} as const;
+});
 
-const AJO_MIN2_VALUE_FIELD = {
-  x: 221,
+const AJO_MIN2_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.ERA2,
   y: 285.3,
   size: 12,
-} as const;
+});
 
-const HYVAKSYTYT_AJOMINUUTIT_FIELD = {
-  x: 286,
+const HYVAKSYTYT_AJOMINUUTIT_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.SUMMARY,
   y: 305.3,
   size: 12,
-} as const;
+});
 
-const AJOAJAN_PISTEET_VALUE_FIELD = {
-  x: 357,
+const AJOAJAN_PISTEET_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.TOTAL,
   y: 305.3,
   size: 12,
-} as const;
+});
 
 export function drawTrialDogPdfAjoajanPisteytys(
   input: TrialDogPdfAjoajanPisteytys & {
@@ -58,42 +62,52 @@ export function drawTrialDogPdfAjoajanPisteytys(
 ): void {
   const { page, font } = input;
 
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.era1Alkoi),
-    ERA1_ALKOI_VALUE_FIELD,
+    input.era1Alkoi,
+    ERA1_ALKOI_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.era2Alkoi),
-    ERA2_ALKOI_VALUE_FIELD,
+    input.era2Alkoi,
+    ERA2_ALKOI_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.hakuMin1),
-    HAKU_MIN1_VALUE_FIELD,
+    input.hakuMin1,
+    HAKU_MIN1_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.hakuMin2),
-    HAKU_MIN2_VALUE_FIELD,
+    input.hakuMin2,
+    HAKU_MIN2_VALUE_BOX,
   );
-  drawText(page, font, formatKoeEraValue(input.ajoMin1), AJO_MIN1_VALUE_FIELD);
-  drawText(page, font, formatKoeEraValue(input.ajoMin2), AJO_MIN2_VALUE_FIELD);
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.hyvaksytytAjominuutit),
-    HYVAKSYTYT_AJOMINUUTIT_FIELD,
+    input.ajoMin1,
+    AJO_MIN1_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.ajoajanPisteet),
-    AJOAJAN_PISTEET_VALUE_FIELD,
+    input.ajoMin2,
+    AJO_MIN2_VALUE_BOX,
+  );
+  drawLegacy2011To2023CenteredScoreValue(
+    page,
+    font,
+    input.hyvaksytytAjominuutit,
+    HYVAKSYTYT_AJOMINUUTIT_BOX,
+  );
+  drawLegacy2011To2023CenteredScoreValue(
+    page,
+    font,
+    input.ajoajanPisteet,
+    AJOAJAN_PISTEET_VALUE_BOX,
   );
 }

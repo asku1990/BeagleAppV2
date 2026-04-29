@@ -3,7 +3,7 @@ import { rgb } from "pdf-lib";
 import type { TrialDogPdfKokeenTiedot } from "@contracts";
 
 export const KENNELPIIRI_FIELD = {
-  x: 62.3,
+  x: 70,
   y: 526.5,
   size: 12,
 } as const;
@@ -15,7 +15,7 @@ export const KENNELPIIRI_NRO_FIELD = {
 } as const;
 
 export const KOEKUNTA_FIELD = {
-  x: 62.3,
+  x: 70,
   y: 504,
   size: 12,
 } as const;

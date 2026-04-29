@@ -3,13 +3,13 @@ import { rgb } from "pdf-lib";
 import type { TrialDogPdfKoiranTiedot } from "@contracts";
 
 export const DOG_REGISTRATION_NO_FIELD = {
-  x: 286.3,
+  x: 300.3,
   y: 433,
   size: 12,
 } as const;
 
 export const DOG_NAME_FIELD = {
-  x: 62.3,
+  x: 70,
   y: 433,
   size: 12,
 } as const;

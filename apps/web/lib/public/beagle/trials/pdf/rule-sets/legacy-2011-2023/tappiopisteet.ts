@@ -1,48 +1,52 @@
 import type { PDFFont, PDFPage } from "pdf-lib";
 import type { TrialDogPdfTappiopisteet } from "@contracts";
-import { drawText, formatKoeEraValue } from "./koe-erat-common";
+import {
+  createLegacy2011To2023ScoreBox,
+  drawLegacy2011To2023CenteredScoreValue,
+  LEGACY_2011_2023_SCORE_COLUMNS,
+} from "./score-boxes";
 
-const HAKULOYSYYS_ERA1_VALUE_FIELD = {
-  x: 147,
+const HAKULOYSYYS_ERA1_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.ERA1,
   y: 164.3,
   size: 12,
-} as const;
+});
 
-const HAKULOYSYYS_ERA2_VALUE_FIELD = {
-  x: 221,
+const HAKULOYSYYS_ERA2_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.ERA2,
   y: 164.3,
   size: 12,
-} as const;
+});
 
-const HAKULOYSYYS_YHTEENSA_VALUE_FIELD = {
-  x: 286,
+const HAKULOYSYYS_YHTEENSA_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.SUMMARY,
   y: 164.3,
   size: 12,
-} as const;
+});
 
-const AJOLOYSYYS_ERA1_VALUE_FIELD = {
-  x: 147,
+const AJOLOYSYYS_ERA1_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.ERA1,
   y: 144.3,
   size: 12,
-} as const;
+});
 
-const AJOLOYSYYS_ERA2_VALUE_FIELD = {
-  x: 221,
+const AJOLOYSYYS_ERA2_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.ERA2,
   y: 144.3,
   size: 12,
-} as const;
+});
 
-const AJOLOYSYYS_YHTEENSA_VALUE_FIELD = {
-  x: 286,
+const AJOLOYSYYS_YHTEENSA_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.SUMMARY,
   y: 144.3,
   size: 12,
-} as const;
+});
 
-const TAPPIOPISTEET_YHTEENSA_VALUE_FIELD = {
-  x: 357,
+const TAPPIOPISTEET_YHTEENSA_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.TOTAL,
   y: 144.3,
   size: 12,
-} as const;
+});
 
 export function drawTrialDogPdfTappiopisteet(
   input: TrialDogPdfTappiopisteet & {
@@ -52,46 +56,46 @@ export function drawTrialDogPdfTappiopisteet(
 ): void {
   const { page, font } = input;
 
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.hakuloysyysTappioEra1),
-    HAKULOYSYYS_ERA1_VALUE_FIELD,
+    input.hakuloysyysTappioEra1,
+    HAKULOYSYYS_ERA1_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.hakuloysyysTappioEra2),
-    HAKULOYSYYS_ERA2_VALUE_FIELD,
+    input.hakuloysyysTappioEra2,
+    HAKULOYSYYS_ERA2_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.hakuloysyysTappioYhteensa),
-    HAKULOYSYYS_YHTEENSA_VALUE_FIELD,
+    input.hakuloysyysTappioYhteensa,
+    HAKULOYSYYS_YHTEENSA_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.tappiopisteetYhteensa),
-    TAPPIOPISTEET_YHTEENSA_VALUE_FIELD,
+    input.tappiopisteetYhteensa,
+    TAPPIOPISTEET_YHTEENSA_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.ajoloysyysTappioEra1),
-    AJOLOYSYYS_ERA1_VALUE_FIELD,
+    input.ajoloysyysTappioEra1,
+    AJOLOYSYYS_ERA1_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.ajoloysyysTappioEra2),
-    AJOLOYSYYS_ERA2_VALUE_FIELD,
+    input.ajoloysyysTappioEra2,
+    AJOLOYSYYS_ERA2_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.ajoloysyysTappioYhteensa),
-    AJOLOYSYYS_YHTEENSA_VALUE_FIELD,
+    input.ajoloysyysTappioYhteensa,
+    AJOLOYSYYS_YHTEENSA_VALUE_BOX,
   );
 }

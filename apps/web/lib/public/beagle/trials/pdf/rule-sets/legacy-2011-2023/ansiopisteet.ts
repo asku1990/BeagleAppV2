@@ -1,66 +1,70 @@
 import type { PDFFont, PDFPage } from "pdf-lib";
 import type { TrialDogPdfAnsiopisteet } from "@contracts";
-import { drawText, formatKoeEraValue } from "./koe-erat-common";
+import {
+  createLegacy2011To2023ScoreBox,
+  drawLegacy2011To2023CenteredScoreValue,
+  LEGACY_2011_2023_SCORE_COLUMNS,
+} from "./score-boxes";
 
-const HAKU_ERA1_VALUE_FIELD = {
-  x: 147,
+const HAKU_ERA1_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.ERA1,
   y: 243.3,
   size: 12,
-} as const;
+});
 
-const HAKUKESKIARVO_VALUE_FIELD = {
-  x: 286,
+const HAKUKESKIARVO_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.SUMMARY,
   y: 243.3,
   size: 12,
-} as const;
+});
 
-const HAKU_ERA2_VALUE_FIELD = {
-  x: 221,
+const HAKU_ERA2_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.ERA2,
   y: 243.3,
   size: 12,
-} as const;
+});
 
-const HAUKKU_ERA1_VALUE_FIELD = {
-  x: 147,
+const HAUKKU_ERA1_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.ERA1,
   y: 223.3,
   size: 12,
-} as const;
+});
 
-const HAUKKU_ERA2_VALUE_FIELD = {
-  x: 221,
+const HAUKKU_ERA2_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.ERA2,
   y: 223.3,
   size: 12,
-} as const;
+});
 
-const HAUKKUESKIARVO_VALUE_FIELD = {
-  x: 286,
+const HAUKKUESKIARVO_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.SUMMARY,
   y: 223.3,
   size: 12,
-} as const;
+});
 
-const AJOTAITO_ERA1_VALUE_FIELD = {
-  x: 147,
+const AJOTAITO_ERA1_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.ERA1,
   y: 203.3,
   size: 12,
-} as const;
+});
 
-const AJOTAITO_ERA2_VALUE_FIELD = {
-  x: 221,
+const AJOTAITO_ERA2_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.ERA2,
   y: 203.3,
   size: 12,
-} as const;
+});
 
-const AJOTAITOKESKIARVO_VALUE_FIELD = {
-  x: 286,
+const AJOTAITOKESKIARVO_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.SUMMARY,
   y: 203.3,
   size: 12,
-} as const;
+});
 
-const ANSIOPISTEET_VALUE_FIELD = {
-  x: 357,
+const ANSIOPISTEET_VALUE_BOX = createLegacy2011To2023ScoreBox({
+  ...LEGACY_2011_2023_SCORE_COLUMNS.TOTAL,
   y: 223.3,
   size: 12,
-} as const;
+});
 
 export function drawTrialDogPdfAnsiopisteet(
   input: TrialDogPdfAnsiopisteet & {
@@ -70,64 +74,64 @@ export function drawTrialDogPdfAnsiopisteet(
 ): void {
   const { page, font } = input;
 
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.hakuEra1),
-    HAKU_ERA1_VALUE_FIELD,
+    input.hakuEra1,
+    HAKU_ERA1_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.hakuEra2),
-    HAKU_ERA2_VALUE_FIELD,
+    input.hakuEra2,
+    HAKU_ERA2_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.hakuKeskiarvo),
-    HAKUKESKIARVO_VALUE_FIELD,
+    input.hakuKeskiarvo,
+    HAKUKESKIARVO_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.haukkuEra1),
-    HAUKKU_ERA1_VALUE_FIELD,
+    input.haukkuEra1,
+    HAUKKU_ERA1_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.haukkuEra2),
-    HAUKKU_ERA2_VALUE_FIELD,
+    input.haukkuEra2,
+    HAUKKU_ERA2_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.haukkuKeskiarvo),
-    HAUKKUESKIARVO_VALUE_FIELD,
+    input.haukkuKeskiarvo,
+    HAUKKUESKIARVO_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.ajotaitoEra1),
-    AJOTAITO_ERA1_VALUE_FIELD,
+    input.ajotaitoEra1,
+    AJOTAITO_ERA1_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.ajotaitoEra2),
-    AJOTAITO_ERA2_VALUE_FIELD,
+    input.ajotaitoEra2,
+    AJOTAITO_ERA2_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.ajotaitoKeskiarvo),
-    AJOTAITOKESKIARVO_VALUE_FIELD,
+    input.ajotaitoKeskiarvo,
+    AJOTAITOKESKIARVO_VALUE_BOX,
   );
-  drawText(
+  drawLegacy2011To2023CenteredScoreValue(
     page,
     font,
-    formatKoeEraValue(input.ansiopisteetYhteensa),
-    ANSIOPISTEET_VALUE_FIELD,
+    input.ansiopisteetYhteensa,
+    ANSIOPISTEET_VALUE_BOX,
   );
 }
