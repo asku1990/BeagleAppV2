@@ -8,6 +8,7 @@ import { drawLegacy2005To2011Huomautus } from "./huomautus";
 import { drawLegacy2005To2011KoiranTausta } from "./koiran-tausta";
 import { drawLegacy2005To2011KoiranTiedot } from "./koiran-tiedot";
 import { drawLegacy2005To2011KokeenTiedot } from "./kokeen-tiedot";
+import { drawLegacy2005To2011LisatiedotHaku } from "./lisatiedot/haku";
 import { drawLegacy2005To2011LisatiedotOlosuhteet } from "./lisatiedot/olosuhteet";
 import { drawLegacy2005To2011Loppupisteet } from "./loppupisteet";
 import { drawLegacy2005To2011Tappiopisteet } from "./tappiopisteet";
@@ -120,6 +121,12 @@ export function renderLegacy2005To2011TrialDogPdfFields({
   });
 
   drawLegacy2005To2011LisatiedotOlosuhteet({
+    lisatiedotRows: input.lisatiedotRows,
+    page,
+    font,
+  });
+
+  drawLegacy2005To2011LisatiedotHaku({
     lisatiedotRows: input.lisatiedotRows,
     page,
     font,
