@@ -5,12 +5,12 @@ import type { PDFFont, PDFPage } from "pdf-lib";
 import { rgb } from "pdf-lib";
 
 export const LEGACY_2005_2011_HUOMAUTUS_BLOCK = {
-  x: 35.5,
-  y: 286,
-  maxWidth: 365,
-  maxHeight: 52,
-  size: 10,
-  lineHeight: 14,
+  x: 57,
+  y: 318,
+  maxWidth: 350,
+  maxHeight: 112,
+  size: 12,
+  lineHeight: 20,
 } as const;
 
 function wrapLegacy2005To2011Text(
