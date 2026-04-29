@@ -28,19 +28,19 @@ describe("drawLegacy2005To2011LisatiedotHaku", () => {
 
     expect(page.drawText).toHaveBeenCalledWith(
       "3,0",
-      expect.objectContaining({ x: 526, y: 547, size: 12, font }),
+      expect.objectContaining({ x: 526, y: 540, size: 12, font }),
     );
     expect(page.drawText).toHaveBeenCalledWith(
       "4,3",
-      expect.objectContaining({ x: 554, y: 547, size: 12, font }),
+      expect.objectContaining({ x: 554, y: 540, size: 12, font }),
     );
     expect(page.drawText).toHaveBeenCalledWith(
       "2,5",
-      expect.objectContaining({ x: 526, y: 527, size: 12, font }),
+      expect.objectContaining({ x: 526, y: 520, size: 12, font }),
     );
     expect(page.drawText).toHaveBeenCalledWith(
       "1,0",
-      expect.objectContaining({ x: 554, y: 507, size: 12, font }),
+      expect.objectContaining({ x: 554, y: 500, size: 12, font }),
     );
     expect(page.drawText).toHaveBeenCalledTimes(4);
   });
