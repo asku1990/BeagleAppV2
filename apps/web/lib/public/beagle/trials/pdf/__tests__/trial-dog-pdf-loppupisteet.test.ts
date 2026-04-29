@@ -249,7 +249,7 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
     });
   });
 
-  it("renders PITKAKOE as dash and PK", () => {
+  it("renders PITKAKOE as PK and class count", () => {
     drawTrialDogPdfLoppuppisteet({
       loppupisteet: 12,
       paljasMaaTaiLumi: null,
@@ -265,12 +265,12 @@ describe("drawTrialDogPdfLoppuppisteet", () => {
     });
 
     expect(drawTextMock).toHaveBeenCalledTimes(4);
-    expect(drawTextMock).toHaveBeenNthCalledWith(2, page, font, "-", {
+    expect(drawTextMock).toHaveBeenNthCalledWith(2, page, font, "PK", {
       x: 355.5,
       y: 106,
       size: 12,
     });
-    expect(drawTextMock).toHaveBeenNthCalledWith(3, page, font, "PK", {
+    expect(drawTextMock).toHaveBeenNthCalledWith(3, page, font, "4", {
       x: 382.5,
       y: 106,
       size: 12,

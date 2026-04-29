@@ -13,8 +13,25 @@ describe("parseLegacySija", () => {
 
   it("maps pitkakoe rows", () => {
     expect(parseLegacySija("PK|4")).toEqual({
-      sija: null,
-      koiriaLuokassa: null,
+      sija: "PK",
+      koiriaLuokassa: 4,
+      koetyyppi: "PITKAKOE",
+      unclear: false,
+    });
+  });
+
+  it.each([
+    ["PK|1", 1],
+    ["PK|8", 8],
+    ["Pk|1", 1],
+    ["pk|2", 2],
+    ["PK.1", 1],
+    ["-|PK3", 3],
+    ["-|PK4", 4],
+  ])("preserves class count from observed pitkakoe value %s", (raw, count) => {
+    expect(parseLegacySija(raw)).toEqual({
+      sija: "PK",
+      koiriaLuokassa: count,
       koetyyppi: "PITKAKOE",
       unclear: false,
     });
@@ -27,12 +44,19 @@ describe("parseLegacySija", () => {
       koetyyppi: "KOKOKAUDENKOE",
       unclear: false,
     });
+
+    expect(parseLegacySija("KK")).toEqual({
+      sija: null,
+      koiriaLuokassa: null,
+      koetyyppi: "KOKOKAUDENKOE",
+      unclear: false,
+    });
   });
 
   it("accepts common legacy separator variants", () => {
     expect(parseLegacySija("PK.1")).toEqual({
-      sija: null,
-      koiriaLuokassa: null,
+      sija: "PK",
+      koiriaLuokassa: 1,
       koetyyppi: "PITKAKOE",
       unclear: false,
     });
@@ -45,15 +69,15 @@ describe("parseLegacySija", () => {
     });
 
     expect(parseLegacySija("PK|-")).toEqual({
-      sija: null,
+      sija: "PK",
       koiriaLuokassa: null,
       koetyyppi: "PITKAKOE",
       unclear: false,
     });
 
     expect(parseLegacySija("-|PK3")).toEqual({
-      sija: null,
-      koiriaLuokassa: null,
+      sija: "PK",
+      koiriaLuokassa: 3,
       koetyyppi: "PITKAKOE",
       unclear: false,
     });

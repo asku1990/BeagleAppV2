@@ -204,7 +204,8 @@ Rules:
   `TrialEntry.huomautus` (`LUOPUI`, `SULJETTU`, `KESKEYTETTY`) and render as
   `X` markers when true.
 - `koetyyppi=KOKOKAUDENKOE` renders `sijoitus` as `-` and `koiriaLuokassa` as `KK`.
-- `koetyyppi=PITKAKOE` renders `sijoitus` as `-` and `koiriaLuokassa` as `PK`.
+- `koetyyppi=PITKAKOE` renders `sijoitus` as `PK` and keeps
+  `koiriaLuokassa` as the stored class count when available.
 - `koetyyppi=NORMAL` renders the stored `sijoitus` and `koiriaLuokassa` values.
 - Otherwise `sijoitus` renders under the status markers and `koiriaLuokassa`
   renders next to `sijoitus`.
