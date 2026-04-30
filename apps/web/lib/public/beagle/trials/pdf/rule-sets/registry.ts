@@ -1,4 +1,5 @@
 import path from "node:path";
+import { renderCurrent2023TrialDogPdfFields } from "./current-2023/index";
 import { renderLegacy2005To2011TrialDogPdfFields } from "./legacy-2005-2011/index";
 import { renderLegacy2011To2023TrialDogPdfFields } from "./legacy-2011-2023/index";
 import type { TrialDogPdfRuleSet } from "./types";
@@ -11,6 +12,11 @@ export const TRIAL_RULE_WINDOW_IDS = {
   POST_2023: "trw_post_20230801",
 } as const;
 
+const TEMPLATE_2023_RELATIVE_PATH = path.join(
+  "public",
+  "templates",
+  "ajok-poytakirja-2023.pdf",
+);
 const TEMPLATE_2011_2023_RELATIVE_PATH = path.join(
   "public",
   "templates",
@@ -26,6 +32,13 @@ const UNSUPPORTED_RULE_SET: TrialDogPdfRuleSet = {
   id: "unsupported",
   templateRelativePath: null,
   status: "not-supported",
+};
+
+const CURRENT_2023_RULE_SET: TrialDogPdfRuleSet = {
+  id: "current-2023",
+  templateRelativePath: TEMPLATE_2023_RELATIVE_PATH,
+  status: "implemented",
+  renderFields: renderCurrent2023TrialDogPdfFields,
 };
 
 const LEGACY_2011_2023_RULE_SET: TrialDogPdfRuleSet = {
@@ -55,11 +68,7 @@ const TRIAL_DOG_PDF_RULE_SETS = {
   },
   [TRIAL_RULE_WINDOW_IDS.RANGE_2005_2011]: LEGACY_2005_2011_RULE_SET,
   [TRIAL_RULE_WINDOW_IDS.RANGE_2011_2023]: LEGACY_2011_2023_RULE_SET,
-  [TRIAL_RULE_WINDOW_IDS.POST_2023]: {
-    id: "post-2023-unimplemented",
-    templateRelativePath: null,
-    status: "not-supported",
-  },
+  [TRIAL_RULE_WINDOW_IDS.POST_2023]: CURRENT_2023_RULE_SET,
 } as const satisfies Record<string, TrialDogPdfRuleSet>;
 
 export function resolveTrialDogPdfRuleSet(
