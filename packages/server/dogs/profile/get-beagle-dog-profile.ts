@@ -9,13 +9,13 @@ import {
   type BeagleTrialDogRowDb,
 } from "@beagle/db";
 import type { BeagleDogProfileDto } from "@beagle/contracts";
-import { encodeShowId } from "../../shows/internal/show-id";
-import { formatTrialAward } from "../../trials/core";
-import { encodeTrialId } from "../../trials/internal/trial-id";
-import { toBusinessDateOnly } from "../../core/date-only";
-import { toErrorLog, withLogContext } from "../../core/logger";
-import type { ServiceResult } from "../../core/result";
-import { parseDogId } from "../core";
+import { toBusinessDateOnly } from "@server/core/date-only";
+import { toErrorLog, withLogContext } from "@server/core/logger";
+import type { ServiceResult } from "@server/core/result";
+import { parseDogId } from "@server/dogs/core";
+import { encodeShowId } from "@server/shows/internal/show-id";
+import { formatTrialAward } from "@server/trials/core";
+import { encodeTrialId } from "@server/trials/internal/trial-id";
 
 export type DogsServiceLogContext = {
   requestId?: string;

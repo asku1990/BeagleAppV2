@@ -170,7 +170,7 @@ describe("trial clipboard actions", () => {
 
     expect(result).toBe(false);
     expect(writeText).toHaveBeenCalledWith(
-      "N:o\tPaikka\tPäivä\tKeli\tPalkinto\tSija\tPisteet\tTuomari\tHaku\tHaukku\tYVA\tHLO\tALO\tTJA\tPIN\n1\tTurku\t2025-06-01\tP\tVOI\t1\t85.50\tJudge A\t4\t5\t6\t1\t2\t3\t9",
+      "N:o\tPaikka\tPäivä\tKeli\tPalkinto\tSija\tPisteet\tTuomari\tHaku\tHaukku\tYVA\tHLO\tALO\tTJA\tPIN\n1\tTurku\t2025-06-01\tP\tVoi 1\t1\t85.50\tJudge A\t4\t5\t6\t1\t2\t3\t9",
     );
     expect(toast.error).toHaveBeenCalledWith("copy.error");
   });

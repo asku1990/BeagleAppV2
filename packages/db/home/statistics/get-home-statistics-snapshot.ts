@@ -1,4 +1,4 @@
-import { prisma } from "../../core/prisma";
+import { prisma } from "@db/core/prisma";
 
 export type HomeStatisticsSnapshot = {
   registrations: {

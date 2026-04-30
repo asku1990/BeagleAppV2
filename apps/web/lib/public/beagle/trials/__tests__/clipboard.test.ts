@@ -288,7 +288,7 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
       "N:o\tPaikka\tPäivä\tKeli\tPalkinto\tSija\tPisteet\tTuomari\tHaku\tHaukku\tYVA\tHLO\tALO\tTJA\tPIN",
     );
     expect(lines[1]).toBe(
-      "1\tHelsinki\t2025-06-01\tL\tVOI\t1\t88.20\tJudge A\t4\t5\t6\t1\t2\t3\t9",
+      "1\tHelsinki\t2025-06-01\tL\tVoi 1\t1\t88.20\tJudge A\t4\t5\t6\t1\t2\t3\t9",
     );
     expect(lines[2]).toBe(
       "2\tTurku\t2025-06-02\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-",
