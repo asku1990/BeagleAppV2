@@ -166,12 +166,16 @@ describe("renderTrialDogPdf", () => {
     ]);
   });
 
-  it("keeps unfinished rule sets blank-only", () => {
-    expect(getTrialDogPdfRuleSetStatus("trw_pre_20020801")).toBe("blank-only");
-    expect(getTrialDogPdfRuleSetStatus("trw_range_2002_2005")).toBe(
-      "blank-only",
+  it("marks unimplemented rule sets as not-supported", () => {
+    expect(getTrialDogPdfRuleSetStatus("trw_pre_20020801")).toBe(
+      "not-supported",
     );
-    expect(getTrialDogPdfRuleSetStatus("trw_post_20230801")).toBe("blank-only");
+    expect(getTrialDogPdfRuleSetStatus("trw_range_2002_2005")).toBe(
+      "not-supported",
+    );
+    expect(getTrialDogPdfRuleSetStatus("trw_post_20230801")).toBe(
+      "not-supported",
+    );
   });
 
   it("marks template-backed timelines as renderable", () => {
@@ -192,9 +196,79 @@ describe("renderTrialDogPdf", () => {
     expect(getTrialDogPdfRuleSetId("trw_post_20230801")).toBe(
       "post-2023-unimplemented",
     );
-    expect(getTrialDogPdfRuleSetStatus("trw_post_20230801")).toBe("blank-only");
+    expect(getTrialDogPdfRuleSetStatus("trw_post_20230801")).toBe(
+      "not-supported",
+    );
     expect(canRenderTrialDogPdf("trw_post_20230801")).toBe(false);
   });
+
+  it.each(["trw_pre_20020801", "trw_range_2002_2005", "trw_post_20230801"])(
+    "throws for not-supported rule window %s instead of returning a blank PDF",
+    async (trialRuleWindowId) => {
+      await expect(
+        renderTrialDogPdf({
+          trialRuleWindowId,
+          registrationNo: "FI00000/00",
+          dogName: null,
+          dogSex: "MALE",
+          sireName: null,
+          sireRegistrationNo: null,
+          damName: null,
+          damRegistrationNo: null,
+          omistaja: null,
+          omistajanKotikunta: null,
+          kennelpiiri: null,
+          kennelpiirinro: null,
+          koekunta: null,
+          koemaasto: null,
+          koepaiva: new Date("2025-01-01T00:00:00.000Z"),
+          jarjestaja: null,
+          era1Alkoi: null,
+          era2Alkoi: null,
+          hakuMin1: null,
+          hakuMin2: null,
+          ajoMin1: null,
+          ajoMin2: null,
+          hyvaksytytAjominuutit: null,
+          ajoajanPisteet: null,
+          hakuEra1: null,
+          hakuEra2: null,
+          hakuKeskiarvo: null,
+          haukkuEra1: null,
+          haukkuEra2: null,
+          haukkuKeskiarvo: null,
+          metsastysintoEra1: null,
+          metsastysintoEra2: null,
+          metsastysintoKeskiarvo: null,
+          hakuloysyysTappioEra1: null,
+          hakuloysyysTappioEra2: null,
+          hakuloysyysTappioYhteensa: null,
+          ajoloysyysTappioEra1: null,
+          ajoloysyysTappioEra2: null,
+          ajoloysyysTappioYhteensa: null,
+          tappiopisteetYhteensa: null,
+          ajotaitoEra1: null,
+          ajotaitoEra2: null,
+          ajotaitoKeskiarvo: null,
+          ansiopisteetYhteensa: null,
+          loppupisteet: null,
+          paljasMaaTaiLumi: null,
+          luopui: false,
+          suljettu: false,
+          keskeytetty: false,
+          koetyyppi: "NORMAL",
+          sijoitus: null,
+          koiriaLuokassa: null,
+          Palkinto: null,
+          huomautusTeksti: null,
+          ryhmatuomariNimi: null,
+          palkintotuomariNimi: null,
+          ylituomariNumeroSnapshot: null,
+          ylituomariNimiSnapshot: null,
+        }),
+      ).rejects.toThrow("has no template.");
+    },
+  );
 
   it("does not fall back to another timeline for unknown rule windows", async () => {
     await expect(

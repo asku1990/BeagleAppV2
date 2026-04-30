@@ -1,7 +1,7 @@
 import type { TrialDogPdfPayload } from "@contracts";
 import type { PDFFont, PDFDocument, PDFPage } from "pdf-lib";
 
-export type TrialDogPdfRuleSetStatus = "blank-only" | "implemented";
+export type TrialDogPdfRuleSetStatus = "not-supported" | "implemented";
 
 export type TrialDogPdfRenderContext = {
   pdfDocument: PDFDocument;

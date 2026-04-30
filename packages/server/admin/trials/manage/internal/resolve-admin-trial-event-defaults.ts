@@ -2,7 +2,7 @@ import { searchAdminTrialsDb } from "@beagle/db";
 import {
   getTrialBusinessYearUtcRange,
   toTrialBusinessYear,
-} from "../../../../trials/core/business-date";
+} from "@server/trials/core/business-date";
 import type { ParsedAdminTrialEventSearchInput } from "./parse-admin-trial-event-search-input";
 
 export type ResolvedAdminTrialEventSearch = {

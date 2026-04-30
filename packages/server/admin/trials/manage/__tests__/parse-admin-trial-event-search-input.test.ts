@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getTrialBusinessDateStartUtc } from "../../../../trials/core/business-date";
+import { getTrialBusinessDateStartUtc } from "@server/trials/core/business-date";
 import { parseAdminTrialEventSearchInput } from "../internal/parse-admin-trial-event-search-input";
 
 describe("parseAdminTrialEventSearchInput", () => {

@@ -25,7 +25,7 @@ const TEMPLATE_2005_2011_RELATIVE_PATH = path.join(
 const UNSUPPORTED_RULE_SET: TrialDogPdfRuleSet = {
   id: "unsupported",
   templateRelativePath: null,
-  status: "blank-only",
+  status: "not-supported",
 };
 
 const LEGACY_2011_2023_RULE_SET: TrialDogPdfRuleSet = {
@@ -46,19 +46,19 @@ const TRIAL_DOG_PDF_RULE_SETS = {
   [TRIAL_RULE_WINDOW_IDS.PRE_2002]: {
     id: "legacy-pre-2002",
     templateRelativePath: null,
-    status: "blank-only",
+    status: "not-supported",
   },
   [TRIAL_RULE_WINDOW_IDS.RANGE_2002_2005]: {
     id: "legacy-2002-2005",
     templateRelativePath: null,
-    status: "blank-only",
+    status: "not-supported",
   },
   [TRIAL_RULE_WINDOW_IDS.RANGE_2005_2011]: LEGACY_2005_2011_RULE_SET,
   [TRIAL_RULE_WINDOW_IDS.RANGE_2011_2023]: LEGACY_2011_2023_RULE_SET,
   [TRIAL_RULE_WINDOW_IDS.POST_2023]: {
     id: "post-2023-unimplemented",
     templateRelativePath: null,
-    status: "blank-only",
+    status: "not-supported",
   },
 } as const satisfies Record<string, TrialDogPdfRuleSet>;
 

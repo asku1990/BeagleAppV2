@@ -3,7 +3,7 @@ import type {
   AdminTrialEventSearchSort,
 } from "@beagle/contracts";
 import type { AdminTrialEventSearchSortDb } from "@beagle/db";
-import { getTrialBusinessDateUtcRange } from "../../../../trials/core/business-date";
+import { getTrialBusinessDateUtcRange } from "@server/trials/core/business-date";
 
 export type ParsedAdminTrialEventSearchInput = {
   query: string;
