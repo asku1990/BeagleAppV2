@@ -49,7 +49,7 @@ export type BeagleTrialDetailsEvent = {
 
 export type BeagleTrialDetailsRow = {
   id: string;
-  dogId: string;
+  dogId: string | null;
   registrationNo: string;
   name: string;
   sex: "U" | "N" | "-";

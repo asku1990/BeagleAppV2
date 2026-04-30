@@ -1,3 +1,6 @@
+// Reads public beagle trial detail from canonical TrialEvent+TrialEntry tables.
+// Multiple TrialEvent rows can share the same (koepaiva, koekunta) — all matching
+// events are folded into one public response to preserve the date/place URL scheme.
 import { DogSex, type Prisma } from "@prisma/client";
 import { prisma } from "../core/prisma";
 import type {
@@ -6,19 +9,27 @@ import type {
   BeagleTrialDetailsRowDb,
 } from "./types";
 
-function toNumberOrNull(value: Prisma.Decimal | null): number | null {
-  if (value === null) {
-    return null;
-  }
-
-  const numeric = Number(value);
-  return Number.isFinite(numeric) ? numeric : null;
+function toNumberOrNull(
+  value: Prisma.Decimal | null | undefined,
+): number | null {
+  if (value == null) return null;
+  return value.toNumber();
 }
 
-function toSexCode(value: DogSex): "U" | "N" | "-" {
+function toSexCode(value: DogSex | null | undefined): "U" | "N" | "-" {
   if (value === DogSex.MALE) return "U";
   if (value === DogSex.FEMALE) return "N";
   return "-";
+}
+
+// Returns the shared judge name when all non-empty values agree, otherwise null.
+function resolveJudge(names: (string | null | undefined)[]): string | null {
+  const nonEmpty = names
+    .map((n) => n?.trim())
+    .filter((n): n is string => Boolean(n));
+  if (nonEmpty.length === 0) return null;
+  const unique = new Set(nonEmpty);
+  return unique.size === 1 ? [...unique][0]! : null;
 }
 
 function compareDetailRows(
@@ -34,9 +45,7 @@ function compareDetailRows(
   const rankComparison = (left.rank ?? "").localeCompare(
     right.rank ?? "",
     "fi",
-    {
-      sensitivity: "base",
-    },
+    { sensitivity: "base" },
   );
   if (rankComparison !== 0) return rankComparison;
 
@@ -53,76 +62,95 @@ function compareDetailRows(
 export async function getBeagleTrialDetailsDb(
   input: BeagleTrialDetailsRequestDb,
 ): Promise<BeagleTrialDetailsResponseDb | null> {
-  const rows = await prisma.trialResult.findMany({
+  const trialEvents = await prisma.trialEvent.findMany({
     where: {
-      eventDate: {
+      koepaiva: {
         gte: input.eventDateStart,
         lt: input.eventDateEndExclusive,
       },
-      eventPlace: input.eventPlace,
+      koekunta: input.eventPlace,
     },
-    include: {
-      dog: {
+    select: {
+      koepaiva: true,
+      koekunta: true,
+      ylituomariNimi: true,
+      entries: {
         select: {
           id: true,
-          name: true,
-          sex: true,
-          registrations: {
+          dogId: true,
+          rekisterinumeroSnapshot: true,
+          ke: true,
+          pa: true,
+          lk: true,
+          sija: true,
+          piste: true,
+          tuom1: true,
+          haku: true,
+          hauk: true,
+          yva: true,
+          hlo: true,
+          alo: true,
+          tja: true,
+          pin: true,
+          dog: {
             select: {
-              registrationNo: true,
+              name: true,
+              sex: true,
             },
-            orderBy: [{ createdAt: "asc" }, { registrationNo: "asc" }],
-            take: 1,
           },
         },
       },
     },
   });
 
-  if (rows.length === 0) {
-    return null;
-  }
+  if (trialEvents.length === 0) return null;
 
-  const items: BeagleTrialDetailsRowDb[] = rows
-    .map((row) => ({
-      id: row.id,
-      dogId: row.dog.id,
-      registrationNo: row.dog.registrations[0]?.registrationNo ?? "-",
-      name: row.dog.name,
-      sex: toSexCode(row.dog.sex),
-      // Legacy akoeall result columns shown/copied to users.
-      weather: row.ke,
-      award: row.pa,
-      classCode: row.lk,
-      rank: row.sija,
-      points: row.piste ? row.piste.toNumber() : null,
-      judge: row.judge,
-      haku: row.haku ? row.haku.toNumber() : null,
-      hauk: row.hauk ? row.hauk.toNumber() : null,
-      yva: row.yva ? row.yva.toNumber() : null,
-      hlo: row.hlo ? row.hlo.toNumber() : null,
-      alo: row.alo ? row.alo.toNumber() : null,
-      tja: row.tja ? row.tja.toNumber() : null,
-      pin: row.pin ? row.pin.toNumber() : null,
-      legacyFlag: row.legacyFlag,
-      sourceKey: row.sourceKey,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
+  // Fold entries from all matched events into a flat list so the public
+  // date/place URL resolves consistently even when more than one TrialEvent
+  // exists for the same koepaiva+koekunta.
+  const allEntries = trialEvents.flatMap((event) =>
+    event.entries.map((entry) => ({
+      ...entry,
+      eventYlituomariNimi: event.ylituomariNimi,
+    })),
+  );
+
+  if (allEntries.length === 0) return null;
+
+  // Event-level judge: use the shared chief judge only when every non-empty
+  // ylituomariNimi value across matched events agrees.
+  const eventJudge = resolveJudge(trialEvents.map((e) => e.ylituomariNimi));
+
+  const items: BeagleTrialDetailsRowDb[] = allEntries
+    .map((entry) => ({
+      id: entry.id,
+      dogId: entry.dogId,
+      registrationNo: entry.rekisterinumeroSnapshot,
+      // Prefer the linked dog name; fall back to registration snapshot so
+      // entries without a dogId always render something meaningful.
+      name: entry.dog?.name?.trim() || entry.rekisterinumeroSnapshot,
+      sex: toSexCode(entry.dog?.sex),
+      weather: entry.ke,
+      award: entry.pa,
+      classCode: entry.lk,
+      rank: entry.sija,
+      points: toNumberOrNull(entry.piste),
+      // Per-entry group judge (tuom1) takes precedence over event chief judge.
+      judge: entry.tuom1?.trim() || eventJudge || null,
+      haku: toNumberOrNull(entry.haku),
+      hauk: toNumberOrNull(entry.hauk),
+      yva: toNumberOrNull(entry.yva),
+      hlo: toNumberOrNull(entry.hlo),
+      alo: toNumberOrNull(entry.alo),
+      tja: toNumberOrNull(entry.tja),
+      pin: toNumberOrNull(entry.pin),
     }))
     .sort(compareDetailRows);
 
-  const judges = Array.from(
-    new Set(
-      rows
-        .map((row) => row.judge?.trim())
-        .filter((judge): judge is string => Boolean(judge)),
-    ),
-  );
-
   return {
-    eventDate: rows[0].eventDate,
-    eventPlace: rows[0].eventPlace,
-    judge: judges.length === 1 ? judges[0] : null,
+    eventDate: trialEvents[0]!.koepaiva,
+    eventPlace: trialEvents[0]!.koekunta,
+    judge: eventJudge,
     dogCount: items.length,
     items,
   };
