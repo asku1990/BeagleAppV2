@@ -58,10 +58,6 @@ export async function renderTrialDogPdf(
   const templateBytes = await readFile(templatePath);
   const pdfDocument = await PDFDocument.load(templateBytes);
 
-  if (ruleSet.status === "blank-only") {
-    return pdfDocument.save();
-  }
-
   if (!ruleSet.renderFields) {
     throw new Error(`PDF rule set ${ruleSet.id} is missing a field renderer.`);
   }

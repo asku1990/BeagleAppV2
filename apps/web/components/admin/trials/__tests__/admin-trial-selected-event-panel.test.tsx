@@ -37,11 +37,9 @@ vi.mock("@/components/ui/card", () => ({
 
 vi.mock("@/components/ui/button", () => ({
   Button: ({
-    asChild: _asChild,
     children,
     ...props
   }: {
-    asChild?: boolean;
     children: React.ReactNode;
     [key: string]: unknown;
   }) => React.createElement("button", props, children),

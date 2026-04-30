@@ -28,8 +28,11 @@ This project uses a user-facing changelog format.
 - Ylläpidon AJOK-listaus ja detalji (`/admin/trials`) lukevat nyt uutta kanonista AJOK-skeemaa (`TrialEvent` + `TrialEntry`) read-only-polussa. Näkymän tunnistekentissä käytetään SKL-koeavainta ja entry-avainta vanhan `sourceKey`-esityksen sijaan.
 - Ylläpidon ajokokeiden `/admin/trials`-näkymä uudistettiin tapahtumapohjaiseksi master-detail-virraksi: ensin haetaan tapahtumia (vuosi tai päivämääräväli), sitten valitun tapahtuman koirariveiltä voi avata olemassa olevan detaljisivun tai koirakohtaisen PDF:n. Nykyinen `/admin/trials/[trialId]` detaljisivu säilyy ennallaan.
 - AJOK 2005-2011 -sääntökaudelle lisättiin koirakohtaisen PDF:n ensimmäinen renderöintirunko nykyisellä koetulosdatalla.
+- AJOK 2023→ -sääntökauden (`trw_post_20230801`) koirakohtainen PDF on nyt käytettävissä. Virallista 2023-pohjaa ei ole vielä saatavilla, joten PDF käyttää väliaikaisesti 2011-2023-pohjaa ja näyttää sivun yläreunassa huomautuksen "Tämä ei ole lopullinen".
 
 ### Changed
+
+- Tukemattomat AJOK PDF -sääntöikkunat palauttavat nyt virheen tyhjän PDF:n sijaan. Aiempi `blank-only`-tila on nimetty `not-supported`-tilaksi selkeyden vuoksi.
 
 ### Fixed
 

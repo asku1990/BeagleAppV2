@@ -26,6 +26,15 @@ Use this format for new entries:
 
 ## Entries
 
+## 2026-04-30 - Replace temporary 2023 AJOK PDF template
+
+- Area: `apps/web/lib/public/beagle/trials/pdf/rule-sets/current-2023/` and `apps/web/public/templates/ajok-poytakirja-2023.pdf`.
+- Issue: The `current-2023` renderer uses a copy of the 2011-2023 PDF template as a stand-in because the official 2023→ template is not yet available. A visible Finnish notice is drawn on every generated page to communicate this.
+- Impact: The generated PDF is functionally correct for the existing fields, but the template header text, layout, and any new 2023-specific lisätieto fields may differ from the final official version.
+- Suggested fix: When the official 2023 pöytäkirja template is delivered, replace `ajok-poytakirja-2023.pdf`, verify all coordinate constants in the `current-2023` renderer, add/adjust any new lisätieto codes or sections, and remove the "not final" notice from the renderer.
+- Trigger to revisit: Official 2023 AJOK pöytäkirja template becomes available.
+- Ticket: BEJ-96 follow-up.
+
 ## 2026-04-04 - Align show-definition visibility semantics
 
 - Area: `ShowResultDefinition` reads, projections, and admin UI option building.

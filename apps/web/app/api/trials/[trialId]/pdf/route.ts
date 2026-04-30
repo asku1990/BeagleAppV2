@@ -57,23 +57,9 @@ export async function GET(
       });
     }
 
-    const registrationNo = result.body.data.registrationNo.trim();
-    const dogName = result.body.data.dogName?.trim() ?? null;
-    const sireName = result.body.data.sireName?.trim() ?? null;
-    const sireRegistrationNo =
-      result.body.data.sireRegistrationNo?.trim() ?? null;
-    const damName = result.body.data.damName?.trim() ?? null;
-    const damRegistrationNo =
-      result.body.data.damRegistrationNo?.trim() ?? null;
-    const omistaja = result.body.data.omistaja?.trim() ?? null;
-    const omistajanKotikunta =
-      result.body.data.omistajanKotikunta?.trim() ?? null;
-    const kennelpiiri = result.body.data.kennelpiiri?.trim() ?? null;
-    const kennelpiirinro = result.body.data.kennelpiirinro?.trim() ?? null;
-    const koekunta = result.body.data.koekunta?.trim() ?? null;
-    const koemaasto = result.body.data.koemaasto?.trim() ?? null;
-    const koepaiva = result.body.data.koepaiva;
-    const trialRuleWindowId = result.body.data.trialRuleWindowId;
+    // trialId is a server-only field not part of TrialDogPdfPayload; it stays in restData
+    // but TypeScript won't flag the extra property when the payload variable is passed to a function.
+    const { trialRuleWindowId, ...restData } = result.body.data;
     if (!canRenderTrialDogPdf(trialRuleWindowId)) {
       const ruleSetId = getTrialDogPdfRuleSetId(trialRuleWindowId);
       log.warn(
@@ -101,123 +87,36 @@ export async function GET(
       );
     }
 
-    const jarjestaja = result.body.data.jarjestaja?.trim() ?? null;
-    const dogSex = result.body.data.dogSex;
-    const era1Alkoi = result.body.data.era1Alkoi?.trim() ?? null;
-    const era2Alkoi = result.body.data.era2Alkoi?.trim() ?? null;
-    const hakuMin1 = result.body.data.hakuMin1;
-    const hakuMin2 = result.body.data.hakuMin2;
-    const ajoMin1 = result.body.data.ajoMin1;
-    const ajoMin2 = result.body.data.ajoMin2;
-    const hyvaksytytAjominuutit = result.body.data.hyvaksytytAjominuutit;
-    const ajoajanPisteet = result.body.data.ajoajanPisteet;
-    const hakuEra1 = result.body.data.hakuEra1;
-    const hakuEra2 = result.body.data.hakuEra2;
-    const hakuKeskiarvo = result.body.data.hakuKeskiarvo;
-    const haukkuEra1 = result.body.data.haukkuEra1;
-    const haukkuEra2 = result.body.data.haukkuEra2;
-    const haukkuKeskiarvo = result.body.data.haukkuKeskiarvo;
-    const metsastysintoEra1 = result.body.data.metsastysintoEra1;
-    const metsastysintoEra2 = result.body.data.metsastysintoEra2;
-    const metsastysintoKeskiarvo = result.body.data.metsastysintoKeskiarvo;
-    const ajotaitoEra1 = result.body.data.ajotaitoEra1;
-    const ajotaitoEra2 = result.body.data.ajotaitoEra2;
-    const ajotaitoKeskiarvo = result.body.data.ajotaitoKeskiarvo;
-    const hakuloysyysTappioEra1 = result.body.data.hakuloysyysTappioEra1;
-    const hakuloysyysTappioEra2 = result.body.data.hakuloysyysTappioEra2;
-    const hakuloysyysTappioYhteensa =
-      result.body.data.hakuloysyysTappioYhteensa;
-    const ajoloysyysTappioEra1 = result.body.data.ajoloysyysTappioEra1;
-    const ajoloysyysTappioEra2 = result.body.data.ajoloysyysTappioEra2;
-    const ajoloysyysTappioYhteensa = result.body.data.ajoloysyysTappioYhteensa;
-    const tappiopisteetYhteensa = result.body.data.tappiopisteetYhteensa;
-    const ansiopisteetYhteensa = result.body.data.ansiopisteetYhteensa;
-    const loppupisteet = result.body.data.loppupisteet;
-    const paljasMaaTaiLumi = result.body.data.paljasMaaTaiLumi;
-    const luopui = result.body.data.luopui;
-    const suljettu = result.body.data.suljettu;
-    const keskeytetty = result.body.data.keskeytetty;
-    const koetyyppi = result.body.data.koetyyppi;
-    const sijoitus = result.body.data.sijoitus;
-    const koiriaLuokassa = result.body.data.koiriaLuokassa;
-    const Palkinto = result.body.data.Palkinto;
-    const huomautusTeksti = result.body.data.huomautusTeksti;
-
-    const ryhmatuomariNimi = result.body.data.ryhmatuomariNimi;
-    const palkintotuomariNimi = result.body.data.palkintotuomariNimi;
-    const ylituomariNumeroSnapshot = result.body.data.ylituomariNumeroSnapshot;
-    const ylituomariNimiSnapshot = result.body.data.ylituomariNimiSnapshot;
-    const lisatiedotRows = result.body.data.lisatiedotRows;
-
-    const pdfBytes = await renderTrialDogPdf({
+    // Spread all payload fields; only trim the string fields that may arrive with whitespace.
+    const payload = {
+      ...restData,
       trialRuleWindowId,
-      registrationNo,
-      dogName,
-      dogSex,
-      sireName,
-      sireRegistrationNo,
-      damName,
-      damRegistrationNo,
-      omistaja,
-      omistajanKotikunta,
-      kennelpiiri,
-      kennelpiirinro,
-      koekunta,
-      koemaasto,
-      koepaiva,
-      jarjestaja,
-      era1Alkoi,
-      era2Alkoi,
-      hakuMin1,
-      hakuMin2,
-      ajoMin1,
-      ajoMin2,
-      hyvaksytytAjominuutit,
-      ajoajanPisteet,
-      hakuEra1,
-      hakuEra2,
-      hakuKeskiarvo,
-      haukkuEra1,
-      haukkuEra2,
-      haukkuKeskiarvo,
-      metsastysintoEra1,
-      metsastysintoEra2,
-      metsastysintoKeskiarvo,
-      ajotaitoEra1,
-      ajotaitoEra2,
-      ajotaitoKeskiarvo,
-      hakuloysyysTappioEra1,
-      hakuloysyysTappioEra2,
-      hakuloysyysTappioYhteensa,
-      ajoloysyysTappioEra1,
-      ajoloysyysTappioEra2,
-      ajoloysyysTappioYhteensa,
-      tappiopisteetYhteensa,
-      ansiopisteetYhteensa,
-      loppupisteet,
-      paljasMaaTaiLumi,
-      luopui,
-      suljettu,
-      keskeytetty,
-      koetyyppi,
-      sijoitus,
-      koiriaLuokassa,
-      Palkinto,
-      huomautusTeksti,
-      ryhmatuomariNimi,
-      palkintotuomariNimi,
-      ylituomariNumeroSnapshot,
-      ylituomariNimiSnapshot,
-      lisatiedotRows,
-    });
+      registrationNo: restData.registrationNo.trim(),
+      dogName: restData.dogName?.trim() ?? null,
+      sireName: restData.sireName?.trim() ?? null,
+      sireRegistrationNo: restData.sireRegistrationNo?.trim() ?? null,
+      damName: restData.damName?.trim() ?? null,
+      damRegistrationNo: restData.damRegistrationNo?.trim() ?? null,
+      omistaja: restData.omistaja?.trim() ?? null,
+      omistajanKotikunta: restData.omistajanKotikunta?.trim() ?? null,
+      kennelpiiri: restData.kennelpiiri?.trim() ?? null,
+      kennelpiirinro: restData.kennelpiirinro?.trim() ?? null,
+      koekunta: restData.koekunta?.trim() ?? null,
+      koemaasto: restData.koemaasto?.trim() ?? null,
+      jarjestaja: restData.jarjestaja?.trim() ?? null,
+      era1Alkoi: restData.era1Alkoi?.trim() ?? null,
+      era2Alkoi: restData.era2Alkoi?.trim() ?? null,
+    };
+
+    const pdfBytes = await renderTrialDogPdf(payload);
 
     log.info(
       {
         event: "success",
         trialId: normalizedTrialId,
-        registrationNo,
-        dogName,
-        kennelpiiri,
+        registrationNo: payload.registrationNo,
+        dogName: payload.dogName,
+        kennelpiiri: payload.kennelpiiri,
         durationMs: Date.now() - startedAt,
       },
       "trial pdf generation succeeded",
