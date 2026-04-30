@@ -31,6 +31,8 @@ This project uses a user-facing changelog format.
 
 ### Changed
 
+- Tukemattomat AJOK PDF -sääntöikkunat palauttavat nyt virheen tyhjän PDF:n sijaan. Aiempi `blank-only`-tila on nimetty `not-supported`-tilaksi selkeyden vuoksi.
+
 ### Fixed
 
 - Ajokokeen koirakohtainen PDF näyttää nyt koiran oman primary-rekisterinumeron eli ensimmäisenä lisätyn rekisterinumeron.
