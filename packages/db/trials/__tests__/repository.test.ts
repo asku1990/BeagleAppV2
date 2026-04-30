@@ -1,20 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DogSex } from "@prisma/client";
 
-const { trialEventFindManyMock, trialResultFindManyMock, prismaMock } =
+const { trialEventFindManyMock, trialEntryFindManyMock, prismaMock } =
   vi.hoisted(() => {
     const trialEventFindMany = vi.fn();
-    const trialResultFindMany = vi.fn();
+    const trialEntryFindMany = vi.fn();
 
     return {
       trialEventFindManyMock: trialEventFindMany,
-      trialResultFindManyMock: trialResultFindMany,
+      trialEntryFindManyMock: trialEntryFindMany,
       prismaMock: {
         trialEvent: {
           findMany: trialEventFindMany,
         },
-        trialResult: {
-          findMany: trialResultFindMany,
+        trialEntry: {
+          findMany: trialEntryFindMany,
         },
       },
     };
@@ -479,27 +479,24 @@ describe("getBeagleTrialDetailsDb", () => {
 });
 
 // ---------------------------------------------------------------------------
-// getBeagleTrialsForDogDb  (still reads from TrialResult)
+// getBeagleTrialsForDogDb
 // ---------------------------------------------------------------------------
 
 describe("getBeagleTrialsForDogDb", () => {
   beforeEach(() => {
-    trialResultFindManyMock.mockReset();
+    trialEntryFindManyMock.mockReset();
   });
 
-  it("maps dog trial rows in date-desc order", async () => {
-    trialResultFindManyMock.mockResolvedValue([
+  it("maps dog trial rows from TrialEntry+TrialEvent in date-desc order", async () => {
+    trialEntryFindManyMock.mockResolvedValue([
       {
         id: "t2",
-        eventPlace: "Lahti",
-        eventDate: new Date("2025-06-02T00:00:00.000Z"),
         ke: "L",
-        eventName: "VOI",
         lk: "V",
         sija: "1",
         piste: { toNumber: () => 88.25 },
         pa: "1",
-        judge: "Judge A",
+        tuom1: "Judge A",
         haku: { toNumber: () => 4.1 },
         hauk: { toNumber: () => 4.2 },
         yva: { toNumber: () => 4.3 },
@@ -507,18 +504,20 @@ describe("getBeagleTrialsForDogDb", () => {
         alo: { toNumber: () => 0.2 },
         tja: { toNumber: () => 0.3 },
         pin: { toNumber: () => 5.6 },
+        trialEvent: {
+          koekunta: "Lahti",
+          koepaiva: new Date("2025-06-02T00:00:00.000Z"),
+          ylituomariNimi: "Chief Judge",
+        },
       },
       {
         id: "t1",
-        eventPlace: "Helsinki",
-        eventDate: new Date("2025-06-01T00:00:00.000Z"),
         ke: null,
-        eventName: null,
         lk: null,
         sija: null,
         piste: null,
         pa: null,
-        judge: null,
+        tuom1: null,
         haku: null,
         hauk: null,
         yva: null,
@@ -526,24 +525,26 @@ describe("getBeagleTrialsForDogDb", () => {
         alo: null,
         tja: null,
         pin: null,
+        trialEvent: {
+          koekunta: "Helsinki",
+          koepaiva: new Date("2025-06-01T00:00:00.000Z"),
+          ylituomariNimi: null,
+        },
       },
     ]);
 
     const result = await getBeagleTrialsForDogDb("dog-1");
 
-    expect(trialResultFindManyMock).toHaveBeenCalledWith({
+    expect(trialEntryFindManyMock).toHaveBeenCalledWith({
       where: { dogId: "dog-1" },
       select: {
         id: true,
-        eventPlace: true,
-        eventDate: true,
         ke: true,
-        eventName: true,
         lk: true,
         sija: true,
         piste: true,
         pa: true,
-        judge: true,
+        tuom1: true,
         haku: true,
         hauk: true,
         yva: true,
@@ -551,16 +552,28 @@ describe("getBeagleTrialsForDogDb", () => {
         alo: true,
         tja: true,
         pin: true,
+        trialEvent: {
+          select: {
+            koekunta: true,
+            koepaiva: true,
+            ylituomariNimi: true,
+          },
+        },
       },
-      orderBy: [{ eventDate: "desc" }, { eventPlace: "asc" }, { id: "asc" }],
+      orderBy: [
+        { trialEvent: { koepaiva: "desc" } },
+        { trialEvent: { koekunta: "asc" } },
+        { id: "asc" },
+      ],
     });
+
     expect(result).toEqual([
       {
         id: "t2",
         place: "Lahti",
         date: new Date("2025-06-02T00:00:00.000Z"),
         weather: "L",
-        className: "VOI",
+        className: "V",
         classCode: "V",
         rank: "1",
         points: 88.25,
@@ -594,5 +607,57 @@ describe("getBeagleTrialsForDogDb", () => {
         pin: null,
       },
     ]);
+  });
+
+  it("prefers tuom1 over event ylituomariNimi for judge", async () => {
+    trialEntryFindManyMock.mockResolvedValue([
+      {
+        id: "t1",
+        ke: null,
+        lk: null,
+        sija: null,
+        piste: null,
+        pa: null,
+        tuom1: null,
+        haku: null,
+        hauk: null,
+        yva: null,
+        hlo: null,
+        alo: null,
+        tja: null,
+        pin: null,
+        trialEvent: {
+          koekunta: "Helsinki",
+          koepaiva: new Date("2025-06-01T00:00:00.000Z"),
+          ylituomariNimi: "Chief",
+        },
+      },
+      {
+        id: "t2",
+        ke: null,
+        lk: null,
+        sija: null,
+        piste: null,
+        pa: null,
+        tuom1: "Group Judge",
+        haku: null,
+        hauk: null,
+        yva: null,
+        hlo: null,
+        alo: null,
+        tja: null,
+        pin: null,
+        trialEvent: {
+          koekunta: "Turku",
+          koepaiva: new Date("2025-06-02T00:00:00.000Z"),
+          ylituomariNimi: "Chief",
+        },
+      },
+    ]);
+
+    const result = await getBeagleTrialsForDogDb("dog-1");
+
+    expect(result[0]?.judge).toBe("Chief"); // tuom1 null -> falls back to ylituomariNimi
+    expect(result[1]?.judge).toBe("Group Judge"); // tuom1 takes precedence
   });
 });

@@ -120,7 +120,7 @@ export type OffspringDogNode = {
   siredPuppies: OffspringLitterRelationNode[];
   _count: {
     showEntries: number;
-    trialResults: number;
+    trialEntries: number;
   };
 };
 
