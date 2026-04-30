@@ -44,8 +44,9 @@ export type ImportStatusResponse = {
 export type ImportRunKind =
   | "LEGACY_PHASE1"
   | "LEGACY_PHASE1_5"
-  | "LEGACY_PHASE2"
-  | "LEGACY_PHASE3";
+  | "LEGACY_PHASE3"
+  | "LEGACY_TRIAL_MIRROR"
+  | "LEGACY_PHASE5";
 
 export type ImportRunStatus = "PENDING" | "RUNNING" | "SUCCEEDED" | "FAILED";
 
@@ -136,6 +137,25 @@ export type {
   BeagleTrialSearchResponse,
   BeagleTrialSearchRow,
   BeagleTrialSearchSort,
+  TrialDogPdfAjoajanPisteytys,
+  TrialDogPdfAnsiopisteet,
+  TrialDogPdfDataRequest,
+  TrialDogPdfKokeenTiedot,
+  TrialDogPdfKoiranTausta,
+  TrialDogPdfKoiranTiedot,
+  TrialDogPdfHuomautus,
+  TrialDogPdfLisatiedot,
+  TrialDogPdfLisatietoRow,
+  TrialDogPdfPayload,
+  TrialDogPdfPayloadWithTrialId,
+  TrialDogPdfTappiopisteet,
+  TrialDogPdfLoppupisteet,
+  TrialDogSex,
+  KoiratietokantaAjokUpsertRequest,
+  KoiratietokantaAjokUpsertResponse,
+  KoiratietokantaAjokValidationIssue,
+  KoiratietokantaAjokWarning,
+  KoiratietokantaAjokWarningCode,
 } from "./trials";
 
 export type {
@@ -215,6 +235,16 @@ export type {
   UpdateAdminShowWorkbookSchemaRuleResponse,
   ValidateAdminShowWorkbookSchemaRuleRequest,
   ValidateAdminShowWorkbookSchemaRuleResponse,
+  AdminTrialEventDetails,
+  AdminTrialEventDetailsRequest,
+  AdminTrialEventDetailsResponse,
+  AdminTrialEventEntry,
+  AdminTrialEventSearchFilters,
+  AdminTrialEventSearchMode,
+  AdminTrialEventSearchRequest,
+  AdminTrialEventSearchResponse,
+  AdminTrialEventSearchSort,
+  AdminTrialEventSummary,
 } from "./admin";
 export type { HomeStatisticsResponse } from "./home";
 export {

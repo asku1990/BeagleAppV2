@@ -1,0 +1,329 @@
+import {
+  type KoiratietokantaAjokUpsertRequest,
+  type KoiratietokantaAjokValidationIssue,
+  type KoiratietokantaAjokWarning,
+} from "@beagle/contracts";
+import type {
+  KoiratietokantaAjokEntryDbInput,
+  KoiratietokantaAjokEraDbInput,
+  KoiratietokantaAjokEventDbInput,
+} from "@beagle/db";
+import { TrialEntryHuomautus, TrialEntryKoetyyppi } from "@beagle/db";
+import {
+  isValidRegistrationNo,
+  normalizeRegistrationNo,
+} from "@server/imports/core";
+import { mapKoiratietokantaAjokEraWrites } from "./map-ajok-era-writes";
+import {
+  isRecord,
+  normalizeText,
+  parseBooleanFlag,
+  parseInteger,
+  parseKoepvm,
+  parseOptionalDecimal,
+  parseOptionalInteger,
+} from "./parse-ajok-payload";
+import { mapKoiratietokantaAjokLisatiedot } from "./map-ajok-lisatiedot";
+
+type MapperResult =
+  | {
+      ok: true;
+      event: Omit<KoiratietokantaAjokEventDbInput, "trialRuleWindowId">;
+      entry: KoiratietokantaAjokEntryDbInput;
+      eras: KoiratietokantaAjokEraDbInput[];
+      lisatiedot: ReturnType<typeof mapKoiratietokantaAjokLisatiedot>;
+      warnings: KoiratietokantaAjokWarning[];
+    }
+  | {
+      ok: false;
+      issues: KoiratietokantaAjokValidationIssue[];
+    };
+
+function joinUniqueText(values: Array<string | null>): string | null {
+  const seen = new Set<string>();
+  const parts: string[] = [];
+
+  for (const value of values) {
+    if (!value || seen.has(value)) {
+      continue;
+    }
+    seen.add(value);
+    parts.push(value);
+  }
+
+  return parts.length > 0 ? parts.join(" ") : null;
+}
+
+// Maps one raw yksi_tulos-style payload into the canonical AJOK event/entry
+// write model while preserving optional parse issues as warnings.
+export function mapKoiratietokantaAjokPayload(
+  payload: KoiratietokantaAjokUpsertRequest,
+): MapperResult {
+  if (!isRecord(payload)) {
+    return {
+      ok: false,
+      issues: [
+        {
+          field: "$",
+          code: "INVALID",
+          message: "Payload must be a JSON object.",
+        },
+      ],
+    };
+  }
+
+  const issues: KoiratietokantaAjokValidationIssue[] = [];
+  const warnings: KoiratietokantaAjokWarning[] = [];
+  const sklKoeId = parseInteger(payload.SKLid);
+  if (sklKoeId === null) {
+    issues.push({
+      field: "SKLid",
+      code: payload.SKLid == null ? "REQUIRED" : "INVALID",
+      message: "SKLid is required and must be an integer.",
+    });
+  }
+
+  const registrationNo = normalizeRegistrationNo(
+    normalizeText(payload.REKISTERINUMERO),
+  );
+  if (!registrationNo || !isValidRegistrationNo(registrationNo)) {
+    issues.push({
+      field: "REKISTERINUMERO",
+      code: registrationNo ? "INVALID" : "REQUIRED",
+      message: "REKISTERINUMERO is required and must be valid.",
+    });
+  }
+
+  const koepaiva = parseKoepvm(payload.Koepvm);
+  if (!koepaiva) {
+    issues.push({
+      field: "Koepvm",
+      code: payload.Koepvm == null ? "REQUIRED" : "INVALID",
+      message: "Koepvm is required and must be a valid date.",
+    });
+  }
+
+  const koekunta = normalizeText(payload.KOEPAIKKA);
+  if (!koekunta) {
+    issues.push({
+      field: "KOEPAIKKA",
+      code: payload.KOEPAIKKA == null ? "REQUIRED" : "INVALID",
+      message: "KOEPAIKKA is required.",
+    });
+  }
+
+  if (
+    issues.length > 0 ||
+    sklKoeId === null ||
+    !registrationNo ||
+    !koepaiva ||
+    !koekunta
+  ) {
+    return { ok: false, issues };
+  }
+
+  const ylituomariNimi = normalizeText(payload.yt);
+  const ylituomariNumero = normalizeText(payload.ytnro);
+  const lisatiedot = mapKoiratietokantaAjokLisatiedot(payload);
+  const koekaudenkoe = parseBooleanFlag(payload.koekaudenkoe);
+  const pitkakoe = parseBooleanFlag(payload.pitkakoe);
+  const luopui = parseBooleanFlag(payload.luopui);
+  const suljettu = parseBooleanFlag(payload.suljettu);
+  const keskeytetty = parseBooleanFlag(payload.keskeytti);
+
+  if (koekaudenkoe === true && pitkakoe === true) {
+    return {
+      ok: false,
+      issues: [
+        {
+          field: "koekaudenkoe",
+          code: "INVALID",
+          message:
+            "koekaudenkoe and pitkakoe cannot both be true for the same entry.",
+        },
+      ],
+    };
+  }
+
+  const activeHuomautusFlags = [
+    { field: "luopui", value: luopui },
+    { field: "suljettu", value: suljettu },
+    { field: "keskeytti", value: keskeytetty },
+  ].filter((flag) => flag.value === true);
+
+  if (activeHuomautusFlags.length > 1) {
+    return {
+      ok: false,
+      issues: [
+        {
+          field: activeHuomautusFlags.map((flag) => flag.field).join(","),
+          code: "INVALID",
+          message:
+            "luopui, suljettu and keskeytti are mutually exclusive for the same entry.",
+        },
+      ],
+    };
+  }
+
+  const koetyyppi =
+    koekaudenkoe === true
+      ? TrialEntryKoetyyppi.KOKOKAUDENKOE
+      : pitkakoe === true
+        ? TrialEntryKoetyyppi.PITKAKOE
+        : TrialEntryKoetyyppi.NORMAL;
+  const huomautus =
+    luopui === true
+      ? TrialEntryHuomautus.LUOPUI
+      : suljettu === true
+        ? TrialEntryHuomautus.SULJETTU
+        : keskeytetty === true
+          ? TrialEntryHuomautus.KESKEYTETTY
+          : null;
+  const huomautusTeksti = joinUniqueText([
+    normalizeText(payload.HUOMAUTUS),
+    normalizeText(payload.VIITE),
+  ]);
+  const entry: KoiratietokantaAjokEntryDbInput = {
+    rekisterinumeroSnapshot: registrationNo,
+    yksilointiAvain: `SKL:${sklKoeId}|REG:${registrationNo}`,
+    raakadataJson: JSON.stringify(payload),
+    luokka: normalizeText(payload.LUOKKA),
+    omistajaSnapshot: normalizeText(payload.Omistaja),
+    omistajanKotikuntaSnapshot: normalizeText(payload.Omistajankotipaikka),
+    koemaasto: normalizeText(payload.koemaasto),
+    era1Alkoi: normalizeText(payload.I_ERA_KLO),
+    era2Alkoi: normalizeText(payload.II_ERA_KLO),
+    era3Alkoi: normalizeText(payload.III_ERA_KLO),
+    era4Alkoi: normalizeText(payload.IV_ERA_KLO),
+    era1HuomautusTeksti: normalizeText(payload.I_VIITE),
+    era2HuomautusTeksti: normalizeText(payload.II_VIITE),
+    era3HuomautusTeksti: normalizeText(payload.III_VIITE),
+    era4HuomautusTeksti: normalizeText(payload.IV_VIITE),
+    hakuMin1: parseOptionalInteger(payload, "i_haku_min", warnings),
+    hakuMin2: parseOptionalInteger(payload, "II_HAKU_MIN", warnings),
+    hakuMin3: parseOptionalInteger(payload, "III_HAKU_MIN", warnings),
+    hakuMin4: parseOptionalInteger(payload, "IV_HAKU_MIN", warnings),
+    ajoMin1: parseOptionalInteger(payload, "I_AJO_MIN", warnings),
+    ajoMin2: parseOptionalInteger(payload, "II_AJO_MIN", warnings),
+    ajoMin3: parseOptionalInteger(payload, "III_AJO_MIN", warnings),
+    ajoMin4: parseOptionalInteger(payload, "IV_AJO_MIN", warnings),
+    hyvaksytytAjominuutit: parseOptionalInteger(
+      payload,
+      "HYV_AJOT_MIN",
+      warnings,
+    ),
+    ajoajanPisteet: parseOptionalDecimal(payload, "AJOPISTEET", warnings),
+    pin: parseOptionalDecimal(payload, "PIN", warnings),
+    hakuEra1: parseOptionalDecimal(payload, "I_HAKU", warnings),
+    hakuEra2: parseOptionalDecimal(payload, "II_HAKU", warnings),
+    hakuEra3: parseOptionalDecimal(payload, "III_HAKU", warnings),
+    hakuEra4: parseOptionalDecimal(payload, "IV_HAKU", warnings),
+    haku: parseOptionalDecimal(payload, "HAKUPISTEET", warnings),
+    haukkuEra1: parseOptionalDecimal(payload, "I_HAUKKU", warnings),
+    haukkuEra2: parseOptionalDecimal(payload, "II_HAUKKU", warnings),
+    haukkuEra3: parseOptionalDecimal(payload, "III_HAUKKU", warnings),
+    haukkuEra4: parseOptionalDecimal(payload, "IV_HAUKKU", warnings),
+    hauk: parseOptionalDecimal(payload, "HAUKKUPISTEET", warnings),
+    ajotaitoEra1: parseOptionalDecimal(payload, "I_AJOTAITO", warnings),
+    ajotaitoEra2: parseOptionalDecimal(payload, "II_AJOTAITO", warnings),
+    ajotaitoEra3: parseOptionalDecimal(payload, "III_AJOTAITO", warnings),
+    ajotaitoEra4: parseOptionalDecimal(payload, "IV_AJOTAITO", warnings),
+    yva: parseOptionalDecimal(payload, "AJOTAITOPISTEET", warnings),
+    hlo: parseOptionalDecimal(payload, "HAKULOYSYYSPISTEET", warnings),
+    alo: parseOptionalDecimal(payload, "AJOLOYSYYSPISTEET", warnings),
+    ansiopisteetYhteensa: parseOptionalDecimal(
+      payload,
+      "ANSIOPISTEET",
+      warnings,
+    ),
+    hakuloysyysTappioEra1: parseOptionalDecimal(
+      payload,
+      "I_HAKULOYSYYS",
+      warnings,
+    ),
+    hakuloysyysTappioEra2: parseOptionalDecimal(
+      payload,
+      "II_HAKULOYSYYS",
+      warnings,
+    ),
+    hakuloysyysTappioEra3: parseOptionalDecimal(
+      payload,
+      "III_HAKULOYSYYS",
+      warnings,
+    ),
+    hakuloysyysTappioEra4: parseOptionalDecimal(
+      payload,
+      "IV_HAKULOYSYYS",
+      warnings,
+    ),
+    hakuloysyysTappioYhteensa: parseOptionalDecimal(
+      payload,
+      "HAKULOYSYYSPISTEET",
+      warnings,
+    ),
+    ajoloysyysTappioEra1: parseOptionalDecimal(
+      payload,
+      "I_AJOLOYSYYS",
+      warnings,
+    ),
+    ajoloysyysTappioEra2: parseOptionalDecimal(
+      payload,
+      "II_AJOLOYSYYS",
+      warnings,
+    ),
+    ajoloysyysTappioEra3: parseOptionalDecimal(
+      payload,
+      "III_AJOLOYSYYS",
+      warnings,
+    ),
+    ajoloysyysTappioEra4: parseOptionalDecimal(
+      payload,
+      "IV_AJOLOYSYYS",
+      warnings,
+    ),
+    ajoloysyysTappioYhteensa: parseOptionalDecimal(
+      payload,
+      "AJOLOYSYYSPISTEET",
+      warnings,
+    ),
+    tappiopisteetYhteensa: parseOptionalDecimal(
+      payload,
+      "TAPPIOPISTEET",
+      warnings,
+    ),
+    loppupisteet: parseOptionalDecimal(payload, "LOPPUPISTEET", warnings),
+    palkinto: normalizeText(payload.PALKINTOSIJA),
+    sijoitus: normalizeText(payload.SIJOITUS_LUOKASSA),
+    koemuoto: normalizeText(payload.SKLkoemuoto),
+    koiriaLuokassa: parseOptionalInteger(payload, "KOIRIA_LUOKASSA", warnings),
+    koetyyppi,
+    keli: normalizeText(payload.KELI),
+    huomautus,
+    huomautusTeksti,
+    ylituomariNimiSnapshot: ylituomariNimi,
+    ylituomariNumeroSnapshot: ylituomariNumero,
+    ryhmatuomariNimi: normalizeText(payload.palkintotuomari1),
+    palkintotuomariNimi: normalizeText(payload.palkintotuomari2),
+  };
+
+  return {
+    ok: true,
+    warnings,
+    lisatiedot,
+    eras: mapKoiratietokantaAjokEraWrites(entry, lisatiedot),
+    event: {
+      sklKoeId,
+      koepaiva,
+      koekunta,
+      jarjestaja: normalizeText(payload.JARJESTAJA),
+      kennelpiiri: normalizeText(payload.KENNELPIIRI),
+      kennelpiirinro:
+        normalizeText(payload.KENNELPIIRINRO) ??
+        normalizeText(payload.SKLkennelpiiri),
+      ylituomariNimi,
+      ylituomariNumero,
+      ytKertomus: normalizeText(payload.YTkertomus),
+    },
+    entry,
+  };
+}

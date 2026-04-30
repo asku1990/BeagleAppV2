@@ -10,3 +10,26 @@ export type {
   BeagleTrialSearchRow,
   BeagleTrialSearchSort,
 } from "./beagle-trials";
+export type {
+  TrialDogPdfAjoajanPisteytys,
+  TrialDogPdfAnsiopisteet,
+  TrialDogPdfDataRequest,
+  TrialDogPdfKokeenTiedot,
+  TrialDogPdfKoiranTausta,
+  TrialDogPdfKoiranTiedot,
+  TrialDogPdfHuomautus,
+  TrialDogPdfLisatiedot,
+  TrialDogPdfLisatietoRow,
+  TrialDogPdfPayload,
+  TrialDogPdfPayloadWithTrialId,
+  TrialDogPdfTappiopisteet,
+  TrialDogPdfLoppupisteet,
+  TrialDogSex,
+} from "./trial-dog-pdf";
+export type {
+  KoiratietokantaAjokUpsertRequest,
+  KoiratietokantaAjokUpsertResponse,
+  KoiratietokantaAjokValidationIssue,
+  KoiratietokantaAjokWarning,
+  KoiratietokantaAjokWarningCode,
+} from "./integrations/koiratietokanta";

@@ -26,6 +26,15 @@ Use this format for new entries:
 
 ## Entries
 
+## 2026-04-30 - Replace temporary 2023 AJOK PDF template
+
+- Area: `apps/web/lib/public/beagle/trials/pdf/rule-sets/current-2023/` and `apps/web/public/templates/ajok-poytakirja-2023.pdf`.
+- Issue: The `current-2023` renderer uses a copy of the 2011-2023 PDF template as a stand-in because the official 2023→ template is not yet available. A visible Finnish notice is drawn on every generated page to communicate this.
+- Impact: The generated PDF is functionally correct for the existing fields, but the template header text, layout, and any new 2023-specific lisätieto fields may differ from the final official version.
+- Suggested fix: When the official 2023 pöytäkirja template is delivered, replace `ajok-poytakirja-2023.pdf`, verify all coordinate constants in the `current-2023` renderer, add/adjust any new lisätieto codes or sections, and remove the "not final" notice from the renderer.
+- Trigger to revisit: Official 2023 AJOK pöytäkirja template becomes available.
+- Ticket: BEJ-96 follow-up.
+
 ## 2026-04-04 - Align show-definition visibility semantics
 
 - Area: `ShowResultDefinition` reads, projections, and admin UI option building.
@@ -70,3 +79,30 @@ Use this format for new entries:
 - Suggested fix: Add explicit multi-judge support to the public show contract/UI instead of collapsing to one value.
 - Trigger to revisit: Next public show UI/contract redesign or workbook-driven show presentation task.
 - Ticket: BEJ-45 follow-up.
+
+## 2026-04-14 - AJOK missing event/dog contract fields
+
+- Area: AJOK future poytakirja event and dog field parity.
+- Issue: `TrialResult`-based read model does not type event metadata (`sklKoeId`, `rotukoodi`, `jarjestaja`, `koemuoto`) or most dog identity snapshot fields required by the locked flow-gate contract.
+- Impact: BEJ-79 schema rollout can drift from BEJ-78 contract unless these fields are implemented with explicit mapping rules.
+- Suggested fix: In BEJ-79, add canonical `TrialEvent` and `TrialEntry` typed fields and map them from API/legacy sources with per-field tests against the BEJ-78 contract table.
+- Trigger to revisit: BEJ-79 implementation kickoff and schema mapping PR review.
+- Ticket: BEJ-79.
+
+## 2026-04-14 - AJOK missing era/result/status contract fields
+
+- Area: AJOK result/era/status read parity.
+- Issue: Current read model lacks some era-level timing/score fields and explicit status flag read parity (`luopui`, `suljettu`, `keskeytetty`) expected by the future poytakirja contract.
+- Impact: Read-path switch readiness cannot be expanded beyond the BEJ-78 minimum set until these fields are typed and validated.
+- Suggested fix: Implement missing result/status fields in BEJ-79 schema and BEJ-80 import mapping, then re-run BEJ-78 flow-gate tests with updated statuses.
+- Trigger to revisit: BEJ-80 backfill/import mapping work and BEJ-82 read-switch preparation.
+- Ticket: BEJ-80.
+
+## 2026-04-14 - AJOK additional/conditions detail gap follow-up
+
+- Area: AJOK lisatiedot and condition-detail completeness.
+- Issue: `lisatiedotJson` remains outside typed read-path parity; the old `paljasMaa`, `lumikeli`, `rokotusOk`, and `tunnistusOk` columns have been dropped from the canonical `TrialEntry` schema.
+- Impact: Additional-detail reporting and future PDF/structured rendering remain partial while `lisatiedotJson` is still raw-only.
+- Suggested fix: Preserve and normalize lisätiedot into typed read adapters and update the gap catalog status for `lisatiedotJson` when canonical mapping is ready.
+- Trigger to revisit: next AJOK additional-field parity task after BEJ-82.
+- Ticket: BEJ-82.

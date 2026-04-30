@@ -1,4 +1,12 @@
-export { DogSex, ImportKind, ImportStatus, Role } from "@prisma/client";
+export {
+  DogSex,
+  ImportKind,
+  ImportStatus,
+  Role,
+  TrialEntryHuomautus,
+  TrialEntryKoetyyppi,
+  TrialSourceTag,
+} from "@prisma/client";
 
 export { prisma } from "./core/prisma";
 export {
@@ -23,7 +31,15 @@ export {
   type ImportRunSummary,
 } from "./imports/repository";
 
-export { fetchLegacyTrialRows } from "./imports/phase2";
+export {
+  fetchLegacyTrialMirrorRows,
+  TRIAL_MIRROR_TABLES,
+} from "./imports/phase2";
+export {
+  countLegacyTrialMirrorRowsDb,
+  upsertLegacyTrialMirrorRowsDb,
+} from "./imports/phase2";
+export { loadLegacyTrialMirrorValidationRowsDb } from "./imports/trial-mirror-validation";
 export { fetchLegacyShowRows } from "./imports/phase3";
 export { fetchLegacyPhase1Rows } from "./imports/phase1";
 export { fetchLegacyPhase1_5Rows } from "./imports/phase1_5";
@@ -34,7 +50,15 @@ export {
   type LegacyEkRow,
   type LegacyDogTitleRow,
   type LegacyOwnerRow,
-  type LegacyTrialResultRow,
+  type LegacyTrialMirrorAkoeallRow,
+  type LegacyTrialMirrorAkoeallValidationRow,
+  type LegacyTrialMirrorBealtCommonRow,
+  type LegacyTrialMirrorCounts,
+  type LegacyTrialMirrorDetailTableName,
+  type LegacyTrialMirrorDetailValidationRow,
+  type LegacyTrialMirrorRows,
+  type LegacyTrialMirrorTableName,
+  type LegacyTrialMirrorValidationRows,
   type LegacyShowResultRow,
   type LegacySamakoiraRow,
   type LegacyPhase1Rows,
@@ -104,16 +128,34 @@ export {
   getBeagleTrialDetailsDb,
   getBeagleTrialsForDogDb,
   searchBeagleTrialsDb,
+  upsertKoiratietokantaAjokResultDb,
   type BeagleTrialDetailsRequestDb,
   type BeagleTrialDetailsResponseDb,
   type BeagleTrialDetailsRowDb,
   type BeagleTrialDogRowDb,
-  type BeagleTrialSearchModeDb,
   type BeagleTrialSearchRequestDb,
   type BeagleTrialSearchResponseDb,
   type BeagleTrialSearchRowDb,
   type BeagleTrialSearchSortDb,
+  type KoiratietokantaAjokEntryDbInput,
+  type KoiratietokantaAjokEventDbInput,
+  type KoiratietokantaAjokEraDbInput,
+  type KoiratietokantaAjokEraLisatietoDbInput,
+  type KoiratietokantaAjokLisatietoDbInput,
+  type KoiratietokantaAjokUpsertDbInput,
+  type KoiratietokantaAjokUpsertDbResult,
 } from "./trials";
+export {
+  getAdminTrialEventDetailsDb,
+  searchAdminTrialsDb,
+  type AdminTrialEventDetailsDb,
+  type AdminTrialEventDetailsRequestDb,
+  type AdminTrialEventEntryDb,
+  type AdminTrialEventSearchRequestDb,
+  type AdminTrialEventSearchResponseDb,
+  type AdminTrialEventSearchSortDb,
+  type AdminTrialEventSummaryDb,
+} from "./admin/trials";
 
 export {
   createAdminDogWriteDb,

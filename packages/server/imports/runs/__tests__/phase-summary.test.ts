@@ -35,17 +35,34 @@ describe("formatLegacyImportSummary", () => {
     expect(summary).not.toContain("showResults=");
   });
 
-  it("formats phase2 with trial counters only", () => {
+  it("formats phase2 mirror import with source and stored counters", () => {
     const summary = formatLegacyImportSummary({
-      kind: "LEGACY_PHASE2",
-      trialResultsUpserted: 9,
+      kind: "LEGACY_TRIAL_MIRROR",
+      mirrorRowsUpserted: 3,
+      sourceCounts: {
+        akoeall: 1,
+        bealt: 1,
+        bealt0: 1,
+        bealt1: 0,
+        bealt2: 0,
+        bealt3: 0,
+      },
+      mirrorCounts: {
+        akoeall: 1,
+        bealt: 1,
+        bealt0: 1,
+        bealt1: 0,
+        bealt2: 0,
+        bealt3: 0,
+      },
+      zeroDateRows: 1,
+      warningsCount: 0,
       errorsCount: 0,
     });
 
-    expect(summary).toBe("Phase 2: trialResults=9, errors=0.");
-    expect(summary).not.toContain("dogs=");
-    expect(summary).not.toContain("owners=");
-    expect(summary).not.toContain("titles=");
+    expect(summary).toBe(
+      "Phase 2: mirrorRows=3, sourceRows=3, storedRows=3, zeroDateMuokattu=1, warnings=0, errors=0.",
+    );
     expect(summary).not.toContain("showResults=");
   });
 
