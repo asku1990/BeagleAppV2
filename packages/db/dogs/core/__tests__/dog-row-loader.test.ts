@@ -49,7 +49,7 @@ describe("dogs/core/dog-row-loader", () => {
           registrations: [],
         },
         _count: {
-          trialResults: 2,
+          trialEntries: 2,
           showEntries: 3,
         },
       },
@@ -72,7 +72,7 @@ describe("dogs/core/dog-row-loader", () => {
           registrations: [],
         },
         _count: {
-          trialResults: 0,
+          trialEntries: 0,
           showEntries: 0,
         },
       },
@@ -89,7 +89,7 @@ describe("dogs/core/dog-row-loader", () => {
         sire: null,
         dam: null,
         _count: {
-          trialResults: 1,
+          trialEntries: 1,
           showEntries: 1,
         },
       },

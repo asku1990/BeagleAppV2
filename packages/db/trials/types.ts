@@ -31,7 +31,7 @@ export type BeagleTrialDetailsRequestDb = {
 
 export type BeagleTrialDetailsRowDb = {
   id: string;
-  dogId: string;
+  dogId: string | null;
   registrationNo: string;
   name: string;
   sex: "U" | "N" | "-";
@@ -41,8 +41,6 @@ export type BeagleTrialDetailsRowDb = {
   rank: string | null;
   points: number | null;
   judge: string | null;
-  // Legacy per-dog scoring fields from `akoeall` rows.
-  // TAPPA -> eventPlace (event-level), these remain dog-row metrics.
   haku: number | null;
   hauk: number | null;
   yva: number | null;
@@ -50,11 +48,6 @@ export type BeagleTrialDetailsRowDb = {
   alo: number | null;
   tja: number | null;
   pin: number | null;
-  // Internal import-trace fields (not exposed in public contract/UI).
-  legacyFlag: string | null;
-  sourceKey: string;
-  createdAt: Date;
-  updatedAt: Date;
 };
 
 export type BeagleTrialDetailsResponseDb = {
@@ -70,7 +63,6 @@ export type BeagleTrialDogRowDb = {
   place: string;
   date: Date;
   weather: string | null;
-  className: string | null;
   classCode: string | null;
   rank: string | null;
   points: number | null;

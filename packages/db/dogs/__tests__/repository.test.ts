@@ -54,7 +54,7 @@ function makeDogRow(input: {
     sire: null,
     dam: null,
     _count: {
-      trialResults: 0,
+      trialEntries: 0,
       showEntries: 0,
     },
   };

@@ -1,22 +1,24 @@
 import { prisma } from "../core/prisma";
 import type { BeagleTrialDogRowDb } from "./types";
 
+function toNumberOrNull(value: { toNumber(): number } | null): number | null {
+  return value === null ? null : value.toNumber();
+}
+
 export async function getBeagleTrialsForDogDb(
   dogId: string,
 ): Promise<BeagleTrialDogRowDb[]> {
-  const rows = await prisma.trialResult.findMany({
+  const rows = await prisma.trialEntry.findMany({
     where: { dogId },
     select: {
       id: true,
-      eventPlace: true,
-      eventDate: true,
       ke: true,
-      eventName: true,
       lk: true,
       sija: true,
       piste: true,
       pa: true,
-      judge: true,
+      tuom1: true,
+      ylituomariNimiSnapshot: true,
       haku: true,
       hauk: true,
       yva: true,
@@ -24,27 +26,41 @@ export async function getBeagleTrialsForDogDb(
       alo: true,
       tja: true,
       pin: true,
+      trialEvent: {
+        select: {
+          koekunta: true,
+          koepaiva: true,
+          ylituomariNimi: true,
+        },
+      },
     },
-    orderBy: [{ eventDate: "desc" }, { eventPlace: "asc" }, { id: "asc" }],
+    orderBy: [
+      { trialEvent: { koepaiva: "desc" } },
+      { trialEvent: { koekunta: "asc" } },
+      { id: "asc" },
+    ],
   });
 
   return rows.map((row) => ({
     id: row.id,
-    place: row.eventPlace,
-    date: row.eventDate,
+    place: row.trialEvent.koekunta,
+    date: row.trialEvent.koepaiva,
     weather: row.ke,
-    className: row.eventName,
     classCode: row.lk,
     rank: row.sija,
-    points: row.piste ? row.piste.toNumber() : null,
+    points: toNumberOrNull(row.piste),
     award: row.pa,
-    judge: row.judge,
-    haku: row.haku ? row.haku.toNumber() : null,
-    hauk: row.hauk ? row.hauk.toNumber() : null,
-    yva: row.yva ? row.yva.toNumber() : null,
-    hlo: row.hlo ? row.hlo.toNumber() : null,
-    alo: row.alo ? row.alo.toNumber() : null,
-    tja: row.tja ? row.tja.toNumber() : null,
-    pin: row.pin ? row.pin.toNumber() : null,
+    judge:
+      row.ylituomariNimiSnapshot?.trim() ||
+      row.tuom1?.trim() ||
+      row.trialEvent.ylituomariNimi ||
+      null,
+    haku: toNumberOrNull(row.haku),
+    hauk: toNumberOrNull(row.hauk),
+    yva: toNumberOrNull(row.yva),
+    hlo: toNumberOrNull(row.hlo),
+    alo: toNumberOrNull(row.alo),
+    tja: toNumberOrNull(row.tja),
+    pin: toNumberOrNull(row.pin),
   }));
 }

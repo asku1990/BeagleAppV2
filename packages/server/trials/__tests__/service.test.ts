@@ -181,10 +181,6 @@ describe("trials service", () => {
           alo: null,
           tja: null,
           pin: null,
-          legacyFlag: null,
-          sourceKey: "src_1",
-          createdAt: new Date("2025-06-01T00:00:00.000Z"),
-          updatedAt: new Date("2025-06-01T00:00:00.000Z"),
         },
       ],
     });

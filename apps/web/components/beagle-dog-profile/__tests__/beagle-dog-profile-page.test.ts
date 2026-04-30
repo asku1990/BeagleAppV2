@@ -152,7 +152,6 @@ describe("BeagleDogProfilePage", () => {
               place: "Turku",
               date: "2024-02-01",
               weather: "P",
-              className: "VOI",
               rank: "1",
               points: 85.5,
               award: "BEAJ-1",
