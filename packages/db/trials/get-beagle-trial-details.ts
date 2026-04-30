@@ -85,6 +85,7 @@ export async function getBeagleTrialDetailsDb(
           sija: true,
           piste: true,
           tuom1: true,
+          ylituomariNimiSnapshot: true,
           haku: true,
           hauk: true,
           yva: true,
@@ -135,8 +136,12 @@ export async function getBeagleTrialDetailsDb(
       classCode: entry.lk,
       rank: entry.sija,
       points: toNumberOrNull(entry.piste),
-      // Per-entry group judge (tuom1) takes precedence over event chief judge.
-      judge: entry.tuom1?.trim() || eventJudge || null,
+      // Dog-row judge prefers the entry snapshot; legacy imports only have tuom1.
+      judge:
+        entry.ylituomariNimiSnapshot?.trim() ||
+        entry.tuom1?.trim() ||
+        eventJudge ||
+        null,
       haku: toNumberOrNull(entry.haku),
       hauk: toNumberOrNull(entry.hauk),
       yva: toNumberOrNull(entry.yva),

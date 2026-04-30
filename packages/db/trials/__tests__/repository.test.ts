@@ -311,6 +311,7 @@ describe("getBeagleTrialDetailsDb", () => {
             sija: null,
             piste: null,
             tuom1: null,
+            ylituomariNimiSnapshot: null,
             haku: null,
             hauk: null,
             yva: null,
@@ -331,6 +332,7 @@ describe("getBeagleTrialDetailsDb", () => {
             sija: "2",
             piste: { toNumber: () => 72.5 },
             tuom1: null,
+            ylituomariNimiSnapshot: null,
             haku: { toNumber: () => 4.1 },
             hauk: { toNumber: () => 4.2 },
             yva: { toNumber: () => 4.3 },
@@ -341,7 +343,7 @@ describe("getBeagleTrialDetailsDb", () => {
             dog: { name: "Bella", sex: DogSex.FEMALE },
           },
           {
-            // linked dog with per-entry tuom1 group judge
+            // linked dog with per-entry ylituomari snapshot
             id: "r1",
             dogId: "d1",
             rekisterinumeroSnapshot: "FI-100/25",
@@ -351,6 +353,7 @@ describe("getBeagleTrialDetailsDb", () => {
             sija: "1",
             piste: { toNumber: () => 88.25 },
             tuom1: "Judge Group",
+            ylituomariNimiSnapshot: "Judge Snapshot",
             haku: { toNumber: () => 5.1 },
             hauk: { toNumber: () => 5.2 },
             yva: { toNumber: () => 5.3 },
@@ -386,7 +389,7 @@ describe("getBeagleTrialDetailsDb", () => {
       classCode: "V",
       rank: "1",
       points: 88.25,
-      judge: "Judge Group",
+      judge: "Judge Snapshot",
     });
 
     // r2: linked dog, no tuom1 — falls back to event-level judge
@@ -427,6 +430,7 @@ describe("getBeagleTrialDetailsDb", () => {
             sija: null,
             piste: { toNumber: () => 80 },
             tuom1: null,
+            ylituomariNimiSnapshot: null,
             haku: null,
             hauk: null,
             yva: null,
@@ -453,6 +457,7 @@ describe("getBeagleTrialDetailsDb", () => {
             sija: null,
             piste: { toNumber: () => 70 },
             tuom1: null,
+            ylituomariNimiSnapshot: null,
             haku: null,
             hauk: null,
             yva: null,
@@ -497,6 +502,7 @@ describe("getBeagleTrialsForDogDb", () => {
         piste: { toNumber: () => 88.25 },
         pa: "1",
         tuom1: "Judge A",
+        ylituomariNimiSnapshot: "Judge Snapshot",
         haku: { toNumber: () => 4.1 },
         hauk: { toNumber: () => 4.2 },
         yva: { toNumber: () => 4.3 },
@@ -518,6 +524,7 @@ describe("getBeagleTrialsForDogDb", () => {
         piste: null,
         pa: null,
         tuom1: null,
+        ylituomariNimiSnapshot: null,
         haku: null,
         hauk: null,
         yva: null,
@@ -545,6 +552,7 @@ describe("getBeagleTrialsForDogDb", () => {
         piste: true,
         pa: true,
         tuom1: true,
+        ylituomariNimiSnapshot: true,
         haku: true,
         hauk: true,
         yva: true,
@@ -573,12 +581,11 @@ describe("getBeagleTrialsForDogDb", () => {
         place: "Lahti",
         date: new Date("2025-06-02T00:00:00.000Z"),
         weather: "L",
-        className: "V",
         classCode: "V",
         rank: "1",
         points: 88.25,
         award: "1",
-        judge: "Judge A",
+        judge: "Judge Snapshot",
         haku: 4.1,
         hauk: 4.2,
         yva: 4.3,
@@ -592,7 +599,6 @@ describe("getBeagleTrialsForDogDb", () => {
         place: "Helsinki",
         date: new Date("2025-06-01T00:00:00.000Z"),
         weather: null,
-        className: null,
         classCode: null,
         rank: null,
         points: null,
@@ -609,7 +615,7 @@ describe("getBeagleTrialsForDogDb", () => {
     ]);
   });
 
-  it("prefers tuom1 over event ylituomariNimi for judge", async () => {
+  it("prefers entry-level ylituomari snapshot, then tuom1, then event judge", async () => {
     trialEntryFindManyMock.mockResolvedValue([
       {
         id: "t1",
@@ -619,6 +625,7 @@ describe("getBeagleTrialsForDogDb", () => {
         piste: null,
         pa: null,
         tuom1: null,
+        ylituomariNimiSnapshot: null,
         haku: null,
         hauk: null,
         yva: null,
@@ -640,6 +647,7 @@ describe("getBeagleTrialsForDogDb", () => {
         piste: null,
         pa: null,
         tuom1: "Group Judge",
+        ylituomariNimiSnapshot: "Entry Chief",
         haku: null,
         hauk: null,
         yva: null,
@@ -657,7 +665,7 @@ describe("getBeagleTrialsForDogDb", () => {
 
     const result = await getBeagleTrialsForDogDb("dog-1");
 
-    expect(result[0]?.judge).toBe("Chief"); // tuom1 null -> falls back to ylituomariNimi
-    expect(result[1]?.judge).toBe("Group Judge"); // tuom1 takes precedence
+    expect(result[0]?.judge).toBe("Chief"); // no entry judge -> event fallback
+    expect(result[1]?.judge).toBe("Entry Chief"); // snapshot takes precedence
   });
 });

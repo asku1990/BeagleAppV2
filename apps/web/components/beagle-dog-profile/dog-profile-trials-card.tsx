@@ -59,7 +59,7 @@ export function DogProfileTrialsCard({
   const visibleRows = isExpanded ? rows : rows.slice(0, 10);
 
   const hasWeather = rows.some((r) => r.weather != null);
-  const hasAward = rows.some((r) => r.className != null || r.award != null);
+  const hasAward = rows.some((r) => r.award != null);
   const hasRank = rows.some((r) => r.rank != null);
   const hasPoints = rows.some((r) => r.points != null);
   const hasJudge = rows.some((r) => r.judge != null);
@@ -214,7 +214,7 @@ export function DogProfileTrialsCard({
                       )}
                       {hasAward && (
                         <td className="px-2 py-2">
-                          {row.className ?? row.award ?? FALLBACK_VALUE}
+                          {row.award ?? FALLBACK_VALUE}
                         </td>
                       )}
                       {hasRank && (
@@ -279,9 +279,7 @@ export function DogProfileTrialsCard({
                         <span className={beagleTheme.mutedText}>
                           {t("dog.profile.trials.col.class")}:
                         </span>{" "}
-                        <span>
-                          {row.className ?? row.award ?? FALLBACK_VALUE}
-                        </span>
+                        <span>{row.award ?? FALLBACK_VALUE}</span>
                       </p>
                     )}
                     {hasRank && (

@@ -18,6 +18,7 @@ export async function getBeagleTrialsForDogDb(
       piste: true,
       pa: true,
       tuom1: true,
+      ylituomariNimiSnapshot: true,
       haku: true,
       hauk: true,
       yva: true,
@@ -45,12 +46,15 @@ export async function getBeagleTrialsForDogDb(
     place: row.trialEvent.koekunta,
     date: row.trialEvent.koepaiva,
     weather: row.ke,
-    className: row.lk,
     classCode: row.lk,
     rank: row.sija,
     points: toNumberOrNull(row.piste),
     award: row.pa,
-    judge: row.tuom1?.trim() || row.trialEvent.ylituomariNimi || null,
+    judge:
+      row.ylituomariNimiSnapshot?.trim() ||
+      row.tuom1?.trim() ||
+      row.trialEvent.ylituomariNimi ||
+      null,
     haku: toNumberOrNull(row.haku),
     hauk: toNumberOrNull(row.hauk),
     yva: toNumberOrNull(row.yva),

@@ -119,7 +119,6 @@ describe("trial clipboard actions", () => {
           place: "Turku",
           date: "2025-06-01",
           weather: "P",
-          className: "VOI",
           rank: "1",
           points: 85.5,
           award: "Voi 1",

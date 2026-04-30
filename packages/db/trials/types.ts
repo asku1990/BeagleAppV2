@@ -63,7 +63,6 @@ export type BeagleTrialDogRowDb = {
   place: string;
   date: Date;
   weather: string | null;
-  className: string | null;
   classCode: string | null;
   rank: string | null;
   points: number | null;

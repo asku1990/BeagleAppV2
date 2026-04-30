@@ -26,7 +26,6 @@ export type BeagleDogProfileTrialRowDto = {
   place: string;
   date: string;
   weather: string | null;
-  className: string | null;
   rank: string | null;
   points: number | null;
   award: string | null;
