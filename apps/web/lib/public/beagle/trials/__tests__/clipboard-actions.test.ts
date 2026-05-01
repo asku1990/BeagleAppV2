@@ -79,6 +79,7 @@ describe("trial clipboard actions", () => {
     const result = await copyTrialDetailRowToClipboard({
       row: {
         id: "r1",
+        trialRuleWindowId: "trw_post_20230801",
         dogId: "d1",
         registrationNo: "FI-1/20",
         name: "Aatu",
