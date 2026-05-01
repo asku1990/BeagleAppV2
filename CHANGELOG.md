@@ -39,6 +39,7 @@ This project uses a user-facing changelog format.
 ### Fixed
 
 - Ajokokeen koirakohtainen PDF näyttää nyt koiran oman primary-rekisterinumeron eli ensimmäisenä lisätyn rekisterinumeron.
+- Vercelin AJOK PDF -route pakkaa nyt kaikki `public/templates/*.pdf`-pohjat mukaan, joten tuotanto voi lukea oikeat template-tiedostot ilman `ENOENT`-virhettä.
 
 ### Removed
 
