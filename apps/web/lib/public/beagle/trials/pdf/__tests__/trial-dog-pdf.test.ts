@@ -141,7 +141,7 @@ describe("renderTrialDogPdf", () => {
     expect(rawPdf.slice(0, 4)).toBe("%PDF");
   });
 
-  it("renders pdf bytes for the current 2023+ renderer with not-final notice", async () => {
+  it("renders pdf bytes for the current 2023+ renderer", async () => {
     const bytes = await renderTrialDogPdf({
       trialRuleWindowId: "trw_post_20230801",
       registrationNo: "FI98765/23",

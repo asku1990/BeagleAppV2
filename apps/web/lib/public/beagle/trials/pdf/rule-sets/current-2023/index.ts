@@ -1,12 +1,4 @@
 // Renderer for the 2023-> AJOK rule period.
-// The permanent 2023 template is not yet available; this renderer uses the
-// 2011-2023 PDF template and identical field coordinates as a stand-in.
-// When the official template is delivered:
-//   1. Replace apps/web/public/templates/ajok-poytakirja-2023.pdf.
-//   2. Verify and adjust all coordinate constants in the sibling files.
-//   3. Add/update any new lisatieto koodi rows.
-//   4. Remove the NOT_FINAL_NOTICE draw call below.
-import { rgb } from "pdf-lib";
 import { drawTrialDogPdfAjoajanPisteytys } from "./ajoajan-pisteytys";
 import { drawTrialDogPdfAllekirjoitukset } from "./allekirjoitukset";
 import { drawTrialDogPdfAnsiopisteet } from "./ansiopisteet";
@@ -25,11 +17,6 @@ import {
 import { drawTrialDogPdfLoppupisteet } from "./loppupisteet";
 import { drawTrialDogPdfTappiopisteet } from "./tappiopisteet";
 import type { TrialDogPdfRenderContext } from "../types";
-
-// Visible notice stamped on every PDF until the official 2023 template
-// replaces the temporary stand-in (see tech-debt.md).
-const NOT_FINAL_NOTICE =
-  "HUOM: Tämä ei ole lopullinen - väliaikainen PDF-pohja (2023->)";
 
 export function renderCurrent2023TrialDogPdfFields({
   input,
@@ -145,15 +132,5 @@ export function renderCurrent2023TrialDogPdfFields({
     ylituomariNimi: input.ylituomariNimi,
     page,
     font,
-  });
-
-  // Temporary notice until the official 2023 template is available.
-  const { height } = page.getSize();
-  page.drawText(NOT_FINAL_NOTICE, {
-    x: 35,
-    y: height - 18,
-    size: 8,
-    font,
-    color: rgb(0.75, 0.1, 0.1),
   });
 }

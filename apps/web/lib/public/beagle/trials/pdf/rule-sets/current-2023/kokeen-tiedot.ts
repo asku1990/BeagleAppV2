@@ -4,7 +4,7 @@ import type { TrialDogPdfKokeenTiedot } from "@contracts";
 
 export const KENNELPIIRI_FIELD = {
   x: 70,
-  y: 526.5,
+  y: 530.5,
   size: 12,
 } as const;
 

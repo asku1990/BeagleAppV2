@@ -15,10 +15,8 @@ does not define field mapping for any single pöytäkirja renderer.
   Field mapping and renderer details are documented in
   `docs/features/trials/ajokoe-koirakohtainen-poytakirja-2011-2023.md`.
 - `trw_post_20230801`: implemented through the `current-2023` renderer.
-  The permanent 2023 template is not yet available; the renderer reuses the
-  2011-2023 PDF template and identical coordinate helpers. A Finnish
-  "not final" notice is drawn on every generated page until the official
-  template is delivered. See BEJ-96.
+  The renderer uses the 2023→ PDF template. Coordinate tuning and lisätiedot
+  parity should be verified against generated output when the template changes.
 - Unknown or null rule periods are unsupported.
 
 ## Runtime behavior
@@ -35,10 +33,10 @@ does not define field mapping for any single pöytäkirja renderer.
   `apps/web/public/templates/ajok-poytakirja-2005-2011.pdf`
 - 2011-2023 template:
   `apps/web/public/templates/ajok-poytakirja-2011-2023.pdf`
-- 2023→ template (temporary copy of 2011-2023):
+- 2023→ template:
   `apps/web/public/templates/ajok-poytakirja-2023.pdf`
-  Replace with the official 2023 template when it becomes available and
-  re-verify all field coordinates for the `current-2023` renderer.
+  Re-verify all field coordinates for the `current-2023` renderer when this
+  template changes.
 
 Do not modify the official current template when adding or changing legacy rule
 period support.
