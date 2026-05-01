@@ -1,0 +1,1 @@
+export { upsertKoiratietokantaAjokResultService } from "./koiratietokanta";

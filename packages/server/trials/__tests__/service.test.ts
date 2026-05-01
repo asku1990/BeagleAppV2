@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createTrialsService } from "../service";
+import { getTrialBusinessDateStartUtc } from "../core/business-date";
 import { encodeTrialId, parseTrialId } from "../internal/trial-id";
 
 const { searchBeagleTrialsDbMock, getBeagleTrialDetailsDbMock } = vi.hoisted(
@@ -59,22 +60,17 @@ describe("trials service", () => {
   it("uses latest year by default and maps encoded trialId", async () => {
     searchBeagleTrialsDbMock
       .mockResolvedValueOnce({
-        mode: "range",
-        year: null,
-        dateFrom: null,
-        dateTo: null,
-        availableYears: [2025, 2024],
+        availableEventDates: [new Date("2025-06-01T00:00:00.000Z")],
         total: 0,
         totalPages: 0,
         page: 1,
         items: [],
       })
       .mockResolvedValueOnce({
-        mode: "year",
-        year: 2025,
-        dateFrom: null,
-        dateTo: null,
-        availableYears: [2025, 2024],
+        availableEventDates: [
+          new Date("2025-06-01T00:00:00.000Z"),
+          new Date("2024-06-01T00:00:00.000Z"),
+        ],
         total: 1,
         totalPages: 1,
         page: 1,
@@ -99,6 +95,52 @@ describe("trials service", () => {
       eventDate: new Date("2025-06-01T00:00:00.000Z"),
       eventPlace: "Helsinki",
     });
+    expect(searchBeagleTrialsDbMock).toHaveBeenNthCalledWith(1, {
+      page: 1,
+      pageSize: 1,
+      sort: "date-desc",
+    });
+    expect(searchBeagleTrialsDbMock).toHaveBeenNthCalledWith(2, {
+      dateFrom: new Date("2024-12-31T22:00:00.000Z"),
+      dateTo: new Date("2025-12-31T22:00:00.000Z"),
+      page: 1,
+      pageSize: 10,
+      sort: "date-desc",
+    });
+  });
+
+  it("normalizes range searches to business-timezone boundaries", async () => {
+    searchBeagleTrialsDbMock.mockResolvedValue({
+      availableEventDates: [new Date("2026-06-01T00:00:00.000Z")],
+      total: 1,
+      totalPages: 1,
+      page: 1,
+      items: [],
+    });
+
+    const service = createTrialsService();
+    const result = await service.searchBeagleTrials({
+      dateFrom: "2026-06-01",
+      dateTo: "2026-06-30",
+      sort: "date-asc",
+    });
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) throw new Error("Expected ok=true");
+
+    expect(result.body.data.filters).toEqual({
+      mode: "range",
+      year: null,
+      dateFrom: "2026-06-01",
+      dateTo: "2026-06-30",
+    });
+    expect(searchBeagleTrialsDbMock).toHaveBeenCalledWith({
+      dateFrom: getTrialBusinessDateStartUtc("2026-06-01"),
+      dateTo: getTrialBusinessDateStartUtc("2026-07-01"),
+      page: 1,
+      pageSize: 10,
+      sort: "date-asc",
+    });
   });
 
   it("returns 404 when trial details are missing", async () => {
@@ -122,6 +164,7 @@ describe("trials service", () => {
       items: [
         {
           id: "r1",
+          trialRuleWindowId: "trw_post_20230801",
           dogId: "d1",
           registrationNo: "FI-1/20",
           name: "Aatu",
@@ -139,10 +182,6 @@ describe("trials service", () => {
           alo: null,
           tja: null,
           pin: null,
-          legacyFlag: null,
-          sourceKey: "src_1",
-          createdAt: new Date("2025-06-01T00:00:00.000Z"),
-          updatedAt: new Date("2025-06-01T00:00:00.000Z"),
         },
       ],
     });
@@ -155,7 +194,15 @@ describe("trials service", () => {
     if (!result.body.ok) throw new Error("Expected ok=true");
 
     expect(result.body.data.items[0]?.award).toBe("Voi 1");
+    expect(result.body.data.items[0]?.trialRuleWindowId).toBe(
+      "trw_post_20230801",
+    );
     expect(result.body.data.trial.trialId).toBe(trialId);
+    expect(getBeagleTrialDetailsDbMock).toHaveBeenCalledWith({
+      eventDateStart: getTrialBusinessDateStartUtc("2025-06-01"),
+      eventDateEndExclusive: getTrialBusinessDateStartUtc("2025-06-02"),
+      eventPlace: "Helsinki",
+    });
   });
 
   it("returns 500 when db throws", async () => {

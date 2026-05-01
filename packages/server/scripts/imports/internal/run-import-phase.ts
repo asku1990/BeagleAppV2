@@ -16,7 +16,7 @@ type ExecutePhase = (
 ) => Promise<RunResult>;
 
 export async function runImportPhase(
-  phaseLabel: "phase1" | "phase1.5" | "phase2" | "phase3",
+  phaseLabel: "phase1" | "phase1.5" | "phase2" | "phase3" | "phase5",
   executePhase: ExecutePhase,
 ) {
   const args = process.argv.slice(2).filter((arg) => arg !== "--");

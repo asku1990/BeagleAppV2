@@ -49,7 +49,8 @@ export type BeagleTrialDetailsEvent = {
 
 export type BeagleTrialDetailsRow = {
   id: string;
-  dogId: string;
+  trialRuleWindowId: string | null;
+  dogId: string | null;
   registrationNo: string;
   name: string;
   sex: "U" | "N" | "-";

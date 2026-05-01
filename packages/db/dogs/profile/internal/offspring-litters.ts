@@ -170,7 +170,7 @@ function mapOffspringRow(
     registrationNo: getPrimaryRegistrationNo(puppy.registrations),
     sex: toSexCode(puppy.sex),
     ekNo: puppy.ekNo ?? null,
-    trialCount: puppy._count.trialResults,
+    trialCount: puppy._count.trialEntries,
     showCount: puppy._count.showEntries,
     litterCount: countOffspringLitters(puppy),
   };

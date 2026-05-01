@@ -49,7 +49,7 @@ const siblingCandidateInclude = {
   _count: {
     select: {
       showEntries: true,
-      trialResults: true,
+      trialEntries: true,
     },
   },
 } as const;

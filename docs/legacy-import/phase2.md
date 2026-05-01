@@ -5,67 +5,80 @@
 This is the detailed implementation reference for phase2.
 For overall flow and ordering, see `docs/legacy-import/import-flow.md`.
 
-Phase 2 imports trial result rows only.
+Phase 2 imports legacy AJOK trial source rows into frozen mirror tables only.
+It does not write `TrialEvent`, `TrialEntry`, `TrialLisatietoItem`, or other
+runtime trial tables.
+
+The mirror checkpoint is intentionally separate from runtime projection:
+
+```text
+v1 MariaDB -> legacy_* mirror tables -> later canonical runtime projection
+```
 
 ## Command
 
 `pnpm import:phase2 [USER_ID]`
 
-## Primary source table
+## Source tables
 
 - `akoeall`
+- `bealt`
+- `bealt0`
+- `bealt1`
+- `bealt2`
+- `bealt3`
 
-## Source row mapping (high level)
+`MUOKATTU` is read as raw text with `CAST(MUOKATTU AS CHAR)`, so zero-date
+values such as `0000-00-00 00:00:00` are preserved.
 
-`akoeall` rows are mapped into `TrialResult`, including:
+## Mirror writes
 
-- identity and event fields:
-  - `REKNO` -> registration key
-  - `TAPPA` -> event place
-  - `TAPPV` -> event date
-- result payload fields:
-  - class/award/rank/points fields (`LK`, `PA`, `SIJA`, `PISTE`)
-  - trial metric fields (`HAKU`, `HAUK`, `YVA`, `HLO`, `ALO`, `TJA`, `PIN`)
-  - judge and legacy flag (`TUOM1`, `VARA`)
+Phase 2 writes:
 
-## Main writes
+- `legacy_akoeall`
+- `legacy_bealt`
+- `legacy_bealt0`
+- `legacy_bealt1`
+- `legacy_bealt2`
+- `legacy_bealt3`
 
-- `TrialResult`
+Write rules:
 
-Dog linkage is resolved through `DogRegistration` (`registrationNo -> dogId`).
+- Upsert by the legacy composite key:
+  - `akoeall`: `REKNO + TAPPA + TAPPV`
+  - `bealt*`: `REKNO + TAPPA + TAPPV + ERA`
+- Preserve v1 source columns through Prisma field mappings.
+- Store the full source row snapshot in `rawPayloadJson`.
+- Store `sourceHash` from the raw payload for later comparison.
+- Do not normalize registrations, link dogs, group events, or calculate runtime fields.
 
-## Linking and write rules
+`ImportRun.kind` is `LEGACY_TRIAL_MIRROR`. The total mirror rows written are
+stored in `ImportRun.trialResultsUpserted` because the shared import run model
+does not yet have a trial-mirror-specific counter.
 
-- Phase2 builds a registration-to-dog index before row processing.
-- Each trial row uses that index to set `dogId` when possible.
-- Invalid registration format or missing required event fields are written as issues.
+## Validation
 
-## Idempotency and rerun behavior
+Phase 2 validates:
 
-- Trial writes are duplicate-safe by canonical trial identity (`sourceKey` path in trial upsert logic).
-- Re-running phase2 updates/keeps existing canonical trial identity rows instead of creating duplicates.
+- source row count vs mirror table row count per table
+- blank or invalid legacy primary-key parts
+- zero-date `MUOKATTU` rows are counted and preserved
 
-## Issue codes
-
-- `TRIAL_REGISTRATION_INVALID_FORMAT`
-- `TRIAL_EVENT_MISSING_REQUIRED_FIELDS`
-- run-level fallback: `UNEXPECTED_EXCEPTION`
-
-Issue rows are written to `ImportRunIssue` with `kind=LEGACY_PHASE2`.
-
-## Error handling detail
-
-- Row-level validation issues are recorded and import continues.
-- Run finishes `SUCCEEDED` with warnings when row issues exist.
-- Unexpected exceptions mark run as `FAILED` with `UNEXPECTED_EXCEPTION`.
+Count mismatch records `TRIAL_MIRROR_COUNT_MISMATCH` and marks the run failed.
+Blank or invalid key parts record `TRIAL_MIRROR_MISSING_KEY_PART` as warnings.
+Unexpected exceptions record `UNEXPECTED_EXCEPTION`.
 
 ## Implementation references
 
 - Phase use-case: `packages/server/imports/phase2/run-legacy-phase2.ts`
 - Source loader: `packages/db/imports/phase2/source.ts`
-- Trial upsert logic: `packages/server/imports/internal/persistence.ts` (`upsertTrialRows`)
+- DB persistence adapters: `packages/db/imports/phase2/repository.ts`
 
 ## Operational notes
 
-- Requires phase1 foundation data to maximize dog linking.
+- Phase 2 is safe to rerun against the same source; rows are upserted by legacy key.
+- Run `pnpm import:trials:validate-mirror` after Phase 2 to inspect mirror
+  integrity before runtime projection.
+- Runtime trial projection is handled by Phase 5; Phase 2 only writes frozen
+  mirror rows.
 - Phase 2 belongs to the initial migration flow and is included in `import:bootstrap`.

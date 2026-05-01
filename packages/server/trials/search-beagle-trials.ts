@@ -1,11 +1,17 @@
 import { searchBeagleTrialsDb, type BeagleTrialSearchSortDb } from "@beagle/db";
 import type {
   BeagleTrialSearchRequest,
+  BeagleTrialSearchMode,
   BeagleTrialSearchResponse,
 } from "@beagle/contracts";
 import { toBusinessDateOnly } from "../core/date-only";
 import { toErrorLog, withLogContext } from "../core/logger";
 import type { ServiceResult } from "../core/result";
+import {
+  getTrialBusinessDateUtcRange,
+  getTrialBusinessYearUtcRange,
+  toTrialBusinessYear,
+} from "./core/business-date";
 import { parseIsoDateOnly } from "./internal/iso-date";
 import { encodeTrialId } from "./internal/trial-id";
 import type { TrialsServiceLogContext } from "./types";
@@ -42,14 +48,10 @@ function parseYear(value: number | undefined): number | null {
   return year;
 }
 
-function toUtcDateStart(isoDate: string): Date {
-  return new Date(`${isoDate}T00:00:00.000Z`);
-}
-
-function addUtcDays(value: Date, days: number): Date {
-  const next = new Date(value.getTime());
-  next.setUTCDate(next.getUTCDate() + days);
-  return next;
+function collectAvailableYears(availableEventDates: Date[]): number[] {
+  return Array.from(
+    new Set(availableEventDates.map((value) => toTrialBusinessYear(value))),
+  ).sort((left, right) => right - left);
 }
 
 export async function searchBeagleTrialsService(
@@ -185,64 +187,76 @@ export async function searchBeagleTrialsService(
   );
 
   try {
-    const rangeFromDate = dateFromIso ? toUtcDateStart(dateFromIso) : null;
+    const rangeFromDate = dateFromIso
+      ? getTrialBusinessDateUtcRange(new Date(`${dateFromIso}T00:00:00.000Z`))
+          .start
+      : null;
     const rangeToExclusive = dateToIso
-      ? addUtcDays(toUtcDateStart(dateToIso), 1)
+      ? getTrialBusinessDateUtcRange(new Date(`${dateToIso}T00:00:00.000Z`))
+          .endExclusive
       : null;
 
     const resolvedMode = year != null ? "year" : hasRangeInput ? "range" : null;
 
-    const result =
-      resolvedMode === "year"
-        ? await searchBeagleTrialsDb({
-            mode: "year",
-            year: year ?? undefined,
-            page: normalizedPage,
-            pageSize: normalizedPageSize,
-            sort: sortResult.value,
-          })
-        : resolvedMode === "range"
-          ? await searchBeagleTrialsDb({
-              mode: "range",
-              dateFrom: rangeFromDate ?? undefined,
-              dateTo: rangeToExclusive ?? undefined,
-              page: normalizedPage,
-              pageSize: normalizedPageSize,
-              sort: sortResult.value,
-            })
-          : await (async () => {
-              const available = await searchBeagleTrialsDb({
-                mode: "range",
-                page: 1,
-                pageSize: 1,
-                sort: sortResult.value,
-              });
-              const latestYear = available.availableYears[0];
-              if (!latestYear) {
-                return {
-                  ...available,
-                  mode: "year" as const,
-                  year: null,
-                };
-              }
-              return searchBeagleTrialsDb({
-                mode: "year",
-                year: latestYear,
-                page: normalizedPage,
-                pageSize: normalizedPageSize,
-                sort: sortResult.value,
-              });
-            })();
+    let filterMode: BeagleTrialSearchMode = "year";
+    let filterYear: number | null = null;
+    let filterDateFrom: string | null = null;
+    let filterDateTo: string | null = null;
+    let result: Awaited<ReturnType<typeof searchBeagleTrialsDb>>;
 
-    const filterMode = resolvedMode ?? result.mode;
-    const filterYear =
-      resolvedMode === "year"
-        ? year
-        : resolvedMode == null
-          ? result.year
-          : null;
-    const filterDateFrom = resolvedMode === "range" ? dateFromIso : null;
-    const filterDateTo = resolvedMode === "range" ? dateToIso : null;
+    if (resolvedMode === "year") {
+      const yearRange = getTrialBusinessYearUtcRange(year ?? 0);
+      if (!yearRange) {
+        throw new Error("Failed to build trial year range.");
+      }
+      result = await searchBeagleTrialsDb({
+        dateFrom: yearRange.start,
+        dateTo: yearRange.endExclusive,
+        page: normalizedPage,
+        pageSize: normalizedPageSize,
+        sort: sortResult.value,
+      });
+      filterYear = year;
+    } else if (resolvedMode === "range") {
+      result = await searchBeagleTrialsDb({
+        dateFrom: rangeFromDate ?? undefined,
+        dateTo: rangeToExclusive ?? undefined,
+        page: normalizedPage,
+        pageSize: normalizedPageSize,
+        sort: sortResult.value,
+      });
+      filterMode = "range";
+      filterDateFrom = dateFromIso;
+      filterDateTo = dateToIso;
+    } else {
+      const available = await searchBeagleTrialsDb({
+        page: 1,
+        pageSize: 1,
+        sort: sortResult.value,
+      });
+      const availableYears = collectAvailableYears(
+        available.availableEventDates,
+      );
+      const latestYear = availableYears[0];
+      if (!latestYear) {
+        result = available;
+      } else {
+        const yearRange = getTrialBusinessYearUtcRange(latestYear);
+        if (!yearRange) {
+          throw new Error("Failed to build trial year range.");
+        }
+        result = await searchBeagleTrialsDb({
+          dateFrom: yearRange.start,
+          dateTo: yearRange.endExclusive,
+          page: normalizedPage,
+          pageSize: normalizedPageSize,
+          sort: sortResult.value,
+        });
+        filterYear = latestYear;
+      }
+    }
+
+    const availableYears = collectAvailableYears(result.availableEventDates);
 
     const data: BeagleTrialSearchResponse = {
       filters: {
@@ -251,7 +265,7 @@ export async function searchBeagleTrialsService(
         dateFrom: filterDateFrom,
         dateTo: filterDateTo,
       },
-      availableYears: result.availableYears,
+      availableYears,
       total: result.total,
       totalPages: result.totalPages,
       page: result.page,

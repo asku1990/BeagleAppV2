@@ -2,9 +2,11 @@ import type {
   BeagleTrialDetailsResponse,
   BeagleTrialSearchRequest,
   BeagleTrialSearchResponse,
+  KoiratietokantaAjokUpsertResponse,
 } from "@beagle/contracts";
 import type { ServiceResult } from "../core/result";
 import { getBeagleTrialDetailsService } from "./get-beagle-trial-details";
+import { upsertKoiratietokantaAjokResultService } from "./integrations";
 import { searchBeagleTrialsService } from "./search-beagle-trials";
 import type { TrialsServiceLogContext } from "./types";
 
@@ -22,6 +24,12 @@ export function createTrialsService() {
       context?: TrialsServiceLogContext,
     ): Promise<ServiceResult<BeagleTrialDetailsResponse>> {
       return getBeagleTrialDetailsService(trialId, context);
+    },
+
+    async upsertKoiratietokantaAjokResult(
+      payload: Record<string, unknown>,
+    ): Promise<ServiceResult<KoiratietokantaAjokUpsertResponse>> {
+      return upsertKoiratietokantaAjokResultService(payload);
     },
   };
 }
