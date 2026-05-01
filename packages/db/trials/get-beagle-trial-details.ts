@@ -74,6 +74,7 @@ export async function getBeagleTrialDetailsDb(
       koepaiva: true,
       koekunta: true,
       ylituomariNimi: true,
+      trialRuleWindowId: true,
       entries: {
         select: {
           id: true,
@@ -113,6 +114,7 @@ export async function getBeagleTrialDetailsDb(
     event.entries.map((entry) => ({
       ...entry,
       eventYlituomariNimi: event.ylituomariNimi,
+      trialRuleWindowId: event.trialRuleWindowId,
     })),
   );
 
@@ -125,6 +127,7 @@ export async function getBeagleTrialDetailsDb(
   const items: BeagleTrialDetailsRowDb[] = allEntries
     .map((entry) => ({
       id: entry.id,
+      trialRuleWindowId: entry.trialRuleWindowId,
       dogId: entry.dogId,
       registrationNo: entry.rekisterinumeroSnapshot,
       // Prefer the linked dog name; fall back to registration snapshot so

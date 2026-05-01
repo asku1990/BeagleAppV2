@@ -164,6 +164,7 @@ describe("trials service", () => {
       items: [
         {
           id: "r1",
+          trialRuleWindowId: "trw_post_20230801",
           dogId: "d1",
           registrationNo: "FI-1/20",
           name: "Aatu",
@@ -193,6 +194,9 @@ describe("trials service", () => {
     if (!result.body.ok) throw new Error("Expected ok=true");
 
     expect(result.body.data.items[0]?.award).toBe("Voi 1");
+    expect(result.body.data.items[0]?.trialRuleWindowId).toBe(
+      "trw_post_20230801",
+    );
     expect(result.body.data.trial.trialId).toBe(trialId);
     expect(getBeagleTrialDetailsDbMock).toHaveBeenCalledWith({
       eventDateStart: getTrialBusinessDateStartUtc("2025-06-01"),

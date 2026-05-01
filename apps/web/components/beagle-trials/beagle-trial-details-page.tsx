@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Copy, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/sonner";
 import type { BeagleTrialDetailsResponse } from "@beagle/contracts";
 import {
@@ -6,14 +8,35 @@ import {
   ListingSectionShell,
 } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useI18n } from "@/hooks/i18n";
 import {
   copyTrialDetailRowToClipboard,
   copyTrialDetailRowsToClipboard,
   formatIsoDateForDisplay,
+  getTrialPdfPageHref,
 } from "@/lib/public/beagle/trials";
 import { getDogProfileHref } from "@/lib/public/beagle/dogs/profile";
 import { cn } from "@/lib/utils";
+
+type TrialDetailRow = BeagleTrialDetailsResponse["items"][number];
+
+const PUBLIC_TRIAL_PDF_RULE_WINDOW_IDS = new Set([
+  "trw_range_2005_2011",
+  "trw_post_20110801",
+  "trw_post_20230801",
+]);
+
+function canShowTrialPdfAction(ruleWindowId: string | null): boolean {
+  return ruleWindowId
+    ? PUBLIC_TRIAL_PDF_RULE_WINDOW_IDS.has(ruleWindowId)
+    : false;
+}
 
 function renderDogValue(value: string, dogId: string | null) {
   if (!dogId) {
@@ -60,6 +83,55 @@ function formatAward(award: string | null, classCode: string | null): string {
   return `Beaj ${award}`;
 }
 
+function TrialDetailRowActions({
+  row,
+  copyLabel,
+  pdfLabel,
+  onCopy,
+}: {
+  row: TrialDetailRow;
+  copyLabel: string;
+  pdfLabel: string;
+  onCopy: () => void;
+}) {
+  return (
+    <div className="flex items-center gap-1">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            aria-label={copyLabel}
+            onClick={onCopy}
+          >
+            <Copy className="size-3.5" aria-hidden="true" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>{copyLabel}</TooltipContent>
+      </Tooltip>
+
+      {canShowTrialPdfAction(row.trialRuleWindowId) ? (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button asChild variant="ghost" size="icon-xs">
+              <Link
+                href={getTrialPdfPageHref(row.id)}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={pdfLabel}
+              >
+                <FileText className="size-3.5" aria-hidden="true" />
+              </Link>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{pdfLabel}</TooltipContent>
+        </Tooltip>
+      ) : null}
+    </div>
+  );
+}
+
 export function BeagleTrialDetailsPage({
   details,
 }: {
@@ -94,10 +166,7 @@ export function BeagleTrialDetailsPage({
     unsupported: t("trials.details.copy.unsupported"),
   };
 
-  const handleCopyRow = async (
-    row: BeagleTrialDetailsResponse["items"][number],
-    index: number,
-  ) => {
+  const handleCopyRow = async (row: TrialDetailRow, index: number) => {
     await copyTrialDetailRowToClipboard({
       row,
       index,
@@ -163,155 +232,159 @@ export function BeagleTrialDetailsPage({
           </span>
         }
       >
-        <ListingResponsiveResults
-          desktop={
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[980px] border-collapse text-sm">
-                <thead>
-                  <tr className={cn("border-b text-left", beagleTheme.border)}>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("trials.details.col.no")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("trials.details.col.reg")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("trials.details.col.name")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("trials.details.col.sex")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("trials.details.col.weather")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("trials.details.col.award")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("trials.details.col.rank")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("trials.details.col.points")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("trials.details.col.judge")}
-                    </th>
-                    <th className="px-2 py-2 font-semibold">
-                      {t("trials.details.copy.button")}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {details.items.map((row, index) => (
+        <TooltipProvider>
+          <ListingResponsiveResults
+            desktop={
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[980px] border-collapse text-sm">
+                  <thead>
                     <tr
-                      key={row.id}
-                      className={cn("border-b align-top", beagleTheme.border)}
+                      className={cn("border-b text-left", beagleTheme.border)}
                     >
-                      <td className="px-2 py-2">{index + 1}</td>
-                      <td className="px-2 py-2">
-                        {renderDogValue(row.registrationNo, row.dogId)}
-                      </td>
-                      <td className="px-2 py-2">
-                        {renderDogValue(row.name, row.dogId)}
-                      </td>
-                      <td className="px-2 py-2">{mapSexLabel(row.sex, t)}</td>
-                      <td className="px-2 py-2">{row.weather ?? "-"}</td>
-                      <td className="px-2 py-2">
-                        {formatAward(row.award, row.classCode)}
-                      </td>
-                      <td className="px-2 py-2">{row.rank ?? "-"}</td>
-                      <td className="px-2 py-2">{formatPoints(row.points)}</td>
-                      <td className="px-2 py-2">{row.judge ?? "-"}</td>
-                      <td className="px-2 py-2">
-                        <button
-                          type="button"
-                          onClick={() => void handleCopyRow(row, index + 1)}
-                          className={beagleTheme.actionLinkStrong}
-                        >
-                          {t("trials.details.copy.button")}
-                        </button>
-                      </td>
+                      <th className="px-2 py-2 font-semibold">
+                        {t("trials.details.col.no")}
+                      </th>
+                      <th className="px-2 py-2 font-semibold">
+                        {t("trials.details.col.reg")}
+                      </th>
+                      <th className="px-2 py-2 font-semibold">
+                        {t("trials.details.col.name")}
+                      </th>
+                      <th className="px-2 py-2 font-semibold">
+                        {t("trials.details.col.sex")}
+                      </th>
+                      <th className="px-2 py-2 font-semibold">
+                        {t("trials.details.col.weather")}
+                      </th>
+                      <th className="px-2 py-2 font-semibold">
+                        {t("trials.details.col.award")}
+                      </th>
+                      <th className="px-2 py-2 font-semibold">
+                        {t("trials.details.col.rank")}
+                      </th>
+                      <th className="px-2 py-2 font-semibold">
+                        {t("trials.details.col.points")}
+                      </th>
+                      <th className="px-2 py-2 font-semibold">
+                        {t("trials.details.col.judge")}
+                      </th>
+                      <th className="px-2 py-2 font-semibold">
+                        {t("trials.details.col.actions")}
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          }
-          mobile={
-            <div className="space-y-2">
-              {details.items.map((row, index) => (
-                <article
-                  key={row.id}
-                  className={cn(
-                    "rounded-lg border p-3",
-                    beagleTheme.border,
-                    beagleTheme.surface,
-                  )}
-                >
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <p className="col-span-2">
-                      <span className={beagleTheme.mutedText}>
-                        {t("trials.details.col.reg")}:
-                      </span>{" "}
-                      {renderDogValue(row.registrationNo, row.dogId)}
-                    </p>
-                    <p className="col-span-2">
-                      <span className={beagleTheme.mutedText}>
-                        {t("trials.details.col.name")}:
-                      </span>{" "}
-                      {renderDogValue(row.name, row.dogId)}
-                    </p>
-                    <p>
-                      <span className={beagleTheme.mutedText}>
-                        {t("trials.details.col.sex")}:
-                      </span>{" "}
-                      <span>{mapSexLabel(row.sex, t)}</span>
-                    </p>
-                    <p>
-                      <span className={beagleTheme.mutedText}>
-                        {t("trials.details.col.weather")}:
-                      </span>{" "}
-                      <span>{row.weather ?? "-"}</span>
-                    </p>
-                    <p>
-                      <span className={beagleTheme.mutedText}>
-                        {t("trials.details.col.award")}:
-                      </span>{" "}
-                      <span>{formatAward(row.award, row.classCode)}</span>
-                    </p>
-                    <p>
-                      <span className={beagleTheme.mutedText}>
-                        {t("trials.details.col.rank")}:
-                      </span>{" "}
-                      <span>{row.rank ?? "-"}</span>
-                    </p>
-                    <p>
-                      <span className={beagleTheme.mutedText}>
-                        {t("trials.details.col.points")}:
-                      </span>{" "}
-                      <span>{formatPoints(row.points)}</span>
-                    </p>
-                    <p>
-                      <span className={beagleTheme.mutedText}>
-                        {t("trials.details.col.judge")}:
-                      </span>{" "}
-                      <span>{row.judge ?? "-"}</span>
-                    </p>
-                    <p className="col-span-2">
-                      <button
-                        type="button"
-                        onClick={() => void handleCopyRow(row, index + 1)}
-                        className={beagleTheme.actionLinkStrong}
+                  </thead>
+                  <tbody>
+                    {details.items.map((row, index) => (
+                      <tr
+                        key={row.id}
+                        className={cn("border-b align-top", beagleTheme.border)}
                       >
-                        {t("trials.details.copy.button")}
-                      </button>
-                    </p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          }
-        />
+                        <td className="px-2 py-2">{index + 1}</td>
+                        <td className="px-2 py-2">
+                          {renderDogValue(row.registrationNo, row.dogId)}
+                        </td>
+                        <td className="px-2 py-2">
+                          {renderDogValue(row.name, row.dogId)}
+                        </td>
+                        <td className="px-2 py-2">{mapSexLabel(row.sex, t)}</td>
+                        <td className="px-2 py-2">{row.weather ?? "-"}</td>
+                        <td className="px-2 py-2">
+                          {formatAward(row.award, row.classCode)}
+                        </td>
+                        <td className="px-2 py-2">{row.rank ?? "-"}</td>
+                        <td className="px-2 py-2">
+                          {formatPoints(row.points)}
+                        </td>
+                        <td className="px-2 py-2">{row.judge ?? "-"}</td>
+                        <td className="px-2 py-2">
+                          <TrialDetailRowActions
+                            row={row}
+                            copyLabel={t("trials.details.actions.copy")}
+                            pdfLabel={t("trials.details.actions.pdf")}
+                            onCopy={() => void handleCopyRow(row, index + 1)}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            }
+            mobile={
+              <div className="space-y-2">
+                {details.items.map((row, index) => (
+                  <article
+                    key={row.id}
+                    className={cn(
+                      "rounded-lg border p-3",
+                      beagleTheme.border,
+                      beagleTheme.surface,
+                    )}
+                  >
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <p className="col-span-2">
+                        <span className={beagleTheme.mutedText}>
+                          {t("trials.details.col.reg")}:
+                        </span>{" "}
+                        {renderDogValue(row.registrationNo, row.dogId)}
+                      </p>
+                      <p className="col-span-2">
+                        <span className={beagleTheme.mutedText}>
+                          {t("trials.details.col.name")}:
+                        </span>{" "}
+                        {renderDogValue(row.name, row.dogId)}
+                      </p>
+                      <p>
+                        <span className={beagleTheme.mutedText}>
+                          {t("trials.details.col.sex")}:
+                        </span>{" "}
+                        <span>{mapSexLabel(row.sex, t)}</span>
+                      </p>
+                      <p>
+                        <span className={beagleTheme.mutedText}>
+                          {t("trials.details.col.weather")}:
+                        </span>{" "}
+                        <span>{row.weather ?? "-"}</span>
+                      </p>
+                      <p>
+                        <span className={beagleTheme.mutedText}>
+                          {t("trials.details.col.award")}:
+                        </span>{" "}
+                        <span>{formatAward(row.award, row.classCode)}</span>
+                      </p>
+                      <p>
+                        <span className={beagleTheme.mutedText}>
+                          {t("trials.details.col.rank")}:
+                        </span>{" "}
+                        <span>{row.rank ?? "-"}</span>
+                      </p>
+                      <p>
+                        <span className={beagleTheme.mutedText}>
+                          {t("trials.details.col.points")}:
+                        </span>{" "}
+                        <span>{formatPoints(row.points)}</span>
+                      </p>
+                      <p>
+                        <span className={beagleTheme.mutedText}>
+                          {t("trials.details.col.judge")}:
+                        </span>{" "}
+                        <span>{row.judge ?? "-"}</span>
+                      </p>
+                      <div className="col-span-2">
+                        <TrialDetailRowActions
+                          row={row}
+                          copyLabel={t("trials.details.actions.copy")}
+                          pdfLabel={t("trials.details.actions.pdf")}
+                          onCopy={() => void handleCopyRow(row, index + 1)}
+                        />
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            }
+          />
+        </TooltipProvider>
       </ListingSectionShell>
     </>
   );

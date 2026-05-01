@@ -31,6 +31,7 @@ export type BeagleTrialDetailsRequestDb = {
 
 export type BeagleTrialDetailsRowDb = {
   id: string;
+  trialRuleWindowId: string | null;
   dogId: string | null;
   registrationNo: string;
   name: string;

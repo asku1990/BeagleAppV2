@@ -77,6 +77,7 @@ export async function getBeagleTrialDetailsService(
       },
       items: result.items.map((item) => ({
         id: item.id,
+        trialRuleWindowId: item.trialRuleWindowId,
         dogId: item.dogId,
         registrationNo: item.registrationNo,
         name: item.name,

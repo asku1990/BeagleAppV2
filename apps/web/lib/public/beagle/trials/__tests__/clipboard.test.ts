@@ -30,6 +30,7 @@ describe("formatTrialDetailRowForClipboard", () => {
     const output = formatTrialDetailRowForClipboard(
       {
         id: "r0",
+        trialRuleWindowId: "trw_post_20230801",
         dogId: "d0",
         registrationNo: "FI-0/20",
         name: "Pena",
@@ -59,6 +60,7 @@ describe("formatTrialDetailRowForClipboard", () => {
     const output = formatTrialDetailRowForClipboard(
       {
         id: "r1",
+        trialRuleWindowId: "trw_post_20230801",
         dogId: "d1",
         registrationNo: "FI-1/20",
         name: "Aatu",
@@ -91,6 +93,7 @@ describe("formatTrialDetailRowForClipboard", () => {
     const output = formatTrialDetailRowForClipboard(
       {
         id: "r2",
+        trialRuleWindowId: "trw_post_20230801",
         dogId: "d2",
         registrationNo: "FI-2/20",
         name: "Be\tlla\n",
@@ -124,6 +127,7 @@ describe("formatTrialDetailRowsForClipboard", () => {
       [
         {
           id: "r1",
+          trialRuleWindowId: "trw_post_20230801",
           dogId: "d1",
           registrationNo: "FI-1/20",
           name: "Aatu",
@@ -144,6 +148,7 @@ describe("formatTrialDetailRowsForClipboard", () => {
         },
         {
           id: "r2",
+          trialRuleWindowId: "trw_post_20230801",
           dogId: "d2",
           registrationNo: "FI-2/20",
           name: "Bella",

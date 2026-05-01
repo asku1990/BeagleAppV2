@@ -90,6 +90,7 @@ describe("BeagleTrialDetailsPageContainer", () => {
         items: [
           {
             id: "r_1",
+            trialRuleWindowId: "trw_post_20230801",
             dogId: "dog_1",
             registrationNo: "FI-1/20",
             name: "Aatu",
@@ -100,6 +101,20 @@ describe("BeagleTrialDetailsPageContainer", () => {
             rank: "1",
             points: 88.5,
             judge: "Judge Main",
+          },
+          {
+            id: "r_2",
+            trialRuleWindowId: "trw_pre_20020801",
+            dogId: null,
+            registrationNo: "FI-2/20",
+            name: "FI-2/20",
+            sex: "-",
+            weather: null,
+            award: null,
+            classCode: null,
+            rank: null,
+            points: null,
+            judge: null,
           },
         ],
       },
@@ -119,7 +134,11 @@ describe("BeagleTrialDetailsPageContainer", () => {
     expect(html).toContain("FI-1/20");
     expect(html).toContain("Aatu");
     expect(html).toContain("88,5");
-    expect(html).toContain("trials.details.copy.button");
+    expect(html).toContain("trials.details.col.actions");
+    expect(html).toContain('aria-label="trials.details.actions.copy"');
+    expect(html).toContain('aria-label="trials.details.actions.pdf"');
+    expect(html).toContain('href="/beagle/trials/r_1/pdf"');
+    expect(html).not.toContain('href="/beagle/trials/r_2/pdf"');
     expect(html).toContain("trials.details.copy.all");
     expect(html).toContain('href="/beagle/dogs/dog_1"');
   });
