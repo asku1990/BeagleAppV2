@@ -1,4 +1,4 @@
-import { prisma } from "../../core/prisma";
+import { prisma } from "@db/core/prisma";
 
 export type HomeStatisticsSnapshot = {
   registrations: {
@@ -46,17 +46,22 @@ export async function getHomeStatisticsSnapshot(): Promise<HomeStatisticsSnapsho
       },
       _max: { birthDate: true },
     }),
-    prisma.trialResult.count(),
+    prisma.trialEntry.count(),
     prisma.dog.count({
       where: {
-        trialResults: {
+        trialEntries: {
           some: {},
         },
       },
     }),
-    prisma.trialResult.aggregate({
-      _min: { eventDate: true },
-      _max: { eventDate: true },
+    prisma.trialEvent.aggregate({
+      where: {
+        entries: {
+          some: {},
+        },
+      },
+      _min: { koepaiva: true },
+      _max: { koepaiva: true },
     }),
     prisma.showEntry.count(),
     prisma.dog.count({
@@ -83,8 +88,8 @@ export async function getHomeStatisticsSnapshot(): Promise<HomeStatisticsSnapsho
       youngestRegisteredBirthDate: youngestBirthDate._max.birthDate,
     },
     trials: {
-      resultsPeriodStart: trialDateRange._min.eventDate,
-      resultsPeriodEnd: trialDateRange._max.eventDate,
+      resultsPeriodStart: trialDateRange._min.koepaiva,
+      resultsPeriodEnd: trialDateRange._max.koepaiva,
       totalEntries: trialTotalEntries,
       performedByDogs: trialPerformedByDogs,
     },

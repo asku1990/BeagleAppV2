@@ -1,4 +1,7 @@
-import type { Prisma } from "@prisma/client";
+// Reads the public beagle trial list from canonical TrialEvent rows.
+// Events are grouped in memory by (koepaiva, koekunta) to produce one public
+// row per date/place — mirrors legacy TrialResult groupBy behavior and
+// preserves the existing public URL scheme.
 import { prisma } from "../core/prisma";
 import type {
   BeagleTrialSearchRequestDb,
@@ -45,19 +48,34 @@ function normalizeSort(
   return value === "date-asc" ? "date-asc" : "date-desc";
 }
 
-function buildWhere(
-  input: BeagleTrialSearchRequestDb,
-): Prisma.TrialResultWhereInput {
-  if (input.dateFrom && input.dateTo) {
-    return {
-      eventDate: {
-        gte: input.dateFrom,
-        lt: input.dateTo,
-      },
-    };
-  }
+// Serialises a Date to a Helsinki business-date string (YYYY-MM-DD).
+// Mirrors toBusinessDateOnly in packages/server/core/date-only.ts so that the
+// grouping key here is always consistent with the public trialId encoding done
+// in the service layer. packages/db cannot import from packages/server (circular
+// dependency), so the logic is kept in sync manually.
+const HELSINKI_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
+  timeZone: "Europe/Helsinki",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
 
-  return {};
+function toHelsinkiDateKey(date: Date): string {
+  const parts = HELSINKI_DATE_FORMATTER.formatToParts(date);
+  const year = parts.find((p) => p.type === "year")?.value ?? "";
+  const month = parts.find((p) => p.type === "month")?.value ?? "";
+  const day = parts.find((p) => p.type === "day")?.value ?? "";
+  return `${year}-${month}-${day}`;
+}
+
+// Returns the shared judge name when all non-empty values agree, otherwise null.
+function resolveJudge(names: (string | null | undefined)[]): string | null {
+  const nonEmpty = names
+    .map((n) => n?.trim())
+    .filter((n): n is string => Boolean(n));
+  if (nonEmpty.length === 0) return null;
+  const unique = new Set(nonEmpty);
+  return unique.size === 1 ? [...unique][0]! : null;
 }
 
 function compareRows(
@@ -81,79 +99,81 @@ export async function searchBeagleTrialsDb(
   const page = parsePage(input.page);
   const pageSize = parsePageSize(input.pageSize);
   const sort = normalizeSort(input.sort);
-  const where = buildWhere(input);
 
-  const [availableDateRows, groupedRows] = await Promise.all([
-    prisma.trialResult.groupBy({
-      by: ["eventDate"],
+  const dateWhere =
+    input.dateFrom && input.dateTo
+      ? { koepaiva: { gte: input.dateFrom, lt: input.dateTo } }
+      : {};
+
+  const [availableDateRows, eventRows] = await Promise.all([
+    // Distinct koepaiva values used for the year-filter picker.
+    // Same entries filter applied as the main query so empty-event years
+    // never appear as selectable options or as the default year.
+    prisma.trialEvent.findMany({
+      where: { entries: { some: {} } },
+      select: { koepaiva: true },
+      orderBy: { koepaiva: "desc" },
+      distinct: ["koepaiva"],
     }),
-    prisma.trialResult.groupBy({
-      by: ["eventDate", "eventPlace"],
-      where,
-      _count: { _all: true },
-      _max: { judge: true },
+    // All events in the requested date window that have at least one entry.
+    // Filtering here prevents zero-entry events from appearing in the public
+    // list (which would 404 on detail, since detail returns null for empty events).
+    prisma.trialEvent.findMany({
+      where: { ...dateWhere, entries: { some: {} } },
+      select: {
+        koepaiva: true,
+        koekunta: true,
+        ylituomariNimi: true,
+        _count: { select: { entries: true } },
+      },
     }),
   ]);
 
-  const availableEventDates = availableDateRows
-    .map((row) => row.eventDate)
-    .sort((left, right) => right.getTime() - left.getTime());
+  const availableEventDates = availableDateRows.map((row) => row.koepaiva);
 
-  const rows: BeagleTrialSearchRowDb[] = groupedRows
-    .map((row) => ({
-      eventDate: row.eventDate,
-      eventPlace: row.eventPlace,
-      judge: row._max.judge ?? null,
-      dogCount: row._count._all,
+  // Group canonical events by (koepaiva, koekunta) into one public row each.
+  // Sums entry counts and resolves a shared judge when all non-empty
+  // ylituomariNimi values agree across matched TrialEvent rows.
+  type GroupAccum = {
+    eventDate: Date;
+    eventPlace: string;
+    dogCount: number;
+    judgeNames: (string | null | undefined)[];
+  };
+
+  const groupMap = new Map<string, GroupAccum>();
+  for (const row of eventRows) {
+    // Use the Helsinki business date so events that share the same Finnish
+    // calendar day but differ in UTC time (e.g. koepaiva stored at local
+    // midnight vs. UTC midnight) still produce one public row — matching the
+    // behaviour of the detail endpoint which uses a full-day UTC range.
+    const key = `${toHelsinkiDateKey(row.koepaiva)}::${row.koekunta}`;
+    const existing = groupMap.get(key);
+    if (existing) {
+      existing.dogCount += row._count.entries;
+      existing.judgeNames.push(row.ylituomariNimi);
+    } else {
+      groupMap.set(key, {
+        eventDate: row.koepaiva,
+        eventPlace: row.koekunta,
+        dogCount: row._count.entries,
+        judgeNames: [row.ylituomariNimi],
+      });
+    }
+  }
+
+  const rows: BeagleTrialSearchRowDb[] = Array.from(groupMap.values())
+    .map((group) => ({
+      eventDate: group.eventDate,
+      eventPlace: group.eventPlace,
+      judge: resolveJudge(group.judgeNames),
+      dogCount: group.dogCount,
     }))
     .sort((left, right) => compareRows(left, right, sort));
 
   const total = rows.length;
   const pagination = resolvePagination(total, page, pageSize);
-  const pageRows = rows.slice(pagination.start, pagination.start + pageSize);
-
-  const judgeRows =
-    pageRows.length === 0
-      ? []
-      : await prisma.trialResult.findMany({
-          where: {
-            OR: pageRows.map((row) => ({
-              eventDate: row.eventDate,
-              eventPlace: row.eventPlace,
-            })),
-          },
-          select: {
-            eventDate: true,
-            eventPlace: true,
-            judge: true,
-          },
-        });
-
-  const judgeByEvent = new Map<string, string | null>();
-  for (const row of judgeRows) {
-    const key = `${row.eventDate.toISOString()}::${row.eventPlace}`;
-    const normalizedJudge = row.judge?.trim() ?? "";
-    if (!normalizedJudge) {
-      continue;
-    }
-    const existing = judgeByEvent.get(key);
-    if (existing == null) {
-      judgeByEvent.set(key, normalizedJudge);
-      continue;
-    }
-    if (existing !== normalizedJudge) {
-      judgeByEvent.set(key, null);
-    }
-  }
-
-  const items = pageRows.map((row) => {
-    const key = `${row.eventDate.toISOString()}::${row.eventPlace}`;
-    const judge = judgeByEvent.get(key);
-    return {
-      ...row,
-      judge: judge === undefined ? null : judge,
-    };
-  });
+  const items = rows.slice(pagination.start, pagination.start + pageSize);
 
   return {
     availableEventDates,

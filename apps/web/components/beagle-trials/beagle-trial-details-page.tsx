@@ -15,6 +15,17 @@ import {
 import { getDogProfileHref } from "@/lib/public/beagle/dogs/profile";
 import { cn } from "@/lib/utils";
 
+function renderDogValue(value: string, dogId: string | null) {
+  if (!dogId) {
+    return value;
+  }
+  return (
+    <Link href={getDogProfileHref(dogId)} className={beagleTheme.entityLink}>
+      {value}
+    </Link>
+  );
+}
+
 function mapSexLabel(
   value: "U" | "N" | "-",
   t: (
@@ -198,20 +209,10 @@ export function BeagleTrialDetailsPage({
                     >
                       <td className="px-2 py-2">{index + 1}</td>
                       <td className="px-2 py-2">
-                        <Link
-                          href={getDogProfileHref(row.dogId)}
-                          className={beagleTheme.entityLink}
-                        >
-                          {row.registrationNo}
-                        </Link>
+                        {renderDogValue(row.registrationNo, row.dogId)}
                       </td>
                       <td className="px-2 py-2">
-                        <Link
-                          href={getDogProfileHref(row.dogId)}
-                          className={beagleTheme.entityLink}
-                        >
-                          {row.name}
-                        </Link>
+                        {renderDogValue(row.name, row.dogId)}
                       </td>
                       <td className="px-2 py-2">{mapSexLabel(row.sex, t)}</td>
                       <td className="px-2 py-2">{row.weather ?? "-"}</td>
@@ -252,23 +253,13 @@ export function BeagleTrialDetailsPage({
                       <span className={beagleTheme.mutedText}>
                         {t("trials.details.col.reg")}:
                       </span>{" "}
-                      <Link
-                        href={getDogProfileHref(row.dogId)}
-                        className={beagleTheme.entityLink}
-                      >
-                        {row.registrationNo}
-                      </Link>
+                      {renderDogValue(row.registrationNo, row.dogId)}
                     </p>
                     <p className="col-span-2">
                       <span className={beagleTheme.mutedText}>
                         {t("trials.details.col.name")}:
                       </span>{" "}
-                      <Link
-                        href={getDogProfileHref(row.dogId)}
-                        className={beagleTheme.entityLink}
-                      >
-                        {row.name}
-                      </Link>
+                      {renderDogValue(row.name, row.dogId)}
                     </p>
                     <p>
                       <span className={beagleTheme.mutedText}>
