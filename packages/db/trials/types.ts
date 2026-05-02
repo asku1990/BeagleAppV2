@@ -9,6 +9,7 @@ export type BeagleTrialSearchRequestDb = {
 };
 
 export type BeagleTrialSearchRowDb = {
+  trialEventId: string;
   eventDate: Date;
   eventPlace: string;
   judge: string | null;
@@ -24,9 +25,7 @@ export type BeagleTrialSearchResponseDb = {
 };
 
 export type BeagleTrialDetailsRequestDb = {
-  eventDateStart: Date;
-  eventDateEndExclusive: Date;
-  eventPlace: string;
+  trialEventId: string;
 };
 
 export type BeagleTrialDetailsRowDb = {
@@ -52,6 +51,7 @@ export type BeagleTrialDetailsRowDb = {
 };
 
 export type BeagleTrialDetailsResponseDb = {
+  trialEventId: string;
   eventDate: Date;
   eventPlace: string;
   judge: string | null;
@@ -61,6 +61,7 @@ export type BeagleTrialDetailsResponseDb = {
 
 export type BeagleTrialDogRowDb = {
   id: string;
+  trialEventId: string;
   place: string;
   date: Date;
   weather: string | null;

@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createDogsService } from "@server/dogs";
 import { encodeShowId } from "@server/shows/internal/show-id";
-import { encodeTrialId } from "@server/trials/internal/trial-id";
 
 const {
   searchBeagleDogsDbMock,
@@ -355,6 +354,7 @@ describe("dogs service", () => {
     const mockTrials = [
       {
         id: "trial1",
+        trialEventId: "trial-1",
         place: "Town",
         date: new Date("2022-02-02T00:00:00.000Z"),
         weather: "P",
@@ -418,7 +418,7 @@ describe("dogs service", () => {
           trials: [
             {
               id: "trial1",
-              trialId: encodeTrialId("2022-02-02", "Town"),
+              trialId: "trial-1",
               place: "Town",
               date: "2022-02-02",
               weather: "P",
@@ -481,6 +481,7 @@ describe("dogs service", () => {
     const mockTrials = [
       {
         id: "trial2",
+        trialEventId: "trial-2",
         place: "Lahti",
         date: new Date("2022-04-16T00:00:00+03:00"),
         weather: null,
@@ -523,7 +524,7 @@ describe("dogs service", () => {
           trials: [
             {
               id: "trial2",
-              trialId: encodeTrialId("2022-04-16", "Lahti"),
+              trialId: "trial-2",
               place: "Lahti",
               date: "2022-04-16",
               weather: null,

@@ -28,6 +28,7 @@ export async function getBeagleTrialsForDogDb(
       pin: true,
       trialEvent: {
         select: {
+          id: true,
           koekunta: true,
           koepaiva: true,
           ylituomariNimi: true,
@@ -43,6 +44,7 @@ export async function getBeagleTrialsForDogDb(
 
   return rows.map((row) => ({
     id: row.id,
+    trialEventId: row.trialEvent.id,
     place: row.trialEvent.koekunta,
     date: row.trialEvent.koepaiva,
     weather: row.ke,

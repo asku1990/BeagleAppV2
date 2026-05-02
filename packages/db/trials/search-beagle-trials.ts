@@ -1,7 +1,3 @@
-// Reads the public beagle trial list from canonical TrialEvent rows.
-// Events are grouped in memory by (koepaiva, koekunta) to produce one public
-// row per date/place — mirrors legacy TrialResult groupBy behavior and
-// preserves the existing public URL scheme.
 import { prisma } from "../core/prisma";
 import type {
   BeagleTrialSearchRequestDb,
@@ -48,36 +44,6 @@ function normalizeSort(
   return value === "date-asc" ? "date-asc" : "date-desc";
 }
 
-// Serialises a Date to a Helsinki business-date string (YYYY-MM-DD).
-// Mirrors toBusinessDateOnly in packages/server/core/date-only.ts so that the
-// grouping key here is always consistent with the public trialId encoding done
-// in the service layer. packages/db cannot import from packages/server (circular
-// dependency), so the logic is kept in sync manually.
-const HELSINKI_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
-  timeZone: "Europe/Helsinki",
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-});
-
-function toHelsinkiDateKey(date: Date): string {
-  const parts = HELSINKI_DATE_FORMATTER.formatToParts(date);
-  const year = parts.find((p) => p.type === "year")?.value ?? "";
-  const month = parts.find((p) => p.type === "month")?.value ?? "";
-  const day = parts.find((p) => p.type === "day")?.value ?? "";
-  return `${year}-${month}-${day}`;
-}
-
-// Returns the shared judge name when all non-empty values agree, otherwise null.
-function resolveJudge(names: (string | null | undefined)[]): string | null {
-  const nonEmpty = names
-    .map((n) => n?.trim())
-    .filter((n): n is string => Boolean(n));
-  if (nonEmpty.length === 0) return null;
-  const unique = new Set(nonEmpty);
-  return unique.size === 1 ? [...unique][0]! : null;
-}
-
 function compareRows(
   left: BeagleTrialSearchRowDb,
   right: BeagleTrialSearchRowDb,
@@ -88,7 +54,15 @@ function compareRows(
       ? left.eventDate.getTime() - right.eventDate.getTime()
       : right.eventDate.getTime() - left.eventDate.getTime();
   if (dateComparison !== 0) return dateComparison;
-  return left.eventPlace.localeCompare(right.eventPlace, "fi", {
+  const placeComparison = left.eventPlace.localeCompare(
+    right.eventPlace,
+    "fi",
+    {
+      sensitivity: "base",
+    },
+  );
+  if (placeComparison !== 0) return placeComparison;
+  return left.trialEventId.localeCompare(right.trialEventId, "fi", {
     sensitivity: "base",
   });
 }
@@ -121,6 +95,7 @@ export async function searchBeagleTrialsDb(
     prisma.trialEvent.findMany({
       where: { ...dateWhere, entries: { some: {} } },
       select: {
+        id: true,
         koepaiva: true,
         koekunta: true,
         ylituomariNimi: true,
@@ -130,44 +105,13 @@ export async function searchBeagleTrialsDb(
   ]);
 
   const availableEventDates = availableDateRows.map((row) => row.koepaiva);
-
-  // Group canonical events by (koepaiva, koekunta) into one public row each.
-  // Sums entry counts and resolves a shared judge when all non-empty
-  // ylituomariNimi values agree across matched TrialEvent rows.
-  type GroupAccum = {
-    eventDate: Date;
-    eventPlace: string;
-    dogCount: number;
-    judgeNames: (string | null | undefined)[];
-  };
-
-  const groupMap = new Map<string, GroupAccum>();
-  for (const row of eventRows) {
-    // Use the Helsinki business date so events that share the same Finnish
-    // calendar day but differ in UTC time (e.g. koepaiva stored at local
-    // midnight vs. UTC midnight) still produce one public row — matching the
-    // behaviour of the detail endpoint which uses a full-day UTC range.
-    const key = `${toHelsinkiDateKey(row.koepaiva)}::${row.koekunta}`;
-    const existing = groupMap.get(key);
-    if (existing) {
-      existing.dogCount += row._count.entries;
-      existing.judgeNames.push(row.ylituomariNimi);
-    } else {
-      groupMap.set(key, {
-        eventDate: row.koepaiva,
-        eventPlace: row.koekunta,
-        dogCount: row._count.entries,
-        judgeNames: [row.ylituomariNimi],
-      });
-    }
-  }
-
-  const rows: BeagleTrialSearchRowDb[] = Array.from(groupMap.values())
-    .map((group) => ({
-      eventDate: group.eventDate,
-      eventPlace: group.eventPlace,
-      judge: resolveJudge(group.judgeNames),
-      dogCount: group.dogCount,
+  const rows: BeagleTrialSearchRowDb[] = eventRows
+    .map((row) => ({
+      trialEventId: row.id,
+      eventDate: row.koepaiva,
+      eventPlace: row.koekunta,
+      judge: row.ylituomariNimi?.trim() || null,
+      dogCount: row._count.entries,
     }))
     .sort((left, right) => compareRows(left, right, sort));
 

@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createTrialsService } from "../service";
 import { getTrialBusinessDateStartUtc } from "../core/business-date";
-import { encodeTrialId, parseTrialId } from "../internal/trial-id";
 
 const { searchBeagleTrialsDbMock, getBeagleTrialDetailsDbMock } = vi.hoisted(
   () => ({
@@ -47,9 +46,9 @@ describe("trials service", () => {
     });
   });
 
-  it("returns 400 for invalid trialId in details", async () => {
+  it("returns 400 for blank trialId in details", async () => {
     const service = createTrialsService();
-    const result = await service.getBeagleTrialDetails("invalid");
+    const result = await service.getBeagleTrialDetails("   ");
 
     expect(result).toEqual({
       status: 400,
@@ -57,7 +56,7 @@ describe("trials service", () => {
     });
   });
 
-  it("uses latest year by default and maps encoded trialId", async () => {
+  it("uses latest year by default and maps canonical trialId", async () => {
     searchBeagleTrialsDbMock
       .mockResolvedValueOnce({
         availableEventDates: [new Date("2025-06-01T00:00:00.000Z")],
@@ -76,6 +75,7 @@ describe("trials service", () => {
         page: 1,
         items: [
           {
+            trialEventId: "event-1",
             eventDate: new Date("2025-06-01T00:00:00.000Z"),
             eventPlace: "Helsinki",
             judge: "Judge Main",
@@ -90,11 +90,7 @@ describe("trials service", () => {
     expect(result.status).toBe(200);
     if (!result.body.ok) throw new Error("Expected ok=true");
 
-    expect(parseTrialId(result.body.data.items[0].trialId)).toEqual({
-      eventDateIsoDate: "2025-06-01",
-      eventDate: new Date("2025-06-01T00:00:00.000Z"),
-      eventPlace: "Helsinki",
-    });
+    expect(result.body.data.items[0].trialId).toBe("event-1");
     expect(searchBeagleTrialsDbMock).toHaveBeenNthCalledWith(1, {
       page: 1,
       pageSize: 1,
@@ -146,8 +142,7 @@ describe("trials service", () => {
   it("returns 404 when trial details are missing", async () => {
     getBeagleTrialDetailsDbMock.mockResolvedValue(null);
     const service = createTrialsService();
-    const trialId = encodeTrialId("2025-06-01", "Helsinki");
-    const result = await service.getBeagleTrialDetails(trialId);
+    const result = await service.getBeagleTrialDetails("event-404");
 
     expect(result).toEqual({
       status: 404,
@@ -157,6 +152,7 @@ describe("trials service", () => {
 
   it("maps details and formats award", async () => {
     getBeagleTrialDetailsDbMock.mockResolvedValue({
+      trialEventId: "event-1",
       eventDate: new Date("2025-06-01T00:00:00.000Z"),
       eventPlace: "Helsinki",
       judge: "Judge Main",
@@ -187,8 +183,7 @@ describe("trials service", () => {
     });
 
     const service = createTrialsService();
-    const trialId = encodeTrialId("2025-06-01", "Helsinki");
-    const result = await service.getBeagleTrialDetails(trialId);
+    const result = await service.getBeagleTrialDetails("event-1");
 
     expect(result.status).toBe(200);
     if (!result.body.ok) throw new Error("Expected ok=true");
@@ -197,11 +192,9 @@ describe("trials service", () => {
     expect(result.body.data.items[0]?.trialRuleWindowId).toBe(
       "trw_post_20230801",
     );
-    expect(result.body.data.trial.trialId).toBe(trialId);
+    expect(result.body.data.trial.trialId).toBe("event-1");
     expect(getBeagleTrialDetailsDbMock).toHaveBeenCalledWith({
-      eventDateStart: getTrialBusinessDateStartUtc("2025-06-01"),
-      eventDateEndExclusive: getTrialBusinessDateStartUtc("2025-06-02"),
-      eventPlace: "Helsinki",
+      trialEventId: "event-1",
     });
   });
 

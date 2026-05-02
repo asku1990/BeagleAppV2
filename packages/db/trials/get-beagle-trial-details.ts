@@ -1,6 +1,6 @@
-// Reads public beagle trial detail from canonical TrialEvent+TrialEntry tables.
-// Multiple TrialEvent rows can share the same (koepaiva, koekunta) — all matching
-// events are folded into one public response to preserve the date/place URL scheme.
+// Reads a public beagle trial detail from a single canonical TrialEvent row.
+// Entries are loaded only through TrialEntry.trialEventId so the response maps
+// exactly to one event, even when other events share the same date/place.
 import { DogSex, type Prisma } from "@prisma/client";
 import { prisma } from "../core/prisma";
 import type {
@@ -62,15 +62,10 @@ function compareDetailRows(
 export async function getBeagleTrialDetailsDb(
   input: BeagleTrialDetailsRequestDb,
 ): Promise<BeagleTrialDetailsResponseDb | null> {
-  const trialEvents = await prisma.trialEvent.findMany({
-    where: {
-      koepaiva: {
-        gte: input.eventDateStart,
-        lt: input.eventDateEndExclusive,
-      },
-      koekunta: input.eventPlace,
-    },
+  const trialEvent = await prisma.trialEvent.findUnique({
+    where: { id: input.trialEventId },
     select: {
+      id: true,
       koepaiva: true,
       koekunta: true,
       ylituomariNimi: true,
@@ -105,29 +100,15 @@ export async function getBeagleTrialDetailsDb(
     },
   });
 
-  if (trialEvents.length === 0) return null;
+  if (!trialEvent) return null;
+  if (trialEvent.entries.length === 0) return null;
 
-  // Fold entries from all matched events into a flat list so the public
-  // date/place URL resolves consistently even when more than one TrialEvent
-  // exists for the same koepaiva+koekunta.
-  const allEntries = trialEvents.flatMap((event) =>
-    event.entries.map((entry) => ({
-      ...entry,
-      eventYlituomariNimi: event.ylituomariNimi,
-      trialRuleWindowId: event.trialRuleWindowId,
-    })),
-  );
+  const eventJudge = resolveJudge([trialEvent.ylituomariNimi]);
 
-  if (allEntries.length === 0) return null;
-
-  // Event-level judge: use the shared chief judge only when every non-empty
-  // ylituomariNimi value across matched events agrees.
-  const eventJudge = resolveJudge(trialEvents.map((e) => e.ylituomariNimi));
-
-  const items: BeagleTrialDetailsRowDb[] = allEntries
+  const items: BeagleTrialDetailsRowDb[] = trialEvent.entries
     .map((entry) => ({
       id: entry.id,
-      trialRuleWindowId: entry.trialRuleWindowId,
+      trialRuleWindowId: trialEvent.trialRuleWindowId,
       dogId: entry.dogId,
       registrationNo: entry.rekisterinumeroSnapshot,
       // Prefer the linked dog name; fall back to registration snapshot so
@@ -156,8 +137,9 @@ export async function getBeagleTrialDetailsDb(
     .sort(compareDetailRows);
 
   return {
-    eventDate: trialEvents[0]!.koepaiva,
-    eventPlace: trialEvents[0]!.koekunta,
+    trialEventId: trialEvent.id,
+    eventDate: trialEvent.koepaiva,
+    eventPlace: trialEvent.koekunta,
     judge: eventJudge,
     dogCount: items.length,
     items,
