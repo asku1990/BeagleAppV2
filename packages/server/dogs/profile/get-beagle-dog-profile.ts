@@ -15,7 +15,6 @@ import type { ServiceResult } from "@server/core/result";
 import { parseDogId } from "@server/dogs/core";
 import { encodeShowId } from "@server/shows/internal/show-id";
 import { formatTrialAward } from "@server/trials/core";
-import { encodeTrialId } from "@server/trials/internal/trial-id";
 
 export type DogsServiceLogContext = {
   requestId?: string;
@@ -76,7 +75,7 @@ function mapDogProfileFromDb(
     }),
     trials: trials.map((trial) => ({
       id: trial.id,
-      trialId: encodeTrialId(toBusinessDateOnly(trial.date), trial.place),
+      trialId: trial.trialEventId,
       place: trial.place,
       date: toBusinessDateOnly(trial.date),
       weather: trial.weather,

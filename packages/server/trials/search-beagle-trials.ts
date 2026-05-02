@@ -13,7 +13,6 @@ import {
   toTrialBusinessYear,
 } from "./core/business-date";
 import { parseIsoDateOnly } from "./internal/iso-date";
-import { encodeTrialId } from "./internal/trial-id";
 import type { TrialsServiceLogContext } from "./types";
 
 const ALLOWED_SORTS: ReadonlySet<BeagleTrialSearchSortDb> = new Set([
@@ -269,16 +268,13 @@ export async function searchBeagleTrialsService(
       total: result.total,
       totalPages: result.totalPages,
       page: result.page,
-      items: result.items.map((item) => {
-        const eventDate = toBusinessDateOnly(item.eventDate);
-        return {
-          trialId: encodeTrialId(eventDate, item.eventPlace),
-          eventDate,
-          eventPlace: item.eventPlace,
-          judge: item.judge,
-          dogCount: item.dogCount,
-        };
-      }),
+      items: result.items.map((item) => ({
+        trialId: item.trialEventId,
+        eventDate: toBusinessDateOnly(item.eventDate),
+        eventPlace: item.eventPlace,
+        judge: item.judge,
+        dogCount: item.dogCount,
+      })),
     };
 
     log.info(
