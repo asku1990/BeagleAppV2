@@ -28,6 +28,7 @@ export { createTrialsService, trialsService } from "./trials";
 export { upsertKoiratietokantaAjokResultService } from "./trials";
 export { listAdminTrialEvents } from "./admin";
 export { getAdminTrialEvent } from "./admin";
+export { deleteAdminTrialEntry } from "./admin";
 export { createImportsService, importsService } from "./imports";
 export { createStatsService, statsService } from "./home";
 export type { ServiceResult } from "./core/result";

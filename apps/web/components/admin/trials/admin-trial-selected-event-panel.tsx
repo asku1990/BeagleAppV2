@@ -20,6 +20,7 @@ type AdminTrialSelectedEventPanelProps = {
   isLoading: boolean;
   isError: boolean;
   errorText: string;
+  onDeletedTrialEvent: (deletedTrialEventId: string) => void;
 };
 
 const EMPTY_ENTRIES: AdminTrialEventEntry[] = [];
@@ -29,6 +30,7 @@ export function AdminTrialSelectedEventPanel({
   isLoading,
   isError,
   errorText,
+  onDeletedTrialEvent,
 }: AdminTrialSelectedEventPanelProps) {
   const { t } = useI18n();
   const selectedEntries = selectedEvent?.entries ?? EMPTY_ENTRIES;
@@ -64,7 +66,14 @@ export function AdminTrialSelectedEventPanel({
                 {t("admin.trials.manage.selected.countSuffix")}
               </p>
             </div>
-            <SelectedEventEntries entries={selectedEntries} />
+            <SelectedEventEntries
+              trialEventId={selectedEvent.trialEventId}
+              eventDate={selectedEvent.eventDate}
+              eventPlace={selectedEvent.eventPlace}
+              eventName={selectedEvent.eventName}
+              entries={selectedEntries}
+              onDeletedTrialEvent={onDeletedTrialEvent}
+            />
           </>
         ) : (
           <Card>
@@ -79,9 +88,19 @@ export function AdminTrialSelectedEventPanel({
 }
 
 function SelectedEventEntries({
+  trialEventId,
+  eventDate,
+  eventPlace,
+  eventName,
   entries,
+  onDeletedTrialEvent,
 }: {
+  trialEventId: string;
+  eventDate: string;
+  eventPlace: string;
+  eventName: string | null;
   entries: AdminTrialEventEntry[];
+  onDeletedTrialEvent: (deletedTrialEventId: string) => void;
 }) {
   const { t } = useI18n();
 
@@ -136,7 +155,17 @@ function SelectedEventEntries({
                 <td className="px-2 py-2">{showDash(entry.rank)}</td>
                 <td className="px-2 py-2">{showDash(entry.judge)}</td>
                 <td className="px-2 py-2">
-                  <AdminTrialEntryActions trialId={entry.trialId} />
+                  <AdminTrialEntryActions
+                    trialEventId={trialEventId}
+                    trialEntryId={entry.trialId}
+                    trialId={entry.trialId}
+                    dogName={entry.dogName}
+                    registrationNo={entry.registrationNo}
+                    eventDate={eventDate}
+                    eventPlace={eventPlace}
+                    eventName={eventName}
+                    onDeletedTrialEvent={onDeletedTrialEvent}
+                  />
                 </td>
               </tr>
             ))}
@@ -177,7 +206,17 @@ function SelectedEventEntries({
               </span>{" "}
               {showDash(entry.judge)}
             </p>
-            <AdminTrialEntryActions trialId={entry.trialId} />
+            <AdminTrialEntryActions
+              trialEventId={trialEventId}
+              trialEntryId={entry.trialId}
+              trialId={entry.trialId}
+              dogName={entry.dogName}
+              registrationNo={entry.registrationNo}
+              eventDate={eventDate}
+              eventPlace={eventPlace}
+              eventName={eventName}
+              onDeletedTrialEvent={onDeletedTrialEvent}
+            />
           </CardContent>
         </Card>
       ))}

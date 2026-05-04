@@ -59,6 +59,16 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.selected.columns.judge": "Tuomari",
   "admin.trials.manage.selected.columns.actions": "Toiminnot",
   "admin.trials.manage.selected.actions.openPdf": "Avaa pöytäkirja",
+  "admin.trials.manage.selected.actions.more": "Lisää toimintoja",
+  "admin.trials.manage.selected.actions.delete": "Poista tulos",
+  "admin.trials.manage.selected.actions.delete.confirmTitle":
+    "Poistetaanko tämä koetulos?",
+  "admin.trials.manage.selected.actions.delete.confirmBody":
+    "Tämä poistaa vain tämän koirakohtaisen koetuloksen.\nJos tämä oli tapahtuman viimeinen tulos, myös tyhjä koetapahtuma poistetaan.",
+  "admin.trials.manage.selected.actions.delete.confirmDog": "Koira",
+  "admin.trials.manage.selected.actions.delete.confirmRegistration":
+    "Rekisterinumero",
+  "admin.trials.manage.selected.actions.delete.confirmEvent": "Tapahtuma",
   "admin.trials.manage.pagination.previous": "Edellinen",
   "admin.trials.manage.pagination.page": "Sivu",
   "admin.trials.manage.pagination.next": "Seuraava",
@@ -138,6 +148,16 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.selected.columns.judge": "Domare",
   "admin.trials.manage.selected.columns.actions": "Åtgärder",
   "admin.trials.manage.selected.actions.openPdf": "Öppna protokoll",
+  "admin.trials.manage.selected.actions.more": "Fler åtgärder",
+  "admin.trials.manage.selected.actions.delete": "Ta bort resultat",
+  "admin.trials.manage.selected.actions.delete.confirmTitle":
+    "Ta bort det här provresultatet?",
+  "admin.trials.manage.selected.actions.delete.confirmBody":
+    "Det här tar bara bort det här hundspecifika provresultatet.\nOm detta var det sista resultatet i evenemanget tas även det tomma provevenemanget bort.",
+  "admin.trials.manage.selected.actions.delete.confirmDog": "Hund",
+  "admin.trials.manage.selected.actions.delete.confirmRegistration":
+    "Registrering",
+  "admin.trials.manage.selected.actions.delete.confirmEvent": "Evenemang",
   "admin.trials.manage.pagination.previous": "Föregående",
   "admin.trials.manage.pagination.page": "Sida",
   "admin.trials.manage.pagination.next": "Nästa",

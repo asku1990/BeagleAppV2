@@ -33,6 +33,9 @@ export function AdminTrialsPageClient() {
       year: undefined,
     });
   const [selectedEventIdInput, setSelectedEventIdInput] = useState("");
+  const [blockedAutoSelectedEventId, setBlockedAutoSelectedEventId] = useState<
+    string | null
+  >(null);
   const [filterError, setFilterError] = useState<string | null>(null);
 
   const eventsQuery = useAdminTrialEventsQuery(searchRequest);
@@ -40,7 +43,11 @@ export function AdminTrialsPageClient() {
   const totalCount = eventsQuery.data?.total ?? events.length;
   const totalPages = eventsQuery.data?.totalPages ?? 0;
   const page = eventsQuery.data?.page ?? 1;
-  const selectedEventId = selectedEventIdInput || events[0]?.trialEventId || "";
+  const fallbackSelectedEventId = events[0]?.trialEventId ?? "";
+  // modification: block auto-selection after deleting currently selected event
+  const selectedEventId =
+    selectedEventIdInput ||
+    (blockedAutoSelectedEventId ? "" : fallbackSelectedEventId);
   const selectedSummary =
     events.find((event) => event.trialEventId === selectedEventId) || null;
 
@@ -68,6 +75,7 @@ export function AdminTrialsPageClient() {
         sort,
       });
       setSelectedEventIdInput("");
+      setBlockedAutoSelectedEventId(null);
       return;
     }
 
@@ -92,6 +100,7 @@ export function AdminTrialsPageClient() {
       sort,
     });
     setSelectedEventIdInput("");
+    setBlockedAutoSelectedEventId(null);
   }
 
   function handleResetSearch() {
@@ -112,6 +121,7 @@ export function AdminTrialsPageClient() {
       sort: "date-desc",
     });
     setSelectedEventIdInput("");
+    setBlockedAutoSelectedEventId(null);
   }
 
   function handlePageDelta(delta: number) {
@@ -168,7 +178,10 @@ export function AdminTrialsPageClient() {
         isLoading={eventsQuery.isLoading}
         isError={eventsQuery.isError}
         errorText={eventsErrorText}
-        onSelectEvent={setSelectedEventIdInput}
+        onSelectEvent={(trialEventId) => {
+          setSelectedEventIdInput(trialEventId);
+          setBlockedAutoSelectedEventId(null);
+        }}
         onPageDelta={handlePageDelta}
       />
 
@@ -177,6 +190,10 @@ export function AdminTrialsPageClient() {
         isLoading={eventQuery.isLoading}
         isError={eventQuery.isError}
         errorText={selectedErrorText}
+        onDeletedTrialEvent={(deletedTrialEventId) => {
+          setSelectedEventIdInput("");
+          setBlockedAutoSelectedEventId(deletedTrialEventId);
+        }}
       />
     </div>
   );

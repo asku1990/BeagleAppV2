@@ -239,6 +239,8 @@ export type {
   AdminTrialEventDetailsRequest,
   AdminTrialEventDetailsResponse,
   AdminTrialEventEntry,
+  DeleteAdminTrialEntryRequest,
+  DeleteAdminTrialEntryResponse,
   AdminTrialEventSearchFilters,
   AdminTrialEventSearchMode,
   AdminTrialEventSearchRequest,
