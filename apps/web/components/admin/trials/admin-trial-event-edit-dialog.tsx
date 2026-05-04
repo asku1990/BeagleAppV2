@@ -1,54 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { AdminFormModalShell } from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useI18n } from "@/hooks/i18n";
 import type { AdminTrialEventDetails } from "@beagle/contracts";
-
-type TrialEventDraft = {
-  eventDate: string;
-  eventPlace: string;
-  jarjestaja: string;
-  ylituomari: string;
-  ylituomariNumero: string;
-  ytKertomus: string;
-  kennelpiiri: string;
-  kennelpiirinro: string;
-  sklKoeId: string;
-};
-
-function toDraft(event: AdminTrialEventDetails): TrialEventDraft {
-  return {
-    eventDate: event.eventDate,
-    eventPlace: event.eventPlace,
-    jarjestaja: event.jarjestaja ?? "",
-    ylituomari: event.ylituomari ?? "",
-    ylituomariNumero: event.ylituomariNumero ?? "",
-    ytKertomus: event.ytKertomus ?? "",
-    kennelpiiri: event.kennelpiiri ?? "",
-    kennelpiirinro: event.kennelpiirinro ?? "",
-    sklKoeId: event.sklKoeId === null ? "" : String(event.sklKoeId),
-  };
-}
-
-function areEqual(
-  left: AdminTrialEventDetails,
-  right: TrialEventDraft,
-): boolean {
-  return (
-    left.eventDate === right.eventDate &&
-    left.eventPlace === right.eventPlace &&
-    (left.jarjestaja ?? "") === right.jarjestaja &&
-    (left.ylituomari ?? "") === right.ylituomari &&
-    (left.ylituomariNumero ?? "") === right.ylituomariNumero &&
-    (left.ytKertomus ?? "") === right.ytKertomus &&
-    (left.kennelpiiri ?? "") === right.kennelpiiri &&
-    (left.kennelpiirinro ?? "") === right.kennelpiirinro &&
-    (left.sklKoeId === null ? "" : String(left.sklKoeId)) === right.sklKoeId
-  );
-}
+import {
+  areTrialEventDraftsEqual,
+  parseSklKoeIdDraft,
+  toTrialEventDraft,
+} from "./admin-trial-event-edit-dialog-helpers";
 
 export type UpdateAdminTrialEventPayload = {
   trialEventId: string;
@@ -80,11 +42,49 @@ export function AdminTrialEventEditDialog({
   onClose,
   onSave,
 }: Props) {
+  const selectedEventKey = useMemo(
+    () =>
+      [
+        selectedEvent.trialEventId,
+        selectedEvent.eventDate,
+        selectedEvent.eventPlace,
+        selectedEvent.jarjestaja ?? "",
+        selectedEvent.ylituomari ?? "",
+        selectedEvent.ylituomariNumero ?? "",
+        selectedEvent.ytKertomus ?? "",
+        selectedEvent.kennelpiiri ?? "",
+        selectedEvent.kennelpiirinro ?? "",
+        selectedEvent.sklKoeId ?? "",
+      ].join("|"),
+    [selectedEvent],
+  );
+
+  return (
+    <AdminTrialEventEditDialogContent
+      key={selectedEventKey}
+      open={open}
+      selectedEvent={selectedEvent}
+      isPending={isPending}
+      errorText={errorText}
+      onClose={onClose}
+      onSave={onSave}
+    />
+  );
+}
+
+function AdminTrialEventEditDialogContent({
+  open,
+  selectedEvent,
+  isPending,
+  errorText,
+  onClose,
+  onSave,
+}: Props) {
   const { t } = useI18n();
-  const [draft, setDraft] = useState(() => toDraft(selectedEvent));
+  const [draft, setDraft] = useState(() => toTrialEventDraft(selectedEvent));
   const [validationError, setValidationError] = useState<string | null>(null);
   const isDirty = useMemo(
-    () => !areEqual(selectedEvent, draft),
+    () => !areTrialEventDraftsEqual(selectedEvent, draft),
     [selectedEvent, draft],
   );
 
@@ -99,7 +99,7 @@ export function AdminTrialEventEditDialog({
   const sklKoeIdRaw = draft.sklKoeId.trim();
 
   function resetDraft() {
-    setDraft(toDraft(selectedEvent));
+    setDraft(toTrialEventDraft(selectedEvent));
     setValidationError(null);
   }
 
@@ -150,12 +150,8 @@ export function AdminTrialEventEditDialog({
 
                 let sklKoeId: number | null = null;
                 if (sklKoeIdRaw.length > 0) {
-                  const parsed = Number.parseInt(sklKoeIdRaw, 10);
-                  if (
-                    !Number.isInteger(parsed) ||
-                    !Number.isFinite(parsed) ||
-                    parsed < 1
-                  ) {
+                  const parsed = parseSklKoeIdDraft(sklKoeIdRaw);
+                  if (parsed === null) {
                     setValidationError(
                       t(
                         "admin.trials.manage.eventModal.validation.invalidSklKoeId",
@@ -163,6 +159,7 @@ export function AdminTrialEventEditDialog({
                     );
                     return;
                   }
+
                   sklKoeId = parsed;
                 }
 
