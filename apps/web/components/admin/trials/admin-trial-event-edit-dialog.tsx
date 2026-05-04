@@ -54,7 +54,6 @@ export type UpdateAdminTrialEventPayload = {
   trialEventId: string;
   eventDate: string;
   eventPlace: string;
-  eventName: string | null;
   jarjestaja: string | null;
   ylituomari: string | null;
   ylituomariNumero: string | null;
@@ -171,7 +170,6 @@ export function AdminTrialEventEditDialog({
                   trialEventId: selectedEvent.trialEventId,
                   eventDate,
                   eventPlace,
-                  eventName: null,
                   jarjestaja: jarjestaja || null,
                   ylituomari: ylituomari || null,
                   ylituomariNumero: ylituomariNumero || null,

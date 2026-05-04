@@ -2,7 +2,6 @@ export type UpdateAdminTrialEventRequest = {
   trialEventId: string;
   eventDate: string;
   eventPlace: string;
-  eventName: string | null;
   jarjestaja: string | null;
   ylituomari: string | null;
   ylituomariNumero: string | null;

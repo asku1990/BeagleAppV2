@@ -54,7 +54,6 @@ describe("AdminTrialEventEditDialog", () => {
           trialEventId: "event-1",
           eventDate: "2026-04-14",
           eventPlace: "Helsinki",
-          eventName: "Kevatkoe",
           jarjestaja: "Kerho",
           ylituomari: "Judge",
           ylituomariNumero: "123",
