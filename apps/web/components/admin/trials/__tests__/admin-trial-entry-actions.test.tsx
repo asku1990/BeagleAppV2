@@ -63,6 +63,9 @@ describe("AdminTrialEntryActions", () => {
         trialId: "trial-1",
         dogName: "Rex",
         registrationNo: "FI123",
+        eventDate: "2026-04-14",
+        eventPlace: "Helsinki",
+        eventName: "Kevatkoe",
         onDeletedTrialEvent: vi.fn(),
       }),
     );

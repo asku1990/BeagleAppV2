@@ -68,6 +68,9 @@ export function AdminTrialSelectedEventPanel({
             </div>
             <SelectedEventEntries
               trialEventId={selectedEvent.trialEventId}
+              eventDate={selectedEvent.eventDate}
+              eventPlace={selectedEvent.eventPlace}
+              eventName={selectedEvent.eventName}
               entries={selectedEntries}
               onDeletedTrialEvent={onDeletedTrialEvent}
             />
@@ -86,10 +89,16 @@ export function AdminTrialSelectedEventPanel({
 
 function SelectedEventEntries({
   trialEventId,
+  eventDate,
+  eventPlace,
+  eventName,
   entries,
   onDeletedTrialEvent,
 }: {
   trialEventId: string;
+  eventDate: string;
+  eventPlace: string;
+  eventName: string | null;
   entries: AdminTrialEventEntry[];
   onDeletedTrialEvent: () => void;
 }) {
@@ -152,6 +161,9 @@ function SelectedEventEntries({
                     trialId={entry.trialId}
                     dogName={entry.dogName}
                     registrationNo={entry.registrationNo}
+                    eventDate={eventDate}
+                    eventPlace={eventPlace}
+                    eventName={eventName}
                     onDeletedTrialEvent={onDeletedTrialEvent}
                   />
                 </td>
@@ -200,6 +212,9 @@ function SelectedEventEntries({
               trialId={entry.trialId}
               dogName={entry.dogName}
               registrationNo={entry.registrationNo}
+              eventDate={eventDate}
+              eventPlace={eventPlace}
+              eventName={eventName}
               onDeletedTrialEvent={onDeletedTrialEvent}
             />
           </CardContent>
