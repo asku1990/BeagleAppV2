@@ -77,7 +77,7 @@ vi.mock("../admin-trial-selected-event-panel", () => ({
     isLoading: boolean;
     isError: boolean;
     errorText: string;
-    onDeletedTrialEvent: () => void;
+    onDeletedTrialEvent: (deletedTrialEventId: string) => void;
   }) =>
     React.createElement(
       "section",

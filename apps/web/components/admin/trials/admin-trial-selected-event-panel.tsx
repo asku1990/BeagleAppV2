@@ -20,7 +20,7 @@ type AdminTrialSelectedEventPanelProps = {
   isLoading: boolean;
   isError: boolean;
   errorText: string;
-  onDeletedTrialEvent: () => void;
+  onDeletedTrialEvent: (deletedTrialEventId: string) => void;
 };
 
 const EMPTY_ENTRIES: AdminTrialEventEntry[] = [];
@@ -100,7 +100,7 @@ function SelectedEventEntries({
   eventPlace: string;
   eventName: string | null;
   entries: AdminTrialEventEntry[];
-  onDeletedTrialEvent: () => void;
+  onDeletedTrialEvent: (deletedTrialEventId: string) => void;
 }) {
   const { t } = useI18n();
 

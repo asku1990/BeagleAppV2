@@ -18,7 +18,7 @@ type AdminTrialEntryActionsProps = {
   eventDate: string;
   eventPlace: string;
   eventName: string | null;
-  onDeletedTrialEvent: () => void;
+  onDeletedTrialEvent: (deletedTrialEventId: string) => void;
 };
 
 export function AdminTrialEntryActions({
@@ -57,7 +57,7 @@ export function AdminTrialEntryActions({
       trialEntryId,
     });
     if (result.deletedTrialEvent) {
-      onDeletedTrialEvent();
+      onDeletedTrialEvent(result.trialEventId);
     }
   }
 
