@@ -60,6 +60,7 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.selected.columns.actions": "Toiminnot",
   "admin.trials.manage.selected.actions.openPdf": "Avaa pöytäkirja",
   "admin.trials.manage.selected.actions.more": "Lisää toimintoja",
+  "admin.trials.manage.selected.actions.editEvent": "Muokkaa tapahtumaa",
   "admin.trials.manage.selected.actions.delete": "Poista tulos",
   "admin.trials.manage.selected.actions.delete.confirmTitle":
     "Poistetaanko tämä koetulos?",
@@ -69,6 +70,27 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.selected.actions.delete.confirmRegistration":
     "Rekisterinumero",
   "admin.trials.manage.selected.actions.delete.confirmEvent": "Tapahtuma",
+  "admin.trials.manage.eventModal.title": "Muokkaa tapahtumaa",
+  "admin.trials.manage.eventModal.aria": "Muokkaa ajokoetapahtumaa",
+  "admin.trials.manage.eventModal.close": "Peruuta",
+  "admin.trials.manage.eventModal.save": "Tallenna",
+  "admin.trials.manage.eventModal.saving": "Tallennetaan...",
+  "admin.trials.manage.eventModal.fields.eventDate": "Koepäivä",
+  "admin.trials.manage.eventModal.fields.eventPlace": "Paikka",
+  "admin.trials.manage.eventModal.fields.eventName": "Tapahtuma",
+  "admin.trials.manage.eventModal.fields.organizer": "Järjestäjä",
+  "admin.trials.manage.eventModal.fields.judge": "Ylituomari",
+  "admin.trials.manage.eventModal.fields.sklKoeId": "SKL koe ID",
+  "admin.trials.manage.eventModal.validation.invalidDate":
+    "Anna kelvollinen päivämäärä.",
+  "admin.trials.manage.eventModal.validation.requiredPlace":
+    "Paikka on pakollinen.",
+  "admin.trials.manage.eventModal.validation.invalidSklKoeId":
+    "SKL koe ID pitää olla positiivinen kokonaisluku.",
+  "admin.trials.manage.eventModal.updateSuccess":
+    "Tapahtuma päivitettiin onnistuneesti.",
+  "admin.trials.manage.eventModal.updateFailed":
+    "Tapahtuman päivitys epäonnistui.",
   "admin.trials.manage.pagination.previous": "Edellinen",
   "admin.trials.manage.pagination.page": "Sivu",
   "admin.trials.manage.pagination.next": "Seuraava",
@@ -149,6 +171,7 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.selected.columns.actions": "Åtgärder",
   "admin.trials.manage.selected.actions.openPdf": "Öppna protokoll",
   "admin.trials.manage.selected.actions.more": "Fler åtgärder",
+  "admin.trials.manage.selected.actions.editEvent": "Redigera evenemang",
   "admin.trials.manage.selected.actions.delete": "Ta bort resultat",
   "admin.trials.manage.selected.actions.delete.confirmTitle":
     "Ta bort det här provresultatet?",
@@ -158,6 +181,26 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.selected.actions.delete.confirmRegistration":
     "Registrering",
   "admin.trials.manage.selected.actions.delete.confirmEvent": "Evenemang",
+  "admin.trials.manage.eventModal.title": "Redigera evenemang",
+  "admin.trials.manage.eventModal.aria": "Redigera jaktprovsevenemang",
+  "admin.trials.manage.eventModal.close": "Avbryt",
+  "admin.trials.manage.eventModal.save": "Spara",
+  "admin.trials.manage.eventModal.saving": "Sparar...",
+  "admin.trials.manage.eventModal.fields.eventDate": "Provdatum",
+  "admin.trials.manage.eventModal.fields.eventPlace": "Plats",
+  "admin.trials.manage.eventModal.fields.eventName": "Evenemang",
+  "admin.trials.manage.eventModal.fields.organizer": "Arrangör",
+  "admin.trials.manage.eventModal.fields.judge": "Överdomare",
+  "admin.trials.manage.eventModal.fields.sklKoeId": "SKL prov-ID",
+  "admin.trials.manage.eventModal.validation.invalidDate":
+    "Ange ett giltigt datum.",
+  "admin.trials.manage.eventModal.validation.requiredPlace":
+    "Plats är obligatorisk.",
+  "admin.trials.manage.eventModal.validation.invalidSklKoeId":
+    "SKL prov-ID måste vara ett positivt heltal.",
+  "admin.trials.manage.eventModal.updateSuccess": "Evenemanget uppdaterades.",
+  "admin.trials.manage.eventModal.updateFailed":
+    "Det gick inte att uppdatera evenemanget.",
   "admin.trials.manage.pagination.previous": "Föregående",
   "admin.trials.manage.pagination.page": "Sida",
   "admin.trials.manage.pagination.next": "Nästa",

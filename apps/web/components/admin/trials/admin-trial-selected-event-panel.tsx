@@ -5,15 +5,22 @@ import {
   ListingSectionShell,
   ListingResponsiveResults,
 } from "@/components/listing";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useI18n } from "@/hooks/i18n";
 import { formatDateForFinland } from "@/lib/admin/core/date";
+import { AdminMutationError } from "@/queries/admin/mutation-error";
+import { useUpdateAdminTrialEventMutation } from "@/queries/admin/trials";
 import type {
   AdminTrialEventDetails,
   AdminTrialEventEntry,
 } from "@beagle/contracts";
 import { formatPoints, showDash } from "./internal/trial-ui";
 import { AdminTrialEntryActions } from "./admin-trial-entry-actions";
+import {
+  AdminTrialEventEditDialog,
+  type UpdateAdminTrialEventPayload,
+} from "./admin-trial-event-edit-dialog";
 
 type AdminTrialSelectedEventPanelProps = {
   selectedEvent: AdminTrialEventDetails | null;
@@ -33,7 +40,28 @@ export function AdminTrialSelectedEventPanel({
   onDeletedTrialEvent,
 }: AdminTrialSelectedEventPanelProps) {
   const { t } = useI18n();
+  const [isEditOpen, setIsEditOpen] = React.useState(false);
+  const [editError, setEditError] = React.useState<string | null>(null);
+  const updateMutation = useUpdateAdminTrialEventMutation();
   const selectedEntries = selectedEvent?.entries ?? EMPTY_ENTRIES;
+
+  async function handleSaveEdit(
+    payload: UpdateAdminTrialEventPayload,
+  ): Promise<boolean> {
+    try {
+      setEditError(null);
+      await updateMutation.mutateAsync(payload);
+      return true;
+    } catch (error) {
+      if (error instanceof AdminMutationError) {
+        setEditError(error.message);
+        return false;
+      }
+
+      setEditError(t("admin.trials.manage.eventModal.updateFailed"));
+      return false;
+    }
+  }
 
   return (
     <ListingSectionShell
@@ -56,15 +84,29 @@ export function AdminTrialSelectedEventPanel({
         ) : selectedEvent ? (
           <>
             <div className="rounded-md border p-4">
-              <p className="text-sm font-medium">
-                {formatDateForFinland(selectedEvent.eventDate)} •{" "}
-                {selectedEvent.eventPlace}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {showDash(selectedEvent.eventName)} •{" "}
-                {showDash(selectedEvent.judge)} • {selectedEvent.dogCount}{" "}
-                {t("admin.trials.manage.selected.countSuffix")}
-              </p>
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div>
+                  <p className="text-sm font-medium">
+                    {formatDateForFinland(selectedEvent.eventDate)} •{" "}
+                    {selectedEvent.eventPlace}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {showDash(selectedEvent.eventName)} •{" "}
+                    {showDash(selectedEvent.judge)} • {selectedEvent.dogCount}{" "}
+                    {t("admin.trials.manage.selected.countSuffix")}
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setEditError(null);
+                    setIsEditOpen(true);
+                  }}
+                  disabled={updateMutation.isPending}
+                >
+                  {t("admin.trials.manage.selected.actions.editEvent")}
+                </Button>
+              </div>
             </div>
             <SelectedEventEntries
               trialEventId={selectedEvent.trialEventId}
@@ -73,6 +115,14 @@ export function AdminTrialSelectedEventPanel({
               eventName={selectedEvent.eventName}
               entries={selectedEntries}
               onDeletedTrialEvent={onDeletedTrialEvent}
+            />
+            <AdminTrialEventEditDialog
+              open={isEditOpen}
+              selectedEvent={selectedEvent}
+              isPending={updateMutation.isPending}
+              errorText={editError}
+              onClose={() => setIsEditOpen(false)}
+              onSave={handleSaveEdit}
             />
           </>
         ) : (

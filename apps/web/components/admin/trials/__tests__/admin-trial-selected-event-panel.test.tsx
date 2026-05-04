@@ -62,6 +62,18 @@ vi.mock("../admin-trial-entry-actions", () => ({
     React.createElement("div", null, `actions-${trialId}`),
 }));
 
+vi.mock("../admin-trial-event-edit-dialog", () => ({
+  AdminTrialEventEditDialog: ({ open }: { open: boolean }) =>
+    React.createElement("div", null, `edit-dialog-${open}`),
+}));
+
+vi.mock("@/queries/admin/trials", () => ({
+  useUpdateAdminTrialEventMutation: () => ({
+    mutateAsync: vi.fn(),
+    isPending: false,
+  }),
+}));
+
 describe("AdminTrialSelectedEventPanel", () => {
   it("renders selected event rows and row actions", () => {
     const html = renderToStaticMarkup(
@@ -101,5 +113,7 @@ describe("AdminTrialSelectedEventPanel", () => {
     expect(html).toContain("admin.trials.manage.selected.title");
     expect(html).toContain("Rex");
     expect(html).toContain("actions-trial-1");
+    expect(html).toContain("admin.trials.manage.selected.actions.editEvent");
+    expect(html).toContain("edit-dialog-false");
   });
 });
