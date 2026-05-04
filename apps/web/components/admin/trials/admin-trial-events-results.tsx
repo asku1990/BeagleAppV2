@@ -171,7 +171,7 @@ function EventResultsTable({
                   </td>
                   <td className="px-2 py-2 font-medium">{event.eventPlace}</td>
                   <td className="px-2 py-2">{showDash(event.eventName)}</td>
-                  <td className="px-2 py-2">{showDash(event.judge)}</td>
+                  <td className="px-2 py-2">{showDash(event.ylituomari)}</td>
                   <td className="px-2 py-2">{event.dogCount}</td>
                 </tr>
               );
@@ -218,7 +218,7 @@ function EventResultsTable({
                 <span className="text-muted-foreground">
                   {t("admin.trials.manage.events.columns.judge")}:
                 </span>{" "}
-                {showDash(event.judge)}
+                {showDash(event.ylituomari)}
               </p>
               <p>
                 <span className="text-muted-foreground">

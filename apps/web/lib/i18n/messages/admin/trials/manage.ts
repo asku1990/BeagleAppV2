@@ -78,8 +78,13 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.eventModal.fields.eventDate": "Koepäivä",
   "admin.trials.manage.eventModal.fields.eventPlace": "Paikka",
   "admin.trials.manage.eventModal.fields.eventName": "Tapahtuma",
-  "admin.trials.manage.eventModal.fields.organizer": "Järjestäjä",
-  "admin.trials.manage.eventModal.fields.judge": "Ylituomari",
+  "admin.trials.manage.eventModal.fields.jarjestaja": "Järjestäjä",
+  "admin.trials.manage.eventModal.fields.ylituomari": "Ylituomari",
+  "admin.trials.manage.eventModal.fields.ylituomariNumero":
+    "Ylituomarin numero",
+  "admin.trials.manage.eventModal.fields.ytKertomus": "YT kertomus",
+  "admin.trials.manage.eventModal.fields.kennelpiiri": "Kennelpiiri",
+  "admin.trials.manage.eventModal.fields.kennelpiirinro": "Kennelpiirin numero",
   "admin.trials.manage.eventModal.fields.sklKoeId": "SKL koe ID",
   "admin.trials.manage.eventModal.validation.invalidDate":
     "Anna kelvollinen päivämäärä.",
@@ -189,8 +194,13 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.eventModal.fields.eventDate": "Provdatum",
   "admin.trials.manage.eventModal.fields.eventPlace": "Plats",
   "admin.trials.manage.eventModal.fields.eventName": "Evenemang",
-  "admin.trials.manage.eventModal.fields.organizer": "Arrangör",
-  "admin.trials.manage.eventModal.fields.judge": "Överdomare",
+  "admin.trials.manage.eventModal.fields.jarjestaja": "Arrangör",
+  "admin.trials.manage.eventModal.fields.ylituomari": "Överdomare",
+  "admin.trials.manage.eventModal.fields.ylituomariNumero": "Överdomarnummer",
+  "admin.trials.manage.eventModal.fields.ytKertomus": "ÖD berättelse",
+  "admin.trials.manage.eventModal.fields.kennelpiiri": "Kenneldistrikt",
+  "admin.trials.manage.eventModal.fields.kennelpiirinro":
+    "Kenneldistriktsnummer",
   "admin.trials.manage.eventModal.fields.sklKoeId": "SKL prov-ID",
   "admin.trials.manage.eventModal.validation.invalidDate":
     "Ange ett giltigt datum.",

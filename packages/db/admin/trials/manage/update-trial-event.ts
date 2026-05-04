@@ -5,8 +5,12 @@ export type UpdateAdminTrialEventWriteRequestDb = {
   trialEventId: string;
   eventDate: Date;
   eventPlace: string;
-  organizer: string | null;
-  judge: string | null;
+  jarjestaja: string | null;
+  ylituomari: string | null;
+  ylituomariNumero: string | null;
+  ytKertomus: string | null;
+  kennelpiiri: string | null;
+  kennelpiirinro: string | null;
   sklKoeId: number | null;
 };
 
@@ -26,8 +30,12 @@ export async function updateAdminTrialEventWriteDb(
       data: {
         koepaiva: input.eventDate,
         koekunta: input.eventPlace,
-        jarjestaja: input.organizer,
-        ylituomariNimi: input.judge,
+        jarjestaja: input.jarjestaja,
+        ylituomariNimi: input.ylituomari,
+        ylituomariNumero: input.ylituomariNumero,
+        ytKertomus: input.ytKertomus,
+        kennelpiiri: input.kennelpiiri,
+        kennelpiirinro: input.kennelpiirinro,
         sklKoeId: input.sklKoeId,
       },
     });

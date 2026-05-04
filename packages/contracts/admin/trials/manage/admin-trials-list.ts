@@ -24,8 +24,12 @@ export type AdminTrialEventSummary = {
   eventDate: string;
   eventPlace: string;
   eventName: string | null;
-  organizer: string | null;
-  judge: string | null;
+  jarjestaja: string | null;
+  ylituomari: string | null;
+  ylituomariNumero: string | null;
+  ytKertomus: string | null;
+  kennelpiiri: string | null;
+  kennelpiirinro: string | null;
   sklKoeId: number | null;
   dogCount: number;
 };

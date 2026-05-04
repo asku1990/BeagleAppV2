@@ -110,8 +110,12 @@ export async function updateAdminTrialEvent(
     };
   }
 
-  const organizer = normalizeOptionalText(input.organizer);
-  const judge = normalizeOptionalText(input.judge);
+  const jarjestaja = normalizeOptionalText(input.jarjestaja);
+  const ylituomari = normalizeOptionalText(input.ylituomari);
+  const ylituomariNumero = normalizeOptionalText(input.ylituomariNumero);
+  const ytKertomus = normalizeOptionalText(input.ytKertomus);
+  const kennelpiiri = normalizeOptionalText(input.kennelpiiri);
+  const kennelpiirinro = normalizeOptionalText(input.kennelpiirinro);
 
   const sklKoeId = input.sklKoeId;
   if (
@@ -152,8 +156,12 @@ export async function updateAdminTrialEvent(
       trialEventId,
       eventDate,
       eventPlace,
-      organizer,
-      judge,
+      jarjestaja,
+      ylituomari,
+      ylituomariNumero,
+      ytKertomus,
+      kennelpiiri,
+      kennelpiirinro,
       sklKoeId,
     });
 

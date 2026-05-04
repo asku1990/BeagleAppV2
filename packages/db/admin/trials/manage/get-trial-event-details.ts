@@ -27,7 +27,11 @@ export async function getAdminTrialEventDetailsDb(
       koepaiva: true,
       koekunta: true,
       jarjestaja: true,
+      kennelpiiri: true,
+      kennelpiirinro: true,
       ylituomariNimi: true,
+      ylituomariNumero: true,
+      ytKertomus: true,
       entries: {
         orderBy: [{ rekisterinumeroSnapshot: "asc" }, { id: "asc" }],
         select: {
@@ -67,8 +71,12 @@ export async function getAdminTrialEventDetailsDb(
     eventDate: row.koepaiva,
     eventPlace: row.koekunta,
     eventName: row.jarjestaja,
-    organizer: row.jarjestaja,
-    judge: row.ylituomariNimi,
+    jarjestaja: row.jarjestaja,
+    ylituomari: row.ylituomariNimi,
+    ylituomariNumero: row.ylituomariNumero,
+    ytKertomus: row.ytKertomus,
+    kennelpiiri: row.kennelpiiri,
+    kennelpiirinro: row.kennelpiirinro,
     sklKoeId: row.sklKoeId,
     entries: row.entries.map((entry) => ({
       trialId: entry.id,

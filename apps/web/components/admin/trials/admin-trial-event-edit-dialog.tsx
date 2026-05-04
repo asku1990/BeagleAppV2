@@ -10,8 +10,12 @@ import type { AdminTrialEventDetails } from "@beagle/contracts";
 type TrialEventDraft = {
   eventDate: string;
   eventPlace: string;
-  organizer: string;
-  judge: string;
+  jarjestaja: string;
+  ylituomari: string;
+  ylituomariNumero: string;
+  ytKertomus: string;
+  kennelpiiri: string;
+  kennelpiirinro: string;
   sklKoeId: string;
 };
 
@@ -19,8 +23,12 @@ function toDraft(event: AdminTrialEventDetails): TrialEventDraft {
   return {
     eventDate: event.eventDate,
     eventPlace: event.eventPlace,
-    organizer: event.organizer ?? "",
-    judge: event.judge ?? "",
+    jarjestaja: event.jarjestaja ?? "",
+    ylituomari: event.ylituomari ?? "",
+    ylituomariNumero: event.ylituomariNumero ?? "",
+    ytKertomus: event.ytKertomus ?? "",
+    kennelpiiri: event.kennelpiiri ?? "",
+    kennelpiirinro: event.kennelpiirinro ?? "",
     sklKoeId: event.sklKoeId === null ? "" : String(event.sklKoeId),
   };
 }
@@ -32,8 +40,12 @@ function areEqual(
   return (
     left.eventDate === right.eventDate &&
     left.eventPlace === right.eventPlace &&
-    (left.organizer ?? "") === right.organizer &&
-    (left.judge ?? "") === right.judge &&
+    (left.jarjestaja ?? "") === right.jarjestaja &&
+    (left.ylituomari ?? "") === right.ylituomari &&
+    (left.ylituomariNumero ?? "") === right.ylituomariNumero &&
+    (left.ytKertomus ?? "") === right.ytKertomus &&
+    (left.kennelpiiri ?? "") === right.kennelpiiri &&
+    (left.kennelpiirinro ?? "") === right.kennelpiirinro &&
     (left.sklKoeId === null ? "" : String(left.sklKoeId)) === right.sklKoeId
   );
 }
@@ -43,8 +55,12 @@ export type UpdateAdminTrialEventPayload = {
   eventDate: string;
   eventPlace: string;
   eventName: string | null;
-  organizer: string | null;
-  judge: string | null;
+  jarjestaja: string | null;
+  ylituomari: string | null;
+  ylituomariNumero: string | null;
+  ytKertomus: string | null;
+  kennelpiiri: string | null;
+  kennelpiirinro: string | null;
   sklKoeId: number | null;
 };
 
@@ -75,8 +91,12 @@ export function AdminTrialEventEditDialog({
 
   const eventDate = draft.eventDate.trim();
   const eventPlace = draft.eventPlace.trim();
-  const organizer = draft.organizer.trim();
-  const judge = draft.judge.trim();
+  const jarjestaja = draft.jarjestaja.trim();
+  const ylituomari = draft.ylituomari.trim();
+  const ylituomariNumero = draft.ylituomariNumero.trim();
+  const ytKertomus = draft.ytKertomus.trim();
+  const kennelpiiri = draft.kennelpiiri.trim();
+  const kennelpiirinro = draft.kennelpiirinro.trim();
   const sklKoeIdRaw = draft.sklKoeId.trim();
 
   function resetDraft() {
@@ -152,8 +172,12 @@ export function AdminTrialEventEditDialog({
                   eventDate,
                   eventPlace,
                   eventName: null,
-                  organizer: organizer || null,
-                  judge: judge || null,
+                  jarjestaja: jarjestaja || null,
+                  ylituomari: ylituomari || null,
+                  ylituomariNumero: ylituomariNumero || null,
+                  ytKertomus: ytKertomus || null,
+                  kennelpiiri: kennelpiiri || null,
+                  kennelpiirinro: kennelpiirinro || null,
                   sklKoeId,
                 });
                 if (ok) {
@@ -207,27 +231,83 @@ export function AdminTrialEventEditDialog({
           />
         </label>
         <label className="space-y-1 text-sm">
-          <span>{t("admin.trials.manage.eventModal.fields.organizer")}</span>
+          <span>{t("admin.trials.manage.eventModal.fields.jarjestaja")}</span>
           <Input
-            value={draft.organizer}
+            value={draft.jarjestaja}
             disabled={isPending}
             onChange={(event) =>
               setDraft((current) => ({
                 ...current,
-                organizer: event.target.value,
+                jarjestaja: event.target.value,
               }))
             }
           />
         </label>
         <label className="space-y-1 text-sm">
-          <span>{t("admin.trials.manage.eventModal.fields.judge")}</span>
+          <span>{t("admin.trials.manage.eventModal.fields.ylituomari")}</span>
           <Input
-            value={draft.judge}
+            value={draft.ylituomari}
             disabled={isPending}
             onChange={(event) =>
               setDraft((current) => ({
                 ...current,
-                judge: event.target.value,
+                ylituomari: event.target.value,
+              }))
+            }
+          />
+        </label>
+        <label className="space-y-1 text-sm">
+          <span>
+            {t("admin.trials.manage.eventModal.fields.ylituomariNumero")}
+          </span>
+          <Input
+            value={draft.ylituomariNumero}
+            disabled={isPending}
+            onChange={(event) =>
+              setDraft((current) => ({
+                ...current,
+                ylituomariNumero: event.target.value,
+              }))
+            }
+          />
+        </label>
+        <label className="space-y-1 text-sm md:col-span-2">
+          <span>{t("admin.trials.manage.eventModal.fields.ytKertomus")}</span>
+          <Input
+            value={draft.ytKertomus}
+            disabled={isPending}
+            onChange={(event) =>
+              setDraft((current) => ({
+                ...current,
+                ytKertomus: event.target.value,
+              }))
+            }
+          />
+        </label>
+        <label className="space-y-1 text-sm">
+          <span>{t("admin.trials.manage.eventModal.fields.kennelpiiri")}</span>
+          <Input
+            value={draft.kennelpiiri}
+            disabled={isPending}
+            onChange={(event) =>
+              setDraft((current) => ({
+                ...current,
+                kennelpiiri: event.target.value,
+              }))
+            }
+          />
+        </label>
+        <label className="space-y-1 text-sm">
+          <span>
+            {t("admin.trials.manage.eventModal.fields.kennelpiirinro")}
+          </span>
+          <Input
+            value={draft.kennelpiirinro}
+            disabled={isPending}
+            onChange={(event) =>
+              setDraft((current) => ({
+                ...current,
+                kennelpiirinro: event.target.value,
               }))
             }
           />

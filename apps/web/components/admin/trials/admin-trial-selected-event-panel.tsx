@@ -92,7 +92,8 @@ export function AdminTrialSelectedEventPanel({
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {showDash(selectedEvent.eventName)} •{" "}
-                    {showDash(selectedEvent.judge)} • {selectedEvent.dogCount}{" "}
+                    {showDash(selectedEvent.ylituomari)} •{" "}
+                    {selectedEvent.dogCount}{" "}
                     {t("admin.trials.manage.selected.countSuffix")}
                   </p>
                 </div>
