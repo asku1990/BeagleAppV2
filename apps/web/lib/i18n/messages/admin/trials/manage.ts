@@ -65,10 +65,10 @@ export const fiAdminTrialsManageMessages = {
     "Poistetaanko tämä koetulos?",
   "admin.trials.manage.selected.actions.delete.confirmBody":
     "Tämä poistaa vain tämän koirakohtaisen koetuloksen.\nJos tämä oli tapahtuman viimeinen tulos, myös tyhjä koetapahtuma poistetaan.",
-  "admin.trials.manage.selected.actions.delete.confirmDog": "Dog",
+  "admin.trials.manage.selected.actions.delete.confirmDog": "Koira",
   "admin.trials.manage.selected.actions.delete.confirmRegistration":
-    "Registration",
-  "admin.trials.manage.selected.actions.delete.confirmEvent": "Event",
+    "Rekisterinumero",
+  "admin.trials.manage.selected.actions.delete.confirmEvent": "Tapahtuma",
   "admin.trials.manage.pagination.previous": "Edellinen",
   "admin.trials.manage.pagination.page": "Sivu",
   "admin.trials.manage.pagination.next": "Seuraava",

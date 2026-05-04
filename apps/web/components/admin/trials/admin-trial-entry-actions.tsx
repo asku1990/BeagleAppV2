@@ -52,12 +52,20 @@ export function AdminTrialEntryActions({
       return;
     }
 
-    const result = await deleteMutation.mutateAsync({
-      trialEventId,
-      trialEntryId,
-    });
-    if (result.deletedTrialEvent) {
-      onDeletedTrialEvent(result.trialEventId);
+    try {
+      const result = await deleteMutation.mutateAsync({
+        trialEventId,
+        trialEntryId,
+      });
+      if (result.deletedTrialEvent) {
+        onDeletedTrialEvent(result.trialEventId);
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("admin.trials.manage.selected.error");
+      window.alert(message);
     }
   }
 
