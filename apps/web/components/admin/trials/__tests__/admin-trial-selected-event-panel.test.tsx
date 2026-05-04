@@ -57,6 +57,11 @@ vi.mock("next/link", () => ({
   }) => React.createElement("a", { href, ...props }, children),
 }));
 
+vi.mock("../admin-trial-entry-actions", () => ({
+  AdminTrialEntryActions: ({ trialId }: { trialId: string }) =>
+    React.createElement("div", null, `actions-${trialId}`),
+}));
+
 describe("AdminTrialSelectedEventPanel", () => {
   it("renders selected event rows and row actions", () => {
     const html = renderToStaticMarkup(
@@ -89,11 +94,12 @@ describe("AdminTrialSelectedEventPanel", () => {
         isLoading: false,
         isError: false,
         errorText: "error",
+        onDeletedTrialEvent: vi.fn(),
       }),
     );
 
     expect(html).toContain("admin.trials.manage.selected.title");
     expect(html).toContain("Rex");
-    expect(html).toContain("admin.trials.manage.selected.actions.openPdf");
+    expect(html).toContain("actions-trial-1");
   });
 });

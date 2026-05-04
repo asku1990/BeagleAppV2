@@ -177,6 +177,9 @@ export function AdminTrialsPageClient() {
         isLoading={eventQuery.isLoading}
         isError={eventQuery.isError}
         errorText={selectedErrorText}
+        onDeletedTrialEvent={() => {
+          setSelectedEventIdInput("");
+        }}
       />
     </div>
   );

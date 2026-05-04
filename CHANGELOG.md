@@ -35,6 +35,7 @@ This project uses a user-facing changelog format.
 
 - Julkinen ajokoelistaus ja kokeen detaljisivu lukevat nyt kanonista AJOK-skeemaa (`TrialEvent` + `TrialEntry`) vanhan `TrialResult`-taulun sijaan. Koirat ilman `dogId`-linkkiä näkyvät edelleen snapshot-rekisterinumerollaan; nimi näytetään vain tietokantaan linkitetyille koirille.
 - Tukemattomat AJOK PDF -sääntöikkunat palauttavat nyt virheen tyhjän PDF:n sijaan. Aiempi `blank-only`-tila on nimetty `not-supported`-tilaksi selkeyden vuoksi.
+- Ylläpidon AJOK-tapahtumanäkymässä yksittäisen koirarivin voi nyt poistaa. Jos poistettu rivi oli tapahtuman viimeinen, tyhjä tapahtuma poistetaan automaattisesti.
 
 ### Fixed
 

@@ -3,6 +3,10 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { AdminTrialEntryActions } from "../admin-trial-entry-actions";
 
+const { useDeleteAdminTrialEntryMutationMock } = vi.hoisted(() => ({
+  useDeleteAdminTrialEntryMutationMock: vi.fn(),
+}));
+
 vi.mock("@/hooks/i18n", () => ({
   useI18n: () => ({
     t: (key: string) => key,
@@ -36,15 +40,30 @@ vi.mock("next/link", () => ({
   }) => React.createElement("a", { href, ...props }, children),
 }));
 
+vi.mock("@/queries/admin/trials", () => ({
+  useDeleteAdminTrialEntryMutation: useDeleteAdminTrialEntryMutationMock,
+}));
+
 describe("AdminTrialEntryActions", () => {
-  it("renders the pdf action", () => {
+  it("renders the pdf and delete actions", () => {
+    useDeleteAdminTrialEntryMutationMock.mockReturnValue({
+      mutateAsync: vi.fn(),
+      isPending: false,
+    });
+
     const html = renderToStaticMarkup(
       React.createElement(AdminTrialEntryActions, {
+        trialEventId: "event-1",
+        trialEntryId: "entry-1",
         trialId: "trial-1",
+        dogName: "Rex",
+        registrationNo: "FI123",
+        onDeletedTrialEvent: vi.fn(),
       }),
     );
 
     expect(html).toContain("admin.trials.manage.selected.actions.openPdf");
+    expect(html).toContain("admin.trials.manage.selected.actions.delete");
     expect(html).toContain('href="/api/trials/trial-1/pdf"');
   });
 });

@@ -71,16 +71,18 @@ vi.mock("../admin-trial-selected-event-panel", () => ({
     isLoading,
     isError,
     errorText,
+    onDeletedTrialEvent,
   }: {
     selectedEvent: { trialEventId: string } | null;
     isLoading: boolean;
     isError: boolean;
     errorText: string;
+    onDeletedTrialEvent: () => void;
   }) =>
     React.createElement(
       "section",
       { "data-testid": "selected" },
-      `${selectedEvent?.trialEventId ?? ""}|${isLoading}|${isError}|${errorText}`,
+      `${selectedEvent?.trialEventId ?? ""}|${isLoading}|${isError}|${errorText}|${typeof onDeletedTrialEvent}`,
     ),
 }));
 
@@ -138,7 +140,7 @@ describe("AdminTrialsPageClient", () => {
     expect(html).toContain("year|||");
     expect(html).toContain("1|1|1|event-1|admin.trials.manage.error");
     expect(html).toContain(
-      "event-1|false|false|admin.trials.manage.selected.error",
+      "event-1|false|false|admin.trials.manage.selected.error|function",
     );
   });
 });
