@@ -176,7 +176,11 @@ export async function searchAdminTrialsDb(
       koepaiva: true,
       koekunta: true,
       jarjestaja: true,
+      kennelpiiri: true,
+      kennelpiirinro: true,
       ylituomariNimi: true,
+      ylituomariNumero: true,
+      ytKertomus: true,
       _count: {
         select: {
           entries: true,
@@ -190,8 +194,12 @@ export async function searchAdminTrialsDb(
     eventDate: row.koepaiva,
     eventPlace: row.koekunta,
     eventName: row.jarjestaja,
-    organizer: row.jarjestaja,
-    judge: row.ylituomariNimi,
+    jarjestaja: row.jarjestaja,
+    ylituomari: row.ylituomariNimi,
+    ylituomariNumero: row.ylituomariNumero,
+    ytKertomus: row.ytKertomus,
+    kennelpiiri: row.kennelpiiri,
+    kennelpiirinro: row.kennelpiirinro,
     sklKoeId: row.sklKoeId ?? null,
     dogCount: row._count.entries,
   }));

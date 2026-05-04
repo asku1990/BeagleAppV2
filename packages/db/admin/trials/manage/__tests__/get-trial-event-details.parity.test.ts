@@ -42,6 +42,10 @@ describe("getAdminTrialEventDetailsDb parity", () => {
       koekunta: "Helsinki",
       jarjestaja: "Talvikoe",
       ylituomariNimi: "Judge One",
+      ylituomariNumero: null,
+      ytKertomus: null,
+      kennelpiiri: null,
+      kennelpiirinro: null,
       entries: [
         {
           id: "trial-1",
@@ -71,8 +75,12 @@ describe("getAdminTrialEventDetailsDb parity", () => {
       eventDate: new Date("2026-03-01T00:00:00.000Z"),
       eventPlace: "Helsinki",
       eventName: "Talvikoe",
-      organizer: "Talvikoe",
-      judge: "Judge One",
+      jarjestaja: "Talvikoe",
+      ylituomari: "Judge One",
+      ylituomariNumero: null,
+      ytKertomus: null,
+      kennelpiiri: null,
+      kennelpiirinro: null,
       sklKoeId: 1001,
       entries: [
         {

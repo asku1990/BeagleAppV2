@@ -5,6 +5,11 @@ export {
   type DeleteAdminTrialEntryWriteRequestDb,
   type DeleteAdminTrialEntryWriteResultDb,
 } from "./delete-trial-entry";
+export {
+  updateAdminTrialEventWriteDb,
+  type UpdateAdminTrialEventWriteRequestDb,
+  type UpdateAdminTrialEventWriteResultDb,
+} from "./update-trial-event";
 export type {
   AdminTrialEventDetailsDb,
   AdminTrialEventDetailsRequestDb,

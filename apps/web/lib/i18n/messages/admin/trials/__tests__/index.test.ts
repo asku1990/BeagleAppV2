@@ -12,6 +12,9 @@ describe("admin trial message index", () => {
     expect(
       fiAdminTrialsMessages["admin.trials.manage.selected.actions.more"],
     ).toBe("Lisää toimintoja");
+    expect(
+      fiAdminTrialsMessages["admin.trials.manage.selected.actions.editEvent"],
+    ).toBe("Muokkaa tapahtumaa");
     expect(svAdminTrialsMessages["admin.trials.manage.events.title"]).toBe(
       "Evenemang",
     );
@@ -21,5 +24,8 @@ describe("admin trial message index", () => {
     expect(
       svAdminTrialsMessages["admin.trials.manage.selected.actions.more"],
     ).toBe("Fler åtgärder");
+    expect(
+      svAdminTrialsMessages["admin.trials.manage.selected.actions.editEvent"],
+    ).toBe("Redigera evenemang");
   });
 });

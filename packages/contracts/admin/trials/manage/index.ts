@@ -16,3 +16,7 @@ export type {
   DeleteAdminTrialEntryRequest,
   DeleteAdminTrialEntryResponse,
 } from "./delete-admin-trial-entry";
+export type {
+  UpdateAdminTrialEventRequest,
+  UpdateAdminTrialEventResponse,
+} from "./update-admin-trial-event";

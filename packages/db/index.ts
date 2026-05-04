@@ -149,6 +149,7 @@ export {
   getAdminTrialEventDetailsDb,
   searchAdminTrialsDb,
   deleteAdminTrialEntryWriteDb,
+  updateAdminTrialEventWriteDb,
   type AdminTrialEventDetailsDb,
   type AdminTrialEventDetailsRequestDb,
   type AdminTrialEventEntryDb,
@@ -158,6 +159,8 @@ export {
   type AdminTrialEventSummaryDb,
   type DeleteAdminTrialEntryWriteRequestDb,
   type DeleteAdminTrialEntryWriteResultDb,
+  type UpdateAdminTrialEventWriteRequestDb,
+  type UpdateAdminTrialEventWriteResultDb,
 } from "./admin/trials";
 
 export {
