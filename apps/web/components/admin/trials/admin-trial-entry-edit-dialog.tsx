@@ -159,9 +159,7 @@ export function AdminTrialEntryEditDialog({
                     huomautusTeksti: parseNullableString(
                       entryDraft.huomautusTeksti,
                     ),
-                    ylituomariNimiSnapshot: parseNullableString(
-                      entryDraft.ylituomariNimiSnapshot,
-                    ),
+                    ylituomariNimiSnapshot: null,
                     ylituomariNumeroSnapshot: parseNullableString(
                       entryDraft.ylituomariNumeroSnapshot,
                     ),
@@ -194,9 +192,9 @@ export function AdminTrialEntryEditDialog({
                   })),
                   lisatiedotRows: lisatiedotRows.map((row) => ({
                     koodi: row.koodi,
-                    osa: "",
-                    nimi: null,
-                    jarjestys: null,
+                    osa: row.osa,
+                    nimi: row.nimi,
+                    jarjestys: row.jarjestys,
                     eraValues: sortedEras.map((era) => ({
                       era: era.era,
                       arvo: parseNullableString(row.eraValues[era.era] ?? ""),
@@ -256,10 +254,10 @@ export function AdminTrialEntryEditDialog({
             eras={eras}
             rows={lisatiedotRows}
             isPending={isPending}
-            onChangeCell={(koodi, era, value) =>
+            onChangeCell={(koodi, osa, era, value) =>
               setLisatiedotRows((current) =>
                 current.map((currentRow) =>
-                  currentRow.koodi === koodi
+                  currentRow.koodi === koodi && currentRow.osa === osa
                     ? {
                         ...currentRow,
                         eraValues: {

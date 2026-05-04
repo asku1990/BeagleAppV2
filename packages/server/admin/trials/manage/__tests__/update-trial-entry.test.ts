@@ -165,14 +165,14 @@ describe("updateAdminTrialEntry", () => {
     expect(updateAdminTrialEntryWriteDbMock).not.toHaveBeenCalled();
   });
 
-  it("rejects unsupported lisatieto codes", async () => {
+  it("rejects malformed lisatieto codes", async () => {
     await expect(
       updateAdminTrialEntry(
         {
           ...baseInput(),
           lisatiedotRows: [
             {
-              koodi: "99",
+              koodi: "abc",
               osa: "",
               nimi: null,
               jarjestys: null,
@@ -186,11 +186,120 @@ describe("updateAdminTrialEntry", () => {
       status: 400,
       body: {
         ok: false,
-        error: "Unsupported lisatieto code: 99",
+        error: "Unsupported lisatieto code: abc",
         code: "INVALID_LISATIETO_CODE",
       },
     });
     expect(updateAdminTrialEntryWriteDbMock).not.toHaveBeenCalled();
+  });
+
+  it("accepts canonical and existing numeric lisatieto codes by koodi and osa", async () => {
+    updateAdminTrialEntryWriteDbMock.mockResolvedValue({
+      status: "updated",
+      trialEventId: "event-1",
+      trialEntryId: "entry-1",
+    });
+
+    await expect(
+      updateAdminTrialEntry(
+        {
+          ...baseInput(),
+          lisatiedotRows: [
+            {
+              koodi: "10",
+              osa: "",
+              nimi: "Vaativat olosuhteet",
+              jarjestys: 10,
+              eraValues: [{ era: 1, arvo: "1" }],
+            },
+            {
+              koodi: "25",
+              osa: " a ",
+              nimi: "Yöjälki löytyi",
+              jarjestys: 25,
+              eraValues: [{ era: 1, arvo: "0.3" }],
+            },
+            {
+              koodi: "27",
+              osa: "c",
+              nimi: "Aika yöjäljellä",
+              jarjestys: 27,
+              eraValues: [{ era: 2, arvo: "5" }],
+            },
+            {
+              koodi: "62",
+              osa: "",
+              nimi: "Matka ajoerässä",
+              jarjestys: 62,
+              eraValues: [{ era: 1, arvo: "12" }],
+            },
+            {
+              koodi: "90",
+              osa: "legacy",
+              nimi: "Legacy field",
+              jarjestys: 900,
+              eraValues: [{ era: 1, arvo: "free" }],
+            },
+          ],
+        },
+        adminUser,
+      ),
+    ).resolves.toMatchObject({
+      status: 200,
+      body: { ok: true },
+    });
+
+    expect(updateAdminTrialEntryWriteDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        lisatiedotByEra: [
+          {
+            era: 1,
+            items: [
+              {
+                koodi: "10",
+                osa: "",
+                arvo: "1",
+                nimi: "Vaativat olosuhteet",
+                jarjestys: 10,
+              },
+              {
+                koodi: "25",
+                osa: "a",
+                arvo: "0.3",
+                nimi: "Yöjälki löytyi",
+                jarjestys: 25,
+              },
+              {
+                koodi: "62",
+                osa: "",
+                arvo: "12",
+                nimi: "Matka ajoerässä",
+                jarjestys: 62,
+              },
+              {
+                koodi: "90",
+                osa: "legacy",
+                arvo: "free",
+                nimi: "Legacy field",
+                jarjestys: 900,
+              },
+            ],
+          },
+          {
+            era: 2,
+            items: [
+              {
+                koodi: "27",
+                osa: "c",
+                arvo: "5",
+                nimi: "Aika yöjäljellä",
+                jarjestys: 27,
+              },
+            ],
+          },
+        ],
+      }),
+    );
   });
 
   it("rejects lisatieto values for unknown eras", async () => {

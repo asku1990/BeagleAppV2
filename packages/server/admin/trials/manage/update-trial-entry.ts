@@ -13,38 +13,9 @@ type ServiceLogContext = {
   actorUserId?: string;
 };
 
-const VALID_LISATIETO_KOODIT = new Set<string>([
-  "11",
-  "12",
-  "13",
-  "14",
-  "15",
-  "16",
-  "17",
-  "18",
-  "20",
-  "21",
-  "22",
-  "30",
-  "31",
-  "32",
-  "33",
-  "34",
-  "35",
-  "36",
-  "40",
-  "41",
-  "42",
-  "50",
-  "51",
-  "52",
-  "53",
-  "54",
-  "55",
-  "56",
-  "60",
-  "61",
-]);
+function isValidLisatietoCode(value: string): boolean {
+  return /^[1-9]\d*$/.test(value.trim());
+}
 
 function normalizeRequiredId(value: string): string {
   return value.trim();
@@ -163,7 +134,8 @@ export async function updateAdminTrialEntry(
   }
 
   for (const row of input.lisatiedotRows) {
-    if (!VALID_LISATIETO_KOODIT.has(row.koodi)) {
+    const normalizedKoodi = normalizeNullableText(row.koodi);
+    if (!normalizedKoodi || !isValidLisatietoCode(normalizedKoodi)) {
       return {
         status: 400,
         body: {
@@ -198,7 +170,7 @@ export async function updateAdminTrialEntry(
           return null;
         }
         return {
-          koodi: row.koodi,
+          koodi: normalizeNullableText(row.koodi) ?? row.koodi,
           osa: normalizeNullableText(row.osa) ?? "",
           arvo: normalizedArvo,
           nimi: normalizeNullableText(row.nimi),

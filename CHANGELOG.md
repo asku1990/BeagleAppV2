@@ -37,10 +37,12 @@ This project uses a user-facing changelog format.
 - Tukemattomat AJOK PDF -sääntöikkunat palauttavat nyt virheen tyhjän PDF:n sijaan. Aiempi `blank-only`-tila on nimetty `not-supported`-tilaksi selkeyden vuoksi.
 - Ylläpidon AJOK-tapahtumanäkymässä yksittäisen koirarivin voi nyt poistaa. Jos poistettu rivi oli tapahtuman viimeinen, tyhjä tapahtuma poistetaan automaattisesti.
 - Ylläpidon AJOK-tapahtumanäkymässä voi nyt muokata tapahtuman metatietoja (päivä, paikka, järjestäjä, ylituomari ja SKL-koe-ID) ilman koirarivien muutoksia.
+- Ylläpidon AJOK-rivin muokkaus näyttää nyt myös koirakohtaisessa PDF:ssä käytettävät perustiedot, pisteet, huomautukset, omistajatiedot ja tuomaritiedot.
 
 ### Fixed
 
 - Ajokokeen koirakohtainen PDF näyttää nyt koiran oman primary-rekisterinumeron eli ensimmäisenä lisätyn rekisterinumeron.
+- Ylläpidon AJOK-rivin muokkaus näyttää ja tallentaa nyt kaikki lisätietokoodit, jotta muiden kenttien tallennus ei poista Koiratietokannan lisätietoja.
 - Vercelin AJOK PDF -route pakkaa nyt kaikki `public/templates/*.pdf`-pohjat mukaan, joten tuotanto voi lukea oikeat template-tiedostot ilman `ENOENT`-virhettä.
 
 ### Removed

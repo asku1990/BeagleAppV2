@@ -1,87 +1,164 @@
-export const ADMIN_TRIAL_LISATIETO_KOODIT = [
-  "11",
-  "12",
-  "13",
-  "14",
-  "15",
-  "16",
-  "17",
-  "18",
-  "20",
-  "21",
-  "22",
-  "30",
-  "31",
-  "32",
-  "33",
-  "34",
-  "35",
-  "36",
-  "40",
-  "41",
-  "42",
-  "50",
-  "51",
-  "52",
-  "53",
-  "54",
-  "55",
-  "56",
-  "60",
-  "61",
-] as const;
-
 export const ADMIN_TRIAL_ERA_FIELD_LABELS = {
   alkoi: "alkoi",
   hakumin: "hakumin",
   ajomin: "ajomin",
   haku: "haku",
-  hauk: "hauk",
-  yva: "yva / ajotaito",
-  hlo: "hlo",
-  alo: "alo",
-  tja: "tja",
-  pin: "pin",
+  hauk: "haukku",
+  yva: "ajotaito / yleisvaikutelma",
+  hlo: "hakulöysyys",
+  alo: "ajolöysyys",
+  tja: "tie ja estetyöskentely",
+  pin: "metsästysinto",
 } as const;
+
+export type AdminTrialLisatietoGroup =
+  | "olosuhteet"
+  | "haku"
+  | "haukku"
+  | "metsastysinto"
+  | "ajo"
+  | "muut_ominaisuudet"
+  | "unknown";
 
 export type AdminTrialLisatietoInputKind =
   | "marker"
   | "integer"
-  | "decimal_1"
-  | "decimal_2";
+  | "decimal"
+  | "text";
 
-export const ADMIN_TRIAL_LISATIETO_INPUT_KIND: Record<
-  (typeof ADMIN_TRIAL_LISATIETO_KOODIT)[number],
-  AdminTrialLisatietoInputKind
-> = {
-  "11": "marker",
-  "12": "integer",
-  "13": "marker",
-  "14": "marker",
-  "15": "marker",
-  "16": "marker",
-  "17": "integer",
-  "18": "integer",
-  "20": "integer",
-  "21": "decimal_1",
-  "22": "decimal_1",
-  "30": "decimal_1",
-  "31": "decimal_1",
-  "32": "decimal_1",
-  "33": "decimal_1",
-  "34": "decimal_1",
-  "35": "decimal_1",
-  "36": "integer",
-  "40": "decimal_2",
-  "41": "decimal_2",
-  "42": "decimal_2",
-  "50": "decimal_2",
-  "51": "decimal_2",
-  "52": "decimal_2",
-  "53": "decimal_2",
-  "54": "decimal_2",
-  "55": "decimal_2",
-  "56": "decimal_2",
-  "60": "decimal_2",
-  "61": "decimal_2",
+export type AdminTrialLisatietoConfig = {
+  koodi: string;
+  osa: string;
+  group: AdminTrialLisatietoGroup;
+  label: string;
+  inputKind: AdminTrialLisatietoInputKind;
+  sortOrder: number;
 };
+
+function defineLisatieto(
+  koodi: string,
+  group: AdminTrialLisatietoGroup,
+  label: string,
+  inputKind: AdminTrialLisatietoInputKind,
+  sortOrder: number,
+  osa = "",
+): AdminTrialLisatietoConfig {
+  return { koodi, osa, group, label, inputKind, sortOrder };
+}
+
+export const ADMIN_TRIAL_LISATIETO_GROUP_LABELS: Record<
+  AdminTrialLisatietoGroup,
+  string
+> = {
+  olosuhteet: "Olosuhteet",
+  haku: "Haku",
+  haukku: "Haukku",
+  metsastysinto: "Metsästysinto",
+  ajo: "Ajo",
+  muut_ominaisuudet: "Muut ominaisuudet",
+  unknown: "Muut / tuntemattomat",
+};
+
+export const ADMIN_TRIAL_LISATIETO_CONFIG = [
+  defineLisatieto("10", "olosuhteet", "Vaativat olosuhteet", "marker", 10),
+  defineLisatieto("11", "olosuhteet", "Paljas maa", "marker", 11),
+  defineLisatieto("12", "olosuhteet", "Lumikeli", "integer", 12),
+  defineLisatieto(
+    "13",
+    "olosuhteet",
+    "Kohtalainen tai kova tuuli",
+    "marker",
+    13,
+  ),
+  defineLisatieto("14", "olosuhteet", "Kuiva keli", "marker", 14),
+  defineLisatieto("15", "olosuhteet", "Kostea keli", "marker", 15),
+  defineLisatieto(
+    "16",
+    "olosuhteet",
+    "Kohtalainen tai kova sade",
+    "marker",
+    16,
+  ),
+  defineLisatieto("17", "olosuhteet", "Lämpötila °C", "integer", 17),
+  defineLisatieto("18", "olosuhteet", "Maasto", "integer", 18),
+  defineLisatieto("19", "olosuhteet", "Lumipeitteen laatu", "marker", 19),
+  defineLisatieto("20", "haku", "Laajuus ilman yöjälkeä", "integer", 20),
+  defineLisatieto("21", "haku", "Vainuamistapa", "decimal", 21),
+  defineLisatieto("22", "haku", "Hakulöysyys", "decimal", 22),
+  defineLisatieto("23", "haku", "Hakukuvio", "integer", 23),
+  defineLisatieto("24", "haku", "Suurin etäisyys", "decimal", 24),
+  defineLisatieto("25", "haku", "Yöjälki löytyi", "decimal", 25, "a"),
+  defineLisatieto("25", "haku", "Yöjälki löytyi", "decimal", 25.1, "b"),
+  defineLisatieto("25", "haku", "Yöjälki löytyi", "decimal", 25.2, "c"),
+  defineLisatieto("26", "haku", "Eteneminen yöjäljellä", "integer", 26),
+  defineLisatieto("27", "haku", "Aika yöjäljellä", "integer", 27, "a"),
+  defineLisatieto("27", "haku", "Aika yöjäljellä", "integer", 27.1, "b"),
+  defineLisatieto("27", "haku", "Aika yöjäljellä", "integer", 27.2, "c"),
+  defineLisatieto("30", "haukku", "Kuuluvuus", "decimal", 30),
+  defineLisatieto("31", "haukku", "Kertovuus", "decimal", 31),
+  defineLisatieto("32", "haukku", "Intohimoisuus", "decimal", 32),
+  defineLisatieto("33", "haukku", "Tiheys", "decimal", 33),
+  defineLisatieto("34", "haukku", "Äänien määrä", "decimal", 34),
+  defineLisatieto("35", "haukku", "Sukupuolileima", "decimal", 35),
+  defineLisatieto("36", "haukku", "Beaglen haukku", "integer", 36),
+  defineLisatieto("37", "haukku", "Todettu kuuluvuus", "decimal", 37),
+  defineLisatieto(
+    "40",
+    "metsastysinto",
+    "Metsästysinto haun aikana",
+    "decimal",
+    40,
+  ),
+  defineLisatieto(
+    "41",
+    "metsastysinto",
+    "Metsästysinto ajon aikana",
+    "decimal",
+    41,
+  ),
+  defineLisatieto(
+    "42",
+    "metsastysinto",
+    "Metsästysinto koetteluaikana",
+    "decimal",
+    42,
+  ),
+  defineLisatieto("50", "ajo", "Ajotaito", "decimal", 50),
+  defineLisatieto("51", "ajo", "Nopeus", "decimal", 51),
+  defineLisatieto("52", "ajo", "Tie- ja estetyöskentely", "decimal", 52),
+  defineLisatieto("53", "ajo", "Vainuamistapa", "decimal", 53),
+  defineLisatieto("54", "ajo", "Havainnot herkkyydestä", "decimal", 54),
+  defineLisatieto("55", "ajo", "Ajolöysyyden laatu", "decimal", 55),
+  defineLisatieto("56", "ajo", "Ajettava nähty", "decimal", 56),
+  defineLisatieto("57", "ajo", "Tie ja esteajoa", "decimal", 57),
+  defineLisatieto("58", "ajo", "Todellinen ajoaika", "integer", 58),
+  defineLisatieto("59", "ajo", "Hukkatyöskentely", "integer", 59),
+  defineLisatieto(
+    "60",
+    "muut_ominaisuudet",
+    "Muiden eläinten ja sorkkaeläinten ajo",
+    "decimal",
+    60,
+  ),
+  defineLisatieto("61", "muut_ominaisuudet", "Hallittavuus", "decimal", 61),
+  defineLisatieto("62", "muut_ominaisuudet", "Matka ajoerässä", "decimal", 62),
+] as const satisfies readonly AdminTrialLisatietoConfig[];
+
+export const ADMIN_TRIAL_LISATIETO_KOODIT = Array.from(
+  new Set(ADMIN_TRIAL_LISATIETO_CONFIG.map((item) => item.koodi)),
+);
+
+export function getAdminTrialLisatietoConfig(
+  koodi: string,
+  osa: string,
+): AdminTrialLisatietoConfig | null {
+  return (
+    ADMIN_TRIAL_LISATIETO_CONFIG.find(
+      (item) => item.koodi === koodi && item.osa === osa,
+    ) ??
+    ADMIN_TRIAL_LISATIETO_CONFIG.find(
+      (item) => item.koodi === koodi && item.osa === "",
+    ) ??
+    null
+  );
+}

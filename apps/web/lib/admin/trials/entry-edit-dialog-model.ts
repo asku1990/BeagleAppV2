@@ -1,8 +1,20 @@
 import type { AdminTrialEventEntry } from "@beagle/contracts";
-import { ADMIN_TRIAL_LISATIETO_KOODIT } from "./entry-edit-config";
+import {
+  ADMIN_TRIAL_LISATIETO_CONFIG,
+  getAdminTrialLisatietoConfig,
+  type AdminTrialLisatietoGroup,
+  type AdminTrialLisatietoInputKind,
+} from "./entry-edit-config";
 
 export type LisatietoRowDraft = {
   koodi: string;
+  osa: string;
+  nimi: string | null;
+  jarjestys: number | null;
+  group: AdminTrialLisatietoGroup;
+  label: string;
+  inputKind: AdminTrialLisatietoInputKind;
+  sortOrder: number;
   eraValues: Record<number, string>;
 };
 
@@ -145,29 +157,93 @@ export function toLisatietoRows(
   eras: EraDraft[],
 ): LisatietoRowDraft[] {
   const eraNumbers = eras.map((era) => era.era);
-  const values = new Map<string, Record<number, string>>();
-  for (const code of ADMIN_TRIAL_LISATIETO_KOODIT) {
+  const values = new Map<string, LisatietoRowDraft>();
+
+  function rowKey(koodi: string, osa: string): string {
+    return `${koodi}\u0000${osa}`;
+  }
+
+  function createEraValues(): Record<number, string> {
     const row: Record<number, string> = {};
     for (const era of eraNumbers) {
       row[era] = "";
     }
-    values.set(code, row);
+    return row;
+  }
+
+  function ensureRow(input: {
+    koodi: string;
+    osa: string;
+    nimi: string | null;
+    jarjestys: number | null;
+  }): LisatietoRowDraft {
+    const key = rowKey(input.koodi, input.osa);
+    const existing = values.get(key);
+    if (existing) {
+      return existing;
+    }
+
+    const config = getAdminTrialLisatietoConfig(input.koodi, input.osa);
+    const parsedCode = Number.parseInt(input.koodi, 10);
+    const row: LisatietoRowDraft = {
+      koodi: input.koodi,
+      osa: input.osa,
+      nimi: input.nimi,
+      jarjestys: input.jarjestys,
+      group: config?.group ?? "unknown",
+      label: config?.label ?? input.nimi ?? "Tuntematon lisätieto",
+      inputKind: config?.inputKind ?? "text",
+      sortOrder:
+        config?.sortOrder ??
+        (Number.isInteger(parsedCode) ? parsedCode : Number.MAX_SAFE_INTEGER),
+      eraValues: createEraValues(),
+    };
+    values.set(key, row);
+    return row;
+  }
+
+  for (const config of ADMIN_TRIAL_LISATIETO_CONFIG) {
+    ensureRow({
+      koodi: config.koodi,
+      osa: config.osa,
+      nimi: config.label,
+      jarjestys: config.sortOrder,
+    });
   }
 
   for (const era of entry.eras ?? []) {
     for (const item of era.lisatiedot) {
-      const existing = values.get(item.koodi);
-      if (!existing) {
-        continue;
-      }
-      existing[era.era] = item.arvo;
+      const row = ensureRow({
+        koodi: item.koodi,
+        osa: item.osa,
+        nimi: item.nimi,
+        jarjestys: item.jarjestys,
+      });
+      row.eraValues[era.era] = item.arvo;
     }
   }
 
-  return ADMIN_TRIAL_LISATIETO_KOODIT.map((koodi) => ({
-    koodi,
-    eraValues: values.get(koodi) ?? {},
-  }));
+  return Array.from(values.values()).sort((left, right) => {
+    if (left.group !== right.group) {
+      const groupOrder: Record<AdminTrialLisatietoGroup, number> = {
+        olosuhteet: 1,
+        haku: 2,
+        haukku: 3,
+        metsastysinto: 4,
+        ajo: 5,
+        muut_ominaisuudet: 6,
+        unknown: 7,
+      };
+      return groupOrder[left.group] - groupOrder[right.group];
+    }
+    if (left.sortOrder !== right.sortOrder) {
+      return left.sortOrder - right.sortOrder;
+    }
+    if (left.koodi !== right.koodi) {
+      return left.koodi.localeCompare(right.koodi, "fi", { numeric: true });
+    }
+    return left.osa.localeCompare(right.osa, "fi", { numeric: true });
+  });
 }
 
 export function parseInteger(value: string): number | null {
