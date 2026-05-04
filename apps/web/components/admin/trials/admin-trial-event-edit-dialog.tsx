@@ -273,7 +273,7 @@ export function AdminTrialEventEditDialog({
         </label>
         <label className="space-y-1 text-sm md:col-span-2">
           <span>{t("admin.trials.manage.eventModal.fields.ytKertomus")}</span>
-          <Input
+          <textarea
             value={draft.ytKertomus}
             disabled={isPending}
             onChange={(event) =>
@@ -282,6 +282,7 @@ export function AdminTrialEventEditDialog({
                 ytKertomus: event.target.value,
               }))
             }
+            className="min-h-24 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
           />
         </label>
         <label className="space-y-1 text-sm">
