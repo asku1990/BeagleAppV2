@@ -20,3 +20,8 @@ export type {
   UpdateAdminTrialEventRequest,
   UpdateAdminTrialEventResponse,
 } from "./update-admin-trial-event";
+export type {
+  UpdateAdminTrialEntryLisatietoRow,
+  UpdateAdminTrialEntryRequest,
+  UpdateAdminTrialEntryResponse,
+} from "./update-admin-trial-entry";

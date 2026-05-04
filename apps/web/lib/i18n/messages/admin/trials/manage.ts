@@ -61,6 +61,7 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.selected.actions.openPdf": "Avaa pöytäkirja",
   "admin.trials.manage.selected.actions.more": "Lisää toimintoja",
   "admin.trials.manage.selected.actions.editEvent": "Muokkaa tapahtumaa",
+  "admin.trials.manage.selected.actions.editEntry": "Muokkaa riviä",
   "admin.trials.manage.selected.actions.delete": "Poista tulos",
   "admin.trials.manage.selected.actions.delete.confirmTitle":
     "Poistetaanko tämä koetulos?",
@@ -177,6 +178,7 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.selected.actions.openPdf": "Öppna protokoll",
   "admin.trials.manage.selected.actions.more": "Fler åtgärder",
   "admin.trials.manage.selected.actions.editEvent": "Redigera evenemang",
+  "admin.trials.manage.selected.actions.editEntry": "Redigera rad",
   "admin.trials.manage.selected.actions.delete": "Ta bort resultat",
   "admin.trials.manage.selected.actions.delete.confirmTitle":
     "Ta bort det här provresultatet?",

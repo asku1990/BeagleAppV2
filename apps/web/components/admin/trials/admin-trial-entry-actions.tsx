@@ -18,6 +18,7 @@ type AdminTrialEntryActionsProps = {
   eventDate: string;
   eventPlace: string;
   eventName: string | null;
+  onEditEntry: () => void;
   onDeletedTrialEvent: (deletedTrialEventId: string) => void;
 };
 
@@ -30,6 +31,7 @@ export function AdminTrialEntryActions({
   eventDate,
   eventPlace,
   eventName,
+  onEditEntry,
   onDeletedTrialEvent,
 }: AdminTrialEntryActionsProps) {
   const { t } = useI18n();
@@ -82,6 +84,12 @@ export function AdminTrialEntryActions({
       <AdminRowActionsMenu
         triggerAriaLabel={t("admin.trials.manage.selected.actions.more")}
         actions={[
+          {
+            id: "edit-trial-entry",
+            label: t("admin.trials.manage.selected.actions.editEntry"),
+            onSelect: onEditEntry,
+            disabled: deleteMutation.isPending,
+          },
           {
             id: "delete-trial-entry",
             label: t("admin.trials.manage.selected.actions.delete"),

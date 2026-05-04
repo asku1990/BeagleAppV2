@@ -72,6 +72,10 @@ vi.mock("@/queries/admin/trials", () => ({
     mutateAsync: vi.fn(),
     isPending: false,
   }),
+  useUpdateAdminTrialEntryMutation: () => ({
+    mutateAsync: vi.fn(),
+    isPending: false,
+  }),
 }));
 
 describe("AdminTrialSelectedEventPanel", () => {

@@ -1,0 +1,279 @@
+"use client";
+
+import React from "react";
+import { AdminFormModalShell } from "@/components/admin";
+import { Button } from "@/components/ui/button";
+import { useI18n } from "@/hooks/i18n";
+import {
+  createEmptyEraDraft,
+  parseDecimal,
+  parseInteger,
+  parseNullableString,
+  toEntryDraft,
+  toEraDrafts,
+  toLisatietoRows,
+  type EntryDraft,
+  type EraDraft,
+  type LisatietoRowDraft,
+} from "@/lib/admin/trials/entry-edit-dialog-model";
+import type {
+  AdminTrialEventEntry,
+  UpdateAdminTrialEntryRequest,
+} from "@beagle/contracts";
+import { EntryMetaSection } from "./internal/entry-meta-section";
+import { EraSection } from "./internal/era-section";
+import { LisatiedotMatrix } from "./internal/lisatiedot-matrix";
+
+type Props = {
+  open: boolean;
+  trialEventId: string;
+  entry: AdminTrialEventEntry;
+  isPending: boolean;
+  errorText: string | null;
+  onClose: () => void;
+  onSave: (payload: UpdateAdminTrialEntryRequest) => Promise<boolean>;
+};
+
+export function AdminTrialEntryEditDialog({
+  open,
+  trialEventId,
+  entry,
+  isPending,
+  errorText,
+  onClose,
+  onSave,
+}: Props) {
+  const { t } = useI18n();
+  const [entryDraft, setEntryDraft] = React.useState<EntryDraft>(() =>
+    toEntryDraft(entry),
+  );
+  const [eras, setEras] = React.useState<EraDraft[]>(() => toEraDrafts(entry));
+  const [lisatiedotRows, setLisatiedotRows] = React.useState<
+    LisatietoRowDraft[]
+  >(() => toLisatietoRows(entry, toEraDrafts(entry)));
+  const [validationError, setValidationError] = React.useState<string | null>(
+    null,
+  );
+
+  const reset = React.useCallback(() => {
+    const initialEras = toEraDrafts(entry);
+    setEntryDraft(toEntryDraft(entry));
+    setEras(initialEras);
+    setLisatiedotRows(toLisatietoRows(entry, initialEras));
+    setValidationError(null);
+  }, [entry]);
+
+  function addEra() {
+    const nextEra = Math.max(...eras.map((era) => era.era), 1) + 1;
+    setEras((current) => [...current, createEmptyEraDraft(nextEra)]);
+    setLisatiedotRows((current) =>
+      current.map((row) => ({
+        ...row,
+        eraValues: { ...row.eraValues, [nextEra]: "" },
+      })),
+    );
+  }
+
+  function removeEra(eraToRemove: number) {
+    if (eraToRemove <= 2) {
+      return;
+    }
+    setEras((current) => current.filter((era) => era.era !== eraToRemove));
+    setLisatiedotRows((current) =>
+      current.map((row) => {
+        const nextValues = { ...row.eraValues };
+        delete nextValues[eraToRemove];
+        return { ...row, eraValues: nextValues };
+      }),
+    );
+  }
+
+  return (
+    <AdminFormModalShell
+      open={open}
+      onClose={() => {
+        reset();
+        onClose();
+      }}
+      title={t("admin.trials.manage.selected.actions.editEntry")}
+      ariaLabel={t("admin.trials.manage.selected.actions.editEntry")}
+      contentClassName="max-h-[90vh] max-w-6xl overflow-y-auto"
+      footer={
+        <>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              reset();
+              onClose();
+            }}
+          >
+            {t("admin.trials.manage.eventModal.close")}
+          </Button>
+          <Button
+            type="button"
+            disabled={isPending}
+            onClick={() =>
+              void (async () => {
+                setValidationError(null);
+                const sortedEras = [...eras].sort(
+                  (left, right) => left.era - right.era,
+                );
+                if (sortedEras.length < 2) {
+                  setValidationError("At least era 1 and era 2 are required.");
+                  return;
+                }
+
+                const ok = await onSave({
+                  trialEventId,
+                  trialEntryId: entry.trialId,
+                  entry: {
+                    koemaasto: parseNullableString(entryDraft.koemaasto),
+                    koemuoto: parseNullableString(entryDraft.koemuoto),
+                    koetyyppi: entryDraft.koetyyppi,
+                    ke: parseNullableString(entryDraft.ke),
+                    lk: parseNullableString(entryDraft.lk),
+                    award: parseNullableString(entryDraft.award),
+                    rank: parseNullableString(entryDraft.rank),
+                    points: parseDecimal(entryDraft.points),
+                    koiriaLuokassa: parseInteger(entryDraft.koiriaLuokassa),
+                    hyvaksytytAjominuutit: parseInteger(
+                      entryDraft.hyvaksytytAjominuutit,
+                    ),
+                    ajoajanPisteet: parseDecimal(entryDraft.ajoajanPisteet),
+                    haku: parseDecimal(entryDraft.haku),
+                    hauk: parseDecimal(entryDraft.hauk),
+                    yva: parseDecimal(entryDraft.yva),
+                    hlo: parseDecimal(entryDraft.hlo),
+                    alo: parseDecimal(entryDraft.alo),
+                    tja: parseDecimal(entryDraft.tja),
+                    pin: parseDecimal(entryDraft.pin),
+                    ansiopisteetYhteensa: parseDecimal(
+                      entryDraft.ansiopisteetYhteensa,
+                    ),
+                    tappiopisteetYhteensa: parseDecimal(
+                      entryDraft.tappiopisteetYhteensa,
+                    ),
+                    judge: parseNullableString(entryDraft.judge),
+                    huomautus: entryDraft.huomautus || null,
+                    huomautusTeksti: parseNullableString(
+                      entryDraft.huomautusTeksti,
+                    ),
+                    ylituomariNimiSnapshot: parseNullableString(
+                      entryDraft.ylituomariNimiSnapshot,
+                    ),
+                    ylituomariNumeroSnapshot: parseNullableString(
+                      entryDraft.ylituomariNumeroSnapshot,
+                    ),
+                    ryhmatuomariNimi: parseNullableString(
+                      entryDraft.ryhmatuomariNimi,
+                    ),
+                    palkintotuomariNimi: parseNullableString(
+                      entryDraft.palkintotuomariNimi,
+                    ),
+                    omistajaSnapshot: parseNullableString(
+                      entryDraft.omistajaSnapshot,
+                    ),
+                    omistajanKotikuntaSnapshot: parseNullableString(
+                      entryDraft.omistajanKotikuntaSnapshot,
+                    ),
+                  },
+                  eras: sortedEras.map((era) => ({
+                    era: era.era,
+                    alkoi: parseNullableString(era.alkoi),
+                    hakumin: parseInteger(era.hakumin),
+                    ajomin: parseInteger(era.ajomin),
+                    haku: parseDecimal(era.haku),
+                    hauk: parseDecimal(era.hauk),
+                    yva: parseDecimal(era.yva),
+                    hlo: parseDecimal(era.hlo),
+                    alo: parseDecimal(era.alo),
+                    tja: parseDecimal(era.tja),
+                    pin: parseDecimal(era.pin),
+                    huomautusTeksti: parseNullableString(era.huomautusTeksti),
+                  })),
+                  lisatiedotRows: lisatiedotRows.map((row) => ({
+                    koodi: row.koodi,
+                    osa: "",
+                    nimi: null,
+                    jarjestys: null,
+                    eraValues: sortedEras.map((era) => ({
+                      era: era.era,
+                      arvo: parseNullableString(row.eraValues[era.era] ?? ""),
+                    })),
+                  })),
+                });
+                if (ok) {
+                  reset();
+                  onClose();
+                }
+              })()
+            }
+          >
+            {isPending
+              ? t("admin.trials.manage.eventModal.saving")
+              : t("admin.trials.manage.eventModal.save")}
+          </Button>
+        </>
+      }
+    >
+      <div className="space-y-3">
+        {validationError ? (
+          <p className="text-sm text-destructive">{validationError}</p>
+        ) : null}
+        {errorText ? (
+          <p className="text-sm text-destructive">{errorText}</p>
+        ) : null}
+
+        <section className="space-y-2">
+          <h3 className="text-sm font-semibold">Perustiedot</h3>
+          <EntryMetaSection
+            entryDraft={entryDraft}
+            isPending={isPending}
+            onChange={setEntryDraft}
+          />
+        </section>
+
+        <EraSection
+          eras={eras}
+          isPending={isPending}
+          onAddEra={addEra}
+          onRemoveEra={removeEra}
+          onChangeEraField={(eraNumber, field, value) =>
+            setEras((current) =>
+              current.map((currentEra) =>
+                currentEra.era === eraNumber
+                  ? { ...currentEra, [field]: value }
+                  : currentEra,
+              ),
+            )
+          }
+        />
+
+        <section className="space-y-2">
+          <h3 className="text-sm font-semibold">Lisätiedot</h3>
+          <LisatiedotMatrix
+            eras={eras}
+            rows={lisatiedotRows}
+            isPending={isPending}
+            onChangeCell={(koodi, era, value) =>
+              setLisatiedotRows((current) =>
+                current.map((currentRow) =>
+                  currentRow.koodi === koodi
+                    ? {
+                        ...currentRow,
+                        eraValues: {
+                          ...currentRow.eraValues,
+                          [era]: value,
+                        },
+                      }
+                    : currentRow,
+                ),
+              )
+            }
+          />
+        </section>
+      </div>
+    </AdminFormModalShell>
+  );
+}

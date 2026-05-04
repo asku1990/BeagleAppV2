@@ -1,0 +1,87 @@
+export const ADMIN_TRIAL_LISATIETO_KOODIT = [
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+  "17",
+  "18",
+  "20",
+  "21",
+  "22",
+  "30",
+  "31",
+  "32",
+  "33",
+  "34",
+  "35",
+  "36",
+  "40",
+  "41",
+  "42",
+  "50",
+  "51",
+  "52",
+  "53",
+  "54",
+  "55",
+  "56",
+  "60",
+  "61",
+] as const;
+
+export const ADMIN_TRIAL_ERA_FIELD_LABELS = {
+  alkoi: "alkoi",
+  hakumin: "hakumin",
+  ajomin: "ajomin",
+  haku: "haku",
+  hauk: "hauk",
+  yva: "yva / ajotaito",
+  hlo: "hlo",
+  alo: "alo",
+  tja: "tja",
+  pin: "pin",
+} as const;
+
+export type AdminTrialLisatietoInputKind =
+  | "marker"
+  | "integer"
+  | "decimal_1"
+  | "decimal_2";
+
+export const ADMIN_TRIAL_LISATIETO_INPUT_KIND: Record<
+  (typeof ADMIN_TRIAL_LISATIETO_KOODIT)[number],
+  AdminTrialLisatietoInputKind
+> = {
+  "11": "marker",
+  "12": "integer",
+  "13": "marker",
+  "14": "marker",
+  "15": "marker",
+  "16": "marker",
+  "17": "integer",
+  "18": "integer",
+  "20": "integer",
+  "21": "decimal_1",
+  "22": "decimal_1",
+  "30": "decimal_1",
+  "31": "decimal_1",
+  "32": "decimal_1",
+  "33": "decimal_1",
+  "34": "decimal_1",
+  "35": "decimal_1",
+  "36": "integer",
+  "40": "decimal_2",
+  "41": "decimal_2",
+  "42": "decimal_2",
+  "50": "decimal_2",
+  "51": "decimal_2",
+  "52": "decimal_2",
+  "53": "decimal_2",
+  "54": "decimal_2",
+  "55": "decimal_2",
+  "56": "decimal_2",
+  "60": "decimal_2",
+  "61": "decimal_2",
+};
