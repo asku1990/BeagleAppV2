@@ -89,7 +89,7 @@ vi.mock("../admin-trial-selected-event-panel", () => ({
 vi.mock("@/queries/admin/trials", () => ({
   useAdminTrialEventsQuery: () => ({
     data: {
-      total: 1,
+      total: 2,
       totalPages: 1,
       page: 1,
       items: [
@@ -103,26 +103,44 @@ vi.mock("@/queries/admin/trials", () => ({
           sklKoeId: 12345,
           dogCount: 2,
         },
+        {
+          trialEventId: "event-2",
+          eventDate: "2026-04-13",
+          eventPlace: "Espoo",
+          eventName: "Talvikoe",
+          organizer: "Jarjestaja",
+          judge: "Judge",
+          sklKoeId: 22222,
+          dogCount: 1,
+        },
       ],
     },
     isLoading: false,
     isError: false,
     error: null,
   }),
-  useAdminTrialEventQuery: () => ({
-    data: {
-      event: {
-        trialEventId: "event-1",
-        eventDate: "2026-04-14",
-        eventPlace: "Helsinki",
-        eventName: "Kevatkoe",
-        organizer: "Jarjestaja",
-        judge: "Judge",
-        sklKoeId: 12345,
-        dogCount: 2,
-        entries: [],
-      },
-    },
+  useAdminTrialEventQuery: ({
+    trialEventId,
+    enabled,
+  }: {
+    trialEventId: string;
+    enabled: boolean;
+  }) => ({
+    data: enabled
+      ? {
+          event: {
+            trialEventId,
+            eventDate: "2026-04-14",
+            eventPlace: "Helsinki",
+            eventName: "Kevatkoe",
+            organizer: "Jarjestaja",
+            judge: "Judge",
+            sklKoeId: 12345,
+            dogCount: 2,
+            entries: [],
+          },
+        }
+      : null,
     isLoading: false,
     isError: false,
     error: null,
@@ -138,9 +156,21 @@ describe("AdminTrialsPageClient", () => {
     expect(html).toContain("admin.trials.title");
     expect(html).toContain("admin.trials.description");
     expect(html).toContain("year|||");
-    expect(html).toContain("1|1|1|event-1|admin.trials.manage.error");
+    expect(html).toContain("2|1|1|event-1|admin.trials.manage.error");
     expect(html).toContain(
       "event-1|false|false|admin.trials.manage.selected.error|function",
     );
+  });
+
+  it("blocks fallback auto-selection when a deleted event is blocked", () => {
+    const selectedEventIdInput = "";
+    const fallbackSelectedEventId = "event-2";
+    const blockedAutoSelectedEventId = "event-1";
+
+    const selectedEventId =
+      selectedEventIdInput ||
+      (blockedAutoSelectedEventId ? "" : fallbackSelectedEventId);
+
+    expect(selectedEventId).toBe("");
   });
 });

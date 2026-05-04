@@ -44,11 +44,10 @@ export function AdminTrialsPageClient() {
   const totalPages = eventsQuery.data?.totalPages ?? 0;
   const page = eventsQuery.data?.page ?? 1;
   const fallbackSelectedEventId = events[0]?.trialEventId ?? "";
+  // modification: block auto-selection after deleting currently selected event
   const selectedEventId =
     selectedEventIdInput ||
-    (blockedAutoSelectedEventId === fallbackSelectedEventId
-      ? ""
-      : fallbackSelectedEventId);
+    (blockedAutoSelectedEventId ? "" : fallbackSelectedEventId);
   const selectedSummary =
     events.find((event) => event.trialEventId === selectedEventId) || null;
 
