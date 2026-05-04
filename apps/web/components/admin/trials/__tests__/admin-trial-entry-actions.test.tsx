@@ -28,6 +28,11 @@ vi.mock("@/components/ui/button", () => ({
       : React.createElement("button", props, children),
 }));
 
+vi.mock("@/components/admin", () => ({
+  AdminRowActionsMenu: ({ triggerAriaLabel }: { triggerAriaLabel: string }) =>
+    React.createElement("div", null, `menu-${triggerAriaLabel}`),
+}));
+
 vi.mock("next/link", () => ({
   default: ({
     href,
@@ -45,7 +50,7 @@ vi.mock("@/queries/admin/trials", () => ({
 }));
 
 describe("AdminTrialEntryActions", () => {
-  it("renders the pdf and delete actions", () => {
+  it("renders icon pdf action and overflow menu", () => {
     useDeleteAdminTrialEntryMutationMock.mockReturnValue({
       mutateAsync: vi.fn(),
       isPending: false,
@@ -63,7 +68,7 @@ describe("AdminTrialEntryActions", () => {
     );
 
     expect(html).toContain("admin.trials.manage.selected.actions.openPdf");
-    expect(html).toContain("admin.trials.manage.selected.actions.delete");
+    expect(html).toContain("menu-admin.trials.manage.selected.actions.more");
     expect(html).toContain('href="/api/trials/trial-1/pdf"');
   });
 });

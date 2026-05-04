@@ -59,6 +59,7 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.selected.columns.judge": "Tuomari",
   "admin.trials.manage.selected.columns.actions": "Toiminnot",
   "admin.trials.manage.selected.actions.openPdf": "Avaa pöytäkirja",
+  "admin.trials.manage.selected.actions.more": "Lisää toimintoja",
   "admin.trials.manage.selected.actions.delete": "Poista tulos",
   "admin.trials.manage.selected.actions.delete.confirmTitle":
     "Delete this trial result?",
@@ -143,6 +144,7 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.selected.columns.judge": "Domare",
   "admin.trials.manage.selected.columns.actions": "Åtgärder",
   "admin.trials.manage.selected.actions.openPdf": "Öppna protokoll",
+  "admin.trials.manage.selected.actions.more": "Fler åtgärder",
   "admin.trials.manage.selected.actions.delete": "Ta bort resultat",
   "admin.trials.manage.selected.actions.delete.confirmTitle":
     "Delete this trial result?",

@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { AdminRowActionsMenu } from "@/components/admin";
 import { Button } from "@/components/ui/button";
+import { FileText } from "lucide-react";
 import { useI18n } from "@/hooks/i18n";
+import { formatDateForFinland } from "@/lib/admin/core/date";
 import { getTrialPdfHref } from "@/lib/public/beagle/trials";
 import { useDeleteAdminTrialEntryMutation } from "@/queries/admin/trials";
 
@@ -12,6 +15,9 @@ type AdminTrialEntryActionsProps = {
   trialId: string;
   dogName: string;
   registrationNo: string | null;
+  eventDate: string;
+  eventPlace: string;
+  eventName: string | null;
   onDeletedTrialEvent: () => void;
 };
 
@@ -21,17 +27,26 @@ export function AdminTrialEntryActions({
   trialId,
   dogName,
   registrationNo,
+  eventDate,
+  eventPlace,
+  eventName,
   onDeletedTrialEvent,
 }: AdminTrialEntryActionsProps) {
   const { t } = useI18n();
   const deleteMutation = useDeleteAdminTrialEntryMutation();
 
   async function handleDelete() {
-    const label = dogName.trim() || registrationNo || trialEntryId;
+    const resolvedDogName = dogName.trim() || "-";
+    const resolvedRegistrationNo = registrationNo?.trim() || "-";
+    const eventDateLabel = formatDateForFinland(eventDate);
+    const eventPlaceLabel = eventPlace.trim() || "-";
+    const eventNameLabel = eventName?.trim() || null;
     const confirmed = window.confirm(
       `${t("admin.trials.manage.selected.actions.delete.confirmTitle")}\n\n` +
         `${t("admin.trials.manage.selected.actions.delete.confirmBody")}\n\n` +
-        `${label}`,
+        `${t("admin.trials.manage.selected.actions.delete.confirmDog")}: ${resolvedDogName}\n` +
+        `${t("admin.trials.manage.selected.actions.delete.confirmRegistration")}: ${resolvedRegistrationNo}\n` +
+        `${t("admin.trials.manage.selected.actions.delete.confirmEvent")}: ${eventDateLabel} • ${eventPlaceLabel}${eventNameLabel ? ` • ${eventNameLabel}` : ""}`,
     );
     if (!confirmed || deleteMutation.isPending) {
       return;
@@ -47,22 +62,29 @@ export function AdminTrialEntryActions({
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
-      <Button asChild size="sm" variant="outline">
+    <div className="flex items-center gap-1">
+      <Button asChild variant="ghost" size="icon-xs">
         <Link href={getTrialPdfHref(trialId)} target="_blank" rel="noreferrer">
-          {t("admin.trials.manage.selected.actions.openPdf")}
+          <FileText className="size-3.5" aria-hidden="true" />
+          <span className="sr-only">
+            {t("admin.trials.manage.selected.actions.openPdf")}
+          </span>
         </Link>
       </Button>
-      <Button
-        size="sm"
-        variant="destructive"
-        onClick={() => {
-          void handleDelete();
-        }}
-        disabled={deleteMutation.isPending}
-      >
-        {t("admin.trials.manage.selected.actions.delete")}
-      </Button>
+      <AdminRowActionsMenu
+        triggerAriaLabel={t("admin.trials.manage.selected.actions.more")}
+        actions={[
+          {
+            id: "delete-trial-entry",
+            label: t("admin.trials.manage.selected.actions.delete"),
+            onSelect: () => {
+              void handleDelete();
+            },
+            destructive: true,
+            disabled: deleteMutation.isPending,
+          },
+        ]}
+      />
     </div>
   );
 }
