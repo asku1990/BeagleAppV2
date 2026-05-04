@@ -96,6 +96,44 @@ export function AdminTrialSelectedEventPanel({
                     {selectedEvent.dogCount}{" "}
                     {t("admin.trials.manage.selected.countSuffix")}
                   </p>
+                  <div className="mt-2 grid gap-1 text-sm text-muted-foreground md:grid-cols-2">
+                    <p>
+                      {t("admin.trials.manage.eventModal.fields.jarjestaja")}:{" "}
+                      {showDash(selectedEvent.jarjestaja)}
+                    </p>
+                    <p>
+                      {t("admin.trials.manage.eventModal.fields.ylituomari")}:
+                      {" " + showDash(selectedEvent.ylituomari)}
+                    </p>
+                    <p>
+                      {t(
+                        "admin.trials.manage.eventModal.fields.ylituomariNumero",
+                      )}
+                      : {showDash(selectedEvent.ylituomariNumero)}
+                    </p>
+                    <p>
+                      {t("admin.trials.manage.eventModal.fields.sklKoeId")}:{" "}
+                      {showDash(
+                        selectedEvent.sklKoeId === null
+                          ? null
+                          : String(selectedEvent.sklKoeId),
+                      )}
+                    </p>
+                    <p>
+                      {t("admin.trials.manage.eventModal.fields.kennelpiiri")}:{" "}
+                      {showDash(selectedEvent.kennelpiiri)}
+                    </p>
+                    <p>
+                      {t(
+                        "admin.trials.manage.eventModal.fields.kennelpiirinro",
+                      )}
+                      : {showDash(selectedEvent.kennelpiirinro)}
+                    </p>
+                    <p className="md:col-span-2">
+                      {t("admin.trials.manage.eventModal.fields.ytKertomus")}:{" "}
+                      {showDash(selectedEvent.ytKertomus)}
+                    </p>
+                  </div>
                 </div>
                 <Button
                   type="button"
