@@ -148,7 +148,7 @@ Olosuhteet ja huomautukset:
 
 Tuomarit:
 
-- `ylituomariNimiSnapshot` (rivi-/payload-snapshot)
+- `tuom1` (rivin ylituomari)
 - `ylituomariNumeroSnapshot` (rivi-/payload-snapshot)
 - `ryhmatuomariNimi`
 - `palkintotuomariNimi`

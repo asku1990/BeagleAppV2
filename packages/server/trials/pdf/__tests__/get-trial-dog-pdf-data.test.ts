@@ -48,7 +48,6 @@ function dbRow(overrides: Record<string, unknown> = {}) {
     koiriaLuokassa: null,
     palkinto: null,
     ylituomariNimi: null,
-    ylituomariNimiSnapshot: null,
     ylituomariNumeroSnapshot: null,
     ryhmatuomariNimi: null,
     palkintotuomariNimi: null,
@@ -234,8 +233,7 @@ describe("getTrialDogPdfDataService", () => {
   it("passes signature name fields through to PDF data", async () => {
     getTrialDogPdfDataDbMock.mockResolvedValue(
       dbRow({
-        ylituomariNimi: "Fallback Ylituomari",
-        ylituomariNimiSnapshot: "Ylituomari",
+        ylituomariNimi: "Ylituomari",
         ylituomariNumeroSnapshot: "123",
         ryhmatuomariNimi: "Ryhmätuomari",
         palkintotuomariNimi: "Palkintotuomari",
@@ -247,7 +245,7 @@ describe("getTrialDogPdfDataService", () => {
     expect(result.status).toBe(200);
     if (!result.body.ok) throw new Error("Expected ok=true");
     expect(result.body.data).toMatchObject({
-      ylituomariNimiSnapshot: "Ylituomari",
+      ylituomariNimi: "Ylituomari",
       ylituomariNumeroSnapshot: "123",
       ryhmatuomariNimi: "Ryhmätuomari",
       palkintotuomariNimi: "Palkintotuomari",

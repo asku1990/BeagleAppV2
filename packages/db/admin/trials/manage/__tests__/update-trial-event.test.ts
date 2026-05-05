@@ -59,6 +59,7 @@ describe("updateAdminTrialEventWriteDb", () => {
 
   it("updates trial event metadata and returns updated id", async () => {
     trialEventUpdateManyMock.mockResolvedValue({ count: 1 });
+    trialEntryUpdateManyMock.mockResolvedValue({ count: 3 });
 
     await expect(
       updateAdminTrialEventWriteDb({
@@ -66,8 +67,8 @@ describe("updateAdminTrialEventWriteDb", () => {
         eventDate: new Date("2026-04-14T00:00:00.000Z"),
         eventPlace: "Helsinki",
         jarjestaja: "Kerho",
-        ylituomari: null,
-        ylituomariNumero: null,
+        ylituomari: "Judge",
+        ylituomariNumero: "123",
         ytKertomus: null,
         kennelpiiri: null,
         kennelpiirinro: null,
@@ -84,15 +85,21 @@ describe("updateAdminTrialEventWriteDb", () => {
         koepaiva: new Date("2026-04-14T00:00:00.000Z"),
         koekunta: "Helsinki",
         jarjestaja: "Kerho",
-        ylituomariNimi: null,
-        ylituomariNumero: null,
+        ylituomariNimi: "Judge",
+        ylituomariNumero: "123",
         ytKertomus: null,
         kennelpiiri: null,
         kennelpiirinro: null,
         sklKoeId: null,
       },
     });
-    expect(trialEntryUpdateManyMock).not.toHaveBeenCalled();
+    expect(trialEntryUpdateManyMock).toHaveBeenCalledWith({
+      where: { trialEventId: "event-1" },
+      data: {
+        tuom1: "Judge",
+        ylituomariNumeroSnapshot: "123",
+      },
+    });
   });
 
   it("passes explicit transaction timeout options", async () => {

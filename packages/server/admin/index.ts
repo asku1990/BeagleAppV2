@@ -15,6 +15,7 @@ export { listAdminTrialEvents } from "./trials";
 export { getAdminTrialEvent } from "./trials";
 export { deleteAdminTrialEntry } from "./trials";
 export { updateAdminTrialEvent } from "./trials";
+export { updateAdminTrialEntry } from "./trials";
 export { previewAdminShowWorkbookImport } from "./shows";
 export { applyAdminShowWorkbookImport } from "./shows";
 export { listAdminShowWorkbookSchemaRules } from "./shows";

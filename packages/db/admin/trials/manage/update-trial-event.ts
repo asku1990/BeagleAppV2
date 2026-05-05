@@ -44,6 +44,16 @@ export async function updateAdminTrialEventWriteDb(
       return { status: "not_found" };
     }
 
+    await tx.trialEntry.updateMany({
+      where: {
+        trialEventId: input.trialEventId,
+      },
+      data: {
+        tuom1: input.ylituomari,
+        ylituomariNumeroSnapshot: input.ylituomariNumero,
+      },
+    });
+
     return {
       status: "updated",
       trialEventId: input.trialEventId,

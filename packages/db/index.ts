@@ -150,8 +150,11 @@ export {
   searchAdminTrialsDb,
   deleteAdminTrialEntryWriteDb,
   updateAdminTrialEventWriteDb,
+  updateAdminTrialEntryWriteDb,
   type AdminTrialEventDetailsDb,
   type AdminTrialEventDetailsRequestDb,
+  type AdminTrialEntryEraDb,
+  type AdminTrialEntryEraLisatietoDb,
   type AdminTrialEventEntryDb,
   type AdminTrialEventSearchRequestDb,
   type AdminTrialEventSearchResponseDb,
@@ -161,6 +164,8 @@ export {
   type DeleteAdminTrialEntryWriteResultDb,
   type UpdateAdminTrialEventWriteRequestDb,
   type UpdateAdminTrialEventWriteResultDb,
+  type UpdateAdminTrialEntryWriteRequestDb,
+  type UpdateAdminTrialEntryWriteResultDb,
 } from "./admin/trials";
 
 export {

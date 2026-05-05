@@ -68,7 +68,7 @@ describe("renderTrialDogPdf", () => {
       ryhmatuomariNimi: null,
       palkintotuomariNimi: null,
       ylituomariNumeroSnapshot: null,
-      ylituomariNimiSnapshot: null,
+      ylituomariNimi: null,
     });
 
     expect(Buffer.from(bytes).toString("latin1", 0, 4)).toBe("%PDF");
@@ -133,7 +133,7 @@ describe("renderTrialDogPdf", () => {
       ryhmatuomariNimi: null,
       palkintotuomariNimi: null,
       ylituomariNumeroSnapshot: null,
-      ylituomariNimiSnapshot: null,
+      ylituomariNimi: null,
     });
 
     const rawPdf = Buffer.from(bytes).toString("latin1");
@@ -200,7 +200,7 @@ describe("renderTrialDogPdf", () => {
       ryhmatuomariNimi: null,
       palkintotuomariNimi: null,
       ylituomariNumeroSnapshot: null,
-      ylituomariNimiSnapshot: null,
+      ylituomariNimi: null,
     });
 
     expect(Buffer.from(bytes).toString("latin1", 0, 4)).toBe("%PDF");
@@ -324,7 +324,7 @@ describe("renderTrialDogPdf", () => {
           ryhmatuomariNimi: null,
           palkintotuomariNimi: null,
           ylituomariNumeroSnapshot: null,
-          ylituomariNimiSnapshot: null,
+          ylituomariNimi: null,
         }),
       ).rejects.toThrow("has no template.");
     },
@@ -390,7 +390,7 @@ describe("renderTrialDogPdf", () => {
         ryhmatuomariNimi: null,
         palkintotuomariNimi: null,
         ylituomariNumeroSnapshot: null,
-        ylituomariNimiSnapshot: null,
+        ylituomariNimi: null,
       }),
     ).rejects.toThrow("PDF rule set unsupported has no template.");
   });

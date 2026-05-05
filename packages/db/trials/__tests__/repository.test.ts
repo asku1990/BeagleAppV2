@@ -258,7 +258,6 @@ describe("getBeagleTrialDetailsDb", () => {
           sija: null,
           piste: null,
           tuom1: null,
-          ylituomariNimiSnapshot: null,
           haku: null,
           hauk: null,
           yva: null,
@@ -278,7 +277,6 @@ describe("getBeagleTrialDetailsDb", () => {
           sija: "2",
           piste: { toNumber: () => 72.5 },
           tuom1: null,
-          ylituomariNimiSnapshot: null,
           haku: { toNumber: () => 4.1 },
           hauk: { toNumber: () => 4.2 },
           yva: { toNumber: () => 4.3 },
@@ -298,7 +296,6 @@ describe("getBeagleTrialDetailsDb", () => {
           sija: "1",
           piste: { toNumber: () => 88.25 },
           tuom1: "Judge Group",
-          ylituomariNimiSnapshot: "Judge Snapshot",
           haku: { toNumber: () => 5.1 },
           hauk: { toNumber: () => 5.2 },
           yva: { toNumber: () => 5.3 },
@@ -331,7 +328,7 @@ describe("getBeagleTrialDetailsDb", () => {
       classCode: "V",
       rank: "1",
       points: 88.25,
-      judge: "Judge Snapshot",
+      judge: "Judge Group",
     });
 
     expect(result?.items[1]).toMatchObject({
@@ -371,7 +368,6 @@ describe("getBeagleTrialDetailsDb", () => {
           sija: null,
           piste: { toNumber: () => 80 },
           tuom1: null,
-          ylituomariNimiSnapshot: null,
           haku: null,
           hauk: null,
           yva: null,
@@ -413,7 +409,6 @@ describe("getBeagleTrialsForDogDb", () => {
         piste: { toNumber: () => 88.25 },
         pa: "1",
         tuom1: "Judge A",
-        ylituomariNimiSnapshot: "Judge Snapshot",
         haku: { toNumber: () => 4.1 },
         hauk: { toNumber: () => 4.2 },
         yva: { toNumber: () => 4.3 },
@@ -436,7 +431,6 @@ describe("getBeagleTrialsForDogDb", () => {
         piste: null,
         pa: null,
         tuom1: null,
-        ylituomariNimiSnapshot: null,
         haku: null,
         hauk: null,
         yva: null,
@@ -465,7 +459,6 @@ describe("getBeagleTrialsForDogDb", () => {
         piste: true,
         pa: true,
         tuom1: true,
-        ylituomariNimiSnapshot: true,
         haku: true,
         hauk: true,
         yva: true,
@@ -500,7 +493,7 @@ describe("getBeagleTrialsForDogDb", () => {
         rank: "1",
         points: 88.25,
         award: "1",
-        judge: "Judge Snapshot",
+        judge: "Judge A",
         haku: 4.1,
         hauk: 4.2,
         yva: 4.3,
@@ -531,7 +524,7 @@ describe("getBeagleTrialsForDogDb", () => {
     ]);
   });
 
-  it("prefers entry-level ylituomari snapshot, then tuom1, then event judge", async () => {
+  it("prefers entry-level judge, then event judge", async () => {
     trialEntryFindManyMock.mockResolvedValue([
       {
         id: "t1",
@@ -541,7 +534,6 @@ describe("getBeagleTrialsForDogDb", () => {
         piste: null,
         pa: null,
         tuom1: null,
-        ylituomariNimiSnapshot: null,
         haku: null,
         hauk: null,
         yva: null,
@@ -563,8 +555,7 @@ describe("getBeagleTrialsForDogDb", () => {
         sija: null,
         piste: null,
         pa: null,
-        tuom1: "Group Judge",
-        ylituomariNimiSnapshot: "Entry Chief",
+        tuom1: "Entry Chief",
         haku: null,
         hauk: null,
         yva: null,

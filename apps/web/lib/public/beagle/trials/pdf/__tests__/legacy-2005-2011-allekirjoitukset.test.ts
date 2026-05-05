@@ -17,7 +17,7 @@ describe("drawLegacy2005To2011Allekirjoitukset", () => {
       ryhmatuomariNimi: "Ryhmätuomari",
       palkintotuomariNimi: "Palkintotuomari",
       ylituomariNumeroSnapshot: "123445",
-      ylituomariNimiSnapshot: "Ylituomari",
+      ylituomariNimi: "Ylituomari",
       page,
       font,
     });

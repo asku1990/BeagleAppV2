@@ -82,6 +82,7 @@ describe("AdminTrialEntryActions", () => {
         eventDate: "2026-04-14",
         eventPlace: "Helsinki",
         eventName: "Kevatkoe",
+        onEditEntry: vi.fn(),
         onDeletedTrialEvent: vi.fn(),
       }),
     );
@@ -113,11 +114,12 @@ describe("AdminTrialEntryActions", () => {
         eventDate: "2026-04-14",
         eventPlace: "Helsinki",
         eventName: "Kevatkoe",
+        onEditEntry: vi.fn(),
         onDeletedTrialEvent: vi.fn(),
       }),
     );
 
-    await rowActionsMock.current[0]?.onSelect();
+    await rowActionsMock.current[1]?.onSelect();
 
     expect(mutateAsync).toHaveBeenCalledWith({
       trialEventId: "event-1",
@@ -149,11 +151,12 @@ describe("AdminTrialEntryActions", () => {
         eventDate: "2026-04-14",
         eventPlace: "Helsinki",
         eventName: "Kevatkoe",
+        onEditEntry: vi.fn(),
         onDeletedTrialEvent,
       }),
     );
 
-    await rowActionsMock.current[0]?.onSelect();
+    await rowActionsMock.current[1]?.onSelect();
 
     expect(onDeletedTrialEvent).toHaveBeenCalledWith("event-1");
     vi.unstubAllGlobals();

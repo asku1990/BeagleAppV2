@@ -32,7 +32,6 @@ function trialRow(overrides: Record<string, unknown> = {}) {
     sija: null,
     huomautus: null,
     huomautusTeksti: null,
-    ylituomariNimiSnapshot: null,
     ylituomariNumeroSnapshot: null,
     ryhmatuomariNimi: null,
     palkintotuomariNimi: null,
@@ -55,6 +54,7 @@ function trialRow(overrides: Record<string, unknown> = {}) {
       koekunta: "Koe",
       koepaiva: new Date("2025-09-07T00:00:00.000Z"),
       jarjestaja: null,
+      ylituomariNimi: null,
     },
     eras: [
       {
@@ -175,5 +175,26 @@ describe("getTrialDogPdfDataDb", () => {
       ansiopisteetYhteensa: null,
       tappiopisteetYhteensa: null,
     });
+  });
+
+  it("falls back to the event judge when entry judge is missing", async () => {
+    prismaMock.trialEntry.findUnique.mockResolvedValue(
+      trialRow({
+        tuom1: null,
+        trialEvent: {
+          trialRuleWindowId: "trw_post_20230801",
+          kennelpiiri: null,
+          kennelpiirinro: null,
+          koekunta: "Koe",
+          koepaiva: new Date("2025-09-07T00:00:00.000Z"),
+          jarjestaja: null,
+          ylituomariNimi: "Event Judge",
+        },
+      }),
+    );
+
+    const result = await getTrialDogPdfDataDb({ trialId: "entry-1" });
+
+    expect(result?.ylituomariNimi).toBe("Event Judge");
   });
 });

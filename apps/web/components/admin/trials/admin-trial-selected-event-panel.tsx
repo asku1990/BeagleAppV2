@@ -10,10 +10,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useI18n } from "@/hooks/i18n";
 import { formatDateForFinland } from "@/lib/admin/core/date";
 import { AdminMutationError } from "@/queries/admin/mutation-error";
-import { useUpdateAdminTrialEventMutation } from "@/queries/admin/trials";
+import {
+  useUpdateAdminTrialEntryMutation,
+  useUpdateAdminTrialEventMutation,
+} from "@/queries/admin/trials";
 import type {
   AdminTrialEventDetails,
   AdminTrialEventEntry,
+  UpdateAdminTrialEntryRequest,
 } from "@beagle/contracts";
 import { formatPoints, showDash } from "./internal/trial-ui";
 import { AdminTrialEntryActions } from "./admin-trial-entry-actions";
@@ -21,6 +25,7 @@ import {
   AdminTrialEventEditDialog,
   type UpdateAdminTrialEventPayload,
 } from "./admin-trial-event-edit-dialog";
+import { AdminTrialEntryEditDialog } from "./admin-trial-entry-edit-dialog";
 
 type AdminTrialSelectedEventPanelProps = {
   selectedEvent: AdminTrialEventDetails | null;
@@ -42,7 +47,13 @@ export function AdminTrialSelectedEventPanel({
   const { t } = useI18n();
   const [isEditOpen, setIsEditOpen] = React.useState(false);
   const [editError, setEditError] = React.useState<string | null>(null);
+  const [entryEditError, setEntryEditError] = React.useState<string | null>(
+    null,
+  );
+  const [editingEntry, setEditingEntry] =
+    React.useState<AdminTrialEventEntry | null>(null);
   const updateMutation = useUpdateAdminTrialEventMutation();
+  const updateEntryMutation = useUpdateAdminTrialEntryMutation();
   const selectedEntries = selectedEvent?.entries ?? EMPTY_ENTRIES;
 
   async function handleSaveEdit(
@@ -59,6 +70,23 @@ export function AdminTrialSelectedEventPanel({
       }
 
       setEditError(t("admin.trials.manage.eventModal.updateFailed"));
+      return false;
+    }
+  }
+
+  async function handleSaveEntryEdit(
+    payload: UpdateAdminTrialEntryRequest,
+  ): Promise<boolean> {
+    try {
+      setEntryEditError(null);
+      await updateEntryMutation.mutateAsync(payload);
+      return true;
+    } catch (error) {
+      if (error instanceof AdminMutationError) {
+        setEntryEditError(error.message);
+        return false;
+      }
+      setEntryEditError(t("admin.trials.manage.entryModal.updateFailed"));
       return false;
     }
   }
@@ -154,6 +182,10 @@ export function AdminTrialSelectedEventPanel({
               eventName={selectedEvent.eventName}
               entries={selectedEntries}
               onDeletedTrialEvent={onDeletedTrialEvent}
+              onEditEntry={(entry) => {
+                setEntryEditError(null);
+                setEditingEntry(entry);
+              }}
             />
             <AdminTrialEventEditDialog
               open={isEditOpen}
@@ -163,6 +195,19 @@ export function AdminTrialSelectedEventPanel({
               onClose={() => setIsEditOpen(false)}
               onSave={handleSaveEdit}
             />
+            {editingEntry ? (
+              <AdminTrialEntryEditDialog
+                open
+                trialEventId={selectedEvent.trialEventId}
+                eventDate={selectedEvent.eventDate}
+                eventPlace={selectedEvent.eventPlace}
+                entry={editingEntry}
+                isPending={updateEntryMutation.isPending}
+                errorText={entryEditError}
+                onClose={() => setEditingEntry(null)}
+                onSave={handleSaveEntryEdit}
+              />
+            ) : null}
           </>
         ) : (
           <Card>
@@ -183,6 +228,7 @@ function SelectedEventEntries({
   eventName,
   entries,
   onDeletedTrialEvent,
+  onEditEntry,
 }: {
   trialEventId: string;
   eventDate: string;
@@ -190,6 +236,7 @@ function SelectedEventEntries({
   eventName: string | null;
   entries: AdminTrialEventEntry[];
   onDeletedTrialEvent: (deletedTrialEventId: string) => void;
+  onEditEntry: (entry: AdminTrialEventEntry) => void;
 }) {
   const { t } = useI18n();
 
@@ -253,6 +300,7 @@ function SelectedEventEntries({
                     eventDate={eventDate}
                     eventPlace={eventPlace}
                     eventName={eventName}
+                    onEditEntry={() => onEditEntry(entry)}
                     onDeletedTrialEvent={onDeletedTrialEvent}
                   />
                 </td>
@@ -304,6 +352,7 @@ function SelectedEventEntries({
               eventDate={eventDate}
               eventPlace={eventPlace}
               eventName={eventName}
+              onEditEntry={() => onEditEntry(entry)}
               onDeletedTrialEvent={onDeletedTrialEvent}
             />
           </CardContent>

@@ -17,7 +17,7 @@ describe("drawTrialDogPdfAllekirjoitukset", () => {
       ryhmatuomariNimi: null,
       palkintotuomariNimi: "",
       ylituomariNumeroSnapshot: "123445",
-      ylituomariNimiSnapshot: "Testi Nimi",
+      ylituomariNimi: "Testi Nimi",
       page,
       font,
     });

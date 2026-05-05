@@ -10,9 +10,16 @@ export {
   type UpdateAdminTrialEventWriteRequestDb,
   type UpdateAdminTrialEventWriteResultDb,
 } from "./update-trial-event";
+export {
+  updateAdminTrialEntryWriteDb,
+  type UpdateAdminTrialEntryWriteRequestDb,
+  type UpdateAdminTrialEntryWriteResultDb,
+} from "./update-trial-entry";
 export type {
   AdminTrialEventDetailsDb,
   AdminTrialEventDetailsRequestDb,
+  AdminTrialEntryEraDb,
+  AdminTrialEntryEraLisatietoDb,
   AdminTrialEventEntryDb,
   AdminTrialEventSearchRequestDb,
   AdminTrialEventSearchResponseDb,
