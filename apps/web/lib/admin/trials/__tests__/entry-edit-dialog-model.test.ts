@@ -56,6 +56,11 @@ describe("entry edit lisatiedot model", () => {
       label: "Vaativat olosuhteet",
       inputKind: "marker",
     });
+    expect(rows.find((row) => row.koodi === "19")).toMatchObject({
+      group: "olosuhteet",
+      label: "Lumipeitteen laatu",
+      inputKind: "text",
+    });
     expect(rows.find((row) => row.koodi === "62")).toMatchObject({
       group: "muut_ominaisuudet",
       label: "Matka ajoerässä",

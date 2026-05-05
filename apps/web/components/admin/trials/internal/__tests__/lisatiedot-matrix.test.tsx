@@ -22,6 +22,17 @@ describe("LisatiedotMatrix", () => {
         eraValues: { 1: "1", 2: "" },
       },
       {
+        koodi: "19",
+        osa: "",
+        nimi: "Lumipeitteen laatu",
+        jarjestys: 19,
+        group: "olosuhteet",
+        label: "Lumipeitteen laatu",
+        inputKind: "text",
+        sortOrder: 19,
+        eraValues: { 1: "5", 2: "" },
+      },
+      {
         koodi: "25",
         osa: "a",
         nimi: "Yöjälki löytyi",

@@ -81,7 +81,7 @@ export const ADMIN_TRIAL_LISATIETO_CONFIG = [
   ),
   defineLisatieto("17", "olosuhteet", "Lämpötila °C", "integer", 17),
   defineLisatieto("18", "olosuhteet", "Maasto", "integer", 18),
-  defineLisatieto("19", "olosuhteet", "Lumipeitteen laatu", "marker", 19),
+  defineLisatieto("19", "olosuhteet", "Lumipeitteen laatu", "text", 19),
   defineLisatieto("20", "haku", "Laajuus ilman yöjälkeä", "integer", 20),
   defineLisatieto("21", "haku", "Vainuamistapa", "decimal", 21),
   defineLisatieto("22", "haku", "Hakulöysyys", "decimal", 22),
