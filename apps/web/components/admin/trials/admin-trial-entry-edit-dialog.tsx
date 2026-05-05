@@ -166,7 +166,9 @@ export function AdminTrialEntryEditDialog({
                     huomautusTeksti: parseNullableString(
                       entryDraft.huomautusTeksti,
                     ),
-                    ylituomariNimiSnapshot: null,
+                    ylituomariNimiSnapshot: parseNullableString(
+                      entryDraft.judge,
+                    ),
                     ylituomariNumeroSnapshot: parseNullableString(
                       entryDraft.ylituomariNumeroSnapshot,
                     ),

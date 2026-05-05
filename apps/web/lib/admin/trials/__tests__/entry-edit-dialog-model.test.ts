@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { AdminTrialEventEntry } from "@beagle/contracts";
 import {
   createEmptyEraDraft,
+  parseInteger,
   toLisatietoRows,
 } from "../entry-edit-dialog-model";
 
@@ -42,6 +43,12 @@ function entryWithLisatiedot(
 }
 
 describe("entry edit lisatiedot model", () => {
+  it("rejects malformed integer input", () => {
+    expect(parseInteger("12abc")).toBeNull();
+    expect(parseInteger("1-2")).toBeNull();
+    expect(parseInteger(" 42 ")).toBe(42);
+  });
+
   it("creates all known grouped lisatieto rows", () => {
     const rows = toLisatietoRows(entryWithLisatiedot([]), [
       createEmptyEraDraft(1),

@@ -249,6 +249,7 @@ export function toLisatietoRows(
 export function parseInteger(value: string): number | null {
   const trimmed = value.trim();
   if (!trimmed) return null;
+  if (!/^-?\d+$/.test(trimmed)) return null;
   const parsed = Number.parseInt(trimmed, 10);
   return Number.isInteger(parsed) ? parsed : null;
 }
