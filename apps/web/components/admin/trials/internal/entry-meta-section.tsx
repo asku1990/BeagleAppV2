@@ -156,65 +156,81 @@ export function EntryMetaSection({ entryDraft, isPending, onChange }: Props) {
 
       <section className="space-y-2">
         <h4 className="text-xs font-semibold uppercase text-muted-foreground">
-          Pisteet
+          Ansiopisteet
+        </h4>
+        <div className="space-y-4">
+          <ScoreSubsection title="Ajo">
+            <TextField
+              label="Hyväksytyt ajominuutit"
+              value={entryDraft.hyvaksytytAjominuutit}
+              inputMode="numeric"
+              disabled={isPending}
+              onChange={(value) => updateField("hyvaksytytAjominuutit", value)}
+            />
+            <TextField
+              label="Ajoajan pisteet"
+              value={entryDraft.ajoajanPisteet}
+              inputMode="decimal"
+              disabled={isPending}
+              onChange={(value) => updateField("ajoajanPisteet", value)}
+            />
+            <TextField
+              label="Ajotaito / yleisvaikutelma"
+              value={entryDraft.yva}
+              inputMode="decimal"
+              disabled={isPending}
+              onChange={(value) => updateField("yva", value)}
+            />
+          </ScoreSubsection>
+          <ScoreSubsection title="Haku">
+            <TextField
+              label="Haku"
+              value={entryDraft.haku}
+              inputMode="decimal"
+              disabled={isPending}
+              onChange={(value) => updateField("haku", value)}
+            />
+          </ScoreSubsection>
+          <ScoreSubsection title="Haukku">
+            <TextField
+              label="Haukku"
+              value={entryDraft.hauk}
+              inputMode="decimal"
+              disabled={isPending}
+              onChange={(value) => updateField("hauk", value)}
+            />
+          </ScoreSubsection>
+          <ScoreSubsection title="Muut">
+            <TextField
+              label="Ansiopisteet yhteensä"
+              value={entryDraft.ansiopisteetYhteensa}
+              inputMode="decimal"
+              disabled={isPending}
+              onChange={(value) => updateField("ansiopisteetYhteensa", value)}
+            />
+            <TextField
+              label="Tie ja estetyöskentely"
+              value={entryDraft.tja}
+              inputMode="decimal"
+              disabled={isPending}
+              onChange={(value) => updateField("tja", value)}
+            />
+            <TextField
+              label="Metsästysinto"
+              value={entryDraft.pin}
+              inputMode="decimal"
+              disabled={isPending}
+              onChange={(value) => updateField("pin", value)}
+            />
+          </ScoreSubsection>
+        </div>
+      </section>
+
+      <section className="space-y-2">
+        <h4 className="text-xs font-semibold uppercase text-muted-foreground">
+          Tappiopisteet
         </h4>
         <div className="grid gap-3 md:grid-cols-4">
-          <TextField
-            label="Hyväksytyt ajominuutit"
-            value={entryDraft.hyvaksytytAjominuutit}
-            inputMode="numeric"
-            disabled={isPending}
-            onChange={(value) => updateField("hyvaksytytAjominuutit", value)}
-          />
-          <TextField
-            label="Ajoajan pisteet"
-            value={entryDraft.ajoajanPisteet}
-            inputMode="decimal"
-            disabled={isPending}
-            onChange={(value) => updateField("ajoajanPisteet", value)}
-          />
-          <TextField
-            label="Ansiopisteet yhteensä"
-            value={entryDraft.ansiopisteetYhteensa}
-            inputMode="decimal"
-            disabled={isPending}
-            onChange={(value) => updateField("ansiopisteetYhteensa", value)}
-          />
-          <TextField
-            label="Tappiopisteet yhteensä"
-            value={entryDraft.tappiopisteetYhteensa}
-            inputMode="decimal"
-            disabled={isPending}
-            onChange={(value) => updateField("tappiopisteetYhteensa", value)}
-          />
-          <TextField
-            label="Haku"
-            value={entryDraft.haku}
-            inputMode="decimal"
-            disabled={isPending}
-            onChange={(value) => updateField("haku", value)}
-          />
-          <TextField
-            label="Haukku"
-            value={entryDraft.hauk}
-            inputMode="decimal"
-            disabled={isPending}
-            onChange={(value) => updateField("hauk", value)}
-          />
-          <TextField
-            label="Ajotaito / yleisvaikutelma"
-            value={entryDraft.yva}
-            inputMode="decimal"
-            disabled={isPending}
-            onChange={(value) => updateField("yva", value)}
-          />
-          <TextField
-            label="Metsästysinto"
-            value={entryDraft.pin}
-            inputMode="decimal"
-            disabled={isPending}
-            onChange={(value) => updateField("pin", value)}
-          />
           <TextField
             label="Hakulöysyys"
             value={entryDraft.hlo}
@@ -230,11 +246,11 @@ export function EntryMetaSection({ entryDraft, isPending, onChange }: Props) {
             onChange={(value) => updateField("alo", value)}
           />
           <TextField
-            label="Tie ja estetyöskentely"
-            value={entryDraft.tja}
+            label="Tappiopisteet yhteensä"
+            value={entryDraft.tappiopisteetYhteensa}
             inputMode="decimal"
             disabled={isPending}
-            onChange={(value) => updateField("tja", value)}
+            onChange={(value) => updateField("tappiopisteetYhteensa", value)}
           />
         </div>
       </section>
@@ -271,6 +287,22 @@ export function EntryMetaSection({ entryDraft, isPending, onChange }: Props) {
         </div>
       </section>
     </div>
+  );
+}
+
+type ScoreSubsectionProps = {
+  title: string;
+  children: React.ReactNode;
+};
+
+function ScoreSubsection({ title, children }: ScoreSubsectionProps) {
+  return (
+    <section className="space-y-2 rounded-md border border-dashed border-muted-foreground/40 p-3">
+      <h5 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+        {title}
+      </h5>
+      <div className="grid gap-3 md:grid-cols-2">{children}</div>
+    </section>
   );
 }
 

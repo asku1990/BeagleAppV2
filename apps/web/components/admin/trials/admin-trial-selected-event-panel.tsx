@@ -199,6 +199,8 @@ export function AdminTrialSelectedEventPanel({
               <AdminTrialEntryEditDialog
                 open
                 trialEventId={selectedEvent.trialEventId}
+                eventDate={selectedEvent.eventDate}
+                eventPlace={selectedEvent.eventPlace}
                 entry={editingEntry}
                 isPending={updateEntryMutation.isPending}
                 errorText={entryEditError}

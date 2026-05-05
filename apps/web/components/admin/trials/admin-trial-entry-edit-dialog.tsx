@@ -3,6 +3,7 @@
 import React from "react";
 import { AdminFormModalShell } from "@/components/admin";
 import { Button } from "@/components/ui/button";
+import { formatDateForFinland } from "@/lib/admin/core/date";
 import { useI18n } from "@/hooks/i18n";
 import {
   createEmptyEraDraft,
@@ -27,6 +28,8 @@ import { LisatiedotMatrix } from "./internal/lisatiedot-matrix";
 type Props = {
   open: boolean;
   trialEventId: string;
+  eventDate?: string;
+  eventPlace?: string;
   entry: AdminTrialEventEntry;
   isPending: boolean;
   errorText: string | null;
@@ -37,6 +40,8 @@ type Props = {
 export function AdminTrialEntryEditDialog({
   open,
   trialEventId,
+  eventDate,
+  eventPlace,
   entry,
   isPending,
   errorText,
@@ -54,6 +59,8 @@ export function AdminTrialEntryEditDialog({
   const [validationError, setValidationError] = React.useState<string | null>(
     null,
   );
+  const eventDateLabel = formatDateForFinland(eventDate);
+  const eventPlaceLabel = eventPlace?.trim() ? eventPlace : "-";
 
   const reset = React.useCallback(() => {
     const initialEras = toEraDrafts(entry);
@@ -222,6 +229,30 @@ export function AdminTrialEntryEditDialog({
         {errorText ? (
           <p className="text-sm text-destructive">{errorText}</p>
         ) : null}
+        <section className="rounded-md border bg-muted/20 p-3 text-sm">
+          <p className="font-semibold">
+            {t("admin.trials.manage.entryModal.header.title")}
+          </p>
+          <div className="mt-1 grid gap-1 text-xs text-muted-foreground md:grid-cols-2">
+            <p>
+              {t("admin.trials.manage.entryModal.header.dog")}: {entry.dogName}
+            </p>
+            <p>
+              {t("admin.trials.manage.entryModal.header.registration")}:{" "}
+              {entry.registrationNo ?? "-"}
+            </p>
+            <p>
+              {t("admin.trials.manage.entryModal.header.entryId")}:{" "}
+              {entry.trialId}
+            </p>
+            {eventDate || eventPlace ? (
+              <p>
+                {t("admin.trials.manage.entryModal.header.event")}:{" "}
+                {eventDateLabel} • {eventPlaceLabel}
+              </p>
+            ) : null}
+          </div>
+        </section>
 
         <section className="space-y-2">
           <h3 className="text-sm font-semibold">Perustiedot</h3>
