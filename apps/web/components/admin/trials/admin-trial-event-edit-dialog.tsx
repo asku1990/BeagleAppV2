@@ -250,6 +250,9 @@ function AdminTrialEventEditDialogContent({
               }))
             }
           />
+          <span className="block text-xs text-muted-foreground">
+            {t("admin.trials.manage.eventModal.fields.ylituomariHelp")}
+          </span>
         </label>
         <label className="space-y-1 text-sm">
           <span>

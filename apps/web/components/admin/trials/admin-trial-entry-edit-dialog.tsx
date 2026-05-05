@@ -138,6 +138,7 @@ export function AdminTrialEntryEditDialog({
   );
   const eventDateLabel = formatDateForFinland(eventDate);
   const eventPlaceLabel = eventPlace?.trim() ? eventPlace : "-";
+  const previousEntryIdRef = React.useRef(entry.trialId);
 
   const reset = React.useCallback(() => {
     const initialEras = toEraDrafts(entry);
@@ -146,6 +147,17 @@ export function AdminTrialEntryEditDialog({
     setLisatiedotRows(toLisatietoRows(entry, initialEras));
     setValidationError(null);
   }, [entry]);
+
+  React.useEffect(() => {
+    if (!open) {
+      previousEntryIdRef.current = entry.trialId;
+      return;
+    }
+    if (previousEntryIdRef.current !== entry.trialId) {
+      reset();
+      previousEntryIdRef.current = entry.trialId;
+    }
+  }, [entry.trialId, open, reset]);
 
   function addEra() {
     const nextEra = Math.max(...eras.map((era) => era.era), 1) + 1;
@@ -204,7 +216,9 @@ export function AdminTrialEntryEditDialog({
                   (left, right) => left.era - right.era,
                 );
                 if (sortedEras.length < 2) {
-                  setValidationError("At least era 1 and era 2 are required.");
+                  setValidationError(
+                    t("admin.trials.manage.entryModal.validation.requiredEras"),
+                  );
                   return;
                 }
                 const invalidNumericField = findInvalidNumericField(

@@ -116,7 +116,7 @@ describe("AdminTrialEntryEditDialog", () => {
     expect(html).toContain("Helsinki");
   });
 
-  it("saves the judge field without the snapshot field", () => {
+  it("saves the judge and ylituomari number snapshot fields", () => {
     const onSave = vi.fn(async () => true);
 
     renderToStaticMarkup(

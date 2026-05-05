@@ -166,11 +166,12 @@ describe("updateAdminTrialEntryWriteDb", () => {
         lisatiedotByEra: [
           {
             era: 1,
+            replaceKeys: [{ koodi: "11", osa: "" }],
             items: [
               { koodi: "11", osa: "", arvo: "1", nimi: null, jarjestys: null },
             ],
           },
-          { era: 2, items: [] },
+          { era: 2, replaceKeys: [], items: [] },
         ],
       }),
     ).resolves.toEqual({
@@ -184,5 +185,84 @@ describe("updateAdminTrialEntryWriteDb", () => {
       ADMIN_WRITE_TX_CONFIG,
     );
     expect(trialEraLisatietoCreateManyMock).toHaveBeenCalledTimes(1);
+    expect(trialEraLisatietoDeleteManyMock).toHaveBeenCalledWith({
+      where: {
+        trialEraId: "era-1",
+        OR: [{ koodi: "11", osa: "" }],
+      },
+    });
+    expect(trialEraLisatietoDeleteManyMock).not.toHaveBeenCalledWith({
+      where: { trialEraId: "era-2" },
+    });
+  });
+
+  it("preserves existing lisatiedot that were not submitted for replacement", async () => {
+    trialEntryUpdateManyMock.mockResolvedValue({ count: 1 });
+    trialEraUpsertMock.mockResolvedValue({ id: "era-1", era: 1 });
+
+    await updateAdminTrialEntryWriteDb({
+      trialEventId: "event-1",
+      trialEntryId: "entry-1",
+      entry: {
+        koemaasto: "Metsa",
+        koemuoto: "AJOK",
+        koetyyppi: "NORMAL",
+        ke: null,
+        lk: null,
+        award: null,
+        rank: null,
+        points: null,
+        koiriaLuokassa: null,
+        hyvaksytytAjominuutit: null,
+        ajoajanPisteet: null,
+        haku: null,
+        hauk: null,
+        yva: null,
+        hlo: null,
+        alo: null,
+        tja: null,
+        pin: null,
+        ansiopisteetYhteensa: null,
+        tappiopisteetYhteensa: null,
+        judge: null,
+        huomautus: null,
+        huomautusTeksti: null,
+        ylituomariNumeroSnapshot: null,
+        ryhmatuomariNimi: null,
+        palkintotuomariNimi: null,
+        omistajaSnapshot: null,
+        omistajanKotikuntaSnapshot: null,
+      },
+      eras: [
+        {
+          era: 1,
+          alkoi: null,
+          hakumin: null,
+          ajomin: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          tja: null,
+          pin: null,
+          huomautusTeksti: null,
+        },
+      ],
+      lisatiedotByEra: [
+        {
+          era: 1,
+          replaceKeys: [{ koodi: "11", osa: "" }],
+          items: [],
+        },
+      ],
+    });
+
+    expect(trialEraLisatietoDeleteManyMock).toHaveBeenCalledWith({
+      where: {
+        trialEraId: "era-1",
+        OR: [{ koodi: "11", osa: "" }],
+      },
+    });
   });
 });

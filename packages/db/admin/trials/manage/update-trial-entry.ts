@@ -51,6 +51,10 @@ export type UpdateAdminTrialEntryWriteRequestDb = {
   }>;
   lisatiedotByEra: Array<{
     era: number;
+    replaceKeys: Array<{
+      koodi: string;
+      osa: string;
+    }>;
     items: Array<{
       koodi: string;
       osa: string;
@@ -166,12 +170,21 @@ export async function updateAdminTrialEntryWriteDb(
       const lisatiedotItems =
         input.lisatiedotByEra.find((item) => item.era === savedEra.era)
           ?.items ?? [];
+      const replaceKeys =
+        input.lisatiedotByEra.find((item) => item.era === savedEra.era)
+          ?.replaceKeys ?? [];
 
-      await tx.trialEraLisatieto.deleteMany({
-        where: {
-          trialEraId: savedEra.id,
-        },
-      });
+      if (replaceKeys.length > 0) {
+        await tx.trialEraLisatieto.deleteMany({
+          where: {
+            trialEraId: savedEra.id,
+            OR: replaceKeys.map((item) => ({
+              koodi: item.koodi,
+              osa: item.osa,
+            })),
+          },
+        });
+      }
 
       if (lisatiedotItems.length > 0) {
         await tx.trialEraLisatieto.createMany({

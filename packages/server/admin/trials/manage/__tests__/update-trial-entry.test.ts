@@ -253,6 +253,13 @@ describe("updateAdminTrialEntry", () => {
         lisatiedotByEra: [
           {
             era: 1,
+            replaceKeys: [
+              { koodi: "10", osa: "" },
+              { koodi: "25", osa: "a" },
+              { koodi: "27", osa: "c" },
+              { koodi: "62", osa: "" },
+              { koodi: "90", osa: "legacy" },
+            ],
             items: [
               {
                 koodi: "10",
@@ -286,6 +293,13 @@ describe("updateAdminTrialEntry", () => {
           },
           {
             era: 2,
+            replaceKeys: [
+              { koodi: "10", osa: "" },
+              { koodi: "25", osa: "a" },
+              { koodi: "27", osa: "c" },
+              { koodi: "62", osa: "" },
+              { koodi: "90", osa: "legacy" },
+            ],
             items: [
               {
                 koodi: "27",
@@ -324,6 +338,120 @@ describe("updateAdminTrialEntry", () => {
         ok: false,
         error: "Lisatiedot era value references unknown era.",
         code: "INVALID_LISATIETO_ERA",
+      },
+    });
+    expect(updateAdminTrialEntryWriteDbMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects duplicate era numbers clearly", async () => {
+    await expect(
+      updateAdminTrialEntry(
+        {
+          ...baseInput(),
+          eras: [baseInput().eras[0], baseInput().eras[0]],
+        },
+        adminUser,
+      ),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Duplicate era numbers are not allowed.",
+        code: "DUPLICATE_ERAS",
+      },
+    });
+    expect(updateAdminTrialEntryWriteDbMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects non-positive era numbers", async () => {
+    await expect(
+      updateAdminTrialEntry(
+        {
+          ...baseInput(),
+          eras: [{ ...baseInput().eras[0], era: 0 }],
+        },
+        adminUser,
+      ),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Era numbers must be positive safe integers.",
+        code: "INVALID_ERAS",
+      },
+    });
+    expect(updateAdminTrialEntryWriteDbMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects invalid runtime enum values", async () => {
+    await expect(
+      updateAdminTrialEntry(
+        {
+          ...baseInput(),
+          entry: { ...baseInput().entry, koetyyppi: "BAD" },
+        } as unknown as Parameters<typeof updateAdminTrialEntry>[0],
+        adminUser,
+      ),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Unsupported koetyyppi.",
+        code: "INVALID_KOETYYPPI",
+      },
+    });
+
+    await expect(
+      updateAdminTrialEntry(
+        {
+          ...baseInput(),
+          entry: { ...baseInput().entry, huomautus: "BAD" },
+        } as unknown as Parameters<typeof updateAdminTrialEntry>[0],
+        adminUser,
+      ),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Unsupported huomautus.",
+        code: "INVALID_HUOMAUTUS",
+      },
+    });
+    expect(updateAdminTrialEntryWriteDbMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects invalid runtime numeric values", async () => {
+    await expect(
+      updateAdminTrialEntry(
+        {
+          ...baseInput(),
+          entry: { ...baseInput().entry, points: Number.NaN },
+        },
+        adminUser,
+      ),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Numeric fields must be finite numbers or null.",
+        code: "INVALID_NUMERIC_FIELD",
+      },
+    });
+
+    await expect(
+      updateAdminTrialEntry(
+        {
+          ...baseInput(),
+          entry: { ...baseInput().entry, koiriaLuokassa: 1.5 },
+        },
+        adminUser,
+      ),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Integer fields must be safe integers or null.",
+        code: "INVALID_INTEGER_FIELD",
       },
     });
     expect(updateAdminTrialEntryWriteDbMock).not.toHaveBeenCalled();
@@ -379,8 +507,8 @@ describe("updateAdminTrialEntry", () => {
             ...baseInput().entry,
             koemaasto: " Forest ",
             koemuoto: " ",
-            points: Number.NaN,
-            koiriaLuokassa: 1.5,
+            points: 80.5,
+            koiriaLuokassa: 2,
             haku: 12.5,
             huomautus: "LUOPUI",
             huomautusTeksti: " ",
@@ -390,9 +518,9 @@ describe("updateAdminTrialEntry", () => {
             {
               ...baseInput().eras[0],
               alkoi: " 10:00 ",
-              hakumin: 15.5,
+              hakumin: 15,
               ajomin: 30,
-              haku: Number.POSITIVE_INFINITY,
+              haku: 5.5,
               huomautusTeksti: " Note ",
             },
           ],
@@ -429,8 +557,8 @@ describe("updateAdminTrialEntry", () => {
       entry: expect.objectContaining({
         koemaasto: "Forest",
         koemuoto: null,
-        points: null,
-        koiriaLuokassa: null,
+        points: 80.5,
+        koiriaLuokassa: 2,
         haku: 12.5,
         huomautus: "LUOPUI",
         huomautusTeksti: null,
@@ -440,15 +568,19 @@ describe("updateAdminTrialEntry", () => {
         expect.objectContaining({
           era: 1,
           alkoi: "10:00",
-          hakumin: null,
+          hakumin: 15,
           ajomin: 30,
-          haku: null,
+          haku: 5.5,
           huomautusTeksti: "Note",
         }),
       ],
       lisatiedotByEra: [
         {
           era: 1,
+          replaceKeys: [
+            { koodi: "11", osa: "Osa" },
+            { koodi: "12", osa: "" },
+          ],
           items: [
             {
               koodi: "11",

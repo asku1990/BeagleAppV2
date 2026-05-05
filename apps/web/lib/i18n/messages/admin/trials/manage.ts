@@ -67,6 +67,10 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.entryModal.header.registration": "Rekisterinumero",
   "admin.trials.manage.entryModal.header.entryId": "Rivitunniste",
   "admin.trials.manage.entryModal.header.event": "Tapahtuma",
+  "admin.trials.manage.entryModal.validation.requiredEras":
+    "Vähintään erät 1 ja 2 ovat pakollisia.",
+  "admin.trials.manage.entryModal.updateFailed":
+    "Koerivin päivitys epäonnistui.",
   "admin.trials.manage.selected.actions.delete": "Poista tulos",
   "admin.trials.manage.selected.actions.delete.confirmTitle":
     "Poistetaanko tämä koetulos?",
@@ -86,6 +90,8 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.eventModal.fields.eventName": "Tapahtuma",
   "admin.trials.manage.eventModal.fields.jarjestaja": "Järjestäjä",
   "admin.trials.manage.eventModal.fields.ylituomari": "Ylituomari",
+  "admin.trials.manage.eventModal.fields.ylituomariHelp":
+    "Tallennus päivittää ylituomarin kaikille tapahtuman koirariveille. Yksittäisen koiran poikkeavan tuomarin voi muuttaa koerivin tiedoista.",
   "admin.trials.manage.eventModal.fields.ylituomariNumero":
     "Ylituomarin numero",
   "admin.trials.manage.eventModal.fields.ytKertomus": "YT kertomus",
@@ -189,6 +195,10 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.entryModal.header.registration": "Registrering",
   "admin.trials.manage.entryModal.header.entryId": "Rad-ID",
   "admin.trials.manage.entryModal.header.event": "Evenemang",
+  "admin.trials.manage.entryModal.validation.requiredEras":
+    "Minst omgång 1 och omgång 2 är obligatoriska.",
+  "admin.trials.manage.entryModal.updateFailed":
+    "Det gick inte att uppdatera provraden.",
   "admin.trials.manage.selected.actions.delete": "Ta bort resultat",
   "admin.trials.manage.selected.actions.delete.confirmTitle":
     "Ta bort det här provresultatet?",
@@ -208,6 +218,8 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.eventModal.fields.eventName": "Evenemang",
   "admin.trials.manage.eventModal.fields.jarjestaja": "Arrangör",
   "admin.trials.manage.eventModal.fields.ylituomari": "Överdomare",
+  "admin.trials.manage.eventModal.fields.ylituomariHelp":
+    "När du sparar uppdateras överdomaren för alla hundrader i evenemanget. En avvikande domare för en enskild hund kan ändras i provradens uppgifter.",
   "admin.trials.manage.eventModal.fields.ylituomariNumero": "Överdomarnummer",
   "admin.trials.manage.eventModal.fields.ytKertomus": "ÖD berättelse",
   "admin.trials.manage.eventModal.fields.kennelpiiri": "Kenneldistrikt",

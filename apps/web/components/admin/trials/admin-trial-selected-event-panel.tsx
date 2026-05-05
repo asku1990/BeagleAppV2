@@ -86,7 +86,7 @@ export function AdminTrialSelectedEventPanel({
         setEntryEditError(error.message);
         return false;
       }
-      setEntryEditError("Entry update failed.");
+      setEntryEditError(t("admin.trials.manage.entryModal.updateFailed"));
       return false;
     }
   }

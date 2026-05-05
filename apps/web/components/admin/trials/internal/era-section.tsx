@@ -77,7 +77,7 @@ export function EraSection({
                   </label>
                 ))}
                 <label className="space-y-1 text-xs md:col-span-4">
-                  <span>huomautusTeksti</span>
+                  <span>Huomautusteksti</span>
                   <Input
                     value={era.huomautusTeksti}
                     disabled={isPending}

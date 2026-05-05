@@ -13,6 +13,9 @@ type ServiceLogContext = {
   actorUserId?: string;
 };
 
+const VALID_KOETYYPIT = new Set(["NORMAL", "KOKOKAUDENKOE", "PITKAKOE"]);
+const VALID_HUOMAUTUKSET = new Set(["LUOPUI", "SULJETTU", "KESKEYTETTY"]);
+
 function isValidLisatietoCode(value: string): boolean {
   return /^[1-9]\d*$/.test(value.trim());
 }
@@ -40,6 +43,16 @@ function normalizeNullableInteger(
   return Number.isInteger(value) ? value : null;
 }
 
+function isNullableInteger(value: unknown): value is number | null | undefined {
+  return (
+    value === null ||
+    typeof value === "undefined" ||
+    (typeof value === "number" &&
+      Number.isSafeInteger(value) &&
+      Number.isFinite(value))
+  );
+}
+
 function normalizeNullableNumber(
   value: number | null | undefined,
 ): number | null {
@@ -47,6 +60,16 @@ function normalizeNullableNumber(
     return null;
   }
   return Number.isFinite(value) ? value : null;
+}
+
+function isNullableFiniteNumber(
+  value: unknown,
+): value is number | null | undefined {
+  return (
+    value === null ||
+    typeof value === "undefined" ||
+    (typeof value === "number" && Number.isFinite(value))
+  );
 }
 
 function hasContinuousEras(eras: number[]): boolean {
@@ -63,6 +86,20 @@ function hasContinuousEras(eras: number[]): boolean {
     }
   }
   return true;
+}
+
+function badRequest(
+  error: string,
+  code: string,
+): ServiceResult<UpdateAdminTrialEntryResponse> {
+  return {
+    status: 400,
+    body: {
+      ok: false,
+      error,
+      code,
+    },
+  };
 }
 
 export async function updateAdminTrialEntry(
@@ -111,26 +148,95 @@ export async function updateAdminTrialEntry(
   }
 
   if (!input.eras.length) {
-    return {
-      status: 400,
-      body: {
-        ok: false,
-        error: "At least one era is required.",
-        code: "INVALID_ERAS",
-      },
-    };
+    return badRequest("At least one era is required.", "INVALID_ERAS");
   }
 
   const eraNumbers = input.eras.map((era) => era.era);
+  if (
+    eraNumbers.some(
+      (era) => !Number.isSafeInteger(era) || !Number.isFinite(era) || era < 1,
+    )
+  ) {
+    return badRequest(
+      "Era numbers must be positive safe integers.",
+      "INVALID_ERAS",
+    );
+  }
+
+  if (new Set(eraNumbers).size !== eraNumbers.length) {
+    return badRequest(
+      "Duplicate era numbers are not allowed.",
+      "DUPLICATE_ERAS",
+    );
+  }
+
   if (!hasContinuousEras(eraNumbers)) {
-    return {
-      status: 400,
-      body: {
-        ok: false,
-        error: "Eras must be continuous starting from 1.",
-        code: "INVALID_ERAS",
-      },
-    };
+    return badRequest(
+      "Eras must be continuous starting from 1.",
+      "INVALID_ERAS",
+    );
+  }
+
+  if (!VALID_KOETYYPIT.has(input.entry.koetyyppi)) {
+    return badRequest("Unsupported koetyyppi.", "INVALID_KOETYYPPI");
+  }
+
+  if (
+    input.entry.huomautus !== null &&
+    typeof input.entry.huomautus !== "undefined" &&
+    !VALID_HUOMAUTUKSET.has(input.entry.huomautus)
+  ) {
+    return badRequest("Unsupported huomautus.", "INVALID_HUOMAUTUS");
+  }
+
+  const entryIntegerFields = [
+    input.entry.koiriaLuokassa,
+    input.entry.hyvaksytytAjominuutit,
+  ];
+  if (!entryIntegerFields.every(isNullableInteger)) {
+    return badRequest(
+      "Integer fields must be safe integers or null.",
+      "INVALID_INTEGER_FIELD",
+    );
+  }
+
+  const entryNumberFields = [
+    input.entry.points,
+    input.entry.ajoajanPisteet,
+    input.entry.haku,
+    input.entry.hauk,
+    input.entry.yva,
+    input.entry.hlo,
+    input.entry.alo,
+    input.entry.tja,
+    input.entry.pin,
+    input.entry.ansiopisteetYhteensa,
+    input.entry.tappiopisteetYhteensa,
+  ];
+  if (!entryNumberFields.every(isNullableFiniteNumber)) {
+    return badRequest(
+      "Numeric fields must be finite numbers or null.",
+      "INVALID_NUMERIC_FIELD",
+    );
+  }
+
+  for (const era of input.eras) {
+    if (![era.hakumin, era.ajomin].every(isNullableInteger)) {
+      return badRequest(
+        "Era integer fields must be safe integers or null.",
+        "INVALID_ERA_INTEGER_FIELD",
+      );
+    }
+    if (
+      ![era.haku, era.hauk, era.yva, era.hlo, era.alo, era.tja, era.pin].every(
+        isNullableFiniteNumber,
+      )
+    ) {
+      return badRequest(
+        "Era numeric fields must be finite numbers or null.",
+        "INVALID_ERA_NUMERIC_FIELD",
+      );
+    }
   }
 
   for (const row of input.lisatiedotRows) {
@@ -162,6 +268,10 @@ export async function updateAdminTrialEntry(
 
   const lisatiedotByEra = eraNumbers.map((era) => ({
     era,
+    replaceKeys: input.lisatiedotRows.map((row) => ({
+      koodi: normalizeNullableText(row.koodi) ?? row.koodi,
+      osa: normalizeNullableText(row.osa) ?? "",
+    })),
     items: input.lisatiedotRows
       .map((row) => {
         const eraValue = row.eraValues.find((value) => value.era === era);
