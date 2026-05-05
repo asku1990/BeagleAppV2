@@ -87,7 +87,7 @@ const entryInput = {
   keli: null,
   huomautus: null,
   huomautusTeksti: null,
-  ylituomariNimiSnapshot: null,
+  tuom1: null,
   ylituomariNumeroSnapshot: null,
   ryhmatuomariNimi: null,
   palkintotuomariNimi: null,
@@ -205,7 +205,6 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
           tuom1: "Ylituomari",
           huomautus: null,
           huomautusTeksti: null,
-          ylituomariNimiSnapshot: null,
           ylituomariNumeroSnapshot: null,
           ryhmatuomariNimi: null,
           palkintotuomariNimi: null,
@@ -353,7 +352,7 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
       },
       entry: {
         ...entryInput,
-        ylituomariNimiSnapshot: "Ylituomari",
+        tuom1: "Ylituomari",
         ylituomariNumeroSnapshot: "123",
         ryhmatuomariNimi: "Ryhmätuomari",
         palkintotuomariNimi: "Palkintotuomari",
@@ -364,13 +363,13 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
     expect(txMock.trialEntry.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         create: expect.objectContaining({
-          ylituomariNimiSnapshot: "Ylituomari",
+          tuom1: "Ylituomari",
           ylituomariNumeroSnapshot: "123",
           ryhmatuomariNimi: "Ryhmätuomari",
           palkintotuomariNimi: "Palkintotuomari",
         }),
         update: expect.objectContaining({
-          ylituomariNimiSnapshot: "Ylituomari",
+          tuom1: "Ylituomari",
           ylituomariNumeroSnapshot: "123",
           ryhmatuomariNimi: "Ryhmätuomari",
           palkintotuomariNimi: "Palkintotuomari",

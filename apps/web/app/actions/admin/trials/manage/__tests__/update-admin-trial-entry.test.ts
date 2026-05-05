@@ -50,7 +50,6 @@ const payload = {
     judge: null,
     huomautus: null,
     huomautusTeksti: null,
-    ylituomariNimiSnapshot: null,
     ylituomariNumeroSnapshot: null,
     ryhmatuomariNimi: null,
     palkintotuomariNimi: null,

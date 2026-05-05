@@ -83,7 +83,7 @@ export type KoiratietokantaAjokEntryDbInput = {
   keli: string | null;
   huomautus: TrialEntryHuomautus | null;
   huomautusTeksti: string | null;
-  ylituomariNimiSnapshot: string | null;
+  tuom1: string | null;
   ylituomariNumeroSnapshot: string | null;
   ryhmatuomariNimi: string | null;
   palkintotuomariNimi: string | null;
@@ -213,10 +213,10 @@ export async function upsertKoiratietokantaAjokResultDb(
       alo: input.entry.alo,
       ansiopisteetYhteensa: input.entry.ansiopisteetYhteensa,
       tappiopisteetYhteensa: input.entry.tappiopisteetYhteensa,
+      // Event-level chief judge is canonical for imported AJOK entries.
       tuom1: input.event.ylituomariNimi,
       huomautus: input.entry.huomautus,
       huomautusTeksti: input.entry.huomautusTeksti,
-      ylituomariNimiSnapshot: input.entry.ylituomariNimiSnapshot,
       ylituomariNumeroSnapshot: input.entry.ylituomariNumeroSnapshot,
       ryhmatuomariNimi: input.entry.ryhmatuomariNimi,
       palkintotuomariNimi: input.entry.palkintotuomariNimi,

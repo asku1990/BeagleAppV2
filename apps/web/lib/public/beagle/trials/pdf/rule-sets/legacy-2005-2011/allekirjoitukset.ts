@@ -60,7 +60,7 @@ export function drawLegacy2005To2011Allekirjoitukset(
   drawLegacy2005To2011Text(
     page,
     font,
-    input.ylituomariNimiSnapshot,
+    input.ylituomariNimi,
     YLITUOMARI_NIMI_FIELD,
   );
 }

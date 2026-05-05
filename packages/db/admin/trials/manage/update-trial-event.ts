@@ -50,7 +50,6 @@ export async function updateAdminTrialEventWriteDb(
       },
       data: {
         tuom1: input.ylituomari,
-        ylituomariNimiSnapshot: input.ylituomari,
         ylituomariNumeroSnapshot: input.ylituomariNumero,
       },
     });

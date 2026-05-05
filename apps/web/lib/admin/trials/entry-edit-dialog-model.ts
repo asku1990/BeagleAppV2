@@ -57,7 +57,6 @@ export type EntryDraft = {
   judge: string;
   huomautus: "" | "LUOPUI" | "SULJETTU" | "KESKEYTETTY";
   huomautusTeksti: string;
-  ylituomariNimiSnapshot: string;
   ylituomariNumeroSnapshot: string;
   ryhmatuomariNimi: string;
   palkintotuomariNimi: string;
@@ -118,7 +117,6 @@ export function toEntryDraft(entry: AdminTrialEventEntry): EntryDraft {
     judge: entry.judge ?? "",
     huomautus: entry.huomautus ?? "",
     huomautusTeksti: entry.huomautusTeksti ?? "",
-    ylituomariNimiSnapshot: entry.ylituomariNimiSnapshot ?? "",
     ylituomariNumeroSnapshot: entry.ylituomariNumeroSnapshot ?? "",
     ryhmatuomariNimi: entry.ryhmatuomariNimi ?? "",
     palkintotuomariNimi: entry.palkintotuomariNimi ?? "",

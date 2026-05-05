@@ -116,5 +116,5 @@ export type TrialDogPdfAllekirjoitukset = {
   ryhmatuomariNimi: string | null;
   palkintotuomariNimi: string | null;
   ylituomariNumeroSnapshot: string | null;
-  ylituomariNimiSnapshot: string | null;
+  ylituomariNimi: string | null;
 };

@@ -116,7 +116,7 @@ describe("AdminTrialEntryEditDialog", () => {
     expect(html).toContain("Helsinki");
   });
 
-  it("preserves the entry judge snapshot when saving", () => {
+  it("saves the judge field without the snapshot field", () => {
     const onSave = vi.fn(async () => true);
 
     renderToStaticMarkup(
@@ -189,7 +189,6 @@ describe("AdminTrialEntryEditDialog", () => {
       expect.objectContaining({
         entry: expect.objectContaining({
           judge: "Judge Snapshot",
-          ylituomariNimiSnapshot: "Judge Snapshot",
           ylituomariNumeroSnapshot: "123",
         }),
       }),

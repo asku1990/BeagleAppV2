@@ -42,7 +42,6 @@ export type UpdateAdminTrialEntryRequest = {
     | "judge"
     | "huomautus"
     | "huomautusTeksti"
-    | "ylituomariNimiSnapshot"
     | "ylituomariNumeroSnapshot"
     | "ryhmatuomariNimi"
     | "palkintotuomariNimi"

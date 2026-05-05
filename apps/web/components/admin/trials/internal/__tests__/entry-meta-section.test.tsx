@@ -28,7 +28,6 @@ const entryDraft: EntryDraft = {
   judge: "Judge",
   huomautus: "",
   huomautusTeksti: "Huomautus",
-  ylituomariNimiSnapshot: "Ylituomari",
   ylituomariNumeroSnapshot: "123",
   ryhmatuomariNimi: "Ryhmätuomari",
   palkintotuomariNimi: "Palkintotuomari",

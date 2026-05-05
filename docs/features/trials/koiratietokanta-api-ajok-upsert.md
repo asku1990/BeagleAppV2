@@ -91,7 +91,7 @@ inside one event are allowed.
   `TrialEra.huomautusTeksti` for the matching era
 - `palkintotuomari1` -> `ryhmatuomariNimi`
 - `palkintotuomari2` -> `palkintotuomariNimi`
-- `yt` / `ytnro` are also copied into `ylituomariNimiSnapshot` /
+- `yt` / `ytnro` are also copied into `TrialEntry.tuom1` /
   `ylituomariNumeroSnapshot`
 
 ### Placement semantics

@@ -69,7 +69,6 @@ export type TrialDogPdfDataDbRow = {
   palkinto: string | null;
   ylituomariNimi: string | null;
   ylituomariNumeroSnapshot: string | null;
-  ylituomariNimiSnapshot: string | null;
   ryhmatuomariNimi: string | null;
   palkintotuomariNimi: string | null;
   eras: TrialDogPdfDataDbEraRow[];
@@ -107,7 +106,6 @@ export async function getTrialDogPdfDataDb(
       ansiopisteetYhteensa: true,
       tappiopisteetYhteensa: true,
       tuom1: true,
-      ylituomariNimiSnapshot: true,
       ylituomariNumeroSnapshot: true,
       ryhmatuomariNimi: true,
       palkintotuomariNimi: true,
@@ -156,6 +154,7 @@ export async function getTrialDogPdfDataDb(
           koekunta: true,
           koepaiva: true,
           jarjestaja: true,
+          ylituomariNimi: true,
         },
       },
       eras: {
@@ -229,9 +228,8 @@ export async function getTrialDogPdfDataDb(
     sijoitus: row.sija ?? null,
     koiriaLuokassa: row.koiriaLuokassa,
     palkinto: row.pa ?? null,
-    ylituomariNimi: row.tuom1 ?? null,
+    ylituomariNimi: row.tuom1 ?? row.trialEvent.ylituomariNimi ?? null,
     ylituomariNumeroSnapshot: row.ylituomariNumeroSnapshot,
-    ylituomariNimiSnapshot: row.ylituomariNimiSnapshot,
     ryhmatuomariNimi: row.ryhmatuomariNimi,
     palkintotuomariNimi: row.palkintotuomariNimi,
     eras: row.eras.map((era) => ({

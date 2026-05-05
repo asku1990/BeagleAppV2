@@ -58,7 +58,7 @@ export function drawTrialDogPdfAllekirjoitukset(
   drawText(
     page,
     font,
-    formatKoeEraValue(input.ylituomariNimiSnapshot),
+    formatKoeEraValue(input.ylituomariNimi),
     YLITUOMARI_NIMI_FIELD,
   );
 }

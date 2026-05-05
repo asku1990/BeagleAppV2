@@ -33,7 +33,6 @@ export type AdminTrialEventEntry = {
   tappiopisteetYhteensa?: number | null;
   huomautus?: "LUOPUI" | "SULJETTU" | "KESKEYTETTY" | null;
   huomautusTeksti?: string | null;
-  ylituomariNimiSnapshot?: string | null;
   ylituomariNumeroSnapshot?: string | null;
   ryhmatuomariNimi?: string | null;
   palkintotuomariNimi?: string | null;

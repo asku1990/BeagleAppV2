@@ -97,7 +97,6 @@ describe("updateAdminTrialEventWriteDb", () => {
       where: { trialEventId: "event-1" },
       data: {
         tuom1: "Judge",
-        ylituomariNimiSnapshot: "Judge",
         ylituomariNumeroSnapshot: "123",
       },
     });

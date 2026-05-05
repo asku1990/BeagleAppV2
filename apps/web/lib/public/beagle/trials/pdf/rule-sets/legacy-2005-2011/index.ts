@@ -119,7 +119,7 @@ export function renderLegacy2005To2011TrialDogPdfFields({
     ryhmatuomariNimi: input.ryhmatuomariNimi,
     palkintotuomariNimi: input.palkintotuomariNimi,
     ylituomariNumeroSnapshot: input.ylituomariNumeroSnapshot,
-    ylituomariNimiSnapshot: input.ylituomariNimiSnapshot,
+    ylituomariNimi: input.ylituomariNimi,
     page,
     font,
   });

@@ -29,7 +29,6 @@ export type UpdateAdminTrialEntryWriteRequestDb = {
     judge: string | null;
     huomautus: "LUOPUI" | "SULJETTU" | "KESKEYTETTY" | null;
     huomautusTeksti: string | null;
-    ylituomariNimiSnapshot: string | null;
     ylituomariNumeroSnapshot: string | null;
     ryhmatuomariNimi: string | null;
     palkintotuomariNimi: string | null;
@@ -105,7 +104,6 @@ export async function updateAdminTrialEntryWriteDb(
         tuom1: input.entry.judge,
         huomautus: input.entry.huomautus,
         huomautusTeksti: input.entry.huomautusTeksti,
-        ylituomariNimiSnapshot: input.entry.ylituomariNimiSnapshot,
         ylituomariNumeroSnapshot: input.entry.ylituomariNumeroSnapshot,
         ryhmatuomariNimi: input.entry.ryhmatuomariNimi,
         palkintotuomariNimi: input.entry.palkintotuomariNimi,

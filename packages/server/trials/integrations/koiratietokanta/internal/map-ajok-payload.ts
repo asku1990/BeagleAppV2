@@ -300,7 +300,7 @@ export function mapKoiratietokantaAjokPayload(
     keli: normalizeText(payload.KELI),
     huomautus,
     huomautusTeksti,
-    ylituomariNimiSnapshot: ylituomariNimi,
+    tuom1: ylituomariNimi,
     ylituomariNumeroSnapshot: ylituomariNumero,
     ryhmatuomariNimi: normalizeText(payload.palkintotuomari1),
     palkintotuomariNimi: normalizeText(payload.palkintotuomari2),

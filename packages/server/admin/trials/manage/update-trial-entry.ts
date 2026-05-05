@@ -214,9 +214,6 @@ export async function updateAdminTrialEntry(
         judge: normalizeNullableText(input.entry.judge),
         huomautus: input.entry.huomautus ?? null,
         huomautusTeksti: normalizeNullableText(input.entry.huomautusTeksti),
-        ylituomariNimiSnapshot: normalizeNullableText(
-          input.entry.ylituomariNimiSnapshot,
-        ),
         ylituomariNumeroSnapshot: normalizeNullableText(
           input.entry.ylituomariNumeroSnapshot,
         ),

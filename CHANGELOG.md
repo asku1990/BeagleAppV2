@@ -42,6 +42,7 @@ This project uses a user-facing changelog format.
 ### Fixed
 
 - Ajokokeen koirakohtainen PDF näyttää nyt koiran oman primary-rekisterinumeron eli ensimmäisenä lisätyn rekisterinumeron.
+- AJOK-rivien ylituomariksi vakiinnutettiin `TrialEntry.tuom1`, ja vanha nimi-snapshot poistettiin trial-adminin, integraatioiden ja PDF-polun käytöstä.
 - Ylläpidon AJOK-rivin muokkaus näyttää ja tallentaa nyt kaikki lisätietokoodit, jotta muiden kenttien tallennus ei poista Koiratietokannan lisätietoja.
 - Vercelin AJOK PDF -route pakkaa nyt kaikki `public/templates/*.pdf`-pohjat mukaan, joten tuotanto voi lukea oikeat template-tiedostot ilman `ENOENT`-virhettä.
 
