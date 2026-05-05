@@ -215,12 +215,6 @@ export function AdminTrialEntryEditDialog({
                 const sortedEras = [...eras].sort(
                   (left, right) => left.era - right.era,
                 );
-                if (sortedEras.length < 2) {
-                  setValidationError(
-                    t("admin.trials.manage.entryModal.validation.requiredEras"),
-                  );
-                  return;
-                }
                 const invalidNumericField = findInvalidNumericField(
                   entryDraft,
                   sortedEras,

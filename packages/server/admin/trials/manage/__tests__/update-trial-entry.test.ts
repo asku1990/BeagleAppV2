@@ -144,12 +144,80 @@ describe("updateAdminTrialEntry", () => {
     expect(updateAdminTrialEntryWriteDbMock).not.toHaveBeenCalled();
   });
 
-  it("rejects invalid era sequence", async () => {
+  it("accepts one era starting at 1", async () => {
+    updateAdminTrialEntryWriteDbMock.mockResolvedValue({
+      status: "updated",
+      trialEventId: "event-1",
+      trialEntryId: "entry-1",
+    });
+
+    await expect(
+      updateAdminTrialEntry(
+        { ...baseInput(), eras: [baseInput().eras[0]] },
+        adminUser,
+      ),
+    ).resolves.toMatchObject({
+      status: 200,
+      body: { ok: true },
+    });
+
+    expect(updateAdminTrialEntryWriteDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eras: [expect.objectContaining({ era: 1 })],
+      }),
+    );
+  });
+
+  it("accepts two continuous eras starting at 1", async () => {
+    updateAdminTrialEntryWriteDbMock.mockResolvedValue({
+      status: "updated",
+      trialEventId: "event-1",
+      trialEntryId: "entry-1",
+    });
+
+    await expect(
+      updateAdminTrialEntry(baseInput(), adminUser),
+    ).resolves.toMatchObject({
+      status: 200,
+      body: { ok: true },
+    });
+
+    expect(updateAdminTrialEntryWriteDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eras: [
+          expect.objectContaining({ era: 1 }),
+          expect.objectContaining({ era: 2 }),
+        ],
+      }),
+    );
+  });
+
+  it("rejects eras that do not start at 1", async () => {
     await expect(
       updateAdminTrialEntry(
         {
           ...baseInput(),
           eras: [{ ...baseInput().eras[1] }],
+        },
+        adminUser,
+      ),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Eras must be continuous starting from 1.",
+        code: "INVALID_ERAS",
+      },
+    });
+    expect(updateAdminTrialEntryWriteDbMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects non-continuous era sequences", async () => {
+    await expect(
+      updateAdminTrialEntry(
+        {
+          ...baseInput(),
+          eras: [baseInput().eras[0], { ...baseInput().eras[1], era: 3 }],
         },
         adminUser,
       ),
