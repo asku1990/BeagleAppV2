@@ -2,10 +2,12 @@ import { describe, expect, it } from "vitest";
 import type { AdminTrialEventEntry } from "@beagle/contracts";
 import {
   createEmptyEraDraft,
+  getNextEraNumber,
   isValidOptionalDecimal,
   isValidOptionalInteger,
   parseInteger,
   toEntryDraft,
+  toEraDrafts,
   toLisatietoRows,
 } from "../entry-edit-dialog-model";
 
@@ -86,6 +88,46 @@ describe("entry edit lisatiedot model", () => {
       hyvaksytytAjominuutit: "",
       haku: "",
     });
+  });
+
+  it("preserves a single existing era instead of adding era 2", () => {
+    expect(
+      toEraDrafts(
+        entryWithLisatiedot([
+          {
+            era: 1,
+            lisatiedot: [],
+          },
+        ]),
+      ).map((era) => era.era),
+    ).toEqual([1]);
+  });
+
+  it("preserves two existing eras", () => {
+    expect(
+      toEraDrafts(
+        entryWithLisatiedot([
+          {
+            era: 1,
+            lisatiedot: [],
+          },
+          {
+            era: 2,
+            lisatiedot: [],
+          },
+        ]),
+      ).map((era) => era.era),
+    ).toEqual([1, 2]);
+  });
+
+  it("ensures era 1 exists when no eras are present", () => {
+    expect(toEraDrafts(entryWithLisatiedot([])).map((era) => era.era)).toEqual([
+      1,
+    ]);
+  });
+
+  it("creates era 2 after a single era 1 draft", () => {
+    expect(getNextEraNumber([createEmptyEraDraft(1)])).toBe(2);
   });
 
   it("creates all known grouped lisatieto rows", () => {

@@ -7,6 +7,7 @@ import { formatDateForFinland } from "@/lib/admin/core/date";
 import { useI18n } from "@/hooks/i18n";
 import {
   createEmptyEraDraft,
+  getNextEraNumber,
   isValidOptionalDecimal,
   isValidOptionalInteger,
   parseDecimal,
@@ -160,7 +161,7 @@ export function AdminTrialEntryEditDialog({
   }, [entry.trialId, open, reset]);
 
   function addEra() {
-    const nextEra = Math.max(...eras.map((era) => era.era), 1) + 1;
+    const nextEra = getNextEraNumber(eras);
     setEras((current) => [...current, createEmptyEraDraft(nextEra)]);
     setLisatiedotRows((current) =>
       current.map((row) => ({
@@ -171,7 +172,7 @@ export function AdminTrialEntryEditDialog({
   }
 
   function removeEra(eraToRemove: number) {
-    if (eraToRemove <= 2) {
+    if (eraToRemove === 1) {
       return;
     }
     setEras((current) => current.filter((era) => era.era !== eraToRemove));

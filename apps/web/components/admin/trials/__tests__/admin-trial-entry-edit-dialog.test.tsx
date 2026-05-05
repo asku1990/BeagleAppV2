@@ -1,7 +1,9 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { AdminTrialEventEntry } from "@beagle/contracts";
 import { AdminTrialEntryEditDialog } from "../admin-trial-entry-edit-dialog";
+import { EraSection } from "../internal/era-section";
 
 const { buttonProps } = vi.hoisted(() => ({
   buttonProps: [] as Array<Record<string, unknown>>,
@@ -44,6 +46,37 @@ vi.mock("@/components/admin", () => ({
     ),
 }));
 
+function trialEntryWithEras(eras: number[]): AdminTrialEventEntry {
+  return {
+    trialId: "entry-1",
+    dogId: null,
+    dogName: "Rex",
+    registrationNo: "FI12345/21",
+    entryKey: "entry-key",
+    koemuoto: "AJOK",
+    koetyyppi: "NORMAL",
+    rank: "1",
+    award: "VOI1",
+    points: 95,
+    judge: "Judge",
+    eras: eras.map((era) => ({
+      era,
+      alkoi: null,
+      hakumin: null,
+      ajomin: null,
+      haku: null,
+      hauk: null,
+      yva: null,
+      hlo: null,
+      alo: null,
+      tja: null,
+      pin: null,
+      huomautusTeksti: null,
+      lisatiedot: [],
+    })),
+  };
+}
+
 describe("AdminTrialEntryEditDialog", () => {
   beforeEach(() => {
     buttonProps.length = 0;
@@ -56,51 +89,7 @@ describe("AdminTrialEntryEditDialog", () => {
         trialEventId: "event-1",
         eventDate: "2026-04-14",
         eventPlace: "Helsinki",
-        entry: {
-          trialId: "entry-1",
-          dogId: null,
-          dogName: "Rex",
-          registrationNo: "FI12345/21",
-          entryKey: "entry-key",
-          koemuoto: "AJOK",
-          koetyyppi: "NORMAL",
-          rank: "1",
-          award: "VOI1",
-          points: 95,
-          judge: "Judge",
-          eras: [
-            {
-              era: 1,
-              alkoi: null,
-              hakumin: null,
-              ajomin: null,
-              haku: null,
-              hauk: null,
-              yva: null,
-              hlo: null,
-              alo: null,
-              tja: null,
-              pin: null,
-              huomautusTeksti: null,
-              lisatiedot: [],
-            },
-            {
-              era: 2,
-              alkoi: null,
-              hakumin: null,
-              ajomin: null,
-              haku: null,
-              hauk: null,
-              yva: null,
-              hlo: null,
-              alo: null,
-              tja: null,
-              pin: null,
-              huomautusTeksti: null,
-              lisatiedot: [],
-            },
-          ],
-        },
+        entry: trialEntryWithEras([1, 2]),
         isPending: false,
         errorText: null,
         onClose: vi.fn(),
@@ -126,50 +115,9 @@ describe("AdminTrialEntryEditDialog", () => {
         eventDate: "2026-04-14",
         eventPlace: "Helsinki",
         entry: {
-          trialId: "entry-1",
-          dogId: null,
-          dogName: "Rex",
-          registrationNo: "FI12345/21",
-          entryKey: "entry-key",
-          koemuoto: "AJOK",
-          koetyyppi: "NORMAL",
-          rank: "1",
-          award: "VOI1",
-          points: 95,
+          ...trialEntryWithEras([1, 2]),
           judge: "Judge Snapshot",
           ylituomariNumeroSnapshot: "123",
-          eras: [
-            {
-              era: 1,
-              alkoi: null,
-              hakumin: null,
-              ajomin: null,
-              haku: null,
-              hauk: null,
-              yva: null,
-              hlo: null,
-              alo: null,
-              tja: null,
-              pin: null,
-              huomautusTeksti: null,
-              lisatiedot: [],
-            },
-            {
-              era: 2,
-              alkoi: null,
-              hakumin: null,
-              ajomin: null,
-              haku: null,
-              hauk: null,
-              yva: null,
-              hlo: null,
-              alo: null,
-              tja: null,
-              pin: null,
-              huomautusTeksti: null,
-              lisatiedot: [],
-            },
-          ],
         },
         isPending: false,
         errorText: null,
@@ -193,5 +141,120 @@ describe("AdminTrialEntryEditDialog", () => {
         }),
       }),
     );
+  });
+
+  it("saves a one-era entry as only era 1", () => {
+    const onSave = vi.fn(async () => true);
+
+    const html = renderToStaticMarkup(
+      React.createElement(AdminTrialEntryEditDialog, {
+        open: true,
+        trialEventId: "event-1",
+        eventDate: "2026-04-14",
+        eventPlace: "Helsinki",
+        entry: trialEntryWithEras([1]),
+        isPending: false,
+        errorText: null,
+        onClose: vi.fn(),
+        onSave,
+      }),
+    );
+
+    expect(html).toContain("Erä 1");
+    expect(html).not.toContain("Erä 2");
+
+    const saveButton = buttonProps.find(
+      (props) => props.children === "admin.trials.manage.eventModal.save",
+    );
+    (saveButton?.onClick as (() => void) | undefined)?.();
+
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eras: [expect.objectContaining({ era: 1 })],
+      }),
+    );
+  });
+
+  it("saves existing eras 1 and 2", () => {
+    const onSave = vi.fn(async () => true);
+
+    renderToStaticMarkup(
+      React.createElement(AdminTrialEntryEditDialog, {
+        open: true,
+        trialEventId: "event-1",
+        eventDate: "2026-04-14",
+        eventPlace: "Helsinki",
+        entry: trialEntryWithEras([1, 2]),
+        isPending: false,
+        errorText: null,
+        onClose: vi.fn(),
+        onSave,
+      }),
+    );
+
+    const saveButton = buttonProps.find(
+      (props) => props.children === "admin.trials.manage.eventModal.save",
+    );
+    (saveButton?.onClick as (() => void) | undefined)?.();
+
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eras: [
+          expect.objectContaining({ era: 1 }),
+          expect.objectContaining({ era: 2 }),
+        ],
+      }),
+    );
+  });
+
+  it("allows removing era 2 but not era 1", () => {
+    const onRemoveEra = vi.fn();
+
+    renderToStaticMarkup(
+      React.createElement(EraSection, {
+        eras: [
+          {
+            era: 1,
+            alkoi: "",
+            hakumin: "",
+            ajomin: "",
+            haku: "",
+            hauk: "",
+            yva: "",
+            hlo: "",
+            alo: "",
+            tja: "",
+            pin: "",
+            huomautusTeksti: "",
+          },
+          {
+            era: 2,
+            alkoi: "",
+            hakumin: "",
+            ajomin: "",
+            haku: "",
+            hauk: "",
+            yva: "",
+            hlo: "",
+            alo: "",
+            tja: "",
+            pin: "",
+            huomautusTeksti: "",
+          },
+        ],
+        isPending: false,
+        onAddEra: vi.fn(),
+        onRemoveEra,
+        onChangeEraField: vi.fn(),
+      }),
+    );
+
+    const removeButtons = buttonProps.filter(
+      (props) => props.children === "Poista erä",
+    );
+    expect(removeButtons).toHaveLength(1);
+
+    (removeButtons[0]?.onClick as (() => void) | undefined)?.();
+    expect(onRemoveEra).toHaveBeenCalledWith(2);
   });
 });

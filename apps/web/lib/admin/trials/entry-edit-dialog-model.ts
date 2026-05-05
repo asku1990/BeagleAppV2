@@ -81,6 +81,10 @@ export function createEmptyEraDraft(era: number): EraDraft {
   };
 }
 
+export function getNextEraNumber(eras: EraDraft[]): number {
+  return Math.max(0, ...eras.map((era) => era.era)) + 1;
+}
+
 function numberDraft(value: number | null | undefined): string {
   return value == null ? "" : String(value);
 }
@@ -136,9 +140,6 @@ export function toEraDrafts(entry: AdminTrialEventEntry): EraDraft[] {
 
   if (!mapped.some((era) => era.era === 1)) {
     mapped.push(createEmptyEraDraft(1));
-  }
-  if (!mapped.some((era) => era.era === 2)) {
-    mapped.push(createEmptyEraDraft(2));
   }
   return mapped.sort((left, right) => left.era - right.era);
 }

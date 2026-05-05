@@ -39,7 +39,7 @@ export function EraSection({
             <div key={era.era} className="rounded-md border p-3">
               <div className="mb-2 flex items-center justify-between">
                 <p className="text-sm font-medium">Erä {era.era}</p>
-                {era.era > 2 ? (
+                {era.era !== 1 ? (
                   <Button
                     type="button"
                     variant="outline"
