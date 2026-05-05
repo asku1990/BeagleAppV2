@@ -81,6 +81,10 @@ export function createEmptyEraDraft(era: number): EraDraft {
   };
 }
 
+function numberDraft(value: number | null | undefined): string {
+  return value == null ? "" : String(value);
+}
+
 export function toEntryDraft(entry: AdminTrialEventEntry): EntryDraft {
   return {
     koemaasto: entry.koemaasto ?? "",
@@ -90,30 +94,19 @@ export function toEntryDraft(entry: AdminTrialEventEntry): EntryDraft {
     lk: entry.lk ?? "",
     award: entry.award ?? "",
     rank: entry.rank ?? "",
-    points: entry.points === null ? "" : String(entry.points),
-    koiriaLuokassa:
-      entry.koiriaLuokassa === null ? "" : String(entry.koiriaLuokassa),
-    hyvaksytytAjominuutit:
-      entry.hyvaksytytAjominuutit === null
-        ? ""
-        : String(entry.hyvaksytytAjominuutit),
-    ajoajanPisteet:
-      entry.ajoajanPisteet === null ? "" : String(entry.ajoajanPisteet),
-    haku: entry.haku === null ? "" : String(entry.haku),
-    hauk: entry.hauk === null ? "" : String(entry.hauk),
-    yva: entry.yva === null ? "" : String(entry.yva),
-    hlo: entry.hlo === null ? "" : String(entry.hlo),
-    alo: entry.alo === null ? "" : String(entry.alo),
-    tja: entry.tja === null ? "" : String(entry.tja),
-    pin: entry.pin === null ? "" : String(entry.pin),
-    ansiopisteetYhteensa:
-      entry.ansiopisteetYhteensa === null
-        ? ""
-        : String(entry.ansiopisteetYhteensa),
-    tappiopisteetYhteensa:
-      entry.tappiopisteetYhteensa === null
-        ? ""
-        : String(entry.tappiopisteetYhteensa),
+    points: numberDraft(entry.points),
+    koiriaLuokassa: numberDraft(entry.koiriaLuokassa),
+    hyvaksytytAjominuutit: numberDraft(entry.hyvaksytytAjominuutit),
+    ajoajanPisteet: numberDraft(entry.ajoajanPisteet),
+    haku: numberDraft(entry.haku),
+    hauk: numberDraft(entry.hauk),
+    yva: numberDraft(entry.yva),
+    hlo: numberDraft(entry.hlo),
+    alo: numberDraft(entry.alo),
+    tja: numberDraft(entry.tja),
+    pin: numberDraft(entry.pin),
+    ansiopisteetYhteensa: numberDraft(entry.ansiopisteetYhteensa),
+    tappiopisteetYhteensa: numberDraft(entry.tappiopisteetYhteensa),
     judge: entry.judge ?? "",
     huomautus: entry.huomautus ?? "",
     huomautusTeksti: entry.huomautusTeksti ?? "",
@@ -257,6 +250,20 @@ export function parseDecimal(value: string): number | null {
   if (!trimmed) return null;
   const parsed = Number(trimmed.replace(",", "."));
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+export function isValidOptionalInteger(value: string): boolean {
+  const trimmed = value.trim();
+  return trimmed.length === 0 || /^-?\d+$/.test(trimmed);
+}
+
+export function isValidOptionalDecimal(value: string): boolean {
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    return true;
+  }
+  const parsed = Number(trimmed.replace(",", "."));
+  return Number.isFinite(parsed);
 }
 
 export function parseNullableString(value: string): string | null {

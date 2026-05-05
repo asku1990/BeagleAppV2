@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 import type { AdminTrialEventEntry } from "@beagle/contracts";
 import {
   createEmptyEraDraft,
+  isValidOptionalDecimal,
+  isValidOptionalInteger,
   parseInteger,
+  toEntryDraft,
   toLisatietoRows,
 } from "../entry-edit-dialog-model";
 
@@ -43,10 +46,46 @@ function entryWithLisatiedot(
 }
 
 describe("entry edit lisatiedot model", () => {
-  it("rejects malformed integer input", () => {
+  it("parses malformed integer input as null for payload conversion", () => {
     expect(parseInteger("12abc")).toBeNull();
     expect(parseInteger("1-2")).toBeNull();
     expect(parseInteger(" 42 ")).toBe(42);
+  });
+
+  it("validates optional numeric input before payload conversion", () => {
+    expect(isValidOptionalInteger("")).toBe(true);
+    expect(isValidOptionalInteger(" 42 ")).toBe(true);
+    expect(isValidOptionalInteger("12abc")).toBe(false);
+    expect(isValidOptionalInteger("1-2")).toBe(false);
+
+    expect(isValidOptionalDecimal("")).toBe(true);
+    expect(isValidOptionalDecimal(" 4,25 ")).toBe(true);
+    expect(isValidOptionalDecimal("4.25")).toBe(true);
+    expect(isValidOptionalDecimal("12-")).toBe(false);
+    expect(isValidOptionalDecimal("abc")).toBe(false);
+  });
+
+  it("initializes omitted optional numeric fields as empty draft values", () => {
+    expect(
+      toEntryDraft({
+        trialId: "entry-1",
+        dogId: null,
+        dogName: "Rex",
+        registrationNo: "FI123",
+        entryKey: "entry-1",
+        koemuoto: "AJOK",
+        koetyyppi: "NORMAL",
+        rank: null,
+        award: null,
+        points: null,
+        judge: null,
+      }),
+    ).toMatchObject({
+      points: "",
+      koiriaLuokassa: "",
+      hyvaksytytAjominuutit: "",
+      haku: "",
+    });
   });
 
   it("creates all known grouped lisatieto rows", () => {

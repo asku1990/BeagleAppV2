@@ -7,6 +7,8 @@ import { formatDateForFinland } from "@/lib/admin/core/date";
 import { useI18n } from "@/hooks/i18n";
 import {
   createEmptyEraDraft,
+  isValidOptionalDecimal,
+  isValidOptionalInteger,
   parseDecimal,
   parseInteger,
   parseNullableString,
@@ -36,6 +38,81 @@ type Props = {
   onClose: () => void;
   onSave: (payload: UpdateAdminTrialEntryRequest) => Promise<boolean>;
 };
+
+const ENTRY_INTEGER_FIELDS: Array<{
+  field: keyof EntryDraft;
+  label: string;
+}> = [
+  { field: "koiriaLuokassa", label: "Koiria luokassa" },
+  { field: "hyvaksytytAjominuutit", label: "Hyväksytyt ajominuutit" },
+];
+
+const ENTRY_DECIMAL_FIELDS: Array<{
+  field: keyof EntryDraft;
+  label: string;
+}> = [
+  { field: "points", label: "Loppupisteet" },
+  { field: "ajoajanPisteet", label: "Ajoajan pisteet" },
+  { field: "haku", label: "Haku" },
+  { field: "hauk", label: "Haukku" },
+  { field: "yva", label: "Ajotaito / yleisvaikutelma" },
+  { field: "hlo", label: "Hakulöysyys" },
+  { field: "alo", label: "Ajolöysyys" },
+  { field: "tja", label: "Tie ja estetyöskentely" },
+  { field: "pin", label: "Metsästysinto" },
+  { field: "ansiopisteetYhteensa", label: "Ansiopisteet yhteensä" },
+  { field: "tappiopisteetYhteensa", label: "Tappiopisteet yhteensä" },
+];
+
+const ERA_INTEGER_FIELDS: Array<{
+  field: Exclude<keyof EraDraft, "era">;
+  label: string;
+}> = [
+  { field: "hakumin", label: "hakumin" },
+  { field: "ajomin", label: "ajomin" },
+];
+
+const ERA_DECIMAL_FIELDS: Array<{
+  field: Exclude<keyof EraDraft, "era">;
+  label: string;
+}> = [
+  { field: "haku", label: "haku" },
+  { field: "hauk", label: "haukku" },
+  { field: "yva", label: "ajotaito / yleisvaikutelma" },
+  { field: "hlo", label: "hakulöysyys" },
+  { field: "alo", label: "ajolöysyys" },
+  { field: "tja", label: "tie ja estetyöskentely" },
+  { field: "pin", label: "metsästysinto" },
+];
+
+function findInvalidNumericField(
+  entryDraft: EntryDraft,
+  eras: EraDraft[],
+): string | null {
+  for (const { field, label } of ENTRY_INTEGER_FIELDS) {
+    if (!isValidOptionalInteger(entryDraft[field])) {
+      return label;
+    }
+  }
+  for (const { field, label } of ENTRY_DECIMAL_FIELDS) {
+    if (!isValidOptionalDecimal(entryDraft[field])) {
+      return label;
+    }
+  }
+  for (const era of eras) {
+    for (const { field, label } of ERA_INTEGER_FIELDS) {
+      if (!isValidOptionalInteger(era[field])) {
+        return `Erä ${era.era}: ${label}`;
+      }
+    }
+    for (const { field, label } of ERA_DECIMAL_FIELDS) {
+      if (!isValidOptionalDecimal(era[field])) {
+        return `Erä ${era.era}: ${label}`;
+      }
+    }
+  }
+  return null;
+}
 
 export function AdminTrialEntryEditDialog({
   open,
@@ -128,6 +205,16 @@ export function AdminTrialEntryEditDialog({
                 );
                 if (sortedEras.length < 2) {
                   setValidationError("At least era 1 and era 2 are required.");
+                  return;
+                }
+                const invalidNumericField = findInvalidNumericField(
+                  entryDraft,
+                  sortedEras,
+                );
+                if (invalidNumericField) {
+                  setValidationError(
+                    `Tarkista numeerinen kenttä: ${invalidNumericField}.`,
+                  );
                   return;
                 }
 
