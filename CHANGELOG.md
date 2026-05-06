@@ -14,36 +14,32 @@ This project uses a user-facing changelog format.
 
 ### Added
 
-- Ajokokeen koirakohtainen PDF näyttää nyt valitun koerivin rekisterinumeron AJOK-pöytäkirjan testitäyttönä.
-- AJOK 2005-2011 -sääntökauden koirakohtaiseen PDF:ään lisättiin tappiopisteiden renderöinti.
-- AJOK 2005-2011 -sääntökauden koirakohtaiseen PDF:ään lisättiin loppupisteiden ja tulosmerkintöjen renderöinti.
-- AJOK 2005-2011 -sääntökauden koirakohtaiseen PDF:ään lisättiin huomautustekstin renderöinti.
-- AJOK-huomautukset säilyttävät nyt myös Koiratietokannan `VIITE`- ja eräkohtaiset `*_VIITE`-tekstit sekä legacy `bealt*.VIITE`-tekstit.
-- Pitkäkokeen legacy-sijoitus, kuten `PK|4`, säilyttää nyt luokkakoon ja näkyy koirakohtaisessa PDF:ssä muodossa `PK / 4`.
-- Lisättiin Koiratietokannan AJOK-tulosten integraatio-upsert, joka vastaanottaa yhden hyväksytyn tuloksen kerrallaan, säilyttää alkuperäisen payloadin raakadatana ja normalisoi lisätiedot erillisiksi riveiksi.
-- Ylläpidon ajokokeisiin lisättiin uusi koetulosten detaljisivu (`/admin/trials/[trialId]`), joka näyttää yhden nykyisen `TrialResult`-rivin kentät read-only-muodossa.
-- Ylläpidon ajokokeiden listalta avataan nyt koetuloksen detaljinäkymä suoraan yhtenäisellä rivi-/korttivalinnalla.
-- Ylläpidon ajokokeisiin lisättiin uusi tapahtumahaku, jolla koetuloksia voi hakea tapahtuman nimellä ja paikalla.
-- Koetuloksen detaljisivu ryhmittelee kentät pöytäkirjamaisesti osioihin ja näyttää mahdollisen raw/source-datan kollapsoitavana read-only-näkymänä.
-- Ylläpidon AJOK-listaus ja detalji (`/admin/trials`) lukevat nyt uutta kanonista AJOK-skeemaa (`TrialEvent` + `TrialEntry`) read-only-polussa. Näkymän tunnistekentissä käytetään SKL-koeavainta ja entry-avainta vanhan `sourceKey`-esityksen sijaan.
-- Ylläpidon ajokokeiden `/admin/trials`-näkymä uudistettiin tapahtumapohjaiseksi master-detail-virraksi: ensin haetaan tapahtumia (vuosi tai päivämääräväli), sitten valitun tapahtuman koirariveiltä voi avata olemassa olevan detaljisivun tai koirakohtaisen PDF:n. Nykyinen `/admin/trials/[trialId]` detaljisivu säilyy ennallaan.
-- AJOK 2005-2011 -sääntökaudelle lisättiin koirakohtaisen PDF:n ensimmäinen renderöintirunko nykyisellä koetulosdatalla.
-- AJOK 2023→ -sääntökauden (`trw_post_20230801`) koirakohtainen PDF on nyt käytettävissä 2023→-pöytäkirjapohjalla.
-
 ### Changed
-
-- Julkinen ajokoelistaus ja kokeen detaljisivu lukevat nyt kanonista AJOK-skeemaa (`TrialEvent` + `TrialEntry`) vanhan `TrialResult`-taulun sijaan. Koirat ilman `dogId`-linkkiä näkyvät edelleen snapshot-rekisterinumerollaan; nimi näytetään vain tietokantaan linkitetyille koirille.
-- Tukemattomat AJOK PDF -sääntöikkunat palauttavat nyt virheen tyhjän PDF:n sijaan. Aiempi `blank-only`-tila on nimetty `not-supported`-tilaksi selkeyden vuoksi.
-- Ylläpidon AJOK-tapahtumanäkymässä yksittäisen koirarivin voi nyt poistaa. Jos poistettu rivi oli tapahtuman viimeinen, tyhjä tapahtuma poistetaan automaattisesti.
-- Ylläpidon AJOK-tapahtumanäkymässä voi nyt muokata tapahtuman metatietoja (päivä, paikka, järjestäjä, ylituomari ja SKL-koe-ID) ilman koirarivien muutoksia.
-- Ylläpidon AJOK-rivin muokkaus näyttää nyt myös koirakohtaisessa PDF:ssä käytettävät perustiedot, pisteet, huomautukset, omistajatiedot ja tuomaritiedot.
 
 ### Fixed
 
-- Ajokokeen koirakohtainen PDF näyttää nyt koiran oman primary-rekisterinumeron eli ensimmäisenä lisätyn rekisterinumeron.
-- AJOK-rivien ylituomariksi vakiinnutettiin `TrialEntry.tuom1`, ja vanha nimi-snapshot poistettiin trial-adminin, integraatioiden ja PDF-polun käytöstä.
-- Ylläpidon AJOK-rivin muokkaus näyttää ja tallentaa nyt kaikki lisätietokoodit, jotta muiden kenttien tallennus ei poista Koiratietokannan lisätietoja.
-- Vercelin AJOK PDF -route pakkaa nyt kaikki `public/templates/*.pdf`-pohjat mukaan, joten tuotanto voi lukea oikeat template-tiedostot ilman `ENOENT`-virhettä.
+### Removed
+
+## [0.11.0] - 2026-05-06
+
+### Added
+
+- Ajokokeille lisättiin uusi tietomalli, joka erottaa koetapahtumat ja koirakohtaiset tulosrivit selkeämmin.
+- Koirakohtaiset AJOK-pöytäkirja-PDF:t ovat nyt käytettävissä kolmelle sääntökaudelle: vanhoille, välimallin ja nykyisille pöytäkirjoille.
+- Ajokokeiden eräkohtaiset tiedot ja lisämerkinnät tallentuvat nyt paremmin ja ovat käytettävissä haussa, ylläpidossa ja PDF-tulosteissa.
+- Koiratietokannan API voi nyt tuoda ajokoetuloksia suoraan uuteen ajokoedataan.
+- Ylläpitoon lisättiin ajokoetapahtumien haku sekä koetapahtumien ja koirarivien tarkastelu.
+- Ylläpidossa voi nyt muokata ajokoetapahtuman tietoja, muokata koirakohtaisia tulosrivejä ja poistaa virheellisiä rivejä.
+
+### Changed
+
+- Julkinen ajokoehaku, koesivut ja koiraprofiilien ajokoetiedot käyttävät nyt uutta ajokoedataa.
+- Ajokokeiden vanhan datan tuontia selkeytettiin, jotta uusi tietomalli voidaan rakentaa luotettavammin.
+
+### Fixed
+
+- AJOK-pöytäkirjojen tulostus toimii nyt paremmin tuotannossa ja käyttää oikeaa pöytäkirjapohjaa sääntökauden mukaan.
+- Ajokoetulosten koirakohtaiset perustiedot, pisteet ja huomautukset näkyvät aiempaa johdonmukaisemmin.
 
 ### Removed
 
