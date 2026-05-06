@@ -3,26 +3,26 @@ import { rgb } from "pdf-lib";
 import type { TrialDogPdfKoiranTiedot } from "@contracts";
 
 export const DOG_REGISTRATION_NO_FIELD = {
-  x: 300.3,
-  y: 433,
+  x: 323,
+  y: 427,
   size: 12,
 } as const;
 
 export const DOG_NAME_FIELD = {
-  x: 70,
-  y: 433,
+  x: 115,
+  y: 427,
   size: 12,
 } as const;
 
 export const DOG_SEX_UROS_FIELD = {
-  x: 38.7,
-  y: 459.5,
+  x: 80.7,
+  y: 448,
   size: 12,
 } as const;
 
 export const DOG_SEX_NARTTU_FIELD = {
-  x: 131,
-  y: 459.5,
+  x: 164.7,
+  y: 448,
   size: 12,
 } as const;
 

@@ -3,9 +3,9 @@ import { rgb } from "pdf-lib";
 import type { TrialDogPdfHuomautus } from "@contracts";
 
 const HUOMAUTUS_BLOCK = {
-  x: 35.5,
-  y: 68,
-  maxWidth: 365,
+  x: 77,
+  y: 97,
+  maxWidth: 340,
   maxHeight: 68,
   size: 10,
   lineHeight: 16,

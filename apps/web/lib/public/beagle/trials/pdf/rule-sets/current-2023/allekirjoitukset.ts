@@ -4,25 +4,25 @@ import { drawText, formatKoeEraValue } from "./koe-erat-common";
 
 const RYHMATUOMARI_FIELD = {
   x: 513,
-  y: 161.6,
+  y: 130,
   size: 10,
 } as const;
 
 const PALKINTOTUOMARI_FIELD = {
   x: 513,
-  y: 122.6,
+  y: 100,
   size: 10,
 } as const;
 
 const YLITUOMARI_NUMERO_FIELD = {
   x: 513,
-  y: 82.7,
+  y: 65,
   size: 10,
 } as const;
 
 const YLITUOMARI_NIMI_FIELD = {
   x: 570,
-  y: 82.7,
+  y: 65,
   size: 10,
 } as const;
 

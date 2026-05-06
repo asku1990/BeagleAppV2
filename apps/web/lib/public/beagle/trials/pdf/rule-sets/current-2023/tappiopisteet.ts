@@ -8,43 +8,43 @@ import {
 
 const HAKULOYSYYS_ERA1_VALUE_BOX = createScoreBox({
   ...SCORE_COLUMNS.ERA1,
-  y: 164.3,
+  y: 184.3,
   size: 12,
 });
 
 const HAKULOYSYYS_ERA2_VALUE_BOX = createScoreBox({
   ...SCORE_COLUMNS.ERA2,
-  y: 164.3,
+  y: 184.3,
   size: 12,
 });
 
 const HAKULOYSYYS_YHTEENSA_VALUE_BOX = createScoreBox({
   ...SCORE_COLUMNS.SUMMARY,
-  y: 164.3,
+  y: 184.3,
   size: 12,
 });
 
 const AJOLOYSYYS_ERA1_VALUE_BOX = createScoreBox({
   ...SCORE_COLUMNS.ERA1,
-  y: 144.3,
+  y: 166.3,
   size: 12,
 });
 
 const AJOLOYSYYS_ERA2_VALUE_BOX = createScoreBox({
   ...SCORE_COLUMNS.ERA2,
-  y: 144.3,
+  y: 166.3,
   size: 12,
 });
 
 const AJOLOYSYYS_YHTEENSA_VALUE_BOX = createScoreBox({
   ...SCORE_COLUMNS.SUMMARY,
-  y: 144.3,
+  y: 166.3,
   size: 12,
 });
 
 const TAPPIOPISTEET_YHTEENSA_VALUE_BOX = createScoreBox({
   ...SCORE_COLUMNS.TOTAL,
-  y: 144.3,
+  y: 166.3,
   size: 12,
 });
 

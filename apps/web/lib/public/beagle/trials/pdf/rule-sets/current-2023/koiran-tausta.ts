@@ -3,38 +3,38 @@ import { rgb } from "pdf-lib";
 import type { TrialDogPdfKoiranTausta } from "@contracts";
 
 const SIRE_NAME_FIELD = {
-  x: 70,
-  y: 407.3228,
+  x: 115,
+  y: 403,
   size: 12,
 } as const;
 
 const SIRE_REGISTRATION_NO_FIELD = {
-  x: 300.3,
-  y: 407.3228,
+  x: 323,
+  y: 403,
   size: 12,
 } as const;
 
 const DAM_NAME_FIELD = {
-  x: 70,
-  y: 384.6454,
+  x: 115,
+  y: 382,
   size: 12,
 } as const;
 
 const DAM_REGISTRATION_NO_FIELD = {
-  x: 300.3,
-  y: 384.6454,
+  x: 323,
+  y: 382,
   size: 12,
 } as const;
 
 const OWNER_FIELD = {
-  x: 70,
-  y: 362.3,
+  x: 115,
+  y: 363,
   size: 12,
 } as const;
 
 const OWNER_HOME_MUNICIPALITY_FIELD = {
-  x: 286.3,
-  y: 361.9682,
+  x: 323,
+  y: 363,
   size: 12,
 } as const;
 
