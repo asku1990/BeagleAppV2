@@ -168,7 +168,7 @@ describe("trial pdf api route", () => {
     });
   });
 
-  it("returns a generated pdf for the 2023+ rule window with not-final notice", async () => {
+  it("returns a generated pdf for the 2023+ rule window", async () => {
     getTrialDogPdfDataServiceMock.mockResolvedValue({
       status: 200,
       body: {

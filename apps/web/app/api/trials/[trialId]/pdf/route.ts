@@ -1,3 +1,4 @@
+import type { TrialDogPdfPayload } from "@contracts";
 import { getTrialDogPdfDataService } from "@server/trials/pdf/get-trial-dog-pdf-data";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import { type NextRequest, NextResponse } from "next/server";
@@ -57,9 +58,11 @@ export async function GET(
       });
     }
 
-    // trialId is a server-only field not part of TrialDogPdfPayload; it stays in restData
-    // but TypeScript won't flag the extra property when the payload variable is passed to a function.
-    const { trialRuleWindowId, ...restData } = result.body.data;
+    const {
+      trialId: _trialId,
+      trialRuleWindowId,
+      ...restData
+    } = result.body.data;
     if (!canRenderTrialDogPdf(trialRuleWindowId)) {
       const ruleSetId = getTrialDogPdfRuleSetId(trialRuleWindowId);
       log.warn(
@@ -88,7 +91,7 @@ export async function GET(
     }
 
     // Spread all payload fields; only trim the string fields that may arrive with whitespace.
-    const payload = {
+    const payload: TrialDogPdfPayload = {
       ...restData,
       trialRuleWindowId,
       registrationNo: restData.registrationNo.trim(),

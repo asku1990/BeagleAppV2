@@ -250,5 +250,6 @@ describe("getTrialDogPdfDataService", () => {
       ryhmatuomariNimi: "Ryhmätuomari",
       palkintotuomariNimi: "Palkintotuomari",
     });
+    expect(result.body.data).not.toHaveProperty("ylituomariNimiSnapshot");
   });
 });

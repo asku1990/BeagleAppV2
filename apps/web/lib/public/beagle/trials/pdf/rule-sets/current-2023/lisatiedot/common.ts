@@ -14,12 +14,12 @@ const BASELINE_OFFSET_Y = 2;
 // X values are the left edges of the small era value cells. Olosuhteet marker
 // cells are printed one point to the right in the template compared to numeric
 // left-table cells, so marker and numeric origins are kept separate.
-const LEFT_GROUP_NUMERIC_ERA1_X = 588;
-const LEFT_GROUP_NUMERIC_ERA2_X = 605;
-const LEFT_GROUP_MARKER_ERA1_X = 587;
-const LEFT_GROUP_MARKER_ERA2_X = 605;
-const RIGHT_GROUP_ERA1_X = 780;
-const RIGHT_GROUP_ERA2_X = 797.5;
+const LEFT_GROUP_NUMERIC_ERA1_X = 576;
+const LEFT_GROUP_NUMERIC_ERA2_X = 592;
+const LEFT_GROUP_MARKER_ERA1_X = 576;
+const LEFT_GROUP_MARKER_ERA2_X = 592;
+const RIGHT_GROUP_ERA1_X = 749.2;
+const RIGHT_GROUP_ERA2_X = 764.7;
 
 export type TrialDogPdfLisatiedotInput = TrialDogPdfLisatiedot & {
   page: PDFPage;
@@ -42,6 +42,14 @@ export function normalizeTrialDogPdfOneDecimalValue(
   const value = formatKoeEraValue(raw).trim();
   if (value === "-") {
     return "";
+  }
+
+  if (value.includes("/")) {
+    return value
+      .split("/")
+      .map((part) => formatKoeEraValue(part).trim())
+      .filter(Boolean)
+      .join("/");
   }
 
   const parsed = Number.parseFloat(value.replace(",", "."));
@@ -68,13 +76,33 @@ export function drawTrialDogPdfCenteredLisatietoValue(
 ): void {
   if (!value) return;
 
+  const size = fitTextSize(input.font, value, field.size, CELL_WIDTH);
+
   drawCenteredText(input.page, input.font, value, {
     x: getCellX(field),
     y: field.y - BASELINE_OFFSET_Y,
     width: CELL_WIDTH,
     height: CELL_HEIGHT,
-    size: field.size,
+    size,
   });
+}
+
+function fitTextSize(
+  font: PDFFont,
+  text: string,
+  size: number,
+  maxWidth: number,
+): number {
+  let currentSize = size;
+
+  while (
+    currentSize > 4.5 &&
+    font.widthOfTextAtSize(text, currentSize) > maxWidth
+  ) {
+    currentSize -= 0.25;
+  }
+
+  return currentSize;
 }
 
 function getCellX(field: {

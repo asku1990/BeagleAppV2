@@ -11,61 +11,61 @@ import {
 // rendered here – they appear in the lisatiedot section (koodi 40-42).
 const HAKU_ERA1_VALUE_BOX = createScoreBox({
   ...SCORE_COLUMNS.ERA1,
-  y: 243.3,
+  y: 256.3,
   size: 12,
 });
 
 const HAKU_ERA2_VALUE_BOX = createScoreBox({
   ...SCORE_COLUMNS.ERA2,
-  y: 243.3,
+  y: 256.3,
   size: 12,
 });
 
 const HAKUKESKIARVO_VALUE_BOX = createScoreBox({
   ...SCORE_COLUMNS.SUMMARY,
-  y: 243.3,
+  y: 256.3,
   size: 12,
 });
 
 const HAUKKU_ERA1_VALUE_BOX = createScoreBox({
   ...SCORE_COLUMNS.ERA1,
-  y: 223.3,
+  y: 238.3,
   size: 12,
 });
 
 const HAUKKU_ERA2_VALUE_BOX = createScoreBox({
   ...SCORE_COLUMNS.ERA2,
-  y: 223.3,
+  y: 238.3,
   size: 12,
 });
 
 const HAUKKUKESKIARVO_VALUE_BOX = createScoreBox({
   ...SCORE_COLUMNS.SUMMARY,
-  y: 223.3,
+  y: 238.3,
   size: 12,
 });
 
 const AJOTAITO_ERA1_VALUE_BOX = createScoreBox({
   ...SCORE_COLUMNS.ERA1,
-  y: 203.3,
+  y: 220.3,
   size: 12,
 });
 
 const AJOTAITO_ERA2_VALUE_BOX = createScoreBox({
   ...SCORE_COLUMNS.ERA2,
-  y: 203.3,
+  y: 220.3,
   size: 12,
 });
 
 const AJOTAITOKESKIARVO_VALUE_BOX = createScoreBox({
   ...SCORE_COLUMNS.SUMMARY,
-  y: 203.3,
+  y: 220.3,
   size: 12,
 });
 
 const ANSIOPISTEET_VALUE_BOX = createScoreBox({
   ...SCORE_COLUMNS.TOTAL,
-  y: 223.3,
+  y: 238.3,
   size: 12,
 });
 

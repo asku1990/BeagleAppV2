@@ -7,7 +7,7 @@ import {
 
 // Renders metsästysinto rows (40-42) from lisätiedot onto fixed PDF coordinates.
 // All three rows use one decimal formatting.
-const METSASTYSINTO_TEXT_SIZE = 10;
+const METSASTYSINTO_TEXT_SIZE = 9;
 
 type MetsastysintoRowConfig = {
   koodi: string;
@@ -15,9 +15,9 @@ type MetsastysintoRowConfig = {
 };
 
 const METSASTYSINTO_ROWS: MetsastysintoRowConfig[] = [
-  { koodi: "40", y: 487.5 },
-  { koodi: "41", y: 473.5 },
-  { koodi: "42", y: 459.5 },
+  { koodi: "40", y: 414 },
+  { koodi: "41", y: 401 },
+  { koodi: "42", y: 388 },
 ];
 
 export function drawTrialDogPdfLisatiedotMetsastysinto(
