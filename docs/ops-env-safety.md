@@ -264,19 +264,35 @@ CONFIRM_PROD=YES pass-cli run --env-file .env.staging -- pnpm db:restore ./tmp/d
 CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm db:restore ./tmp/db-dumps/local/<YYYY-MM-DD>/beagle-local-<timestamp>.sql
 ```
 
+Restore staging from a chosen dump (replace only `DUMP_PATH`):
+
+```bash
+DUMP_PATH="./tmp/db-dumps/local/<YYYY-MM-DD>/beagle-local-<timestamp>.sql" && \
+CONFIRM_PROD=YES pass-cli run --env-file .env.staging -- pnpm db:restore "$DUMP_PATH"
+```
+
+Use this when you already know the dump path and want to fully replace staging with that dump.
+The restore is destructive to staging contents. Dumps created by `pnpm db:dump` include `pg_dump --clean --if-exists`, so do not run `prisma migrate reset` before this normal restore flow.
+
+If the dump was created from older code and may not include the current migrations, run migrations after the restore:
+
+```bash
+pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db exec prisma migrate deploy
+```
+
 Suggested local -> staging refresh flow:
 
 1. `pass-cli run --env-file .env.local -- pnpm db:dump`
 2. `ls -1t ./tmp/db-dumps/local/*/beagle-local-*.sql | head -n 1`
-3. `pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db exec prisma migrate reset --force`
-4. `CONFIRM_PROD=YES pass-cli run --env-file .env.staging -- pnpm db:restore <latest-local-dump-from-step-2>`
-5. `pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db exec prisma migrate deploy`
+3. Run the staging restore command above with that dump path.
 
-Example (auto-pick latest local dump):
+Example (auto-pick latest local dump and restore staging):
 
 ```bash
-latest_dump=$(ls -1t ./tmp/db-dumps/local/*/beagle-local-*.sql 2>/dev/null | head -n 1)
-CONFIRM_PROD=YES pass-cli run --env-file .env.staging -- pnpm db:restore "$latest_dump"
+DUMP_PATH="$(ls -1t ./tmp/db-dumps/local/*/beagle-local-*.sql 2>/dev/null | head -n 1)" && \
+test -n "$DUMP_PATH" && \
+echo "Restoring staging from: $DUMP_PATH" && \
+CONFIRM_PROD=YES pass-cli run --env-file .env.staging -- pnpm db:restore "$DUMP_PATH"
 ```
 
 ## Optional explicit host check
