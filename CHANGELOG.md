@@ -20,6 +20,29 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.11.0] - 2026-05-06
+
+### Added
+
+- Ajokokeille lisättiin uusi tietomalli, joka erottaa koetapahtumat ja koirakohtaiset tulosrivit selkeämmin.
+- Koirakohtaiset AJOK-pöytäkirja-PDF:t ovat nyt käytettävissä kolmelle sääntökaudelle: vanhoille, välimallin ja nykyisille pöytäkirjoille.
+- Ajokokeiden eräkohtaiset tiedot ja lisämerkinnät tallentuvat nyt paremmin ja ovat käytettävissä haussa, ylläpidossa ja PDF-tulosteissa.
+- Koiratietokannan API voi nyt tuoda ajokoetuloksia suoraan uuteen ajokoedataan.
+- Ylläpitoon lisättiin ajokoetapahtumien haku sekä koetapahtumien ja koirarivien tarkastelu.
+- Ylläpidossa voi nyt muokata ajokoetapahtuman tietoja, muokata koirakohtaisia tulosrivejä ja poistaa virheellisiä rivejä.
+
+### Changed
+
+- Julkinen ajokoehaku, koesivut ja koiraprofiilien ajokoetiedot käyttävät nyt uutta ajokoedataa.
+- Ajokokeiden vanhan datan tuontia selkeytettiin, jotta uusi tietomalli voidaan rakentaa luotettavammin.
+
+### Fixed
+
+- AJOK-pöytäkirjojen tulostus toimii nyt paremmin tuotannossa ja käyttää oikeaa pöytäkirjapohjaa sääntökauden mukaan.
+- Ajokoetulosten koirakohtaiset perustiedot, pisteet ja huomautukset näkyvät aiempaa johdonmukaisemmin.
+
+### Removed
+
 ## [0.10.0] - 2026-04-10
 
 ### Added

@@ -51,12 +51,12 @@ function makeOffspringLitterParent(id: string, registrationNo: string) {
 function makeOffspringCounts(
   overrides?: Partial<{
     showEntries: number;
-    trialResults: number;
+    trialEntries: number;
   }>,
 ) {
   return {
     showEntries: overrides?.showEntries ?? 0,
-    trialResults: overrides?.trialResults ?? 0,
+    trialEntries: overrides?.trialEntries ?? 0,
   };
 }
 
@@ -168,7 +168,6 @@ describe("getBeagleDogProfileDb", () => {
     expect(result?.siblingsSummary).toEqual({ siblingCount: 0 });
     expect(result?.siblings).toEqual([]);
     expect(queryArgs.include).not.toHaveProperty("showResults");
-    expect(queryArgs.include).not.toHaveProperty("trialResults");
     expect(queryArgs.include).toHaveProperty("whelpedPuppies");
     expect(queryArgs.include).toHaveProperty("siredPuppies");
     expect(queryArgs.include).toHaveProperty("titles");
@@ -318,7 +317,7 @@ describe("getBeagleDogProfileDb", () => {
           ],
           _count: makeOffspringCounts({
             showEntries: 1,
-            trialResults: 2,
+            trialEntries: 2,
           }),
         },
         {
@@ -341,7 +340,7 @@ describe("getBeagleDogProfileDb", () => {
           siredPuppies: [],
           _count: makeOffspringCounts({
             showEntries: 3,
-            trialResults: 1,
+            trialEntries: 1,
           }),
         },
         {
@@ -443,7 +442,7 @@ describe("getBeagleDogProfileDb", () => {
           ],
           _count: makeOffspringCounts({
             showEntries: 2,
-            trialResults: 4,
+            trialEntries: 4,
           }),
         },
         {
@@ -467,7 +466,7 @@ describe("getBeagleDogProfileDb", () => {
             }),
           ],
           siredPuppies: [],
-          _count: makeOffspringCounts({ trialResults: 1 }),
+          _count: makeOffspringCounts({ trialEntries: 1 }),
         },
       ],
     });
@@ -687,7 +686,7 @@ describe("getBeagleDogProfileDb", () => {
         dam: makeParent("dam-1", "Dam", "DAM-1"),
         whelpedPuppies: [],
         siredPuppies: [],
-        _count: makeOffspringCounts({ showEntries: 1, trialResults: 2 }),
+        _count: makeOffspringCounts({ showEntries: 1, trialEntries: 2 }),
       },
       {
         id: "sib-a",
@@ -700,7 +699,7 @@ describe("getBeagleDogProfileDb", () => {
         dam: makeParent("dam-1", "Dam", "DAM-1"),
         whelpedPuppies: [],
         siredPuppies: [],
-        _count: makeOffspringCounts({ showEntries: 3, trialResults: 4 }),
+        _count: makeOffspringCounts({ showEntries: 3, trialEntries: 4 }),
       },
     ]);
 
@@ -911,7 +910,7 @@ describe("getBeagleDogProfileDb", () => {
           ],
           _count: makeOffspringCounts({
             showEntries: 2,
-            trialResults: 3,
+            trialEntries: 3,
           }),
         },
       ],

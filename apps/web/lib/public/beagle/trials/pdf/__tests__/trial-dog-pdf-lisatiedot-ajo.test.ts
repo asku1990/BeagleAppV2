@@ -1,0 +1,133 @@
+import type { PDFFont, PDFPage } from "pdf-lib";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { drawTrialDogPdfLisatiedotAjo } from "../rule-sets/legacy-2011-2023/lisatiedot/ajo";
+
+describe("drawTrialDogPdfLisatiedotAjo", () => {
+  const page = {
+    drawText: vi.fn(),
+  } as unknown as PDFPage;
+  const font = {
+    widthOfTextAtSize: vi.fn((text: string) => text.length * 5),
+    heightAtSize: vi.fn(() => 8),
+  } as unknown as PDFFont;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("renders ajo 50-56 with one-decimal formatting", () => {
+    drawTrialDogPdfLisatiedotAjo({
+      lisatiedotRows: [
+        { koodi: "50", era1: "2.00", era2: "0.00" },
+        { koodi: "51", era1: "3.00", era2: "0.00" },
+        { koodi: "52", era1: "3.00", era2: "0.00" },
+        { koodi: "53", era1: "2.00", era2: "0.00" },
+        { koodi: "54", era1: "6.00", era2: "0.00" },
+        { koodi: "55", era1: "0.00", era2: "0.00" },
+        { koodi: "56", era1: "5.00", era2: "0.00" },
+      ],
+      page,
+      font,
+    });
+
+    expect(page.drawText).toHaveBeenCalledTimes(14);
+    expect(page.drawText).toHaveBeenNthCalledWith(1, "2.0", {
+      x: 781,
+      y: 431,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(2, "0.0", {
+      x: 798.5,
+      y: 431,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(3, "3.0", {
+      x: 781,
+      y: 417,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(4, "0.0", {
+      x: 798.5,
+      y: 417,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(5, "3.0", {
+      x: 781,
+      y: 403,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(6, "0.0", {
+      x: 798.5,
+      y: 403,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(7, "2.0", {
+      x: 781,
+      y: 389,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(8, "0.0", {
+      x: 798.5,
+      y: 389,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(9, "6.0", {
+      x: 781,
+      y: 375,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(10, "0.0", {
+      x: 798.5,
+      y: 375,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(11, "0.0", {
+      x: 781,
+      y: 361,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(12, "0.0", {
+      x: 798.5,
+      y: 361,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(13, "5.0", {
+      x: 781,
+      y: 347,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+    expect(page.drawText).toHaveBeenNthCalledWith(14, "0.0", {
+      x: 798.5,
+      y: 347,
+      size: 10,
+      font,
+      color: expect.any(Object),
+    });
+  });
+});

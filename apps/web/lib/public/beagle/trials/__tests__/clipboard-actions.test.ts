@@ -79,6 +79,7 @@ describe("trial clipboard actions", () => {
     const result = await copyTrialDetailRowToClipboard({
       row: {
         id: "r1",
+        trialRuleWindowId: "trw_post_20230801",
         dogId: "d1",
         registrationNo: "FI-1/20",
         name: "Aatu",
@@ -119,7 +120,6 @@ describe("trial clipboard actions", () => {
           place: "Turku",
           date: "2025-06-01",
           weather: "P",
-          className: "VOI",
           rank: "1",
           points: 85.5,
           award: "Voi 1",
@@ -171,7 +171,7 @@ describe("trial clipboard actions", () => {
 
     expect(result).toBe(false);
     expect(writeText).toHaveBeenCalledWith(
-      "N:o\tPaikka\tPäivä\tKeli\tPalkinto\tSija\tPisteet\tTuomari\tHaku\tHaukku\tYVA\tHLO\tALO\tTJA\tPIN\n1\tTurku\t2025-06-01\tP\tVOI\t1\t85.50\tJudge A\t4\t5\t6\t1\t2\t3\t9",
+      "N:o\tPaikka\tPäivä\tKeli\tPalkinto\tSija\tPisteet\tTuomari\tHaku\tHaukku\tYVA\tHLO\tALO\tTJA\tPIN\n1\tTurku\t2025-06-01\tP\tVoi 1\t1\t85.50\tJudge A\t4\t5\t6\t1\t2\t3\t9",
     );
     expect(toast.error).toHaveBeenCalledWith("copy.error");
   });

@@ -23,6 +23,7 @@ import {
 } from "../core";
 import { toOwnershipDateKey, upsertOwner } from "../internal";
 import { toImportRunResponse } from "../runs/transform";
+import { formatLegacyImportSummary } from "../runs/phase-summary";
 
 const FINNISH_REGISTRATION_PREFIXES = new Set(["FI", "SF"]);
 
@@ -69,6 +70,10 @@ function parseRegistrationNo(value: string | null | undefined): {
     registrationNo,
     isInvalid: !isValidRegistrationNo(registrationNo),
   };
+}
+
+function formatPlaceholderRelationMessage(role: "Sire" | "Dam"): string {
+  return `${role} registration is a placeholder and was treated as unknown, so the placeholder reference was not written to the new database.`;
 }
 
 async function loadDogIdByRegistration(): Promise<Map<string, string>> {
@@ -280,8 +285,12 @@ export async function runLegacyPhase1(
     const legacy = await fetchLegacyPhase1Rows({
       log: (message) => log(`[stage:load] ${message}`),
     });
+    const beaApuRows = legacy.eks.length;
+    const beaApuRowsWithEkNo = legacy.eks.filter(
+      (row) => row.ekNo != null,
+    ).length;
     log(
-      `Loaded legacy rows: dogs=${legacy.dogs.length}, breeders=${legacy.breeders.length}, eks=${legacy.eks.length}, owners=${legacy.owners.length}, samakoira=${legacy.samakoira.length}`,
+      `Loaded legacy source rows: dogs=${legacy.dogs.length}, breeders=${legacy.breeders.length}, bea_apuRows=${beaApuRows}, bea_apuRowsWithEkNo=${beaApuRowsWithEkNo}, owners=${legacy.owners.length}, samakoira=${legacy.samakoira.length}`,
     );
     finishStage("load");
 
@@ -572,26 +581,6 @@ export async function runLegacyPhase1(
         continue;
       }
 
-      if (row.ekNo == null) {
-        eksSkipped += 1;
-        await recordIssue({
-          stage: "ek",
-          severity: "INFO",
-          code: "EK_MISSING_EKNO",
-          message: "EK row missing EK number.",
-          registrationNo,
-          sourceTable: "bea_apu",
-          payloadJson: JSON.stringify({
-            registrationNo: row.registrationNo,
-            ekNo: row.ekNo,
-          }),
-        });
-        if (eksProcessed % 1000 === 0) {
-          logProgress("ek", eksProcessed, totalEks);
-        }
-        continue;
-      }
-
       if (isInvalid) {
         eksSkipped += 1;
         errorsCount += 1;
@@ -606,6 +595,14 @@ export async function runLegacyPhase1(
             ekNo: row.ekNo,
           }),
         });
+        if (eksProcessed % 1000 === 0) {
+          logProgress("ek", eksProcessed, totalEks);
+        }
+        continue;
+      }
+
+      if (row.ekNo == null) {
+        eksSkipped += 1;
         if (eksProcessed % 1000 === 0) {
           logProgress("ek", eksProcessed, totalEks);
         }
@@ -723,18 +720,21 @@ export async function runLegacyPhase1(
       for (const alias of aliases) {
         const parsedAlias = parseRegistrationNo(alias.value);
         if (!parsedAlias.registrationNo) {
-          await recordIssue({
-            stage: "samakoira",
-            severity: "INFO",
-            code: "SAMAKOIRA_ALIAS_EMPTY",
-            message: `Samakoira alias ${alias.key} is empty.`,
-            registrationNo: canonical.registrationNo,
-            sourceTable: "samakoira",
-            payloadJson: JSON.stringify({
-              rek1: canonical.registrationNo,
-              [alias.key]: alias.value,
-            }),
-          });
+          if (alias.key === "REK_2") {
+            await recordIssue({
+              stage: "samakoira",
+              severity: "WARNING",
+              code: "SAMAKOIRA_ALIAS_EMPTY",
+              message: `Samakoira alias ${alias.key} is empty.`,
+              registrationNo: canonical.registrationNo,
+              sourceTable: "samakoira",
+              payloadJson: JSON.stringify({
+                rek1: canonical.registrationNo,
+                [alias.key]: alias.value,
+              }),
+            });
+          }
+          // Missing alias slots are expected in legacy samakoira rows.
           continue;
         }
         if (parsedAlias.isInvalid) {
@@ -967,15 +967,18 @@ export async function runLegacyPhase1(
       if (!dogId) {
         relationsSkippedDogNotFound += 1;
         errorsCount += 1;
+        const missingDogName = !normalizeNullable(row.name);
         await recordIssue({
           stage: "relations",
           code: "RELATION_DOG_NOT_FOUND",
-          message:
-            "Relations row references a dog that was not found among imported dogs.",
+          message: missingDogName
+            ? "Dog was not found in the imported dogs index because the source row was skipped earlier due to blank KNIMI, so sire/dam relations were not created."
+            : "Dog was not found in the imported dogs index from the new database, so sire/dam relations were not created.",
           registrationNo: registration.registrationNo,
           sourceTable: "bearek_id",
           payloadJson: JSON.stringify({
             registrationNo: row.registrationNo,
+            dogName: row.name,
             sireRegistrationNo: row.sireRegistrationNo,
             damRegistrationNo: row.damRegistrationNo,
           }),
@@ -1002,8 +1005,7 @@ export async function runLegacyPhase1(
           stage: "relations",
           severity: "INFO",
           code: "RELATION_SIRE_PLACEHOLDER",
-          message:
-            "Sire registration is a placeholder and was treated as unknown.",
+          message: formatPlaceholderRelationMessage("Sire"),
           registrationNo: registration.registrationNo,
           sourceTable: "bearek_id",
           payloadJson: JSON.stringify({
@@ -1018,8 +1020,7 @@ export async function runLegacyPhase1(
           stage: "relations",
           severity: "INFO",
           code: "RELATION_DAM_PLACEHOLDER",
-          message:
-            "Dam registration is a placeholder and was treated as unknown.",
+          message: formatPlaceholderRelationMessage("Dam"),
           registrationNo: registration.registrationNo,
           sourceTable: "bearek_id",
           payloadJson: JSON.stringify({
@@ -1233,8 +1234,13 @@ export async function runLegacyPhase1(
         trialResultsUpserted,
         showResultsUpserted,
         errorsCount,
-        errorSummary:
-          errorsCount > 0 ? "Import completed with warnings." : null,
+        errorSummary: formatLegacyImportSummary({
+          kind: "LEGACY_PHASE1",
+          dogsUpserted,
+          ownersUpserted,
+          ownershipsUpserted,
+          errorsCount,
+        }),
       },
       auditContext,
     );

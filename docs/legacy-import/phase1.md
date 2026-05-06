@@ -31,6 +31,7 @@ Phase 1 imports foundation entities and link structures. It does not import tria
 - `bea_apu` -> `Dog.ekNo` by registration lookup.
 - `beaom` -> `Owner` + `DogOwnership` rows by registration lookup.
 - `samakoira` -> alias registrations (`REK_2`, `REK_3`) attached to canonical `REK_1`.
+- `samakoira.VARA` -> appended into `Dog.note` for the canonical dog when non-empty.
 
 ## Main writes
 
@@ -50,9 +51,15 @@ Phase 1 imports foundation entities and link structures. It does not import tria
 - Parent links (`sireId`, `damId`):
   - resolved after dog/registration indexing
   - missing/invalid/placeholder parent refs are reported as issues
+  - when the dog itself never imported, `RELATION_DOG_NOT_FOUND` now clarifies whether the row was skipped earlier because `KNIMI` was blank or whether the dog was absent from the imported dogs index in the new database
 - Owner links:
   - owner row requires a resolved dog by registration
   - ownership uses `ownershipDateKey` and `createMany(skipDuplicates=true)`
+- EK rows:
+  - `bea_apu` rows with a non-empty `EKNO` update `Dog.ekNo`
+  - rows without `EKNO` do not update `Dog.ekNo`
+  - malformed `registrationNo` values are still recorded as issues before the `EKNO` check
+  - the phase log reports both the raw `bea_apu` row count and the subset that has a non-empty `EKNO`
 
 ## Idempotency and rerun behavior
 
@@ -60,6 +67,9 @@ Phase 1 imports foundation entities and link structures. It does not import tria
 - Alias registration inserts from `samakoira` avoid duplicates/conflicts:
   - existing alias on same dog: kept
   - existing alias on different dog: `REGISTRATION_ALIAS_CONFLICT`
+  - empty `REK_2` slots are recorded as warnings
+  - empty `REK_3` slots are expected and skipped silently
+- `samakoira.VARA` values are merged into `Dog.note` using a `|` separator and duplicate text is not re-added.
 - Ownership rows are duplicate-safe via unique key + `skipDuplicates`.
 
 ## Issue profile

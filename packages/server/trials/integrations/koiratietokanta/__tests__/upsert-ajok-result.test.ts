@@ -1,0 +1,308 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { upsertKoiratietokantaAjokResultService } from "../upsert-ajok-result";
+
+const { upsertDbMock, trialRuleWindowFindManyMock } = vi.hoisted(() => ({
+  upsertDbMock: vi.fn(),
+  trialRuleWindowFindManyMock: vi.fn(),
+}));
+
+vi.mock("@beagle/db", () => ({
+  DogSex: {
+    MALE: "MALE",
+    FEMALE: "FEMALE",
+    UNKNOWN: "UNKNOWN",
+  },
+  TrialEntryKoetyyppi: {
+    NORMAL: "NORMAL",
+    KOKOKAUDENKOE: "KOKOKAUDENKOE",
+    PITKAKOE: "PITKAKOE",
+  },
+  TrialEntryHuomautus: {
+    LUOPUI: "LUOPUI",
+    SULJETTU: "SULJETTU",
+    KESKEYTETTY: "KESKEYTETTY",
+  },
+  prisma: {
+    trialRuleWindow: {
+      findMany: trialRuleWindowFindManyMock,
+    },
+  },
+  upsertKoiratietokantaAjokResultDb: upsertDbMock,
+}));
+
+describe("upsertKoiratietokantaAjokResultService", () => {
+  beforeEach(() => {
+    upsertDbMock.mockReset();
+    trialRuleWindowFindManyMock.mockReset();
+    trialRuleWindowFindManyMock.mockResolvedValue([
+      {
+        id: "window-1",
+        fromYmd: 20200101,
+        toYmd: null,
+      },
+    ]);
+    upsertDbMock.mockResolvedValue({
+      trialEventId: "event-1",
+      trialEntryId: "entry-1",
+      created: true,
+      updated: false,
+      dogFound: true,
+    });
+  });
+
+  it("maps core yksi_tulos fields and saves full raw payload", async () => {
+    const payload = {
+      SKLid: "431477",
+      REKISTERINUMERO: " fi33413/18 ",
+      Koepvm: "2025-09-07 00:00:00",
+      KOEPAIKKA: "Ristijärvi",
+      koemaasto: "Ristijärvi",
+      JARJESTAJA: "Kainuun Ajokoirakerho",
+      KENNELPIIRI: "Kainuun kennelpiiri ry",
+      KENNELPIIRINRO: "3",
+      SKLkoemuoto: "AJOK",
+      yt: "Fors Jari",
+      ytnro: "402762",
+      KELI: "P",
+      Omistaja: "Marja ja Kari Virtanen",
+      Omistajankotipaikka: "Hyrynsalmi",
+      I_ERA_KLO: " 5:49",
+      i_haku_min: "201",
+      I_AJO_MIN: "51",
+      II_AJO_MIN: "-",
+      I_HAKU: "5,60",
+      I_HAUKKU: "7",
+      AJOPISTEET: "14.88",
+      LOPPUPISTEET: "29.38",
+      luopui: "0",
+      suljettu: "0",
+      keskeytti: "0",
+      palkintotuomari1: "Mikko Kemppainen",
+      palkintotuomari2: "-",
+      "111_PALJAS_MAA": "1",
+      "112_PALJAS_MAA": "1",
+      "113_PALJAS_MAA": null,
+      "171_LAMPOTILA": "13",
+      "172_LAMPOTILA": "19",
+      "301_KUULUVUUS": "4.00",
+      "302_KUULUVUUS": "0.00",
+      "531_BEAGLEN_HAUKKU": "4",
+      "532_BEAGLEN_HAUKKU": "0",
+    };
+
+    const result = await upsertKoiratietokantaAjokResultService(payload);
+
+    expect(result.status).toBe(201);
+    expect(upsertDbMock).toHaveBeenCalledWith({
+      event: expect.objectContaining({
+        sklKoeId: 431477,
+        koekunta: "Ristijärvi",
+        jarjestaja: "Kainuun Ajokoirakerho",
+        ylituomariNimi: "Fors Jari",
+        ylituomariNumero: "402762",
+        trialRuleWindowId: "window-1",
+      }),
+      entry: expect.objectContaining({
+        rekisterinumeroSnapshot: "FI33413/18",
+        yksilointiAvain: "SKL:431477|REG:FI33413/18",
+        raakadataJson: JSON.stringify(payload),
+        koemuoto: "AJOK",
+        koetyyppi: "NORMAL",
+        omistajaSnapshot: "Marja ja Kari Virtanen",
+        koemaasto: "Ristijärvi",
+        era1Alkoi: "5:49",
+        hakuMin1: 201,
+        ajoMin1: 51,
+        ajoMin2: null,
+        haku: null,
+        hauk: null,
+        hakuEra1: 5.6,
+        haukkuEra1: 7,
+        ajoajanPisteet: 14.88,
+        loppupisteet: 29.38,
+        keli: "P",
+        huomautus: null,
+        ryhmatuomariNimi: "Mikko Kemppainen",
+        palkintotuomariNimi: null,
+      }),
+      eras: expect.arrayContaining([
+        expect.objectContaining({
+          era: 1,
+          alkoi: "5:49",
+          hakumin: 201,
+          ajomin: 51,
+          haku: 5.6,
+          hauk: 7,
+          lisatiedot: expect.arrayContaining([
+            expect.objectContaining({
+              koodi: "11",
+              nimi: "Paljas maa",
+              arvo: "1",
+            }),
+            expect.objectContaining({
+              koodi: "17",
+              nimi: "Lämpötila",
+              arvo: "13",
+            }),
+            expect.objectContaining({
+              koodi: "30",
+              nimi: "Kuuluvuus",
+              arvo: "4.00",
+            }),
+            expect.objectContaining({
+              koodi: "36",
+              nimi: "Beaglen haukku",
+              arvo: "4",
+            }),
+          ]),
+        }),
+        expect.objectContaining({
+          era: 2,
+          lisatiedot: expect.arrayContaining([
+            expect.objectContaining({
+              koodi: "11",
+              nimi: "Paljas maa",
+              arvo: "1",
+            }),
+            expect.objectContaining({
+              koodi: "17",
+              nimi: "Lämpötila",
+              arvo: "19",
+            }),
+            expect.objectContaining({
+              koodi: "30",
+              nimi: "Kuuluvuus",
+              arvo: "0.00",
+            }),
+            expect.objectContaining({
+              koodi: "36",
+              nimi: "Beaglen haukku",
+              arvo: "0",
+            }),
+          ]),
+        }),
+      ]),
+    });
+    const call = upsertDbMock.mock.calls[0]?.[0];
+    expect(call.eras).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ era: 3 })]),
+    );
+    expect(result.body.ok).toBe(true);
+    if (result.body.ok) {
+      expect(result.body.data.warnings).toEqual([]);
+    }
+  });
+
+  it("warns when optional numeric fields contain malformed values", async () => {
+    const result = await upsertKoiratietokantaAjokResultService({
+      SKLid: "431477",
+      REKISTERINUMERO: "FI33413/18",
+      Koepvm: "2025-09-07",
+      KOEPAIKKA: "Ristijärvi",
+      koemaasto: "Ristijärvi",
+      II_AJO_MIN: "not-a-number",
+    });
+
+    expect(result.status).toBe(201);
+    expect(result.body.ok).toBe(true);
+    if (result.body.ok) {
+      expect(result.body.data.warnings).toEqual([
+        expect.objectContaining({
+          code: "OPTIONAL_FIELD_PARSE_FAILED",
+          field: "II_AJO_MIN",
+        }),
+      ]);
+    }
+  });
+
+  it("maps a single status flag to canonical huomautus", async () => {
+    const payload = {
+      SKLid: "431477",
+      REKISTERINUMERO: "FI33413/18",
+      Koepvm: "2025-09-07 00:00:00",
+      KOEPAIKKA: "Ristijärvi",
+      luopui: "1",
+      suljettu: "0",
+      keskeytti: "0",
+    };
+
+    const result = await upsertKoiratietokantaAjokResultService(payload);
+
+    expect(result.status).toBe(201);
+    expect(upsertDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        entry: expect.objectContaining({
+          huomautus: "LUOPUI",
+        }),
+      }),
+    );
+  });
+
+  it("rejects multiple true status flags", async () => {
+    const result = await upsertKoiratietokantaAjokResultService({
+      SKLid: "431477",
+      REKISTERINUMERO: "FI33413/18",
+      Koepvm: "2025-09-07 00:00:00",
+      KOEPAIKKA: "Ristijärvi",
+      luopui: "1",
+      suljettu: "1",
+      keskeytti: "0",
+    });
+
+    expect(result.status).toBe(400);
+    expect(upsertDbMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects payloads missing required identity fields", async () => {
+    const result = await upsertKoiratietokantaAjokResultService({
+      SKLid: "431477",
+    });
+
+    expect(result.status).toBe(400);
+    expect(upsertDbMock).not.toHaveBeenCalled();
+    expect(result.body.ok).toBe(false);
+    if (!result.body.ok) {
+      expect(result.body.code).toBe("VALIDATION_ERROR");
+      expect(result.body.details).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ field: "REKISTERINUMERO" }),
+          expect.objectContaining({ field: "Koepvm" }),
+          expect.objectContaining({ field: "KOEPAIKKA" }),
+        ]),
+      );
+    }
+  });
+
+  it("returns warnings for missing dog link", async () => {
+    upsertDbMock.mockResolvedValueOnce({
+      trialEventId: "event-1",
+      trialEntryId: "entry-1",
+      created: false,
+      updated: true,
+      dogFound: false,
+    });
+
+    const result = await upsertKoiratietokantaAjokResultService({
+      SKLid: "431477",
+      REKISTERINUMERO: "FI33413/18",
+      Koepvm: "2025-09-07",
+      KOEPAIKKA: "Ristijärvi",
+      koemaasto: "Ristijärvi",
+      yt: "Different Judge",
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.body.ok).toBe(true);
+    if (result.body.ok) {
+      expect(result.body.data).toMatchObject({
+        created: false,
+        updated: true,
+      });
+      expect(result.body.data.warnings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ code: "DOG_NOT_FOUND" }),
+        ]),
+      );
+    }
+  });
+});

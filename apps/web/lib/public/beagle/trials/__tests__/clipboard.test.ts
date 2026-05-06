@@ -30,6 +30,7 @@ describe("formatTrialDetailRowForClipboard", () => {
     const output = formatTrialDetailRowForClipboard(
       {
         id: "r0",
+        trialRuleWindowId: "trw_post_20230801",
         dogId: "d0",
         registrationNo: "FI-0/20",
         name: "Pena",
@@ -59,6 +60,7 @@ describe("formatTrialDetailRowForClipboard", () => {
     const output = formatTrialDetailRowForClipboard(
       {
         id: "r1",
+        trialRuleWindowId: "trw_post_20230801",
         dogId: "d1",
         registrationNo: "FI-1/20",
         name: "Aatu",
@@ -91,6 +93,7 @@ describe("formatTrialDetailRowForClipboard", () => {
     const output = formatTrialDetailRowForClipboard(
       {
         id: "r2",
+        trialRuleWindowId: "trw_post_20230801",
         dogId: "d2",
         registrationNo: "FI-2/20",
         name: "Be\tlla\n",
@@ -124,6 +127,7 @@ describe("formatTrialDetailRowsForClipboard", () => {
       [
         {
           id: "r1",
+          trialRuleWindowId: "trw_post_20230801",
           dogId: "d1",
           registrationNo: "FI-1/20",
           name: "Aatu",
@@ -144,6 +148,7 @@ describe("formatTrialDetailRowsForClipboard", () => {
         },
         {
           id: "r2",
+          trialRuleWindowId: "trw_post_20230801",
           dogId: "d2",
           registrationNo: "FI-2/20",
           name: "Bella",
@@ -219,7 +224,6 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
           place: "Helsinki",
           date: "2025-06-01",
           weather: "L",
-          className: "VOI",
           rank: "1",
           points: 88.2,
           award: "Voi 1",
@@ -238,7 +242,6 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
           place: "Turku",
           date: "2025-06-02",
           weather: null,
-          className: null,
           rank: null,
           points: null,
           award: null,
@@ -290,7 +293,7 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
       "N:o\tPaikka\tPäivä\tKeli\tPalkinto\tSija\tPisteet\tTuomari\tHaku\tHaukku\tYVA\tHLO\tALO\tTJA\tPIN",
     );
     expect(lines[1]).toBe(
-      "1\tHelsinki\t2025-06-01\tL\tVOI\t1\t88.20\tJudge A\t4\t5\t6\t1\t2\t3\t9",
+      "1\tHelsinki\t2025-06-01\tL\tVoi 1\t1\t88.20\tJudge A\t4\t5\t6\t1\t2\t3\t9",
     );
     expect(lines[2]).toBe(
       "2\tTurku\t2025-06-02\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-",
@@ -306,7 +309,6 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
           place: "Tam\tpe\nre",
           date: "2025-06-03",
           weather: null,
-          className: null,
           rank: "  ",
           points: 75,
           award: "Avo 2",

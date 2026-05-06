@@ -54,8 +54,9 @@ export async function fetchLegacyPhase1Rows(options?: {
               EKNO as ekNo
        FROM bea_apu`,
     )) as LegacyEkRow[];
+    const eksWithEkNo = eks.filter((row) => row.ekNo != null).length;
     log(
-      `Fetched EK rows: count=${eks.length}, elapsed=${Math.round((Date.now() - eksStartedAt) / 1000)}s`,
+      `Fetched bea_apu source rows: total=${eks.length}, withEkNo=${eksWithEkNo}, elapsed=${Math.round((Date.now() - eksStartedAt) / 1000)}s`,
     );
 
     const ownersStartedAt = Date.now();

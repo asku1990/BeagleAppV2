@@ -10,10 +10,11 @@ For show-domain deep details, see:
 
 - `Role`: `USER`, `ADMIN`
 - `DogSex`: `MALE`, `FEMALE`, `UNKNOWN`
-- `ImportKind`: `LEGACY_PHASE1`, `LEGACY_PHASE1_5`, `LEGACY_PHASE2`, `LEGACY_PHASE3`
+- `ImportKind`: `LEGACY_PHASE1`, `LEGACY_PHASE1_5`, `LEGACY_PHASE3`, `LEGACY_TRIAL_MIRROR`, `LEGACY_PHASE5`
 - `ImportStatus`: `PENDING`, `RUNNING`, `SUCCEEDED`, `FAILED`
 - `ImportIssueSeverity`: `INFO`, `WARNING`, `ERROR`
 - `ShowSourceTag`: source tagging for legacy/workbook/manual show data
+- `TrialSourceTag`: source tagging for canonical trial entry writes
 - `ShowResultValueType`: `FLAG`, `CODE`, `TEXT`, `NUMERIC`, `DATE`
 - `AuditAction`: `INSERT`, `UPDATE`, `DELETE`
 - `AuditSource`: `WEB`, `SCRIPT`, `SYSTEM`
@@ -31,6 +32,15 @@ erDiagram
   Dog ||--o{ DogOwnership : "ownership history"
   Owner ||--o{ DogOwnership : "owns dogs"
   Dog ||--o{ TrialResult : "trial results"
+  Dog ||--o{ TrialEntry : "canonical trial entries (optional)"
+  TrialEvent ||--o{ TrialEntry : "canonical AJOK entries"
+  TrialEntry ||--o{ TrialEra : "canonical AJOK era rows"
+  TrialEra ||--o{ TrialEraLisatieto : "canonical AJOK lisatieto rows"
+  LegacyAkoeall ||--o{ LegacyBealt : "legacy key match"
+  LegacyAkoeall ||--o{ LegacyBealt0 : "legacy key match"
+  LegacyAkoeall ||--o{ LegacyBealt1 : "legacy key match"
+  LegacyAkoeall ||--o{ LegacyBealt2 : "legacy key match"
+  LegacyAkoeall ||--o{ LegacyBealt3 : "legacy key match"
   Dog ||--o{ ShowEntry : "canonical show entries (optional)"
 
   ImportRun ||--o{ ImportRunIssue : "issues"
@@ -65,6 +75,27 @@ erDiagram
 ### Results
 
 - `TrialResult`: canonical trial rows keyed by unique `sourceKey`.
+- `TrialEvent`: canonical AJOK trial event (new schema event level).
+- `TrialEntry`: canonical AJOK trial dog entry (new schema entry level).
+  - `TrialEntry` stores the direct summary/core fields for one dog in one event.
+  - `TrialEntry.ke` stores the top-level weather/condition value from source
+    `KELI` / legacy `KE`.
+- `TrialEra`: canonical AJOK era row per `trialEntryId + era`.
+- `TrialEraLisatieto`: canonical AJOK lisatieto row per
+  `trialEraId + koodi + osa`.
+  - `TrialEra` stores per-era timing, score, and free-text note fields.
+  - `TrialEraLisatieto` stores detailed code rows such as `10-62` for report/PDF
+    rendering without decoding raw payload JSON.
+  - `TrialEraLisatieto.osa` is empty for normal one-value codes and stores a
+    subpart key such as `a`, `b`, or `c` when one official code has multiple
+    values for the same era.
+- `LegacyAkoeall`, `LegacyBealt`, `LegacyBealt0`, `LegacyBealt1`,
+  `LegacyBealt2`, `LegacyBealt3`: frozen v1 AJOK mirror tables used for
+  source validation and later projection into canonical runtime tables.
+  These tables preserve the legacy composite keys and source column names via
+  Prisma mappings, store legacy `MUOKATTU` as raw text to support zero-date
+  values, and include import metadata (`rawPayloadJson`, `sourceHash`,
+  `importedAt`). Runtime application reads should not use these tables directly.
 - `ShowEvent`: canonical show event.
 - `ShowEntry`: canonical show participation row; `dogId` nullable.
 - `ShowResultCategory`: UI/admin managed grouping for show definitions.
@@ -82,6 +113,10 @@ erDiagram
 - `BetterAuthUser -> BetterAuthSession/BetterAuthAccount`: `Cascade`
 - `BetterAuthUser -> ImportRun(createdByUser)`: `SetNull`
 - `Dog -> DogRegistration/DogOwnership/TrialResult`: `Cascade`
+- `Dog -> TrialEntry`: `SetNull` (allows trial rows without local dog)
+- `TrialEvent -> TrialEntry`: `Cascade`
+- `TrialEntry -> TrialEra`: `Cascade`
+- `TrialEra -> TrialEraLisatieto`: `Cascade`
 - `Dog -> ShowEntry`: `SetNull` (allows show rows without local dog)
 - `ShowEvent -> ShowEntry`: `Cascade`
 - `ShowEntry -> ShowResultItem`: `Cascade`
@@ -95,6 +130,14 @@ erDiagram
 - `Dog.ekNo` unique
 - `DogRegistration.registrationNo` unique
 - `TrialResult.sourceKey` unique
+- `TrialEvent.sklKoeId` unique (nullable in legacy phase2 fallback)
+- `TrialEvent.legacyEventKey` unique (nullable, used for legacy fallback identity)
+- `TrialEntry.yksilointiAvain` unique
+- `TrialEntry.[trialEventId, rekisterinumeroSnapshot]` unique
+- `TrialEra.[trialEntryId, era]` unique
+- `TrialEraLisatieto.[trialEraId, koodi, osa]` unique
+- `LegacyAkoeall.[REKNO, TAPPA, TAPPV]` composite primary key
+- `LegacyBealt*.[REKNO, TAPPA, TAPPV, ERA]` composite primary key
 - `ShowEvent.eventLookupKey` unique
 - `ShowEntry.entryLookupKey` unique
 - `ShowResultItem.itemLookupKey` unique

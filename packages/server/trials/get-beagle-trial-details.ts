@@ -4,7 +4,6 @@ import { toBusinessDateOnly } from "../core/date-only";
 import { toErrorLog, withLogContext } from "../core/logger";
 import type { ServiceResult } from "../core/result";
 import { formatTrialAward } from "./core";
-import { encodeTrialId, parseTrialId } from "./internal/trial-id";
 import type { TrialsServiceLogContext } from "./types";
 
 export async function getBeagleTrialDetailsService(
@@ -19,8 +18,8 @@ export async function getBeagleTrialDetailsService(
     ...(context?.actorUserId ? { actorUserId: context.actorUserId } : {}),
   });
 
-  const parsedTrialId = parseTrialId(trialId);
-  if (!parsedTrialId) {
+  const normalizedTrialId = trialId.trim();
+  if (!normalizedTrialId) {
     log.warn(
       { event: "invalid_trial_id", durationMs: Date.now() - startedAt },
       "trial detail rejected because trialId is invalid",
@@ -34,23 +33,20 @@ export async function getBeagleTrialDetailsService(
   log.info(
     {
       event: "start",
-      eventDate: parsedTrialId.eventDateIsoDate,
-      eventPlace: parsedTrialId.eventPlace,
+      trialId: normalizedTrialId,
     },
     "trial detail fetch started",
   );
 
   try {
     const result = await getBeagleTrialDetailsDb({
-      eventDate: parsedTrialId.eventDate,
-      eventPlace: parsedTrialId.eventPlace,
+      trialEventId: normalizedTrialId,
     });
     if (!result) {
       log.info(
         {
           event: "not_found",
-          eventDate: parsedTrialId.eventDateIsoDate,
-          eventPlace: parsedTrialId.eventPlace,
+          trialId: normalizedTrialId,
           durationMs: Date.now() - startedAt,
         },
         "trial detail not found",
@@ -61,17 +57,17 @@ export async function getBeagleTrialDetailsService(
       };
     }
 
-    const eventDate = toBusinessDateOnly(result.eventDate);
     const data: BeagleTrialDetailsResponse = {
       trial: {
-        trialId: encodeTrialId(eventDate, result.eventPlace),
-        eventDate,
+        trialId: result.trialEventId,
+        eventDate: toBusinessDateOnly(result.eventDate),
         eventPlace: result.eventPlace,
         judge: result.judge,
         dogCount: result.dogCount,
       },
       items: result.items.map((item) => ({
         id: item.id,
+        trialRuleWindowId: item.trialRuleWindowId,
         dogId: item.dogId,
         registrationNo: item.registrationNo,
         name: item.name,
@@ -95,8 +91,7 @@ export async function getBeagleTrialDetailsService(
     log.info(
       {
         event: "success",
-        eventDate,
-        eventPlace: data.trial.eventPlace,
+        trialId: data.trial.trialId,
         dogCount: data.trial.dogCount,
         durationMs: Date.now() - startedAt,
       },
@@ -111,8 +106,7 @@ export async function getBeagleTrialDetailsService(
     log.error(
       {
         event: "exception",
-        eventDate: parsedTrialId.eventDateIsoDate,
-        eventPlace: parsedTrialId.eventPlace,
+        trialId: normalizedTrialId,
         durationMs: Date.now() - startedAt,
         ...toErrorLog(error),
       },

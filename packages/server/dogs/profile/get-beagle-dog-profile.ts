@@ -9,13 +9,12 @@ import {
   type BeagleTrialDogRowDb,
 } from "@beagle/db";
 import type { BeagleDogProfileDto } from "@beagle/contracts";
-import { encodeShowId } from "../../shows/internal/show-id";
-import { formatTrialAward } from "../../trials/core";
-import { encodeTrialId } from "../../trials/internal/trial-id";
-import { toBusinessDateOnly } from "../../core/date-only";
-import { toErrorLog, withLogContext } from "../../core/logger";
-import type { ServiceResult } from "../../core/result";
-import { parseDogId } from "../core";
+import { toBusinessDateOnly } from "@server/core/date-only";
+import { toErrorLog, withLogContext } from "@server/core/logger";
+import type { ServiceResult } from "@server/core/result";
+import { parseDogId } from "@server/dogs/core";
+import { encodeShowId } from "@server/shows/internal/show-id";
+import { formatTrialAward } from "@server/trials/core";
 
 export type DogsServiceLogContext = {
   requestId?: string;
@@ -76,11 +75,10 @@ function mapDogProfileFromDb(
     }),
     trials: trials.map((trial) => ({
       id: trial.id,
-      trialId: encodeTrialId(toBusinessDateOnly(trial.date), trial.place),
+      trialId: trial.trialEventId,
       place: trial.place,
       date: toBusinessDateOnly(trial.date),
       weather: trial.weather,
-      className: trial.className,
       rank: trial.rank,
       points: trial.points,
       award: formatTrialAward(trial.award, trial.classCode),

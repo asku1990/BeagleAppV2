@@ -15,6 +15,7 @@ describe("fetchLegacyPhase1_5Rows", () => {
   });
 
   it("loads REKNO + VALIO rows from bea_apu", async () => {
+    const log = vi.fn();
     const connection = {
       query: vi.fn().mockResolvedValue([
         { registrationNo: "FI-1/20", titleCodeRaw: "FI JVA" },
@@ -24,7 +25,7 @@ describe("fetchLegacyPhase1_5Rows", () => {
     };
     connectLegacyDatabaseMock.mockResolvedValue(connection);
 
-    const result = await fetchLegacyPhase1_5Rows();
+    const result = await fetchLegacyPhase1_5Rows({ log });
 
     expect(connection.query).toHaveBeenCalledWith(
       expect.stringContaining("FROM bea_apu"),
@@ -33,6 +34,9 @@ describe("fetchLegacyPhase1_5Rows", () => {
       { registrationNo: "FI-1/20", titleCodeRaw: "FI JVA" },
       { registrationNo: "FI-2/20", titleCodeRaw: null },
     ]);
+    expect(log).toHaveBeenCalledWith(
+      "Fetched bea_apu title source rows: total=2, elapsed=0s",
+    );
     expect(connection.end).toHaveBeenCalled();
   });
 });

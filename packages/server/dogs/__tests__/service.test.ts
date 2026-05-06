@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createDogsService } from "../search";
-import { encodeShowId } from "../../shows/internal/show-id";
-import { encodeTrialId } from "../../trials/internal/trial-id";
+import { createDogsService } from "@server/dogs";
+import { encodeShowId } from "@server/shows/internal/show-id";
 
 const {
   searchBeagleDogsDbMock,
@@ -28,6 +27,14 @@ vi.mock("@beagle/db", async () => {
     getBeagleTrialsForDogDb: getBeagleTrialsForDogDbMock,
   };
 });
+
+function withoutEventKey<T extends { eventKey: unknown }>(
+  row: T,
+): Omit<T, "eventKey"> {
+  const { eventKey, ...rest } = row;
+  void eventKey;
+  return rest;
+}
 
 describe("dogs service", () => {
   beforeEach(() => {
@@ -347,10 +354,10 @@ describe("dogs service", () => {
     const mockTrials = [
       {
         id: "trial1",
+        trialEventId: "trial-1",
         place: "Town",
         date: new Date("2022-02-02T00:00:00.000Z"),
         weather: "P",
-        className: "VOI",
         classCode: "A",
         rank: "1",
         points: 85.5,
@@ -375,7 +382,7 @@ describe("dogs service", () => {
     expect(getBeagleDogProfileDbMock).toHaveBeenCalledWith("dog1");
     expect(getBeagleShowsForDogDbMock).toHaveBeenCalledWith("dog1");
     expect(getBeagleTrialsForDogDbMock).toHaveBeenCalledWith("dog1");
-    const { eventKey: _show1EventKey, ...show1 } = mockShows[0];
+    const show1 = withoutEventKey(mockShows[0]);
     expect(result).toEqual({
       status: 200,
       body: {
@@ -411,11 +418,10 @@ describe("dogs service", () => {
           trials: [
             {
               id: "trial1",
-              trialId: encodeTrialId("2022-02-02", "Town"),
+              trialId: "trial-1",
               place: "Town",
               date: "2022-02-02",
               weather: "P",
-              className: "VOI",
               rank: "1",
               points: 85.5,
               award: "Avo 1",
@@ -475,10 +481,10 @@ describe("dogs service", () => {
     const mockTrials = [
       {
         id: "trial2",
+        trialEventId: "trial-2",
         place: "Lahti",
         date: new Date("2022-04-16T00:00:00+03:00"),
         weather: null,
-        className: null,
         classCode: null,
         rank: null,
         points: null,
@@ -500,7 +506,7 @@ describe("dogs service", () => {
     const service = createDogsService();
     const result = await service.getBeagleDogProfile("dog2");
 
-    const { eventKey: _show2EventKey, ...show2 } = mockShows[0];
+    const show2 = withoutEventKey(mockShows[0]);
     expect(result).toEqual({
       status: 200,
       body: {
@@ -518,11 +524,10 @@ describe("dogs service", () => {
           trials: [
             {
               id: "trial2",
-              trialId: encodeTrialId("2022-04-16", "Lahti"),
+              trialId: "trial-2",
               place: "Lahti",
               date: "2022-04-16",
               weather: null,
-              className: null,
               rank: null,
               points: null,
               award: null,
@@ -586,7 +591,7 @@ describe("dogs service", () => {
     const service = createDogsService();
     const result = await service.getBeagleDogProfile("dog-casing");
 
-    const { eventKey: _showCaseEventKey, ...showCase } = mockShows[0];
+    const showCase = withoutEventKey(mockShows[0]);
     expect(result).toEqual({
       status: 200,
       body: {
@@ -651,7 +656,7 @@ describe("dogs service", () => {
     const service = createDogsService();
     const result = await service.getBeagleDogProfile("dog-legacy");
 
-    const { eventKey: _showLegacyEventKey, ...showLegacy } = mockShows[0];
+    const showLegacy = withoutEventKey(mockShows[0]);
     expect(result).toEqual({
       status: 200,
       body: {

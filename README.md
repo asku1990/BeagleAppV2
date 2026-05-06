@@ -46,6 +46,7 @@ cp .env.example .env.local
 
 - `DATABASE_URL` (PostgreSQL)
 - `BETTER_AUTH_SECRET` (minimum 32 characters)
+- `KOIRATIETOKANTA_RESULTS_API_SECRET` (required when testing the AJOK result upsert API)
 
 Useful for admin login setup:
 

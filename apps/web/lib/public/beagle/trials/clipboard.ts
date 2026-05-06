@@ -265,7 +265,7 @@ export function formatDogProfileTrialRowsForClipboard(
     const cells = [String(index + 1), row.place, row.date];
     if (columns.includeWeather) cells.push(formatMaybeString(row.weather));
     if (columns.includeAward) {
-      cells.push(formatMaybeString(row.className ?? row.award));
+      cells.push(formatMaybeString(row.award));
     }
     if (columns.includeRank) cells.push(formatMaybeString(row.rank));
     if (columns.includePoints) cells.push(formatDogProfilePoints(row.points));
