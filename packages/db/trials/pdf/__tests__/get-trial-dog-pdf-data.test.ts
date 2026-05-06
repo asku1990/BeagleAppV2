@@ -197,4 +197,25 @@ describe("getTrialDogPdfDataDb", () => {
 
     expect(result?.ylituomariNimi).toBe("Event Judge");
   });
+
+  it("uses the entry judge before the event judge", async () => {
+    prismaMock.trialEntry.findUnique.mockResolvedValue(
+      trialRow({
+        tuom1: "Entry Judge",
+        trialEvent: {
+          trialRuleWindowId: "trw_post_20230801",
+          kennelpiiri: null,
+          kennelpiirinro: null,
+          koekunta: "Koe",
+          koepaiva: new Date("2025-09-07T00:00:00.000Z"),
+          jarjestaja: null,
+          ylituomariNimi: "Event Judge",
+        },
+      }),
+    );
+
+    const result = await getTrialDogPdfDataDb({ trialId: "entry-1" });
+
+    expect(result?.ylituomariNimi).toBe("Entry Judge");
+  });
 });

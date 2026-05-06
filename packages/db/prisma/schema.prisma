@@ -380,7 +380,6 @@ model TrialEntry {
   tuom1                      String?
   huomautus                  TrialEntryHuomautus?
   huomautusTeksti            String?              @db.Text
-  ylituomariNimiSnapshot     String?  // not used anymore, use tuom1 instead
   ylituomariNumeroSnapshot   String?
   ryhmatuomariNimi           String?
   palkintotuomariNimi        String?

@@ -7,7 +7,6 @@ ALTER TABLE "TrialEntry"
 ADD COLUMN "huomautusTeksti" TEXT;
 
 ALTER TABLE "TrialEntry"
-ADD COLUMN "ylituomariNimiSnapshot" TEXT,
 ADD COLUMN "ylituomariNumeroSnapshot" TEXT,
 ADD COLUMN "ryhmatuomariNimi" TEXT,
 ADD COLUMN "palkintotuomariNimi" TEXT;
@@ -17,7 +16,6 @@ DROP COLUMN "vara";
 
 COMMENT ON COLUMN "TrialEntry"."huomautus" IS 'Canonical entry-level huomautus marker: luopui, suljettu, or keskeytetty.';
 COMMENT ON COLUMN "TrialEntry"."huomautusTeksti" IS 'Free-text trial entry note rendered in the PDF huomautus section.';
-COMMENT ON COLUMN "TrialEntry"."ylituomariNimiSnapshot" IS 'Entry-level chief judge name snapshot rendered in the PDF signature section.';
 COMMENT ON COLUMN "TrialEntry"."ylituomariNumeroSnapshot" IS 'Entry-level chief judge number snapshot rendered in the PDF signature section.';
 COMMENT ON COLUMN "TrialEntry"."ryhmatuomariNimi" IS 'Group judge name rendered in the PDF signature section.';
 COMMENT ON COLUMN "TrialEntry"."palkintotuomariNimi" IS 'Prize judge name rendered in the PDF signature section.';
