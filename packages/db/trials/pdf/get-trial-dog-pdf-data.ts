@@ -13,7 +13,9 @@ export type TrialDogPdfDataDbDogSex = "MALE" | "FEMALE" | "UNKNOWN";
 
 export type TrialDogPdfDataDbEraLisatietoRow = {
   koodi: string;
+  osa: string;
   arvo: string;
+  jarjestys: number | null;
 };
 
 export type TrialDogPdfDataDbEraRow = {
@@ -174,12 +176,12 @@ export async function getTrialDogPdfDataDb(
           alo: true,
           huomautusTeksti: true,
           lisatiedot: {
-            orderBy: {
-              koodi: "asc",
-            },
+            orderBy: [{ koodi: "asc" }, { jarjestys: "asc" }, { osa: "asc" }],
             select: {
               koodi: true,
+              osa: true,
               arvo: true,
+              jarjestys: true,
             },
           },
         },

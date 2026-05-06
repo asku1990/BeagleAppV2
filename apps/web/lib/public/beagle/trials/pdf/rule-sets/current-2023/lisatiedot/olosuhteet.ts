@@ -6,11 +6,10 @@ import {
   normalizeTrialDogPdfMarkerValue,
 } from "./common";
 
-// Renders olosuhteet rows (11-18) from lisätiedot onto fixed PDF coordinates.
+// Renders olosuhteet rows (10-19) from lisätiedot onto fixed PDF coordinates.
 // Marker rows show X for true (1/X); numeric rows show their raw number values.
-const OLOSUHDE_TEXT_SIZE = 12;
-const NUMERIC_TEXT_SIZE = 10;
-const LUMIKELI_Y = 474.5;
+const OLOSUHDE_TEXT_SIZE = 10;
+const NUMERIC_TEXT_SIZE = 9;
 
 type OlosuhdeRowKind = "MARKER" | "NUMBER";
 
@@ -21,14 +20,16 @@ type OlosuhdeRowConfig = {
 };
 
 const OLOSUHDE_ROWS: OlosuhdeRowConfig[] = [
-  { koodi: "11", y: 487.5, kind: "MARKER" },
-  { koodi: "12", y: 473.5, kind: "NUMBER" },
-  { koodi: "13", y: 459.5, kind: "MARKER" },
-  { koodi: "14", y: 445.5, kind: "MARKER" },
-  { koodi: "15", y: 430.5, kind: "MARKER" },
-  { koodi: "16", y: 416.5, kind: "MARKER" },
-  { koodi: "17", y: 402.5, kind: "NUMBER" },
-  { koodi: "18", y: 388.5, kind: "NUMBER" },
+  { koodi: "10", y: 487.5, kind: "MARKER" },
+  { koodi: "11", y: 475.5, kind: "MARKER" },
+  { koodi: "12", y: 462.5, kind: "NUMBER" },
+  { koodi: "13", y: 450.5, kind: "MARKER" },
+  { koodi: "14", y: 437.5, kind: "MARKER" },
+  { koodi: "15", y: 424.5, kind: "MARKER" },
+  { koodi: "16", y: 411.5, kind: "MARKER" },
+  { koodi: "17", y: 398.5, kind: "NUMBER" },
+  { koodi: "18", y: 385.5, kind: "NUMBER" },
+  { koodi: "19", y: 373.5, kind: "NUMBER" },
 ];
 
 function normalizeRowValue(
@@ -40,7 +41,7 @@ function normalizeRowValue(
     : normalizeTrialDogPdfMarkerValue(raw);
 }
 
-// Olosuhteet group (11-18). Renders marker rows and numeric rows on fixed positions.
+// Olosuhteet group (10-19). Renders marker rows and numeric rows on fixed positions.
 export function drawTrialDogPdfLisatiedotOlosuhteet(
   input: TrialDogPdfLisatiedot & {
     page: PDFPage;
@@ -56,19 +57,18 @@ export function drawTrialDogPdfLisatiedotOlosuhteet(
     const era1 = normalizeRowValue(rowConfig.kind, row?.era1);
     const era2 = normalizeRowValue(rowConfig.kind, row?.era2);
     const isNumeric = rowConfig.kind === "NUMBER";
-    const y = isNumeric && rowConfig.koodi === "12" ? LUMIKELI_Y : rowConfig.y;
 
     drawTrialDogPdfCenteredLisatietoValue(input, era1, {
       columnGroup: "LEFT",
       era: 1,
-      y,
+      y: rowConfig.y,
       size: isNumeric ? NUMERIC_TEXT_SIZE : OLOSUHDE_TEXT_SIZE,
       leftCellKind: isNumeric ? "NUMERIC" : "MARKER",
     });
     drawTrialDogPdfCenteredLisatietoValue(input, era2, {
       columnGroup: "LEFT",
       era: 2,
-      y,
+      y: rowConfig.y,
       size: isNumeric ? NUMERIC_TEXT_SIZE : OLOSUHDE_TEXT_SIZE,
       leftCellKind: isNumeric ? "NUMERIC" : "MARKER",
     });

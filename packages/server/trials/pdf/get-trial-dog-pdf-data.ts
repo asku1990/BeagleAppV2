@@ -90,6 +90,7 @@ function calculateAjoajanPisteet(ajominuutit: number | null): number | null {
 }
 
 const OLOSUHDE_KOODIT = [
+  "10",
   "11",
   "12",
   "13",
@@ -98,13 +99,25 @@ const OLOSUHDE_KOODIT = [
   "16",
   "17",
   "18",
+  "19",
 ] as const;
 
-const HAKU_KOODIT = ["20", "21", "22"] as const;
-const HAUKKU_KOODIT = ["30", "31", "32", "33", "34", "35", "36"] as const;
+const HAKU_KOODIT = ["20", "21", "22", "23", "24", "25", "26", "27"] as const;
+const HAUKKU_KOODIT = ["30", "31", "32", "33", "34", "35", "36", "37"] as const;
 const METSASTYSINTO_KOODIT = ["40", "41", "42"] as const;
-const AJO_KOODIT = ["50", "51", "52", "53", "54", "55", "56"] as const;
-const MUUT_OMINAISUUDET_KOODIT = ["60", "61"] as const;
+const AJO_KOODIT = [
+  "50",
+  "51",
+  "52",
+  "53",
+  "54",
+  "55",
+  "56",
+  "57",
+  "58",
+  "59",
+] as const;
+const MUUT_OMINAISUUDET_KOODIT = ["60", "61", "62"] as const;
 const LISATIETO_KOODIT: ReadonlySet<string> = new Set([
   ...OLOSUHDE_KOODIT,
   ...HAKU_KOODIT,
@@ -135,6 +148,9 @@ function pivotLisatiedot(
 
     for (const item of era.lisatiedot) {
       if (!LISATIETO_KOODIT.has(item.koodi)) {
+        continue;
+      }
+      if ((item.koodi === "25" || item.koodi === "27") && item.osa !== "a") {
         continue;
       }
       if (!byCode.has(item.koodi)) {

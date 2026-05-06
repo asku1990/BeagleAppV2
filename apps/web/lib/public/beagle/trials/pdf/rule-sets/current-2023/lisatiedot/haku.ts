@@ -6,9 +6,8 @@ import {
   normalizeTrialDogPdfOneDecimalValue,
 } from "./common";
 
-// Renders haku rows (20-22) from lisätiedot onto fixed PDF coordinates.
-// Row 20 shows the raw integer value; rows 21 and 22 show one decimal.
-const HAKU_TEXT_SIZE = 10;
+// Renders haku rows (20-27) from lisätiedot onto fixed PDF coordinates.
+const HAKU_TEXT_SIZE = 9;
 
 type HakuRowKind = "INTEGER" | "ONE_DECIMAL";
 
@@ -19,9 +18,14 @@ type HakuRowConfig = {
 };
 
 const HAKU_ROWS: HakuRowConfig[] = [
-  { koodi: "20", y: 360.5, kind: "INTEGER" },
-  { koodi: "21", y: 346.5, kind: "ONE_DECIMAL" },
-  { koodi: "22", y: 332.5, kind: "ONE_DECIMAL" },
+  { koodi: "20", y: 346.5, kind: "INTEGER" },
+  { koodi: "21", y: 333.5, kind: "ONE_DECIMAL" },
+  { koodi: "22", y: 321.5, kind: "ONE_DECIMAL" },
+  { koodi: "23", y: 307.5, kind: "ONE_DECIMAL" },
+  { koodi: "24", y: 295.5, kind: "ONE_DECIMAL" },
+  { koodi: "25", y: 282.5, kind: "ONE_DECIMAL" },
+  { koodi: "26", y: 269.5, kind: "ONE_DECIMAL" },
+  { koodi: "27", y: 256.5, kind: "INTEGER" },
 ];
 
 export function drawTrialDogPdfLisatiedotHaku(

@@ -5,9 +5,9 @@ import {
   normalizeTrialDogPdfOneDecimalValue,
 } from "./common";
 
-// Renders muut ominaisuudet rows (60-61) from lisätiedot onto fixed PDF coordinates.
-// Both rows use one decimal formatting.
-const MUUT_OMINAISUUDET_TEXT_SIZE = 10;
+// Renders muut ominaisuudet rows (60-62) from lisätiedot onto fixed PDF coordinates.
+// All rows use one decimal formatting.
+const MUUT_OMINAISUUDET_TEXT_SIZE = 9;
 
 type MuutOminaisuudetRowConfig = {
   koodi: string;
@@ -15,8 +15,9 @@ type MuutOminaisuudetRowConfig = {
 };
 
 const MUUT_OMINAISUUDET_ROWS: MuutOminaisuudetRowConfig[] = [
-  { koodi: "60", y: 303.5 },
-  { koodi: "61", y: 289.5 },
+  { koodi: "60", y: 198.5 },
+  { koodi: "61", y: 184.5 },
+  { koodi: "62", y: 171.5 },
 ];
 
 export function drawTrialDogPdfLisatiedotMuutOminaisuudet(
