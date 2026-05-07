@@ -241,6 +241,7 @@ describe("createAdminDog", () => {
         damId: "dam_1",
         ownerNames: ["Tiina Virtanen"],
         ekNo: 5588,
+        colorCode: null,
         note: "Important",
         registrationNo: "FI12345/21",
         secondaryRegistrationNos: [],

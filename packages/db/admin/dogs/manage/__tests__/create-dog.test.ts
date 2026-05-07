@@ -61,6 +61,7 @@ describe("createAdminDogWriteDb", () => {
           damId: null,
           ownerNames: ["Owner One"],
           ekNo: null,
+          colorCode: null,
           note: null,
           registrationNo: "FI12345/21",
           titles: [
@@ -112,6 +113,7 @@ describe("createAdminDogWriteDb", () => {
         damId: null,
         ownerNames: [],
         ekNo: null,
+        colorCode: null,
         note: null,
         registrationNo: "FI12345/21",
       },

@@ -190,6 +190,7 @@ export async function listAdminDogs(
             showCount: item.showCount,
             titlesText: item.titlesText,
             ekNo: item.ekNo,
+            colorCode: item.colorCode,
             note: item.note,
             titles: item.titles.map((title) => ({
               id: title.id,

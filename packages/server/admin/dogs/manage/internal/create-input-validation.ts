@@ -14,6 +14,7 @@ import {
 import {
   duplicateRegistrationNoResponse,
   invalidBirthDateResponse,
+  invalidColorCodeResponse,
   invalidEkNoResponse,
   invalidNameResponse,
   invalidRegistrationNoFormatResponse,
@@ -47,6 +48,7 @@ export type CreatePreflightValidationResult =
       sex: "MALE" | "FEMALE" | "UNKNOWN";
       birthDate: Date | null;
       ekNo: number | null;
+      colorCode: number | null;
       primaryRegistrationNo: string;
       secondaryRegistrationNos: string[];
       allRegistrationNos: string[];
@@ -116,6 +118,16 @@ export function validateCreatePreflight(
     };
   }
 
+  const colorCode = parsePositiveInteger(input.colorCode);
+  if (colorCode === "INVALID") {
+    return {
+      ok: false,
+      logContext: { event: "invalid_color_code", colorCode: input.colorCode },
+      logMessage: "admin dog create rejected because color code is invalid",
+      response: invalidColorCodeResponse(),
+    };
+  }
+
   const registration = validateRegistrationInput(
     input.registrationNo,
     input.secondaryRegistrationNos,
@@ -177,6 +189,7 @@ export function validateCreatePreflight(
       sex,
       birthDate,
       ekNo,
+      colorCode,
       primaryRegistrationNo: registration.primaryRegistrationNo,
       secondaryRegistrationNos: registration.secondaryRegistrationNos,
       allRegistrationNos: registration.allRegistrationNos,

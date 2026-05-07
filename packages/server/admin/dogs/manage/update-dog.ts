@@ -1,5 +1,6 @@
 import {
   findDogByIdDb,
+  listAdminDogColorOptionsDb,
   runAdminDogWriteTransactionDb,
   updateAdminDogWriteDb,
   type AuditContextDb,
@@ -126,6 +127,23 @@ export async function updateAdminDog(
     if (parentGuardResult && !parentGuardResult.ok) {
       return parentGuardResult.response;
     }
+    if (preflight.data.colorCode != null) {
+      const colorOptions = await listAdminDogColorOptionsDb();
+      if (
+        !colorOptions.items.some(
+          (item) => item.code === preflight.data.colorCode,
+        )
+      ) {
+        return {
+          status: 400,
+          body: {
+            ok: false,
+            error: "Color code was not found.",
+            code: "INVALID_COLOR_CODE",
+          },
+        };
+      }
+    }
 
     const updatedDog = await runAdminDogWriteTransactionDb(
       async (tx) =>
@@ -146,6 +164,7 @@ export async function updateAdminDog(
                 : (resolvedParents.data.dam?.id ?? null),
             ownerNames: inTryValidation.data.ownerNames,
             ekNo: preflight.data.ekNo,
+            colorCode: preflight.data.colorCode,
             note: inTryValidation.data.note,
             registrationNo: preflight.data.primaryRegistrationNo,
             secondaryRegistrationNos:

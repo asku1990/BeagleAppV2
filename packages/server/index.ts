@@ -10,6 +10,7 @@ export {
   deleteAdminUser,
   listAdminBreederOptions,
   listAdminDogDiseases,
+  listAdminDogColorOptions,
   listAdminDogParentOptions,
   listAdminDogs,
   listAdminUsers,

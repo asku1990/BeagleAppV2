@@ -18,6 +18,7 @@ type DogFormModalProps = {
   mode: "create" | "edit";
   dog: AdminDogRecord | null;
   values: AdminDogFormValues;
+  colorOptions: ComboboxOption[];
   ownerOptions: NamedEntityOption[];
   parentOptions: DogParentOption[];
   onOwnerSearchChange: (value: string) => void;
@@ -35,6 +36,7 @@ export function DogFormModal({
   mode,
   dog,
   values,
+  colorOptions,
   ownerOptions,
   parentOptions,
   onOwnerSearchChange,
@@ -166,6 +168,7 @@ export function DogFormModal({
 
         <DogFormMetadataSection
           values={values}
+          colorOptions={colorOptions}
           onValuesChange={onValuesChange}
           t={t}
         />

@@ -154,6 +154,13 @@ export async function getDogProfileBaseRow(dogId: string) {
         },
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }, { id: "asc" }],
       },
+      color: {
+        select: {
+          nameFi: true,
+          nameSv: true,
+          nameEn: true,
+        },
+      },
     },
   });
 }
