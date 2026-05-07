@@ -36,6 +36,7 @@ export type AdminDogListItem = {
   showCount: number;
   titlesText: string | null;
   ekNo: number | null;
+  colorCode: number | null;
   note: string | null;
   titles?: AdminDogTitleItem[];
 };

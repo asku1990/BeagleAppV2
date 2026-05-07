@@ -15,6 +15,7 @@ const {
   dogRegistrationUpdateMock,
   dogCreateMock,
   dogUpdateMock,
+  dogColorUpsertMock,
   ownerFindFirstMock,
   ownerCreateMock,
   dogOwnershipCreateManyMock,
@@ -32,6 +33,7 @@ const {
   dogRegistrationUpdateMock: vi.fn(),
   dogCreateMock: vi.fn(),
   dogUpdateMock: vi.fn(),
+  dogColorUpsertMock: vi.fn(),
   ownerFindFirstMock: vi.fn(),
   ownerCreateMock: vi.fn(),
   dogOwnershipCreateManyMock: vi.fn(),
@@ -66,6 +68,9 @@ vi.mock("@beagle/db", () => ({
       update: dogUpdateMock,
       findUnique: vi.fn(),
     },
+    dogColor: {
+      upsert: dogColorUpsertMock,
+    },
     owner: {
       findFirst: ownerFindFirstMock,
       create: ownerCreateMock,
@@ -92,6 +97,7 @@ describe("runLegacyPhase1", () => {
     dogRegistrationUpdateMock.mockReset();
     dogCreateMock.mockReset();
     dogUpdateMock.mockReset();
+    dogColorUpsertMock.mockReset();
     ownerFindFirstMock.mockReset();
     ownerCreateMock.mockReset();
     dogOwnershipCreateManyMock.mockReset();
@@ -118,6 +124,7 @@ describe("runLegacyPhase1", () => {
     });
 
     fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogColors: [],
       dogs: [
         {
           registrationNo: "FI12345/21",
@@ -193,6 +200,7 @@ describe("runLegacyPhase1", () => {
 
   it("explains that missing KNIMI prevented the dog from being imported and linked", async () => {
     fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogColors: [],
       dogs: [
         {
           registrationNo: "S87477",
@@ -242,6 +250,7 @@ describe("runLegacyPhase1", () => {
 
   it("describes placeholder parent registrations as unknown and excluded from the new database", async () => {
     fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogColors: [],
       dogs: [
         {
           registrationNo: "FI12345/21",
@@ -294,6 +303,7 @@ describe("runLegacyPhase1", () => {
 
   it("skips a null EK row without writing an EK value", async () => {
     fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogColors: [],
       dogs: [
         {
           registrationNo: "FI12345/21",
@@ -332,6 +342,7 @@ describe("runLegacyPhase1", () => {
 
   it("does not record an issue for an empty REK_3 alias slot", async () => {
     fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogColors: [],
       dogs: [
         {
           registrationNo: "FI12345/21",
@@ -389,6 +400,7 @@ describe("runLegacyPhase1", () => {
 
   it("records an empty REK_2 alias slot as a warning", async () => {
     fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogColors: [],
       dogs: [
         {
           registrationNo: "FI12345/21",

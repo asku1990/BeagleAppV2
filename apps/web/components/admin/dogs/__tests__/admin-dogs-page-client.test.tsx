@@ -6,6 +6,7 @@ import type { AdminDogFormValues } from "../types";
 const {
   useAdminDogsQueryMock,
   useAdminDogBreederOptionsQueryMock,
+  useAdminDogColorOptionsQueryMock,
   useAdminDogOwnerOptionsQueryMock,
   useAdminDogParentOptionsQueryMock,
   useCreateAdminDogMutationMock,
@@ -19,6 +20,7 @@ const {
 } = vi.hoisted(() => ({
   useAdminDogsQueryMock: vi.fn(),
   useAdminDogBreederOptionsQueryMock: vi.fn(),
+  useAdminDogColorOptionsQueryMock: vi.fn(),
   useAdminDogOwnerOptionsQueryMock: vi.fn(),
   useAdminDogParentOptionsQueryMock: vi.fn(),
   useCreateAdminDogMutationMock: vi.fn(),
@@ -44,6 +46,7 @@ vi.mock("@/hooks/admin/dogs/manage", () => ({
 vi.mock("@/queries/admin/dogs", () => ({
   useAdminDogsQuery: useAdminDogsQueryMock,
   useAdminDogBreederOptionsQuery: useAdminDogBreederOptionsQueryMock,
+  useAdminDogColorOptionsQuery: useAdminDogColorOptionsQueryMock,
   useAdminDogOwnerOptionsQuery: useAdminDogOwnerOptionsQueryMock,
   useAdminDogParentOptionsQuery: useAdminDogParentOptionsQueryMock,
   useCreateAdminDogMutation: useCreateAdminDogMutationMock,
@@ -108,6 +111,7 @@ function buildFormValues(): AdminDogFormValues {
     breederNameText: "Selected Breeder",
     ownershipNames: ["Tiina Virtanen"],
     ekNo: "5588",
+    colorCode: "121",
     note: "",
     registrationNo: "FI12345/21",
     secondaryRegistrationNos: [],
@@ -123,6 +127,7 @@ describe("AdminDogsPageClient", () => {
   beforeEach(() => {
     useAdminDogsQueryMock.mockReset();
     useAdminDogBreederOptionsQueryMock.mockReset();
+    useAdminDogColorOptionsQueryMock.mockReset();
     useAdminDogOwnerOptionsQueryMock.mockReset();
     useAdminDogParentOptionsQueryMock.mockReset();
     useCreateAdminDogMutationMock.mockReset();
@@ -165,6 +170,7 @@ describe("AdminDogsPageClient", () => {
             showCount: 1,
             titlesText: null,
             ekNo: 5588,
+            colorCode: 121,
             note: null,
             titles: [],
           },
@@ -175,6 +181,9 @@ describe("AdminDogsPageClient", () => {
     });
     useAdminDogBreederOptionsQueryMock.mockReturnValue({
       data: [{ id: "b_1", name: "Metsapolun" }],
+    });
+    useAdminDogColorOptionsQueryMock.mockReturnValue({
+      data: [{ code: 121, nameFi: "Kolmivärinen", nameSv: null, nameEn: null }],
     });
     useAdminDogOwnerOptionsQueryMock.mockReturnValue({
       data: [{ id: "o_1", name: "Tiina Virtanen" }],
@@ -247,6 +256,13 @@ describe("AdminDogsPageClient", () => {
     expect(dogFormProps.parentOptions).toEqual([
       { registrationNo: "FI77777/18", name: "Havupolun Helmi" },
       { registrationNo: "FI54321/20", name: "Korven Aatos" },
+    ]);
+    expect(dogFormProps.colorOptions).toEqual([
+      {
+        value: "121",
+        label: "121 - Kolmivärinen",
+        keywords: ["121", "Kolmivärinen", "", ""],
+      },
     ]);
     expect(dogResultsProps.dogs[0]?.titlesText).toBeNull();
   });

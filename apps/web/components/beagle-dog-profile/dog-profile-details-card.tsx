@@ -184,10 +184,7 @@ export function DogProfileDetailsCard({
         />
         <DetailRow
           label={t("dog.profile.field.color")}
-          value={
-            profile.color ??
-            `${FALLBACK_VALUE} ${t("dog.profile.field.comingSoon")}`
-          }
+          value={profile.color ?? FALLBACK_VALUE}
         />
         {profile.ekNo != null && (
           <DetailRow

@@ -1,5 +1,6 @@
 import {
   createAdminDogWriteDb,
+  listAdminDogColorOptionsDb,
   runAdminDogWriteTransactionDb,
   type AuditContextDb,
 } from "@beagle/db";
@@ -83,6 +84,23 @@ export async function createAdminDog(
     if (!parentValidation.ok) {
       return parentValidation.response;
     }
+    if (preflight.data.colorCode != null) {
+      const colorOptions = await listAdminDogColorOptionsDb();
+      if (
+        !colorOptions.items.some(
+          (item) => item.code === preflight.data.colorCode,
+        )
+      ) {
+        return {
+          status: 400,
+          body: {
+            ok: false,
+            error: "Color code was not found.",
+            code: "INVALID_COLOR_CODE",
+          },
+        };
+      }
+    }
 
     const createdDog = await runAdminDogWriteTransactionDb(
       async (tx) =>
@@ -96,6 +114,7 @@ export async function createAdminDog(
             damId: parentValidation.data.dam?.id ?? null,
             ownerNames: inTryValidation.data.ownerNames,
             ekNo: preflight.data.ekNo,
+            colorCode: preflight.data.colorCode,
             note: inTryValidation.data.note,
             registrationNo: preflight.data.primaryRegistrationNo,
             secondaryRegistrationNos: preflight.data.secondaryRegistrationNos,

@@ -27,11 +27,22 @@ export async function fetchLegacyPhase1Rows(options?: {
               SYNTY as birthDateRaw,
               ISREK as sireRegistrationNo,
               EMREK as damRegistrationNo,
-              KASVA as breederName
+              KASVA as breederName,
+              COLCODE as colorCode
        FROM bearek_id`,
     )) as LegacyDogRow[];
     log(
       `Fetched dogs rows: count=${dogs.length}, elapsed=${Math.round((Date.now() - dogsStartedAt) / 1000)}s`,
+    );
+
+    const dogColorsStartedAt = Date.now();
+    const dogColors = (await connection.query(
+      `SELECT COLCODE as code,
+              COLOR as name
+       FROM beacolor`,
+    )) as LegacyPhase1Rows["dogColors"];
+    log(
+      `Fetched dog color rows: count=${dogColors.length}, elapsed=${Math.round((Date.now() - dogColorsStartedAt) / 1000)}s`,
     );
 
     const breedersStartedAt = Date.now();
@@ -91,6 +102,7 @@ export async function fetchLegacyPhase1Rows(options?: {
 
     return {
       dogs,
+      dogColors,
       breeders,
       eks,
       owners,

@@ -26,7 +26,7 @@ Developer notes for the admin dog management flow.
 1. `AdminDogsPageClient` loads dog results with `useAdminDogsQuery`.
 2. Admin dog search matches existing fields plus title row `titleCode` and `titleName`.
 3. The page delegates modal/form state and submit/delete handlers to `useAdminDogFormFlow`.
-4. Lookup queries for breeder/owner/parent options are enabled while the form modal is open.
+4. Lookup queries for breeder/owner/parent/color options are enabled while the form modal is open.
 5. Lookup response data and current form values are shaped via pure feature-local `lib` helpers before rendering `DogFormModal`.
 6. `DogFormModal` delegates large form areas to private `internal/*` sections while keeping controlled form values in the parent flow.
 7. Create/update/delete actions call admin dog mutation hooks, then rely on existing query invalidation behavior from those hooks.
@@ -36,7 +36,7 @@ Developer notes for the admin dog management flow.
 - `AdminDogsPageClient` stays a composition shell.
 - Non-UI form flow logic stays in feature-local hook/lib modules.
 - `DogFormModal` remains presentational and receives prepared options/handlers as props.
-- No contract/API payload shapes changed in this refactor.
+- Admin create/update payloads include optional `colorCode`; the form edits it with lookup-backed options from `DogColor`.
 
 ## Tests
 
