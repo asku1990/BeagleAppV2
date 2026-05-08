@@ -45,6 +45,7 @@ function buildEditValues(): AdminDogFormValues {
     breederNameText: "Metsapolun",
     ownershipNames: ["Tiina Virtanen", "Antti Virtanen"],
     ekNo: "5588",
+    colorCode: "121",
     note: "Important note",
     registrationNo: "FI12345/21",
     secondaryRegistrationNos: ["FI54321/21"],
@@ -70,6 +71,7 @@ function buildCreateValues(): AdminDogFormValues {
     breederNameText: "",
     ownershipNames: [],
     ekNo: "",
+    colorCode: "",
     note: "",
     registrationNo: "",
     secondaryRegistrationNos: [],
@@ -102,6 +104,7 @@ function buildDog(values: AdminDogFormValues): AdminDogRecord {
     titlesText:
       values.titles.map((title) => title.titleCode).join(", ") || null,
     ekNo: Number(values.ekNo),
+    colorCode: values.colorCode ? Number(values.colorCode) : null,
     note: values.note,
     registrationNo: values.registrationNo,
     secondaryRegistrationNos: values.secondaryRegistrationNos,
@@ -124,6 +127,7 @@ describe("DogFormModal", () => {
         dog: buildDog(values),
         values,
         breederOptions: [{ id: "b_1", name: "Metsapolun" }],
+        colorOptions: [{ value: "121", label: "121 - Kolmivärinen" }],
         ownerOptions: [
           { id: "o_1", name: "Tiina Virtanen" },
           { id: "o_2", name: "Antti Virtanen" },
@@ -166,6 +170,7 @@ describe("DogFormModal", () => {
         dog: buildDog(values),
         values,
         breederOptions: [{ id: "b_1", name: "Metsapolun" }],
+        colorOptions: [{ value: "121", label: "121 - Kolmivärinen" }],
         ownerOptions: [
           { id: "o_1", name: "Tiina Virtanen" },
           { id: "o_2", name: "Antti Virtanen" },
@@ -195,6 +200,7 @@ describe("DogFormModal", () => {
         dog: null,
         values,
         breederOptions: [],
+        colorOptions: [],
         ownerOptions: [],
         parentOptions: [],
         onBreederSearchChange: vi.fn(),

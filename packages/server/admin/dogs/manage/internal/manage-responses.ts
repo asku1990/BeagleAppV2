@@ -98,6 +98,19 @@ export function invalidEkNoResponse<
   } as ServiceResult<T>;
 }
 
+export function invalidColorCodeResponse<
+  T extends ManageErrorTarget,
+>(): ServiceResult<T> {
+  return {
+    status: 400,
+    body: {
+      ok: false,
+      error: "Color code was not found.",
+      code: "INVALID_COLOR_CODE",
+    },
+  } as ServiceResult<T>;
+}
+
 export function invalidRegistrationNoResponse<
   T extends ManageErrorTarget,
 >(): ServiceResult<T> {

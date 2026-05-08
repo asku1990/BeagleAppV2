@@ -6,6 +6,12 @@ export type LegacyDogRow = {
   sireRegistrationNo: string | null;
   damRegistrationNo: string | null;
   breederName: string | null;
+  colorCode: number | string | null;
+};
+
+export type LegacyDogColorRow = {
+  code: number | string | null;
+  name: string | null;
 };
 
 export type LegacyBreederRow = {
@@ -234,6 +240,7 @@ export type LegacySamakoiraRow = {
 
 export type LegacyPhase1Rows = {
   dogs: LegacyDogRow[];
+  dogColors: LegacyDogColorRow[];
   breeders: LegacyBreederRow[];
   eks: LegacyEkRow[];
   owners: LegacyOwnerRow[];

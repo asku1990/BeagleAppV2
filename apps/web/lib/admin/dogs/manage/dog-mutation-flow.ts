@@ -44,6 +44,16 @@ function normalizeEkNo(value: string): number | null {
   return Number.isNaN(parsed) ? null : parsed;
 }
 
+function normalizeColorCode(value: string): number | null {
+  const normalized = value.trim();
+  if (normalized.length === 0) {
+    return null;
+  }
+
+  const parsed = Number.parseInt(normalized, 10);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
 function normalizeSecondaryRegistrations(values: string[]): string[] {
   return values
     .map((value) => value.trim().toUpperCase())
@@ -74,6 +84,7 @@ export function toCreateAdminDogRequest(
     breederNameText: normalizeOptionalText(values.breederNameText) ?? undefined,
     ownerNames: values.ownershipNames,
     ekNo: normalizeEkNo(values.ekNo) ?? undefined,
+    colorCode: normalizeColorCode(values.colorCode),
     note: normalizeOptionalText(values.note) ?? undefined,
     registrationNo: values.registrationNo.trim(),
     secondaryRegistrationNos: normalizeSecondaryRegistrations(
@@ -99,6 +110,7 @@ export function toUpdateAdminDogRequest(
     breederNameText: normalizeOptionalText(values.breederNameText),
     ownerNames: values.ownershipNames,
     ekNo: normalizeEkNo(values.ekNo),
+    colorCode: normalizeColorCode(values.colorCode),
     note: normalizeOptionalText(values.note),
     registrationNo: values.registrationNo.trim(),
     secondaryRegistrationNos: normalizeSecondaryRegistrations(
@@ -147,6 +159,8 @@ export function getAdminDogMutationErrorMessageKey(
       return "admin.dogs.mutation.errorInvalidBirthDate";
     case "INVALID_EK_NO":
       return "admin.dogs.mutation.errorInvalidEkNo";
+    case "INVALID_COLOR_CODE":
+      return "admin.dogs.mutation.errorInvalidColorCode";
     case "REGISTRATION_NO_TOO_LONG":
       return "admin.dogs.mutation.errorRegistrationTooLong";
     case "NOTE_TOO_LONG":

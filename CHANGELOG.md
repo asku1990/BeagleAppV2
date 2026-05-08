@@ -14,6 +14,8 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+- Koirien värit tuodaan nyt vanhasta järjestelmästä, näkyvät koiraprofiilissa ja ovat muokattavissa ylläpidon koiralomakkeella.
+
 ### Changed
 
 ### Fixed

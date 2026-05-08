@@ -5,6 +5,7 @@ export {
   createAdminUser,
   deleteAdminUser,
   listAdminBreederOptions,
+  listAdminDogColorOptions,
   listAdminDogParentOptions,
   listAdminDogs,
   listAdminUsers,

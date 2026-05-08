@@ -15,6 +15,7 @@ import {
 import {
   duplicateRegistrationNoResponse,
   invalidBirthDateResponse,
+  invalidColorCodeResponse,
   invalidDogIdResponse,
   invalidEkNoResponse,
   invalidNameResponse,
@@ -50,6 +51,7 @@ export type UpdatePreflightValidationResult =
       sex: "MALE" | "FEMALE" | "UNKNOWN";
       birthDate: Date | null | undefined;
       ekNo: number | null | undefined;
+      colorCode: number | null | undefined;
       primaryRegistrationNo: string;
       secondaryRegistrationNos: string[];
       allRegistrationNos: string[];
@@ -194,6 +196,23 @@ export function validateUpdatePreflight(
     };
   }
 
+  const colorCode =
+    input.colorCode === undefined
+      ? undefined
+      : parsePositiveInteger(input.colorCode);
+  if (colorCode === "INVALID") {
+    return {
+      ok: false,
+      logContext: {
+        event: "invalid_color_code",
+        dogId: id,
+        colorCode: input.colorCode,
+      },
+      logMessage: "admin dog update rejected because color code is invalid",
+      response: invalidColorCodeResponse(),
+    };
+  }
+
   return {
     ok: true,
     data: {
@@ -202,6 +221,7 @@ export function validateUpdatePreflight(
       sex,
       birthDate,
       ekNo,
+      colorCode,
       primaryRegistrationNo: registration.primaryRegistrationNo,
       secondaryRegistrationNos: registration.secondaryRegistrationNos,
       allRegistrationNos: registration.allRegistrationNos,

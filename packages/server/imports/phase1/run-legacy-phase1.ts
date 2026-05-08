@@ -72,6 +72,18 @@ function parseRegistrationNo(value: string | null | undefined): {
   };
 }
 
+function parseLegacyColorCode(
+  value: string | number | null | undefined,
+): number | null | "INVALID" {
+  if (value == null) return null;
+  const normalized = String(value).trim();
+  if (!normalized) return null;
+  if (!/^\d+$/u.test(normalized)) return "INVALID";
+  const parsed = Number(normalized);
+  if (!Number.isSafeInteger(parsed)) return "INVALID";
+  return parsed > 0 ? parsed : null;
+}
+
 function formatPlaceholderRelationMessage(role: "Sire" | "Dam"): string {
   return `${role} registration is a placeholder and was treated as unknown, so the placeholder reference was not written to the new database.`;
 }
@@ -290,9 +302,50 @@ export async function runLegacyPhase1(
       (row) => row.ekNo != null,
     ).length;
     log(
-      `Loaded legacy source rows: dogs=${legacy.dogs.length}, breeders=${legacy.breeders.length}, bea_apuRows=${beaApuRows}, bea_apuRowsWithEkNo=${beaApuRowsWithEkNo}, owners=${legacy.owners.length}, samakoira=${legacy.samakoira.length}`,
+      `Loaded legacy source rows: dogs=${legacy.dogs.length}, dogColors=${legacy.dogColors.length}, breeders=${legacy.breeders.length}, bea_apuRows=${beaApuRows}, bea_apuRowsWithEkNo=${beaApuRowsWithEkNo}, owners=${legacy.owners.length}, samakoira=${legacy.samakoira.length}`,
     );
     finishStage("load");
+
+    startStage("dogColors");
+    let dogColorsProcessed = 0;
+    let dogColorsUpserted = 0;
+    let dogColorsSkipped = 0;
+    const totalDogColors = legacy.dogColors.length;
+    const importedDogColorCodes = new Set<number>();
+    for (const row of legacy.dogColors) {
+      dogColorsProcessed += 1;
+      const code = parseLegacyColorCode(row.code);
+      const name = normalizeNullable(row.name);
+
+      if (code === "INVALID" || code == null || !name) {
+        dogColorsSkipped += 1;
+        await recordIssue({
+          stage: "dogColors",
+          code: "DOG_COLOR_INVALID_LOOKUP_ROW",
+          message: "Dog color lookup row has invalid code or missing name.",
+          sourceTable: "beacolor",
+          payloadJson: JSON.stringify(row),
+        });
+        continue;
+      }
+
+      await prisma.dogColor.upsert({
+        where: { code },
+        create: {
+          code,
+          nameFi: name,
+        },
+        update: {
+          nameFi: name,
+        },
+      });
+      importedDogColorCodes.add(code);
+      dogColorsUpserted += 1;
+    }
+    finishStage(
+      "dogColors",
+      `upserted=${dogColorsUpserted}, skipped=${dogColorsSkipped}`,
+    );
 
     startStage("breeders");
     let breederRowsProcessed = 0;
@@ -469,6 +522,40 @@ export async function runLegacyPhase1(
       }
 
       const breederNameText = normalizeNullable(row.breederName);
+      const colorCode = parseLegacyColorCode(row.colorCode);
+      if (colorCode === "INVALID") {
+        await recordIssue({
+          stage: "dogs",
+          code: "DOG_COLOR_INVALID_CODE",
+          message:
+            "Dog row has invalid color code; color was treated as unknown.",
+          registrationNo,
+          sourceTable: "bearek_id",
+          payloadJson: JSON.stringify({
+            registrationNo: row.registrationNo,
+            colorCode: row.colorCode,
+          }),
+        });
+      } else if (colorCode != null && !importedDogColorCodes.has(colorCode)) {
+        await recordIssue({
+          stage: "dogs",
+          code: "DOG_COLOR_LOOKUP_NOT_FOUND",
+          message:
+            "Dog row references a color code missing from beacolor; color was treated as unknown.",
+          registrationNo,
+          sourceTable: "bearek_id",
+          payloadJson: JSON.stringify({
+            registrationNo: row.registrationNo,
+            colorCode,
+          }),
+        });
+      }
+      const dogColorCode =
+        colorCode === "INVALID" ||
+        !colorCode ||
+        !importedDogColorCodes.has(colorCode)
+          ? null
+          : colorCode;
       if (breederNameText) {
         dogsWithBreederText += 1;
       }
@@ -513,6 +600,7 @@ export async function runLegacyPhase1(
             birthDate: parseLegacyDate(row.birthDateRaw),
             breederNameText,
             breederId,
+            colorCode: dogColorCode,
           },
         });
 
@@ -530,6 +618,7 @@ export async function runLegacyPhase1(
             birthDate: parseLegacyDate(row.birthDateRaw),
             breederNameText,
             breederId,
+            colorCode: dogColorCode,
             registrations: {
               create: {
                 registrationNo,
