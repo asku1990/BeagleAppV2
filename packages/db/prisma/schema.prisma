@@ -217,9 +217,6 @@ model Dog {
   sairaudet           KoiranSairaus[]   @relation("KoiranSairausDog")
   sairauksienIsana    KoiranSairaus[]   @relation("KoiranSairausIsa")
   sairauksienEmana    KoiranSairaus[]   @relation("KoiranSairausEma")
-  epiLuvut            KoiranEpiLuku[]   @relation("KoiranEpiLukuDog")
-  epiLukujenIsana     KoiranEpiLuku[]   @relation("KoiranEpiLukuIsa")
-  epiLukujenEmana     KoiranEpiLuku[]   @relation("KoiranEpiLukuEma")
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
 
@@ -298,30 +295,6 @@ model KoiranSairaus {
   @@index([rekisterinumero])
   @@index([sairausId])
   @@index([sairausKoodi])
-}
-
-model KoiranEpiLuku {
-  id                String    @id @default(cuid())
-  vanhaId           Int
-  dogId             String?
-  isaDogId          String?
-  emaDogId          String?
-  rekisterinumero   String
-  epiLuku           Decimal?  @db.Decimal(10, 5)
-  epiTeksti         String?
-  vara              String?
-  muokattuLahteessa DateTime?
-  dog               Dog?      @relation("KoiranEpiLukuDog", fields: [dogId], references: [id], onDelete: SetNull)
-  isaDog            Dog?      @relation("KoiranEpiLukuIsa", fields: [isaDogId], references: [id], onDelete: SetNull)
-  emaDog            Dog?      @relation("KoiranEpiLukuEma", fields: [emaDogId], references: [id], onDelete: SetNull)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-
-  @@unique([vanhaId, rekisterinumero])
-  @@index([dogId])
-  @@index([isaDogId])
-  @@index([emaDogId])
-  @@index([rekisterinumero])
 }
 
 model Breeder {

@@ -29,7 +29,7 @@ describe("BeagleDogProfilePage", () => {
           sex: "N",
           color: null,
           ekNo: 11,
-          inbreedingCoefficientPct: null,
+          inbreedingCoefficientPct: 12.5,
           sire: {
             id: "sire_1",
             name: "Sire",
@@ -205,7 +205,7 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain("Puppy One");
     expect(html).toContain("FI-31/24");
     expect(html).toContain("Puppy Two");
-    expect(html).toContain("dog.profile.field.comingSoon");
+    expect(html).toContain("12.50 %");
     expect(html).toContain("301");
     expect(html).toContain("dog.profile.shows.copy.button");
     expect(html).toContain("dog.profile.trials.copy.button");

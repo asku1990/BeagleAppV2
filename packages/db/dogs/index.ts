@@ -10,6 +10,11 @@ export {
   type BeagleDogProfileSexDb,
   type BeagleDogProfileTitleDb,
 } from "./profile/get-beagle-dog-profile";
+export {
+  loadDogPedigreeAncestryDb,
+  type DogPedigreeAncestorDb,
+  type DogPedigreeAncestryDb,
+} from "./core/pedigree-ancestry";
 export { getNewestBeagleDogsDb } from "./newest";
 export {
   searchBeagleDogsDb,

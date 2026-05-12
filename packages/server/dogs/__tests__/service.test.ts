@@ -8,12 +8,16 @@ const {
   getBeagleDogProfileDbMock,
   getBeagleShowsForDogDbMock,
   getBeagleTrialsForDogDbMock,
+  loadDogPedigreeAncestryDbMock,
+  calculateInbreedingCoefficientPctMock,
 } = vi.hoisted(() => ({
   searchBeagleDogsDbMock: vi.fn(),
   getNewestBeagleDogsDbMock: vi.fn(),
   getBeagleDogProfileDbMock: vi.fn(),
   getBeagleShowsForDogDbMock: vi.fn(),
   getBeagleTrialsForDogDbMock: vi.fn(),
+  loadDogPedigreeAncestryDbMock: vi.fn(),
+  calculateInbreedingCoefficientPctMock: vi.fn(),
 }));
 
 vi.mock("@beagle/db", async () => {
@@ -25,8 +29,13 @@ vi.mock("@beagle/db", async () => {
     getBeagleDogProfileDb: getBeagleDogProfileDbMock,
     getBeagleShowsForDogDb: getBeagleShowsForDogDbMock,
     getBeagleTrialsForDogDb: getBeagleTrialsForDogDbMock,
+    loadDogPedigreeAncestryDb: loadDogPedigreeAncestryDbMock,
   };
 });
+
+vi.mock("@server/dogs/core/inbreeding-coefficient", () => ({
+  calculateInbreedingCoefficientPct: calculateInbreedingCoefficientPctMock,
+}));
 
 function withoutEventKey<T extends { eventKey: unknown }>(
   row: T,
@@ -43,6 +52,8 @@ describe("dogs service", () => {
     getBeagleDogProfileDbMock.mockReset();
     getBeagleShowsForDogDbMock.mockReset();
     getBeagleTrialsForDogDbMock.mockReset();
+    loadDogPedigreeAncestryDbMock.mockReset();
+    calculateInbreedingCoefficientPctMock.mockReset();
   });
 
   it("returns 400 for invalid sort and does not call DB", async () => {
@@ -389,6 +400,7 @@ describe("dogs service", () => {
         ok: true,
         data: {
           ...mockProfile,
+          inbreedingCoefficientPct: null,
           birthDate: "2020-01-01",
           litters: [
             {

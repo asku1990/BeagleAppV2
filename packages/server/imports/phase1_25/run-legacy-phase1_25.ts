@@ -69,28 +69,10 @@ type KoiranSairausDelegate = {
   }): Promise<{ count: number }>;
 };
 
-type KoiranEpiLukuDelegate = {
-  createMany(args: {
-    data: Array<{
-      vanhaId: number;
-      dogId: string | null;
-      isaDogId: string | null;
-      emaDogId: string | null;
-      rekisterinumero: string;
-      epiLuku: string | null;
-      epiTeksti: string | null;
-      vara: string | null;
-      muokattuLahteessa: Date | null;
-    }>;
-    skipDuplicates?: boolean;
-  }): Promise<{ count: number }>;
-};
-
 function getPhase1_25Db() {
   return prisma as unknown as {
     sairaus: SairausDelegate;
     koiranSairaus: KoiranSairausDelegate;
-    koiranEpiLuku: KoiranEpiLukuDelegate;
   };
 }
 
@@ -109,7 +91,7 @@ function parseSiitosastePercent(
   value: string | number | null | undefined,
 ): string | null {
   const parsed = parseLegacyDecimal(value);
-  if (parsed == null || Number.parseFloat(parsed) === 0) return null;
+  if (parsed == null) return null;
   return parsed;
 }
 
@@ -200,33 +182,6 @@ function resolveRegistration(
 
 function isUnknownLegacyParentRegistration(value: string): boolean {
   return value === "-" || value === "0" || /^U0+$/u.test(value);
-}
-
-function buildDuplicateLegacyEpiIdGroups(
-  rows: Array<{
-    legacyId: number;
-    registrationNo: string | null;
-    sireRegistrationNo: string | null;
-    damRegistrationNo: string | null;
-    epiValueRaw: string | number | null;
-    epiText: string | null;
-    modifiedRaw: string | Date | null;
-    flag: string | null;
-  }>,
-) {
-  const rowsByLegacyId = new Map<number, typeof rows>();
-  for (const row of rows) {
-    const existing = rowsByLegacyId.get(row.legacyId);
-    if (existing) {
-      existing.push(row);
-    } else {
-      rowsByLegacyId.set(row.legacyId, [row]);
-    }
-  }
-
-  return Array.from(rowsByLegacyId.entries()).filter(
-    ([, legacyRows]) => legacyRows.length > 1,
-  );
 }
 
 // Imports v1 virtual pairing support tables after phase1 has created dogs and registrations.
@@ -363,7 +318,7 @@ export async function runLegacyPhase1_25(
     });
     finishStage(
       "load",
-      `inbreeding=${legacy.inbreeding.length}, sairaudet=${legacy.sairaudet.length}, koiranSairaudet=${legacy.koiranSairaudet.length}, epiLuvut=${legacy.epiLuvut.length}`,
+      `inbreeding=${legacy.inbreeding.length}, sairaudet=${legacy.sairaudet.length}, koiranSairaudet=${legacy.koiranSairaudet.length}`,
     );
 
     startStage("index");
@@ -628,113 +583,6 @@ export async function runLegacyPhase1_25(
       `source=${legacy.koiranSairaudet.length}, inserted=${koiranSairaudetInserted}, skipped=${koiranSairaudetSkipped}, parentInvalid=${koiranSairaudetParentInvalid}, parentUnresolved=${koiranSairaudetParentUnresolved}`,
     );
 
-    startStage("epi-luvut");
-    const epiLuvutData: Parameters<
-      KoiranEpiLukuDelegate["createMany"]
-    >[0]["data"] = [];
-    let epiLuvutSkipped = 0;
-    let epiLuvutProcessed = 0;
-    let epiLuvutParentInvalid = 0;
-    let epiLuvutParentUnresolved = 0;
-    for (const row of legacy.epiLuvut) {
-      epiLuvutProcessed += 1;
-      const dog = resolveRegistration(registrationIndex, row.registrationNo);
-      const isa = resolveRegistration(
-        registrationIndex,
-        row.sireRegistrationNo,
-      );
-      const ema = resolveRegistration(registrationIndex, row.damRegistrationNo);
-      if (!dog.registrationNo || !isValidRegistrationNo(dog.registrationNo)) {
-        epiLuvutSkipped += 1;
-        errorsCount += 1;
-        await recordIssue({
-          stage: "epi-luvut",
-          code: "EPI_LUKU_REGISTRATION_INVALID",
-          message: "beaepi row is missing a valid REKNO.",
-          sourceRowId: row.legacyId,
-          sourceTable: "beaepi",
-          payloadJson: JSON.stringify(row),
-        });
-        if (epiLuvutProcessed % 1000 === 0) {
-          logProgress("epi-luvut", epiLuvutProcessed, legacy.epiLuvut.length);
-        }
-        continue;
-      }
-      for (const [role, parent] of [
-        ["sire", isa],
-        ["dam", ema],
-      ] as const) {
-        const result = await recordParentResolutionIssue({
-          stage: "epi-luvut",
-          sourceTable: "beaepi",
-          sourceRowId: row.legacyId,
-          rowRegistrationNo: dog.registrationNo,
-          role,
-          parentRegistrationNo: parent.registrationNo,
-          parentDogId: parent.dogId,
-          payloadJson: JSON.stringify(row),
-        });
-        if (result === "invalid") epiLuvutParentInvalid += 1;
-        if (result === "unresolved") epiLuvutParentUnresolved += 1;
-      }
-      epiLuvutData.push({
-        vanhaId: row.legacyId,
-        dogId: dog.dogId,
-        isaDogId: isa.dogId,
-        emaDogId: ema.dogId,
-        rekisterinumero: dog.registrationNo,
-        epiLuku: parseLegacyDecimal(row.epiValueRaw),
-        epiTeksti: normalizeNullable(row.epiText),
-        vara: normalizeNullable(row.flag),
-        muokattuLahteessa: parseLegacyTimestamp(row.modifiedRaw),
-      });
-      if (epiLuvutProcessed % 1000 === 0) {
-        logProgress("epi-luvut", epiLuvutProcessed, legacy.epiLuvut.length);
-      }
-    }
-    logProgress("epi-luvut", epiLuvutProcessed, legacy.epiLuvut.length);
-
-    const duplicateLegacyEpiIdGroups = buildDuplicateLegacyEpiIdGroups(
-      legacy.epiLuvut,
-    );
-    for (const [legacyId, duplicateRows] of duplicateLegacyEpiIdGroups) {
-      await recordIssue({
-        stage: "epi-luvut",
-        severity: "WARNING",
-        code: "EPI_LUKU_LEGACY_ID_DUPLICATE",
-        message:
-          "beaepi.ID appears on multiple REKNO rows; imported all rows using ID + REKNO identity.",
-        sourceRowId: legacyId,
-        sourceTable: "beaepi",
-        payloadJson: JSON.stringify({
-          legacyId,
-          rows: duplicateRows.map((row) => ({
-            registrationNo: normalizeRegistrationNo(row.registrationNo),
-            sireRegistrationNo: normalizeRegistrationNo(row.sireRegistrationNo),
-            damRegistrationNo: normalizeRegistrationNo(row.damRegistrationNo),
-            epiLuku: parseLegacyDecimal(row.epiValueRaw),
-            epiTeksti: normalizeNullable(row.epiText),
-            modifiedRaw: row.modifiedRaw,
-            flag: normalizeNullable(row.flag),
-          })),
-        }),
-      });
-    }
-
-    const epiLuvutInserted =
-      epiLuvutData.length > 0
-        ? (
-            await phaseDb.koiranEpiLuku.createMany({
-              data: epiLuvutData,
-              skipDuplicates: true,
-            })
-          ).count
-        : 0;
-    finishStage(
-      "epi-luvut",
-      `source=${legacy.epiLuvut.length}, inserted=${epiLuvutInserted}, skipped=${epiLuvutSkipped}, parentInvalid=${epiLuvutParentInvalid}, parentUnresolved=${epiLuvutParentUnresolved}, duplicateLegacyIds=${duplicateLegacyEpiIdGroups.length}`,
-    );
-
     await flushIssueBuffer();
 
     const finished = await markImportRunFinished(
@@ -752,7 +600,7 @@ export async function runLegacyPhase1_25(
           siitosasteUpdated,
           sairaudetInserted,
           koiranSairaudetInserted,
-          epiLuvutInserted,
+          epiLuvutInserted: 0,
           errorsCount,
         }),
       },

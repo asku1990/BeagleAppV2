@@ -1,7 +1,6 @@
 import { connectLegacyDatabase } from "../internal";
 import type {
   LegacyDogInbreedingRow,
-  LegacyKoiranEpiLukuRow,
   LegacyKoiranSairausRow,
   LegacyPhase1_25Rows,
   LegacySairausRow,
@@ -57,22 +56,6 @@ export async function fetchLegacyPhase1_25Rows(options?: {
       `Fetched beasairaat rows: total=${koiranSairaudet.length}, elapsed=${Math.round((Date.now() - koiranSairaudetStartedAt) / 1000)}s`,
     );
 
-    const epiLuvutStartedAt = Date.now();
-    const epiLuvut = (await connection.query(
-      `SELECT ID as legacyId,
-              REKNO as registrationNo,
-              ISREK as sireRegistrationNo,
-              EMREK as damRegistrationNo,
-              EPILUKU as epiValueRaw,
-              EPITEKSTI as epiText,
-              MUOKATTU as modifiedRaw,
-              VARA as flag
-       FROM beaepi`,
-    )) as LegacyKoiranEpiLukuRow[];
-    log(
-      `Fetched beaepi rows: total=${epiLuvut.length}, elapsed=${Math.round((Date.now() - epiLuvutStartedAt) / 1000)}s`,
-    );
-
     log(
       `Legacy phase1.25 source fetch completed in ${Math.round((Date.now() - startedAt) / 1000)}s`,
     );
@@ -81,7 +64,6 @@ export async function fetchLegacyPhase1_25Rows(options?: {
       inbreeding,
       sairaudet,
       koiranSairaudet,
-      epiLuvut,
     };
   } finally {
     log("Closing legacy database connection...");

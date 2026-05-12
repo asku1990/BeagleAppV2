@@ -51,22 +51,10 @@ export type LegacyKoiranSairausRow = {
   modifiedRaw: string | Date | null;
 };
 
-export type LegacyKoiranEpiLukuRow = {
-  legacyId: number;
-  registrationNo: string | null;
-  sireRegistrationNo: string | null;
-  damRegistrationNo: string | null;
-  epiValueRaw: string | number | null;
-  epiText: string | null;
-  modifiedRaw: string | Date | null;
-  flag: string | null;
-};
-
 export type LegacyPhase1_25Rows = {
   inbreeding: LegacyDogInbreedingRow[];
   sairaudet: LegacySairausRow[];
   koiranSairaudet: LegacyKoiranSairausRow[];
-  epiLuvut: LegacyKoiranEpiLukuRow[];
 };
 
 export type LegacyOwnerRow = {

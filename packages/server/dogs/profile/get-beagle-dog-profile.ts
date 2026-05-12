@@ -143,6 +143,7 @@ export async function getBeagleDogProfileService(
       getBeagleShowsForDogDb(parsedDogId),
       getBeagleTrialsForDogDb(parsedDogId),
     ]);
+    const inbreedingCoefficientPct = profile.siitosasteProsentti ?? null;
 
     log.info(
       {
@@ -154,7 +155,14 @@ export async function getBeagleDogProfileService(
     );
     return {
       status: 200,
-      body: { ok: true, data: mapDogProfileFromDb(profile, shows, trials) },
+      body: {
+        ok: true,
+        data: mapDogProfileFromDb(
+          { ...profile, inbreedingCoefficientPct },
+          shows,
+          trials,
+        ),
+      },
     };
   } catch (error) {
     log.error(
