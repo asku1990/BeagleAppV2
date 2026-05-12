@@ -1,4 +1,5 @@
 export { listAdminDogs } from "./manage/list-dogs";
+export { calculateAdminDogInbreeding } from "./manage/calculate-inbreeding";
 export { createAdminDog } from "./manage/create-dog";
 export { updateAdminDog } from "./manage/update-dog";
 export { deleteAdminDog } from "./manage/delete-dog";

@@ -26,9 +26,11 @@ type DogFormModalProps = {
   onParentSearchChange: (value: string) => void;
   open: boolean;
   isSubmitting?: boolean;
+  isCalculatingInbreeding?: boolean;
   onClose: () => void;
   onValuesChange: (values: AdminDogFormValues) => void;
   onSubmit: (values: AdminDogFormValues) => void | Promise<void>;
+  onCalculateInbreeding?: () => void | Promise<void>;
 };
 
 export function DogFormModal({
@@ -43,9 +45,11 @@ export function DogFormModal({
   onParentSearchChange,
   open,
   isSubmitting = false,
+  isCalculatingInbreeding = false,
   onClose,
   onValuesChange,
   onSubmit,
+  onCalculateInbreeding,
 }: DogFormModalProps) {
   const { t } = useI18n();
   const todayDateInputValue = useMemo(
@@ -171,6 +175,8 @@ export function DogFormModal({
           parentComboboxOptions={parentComboboxOptions}
           onParentSearchChange={onParentSearchChange}
           onValuesChange={onValuesChange}
+          onCalculateInbreeding={onCalculateInbreeding}
+          isCalculatingInbreeding={isCalculatingInbreeding}
           t={t}
         />
 

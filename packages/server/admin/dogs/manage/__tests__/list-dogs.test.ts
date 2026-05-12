@@ -110,6 +110,7 @@ describe("listAdminDogs", () => {
           showCount: 4,
           titlesText: "FI JVA",
           ekNo: 5588,
+          siitosasteProsentti: 12.5,
           note: "Important",
           titles: [
             {
@@ -172,6 +173,7 @@ describe("listAdminDogs", () => {
               showCount: 4,
               titlesText: "FI JVA",
               ekNo: 5588,
+              inbreedingCoefficientPct: 12.5,
               note: "Important",
               titles: [
                 {

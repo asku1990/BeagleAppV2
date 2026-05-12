@@ -16,7 +16,10 @@ vi.mock("../../../core/prisma", () => ({
   prisma: prismaMock,
 }));
 
-import { loadDogPedigreeAncestryDb } from "../pedigree-ancestry";
+import {
+  loadDogPedigreeAncestryDb,
+  loadDogPedigreeAncestryForParentsDb,
+} from "../pedigree-ancestry";
 
 describe("loadDogPedigreeAncestryDb", () => {
   beforeEach(() => {
@@ -65,6 +68,28 @@ describe("loadDogPedigreeAncestryDb", () => {
           siitosasteProsentti: null,
         },
       },
+    });
+  });
+
+  it("loads both parent branches for virtual calculations", async () => {
+    dogFindManyMock
+      .mockResolvedValueOnce([
+        { id: "sire", sireId: "ancestor", damId: null },
+        { id: "dam", sireId: "ancestor", damId: null },
+      ])
+      .mockResolvedValueOnce([{ id: "ancestor", sireId: null, damId: null }]);
+
+    const result = await loadDogPedigreeAncestryForParentsDb("sire", "dam", 9);
+
+    expect(dogFindManyMock).toHaveBeenCalledTimes(2);
+    expect(result.rootId).toBe("sire:dam");
+    expect(result.nodes.sire?.sireId).toBe("ancestor");
+    expect(result.nodes.dam?.sireId).toBe("ancestor");
+    expect(result.nodes.ancestor).toEqual({
+      id: "ancestor",
+      sireId: null,
+      damId: null,
+      siitosasteProsentti: null,
     });
   });
 });

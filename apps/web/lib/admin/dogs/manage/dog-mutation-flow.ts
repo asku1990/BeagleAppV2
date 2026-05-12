@@ -74,6 +74,7 @@ export function toCreateAdminDogRequest(
     breederNameText: normalizeOptionalText(values.breederNameText) ?? undefined,
     ownerNames: values.ownershipNames,
     ekNo: normalizeEkNo(values.ekNo) ?? undefined,
+    inbreedingCoefficientPct: values.inbreedingCoefficientPct,
     note: normalizeOptionalText(values.note) ?? undefined,
     registrationNo: values.registrationNo.trim(),
     secondaryRegistrationNos: normalizeSecondaryRegistrations(
@@ -99,6 +100,7 @@ export function toUpdateAdminDogRequest(
     breederNameText: normalizeOptionalText(values.breederNameText),
     ownerNames: values.ownershipNames,
     ekNo: normalizeEkNo(values.ekNo),
+    inbreedingCoefficientPct: values.inbreedingCoefficientPct,
     note: normalizeOptionalText(values.note),
     registrationNo: values.registrationNo.trim(),
     secondaryRegistrationNos: normalizeSecondaryRegistrations(

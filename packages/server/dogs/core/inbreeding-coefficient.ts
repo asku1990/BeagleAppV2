@@ -146,8 +146,22 @@ export function calculateInbreedingCoefficientPct(
     return 0;
   }
 
-  const sireMatrix = buildSideMatrix(ancestry, root.sireId, maxDepth);
-  const damMatrix = buildSideMatrix(ancestry, root.damId, maxDepth);
+  return calculateInbreedingCoefficientForParentsPct(
+    root.sireId,
+    root.damId,
+    ancestry,
+    maxDepth,
+  );
+}
+
+export function calculateInbreedingCoefficientForParentsPct(
+  sireId: string,
+  damId: string,
+  ancestry: DogPedigreeAncestryDb,
+  maxDepth = 9,
+): number {
+  const sireMatrix = buildSideMatrix(ancestry, sireId, maxDepth);
+  const damMatrix = buildSideMatrix(ancestry, damId, maxDepth);
   const shared = buildSharedOccurrences(sireMatrix, damMatrix, maxDepth);
   return sumInbreedingPct(shared, ancestry);
 }

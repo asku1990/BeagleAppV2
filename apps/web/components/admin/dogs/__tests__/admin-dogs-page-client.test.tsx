@@ -8,6 +8,7 @@ const {
   useAdminDogBreederOptionsQueryMock,
   useAdminDogOwnerOptionsQueryMock,
   useAdminDogParentOptionsQueryMock,
+  useCalculateAdminDogInbreedingMutationMock,
   useCreateAdminDogMutationMock,
   useUpdateAdminDogMutationMock,
   useDeleteAdminDogMutationMock,
@@ -21,6 +22,7 @@ const {
   useAdminDogBreederOptionsQueryMock: vi.fn(),
   useAdminDogOwnerOptionsQueryMock: vi.fn(),
   useAdminDogParentOptionsQueryMock: vi.fn(),
+  useCalculateAdminDogInbreedingMutationMock: vi.fn(),
   useCreateAdminDogMutationMock: vi.fn(),
   useUpdateAdminDogMutationMock: vi.fn(),
   useDeleteAdminDogMutationMock: vi.fn(),
@@ -46,6 +48,8 @@ vi.mock("@/queries/admin/dogs", () => ({
   useAdminDogBreederOptionsQuery: useAdminDogBreederOptionsQueryMock,
   useAdminDogOwnerOptionsQuery: useAdminDogOwnerOptionsQueryMock,
   useAdminDogParentOptionsQuery: useAdminDogParentOptionsQueryMock,
+  useCalculateAdminDogInbreedingMutation:
+    useCalculateAdminDogInbreedingMutationMock,
   useCreateAdminDogMutation: useCreateAdminDogMutationMock,
   useUpdateAdminDogMutation: useUpdateAdminDogMutationMock,
   useDeleteAdminDogMutation: useDeleteAdminDogMutationMock,
@@ -108,6 +112,7 @@ function buildFormValues(): AdminDogFormValues {
     breederNameText: "Selected Breeder",
     ownershipNames: ["Tiina Virtanen"],
     ekNo: "5588",
+    inbreedingCoefficientPct: null,
     note: "",
     registrationNo: "FI12345/21",
     secondaryRegistrationNos: [],
@@ -125,6 +130,7 @@ describe("AdminDogsPageClient", () => {
     useAdminDogBreederOptionsQueryMock.mockReset();
     useAdminDogOwnerOptionsQueryMock.mockReset();
     useAdminDogParentOptionsQueryMock.mockReset();
+    useCalculateAdminDogInbreedingMutationMock.mockReset();
     useCreateAdminDogMutationMock.mockReset();
     useUpdateAdminDogMutationMock.mockReset();
     useDeleteAdminDogMutationMock.mockReset();
@@ -134,6 +140,10 @@ describe("AdminDogsPageClient", () => {
     deleteModalPropsMock.mockReset();
     dogResultsPropsMock.mockReset();
 
+    useCalculateAdminDogInbreedingMutationMock.mockReturnValue({
+      isPending: false,
+      mutateAsync: vi.fn(),
+    });
     useCreateAdminDogMutationMock.mockReturnValue({
       isPending: false,
       mutateAsync: vi.fn(),
@@ -165,6 +175,7 @@ describe("AdminDogsPageClient", () => {
             showCount: 1,
             titlesText: null,
             ekNo: 5588,
+            inbreedingCoefficientPct: 12.5,
             note: null,
             titles: [],
           },
@@ -204,8 +215,12 @@ describe("AdminDogsPageClient", () => {
       openCreateModal: vi.fn(),
       openEditModal: vi.fn(),
       closeFormModal: vi.fn(),
+      handleCalculateInbreeding: vi.fn(),
       handleSubmit: vi.fn(),
       handleDeleteConfirm: vi.fn(),
+      inbreedingCalculationPct: null,
+      hasInbreedingCalculation: false,
+      isCalculatingInbreeding: false,
       isSubmitting: false,
       isDeleting: false,
     });
@@ -228,6 +243,9 @@ describe("AdminDogsPageClient", () => {
     expect(dogResultsProps.onEdit).toBe(formFlow.openEditModal);
     expect(dogResultsProps.onDelete).toBe(formFlow.setDeleteTarget);
     expect(dogFormProps.onSubmit).toBe(formFlow.handleSubmit);
+    expect(dogFormProps.onCalculateInbreeding).toBe(
+      formFlow.handleCalculateInbreeding,
+    );
     expect(deleteProps.onConfirm).toBe(formFlow.handleDeleteConfirm);
   });
 

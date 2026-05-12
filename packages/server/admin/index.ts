@@ -4,6 +4,7 @@ export { createAdminUser } from "./users/manage/create-user";
 export { deleteAdminUser } from "./users/manage/delete-user";
 export { setAdminUserStatus } from "./users/manage/set-user-status";
 export { setAdminUserPassword } from "./users/manage/set-user-password";
+export { calculateAdminDogInbreeding } from "./dogs";
 export { createAdminDog } from "./dogs";
 export { updateAdminDog } from "./dogs";
 export { deleteAdminDog } from "./dogs";

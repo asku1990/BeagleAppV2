@@ -11,6 +11,7 @@ export type UpdateAdminDogDbInput = {
   damId: string | null | undefined;
   ownerNames?: string[];
   ekNo?: number | null;
+  siitosasteProsentti?: number | null;
   note?: string | null;
   registrationNo: string;
   secondaryRegistrationNos?: string[];
@@ -312,6 +313,9 @@ export async function updateAdminDogWriteDb(
       ...(input.sireId === undefined ? {} : { sireId: input.sireId }),
       ...(input.damId === undefined ? {} : { damId: input.damId }),
       ...(input.ekNo === undefined ? {} : { ekNo: input.ekNo }),
+      ...(input.siitosasteProsentti === undefined
+        ? {}
+        : { siitosasteProsentti: input.siitosasteProsentti }),
       ...(input.note === undefined ? {} : { note: input.note }),
     },
     select: {

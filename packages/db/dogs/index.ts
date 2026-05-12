@@ -12,6 +12,7 @@ export {
 } from "./profile/get-beagle-dog-profile";
 export {
   loadDogPedigreeAncestryDb,
+  loadDogPedigreeAncestryForParentsDb,
   type DogPedigreeAncestorDb,
   type DogPedigreeAncestryDb,
 } from "./core/pedigree-ancestry";

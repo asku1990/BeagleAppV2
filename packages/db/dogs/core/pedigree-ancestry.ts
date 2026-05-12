@@ -16,9 +16,29 @@ export async function loadDogPedigreeAncestryDb(
   rootId: string,
   maxDepth = 10,
 ): Promise<DogPedigreeAncestryDb> {
+  return loadDogPedigreeAncestryFromFrontier(rootId, [rootId], maxDepth);
+}
+
+export async function loadDogPedigreeAncestryForParentsDb(
+  sireId: string,
+  damId: string,
+  maxDepth = 9,
+): Promise<DogPedigreeAncestryDb> {
+  return loadDogPedigreeAncestryFromFrontier(
+    `${sireId}:${damId}`,
+    [sireId, damId],
+    maxDepth,
+  );
+}
+
+async function loadDogPedigreeAncestryFromFrontier(
+  rootId: string,
+  initialFrontier: string[],
+  maxDepth: number,
+): Promise<DogPedigreeAncestryDb> {
   const nodes: Record<string, DogPedigreeAncestorDb> = {};
   const visited = new Set<string>();
-  let frontier = [rootId];
+  let frontier = initialFrontier;
   let depth = 0;
 
   while (frontier.length > 0 && depth <= maxDepth) {

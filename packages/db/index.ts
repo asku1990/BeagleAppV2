@@ -75,6 +75,7 @@ export {
   getBeagleDogProfileDb,
   getNewestBeagleDogsDb,
   loadDogPedigreeAncestryDb,
+  loadDogPedigreeAncestryForParentsDb,
   searchBeagleDogsDb,
   type BeagleDogProfileDb,
   type BeagleDogProfileLitterDb,

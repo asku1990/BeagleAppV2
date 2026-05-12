@@ -53,6 +53,7 @@ describe("listAdminDogsDb", () => {
         breederNameText: "Metsapolun",
         note: "Important",
         ekNo: 5588,
+        siitosasteProsentti: { toString: () => "12.5" },
         breeder: { name: "Metsapolun" },
         registrations: [{ registrationNo: "FI12345/21" }],
         ownerships: [
@@ -121,6 +122,7 @@ describe("listAdminDogsDb", () => {
           showCount: 4,
           titlesText: "FI JVA, SE JCH",
           ekNo: 5588,
+          siitosasteProsentti: 12.5,
           note: "Important",
           titles: [
             {
@@ -184,6 +186,7 @@ describe("listAdminDogsDb", () => {
         breederNameText: null,
         note: null,
         ekNo: null,
+        siitosasteProsentti: null,
         breeder: null,
         registrations: [{ registrationNo: "FI12345/21" }],
         ownerships: [],

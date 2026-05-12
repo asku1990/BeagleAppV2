@@ -1,5 +1,6 @@
 export {
   createAdminDog,
+  calculateAdminDogInbreeding,
   updateAdminDog,
   deleteAdminDog,
   createAdminUser,

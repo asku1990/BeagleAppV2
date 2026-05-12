@@ -35,6 +35,7 @@ function buildFormValues(): AdminDogFormValues {
     breederNameText: "Metsapolun",
     ownershipNames: ["Tiina Virtanen"],
     ekNo: "5588",
+    inbreedingCoefficientPct: null,
     note: "Important note",
     registrationNo: "fi12345/21",
     secondaryRegistrationNos: [" fi54321/21 "],
@@ -64,6 +65,7 @@ function buildTargetDog(): AdminDogRecord {
     titlesText: null,
     ownershipPreview: ["Tiina Virtanen"],
     ekNo: 5588,
+    inbreedingCoefficientPct: 12.5,
     note: "Important note",
     registrationNo: "FI12345/21",
     secondaryRegistrationNos: ["FI54321/21"],
@@ -102,6 +104,7 @@ describe("useAdminDogFormFlow", () => {
     const createMutateAsync = vi.fn().mockResolvedValue({ id: "dog_1" });
     const hook = useAdminDogFormFlow({
       t: (key) => key,
+      calculateInbreedingMutation: { isPending: false, mutateAsync: vi.fn() },
       createDogMutation: { isPending: false, mutateAsync: createMutateAsync },
       updateDogMutation: { isPending: false, mutateAsync: vi.fn() },
       deleteDogMutation: { isPending: false, mutateAsync: vi.fn() },
@@ -116,6 +119,7 @@ describe("useAdminDogFormFlow", () => {
       breederNameText: "Metsapolun",
       ownerNames: ["Tiina Virtanen"],
       ekNo: 5588,
+      inbreedingCoefficientPct: null,
       note: "Important note",
       registrationNo: "fi12345/21",
       secondaryRegistrationNos: ["FI54321/21"],
@@ -149,11 +153,14 @@ describe("useAdminDogFormFlow", () => {
       .mockImplementationOnce((initial) => [initial, vi.fn()])
       .mockImplementationOnce((initial) => [initial, vi.fn()])
       .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
       .mockImplementationOnce((initial) => [initial, vi.fn()]);
 
     const updateMutateAsync = vi.fn().mockResolvedValue({ id: "dog_1" });
     const hook = useAdminDogFormFlow({
       t: (key) => key,
+      calculateInbreedingMutation: { isPending: false, mutateAsync: vi.fn() },
       createDogMutation: { isPending: false, mutateAsync: vi.fn() },
       updateDogMutation: { isPending: false, mutateAsync: updateMutateAsync },
       deleteDogMutation: { isPending: false, mutateAsync: vi.fn() },
@@ -180,11 +187,14 @@ describe("useAdminDogFormFlow", () => {
       .mockImplementationOnce((initial) => [initial, vi.fn()])
       .mockImplementationOnce((initial) => [initial, vi.fn()])
       .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
       .mockImplementationOnce((initial) => [initial, vi.fn()]);
 
     const deleteMutateAsync = vi.fn().mockResolvedValue({});
     const hook = useAdminDogFormFlow({
       t: (key) => key,
+      calculateInbreedingMutation: { isPending: false, mutateAsync: vi.fn() },
       createDogMutation: { isPending: false, mutateAsync: vi.fn() },
       updateDogMutation: { isPending: false, mutateAsync: vi.fn() },
       deleteDogMutation: { isPending: false, mutateAsync: deleteMutateAsync },
@@ -207,6 +217,8 @@ describe("useAdminDogFormFlow", () => {
       .mockImplementationOnce((initial) => [initial, vi.fn()])
       .mockImplementationOnce((initial) => [initial, vi.fn()])
       .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
       .mockImplementationOnce((initial) => [initial, vi.fn()]);
 
     const createMutateAsync = vi
@@ -215,6 +227,7 @@ describe("useAdminDogFormFlow", () => {
 
     const hook = useAdminDogFormFlow({
       t: (key) => `tr:${key}`,
+      calculateInbreedingMutation: { isPending: false, mutateAsync: vi.fn() },
       createDogMutation: { isPending: false, mutateAsync: createMutateAsync },
       updateDogMutation: { isPending: false, mutateAsync: vi.fn() },
       deleteDogMutation: { isPending: false, mutateAsync: vi.fn() },
@@ -227,6 +240,115 @@ describe("useAdminDogFormFlow", () => {
     );
   });
 
+  it("calculates inbreeding from selected parents", async () => {
+    const setFormValues = vi.fn();
+
+    useStateMock
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce(() => [buildFormValues(), setFormValues])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()]);
+
+    const calculateMutateAsync = vi.fn().mockResolvedValue({
+      inbreedingCoefficientPct: 12.5,
+    });
+    const hook = useAdminDogFormFlow({
+      t: (key) => key,
+      calculateInbreedingMutation: {
+        isPending: false,
+        mutateAsync: calculateMutateAsync,
+      },
+      createDogMutation: { isPending: false, mutateAsync: vi.fn() },
+      updateDogMutation: { isPending: false, mutateAsync: vi.fn() },
+      deleteDogMutation: { isPending: false, mutateAsync: vi.fn() },
+    });
+
+    await hook.handleCalculateInbreeding();
+
+    expect(calculateMutateAsync).toHaveBeenCalledWith({
+      sireRegistrationNo: "FI54321/20",
+      damRegistrationNo: "FI77777/18",
+    });
+    expect(setFormValues).toHaveBeenCalledWith(
+      expect.objectContaining({ inbreedingCoefficientPct: 12.5 }),
+    );
+  });
+
+  it("clears displayed inbreeding result when parents change", () => {
+    const setFormValues = vi.fn();
+
+    useStateMock
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce(() => [
+        { ...buildFormValues(), inbreedingCoefficientPct: 12.5 },
+        setFormValues,
+      ])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()]);
+
+    const hook = useAdminDogFormFlow({
+      t: (key) => key,
+      calculateInbreedingMutation: { isPending: false, mutateAsync: vi.fn() },
+      createDogMutation: { isPending: false, mutateAsync: vi.fn() },
+      updateDogMutation: { isPending: false, mutateAsync: vi.fn() },
+      deleteDogMutation: { isPending: false, mutateAsync: vi.fn() },
+    });
+
+    hook.setFormValues({
+      ...buildFormValues(),
+      sirePreviewRegistrationNo: "FI00000/20",
+    });
+
+    expect(setFormValues).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sirePreviewRegistrationNo: "FI00000/20",
+        inbreedingCoefficientPct: null,
+      }),
+    );
+  });
+
+  it("prefills displayed inbreeding result from persisted edit dog value", () => {
+    const target = buildTargetDog();
+    const setFormValues = vi.fn();
+    const setFormState = vi.fn();
+
+    useStateMock
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, setFormState])
+      .mockImplementationOnce((initial) => [initial, setFormValues])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()]);
+
+    const hook = useAdminDogFormFlow({
+      t: (key) => key,
+      calculateInbreedingMutation: { isPending: false, mutateAsync: vi.fn() },
+      createDogMutation: { isPending: false, mutateAsync: vi.fn() },
+      updateDogMutation: { isPending: false, mutateAsync: vi.fn() },
+      deleteDogMutation: { isPending: false, mutateAsync: vi.fn() },
+    });
+
+    hook.openEditModal(target);
+
+    expect(setFormValues).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: "Metsapolun Kide",
+        sirePreviewRegistrationNo: "FI54321/20",
+        damPreviewRegistrationNo: "FI77777/18",
+        inbreedingCoefficientPct: 12.5,
+      }),
+    );
+    expect(setFormState).toHaveBeenCalledWith({
+      open: true,
+      mode: "edit",
+      target,
+    });
+  });
+
   it("keeps create modal birth date empty by default", () => {
     const setFormValues = vi.fn();
 
@@ -236,10 +358,13 @@ describe("useAdminDogFormFlow", () => {
       .mockImplementationOnce((initial) => [initial, setFormValues])
       .mockImplementationOnce((initial) => [initial, vi.fn()])
       .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, vi.fn()])
       .mockImplementationOnce((initial) => [initial, vi.fn()]);
 
     const hook = useAdminDogFormFlow({
       t: (key) => key,
+      calculateInbreedingMutation: { isPending: false, mutateAsync: vi.fn() },
       createDogMutation: { isPending: false, mutateAsync: vi.fn() },
       updateDogMutation: { isPending: false, mutateAsync: vi.fn() },
       deleteDogMutation: { isPending: false, mutateAsync: vi.fn() },

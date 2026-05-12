@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import type {
+  CalculateAdminDogInbreedingRequest,
+  CalculateAdminDogInbreedingResponse,
   CreateAdminDogRequest,
   DeleteAdminDogRequest,
   UpdateAdminDogRequest,
@@ -21,13 +23,17 @@ import {
   toUpdateAdminDogRequest,
 } from "@/lib/admin/dogs/manage";
 
-type AdminDogMutation<Request> = {
+type AdminDogMutation<Request, Response = unknown> = {
   isPending: boolean;
-  mutateAsync: (input: Request) => Promise<unknown>;
+  mutateAsync: (input: Request) => Promise<Response>;
 };
 
 type UseAdminDogFormFlowInput = {
   t: (key: MessageKey) => string;
+  calculateInbreedingMutation: AdminDogMutation<
+    CalculateAdminDogInbreedingRequest,
+    CalculateAdminDogInbreedingResponse
+  >;
   createDogMutation: AdminDogMutation<CreateAdminDogRequest>;
   updateDogMutation: AdminDogMutation<UpdateAdminDogRequest>;
   deleteDogMutation: AdminDogMutation<DeleteAdminDogRequest>;
@@ -42,6 +48,7 @@ type DogFormState = {
 // Owns admin dog modal/form state and mutation orchestration without UI concerns.
 export function useAdminDogFormFlow({
   t,
+  calculateInbreedingMutation,
   createDogMutation,
   updateDogMutation,
   deleteDogMutation,
@@ -79,6 +86,40 @@ export function useAdminDogFormFlow({
 
   function closeFormModal() {
     setFormState((current) => ({ ...current, open: false }));
+  }
+
+  function handleValuesChange(values: AdminDogFormValues) {
+    if (
+      formValues.sirePreviewRegistrationNo !==
+        values.sirePreviewRegistrationNo ||
+      formValues.damPreviewRegistrationNo !== values.damPreviewRegistrationNo
+    ) {
+      setFormValues({ ...values, inbreedingCoefficientPct: null });
+      return;
+    }
+
+    setFormValues(values);
+  }
+
+  async function handleCalculateInbreeding() {
+    try {
+      const result = await calculateInbreedingMutation.mutateAsync({
+        sireRegistrationNo: formValues.sirePreviewRegistrationNo,
+        damRegistrationNo: formValues.damPreviewRegistrationNo,
+      });
+      setFormValues({
+        ...formValues,
+        inbreedingCoefficientPct: result.inbreedingCoefficientPct,
+      });
+    } catch (error) {
+      toast.error(
+        t(
+          getAdminDogMutationErrorMessageKey(
+            getAdminDogMutationErrorCode(error),
+          ),
+        ),
+      );
+    }
   }
 
   async function handleSubmit(values: AdminDogFormValues) {
@@ -145,7 +186,7 @@ export function useAdminDogFormFlow({
     setDeleteTarget,
     formState,
     formValues,
-    setFormValues,
+    setFormValues: handleValuesChange,
     breederLookupQuery,
     setBreederLookupQuery,
     ownerLookupQuery,
@@ -155,8 +196,10 @@ export function useAdminDogFormFlow({
     openCreateModal,
     openEditModal,
     closeFormModal,
+    handleCalculateInbreeding,
     handleSubmit,
     handleDeleteConfirm,
+    isCalculatingInbreeding: calculateInbreedingMutation.isPending,
     isSubmitting: createDogMutation.isPending || updateDogMutation.isPending,
     isDeleting: deleteDogMutation.isPending,
   };

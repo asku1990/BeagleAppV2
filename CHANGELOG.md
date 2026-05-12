@@ -14,7 +14,8 @@ This project uses a user-facing changelog format.
 
 ### Added
 
-- Vanhan kannan virtuaaliparituksen tukidata voidaan tuoda uudessa `phase1.25`-tuontivaiheessa.
+- Vanhan kannan virtuaaliparituksen tukidata voidaan tuoda uudessa `phase1.25`-tuontivaiheessa.tallentamatta arvoa koiralle
+- Ylläpidon koiralomakkeella voi laskea valitun uroksen ja emän sukusiitosasteen ja tallentaa sen.
 
 ### Changed
 

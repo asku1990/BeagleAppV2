@@ -50,6 +50,7 @@ describe("admin dog manage lib", () => {
         breederNameText: " Metsapolun ",
         ownershipNames: ["Tiina Virtanen"],
         ekNo: " 5588 ",
+        inbreedingCoefficientPct: 12.5,
         note: " Important note ",
         registrationNo: "FI12345/21 ",
         secondaryRegistrationNos: [" fi54321/21 ", "", " FI77777/18 "],
@@ -68,6 +69,7 @@ describe("admin dog manage lib", () => {
       breederNameText: "Metsapolun",
       ownerNames: ["Tiina Virtanen"],
       ekNo: 5588,
+      inbreedingCoefficientPct: 12.5,
       note: "Important note",
       registrationNo: "FI12345/21",
       secondaryRegistrationNos: ["FI54321/21", "FI77777/18"],
@@ -101,10 +103,12 @@ describe("admin dog manage lib", () => {
       showCount: 2,
       titlesText: "FI JVA, SE JCH",
       ekNo: 5588,
+      inbreedingCoefficientPct: 12.5,
       note: null,
       titles: [],
     });
 
     expect(mapped.titlesText).toBe("FI JVA, SE JCH");
+    expect(mapped.inbreedingCoefficientPct).toBe(12.5);
   });
 });

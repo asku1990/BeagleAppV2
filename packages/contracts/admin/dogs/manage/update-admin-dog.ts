@@ -8,6 +8,7 @@ export type UpdateAdminDogRequest = {
   breederNameText?: string | null;
   ownerNames?: string[];
   ekNo?: number | null;
+  inbreedingCoefficientPct?: number | null;
   note?: string | null;
   registrationNo: string;
   secondaryRegistrationNos?: string[];

@@ -24,6 +24,7 @@ export type AdminDogRecord = {
   titlesText: string | null;
   ownershipPreview: string[];
   ekNo: number | null;
+  inbreedingCoefficientPct: number | null;
   note: string | null;
   registrationNo: string | null;
   secondaryRegistrationNos: string[];
@@ -45,6 +46,7 @@ export type AdminDogFormValues = {
   breederNameText: string;
   ownershipNames: string[];
   ekNo: string;
+  inbreedingCoefficientPct: number | null;
   note: string;
   registrationNo: string;
   secondaryRegistrationNos: string[];

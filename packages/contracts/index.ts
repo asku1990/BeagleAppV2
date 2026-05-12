@@ -179,6 +179,8 @@ export type {
   AdminDogParentPreview,
   AdminDogTitleInput,
   AdminDogTitleItem,
+  CalculateAdminDogInbreedingRequest,
+  CalculateAdminDogInbreedingResponse,
   CreateAdminDogRequest,
   CreateAdminDogResponse,
   UpdateAdminDogRequest,

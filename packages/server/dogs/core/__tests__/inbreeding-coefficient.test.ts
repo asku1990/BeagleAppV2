@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { calculateInbreedingCoefficientPct } from "../inbreeding-coefficient";
+import {
+  calculateInbreedingCoefficientForParentsPct,
+  calculateInbreedingCoefficientPct,
+} from "../inbreeding-coefficient";
 import type { DogPedigreeAncestryDb } from "@beagle/db/dogs/core/pedigree-ancestry";
 
 function makeAncestry(
@@ -97,6 +100,33 @@ describe("calculateInbreedingCoefficientPct", () => {
       12.5,
       5,
     );
+  });
+
+  it("calculates from a virtual parent pair", () => {
+    const ancestry = makeAncestry({
+      sire: {
+        id: "sire",
+        sireId: "ancestor",
+        damId: null,
+        siitosasteProsentti: null,
+      },
+      dam: {
+        id: "dam",
+        sireId: "ancestor",
+        damId: null,
+        siitosasteProsentti: null,
+      },
+      ancestor: {
+        id: "ancestor",
+        sireId: null,
+        damId: null,
+        siitosasteProsentti: null,
+      },
+    });
+
+    expect(
+      calculateInbreedingCoefficientForParentsPct("sire", "dam", ancestry),
+    ).toBeCloseTo(12.5, 5);
   });
 
   it("accumulates multiple shared ancestor paths", () => {
