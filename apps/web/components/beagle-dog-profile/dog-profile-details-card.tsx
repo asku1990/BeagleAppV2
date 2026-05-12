@@ -209,7 +209,7 @@ export function DogProfileDetailsCard({
           value={
             profile.inbreedingCoefficientPct != null
               ? formatPercent(profile.inbreedingCoefficientPct)
-              : `${FALLBACK_VALUE} ${t("dog.profile.field.comingSoon")}`
+              : FALLBACK_VALUE
           }
           numeric
         />

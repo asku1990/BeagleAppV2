@@ -260,5 +260,9 @@ describe("BeagleDogProfilePage", () => {
     expect(html).not.toContain("dog.profile.card.trials.title");
     expect(html).not.toContain("dog.profile.shows.copy.button");
     expect(html).not.toContain("dog.profile.trials.copy.button");
+    expect(html).toContain("dog.profile.field.inbreeding");
+    expect(html).toMatch(
+      /dog\.profile\.field\.inbreeding[\s\S]*<dd[^>]*>-<\/dd>/,
+    );
   });
 });
