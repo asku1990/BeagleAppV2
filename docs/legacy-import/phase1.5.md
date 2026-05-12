@@ -75,5 +75,5 @@ Issue rows are written to `ImportRunIssue` with `kind=LEGACY_PHASE1_5`.
 
 ## Operational notes
 
-- Phase 1.5 should run after phase1 and before phase2.
-- Phase 1.5 belongs to the same one-shot bootstrap/migration flow as phase1/2/3.
+- Phase 1.5 should run after phase1.25 and before phase2.
+- Phase 1.5 belongs to the same one-shot bootstrap/migration flow as phase1/1.25/2/3.

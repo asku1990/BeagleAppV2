@@ -42,14 +42,19 @@ export {
 export { loadLegacyTrialMirrorValidationRowsDb } from "./imports/trial-mirror-validation";
 export { fetchLegacyShowRows } from "./imports/phase3";
 export { fetchLegacyPhase1Rows } from "./imports/phase1";
+export { fetchLegacyPhase1_25Rows } from "./imports/phase1_25";
 export { fetchLegacyPhase1_5Rows } from "./imports/phase1_5";
 
 export {
   type LegacyBreederRow,
   type LegacyDogRow,
+  type LegacyDogInbreedingRow,
   type LegacyEkRow,
   type LegacyDogTitleRow,
+  type LegacyKoiranEpiLukuRow,
+  type LegacyKoiranSairausRow,
   type LegacyOwnerRow,
+  type LegacyPhase1_25Rows,
   type LegacyTrialMirrorAkoeallRow,
   type LegacyTrialMirrorAkoeallValidationRow,
   type LegacyTrialMirrorBealtCommonRow,
@@ -61,6 +66,7 @@ export {
   type LegacyTrialMirrorValidationRows,
   type LegacyShowResultRow,
   type LegacySamakoiraRow,
+  type LegacySairausRow,
   type LegacyPhase1Rows,
 } from "./imports/types";
 

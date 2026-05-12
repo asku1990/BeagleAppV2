@@ -27,6 +27,48 @@ export type LegacyDogTitleRow = {
   titleCodeRaw: string | null;
 };
 
+export type LegacyDogInbreedingRow = {
+  registrationNo: string | null;
+  siitosasteRaw: string | number | null;
+};
+
+export type LegacySairausRow = {
+  legacyId: number;
+  code: string | null;
+  text: string | null;
+};
+
+export type LegacyKoiranSairausRow = {
+  legacyId: number;
+  sireRegistrationNo: string | null;
+  damRegistrationNo: string | null;
+  registrationNo: string | null;
+  litterRaw: string | null;
+  diseaseCode: string | null;
+  description: string | null;
+  publicRaw: string | number | null;
+  source: string | null;
+  modifiedRaw: string | Date | null;
+};
+
+export type LegacyKoiranEpiLukuRow = {
+  legacyId: number;
+  registrationNo: string | null;
+  sireRegistrationNo: string | null;
+  damRegistrationNo: string | null;
+  epiValueRaw: string | number | null;
+  epiText: string | null;
+  modifiedRaw: string | Date | null;
+  flag: string | null;
+};
+
+export type LegacyPhase1_25Rows = {
+  inbreeding: LegacyDogInbreedingRow[];
+  sairaudet: LegacySairausRow[];
+  koiranSairaudet: LegacyKoiranSairausRow[];
+  epiLuvut: LegacyKoiranEpiLukuRow[];
+};
+
 export type LegacyOwnerRow = {
   registrationNo: string;
   ownerName: string | null;

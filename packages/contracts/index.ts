@@ -43,6 +43,7 @@ export type ImportStatusResponse = {
 
 export type ImportRunKind =
   | "LEGACY_PHASE1"
+  | "LEGACY_PHASE1_25"
   | "LEGACY_PHASE1_5"
   | "LEGACY_PHASE3"
   | "LEGACY_TRIAL_MIRROR"

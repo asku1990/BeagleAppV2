@@ -14,6 +14,8 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+- Vanhan kannan virtuaaliparituksen tukidata voidaan tuoda uudessa `phase1.25`-tuontivaiheessa.
+
 ### Changed
 
 ### Fixed
