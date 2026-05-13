@@ -80,7 +80,6 @@ export type BeagleDogProfileDb = {
   color: string | null;
   ekNo: number | null;
   siitosasteProsentti: number | null;
-  inbreedingCoefficientPct: number | null;
   sire: BeagleDogProfileParentDb | null;
   dam: BeagleDogProfileParentDb | null;
   pedigree: BeagleDogProfilePedigreeGenerationDb[];

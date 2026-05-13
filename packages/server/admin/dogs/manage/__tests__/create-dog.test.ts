@@ -5,23 +5,60 @@ const {
   createAdminDogWriteDbMock,
   runAdminDogWriteTransactionDbMock,
   findDogByRegistrationNoDbMock,
+  loadDogPedigreeAncestryForParentsDbMock,
 } = vi.hoisted(() => ({
   createAdminDogWriteDbMock: vi.fn(),
   runAdminDogWriteTransactionDbMock: vi.fn(),
   findDogByRegistrationNoDbMock: vi.fn(),
+  loadDogPedigreeAncestryForParentsDbMock: vi.fn(),
 }));
 
 vi.mock("@beagle/db", () => ({
   createAdminDogWriteDb: createAdminDogWriteDbMock,
   runAdminDogWriteTransactionDb: runAdminDogWriteTransactionDbMock,
   findDogByRegistrationNoDb: findDogByRegistrationNoDbMock,
+  loadDogPedigreeAncestryForParentsDb: loadDogPedigreeAncestryForParentsDbMock,
 }));
+
+function mockRequiredParentResolution(): void {
+  findDogByRegistrationNoDbMock.mockImplementation(
+    async (registrationNo: string) => {
+      if (registrationNo === "FI11111/11") {
+        return { id: "sire_1", sex: "MALE" };
+      }
+
+      if (registrationNo === "FI22222/22") {
+        return { id: "dam_1", sex: "FEMALE" };
+      }
+
+      return null;
+    },
+  );
+  loadDogPedigreeAncestryForParentsDbMock.mockResolvedValue({
+    rootId: "sire_1:dam_1",
+    nodes: {
+      sire_1: {
+        id: "sire_1",
+        sireId: null,
+        damId: null,
+        siitosasteProsentti: null,
+      },
+      dam_1: {
+        id: "dam_1",
+        sireId: null,
+        damId: null,
+        siitosasteProsentti: null,
+      },
+    },
+  });
+}
 
 describe("createAdminDog", () => {
   beforeEach(() => {
     createAdminDogWriteDbMock.mockReset();
     runAdminDogWriteTransactionDbMock.mockReset();
     findDogByRegistrationNoDbMock.mockReset();
+    loadDogPedigreeAncestryForParentsDbMock.mockReset();
     runAdminDogWriteTransactionDbMock.mockImplementation(async (callback) =>
       callback({}),
     );
@@ -151,7 +188,7 @@ describe("createAdminDog", () => {
   });
 
   it("creates dog and returns 201", async () => {
-    findDogByRegistrationNoDbMock.mockResolvedValue(null);
+    mockRequiredParentResolution();
     createAdminDogWriteDbMock.mockResolvedValue({
       id: "dog_1",
       name: "Metsapolun Kide",
@@ -169,6 +206,8 @@ describe("createAdminDog", () => {
         ekNo: 5588,
         note: " Important ",
         registrationNo: " FI12345/21 ",
+        sireRegistrationNo: "FI11111/11",
+        damRegistrationNo: "FI22222/22",
       }),
     ).resolves.toEqual({
       status: 201,
@@ -189,11 +228,11 @@ describe("createAdminDog", () => {
         sex: "FEMALE",
         birthDate: new Date("2021-04-09T00:00:00.000Z"),
         breederNameText: "Metsapolun",
-        sireId: null,
-        damId: null,
+        sireId: "sire_1",
+        damId: "dam_1",
         ownerNames: ["Tiina Virtanen"],
         ekNo: 5588,
-        siitosasteProsentti: null,
+        siitosasteProsentti: 0,
         note: "Important",
         registrationNo: "FI12345/21",
         secondaryRegistrationNos: [],
@@ -208,8 +247,74 @@ describe("createAdminDog", () => {
     );
   });
 
+  it("ignores injected inbreeding values and persists the server calculation", async () => {
+    findDogByRegistrationNoDbMock.mockImplementation(
+      async (registrationNo: string) => {
+        if (registrationNo === "FI11111/11") {
+          return { id: "sire_1", sex: "MALE" };
+        }
+
+        if (registrationNo === "FI22222/22") {
+          return { id: "dam_1", sex: "FEMALE" };
+        }
+
+        return null;
+      },
+    );
+    loadDogPedigreeAncestryForParentsDbMock.mockResolvedValue({
+      rootId: "sire_1:dam_1",
+      nodes: {
+        sire_1: {
+          id: "sire_1",
+          sireId: null,
+          damId: null,
+          siitosasteProsentti: null,
+        },
+        dam_1: {
+          id: "dam_1",
+          sireId: null,
+          damId: null,
+          siitosasteProsentti: null,
+        },
+      },
+    });
+    createAdminDogWriteDbMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Metsapolun Kide",
+      sex: "FEMALE",
+      registrationNo: "FI12345/21",
+    });
+
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        sireRegistrationNo: "FI11111/11",
+        damRegistrationNo: "FI22222/22",
+        inbreedingCoefficientPct: 99,
+      } as Parameters<typeof createAdminDog>[0] & {
+        inbreedingCoefficientPct: number;
+      }),
+    ).resolves.toMatchObject({ status: 201 });
+
+    expect(loadDogPedigreeAncestryForParentsDbMock).toHaveBeenCalledWith(
+      "sire_1",
+      "dam_1",
+      9,
+    );
+    expect(createAdminDogWriteDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sireId: "sire_1",
+        damId: "dam_1",
+        siitosasteProsentti: 0,
+      }),
+      {},
+    );
+  });
+
   it("returns 409 when duplicate dog exists", async () => {
-    findDogByRegistrationNoDbMock.mockResolvedValue(null);
+    mockRequiredParentResolution();
     createAdminDogWriteDbMock.mockRejectedValue({ code: "P2002" });
 
     await expect(
@@ -217,6 +322,8 @@ describe("createAdminDog", () => {
         name: "Metsapolun Kide",
         sex: "FEMALE",
         registrationNo: "FI12345/21",
+        sireRegistrationNo: "FI11111/11",
+        damRegistrationNo: "FI22222/22",
       }),
     ).resolves.toEqual({
       status: 409,
@@ -237,6 +344,7 @@ describe("createAdminDog", () => {
         sex: "FEMALE",
         registrationNo: "FI12345/21",
         sireRegistrationNo: "FI00000/00",
+        damRegistrationNo: "FI22222/22",
       }),
     ).resolves.toEqual({
       status: 400,
@@ -244,6 +352,42 @@ describe("createAdminDog", () => {
         ok: false,
         error: "Sire registration number was not found.",
         code: "INVALID_SIRE_REGISTRATION",
+      },
+    });
+  });
+
+  it("returns 400 when sire registration is missing", async () => {
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        damRegistrationNo: "FI22222/22",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Sire registration number is required.",
+        code: "REQUIRED_SIRE_REGISTRATION",
+      },
+    });
+  });
+
+  it("returns 400 when dam registration is missing", async () => {
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        sireRegistrationNo: "FI11111/11",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Dam registration number is required.",
+        code: "REQUIRED_DAM_REGISTRATION",
       },
     });
   });
@@ -383,7 +527,7 @@ describe("createAdminDog", () => {
   });
 
   it("creates dog with many titles and nullable title fields", async () => {
-    findDogByRegistrationNoDbMock.mockResolvedValue(null);
+    mockRequiredParentResolution();
     createAdminDogWriteDbMock.mockResolvedValue({
       id: "dog_1",
       name: "Metsapolun Kide",
@@ -396,6 +540,8 @@ describe("createAdminDog", () => {
         name: "Metsapolun Kide",
         sex: "FEMALE",
         registrationNo: "FI12345/21",
+        sireRegistrationNo: "FI11111/11",
+        damRegistrationNo: "FI22222/22",
         titles: [
           {
             titleCode: " fi jva ",
@@ -475,7 +621,7 @@ describe("createAdminDog", () => {
   });
 
   it("derives title sortOrder from row order when omitted", async () => {
-    findDogByRegistrationNoDbMock.mockResolvedValue(null);
+    mockRequiredParentResolution();
     createAdminDogWriteDbMock.mockResolvedValue({
       id: "dog_1",
       name: "Metsapolun Kide",
@@ -488,6 +634,8 @@ describe("createAdminDog", () => {
         name: "Metsapolun Kide",
         sex: "FEMALE",
         registrationNo: "FI12345/21",
+        sireRegistrationNo: "FI11111/11",
+        damRegistrationNo: "FI22222/22",
         titles: [
           {
             titleCode: "FI JVA",

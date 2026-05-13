@@ -69,7 +69,6 @@ describe("admin dog manage lib", () => {
       breederNameText: "Metsapolun",
       ownerNames: ["Tiina Virtanen"],
       ekNo: 5588,
-      inbreedingCoefficientPct: 12.5,
       note: "Important note",
       registrationNo: "FI12345/21",
       secondaryRegistrationNos: ["FI54321/21", "FI77777/18"],

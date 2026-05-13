@@ -61,9 +61,17 @@ export function DogFormModal({
     return (
       isSubmitting ||
       values.name.trim().length === 0 ||
-      values.registrationNo.trim().length === 0
+      values.registrationNo.trim().length === 0 ||
+      values.sirePreviewRegistrationNo.trim().length === 0 ||
+      values.damPreviewRegistrationNo.trim().length === 0
     );
-  }, [isSubmitting, values.name, values.registrationNo]);
+  }, [
+    isSubmitting,
+    values.name,
+    values.registrationNo,
+    values.sirePreviewRegistrationNo,
+    values.damPreviewRegistrationNo,
+  ]);
 
   const breederSelectedId = useMemo(
     () =>

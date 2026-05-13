@@ -36,7 +36,7 @@ function mapDogProfileFromDb(
     sex: profile.sex,
     color: profile.color,
     ekNo: profile.ekNo,
-    inbreedingCoefficientPct: profile.inbreedingCoefficientPct,
+    inbreedingCoefficientPct: profile.siitosasteProsentti ?? null,
     sire: profile.sire,
     dam: profile.dam,
     pedigree: profile.pedigree,
@@ -143,8 +143,6 @@ export async function getBeagleDogProfileService(
       getBeagleShowsForDogDb(parsedDogId),
       getBeagleTrialsForDogDb(parsedDogId),
     ]);
-    const inbreedingCoefficientPct = profile.siitosasteProsentti ?? null;
-
     log.info(
       {
         event: "success",
@@ -157,11 +155,7 @@ export async function getBeagleDogProfileService(
       status: 200,
       body: {
         ok: true,
-        data: mapDogProfileFromDb(
-          { ...profile, inbreedingCoefficientPct },
-          shows,
-          trials,
-        ),
+        data: mapDogProfileFromDb(profile, shows, trials),
       },
     };
   } catch (error) {

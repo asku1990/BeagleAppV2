@@ -189,6 +189,32 @@ export function invalidDamRegistrationResponse<
   } as ServiceResult<T>;
 }
 
+export function requiredSireRegistrationResponse<
+  T extends ManageErrorTarget,
+>(): ServiceResult<T> {
+  return {
+    status: 400,
+    body: {
+      ok: false,
+      error: "Sire registration number is required.",
+      code: "REQUIRED_SIRE_REGISTRATION",
+    },
+  } as ServiceResult<T>;
+}
+
+export function requiredDamRegistrationResponse<
+  T extends ManageErrorTarget,
+>(): ServiceResult<T> {
+  return {
+    status: 400,
+    body: {
+      ok: false,
+      error: "Dam registration number is required.",
+      code: "REQUIRED_DAM_REGISTRATION",
+    },
+  } as ServiceResult<T>;
+}
+
 export function invalidParentCombinationResponse<
   T extends ManageErrorTarget,
 >(): ServiceResult<T> {

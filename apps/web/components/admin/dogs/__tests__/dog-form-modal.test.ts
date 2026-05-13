@@ -159,6 +159,8 @@ describe("DogFormModal", () => {
     expect(html).toContain('value="FI JVA"');
     expect(html).toContain('value="Valio"');
     expect(html).toContain("admin.dogs.form.inbreedingLabel");
+    expect(html).toContain("admin.dogs.form.sireSelectLabel *");
+    expect(html).toContain("admin.dogs.form.damSelectLabel *");
     expect(html).toContain("12.5 %");
     expect(html).toContain("admin.dogs.form.recordIdPrefix dog_1");
   });

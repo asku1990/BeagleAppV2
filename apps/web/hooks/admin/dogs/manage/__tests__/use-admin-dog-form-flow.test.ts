@@ -119,7 +119,6 @@ describe("useAdminDogFormFlow", () => {
       breederNameText: "Metsapolun",
       ownerNames: ["Tiina Virtanen"],
       ekNo: 5588,
-      inbreedingCoefficientPct: null,
       note: "Important note",
       registrationNo: "fi12345/21",
       secondaryRegistrationNos: ["FI54321/21"],

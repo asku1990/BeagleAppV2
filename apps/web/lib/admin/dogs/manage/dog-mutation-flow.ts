@@ -74,7 +74,6 @@ export function toCreateAdminDogRequest(
     breederNameText: normalizeOptionalText(values.breederNameText) ?? undefined,
     ownerNames: values.ownershipNames,
     ekNo: normalizeEkNo(values.ekNo) ?? undefined,
-    inbreedingCoefficientPct: values.inbreedingCoefficientPct,
     note: normalizeOptionalText(values.note) ?? undefined,
     registrationNo: values.registrationNo.trim(),
     secondaryRegistrationNos: normalizeSecondaryRegistrations(
@@ -100,7 +99,6 @@ export function toUpdateAdminDogRequest(
     breederNameText: normalizeOptionalText(values.breederNameText),
     ownerNames: values.ownershipNames,
     ekNo: normalizeEkNo(values.ekNo),
-    inbreedingCoefficientPct: values.inbreedingCoefficientPct,
     note: normalizeOptionalText(values.note),
     registrationNo: values.registrationNo.trim(),
     secondaryRegistrationNos: normalizeSecondaryRegistrations(
@@ -157,6 +155,10 @@ export function getAdminDogMutationErrorMessageKey(
       return "admin.dogs.mutation.errorInvalidSireRegistration";
     case "INVALID_DAM_REGISTRATION":
       return "admin.dogs.mutation.errorInvalidDamRegistration";
+    case "REQUIRED_SIRE_REGISTRATION":
+      return "admin.dogs.mutation.errorRequiredSireRegistration";
+    case "REQUIRED_DAM_REGISTRATION":
+      return "admin.dogs.mutation.errorRequiredDamRegistration";
     case "INVALID_PARENT_COMBINATION":
       return "admin.dogs.mutation.errorInvalidParentCombination";
     case "INVALID_SELF_PARENT":

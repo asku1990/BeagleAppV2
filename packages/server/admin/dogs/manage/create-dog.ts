@@ -21,6 +21,7 @@ import {
   validateCreatePreflight,
 } from "./internal/create-input-validation";
 import { resolveAndValidateCreateParents } from "./internal/create-parent-validation";
+import { calculatePersistedInbreedingCoefficientPct } from "./internal/inbreeding-persistence";
 
 const DOG_NAME_MAX_LENGTH = 120;
 const DOG_REGISTRATION_NO_MAX_LENGTH = 40;
@@ -84,6 +85,12 @@ export async function createAdminDog(
       return parentValidation.response;
     }
 
+    const inbreedingCoefficientPct =
+      await calculatePersistedInbreedingCoefficientPct(
+        parentValidation.data.sire,
+        parentValidation.data.dam,
+      );
+
     const createdDog = await runAdminDogWriteTransactionDb(
       async (tx) =>
         createAdminDogWriteDb(
@@ -96,7 +103,7 @@ export async function createAdminDog(
             damId: parentValidation.data.dam?.id ?? null,
             ownerNames: inTryValidation.data.ownerNames,
             ekNo: preflight.data.ekNo,
-            siitosasteProsentti: preflight.data.inbreedingCoefficientPct,
+            siitosasteProsentti: inbreedingCoefficientPct,
             note: inTryValidation.data.note,
             registrationNo: preflight.data.primaryRegistrationNo,
             secondaryRegistrationNos: preflight.data.secondaryRegistrationNos,

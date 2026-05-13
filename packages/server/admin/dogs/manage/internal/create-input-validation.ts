@@ -47,7 +47,6 @@ export type CreatePreflightValidationResult =
       sex: "MALE" | "FEMALE" | "UNKNOWN";
       birthDate: Date | null;
       ekNo: number | null;
-      inbreedingCoefficientPct: number | null;
       primaryRegistrationNo: string;
       secondaryRegistrationNos: string[];
       allRegistrationNos: string[];
@@ -117,11 +116,6 @@ export function validateCreatePreflight(
     };
   }
 
-  const inbreedingCoefficientPct =
-    input.inbreedingCoefficientPct === undefined
-      ? null
-      : input.inbreedingCoefficientPct;
-
   const registration = validateRegistrationInput(
     input.registrationNo,
     input.secondaryRegistrationNos,
@@ -183,7 +177,6 @@ export function validateCreatePreflight(
       sex,
       birthDate,
       ekNo,
-      inbreedingCoefficientPct,
       primaryRegistrationNo: registration.primaryRegistrationNo,
       secondaryRegistrationNos: registration.secondaryRegistrationNos,
       allRegistrationNos: registration.allRegistrationNos,

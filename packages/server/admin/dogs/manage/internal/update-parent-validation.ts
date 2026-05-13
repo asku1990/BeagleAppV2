@@ -8,6 +8,8 @@ import {
   invalidSelfParentResponse,
   invalidSireRegistrationResponse,
   invalidSireSexResponse,
+  requiredDamRegistrationResponse,
+  requiredSireRegistrationResponse,
 } from "./manage-responses";
 import {
   resolveParentByRegistration,
@@ -109,6 +111,20 @@ export function validateUpdateParentGuards(
     return {
       ok: false,
       response: invalidSelfParentDamResponse(),
+    };
+  }
+
+  if (!effectiveSire) {
+    return {
+      ok: false,
+      response: requiredSireRegistrationResponse(),
+    };
+  }
+
+  if (!effectiveDam) {
+    return {
+      ok: false,
+      response: requiredDamRegistrationResponse(),
     };
   }
 
