@@ -1,4 +1,5 @@
 import type {
+  CalculateAdminDogInbreedingResponse,
   CreateAdminDogResponse,
   UpdateAdminDogResponse,
 } from "@beagle/contracts";
@@ -6,7 +7,10 @@ import type { ServiceResult } from "@server/core/result";
 
 type CreateResult = ServiceResult<CreateAdminDogResponse>;
 type UpdateResult = ServiceResult<UpdateAdminDogResponse>;
-type ManageErrorTarget = CreateAdminDogResponse | UpdateAdminDogResponse;
+type ManageErrorTarget =
+  | CalculateAdminDogInbreedingResponse
+  | CreateAdminDogResponse
+  | UpdateAdminDogResponse;
 
 type CreateDogSummary = {
   id: string;

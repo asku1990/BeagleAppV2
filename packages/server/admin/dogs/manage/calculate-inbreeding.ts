@@ -10,6 +10,10 @@ import type { ServiceResult } from "@server/core/result";
 import { calculateInbreedingCoefficientForParentsPct } from "@server/dogs/core";
 import { normalizeOptionalText } from "./normalization";
 import { resolveParentByRegistration } from "./internal/parent-resolution";
+import {
+  invalidDamSexResponse,
+  invalidSireSexResponse,
+} from "./internal/manage-responses";
 
 type CalculateResult = ServiceResult<CalculateAdminDogInbreedingResponse>;
 
@@ -117,6 +121,14 @@ export async function calculateAdminDogInbreeding(
 
     if (sire.id === dam.id) {
       return invalidParentCombinationResponse();
+    }
+
+    if (sire.sex !== "MALE") {
+      return invalidSireSexResponse<CalculateAdminDogInbreedingResponse>();
+    }
+
+    if (dam.sex !== "FEMALE") {
+      return invalidDamSexResponse<CalculateAdminDogInbreedingResponse>();
     }
 
     const ancestry = await loadDogPedigreeAncestryForParentsDb(
