@@ -6,7 +6,7 @@ import type {
   LegacySairausRow,
 } from "../types";
 
-// Loads legacy virtual pairing support rows for phase1.25 import.
+// Loads legacy disease rows and stored inbreeding percentages for phase1.25 import.
 export async function fetchLegacyPhase1_25Rows(options?: {
   log?: (message: string) => void;
 }): Promise<LegacyPhase1_25Rows> {
