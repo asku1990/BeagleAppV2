@@ -17,6 +17,7 @@ export { getAdminTrialEvent } from "./trials";
 export { deleteAdminTrialEntry } from "./trials";
 export { updateAdminTrialEvent } from "./trials";
 export { updateAdminTrialEntry } from "./trials";
+export { getAdminDogProfile } from "./dogs";
 export { previewAdminShowWorkbookImport } from "./shows";
 export { applyAdminShowWorkbookImport } from "./shows";
 export { listAdminShowWorkbookSchemaRules } from "./shows";

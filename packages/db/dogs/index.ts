@@ -11,6 +11,10 @@ export {
   type BeagleDogProfileTitleDb,
 } from "./profile/get-beagle-dog-profile";
 export {
+  getAdminDogProfileDb,
+  type AdminDogProfileDb,
+} from "../admin/dogs/profile";
+export {
   loadDogPedigreeAncestryDb,
   loadDogPedigreeAncestryForParentsDb,
   type DogPedigreeAncestorDb,

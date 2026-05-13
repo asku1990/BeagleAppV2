@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ListingResponsiveResults } from "@/components/listing";
 import { AdminRowActionsMenu } from "@/components/admin";
 import { Card, CardContent } from "@/components/ui/card";
@@ -101,6 +102,10 @@ function formatParent(parent: AdminDogParentPreview | null): string {
   return safeName || safeRegistrationNo;
 }
 
+function buildDogProfileHref(dogId: string): string {
+  return `/admin/dogs/${encodeURIComponent(dogId)}/profile`;
+}
+
 export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
   const { t, locale } = useI18n();
 
@@ -143,7 +148,12 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
               <tr key={dog.id} className="border-b align-top">
                 <td className="px-2 py-2">
                   <div className="font-medium">
-                    {showDash(dog.registrationNo)}
+                    <Link
+                      href={buildDogProfileHref(dog.id)}
+                      className="underline-offset-2 hover:underline"
+                    >
+                      {showDash(dog.registrationNo)}
+                    </Link>
                   </div>
                   {dog.secondaryRegistrationNos.length > 0 ? (
                     <div className="mt-1 text-xs text-muted-foreground">
@@ -154,7 +164,14 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
                     </div>
                   ) : null}
                 </td>
-                <td className="px-2 py-2">{showDash(dog.name)}</td>
+                <td className="px-2 py-2">
+                  <Link
+                    href={buildDogProfileHref(dog.id)}
+                    className="underline-offset-2 hover:underline"
+                  >
+                    {showDash(dog.name)}
+                  </Link>
+                </td>
                 <td className="px-2 py-2">
                   <DogSexLabel sex={dog.sex} />
                 </td>
@@ -202,9 +219,21 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
         <Card key={dog.id}>
           <CardContent className="space-y-3 pt-4">
             <div>
-              <p className="font-medium">{showDash(dog.name)}</p>
+              <p className="font-medium">
+                <Link
+                  href={buildDogProfileHref(dog.id)}
+                  className="underline-offset-2 hover:underline"
+                >
+                  {showDash(dog.name)}
+                </Link>
+              </p>
               <p className="text-sm text-muted-foreground">
-                {showDash(dog.registrationNo)}
+                <Link
+                  href={buildDogProfileHref(dog.id)}
+                  className="underline-offset-2 hover:underline"
+                >
+                  {showDash(dog.registrationNo)}
+                </Link>
               </p>
             </div>
             <div className="text-sm space-y-1">

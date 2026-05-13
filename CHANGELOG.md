@@ -16,6 +16,8 @@ This project uses a user-facing changelog format.
 
 - Uusi `phase1.25`-tuontivaihe tuo vanhan kannan sairaustiedot sekä koirille tallennetut sukusiitosasteet.
 - Ylläpidon koiralomakkeella voi laskea valitun uroksen ja emän sukusiitosasteen esikatseluna; arvo tallennetaan aina automaattisesti uutta koiraa luotaessa tai kun emä tai isä muuttuu.
+- Ylläpitoon lisättiin uusi erillinen koiraprofiili, joka näyttää vanhan hallinnan perustiedot omalla luku-API:lla ja pitää julkisen profiilin tiedot erillään ylläpitonäkymästä.
+- Ylläpitoprofiilin `EPI`-kentät näytetään toistaiseksi paikkamerkkeinä, kunnes vanha laskenta on portattu ja testattu.
 
 ### Changed
 
