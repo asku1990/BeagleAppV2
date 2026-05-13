@@ -235,13 +235,16 @@ describe("updateAdminDog", () => {
         damId: undefined,
         ownerNames: ["Tiina Virtanen"],
         ekNo: 5588,
-        siitosasteProsentti: 0,
         note: "Important",
         registrationNo: "FI12345/21",
         secondaryRegistrationNos: undefined,
         titles: undefined,
       },
       {},
+    );
+    expect(loadDogPedigreeAncestryForParentsDbMock).not.toHaveBeenCalled();
+    expect(updateAdminDogWriteDbMock.mock.calls[0]?.[0]).not.toHaveProperty(
+      "siitosasteProsentti",
     );
   });
 
@@ -367,6 +370,10 @@ describe("updateAdminDog", () => {
         ownerNames: undefined,
       }),
       {},
+    );
+    expect(loadDogPedigreeAncestryForParentsDbMock).not.toHaveBeenCalled();
+    expect(updateAdminDogWriteDbMock.mock.calls[0]?.[0]).not.toHaveProperty(
+      "siitosasteProsentti",
     );
   });
 
