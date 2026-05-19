@@ -32,10 +32,7 @@ describe("getAdminDogProfile", () => {
       base: {
         id: "dog-1",
         name: "JALLU",
-        title: null,
-        registrationNo: "FIN28284/01",
-        registrationNos: ["FIN28284/01"],
-        registrations: [
+        registrationNos: [
           {
             registrationNo: "FIN28284/01",
             createdAt: new Date("2001-01-01T00:00:00.000Z"),
@@ -45,7 +42,7 @@ describe("getAdminDogProfile", () => {
         sex: "MALE",
         color: null,
         ekNo: null,
-        siitosasteProsentti: 3.0724,
+        inbreedingCoefficientPct: 3.0724,
         sire: {
           id: "sire-1",
           name: "JUHANNIN ROOPE",
@@ -78,9 +75,7 @@ describe("getAdminDogProfile", () => {
         siblingsSummary: {
           siblingCount: 0,
         },
-        litters: [],
-        siblings: [],
-        titles: [],
+        breederNameText: null,
       },
       note: "Muut tiedot",
       breeder: {
@@ -183,6 +178,7 @@ describe("getAdminDogProfile", () => {
               city: "Maukkula",
               detailsSource: null,
             },
+            breederNameText: null,
             note: "Muut tiedot",
           },
         },

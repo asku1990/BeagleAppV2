@@ -175,7 +175,7 @@ function AdminDogProfileBasicsSection({ dog }: { dog: AdminDogProfileDto }) {
           value={formatBirthDateWithAge(dog.birthDate)}
         />
         <DetailRow label="Sukupuoli" value={formatSex(dog.sex)} />
-        <DetailRow label="Väri" value={showDash(dog.color)} />
+        <DetailRow label="Väri" value="Tulossa" />
         <DetailRow label="EK-numero" value={showDash(dog.ekNo)} />
         <DetailRow
           label="Jälkeläisiä(EK)[2p]"

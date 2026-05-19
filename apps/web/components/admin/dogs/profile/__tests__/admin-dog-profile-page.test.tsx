@@ -71,6 +71,7 @@ describe("AdminDogProfilePage", () => {
     expect(html).toContain("25.5.2001");
     expect(html).toContain("Vanhemmat");
     expect(html).toContain("Väri");
+    expect(html).toContain("Tulossa");
     expect(html).toContain("Jälkeläisiä(EK)[2p]");
     expect(html).toContain("3.0724 %");
     expect(html).toContain("PERUSTIEDOT");

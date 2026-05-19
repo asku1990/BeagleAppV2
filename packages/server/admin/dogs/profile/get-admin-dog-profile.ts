@@ -61,22 +61,22 @@ function toAdminDogProfileDto(profile: AdminDogProfileDb): AdminDogProfileDto {
   return {
     id: profile.base.id,
     name: profile.base.name,
-    registrationNo: getPrimaryRegistrationNo(profile.base.registrations),
-    registrationNos: profile.base.registrations.map(
+    registrationNo: getPrimaryRegistrationNo(profile.base.registrationNos),
+    registrationNos: profile.base.registrationNos.map(
       (registration) => registration.registrationNo,
     ),
     birthDate: profile.base.birthDate
       ? toBusinessDateOnly(profile.base.birthDate)
       : null,
     sex: mapSex(sex),
-    color: null,
+    color: profile.base.color,
     ekNo: profile.base.ekNo,
     offspringCount: buildOffspringSummary(litters).puppyCount,
     offspringLitterCount: buildOffspringSummary(litters).litterCount,
     inbreedingCoefficientPct:
-      profile.base.siitosasteProsentti == null
+      profile.base.inbreedingCoefficientPct == null
         ? null
-        : Number(profile.base.siitosasteProsentti),
+        : Number(profile.base.inbreedingCoefficientPct),
     epiLuku: null,
     laforaLuku: null,
     epiRiskLuku: null,
