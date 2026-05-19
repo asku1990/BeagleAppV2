@@ -4,6 +4,11 @@ import { describe, expect, it, vi } from "vitest";
 import { DogResults } from "../dog-results";
 import type { AdminDogRecord } from "../types";
 
+vi.mock("next/link", () => ({
+  default: ({ href, children, ...props }: React.ComponentProps<"a">) =>
+    React.createElement("a", { href, ...props }, children),
+}));
+
 vi.mock("@/hooks/i18n", () => ({
   useI18n: () => ({
     locale: "fi",
@@ -68,6 +73,7 @@ describe("DogResults", () => {
     expect(html).toContain("admin.dogs.columns.titles");
     expect(html).toContain("FI JVA, SE JCH");
     expect(html).toContain("admin.dogs.mobile.titlesLabel");
+    expect(html).toContain('href="/admin/dogs/dog_1/profile"');
   });
 
   it("shows dash when titlesText is missing", () => {

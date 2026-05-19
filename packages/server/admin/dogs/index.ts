@@ -6,3 +6,4 @@ export { deleteAdminDog } from "./manage/delete-dog";
 export { listAdminBreederOptions } from "./lookups/list-breeder-options";
 export { listAdminOwnerOptions } from "./lookups/list-owner-options";
 export { listAdminDogParentOptions } from "./lookups/list-parent-options";
+export { getAdminDogProfile } from "./profile";
