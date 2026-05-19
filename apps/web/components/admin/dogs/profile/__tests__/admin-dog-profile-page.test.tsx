@@ -59,6 +59,7 @@ describe("AdminDogProfilePage", () => {
             city: "Maukkula",
             detailsSource: null,
           },
+          breederNameText: null,
           note: null,
         },
       }),
@@ -82,5 +83,41 @@ describe("AdminDogProfilePage", () => {
     expect(html).toContain("82900 Ilomantsi");
     expect(html).toContain("Karppi Raija");
     expect(html).toContain("Maukkula");
+  });
+
+  it("shows breeder text fallback with warning tooltip when breeder link is missing", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(AdminDogProfilePage, {
+        dog: {
+          id: "dog-2",
+          name: "TAVAJS BARR",
+          registrationNo: "SE12345/01",
+          registrationNos: ["SE12345/01"],
+          birthDate: "2001-05-25",
+          sex: "MALE",
+          color: null,
+          ekNo: null,
+          offspringCount: 0,
+          offspringLitterCount: 0,
+          inbreedingCoefficientPct: null,
+          epiLuku: null,
+          laforaLuku: null,
+          epiRiskLuku: null,
+          healthSummary: null,
+          diseases: [],
+          sire: null,
+          dam: null,
+          owners: [],
+          breeder: null,
+          breederNameText: "ROLIN CHRISTINA",
+          note: null,
+        },
+      }),
+    );
+
+    expect(html).toContain("ROLIN CHRISTINA");
+    expect(html).toContain(
+      "Kasvattaja tulee koirataulusta suoraan eik\u00E4 ole linkitetty kasvattaja tauluun",
+    );
   });
 });

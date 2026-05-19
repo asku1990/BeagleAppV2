@@ -86,6 +86,7 @@ function toAdminDogProfileDto(profile: AdminDogProfileDb): AdminDogProfileDto {
     dam: mapParent(profile.base.dam),
     owners: profile.owners,
     breeder: profile.breeder,
+    breederNameText: profile.base.breederNameText,
     note: profile.note,
   };
 }

@@ -53,6 +53,7 @@ export type AdminDogProfileDto = {
   dam: AdminDogProfileParentDto | null;
   owners: AdminDogProfileOwnerDto[];
   breeder: AdminDogProfileBreederDto | null;
+  breederNameText?: string | null;
   note: string | null;
 };
 

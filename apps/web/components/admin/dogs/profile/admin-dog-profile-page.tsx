@@ -4,6 +4,7 @@ import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { cn } from "@/lib/utils";
 import type { AdminDogProfileDto } from "@beagle/contracts";
+import { TriangleAlert } from "lucide-react";
 import { type ReactNode } from "react";
 
 const FALLBACK_VALUE = "-";
@@ -96,14 +97,37 @@ function formatOwnerAddress(owners: AdminDogProfileDto["owners"]): string {
   return `${primary.postalCode} ${primary.city}`.trim();
 }
 
-function formatBreederAddress(breeder: AdminDogProfileDto["breeder"]): string {
-  if (!breeder) {
+function formatBreederOwnerName(
+  breeder: AdminDogProfileDto["breeder"],
+): string {
+  return showDash(breeder?.ownerName);
+}
+
+function formatBreederCity(breeder: AdminDogProfileDto["breeder"]): string {
+  return showDash(breeder?.city);
+}
+
+function renderBreederName(dog: AdminDogProfileDto): ReactNode {
+  if (dog.breeder) {
+    return dog.breeder.name;
+  }
+
+  const fallbackName = dog.breederNameText?.trim();
+  if (!fallbackName) {
     return FALLBACK_VALUE;
   }
 
-  return [breeder.ownerName, breeder.city]
-    .filter((part) => Boolean(part && part.trim().length > 0))
-    .join(", ");
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span>{fallbackName}</span>
+      <span
+        title="Kasvattaja tulee koirataulusta suoraan eikä ole linkitetty kasvattaja tauluun"
+        aria-label="Kasvattaja ei ole linkitetty canonical-lähteeseen"
+      >
+        <TriangleAlert className="size-4 text-amber-500" />
+      </span>
+    </span>
+  );
 }
 
 function DetailRow({
@@ -180,13 +204,14 @@ function AdminDogProfileBasicsSection({ dog }: { dog: AdminDogProfileDto }) {
           label="Omistajan Osoite"
           value={formatOwnerAddress(dog.owners)}
         />
+        <DetailRow label="Kennel" value={renderBreederName(dog)} />
         <DetailRow
-          label="Kasvattaja"
-          value={dog.breeder ? dog.breeder.name : FALLBACK_VALUE}
+          label="Kennelin omistajat"
+          value={formatBreederOwnerName(dog.breeder)}
         />
         <DetailRow
-          label="Kasvattajan Osoite"
-          value={formatBreederAddress(dog.breeder)}
+          label="Kennelin paikkakunta"
+          value={formatBreederCity(dog.breeder)}
         />
         <DetailRow label="Muut tiedot" value={showDash(dog.note)} />
       </dl>
