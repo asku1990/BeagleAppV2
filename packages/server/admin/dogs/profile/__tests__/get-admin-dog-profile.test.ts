@@ -1,17 +1,27 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getAdminDogProfile } from "../get-admin-dog-profile";
 
-const { getAdminDogProfileDbMock } = vi.hoisted(() => ({
+const {
+  getAdminDogProfileDbMock,
+  loadDogPedigreeAncestryDbMock,
+  loadDogEpiDiseaseFactsDbMock,
+} = vi.hoisted(() => ({
   getAdminDogProfileDbMock: vi.fn(),
+  loadDogPedigreeAncestryDbMock: vi.fn(),
+  loadDogEpiDiseaseFactsDbMock: vi.fn(),
 }));
 
 vi.mock("@beagle/db", () => ({
   getAdminDogProfileDb: getAdminDogProfileDbMock,
+  loadDogPedigreeAncestryDb: loadDogPedigreeAncestryDbMock,
+  loadDogEpiDiseaseFactsDb: loadDogEpiDiseaseFactsDbMock,
 }));
 
 describe("getAdminDogProfile", () => {
   beforeEach(() => {
     getAdminDogProfileDbMock.mockReset();
+    loadDogPedigreeAncestryDbMock.mockReset();
+    loadDogEpiDiseaseFactsDbMock.mockReset();
   });
 
   it("returns unauthorized when the user is missing", async () => {
@@ -27,7 +37,7 @@ describe("getAdminDogProfile", () => {
     expect(getAdminDogProfileDbMock).not.toHaveBeenCalled();
   });
 
-  it("returns placeholder health fields and admin-only data for an admin user", async () => {
+  it("returns computed EPI fields and admin-only data for an admin user", async () => {
     getAdminDogProfileDbMock.mockResolvedValue({
       base: {
         id: "dog-1",
@@ -108,6 +118,37 @@ describe("getAdminDogProfile", () => {
         },
       ],
     } as never);
+    loadDogPedigreeAncestryDbMock.mockResolvedValue({
+      rootId: "dog-1",
+      nodes: {
+        "dog-1": {
+          id: "dog-1",
+          sireId: "sire-1",
+          damId: "dam-1",
+          siitosasteProsentti: null,
+        },
+        "sire-1": {
+          id: "sire-1",
+          sireId: null,
+          damId: null,
+          siitosasteProsentti: null,
+        },
+        "dam-1": {
+          id: "dam-1",
+          sireId: null,
+          damId: null,
+          siitosasteProsentti: null,
+        },
+      },
+    });
+    loadDogEpiDiseaseFactsDbMock.mockResolvedValue([
+      {
+        dogId: "dog-1",
+        isaDogId: "sire-1",
+        emaDogId: "dam-1",
+        sairausKoodi: "epi",
+      },
+    ]);
 
     const result = await getAdminDogProfile("dog-1", {
       id: "admin-1",
@@ -133,9 +174,10 @@ describe("getAdminDogProfile", () => {
             offspringCount: 0,
             offspringLitterCount: 0,
             inbreedingCoefficientPct: 3.0724,
-            epiLuku: null,
-            laforaLuku: null,
-            epiRiskLuku: null,
+            epiLuku: 1.5,
+            epiTeksti: "I----",
+            laforaLuku: 0,
+            epiRiskLuku: 4,
             healthSummary: "Epilepsia",
             diseases: [
               {
@@ -186,6 +228,12 @@ describe("getAdminDogProfile", () => {
     });
 
     expect(getAdminDogProfileDbMock).toHaveBeenCalledWith("dog-1");
+    expect(loadDogPedigreeAncestryDbMock).toHaveBeenCalledWith("dog-1", 5);
+    expect(loadDogEpiDiseaseFactsDbMock).toHaveBeenCalledWith([
+      "dog-1",
+      "sire-1",
+      "dam-1",
+    ]);
   });
 
   it("rejects invalid dog ids before hitting the database", async () => {

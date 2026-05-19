@@ -20,7 +20,7 @@ The page renders the legacy basics that were visible in the old hallinta view:
 - `EK-numero`
 - `Jälkeläisiä(EK)[2p]`
 - `Sukusiitosaste (9 sp)`
-- `EPI-luku (5 sp)`
+- `EPI-luku (5 sp)` with `EPITEKSTI`
 - `Lafora-luku(-1..7)`
 - `EPI-riskiluku(1-8)`
 - `Terveystiedot`
@@ -33,10 +33,15 @@ The page renders the legacy basics that were visible in the old hallinta view:
 
 ## EPI status
 
-`EPI-luku`, `Lafora-luku`, and `EPI-riskiluku` are shown as placeholders for now. The legacy calculation path is not yet ported into the new profile surface, so the admin page intentionally avoids inventing a value.
+`EPI-luku`, `EPITEKSTI`, `Lafora-luku`, and `EPI-riskiluku` are calculated on demand in server code from:
+
+- imported `KoiranSairaus` disease rows (`epi`, `lepis`, `lepik`, `lepit`)
+- bounded pedigree ancestry loaded for the profile dog
+
+No legacy `beaepi` cache table is imported or persisted in v2 for this admin profile view.
 
 ## Boundary rules
 
 - Public responses must not include admin-only fields.
 - Admin-only reads go through the admin route and admin DTOs.
-- Any future EPI implementation should be added behind the same boundary and covered by tests before the placeholder is replaced.
+- Any future virtual-pairing EPI implementation should be added behind the same boundary and covered by tests.

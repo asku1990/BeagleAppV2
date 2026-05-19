@@ -20,6 +20,10 @@ export {
   type DogPedigreeAncestorDb,
   type DogPedigreeAncestryDb,
 } from "./core/pedigree-ancestry";
+export {
+  loadDogEpiDiseaseFactsDb,
+  type DogEpiDiseaseFactDb,
+} from "./core/epi-disease-facts";
 export { getNewestBeagleDogsDb } from "./newest";
 export {
   searchBeagleDogsDb,

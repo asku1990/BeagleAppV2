@@ -1,4 +1,9 @@
-import { getAdminDogProfileDb, type AdminDogProfileDb } from "@beagle/db";
+import {
+  getAdminDogProfileDb,
+  loadDogEpiDiseaseFactsDb,
+  loadDogPedigreeAncestryDb,
+  type AdminDogProfileDb,
+} from "@beagle/db";
 import type {
   AdminDogProfileDto,
   AdminDogProfileResponse,
@@ -20,6 +25,7 @@ import {
   toSexCode,
 } from "@db/dogs/profile/internal/profile-mappers";
 import type { BeagleDogProfileSexDb } from "@db/dogs/profile/internal/profile-types";
+import { calculateAdminDogEpiSummary } from "./internal/epi-risk";
 
 type AdminDogProfileResult = ServiceResult<AdminDogProfileResponse>;
 
@@ -49,7 +55,10 @@ function formatHealthSummary(
   return summary.join(", ");
 }
 
-function toAdminDogProfileDto(profile: AdminDogProfileDb): AdminDogProfileDto {
+function toAdminDogProfileDto(
+  profile: AdminDogProfileDb,
+  epiSummary: ReturnType<typeof calculateAdminDogEpiSummary>,
+): AdminDogProfileDto {
   const sex = toSexCode(profile.base.sex);
   const litters = buildLitters(
     profile.base.id,
@@ -77,9 +86,10 @@ function toAdminDogProfileDto(profile: AdminDogProfileDb): AdminDogProfileDto {
       profile.base.inbreedingCoefficientPct == null
         ? null
         : Number(profile.base.inbreedingCoefficientPct),
-    epiLuku: null,
-    laforaLuku: null,
-    epiRiskLuku: null,
+    epiLuku: epiSummary.epiLuku,
+    epiTeksti: epiSummary.epiTeksti,
+    laforaLuku: epiSummary.laforaLuku,
+    epiRiskLuku: epiSummary.epiRiskLuku,
     healthSummary: formatHealthSummary(profile.diseases),
     diseases: profile.diseases,
     sire: mapParent(profile.base.sire),
@@ -154,6 +164,15 @@ export async function getAdminDogProfile(
       };
     }
 
+    const ancestry = await loadDogPedigreeAncestryDb(parsedDogId, 5);
+    const relatedDogIds = Object.keys(ancestry.nodes);
+    const diseaseFacts = await loadDogEpiDiseaseFactsDb(relatedDogIds);
+    const epiSummary = calculateAdminDogEpiSummary(
+      parsedDogId,
+      ancestry,
+      diseaseFacts,
+    );
+
     log.info(
       {
         event: "success",
@@ -165,7 +184,10 @@ export async function getAdminDogProfile(
 
     return {
       status: 200,
-      body: { ok: true, data: { dog: toAdminDogProfileDto(profile) } },
+      body: {
+        ok: true,
+        data: { dog: toAdminDogProfileDto(profile, epiSummary) },
+      },
     };
   } catch (error) {
     log.error(

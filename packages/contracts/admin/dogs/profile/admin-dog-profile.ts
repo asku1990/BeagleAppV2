@@ -45,6 +45,7 @@ export type AdminDogProfileDto = {
   offspringLitterCount: number;
   inbreedingCoefficientPct: number | null;
   epiLuku: number | null;
+  epiTeksti: string | null;
   laforaLuku: number | null;
   epiRiskLuku: number | null;
   healthSummary: string | null;
