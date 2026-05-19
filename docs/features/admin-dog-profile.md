@@ -27,8 +27,9 @@ The page renders the legacy basics that were visible in the old hallinta view:
 - `Vanhemmat`
 - `Omistaja`
 - `Omistajan Osoite`
-- `Kasvattaja`
-- `Kasvattajan Osoite`
+- `Kennel`
+- `Kennelin omistajat`
+- `Kennelin paikkakunta`
 
 ## EPI status
 
