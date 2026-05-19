@@ -32,28 +32,55 @@ describe("getAdminDogProfile", () => {
       base: {
         id: "dog-1",
         name: "JALLU",
+        title: null,
         registrationNo: "FIN28284/01",
         registrationNos: ["FIN28284/01"],
+        registrations: [
+          {
+            registrationNo: "FIN28284/01",
+            createdAt: new Date("2001-01-01T00:00:00.000Z"),
+          },
+        ],
         birthDate: new Date("2001-05-25T00:00:00.000Z"),
-        sex: "U",
+        sex: "MALE",
+        color: null,
         ekNo: null,
         siitosasteProsentti: 3.0724,
-        offspringSummary: {
-          puppyCount: 0,
-          litterCount: 0,
-        },
         sire: {
           id: "sire-1",
           name: "JUHANNIN ROOPE",
-          registrationNo: "FIN21285/96",
+          registrations: [
+            {
+              registrationNo: "FIN21285/96",
+              createdAt: new Date("1996-01-01T00:00:00.000Z"),
+            },
+          ],
           ekNo: null,
         },
         dam: {
           id: "dam-1",
           name: "HUPI",
-          registrationNo: "FIN31655/98",
+          registrations: [
+            {
+              registrationNo: "FIN31655/98",
+              createdAt: new Date("1998-01-01T00:00:00.000Z"),
+            },
+          ],
           ekNo: null,
         },
+        pedigree: [],
+        offspringSummary: {
+          puppyCount: 0,
+          litterCount: 0,
+        },
+        whelpedPuppies: [],
+        siredPuppies: [],
+        siblingsSummary: {
+          siblingCount: 0,
+        },
+        litters: [],
+        siblings: [],
+        titles: [],
       },
       note: "Muut tiedot",
       breeder: {
