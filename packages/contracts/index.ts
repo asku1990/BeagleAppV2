@@ -113,6 +113,10 @@ export type {
   BeagleDogProfileSiblingsSummaryDto,
   BeagleDogProfileTitleRowDto,
   BeagleDogProfileTrialRowDto,
+  VirtualPairingDogOption,
+  VirtualPairingSearchField,
+  VirtualPairingSearchRequest,
+  VirtualPairingSearchResponse,
 } from "./dogs";
 export type {
   BeagleShowDetailsEvent,
@@ -202,6 +206,10 @@ export type {
   AdminBreederLookupResponse,
   AdminOwnerLookupResponse,
   AdminDogParentLookupResponse,
+  AdminVirtualPairingContributionDto,
+  AdminVirtualPairingDiagnosticsDto,
+  CalculateAdminVirtualPairingRequest,
+  CalculateAdminVirtualPairingResponse,
   AdminShowDetailsEvent,
   AdminShowDetailsRequest,
   AdminShowDetailsResponse,
