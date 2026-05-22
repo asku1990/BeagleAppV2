@@ -1,5 +1,7 @@
 import type { DogEpiDiseaseFactDb, DogPedigreeAncestryDb } from "@beagle/db";
 
+// Calculates the legacy admin profile EPI, Lafora, and derived risk summary
+// from imported disease facts and bounded pedigree ancestry.
 type EpiEvidence = {
   text: string;
   value: number;

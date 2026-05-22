@@ -1,5 +1,7 @@
 import type { DogPedigreeAncestryDb } from "@beagle/db";
 
+// Calculates the legacy inbreeding percentage from shared ancestor paths in a
+// bounded pedigree matrix, preserving the import-time weighting semantics.
 type PedigreeMatrix = Record<number, Record<number, string | null>>;
 
 type SharedOccurrence = {
