@@ -44,6 +44,17 @@ describe("useCalculateAdminVirtualPairingMutation", () => {
           sex: "N",
         },
         inbreedingCoefficientPct: 12.5,
+        diagnostics: {
+          sharedAncestorCount: 2,
+          sharedOccurrenceCount: 3,
+          includedOccurrenceCount: 2,
+          includedSirePositionCount: 2,
+          includedDamPositionCount: 2,
+          includedPositionCount: 4,
+          knownSlotCount: 10,
+          knownPedigreePct: 81.02,
+          contributions: [],
+        },
         placeholders: {
           epi: {
             label: "EPI-luku (5 sp)",

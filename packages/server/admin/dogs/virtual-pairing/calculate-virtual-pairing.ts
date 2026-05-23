@@ -238,6 +238,9 @@ export async function calculateAdminVirtualPairing(
             sharedAncestorCount: breakdown.sharedAncestorCount,
             sharedOccurrenceCount: breakdown.sharedOccurrenceCount,
             includedOccurrenceCount: breakdown.includedOccurrenceCount,
+            includedSirePositionCount: breakdown.includedSirePositionCount,
+            includedDamPositionCount: breakdown.includedDamPositionCount,
+            includedPositionCount: breakdown.includedPositionCount,
             knownSlotCount: breakdown.knownSlotCount,
             knownPedigreePct: breakdown.knownPedigreePct,
             contributions: breakdown.contributions.map((contribution) => {

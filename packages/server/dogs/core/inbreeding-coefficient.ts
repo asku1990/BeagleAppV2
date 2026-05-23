@@ -20,6 +20,9 @@ export type InbreedingCoefficientBreakdownPct = {
   sharedAncestorCount: number;
   sharedOccurrenceCount: number;
   includedOccurrenceCount: number;
+  includedSirePositionCount: number;
+  includedDamPositionCount: number;
+  includedPositionCount: number;
   knownSlotCount: number;
   knownPedigreePct: number;
   contributionPct: number;
@@ -216,9 +219,20 @@ export function calculateInbreedingCoefficientBreakdownForParentsPct(
   const includedContributions = shared
     .filter((occurrence) => occurrence.include)
     .sort((left, right) => right.contributionPct - left.contributionPct);
-  const sharedAncestorCount = new Set(shared.map((occurrence) => occurrence.id))
-    .size;
+  const sharedAncestorCount = new Set(
+    includedContributions.map((occurrence) => occurrence.id),
+  ).size;
   const includedOccurrenceCount = includedContributions.length;
+  const includedSirePositionCount = new Set(
+    includedContributions.map(
+      (occurrence) => `${occurrence.sireGeneration}-${occurrence.sireIndex}`,
+    ),
+  ).size;
+  const includedDamPositionCount = new Set(
+    includedContributions.map(
+      (occurrence) => `${occurrence.damGeneration}-${occurrence.damIndex}`,
+    ),
+  ).size;
   const { knownSlotCount, knownPedigreePct } = countKnownPedigreePct(
     sireMatrix,
     damMatrix,
@@ -229,6 +243,9 @@ export function calculateInbreedingCoefficientBreakdownForParentsPct(
     sharedAncestorCount,
     sharedOccurrenceCount: shared.length,
     includedOccurrenceCount,
+    includedSirePositionCount,
+    includedDamPositionCount,
+    includedPositionCount: includedSirePositionCount + includedDamPositionCount,
     knownSlotCount,
     knownPedigreePct,
     contributionPct,

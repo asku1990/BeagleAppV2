@@ -63,6 +63,9 @@ describe("calculateAdminVirtualPairingAction", () => {
             sharedAncestorCount: 2,
             sharedOccurrenceCount: 3,
             includedOccurrenceCount: 2,
+            includedSirePositionCount: 2,
+            includedDamPositionCount: 2,
+            includedPositionCount: 4,
             knownSlotCount: 10,
             knownPedigreePct: 81.02,
             contributions: [

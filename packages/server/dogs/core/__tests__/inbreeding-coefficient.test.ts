@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  calculateInbreedingCoefficientBreakdownForParentsPct,
   calculateInbreedingCoefficientForParentsPct,
   calculateInbreedingCoefficientPct,
 } from "../inbreeding-coefficient";
@@ -221,5 +222,50 @@ describe("calculateInbreedingCoefficientPct", () => {
       13.75,
       5,
     );
+  });
+
+  it("reports legacy-compatible included side-position counts", () => {
+    const ancestry = makeAncestry({
+      sire: {
+        id: "sire",
+        sireId: "shared-a",
+        damId: "shared-b",
+        siitosasteProsentti: null,
+      },
+      dam: {
+        id: "dam",
+        sireId: "shared-a",
+        damId: "shared-b",
+        siitosasteProsentti: null,
+      },
+      "shared-a": {
+        id: "shared-a",
+        sireId: null,
+        damId: null,
+        siitosasteProsentti: null,
+      },
+      "shared-b": {
+        id: "shared-b",
+        sireId: null,
+        damId: null,
+        siitosasteProsentti: null,
+      },
+    });
+
+    expect(
+      calculateInbreedingCoefficientBreakdownForParentsPct(
+        "sire",
+        "dam",
+        ancestry,
+        2,
+      ),
+    ).toMatchObject({
+      sharedAncestorCount: 2,
+      sharedOccurrenceCount: 2,
+      includedOccurrenceCount: 2,
+      includedSirePositionCount: 2,
+      includedDamPositionCount: 2,
+      includedPositionCount: 4,
+    });
   });
 });

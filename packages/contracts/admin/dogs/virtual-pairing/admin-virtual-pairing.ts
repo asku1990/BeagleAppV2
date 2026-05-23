@@ -15,6 +15,9 @@ export type AdminVirtualPairingDiagnosticsDto = {
   sharedAncestorCount: number;
   sharedOccurrenceCount: number;
   includedOccurrenceCount: number;
+  includedSirePositionCount: number;
+  includedDamPositionCount: number;
+  includedPositionCount: number;
   knownSlotCount: number;
   knownPedigreePct: number;
   contributions: AdminVirtualPairingContributionDto[];

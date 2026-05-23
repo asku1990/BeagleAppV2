@@ -104,6 +104,14 @@ describe("calculateAdminVirtualPairing", () => {
             registrationNo: "FI77777/18",
           },
           inbreedingCoefficientPct: 12.5,
+          diagnostics: expect.objectContaining({
+            sharedAncestorCount: 1,
+            sharedOccurrenceCount: 1,
+            includedOccurrenceCount: 1,
+            includedSirePositionCount: 1,
+            includedDamPositionCount: 1,
+            includedPositionCount: 2,
+          }),
         },
       },
     });
