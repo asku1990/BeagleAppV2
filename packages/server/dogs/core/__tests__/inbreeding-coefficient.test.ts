@@ -190,7 +190,7 @@ describe("calculateInbreedingCoefficientPct", () => {
     expect(calculateInbreedingCoefficientPct("root", ancestry)).not.toBeNull();
   });
 
-  it("applies ancestor Fa multiplier from siitosasteProsentti", () => {
+  it("ignores stored ancestor siitosasteProsentti values", () => {
     const ancestry = makeAncestry({
       root: {
         id: "root",
@@ -219,7 +219,59 @@ describe("calculateInbreedingCoefficientPct", () => {
     });
 
     expect(calculateInbreedingCoefficientPct("root", ancestry)).toBeCloseTo(
-      13.75,
+      12.5,
+      5,
+    );
+  });
+
+  it("applies ancestor Fa multiplier from dynamically calculated inbreeding", () => {
+    const ancestry = makeAncestry({
+      root: {
+        id: "root",
+        sireId: "sire",
+        damId: "dam",
+        siitosasteProsentti: null,
+      },
+      sire: {
+        id: "sire",
+        sireId: "ancestor",
+        damId: null,
+        siitosasteProsentti: null,
+      },
+      dam: {
+        id: "dam",
+        sireId: "ancestor",
+        damId: null,
+        siitosasteProsentti: null,
+      },
+      ancestor: {
+        id: "ancestor",
+        sireId: "ancestor-sire",
+        damId: "ancestor-dam",
+        siitosasteProsentti: 99,
+      },
+      "ancestor-sire": {
+        id: "ancestor-sire",
+        sireId: "deep-shared",
+        damId: null,
+        siitosasteProsentti: null,
+      },
+      "ancestor-dam": {
+        id: "ancestor-dam",
+        sireId: "deep-shared",
+        damId: null,
+        siitosasteProsentti: null,
+      },
+      "deep-shared": {
+        id: "deep-shared",
+        sireId: null,
+        damId: null,
+        siitosasteProsentti: null,
+      },
+    });
+
+    expect(calculateInbreedingCoefficientPct("root", ancestry, 3)).toBeCloseTo(
+      14.0625,
       5,
     );
   });
@@ -269,7 +321,7 @@ describe("calculateInbreedingCoefficientPct", () => {
     });
   });
 
-  it("groups breakdown contributions by ancestor and applies ancestor Fa", () => {
+  it("groups breakdown contributions by ancestor without stored ancestor Fa", () => {
     const ancestry = makeAncestry({
       sire: {
         id: "sire",
@@ -320,7 +372,7 @@ describe("calculateInbreedingCoefficientPct", () => {
       5,
     );
     expect(breakdown.contributions[0]?.adjustedContributionPct).toBeCloseTo(
-      30.9375,
+      28.125,
       5,
     );
   });
