@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type {
   CalculateAdminVirtualPairingResponse,
   VirtualPairingDogOption,
@@ -15,6 +16,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useI18n } from "@/hooks/i18n";
+import {
+  readVirtualPairingUrlState,
+  toVirtualPairingQueryHref,
+} from "@/lib/admin/dogs/virtual-pairing";
 import {
   useAdminVirtualPairingSearchQuery,
   useCalculateAdminVirtualPairingMutation,
@@ -36,6 +41,11 @@ function isValidDam(candidate: VirtualPairingDogOption): boolean {
 // Admin-only virtual pairing workflow with legacy search, selection, and placeholders.
 export function AdminVirtualPairingPageClient() {
   const { t } = useI18n();
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const lastAutoLoadKeyRef = useRef<string | null>(null);
+  const activeCalculationKeyRef = useRef<string | null>(null);
   const [searchField, setSearchField] =
     useState<VirtualPairingSearchField>("reg");
   const [searchText, setSearchText] = useState("");
@@ -69,8 +79,73 @@ export function AdminVirtualPairingPageClient() {
     searchEnabled,
   );
   const calculateMutation = useCalculateAdminVirtualPairingMutation();
+  const urlState = useMemo(
+    () => readVirtualPairingUrlState(searchParams),
+    [searchParams],
+  );
+  const urlCalculationKey = useMemo(() => {
+    if (!urlState.sireRegistrationNo || !urlState.damRegistrationNo) {
+      return null;
+    }
+
+    return `${urlState.sireRegistrationNo}|${urlState.damRegistrationNo}|${urlState.generationDepth}`;
+  }, [
+    urlState.damRegistrationNo,
+    urlState.generationDepth,
+    urlState.sireRegistrationNo,
+  ]);
   const canCalculate =
     Boolean(selectedSire && selectedDam) && !calculateMutation.isPending;
+
+  useEffect(() => {
+    if (!urlCalculationKey) {
+      return;
+    }
+
+    if (lastAutoLoadKeyRef.current === urlCalculationKey) {
+      return;
+    }
+
+    lastAutoLoadKeyRef.current = urlCalculationKey;
+    activeCalculationKeyRef.current = urlCalculationKey;
+    // Clear stale messages before loading the URL-backed calculation result.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSelectionMessage(null);
+    setCalculationMessage(null);
+
+    void (async () => {
+      try {
+        const result = await calculateMutation.mutateAsync({
+          sireRegistrationNo: urlState.sireRegistrationNo,
+          damRegistrationNo: urlState.damRegistrationNo,
+          generationDepth: urlState.generationDepth,
+        });
+
+        if (activeCalculationKeyRef.current !== urlCalculationKey) {
+          return;
+        }
+
+        setSelectedSire(result.sire);
+        setSelectedDam(result.dam);
+        setGenerationDepth(String(result.generationDepth));
+        setCalculationResult(result);
+      } catch (error) {
+        setCalculationResult(null);
+        setCalculationMessage(
+          error instanceof Error
+            ? error.message
+            : t("admin.virtualPairing.calculate.error"),
+        );
+      }
+    })();
+  }, [
+    calculateMutation,
+    t,
+    urlCalculationKey,
+    urlState.damRegistrationNo,
+    urlState.generationDepth,
+    urlState.sireRegistrationNo,
+  ]);
 
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -100,6 +175,8 @@ export function AdminVirtualPairingPageClient() {
 
     setSelectionMessage(null);
     setCalculationMessage(null);
+    setCalculationResult(null);
+    activeCalculationKeyRef.current = null;
     if (target === "sire") {
       setSelectedSire(candidate);
       return;
@@ -112,6 +189,8 @@ export function AdminVirtualPairingPageClient() {
       return;
     }
 
+    const calculationKey = `${selectedSire.registrationNo}|${selectedDam.registrationNo}|${generationDepth}`;
+    activeCalculationKeyRef.current = calculationKey;
     setSelectionMessage(null);
     setCalculationMessage(null);
 
@@ -121,7 +200,22 @@ export function AdminVirtualPairingPageClient() {
         damRegistrationNo: selectedDam.registrationNo,
         generationDepth: Number.parseInt(generationDepth, 10),
       });
+      if (activeCalculationKeyRef.current !== calculationKey) {
+        return;
+      }
+      lastAutoLoadKeyRef.current = `${result.sire.registrationNo}|${result.dam.registrationNo}|${result.generationDepth}`;
+      setSelectedSire(result.sire);
+      setSelectedDam(result.dam);
+      setGenerationDepth(String(result.generationDepth));
       setCalculationResult(result);
+      router.replace(
+        toVirtualPairingQueryHref(pathname, {
+          sireRegistrationNo: result.sire.registrationNo,
+          damRegistrationNo: result.dam.registrationNo,
+          generationDepth: result.generationDepth,
+        }),
+        { scroll: false },
+      );
     } catch (error) {
       setCalculationResult(null);
       setCalculationMessage(
@@ -135,11 +229,22 @@ export function AdminVirtualPairingPageClient() {
   const clearSelectedSire = () => {
     setSelectedSire(null);
     setCalculationMessage(null);
+    setCalculationResult(null);
+    activeCalculationKeyRef.current = null;
   };
 
   const clearSelectedDam = () => {
     setSelectedDam(null);
     setCalculationMessage(null);
+    setCalculationResult(null);
+    activeCalculationKeyRef.current = null;
+  };
+
+  const handleGenerationDepthChange = (value: string) => {
+    setGenerationDepth(value);
+    setCalculationMessage(null);
+    setCalculationResult(null);
+    activeCalculationKeyRef.current = null;
   };
 
   return (
@@ -190,7 +295,7 @@ export function AdminVirtualPairingPageClient() {
               canCalculate={canCalculate}
               selectionMessage={selectionMessage}
               calculationMessage={calculationMessage}
-              onGenerationDepthChange={setGenerationDepth}
+              onGenerationDepthChange={handleGenerationDepthChange}
               onClearSire={clearSelectedSire}
               onClearDam={clearSelectedDam}
               onCalculate={handleCalculate}

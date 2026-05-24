@@ -19,6 +19,7 @@ This project uses a user-facing changelog format.
 - Ylläpitoon lisättiin uusi erillinen koiraprofiili, joka näyttää vanhan hallinnan perustiedot omalla luku-API:lla ja pitää julkisen profiilin tiedot erillään ylläpitonäkymästä.
 - Ylläpitoprofiilin `EPI-luku`, `EPITEKSTI`, `Lafora-luku` ja `EPI-riskiluku` lasketaan nyt palvelinpuolella vanhan hallinnan sääntöjen mukaisesti tuoduista sairaustiedoista ja sukutaulusta.
 - Ylläpitoon lisättiin uusi virtuaaliparituksen MVP-sivu, jossa voi hakea koiria EK-numerolla, rekisterinumerolla tai nimellä, valita uroksen ja emän sekä laskea sukusiitosasteen v1-tyylisellä hakukäytöksellä.
+- Virtuaaliparituksen tulos on nyt jaettavissa URL:n kautta. Valitut uros, emä ja SP tallentuvat osoitteeseen onnistuneen laskennan jälkeen, ja kelvollinen URL laskee tuloksen automaattisesti sivun avauksessa.
 
 ### Changed
 
