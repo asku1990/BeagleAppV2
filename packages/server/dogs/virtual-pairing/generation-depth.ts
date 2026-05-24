@@ -1,6 +1,6 @@
 export const VIRTUAL_PAIRING_DEFAULT_GENERATION_DEPTH = 9;
-export const VIRTUAL_PAIRING_MIN_GENERATION_DEPTH = 5;
-export const VIRTUAL_PAIRING_MAX_GENERATION_DEPTH = 9;
+export const VIRTUAL_PAIRING_MIN_GENERATION_DEPTH = 4;
+export const VIRTUAL_PAIRING_MAX_GENERATION_DEPTH = 12;
 
 // Normalizes the legacy virtual-pairing generation depth selector.
 export function parseVirtualPairingGenerationDepth(

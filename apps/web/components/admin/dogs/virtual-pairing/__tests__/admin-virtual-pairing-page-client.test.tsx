@@ -174,9 +174,9 @@ describe("AdminVirtualPairingPageClient", () => {
     });
   });
 
-  it("auto-loads a URL-backed calculation once and falls back to SP 9 when the query depth is invalid", async () => {
+  it("auto-loads a URL-backed calculation once for SP 12", async () => {
     const mutateAsync = vi.fn().mockResolvedValue({
-      generationDepth: 9,
+      generationDepth: 12,
       sire: {
         id: "sire-1",
         ekNo: null,
@@ -219,7 +219,7 @@ describe("AdminVirtualPairingPageClient", () => {
     });
     searchParamsState.sire = "FIN18665/07";
     searchParamsState.dam = "FIN12562/97";
-    searchParamsState.sp = "abc";
+    searchParamsState.sp = "12";
 
     const firstHtml = renderClient();
     expect(firstHtml).toContain("admin.virtualPairing.result.empty");
@@ -232,10 +232,10 @@ describe("AdminVirtualPairingPageClient", () => {
     expect(mutateAsync).toHaveBeenCalledWith({
       sireRegistrationNo: "FIN18665/07",
       damRegistrationNo: "FIN12562/97",
-      generationDepth: 9,
+      generationDepth: 12,
     });
     expect(secondHtml).toContain("Sire Dog / Dam Dog");
-    expect(secondHtml).toContain("SP 9");
+    expect(secondHtml).toContain("SP 12");
     expect(secondHtml).toContain("12.3456 %");
     expect(replaceMock).not.toHaveBeenCalled();
   });

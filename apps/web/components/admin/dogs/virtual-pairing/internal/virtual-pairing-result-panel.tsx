@@ -74,7 +74,7 @@ export function AdminVirtualPairingResultPanel({ t, result }: Props) {
           {t("admin.virtualPairing.result.basisTitle")}
         </div>
         <ol className="mt-3 space-y-1 font-mono text-xs leading-5">
-          {result.diagnostics.contributions.slice(0, 37).map((item, index) => (
+          {result.diagnostics.contributions.map((item, index) => (
             <li key={`${item.ancestorId}-${index}`}>
               {String(index + 1).padStart(2, " ")}. {formatAncestorLabel(item)}
             </li>

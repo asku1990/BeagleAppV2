@@ -101,7 +101,7 @@ export function AdminVirtualPairingSelectionPanel({
             value={generationDepth}
             onChange={(event) => onGenerationDepthChange(event.target.value)}
           >
-            {[5, 6, 7, 8, 9].map((depth) => (
+            {[4, 5, 6, 7, 8, 9, 10, 11, 12].map((depth) => (
               <option key={depth} value={depth}>
                 {depth}
               </option>

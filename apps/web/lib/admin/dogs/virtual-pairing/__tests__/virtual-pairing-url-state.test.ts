@@ -10,8 +10,9 @@ describe("virtual pairing URL state helpers", () => {
     expect(readVirtualPairingGenerationDepth(null)).toBe(9);
     expect(readVirtualPairingGenerationDepth("")).toBe(9);
     expect(readVirtualPairingGenerationDepth("abc")).toBe(9);
-    expect(readVirtualPairingGenerationDepth("4")).toBe(5);
-    expect(readVirtualPairingGenerationDepth("10")).toBe(9);
+    expect(readVirtualPairingGenerationDepth("3")).toBe(4);
+    expect(readVirtualPairingGenerationDepth("12")).toBe(12);
+    expect(readVirtualPairingGenerationDepth("13")).toBe(12);
   });
 
   it("reads sire, dam, and SP from query parameters", () => {
@@ -38,8 +39,8 @@ describe("virtual pairing URL state helpers", () => {
       toVirtualPairingQueryString({
         sireRegistrationNo: "FIN18665/07",
         damRegistrationNo: "FIN12562/97",
-        generationDepth: 9,
+        generationDepth: 12,
       }),
-    ).toBe("sire=FIN18665%2F07&dam=FIN12562%2F97&sp=9");
+    ).toBe("sire=FIN18665%2F07&dam=FIN12562%2F97&sp=12");
   });
 });
