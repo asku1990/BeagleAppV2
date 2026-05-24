@@ -111,6 +111,15 @@ describe("calculateAdminVirtualPairing", () => {
             includedSirePositionCount: 1,
             includedDamPositionCount: 1,
             includedPositionCount: 2,
+            contributions: [
+              expect.objectContaining({
+                ancestorId: "ancestor",
+                contributionPct: 12.5,
+                rawContributionPct: 12.5,
+                occurrenceCount: 1,
+                displayPct: "12.50000 %",
+              }),
+            ],
           }),
         },
       },

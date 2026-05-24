@@ -16,6 +16,17 @@ type SharedOccurrence = {
 
 export type InbreedingContributionBreakdown = SharedOccurrence;
 
+export type GroupedInbreedingContributionBreakdown = {
+  id: string;
+  rawContributionPct: number;
+  adjustedContributionPct: number;
+  occurrenceCount: number;
+  sireGeneration: number;
+  sireIndex: number;
+  damGeneration: number;
+  damIndex: number;
+};
+
 export type InbreedingCoefficientBreakdownPct = {
   sharedAncestorCount: number;
   sharedOccurrenceCount: number;
@@ -26,7 +37,7 @@ export type InbreedingCoefficientBreakdownPct = {
   knownSlotCount: number;
   knownPedigreePct: number;
   contributionPct: number;
-  contributions: InbreedingContributionBreakdown[];
+  contributions: GroupedInbreedingContributionBreakdown[];
 };
 
 function getNode(ancestry: DogPedigreeAncestryDb, id: string) {
@@ -150,6 +161,57 @@ function sumInbreedingPct(
   }, 0);
 }
 
+function getAncestorMultiplier(
+  ancestry: DogPedigreeAncestryDb,
+  ancestorId: string,
+): number {
+  const ancestor = getNode(ancestry, ancestorId);
+  return ancestor?.siitosasteProsentti == null ||
+    ancestor.siitosasteProsentti === 0
+    ? 1
+    : 1 + ancestor.siitosasteProsentti / 100;
+}
+
+function groupIncludedContributions(
+  shared: SharedOccurrence[],
+  ancestry: DogPedigreeAncestryDb,
+): GroupedInbreedingContributionBreakdown[] {
+  const grouped = new Map<string, GroupedInbreedingContributionBreakdown>();
+
+  for (const occurrence of shared) {
+    if (!occurrence.include) {
+      continue;
+    }
+
+    const existing = grouped.get(occurrence.id);
+    if (existing) {
+      existing.rawContributionPct += occurrence.contributionPct;
+      existing.occurrenceCount += 1;
+      existing.adjustedContributionPct =
+        existing.rawContributionPct *
+        getAncestorMultiplier(ancestry, occurrence.id);
+      continue;
+    }
+
+    const multiplier = getAncestorMultiplier(ancestry, occurrence.id);
+    grouped.set(occurrence.id, {
+      id: occurrence.id,
+      rawContributionPct: occurrence.contributionPct,
+      adjustedContributionPct: occurrence.contributionPct * multiplier,
+      occurrenceCount: 1,
+      sireGeneration: occurrence.sireGeneration,
+      sireIndex: occurrence.sireIndex,
+      damGeneration: occurrence.damGeneration,
+      damIndex: occurrence.damIndex,
+    });
+  }
+
+  return [...grouped.values()].sort(
+    (left, right) =>
+      right.adjustedContributionPct - left.adjustedContributionPct,
+  );
+}
+
 function countKnownPedigreePct(
   sire: PedigreeMatrix,
   dam: PedigreeMatrix,
@@ -216,20 +278,19 @@ export function calculateInbreedingCoefficientBreakdownForParentsPct(
   const damMatrix = buildSideMatrix(ancestry, damId, maxDepth);
   const shared = buildSharedOccurrences(sireMatrix, damMatrix, maxDepth);
   const contributionPct = sumInbreedingPct(shared, ancestry);
-  const includedContributions = shared
-    .filter((occurrence) => occurrence.include)
-    .sort((left, right) => right.contributionPct - left.contributionPct);
+  const includedOccurrences = shared.filter((occurrence) => occurrence.include);
+  const contributions = groupIncludedContributions(shared, ancestry);
   const sharedAncestorCount = new Set(
-    includedContributions.map((occurrence) => occurrence.id),
+    includedOccurrences.map((occurrence) => occurrence.id),
   ).size;
-  const includedOccurrenceCount = includedContributions.length;
+  const includedOccurrenceCount = includedOccurrences.length;
   const includedSirePositionCount = new Set(
-    includedContributions.map(
+    includedOccurrences.map(
       (occurrence) => `${occurrence.sireGeneration}-${occurrence.sireIndex}`,
     ),
   ).size;
   const includedDamPositionCount = new Set(
-    includedContributions.map(
+    includedOccurrences.map(
       (occurrence) => `${occurrence.damGeneration}-${occurrence.damIndex}`,
     ),
   ).size;
@@ -249,6 +310,6 @@ export function calculateInbreedingCoefficientBreakdownForParentsPct(
     knownSlotCount,
     knownPedigreePct,
     contributionPct,
-    contributions: includedContributions,
+    contributions,
   };
 }

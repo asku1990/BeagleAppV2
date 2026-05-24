@@ -11,10 +11,6 @@ function formatCoefficient(value: number | null): string {
   return `${value.toFixed(4)} %`;
 }
 
-function formatContributionPct(value: number): string {
-  return `${value.toFixed(5)} %`;
-}
-
 function formatSummaryPct(value: number): string {
   return `${value.toFixed(2)} %`;
 }
@@ -23,8 +19,8 @@ function formatPlaceholderLabel(value: string): string {
   return `${value}:`;
 }
 
-function formatAncestorLabel(item: { label: string; contributionPct: number }) {
-  return `${item.label} => ${formatContributionPct(item.contributionPct)}`;
+function formatAncestorLabel(item: { label: string; displayPct: string }) {
+  return `${item.label} => ${item.displayPct}`;
 }
 
 // Result card for the admin virtual-pairing workflow.

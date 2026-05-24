@@ -268,4 +268,60 @@ describe("calculateInbreedingCoefficientPct", () => {
       includedPositionCount: 4,
     });
   });
+
+  it("groups breakdown contributions by ancestor and applies ancestor Fa", () => {
+    const ancestry = makeAncestry({
+      sire: {
+        id: "sire",
+        sireId: "shared",
+        damId: "sire-dam",
+        siitosasteProsentti: null,
+      },
+      dam: {
+        id: "dam",
+        sireId: "shared",
+        damId: "dam-dam",
+        siitosasteProsentti: null,
+      },
+      "sire-dam": {
+        id: "sire-dam",
+        sireId: "shared",
+        damId: null,
+        siitosasteProsentti: null,
+      },
+      "dam-dam": {
+        id: "dam-dam",
+        sireId: "shared",
+        damId: null,
+        siitosasteProsentti: null,
+      },
+      shared: {
+        id: "shared",
+        sireId: null,
+        damId: null,
+        siitosasteProsentti: 10,
+      },
+    });
+
+    const breakdown = calculateInbreedingCoefficientBreakdownForParentsPct(
+      "sire",
+      "dam",
+      ancestry,
+      3,
+    );
+
+    expect(breakdown.contributions).toHaveLength(1);
+    expect(breakdown.contributions[0]).toMatchObject({
+      id: "shared",
+      occurrenceCount: 4,
+    });
+    expect(breakdown.contributions[0]?.rawContributionPct).toBeCloseTo(
+      28.125,
+      5,
+    );
+    expect(breakdown.contributions[0]?.adjustedContributionPct).toBeCloseTo(
+      30.9375,
+      5,
+    );
+  });
 });

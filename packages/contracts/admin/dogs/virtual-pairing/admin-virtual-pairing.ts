@@ -4,6 +4,8 @@ export type AdminVirtualPairingContributionDto = {
   ancestorId: string;
   label: string;
   contributionPct: number;
+  rawContributionPct: number;
+  occurrenceCount: number;
   displayPct: string;
   sireGeneration: number;
   sireIndex: number;

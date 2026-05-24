@@ -73,6 +73,8 @@ describe("calculateAdminVirtualPairingAction", () => {
                 ancestorId: "a_1",
                 label: "Ancestor One FI123/20",
                 contributionPct: 0.83008,
+                rawContributionPct: 0.78125,
+                occurrenceCount: 1,
                 displayPct: "0.83008 %",
                 sireGeneration: 2,
                 sireIndex: 1,

@@ -111,8 +111,13 @@ function buildPlaceholderSection(label: string) {
   };
 }
 
-function formatContributionPct(value: number): string {
-  return `${value.toFixed(5)} %`;
+function formatGroupedContributionPct(
+  adjustedContributionPct: number,
+  rawContributionPct: number,
+): string {
+  const adjusted = adjustedContributionPct.toFixed(5);
+  const raw = rawContributionPct.toFixed(5);
+  return adjusted === raw ? `${adjusted} %` : `${adjusted} % (${raw} %)`;
 }
 
 export async function calculateAdminVirtualPairing(
@@ -250,8 +255,13 @@ export async function calculateAdminVirtualPairing(
                 label: detail
                   ? `${detail.name}${detail.ekNo != null ? ` EK:${detail.ekNo}` : ""} ${detail.registrationNo}`.trim()
                   : contribution.id,
-                contributionPct: contribution.contributionPct,
-                displayPct: formatContributionPct(contribution.contributionPct),
+                contributionPct: contribution.adjustedContributionPct,
+                rawContributionPct: contribution.rawContributionPct,
+                occurrenceCount: contribution.occurrenceCount,
+                displayPct: formatGroupedContributionPct(
+                  contribution.adjustedContributionPct,
+                  contribution.rawContributionPct,
+                ),
                 sireGeneration: contribution.sireGeneration,
                 sireIndex: contribution.sireIndex,
                 damGeneration: contribution.damGeneration,
