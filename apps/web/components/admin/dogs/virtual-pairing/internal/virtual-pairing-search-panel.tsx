@@ -38,7 +38,15 @@ function formatSexLabel(sex: VirtualPairingDogOption["sex"], t: TranslateFn) {
   return t("admin.dogs.sex.unknown");
 }
 
-const SEARCH_FIELDS: VirtualPairingSearchField[] = ["reg", "ek", "name"];
+const SEARCH_FIELDS: VirtualPairingSearchField[] = ["name", "reg", "ek"];
+
+function canSelectAsSire(candidate: VirtualPairingDogOption): boolean {
+  return candidate.sex === "U";
+}
+
+function canSelectAsDam(candidate: VirtualPairingDogOption): boolean {
+  return candidate.sex === "N";
+}
 
 // Search card for the admin virtual-pairing workflow.
 export function AdminVirtualPairingSearchPanel({
@@ -134,22 +142,26 @@ export function AdminVirtualPairingSearchPanel({
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onSelectParent(candidate, "sire")}
-                >
-                  {t("admin.virtualPairing.search.selectSire")}
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onSelectParent(candidate, "dam")}
-                >
-                  {t("admin.virtualPairing.search.selectDam")}
-                </Button>
+                {canSelectAsSire(candidate) ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => onSelectParent(candidate, "sire")}
+                  >
+                    {t("admin.virtualPairing.search.selectSire")}
+                  </Button>
+                ) : null}
+                {canSelectAsDam(candidate) ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => onSelectParent(candidate, "dam")}
+                  >
+                    {t("admin.virtualPairing.search.selectDam")}
+                  </Button>
+                ) : null}
               </div>
             </div>
           ))}

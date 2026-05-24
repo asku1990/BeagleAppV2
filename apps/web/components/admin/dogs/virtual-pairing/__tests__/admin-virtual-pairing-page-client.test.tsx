@@ -223,6 +223,7 @@ describe("AdminVirtualPairingPageClient", () => {
 
     const firstHtml = renderClient();
     expect(firstHtml).toContain("admin.virtualPairing.result.empty");
+    expect(searchPanelPropsRef.current?.searchField).toBe("name");
 
     await flushMicrotasks();
 

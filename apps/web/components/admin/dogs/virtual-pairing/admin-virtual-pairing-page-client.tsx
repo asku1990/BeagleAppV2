@@ -47,7 +47,7 @@ export function AdminVirtualPairingPageClient() {
   const lastAutoLoadKeyRef = useRef<string | null>(null);
   const activeCalculationKeyRef = useRef<string | null>(null);
   const [searchField, setSearchField] =
-    useState<VirtualPairingSearchField>("reg");
+    useState<VirtualPairingSearchField>("name");
   const [searchText, setSearchText] = useState("");
   const [submittedSearch, setSubmittedSearch] =
     useState<VirtualPairingSearchRequest | null>(null);
