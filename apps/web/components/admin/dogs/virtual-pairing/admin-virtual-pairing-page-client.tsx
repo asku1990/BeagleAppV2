@@ -130,6 +130,10 @@ export function AdminVirtualPairingPageClient() {
         setGenerationDepth(String(result.generationDepth));
         setCalculationResult(result);
       } catch (error) {
+        if (activeCalculationKeyRef.current !== urlCalculationKey) {
+          return;
+        }
+
         setCalculationResult(null);
         setCalculationMessage(
           error instanceof Error
@@ -217,6 +221,10 @@ export function AdminVirtualPairingPageClient() {
         { scroll: false },
       );
     } catch (error) {
+      if (activeCalculationKeyRef.current !== calculationKey) {
+        return;
+      }
+
       setCalculationResult(null);
       setCalculationMessage(
         error instanceof Error
