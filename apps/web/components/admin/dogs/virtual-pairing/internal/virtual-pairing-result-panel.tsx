@@ -38,6 +38,16 @@ function formatSummaryPct(value: number): string {
   return `${value.toFixed(2)} %`;
 }
 
+function formatKnownPedigreeSummary(
+  template: string,
+  generationDepth: number,
+  knownPedigreePct: number,
+): string {
+  return template
+    .replace("{generationDepth}", String(generationDepth))
+    .replace("{knownPedigreePct}", formatSummaryPct(knownPedigreePct));
+}
+
 function formatPlaceholderLabel(value: string): string {
   return `${value}:`;
 }
@@ -131,8 +141,11 @@ export function AdminVirtualPairingResultPanel({ t, result }: Props) {
           {result.diagnostics.includedDamPositionCount} kpl)
         </div>
         <div>
-          {result.generationDepth}-polven sukutaulusta tiedossa{" "}
-          {formatSummaryPct(result.diagnostics.knownPedigreePct)}
+          {formatKnownPedigreeSummary(
+            t("admin.virtualPairing.result.summary.knownPedigreeLine"),
+            result.generationDepth,
+            result.diagnostics.knownPedigreePct,
+          )}
         </div>
       </div>
 

@@ -48,6 +48,8 @@ export const fiAdminDogsVirtualPairingMessages = {
     "Sukutaulussa laskentaan otettavia esiintymiä",
   "admin.virtualPairing.result.summary.knownPedigree":
     "polven sukutaulusta tiedossa",
+  "admin.virtualPairing.result.summary.knownPedigreeLine":
+    "{generationDepth}-polven sukutaulusta tiedossa {knownPedigreePct}",
   "admin.virtualPairing.result.basisTitle": "LASKENTAPERUSTEET",
   "admin.virtualPairing.result.linksTitle": "SIIRRY",
   "admin.virtualPairing.result.empty":
@@ -106,6 +108,8 @@ export const svAdminDogsVirtualPairingMessages = {
     "I stamtavlan medräknade förekomster",
   "admin.virtualPairing.result.summary.knownPedigree":
     "generationers stamtavla känd",
+  "admin.virtualPairing.result.summary.knownPedigreeLine":
+    "{generationDepth} generationers stamtavla känd {knownPedigreePct}",
   "admin.virtualPairing.result.basisTitle": "BERÄKNINGSGRUNDER",
   "admin.virtualPairing.result.linksTitle": "GÅ TILL",
   "admin.virtualPairing.result.empty":

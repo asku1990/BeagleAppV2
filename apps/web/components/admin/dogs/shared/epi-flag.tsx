@@ -1,8 +1,8 @@
 "use client";
 
 // Shared EPI value renderer used by admin dog profile and virtual pairing.
-// It preserves the legacy five-decimal value, color dot, tooltip, and class
-// number label so both views stay visually consistent.
+// It preserves the legacy admin value, color dot, tooltip, and class number
+// label so both views stay visually consistent.
 
 import {
   Tooltip,
@@ -39,6 +39,8 @@ function formatEpiLuku(
     return FALLBACK_VALUE;
   }
 
+  // This shared UI owns the legacy admin/profile precision. DTO display
+  // strings are still used by other health metric rows.
   return `${epiLuku.toFixed(4)} ${showDash(epiTeksti)}`;
 }
 
@@ -133,6 +135,8 @@ export function EpiLukuWithFlag({
   );
 
   return (
+    // Virtual pairing does not have its own page-level provider, so this keeps
+    // the shared admin profile and virtual pairing EPI tooltip self-contained.
     <TooltipProvider>
       <span className="inline-flex items-center gap-2">
         <span>{value}</span>
