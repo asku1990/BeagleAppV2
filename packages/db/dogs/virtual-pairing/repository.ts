@@ -86,7 +86,7 @@ function buildBroadWhere(input: {
 
   return {
     name: {
-      startsWith: query,
+      contains: query,
       mode: "insensitive",
     },
   };
@@ -118,7 +118,7 @@ function matchesField(
 
   return hasWildcard(normalized)
     ? matchesLike(row.name, normalized)
-    : row.name.toLowerCase().startsWith(normalized.toLowerCase());
+    : row.name.toLowerCase().includes(normalized.toLowerCase());
 }
 
 function compareRows(

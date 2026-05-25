@@ -5,9 +5,9 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
 ## Scope
 
 - Route: `/admin/dogs/virtual-pairing`
-- Alias route: `/admin/virtual-pairing`
 - Search by one active field at a time: `EK-numero`, `Rekisterinumero`, or `Nimi`
-- Wildcard search supports `%` and `_` like the legacy v1 app
+- Name searches match substrings by default; use `%` and `_` to narrow or
+  pattern-match results like the legacy v1 app
 - Parent selection uses the legacy `Isäksi` and `Emäksi` actions
 - Calculation reuses the existing pedigree ancestry loader and inbreeding coefficient code
 

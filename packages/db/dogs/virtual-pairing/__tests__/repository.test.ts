@@ -102,6 +102,53 @@ describe("searchVirtualPairingDogsDb", () => {
     ).not.toContain("ownership");
   });
 
+  it("searches name substrings without explicit wildcards", async () => {
+    dogFindManyMock.mockResolvedValue([
+      makeRow({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        ekNo: 5588,
+        sex: DogSex.FEMALE,
+        registrations: [
+          { registrationNo: "FI12345/21", createdAt: new Date("2021-04-09") },
+        ],
+      }),
+      makeRow({
+        id: "dog_2",
+        name: "Aurinkopolun Aatos",
+        ekNo: 5599,
+        sex: DogSex.MALE,
+        registrations: [
+          { registrationNo: "FI54321/20", createdAt: new Date("2020-03-01") },
+        ],
+      }),
+    ]);
+
+    const result = await searchVirtualPairingDogsDb({
+      field: "name",
+      query: "kide",
+      page: 1,
+      pageSize: 10,
+    });
+
+    expect(dogFindManyMock.mock.calls[0]?.[0].where).toEqual({
+      name: {
+        contains: "kide",
+        mode: "insensitive",
+      },
+    });
+    expect(result.total).toBe(1);
+    expect(result.items).toEqual([
+      {
+        id: "dog_1",
+        ekNo: 5588,
+        registrationNo: "FI12345/21",
+        name: "Metsapolun Kide",
+        sex: "N",
+      },
+    ]);
+  });
+
   it("searches by exact registration number and sorts by registration", async () => {
     dogFindManyMock.mockResolvedValue([
       makeRow({

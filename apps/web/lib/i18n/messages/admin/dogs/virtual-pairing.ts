@@ -4,7 +4,7 @@ export const fiAdminDogsVirtualPairingMessages = {
     "Hae koiria yhdellä hakukentällä, valitse uros ja narttu, ja laske sukusiitosaste.",
   "admin.virtualPairing.search.title": "Hae koira",
   "admin.virtualPairing.search.description":
-    "Käytä yhtä hakukenttää kerrallaan. Wildcard-merkit % ja _ ovat käytössä kuten v1-versiossa.",
+    "Käytä yhtä hakukenttää kerrallaan.",
   "admin.virtualPairing.search.fieldLabel": "Hakutapa",
   "admin.virtualPairing.search.field.ek": "EK-numero",
   "admin.virtualPairing.search.field.reg": "Rekisterinumero",
@@ -12,7 +12,8 @@ export const fiAdminDogsVirtualPairingMessages = {
   "admin.virtualPairing.search.inputPlaceholder": "Syötä hakusana",
   "admin.virtualPairing.search.inputAria": "Virtuaaliparituksen hakusana",
   "admin.virtualPairing.search.button": "Hae",
-  "admin.virtualPairing.search.helper": "Käytä % ja _ -merkkejä tarvittaessa.",
+  "admin.virtualPairing.search.helper":
+    "Nimihaussa osuma voi tulla myös sanan keskeltä. Käytä % ja _ -merkkejä tarvittaessa.",
   "admin.virtualPairing.search.loading": "Ladataan hakutuloksia...",
   "admin.virtualPairing.search.error":
     "Virtuaaliparituksen hakutulosten lataaminen epäonnistui.",
@@ -53,8 +54,7 @@ export const svAdminDogsVirtualPairingMessages = {
   "admin.virtualPairing.description":
     "Sok hundar med ett sokfält, valj hane och tik, och beräkna avelsgraden.",
   "admin.virtualPairing.search.title": "Sok hund",
-  "admin.virtualPairing.search.description":
-    "Använd ett sokfält i taget. Wildcard-tecknen % och _ fungerar som i v1-versionen.",
+  "admin.virtualPairing.search.description": "Använd ett sokfält i taget.",
   "admin.virtualPairing.search.fieldLabel": "Soksatt",
   "admin.virtualPairing.search.field.ek": "EK-nummer",
   "admin.virtualPairing.search.field.reg": "Registreringsnummer",
@@ -62,7 +62,8 @@ export const svAdminDogsVirtualPairingMessages = {
   "admin.virtualPairing.search.inputPlaceholder": "Skriv sokord",
   "admin.virtualPairing.search.inputAria": "Sokord for virtuell parning",
   "admin.virtualPairing.search.button": "Sok",
-  "admin.virtualPairing.search.helper": "Använd % och _ vid behov.",
+  "admin.virtualPairing.search.helper":
+    "Namnsökning kan träffa även mitt i ordet. Använd % och _ vid behov.",
   "admin.virtualPairing.search.loading": "Laddar sokresultat...",
   "admin.virtualPairing.search.error":
     "Det gick inte att ladda sokresultaten for virtuell parning.",
