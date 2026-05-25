@@ -16,6 +16,9 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
 - Inbreeding is calculated from the current pedigree graph at request time; v2
   does not use or update imported/stored legacy `SIITOSASTE` values for virtual
   pairing
+- `knownPedigreePct` reports known pedigree slots across both sire and dam
+  sides; it includes the selected sire and dam as generation 1 and counts
+  repeated ancestors by slot, not as unique dogs
 
 ## What ships now
 

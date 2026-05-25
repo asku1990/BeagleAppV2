@@ -1,15 +1,51 @@
 import { describe, expect, it } from "vitest";
+import type { DogPedigreeAncestryDb } from "@beagle/db/dogs/core/pedigree-ancestry";
 import {
   calculateInbreedingCoefficientBreakdownForParentsPct,
   calculateInbreedingCoefficientForParentsPct,
   calculateInbreedingCoefficientPct,
 } from "../inbreeding-coefficient";
-import type { DogPedigreeAncestryDb } from "@beagle/db/dogs/core/pedigree-ancestry";
 
 function makeAncestry(
   nodes: DogPedigreeAncestryDb["nodes"],
 ): DogPedigreeAncestryDb {
   return { rootId: "root", nodes };
+}
+
+function makeNode(
+  id: string,
+  sireId: string | null,
+  damId: string | null,
+): DogPedigreeAncestryDb["nodes"][string] {
+  return {
+    id,
+    sireId,
+    damId,
+    siitosasteProsentti: null,
+  };
+}
+
+function buildCompleteTree(
+  rootId: string,
+  maxDepth: number,
+): DogPedigreeAncestryDb["nodes"] {
+  const nodes: DogPedigreeAncestryDb["nodes"] = {};
+
+  const visit = (id: string, generation: number) => {
+    if (generation >= maxDepth) {
+      nodes[id] = makeNode(id, null, null);
+      return;
+    }
+
+    const sireId = `${id}-s`;
+    const damId = `${id}-d`;
+    visit(sireId, generation + 1);
+    visit(damId, generation + 1);
+    nodes[id] = makeNode(id, sireId, damId);
+  };
+
+  visit(rootId, 1);
+  return nodes;
 }
 
 describe("calculateInbreedingCoefficientPct", () => {
@@ -375,5 +411,76 @@ describe("calculateInbreedingCoefficientPct", () => {
       28.125,
       5,
     );
+  });
+
+  it("counts the full SP4 pedigree slots including the selected sire and dam", () => {
+    const ancestry = makeAncestry({
+      ...buildCompleteTree("sire", 4),
+      ...buildCompleteTree("dam", 4),
+    });
+
+    const breakdown = calculateInbreedingCoefficientBreakdownForParentsPct(
+      "sire",
+      "dam",
+      ancestry,
+      4,
+    );
+
+    expect(breakdown.knownSlotCount).toBe(30);
+    expect(breakdown.knownPedigreePct).toBeCloseTo(100, 5);
+  });
+
+  it("counts only the selected sire and dam when no parents are known", () => {
+    const ancestry = makeAncestry({
+      sire: makeNode("sire", null, null),
+      dam: makeNode("dam", null, null),
+    });
+
+    const breakdown = calculateInbreedingCoefficientBreakdownForParentsPct(
+      "sire",
+      "dam",
+      ancestry,
+      4,
+    );
+
+    expect(breakdown.knownSlotCount).toBe(2);
+    expect(breakdown.knownPedigreePct).toBeCloseTo(6.6666666667, 5);
+  });
+
+  it("counts pedigree slots rather than unique ancestors in a partially missing SP3 pedigree", () => {
+    const ancestry = makeAncestry({
+      sire: makeNode("sire", "shared", "shared"),
+      dam: makeNode("dam", "shared", "dam-parent"),
+      shared: makeNode("shared", null, null),
+      "dam-parent": makeNode("dam-parent", null, null),
+    });
+
+    const breakdown = calculateInbreedingCoefficientBreakdownForParentsPct(
+      "sire",
+      "dam",
+      ancestry,
+      3,
+    );
+
+    expect(Object.keys(ancestry.nodes)).toHaveLength(4);
+    expect(breakdown.knownSlotCount).toBe(6);
+    expect(breakdown.knownPedigreePct).toBeCloseTo(42.8571428571, 5);
+  });
+
+  it("uses the full SP9 denominator when only the selected pair is known", () => {
+    const ancestry = makeAncestry({
+      sire: makeNode("sire", null, null),
+      dam: makeNode("dam", null, null),
+    });
+
+    const breakdown = calculateInbreedingCoefficientBreakdownForParentsPct(
+      "sire",
+      "dam",
+      ancestry,
+      9,
+    );
+
+    expect(breakdown.knownSlotCount).toBe(2);
+    expect(breakdown.knownPedigreePct).toBeCloseTo(0.1956947162, 5);
   });
 });
