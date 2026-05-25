@@ -32,7 +32,7 @@ describe("calculateAdminVirtualPairing", () => {
     loadDogPedigreeAncestryForParentsDbMock.mockReset();
   });
 
-  it("calculates inbreeding and passes the selected generation depth", async () => {
+  it("calculates inbreeding and loads enough ancestry for dynamic ancestor Fa", async () => {
     findVirtualPairingDogByRegistrationNoDbMock
       .mockResolvedValueOnce({
         id: "sire",
@@ -128,7 +128,7 @@ describe("calculateAdminVirtualPairing", () => {
     expect(loadDogPedigreeAncestryForParentsDbMock).toHaveBeenCalledWith(
       "sire",
       "dam",
-      5,
+      9,
     );
   });
 

@@ -4,6 +4,7 @@ export {
   calculateInbreedingCoefficientForParentsPct,
   calculateInbreedingCoefficientPct,
 } from "./inbreeding-coefficient";
+export { getInbreedingAncestryLoadDepth } from "./inbreeding-ancestry-depth";
 export {
   VIRTUAL_PAIRING_DEFAULT_GENERATION_DEPTH,
   VIRTUAL_PAIRING_MAX_GENERATION_DEPTH,

@@ -7,7 +7,10 @@ import type {
 import { requireAdmin } from "@server/admin/core/service";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
-import { calculateInbreedingCoefficientForParentsPct } from "@server/dogs/core";
+import {
+  calculateInbreedingCoefficientForParentsPct,
+  getInbreedingAncestryLoadDepth,
+} from "@server/dogs/core";
 import { normalizeOptionalText } from "./normalization";
 import { resolveParentByRegistration } from "./internal/parent-resolution";
 import {
@@ -134,7 +137,7 @@ export async function calculateAdminDogInbreeding(
     const ancestry = await loadDogPedigreeAncestryForParentsDb(
       sire.id,
       dam.id,
-      9,
+      getInbreedingAncestryLoadDepth(9),
     );
     const inbreedingCoefficientPct =
       calculateInbreedingCoefficientForParentsPct(sire.id, dam.id, ancestry, 9);

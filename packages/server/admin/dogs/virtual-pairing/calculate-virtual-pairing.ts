@@ -12,6 +12,7 @@ import type {
 } from "@beagle/contracts";
 import {
   calculateInbreedingCoefficientBreakdownForParentsPct,
+  getInbreedingAncestryLoadDepth,
   parseVirtualPairingGenerationDepth,
 } from "@server/dogs/core";
 import { requireAdmin } from "@server/admin/core/service";
@@ -199,7 +200,7 @@ export async function calculateAdminVirtualPairing(
     const ancestry = await loadDogPedigreeAncestryForParentsDb(
       sireRow.id,
       damRow.id,
-      generationDepth,
+      getInbreedingAncestryLoadDepth(generationDepth),
     );
     const breakdown = calculateInbreedingCoefficientBreakdownForParentsPct(
       sireRow.id,

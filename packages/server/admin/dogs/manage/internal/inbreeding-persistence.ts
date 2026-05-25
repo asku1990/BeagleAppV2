@@ -1,5 +1,8 @@
 import { loadDogPedigreeAncestryForParentsDb } from "@beagle/db";
-import { calculateInbreedingCoefficientForParentsPct } from "@server/dogs/core";
+import {
+  calculateInbreedingCoefficientForParentsPct,
+  getInbreedingAncestryLoadDepth,
+} from "@server/dogs/core";
 import type { ParentRef } from "./parent-resolution";
 
 export async function calculatePersistedInbreedingCoefficientPct(
@@ -13,7 +16,7 @@ export async function calculatePersistedInbreedingCoefficientPct(
   const ancestry = await loadDogPedigreeAncestryForParentsDb(
     sire.id,
     dam.id,
-    9,
+    getInbreedingAncestryLoadDepth(9),
   );
   return calculateInbreedingCoefficientForParentsPct(
     sire.id,
