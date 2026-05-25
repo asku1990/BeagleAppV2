@@ -132,6 +132,60 @@ describe("calculateAdminVirtualPairing", () => {
     );
   });
 
+  it("normalizes registration numbers before lookup", async () => {
+    findVirtualPairingDogByRegistrationNoDbMock
+      .mockResolvedValueOnce({
+        id: "sire",
+        name: "Korven Aatos",
+        ekNo: 5588,
+        sex: "MALE",
+        registrationNo: "FI54321/20",
+      })
+      .mockResolvedValueOnce({
+        id: "dam",
+        name: "Havupolun Helmi",
+        ekNo: 4422,
+        sex: "FEMALE",
+        registrationNo: "FI77777/18",
+      });
+    loadDogPedigreeAncestryForParentsDbMock.mockResolvedValue({
+      rootId: "sire:dam",
+      nodes: {
+        sire: {
+          id: "sire",
+          sireId: null,
+          damId: null,
+          siitosasteProsentti: null,
+        },
+        dam: {
+          id: "dam",
+          sireId: null,
+          damId: null,
+          siitosasteProsentti: null,
+        },
+      },
+    });
+    findVirtualPairingAncestorDetailsDbMock.mockResolvedValue([]);
+
+    await calculateAdminVirtualPairing(
+      {
+        sireRegistrationNo: " fi54321/20 ",
+        damRegistrationNo: " Fi77777/18 ",
+        generationDepth: 5,
+      },
+      adminUser,
+    );
+
+    expect(findVirtualPairingDogByRegistrationNoDbMock).toHaveBeenNthCalledWith(
+      1,
+      "FI54321/20",
+    );
+    expect(findVirtualPairingDogByRegistrationNoDbMock).toHaveBeenNthCalledWith(
+      2,
+      "FI77777/18",
+    );
+  });
+
   it("rejects unauthenticated requests", async () => {
     await expect(
       calculateAdminVirtualPairing(

@@ -9,6 +9,11 @@ function resolveDbClient(
   return dbClient ?? prisma;
 }
 
+function normalizeRegistrationNo(value: string): string | null {
+  const normalized = value.trim().toUpperCase();
+  return normalized.length > 0 ? normalized : null;
+}
+
 export type VirtualPairingDogByRegistrationLookupDb = {
   id: string;
   name: string;
@@ -21,8 +26,20 @@ export async function findVirtualPairingDogByRegistrationNoDb(
   registrationNo: string,
   dbClient?: VirtualPairingDbClient,
 ): Promise<VirtualPairingDogByRegistrationLookupDb | null> {
-  const row = await resolveDbClient(dbClient).dogRegistration.findUnique({
-    where: { registrationNo },
+  const normalizedRegistrationNo = normalizeRegistrationNo(registrationNo);
+  if (!normalizedRegistrationNo) {
+    return null;
+  }
+
+  const rows = await resolveDbClient(dbClient).dogRegistration.findMany({
+    where: {
+      registrationNo: {
+        equals: normalizedRegistrationNo,
+        mode: "insensitive",
+      },
+    },
+    take: 2,
+    orderBy: [{ registrationNo: "asc" }, { id: "asc" }],
     select: {
       registrationNo: true,
       dog: {
@@ -36,9 +53,11 @@ export async function findVirtualPairingDogByRegistrationNoDb(
     },
   });
 
-  if (!row?.dog) {
+  if (rows.length !== 1 || !rows[0]?.dog) {
     return null;
   }
+
+  const row = rows[0];
 
   return {
     id: row.dog.id,
