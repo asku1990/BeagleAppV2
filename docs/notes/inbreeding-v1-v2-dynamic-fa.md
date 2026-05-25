@@ -19,6 +19,11 @@ Observed values:
 
 The raw shared-ancestor basis matches between v1 and v2.
 
+This is the intended parity target. v2 should preserve v1 behavior for shared
+ancestor occurrence discovery, included/excluded occurrence rules, raw `Fx`
+contribution formula, grouped ancestor contributions, and known pedigree
+coverage.
+
 For `SP 9`:
 
 - Shared occurrences: `198` in both.
@@ -30,6 +35,12 @@ For `SP 9`:
 The final adjusted percentage differs because v1 uses stored legacy
 `bearek_id.SIITOSASTE` values for shared ancestors' `Fa`, while v2 now
 calculates ancestor `Fa` dynamically from the current pedigree graph.
+
+This difference is intentional. v2 must always use current pedigree data for
+virtual pairing, so admins do not need to save or recalculate stored
+percentages before getting an up-to-date result. Imported/stored
+`SIITOSASTE` values are not the source of truth for virtual-pairing
+calculation.
 
 ## SP 6 Check
 
@@ -76,8 +87,17 @@ v1's final percentage is not fully current relative to the current pedigree
 data, because it depends on stored `SIITOSASTE` values that may have been
 calculated earlier with a different data state or generation depth.
 
-v2 dynamic calculation is the better canonical direction if the product goal is
+v2 dynamic calculation is the canonical direction because the product goal is
 an always up-to-date inbreeding percentage from the current pedigree data.
+
+When reviewing legacy parity, classify differences as acceptable when:
+
+- raw `Fx` and diagnostic basis counts match v1, and
+- the remaining difference is explained by stored legacy ancestor `Fa` versus
+  dynamically calculated current-data ancestor `Fa`.
+
+Do not change virtual pairing to read stored `SIITOSASTE` unless the product
+goal changes from current-data calculation to exact legacy output reproduction.
 
 ## Follow-Up Test
 

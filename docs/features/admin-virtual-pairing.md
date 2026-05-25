@@ -13,6 +13,9 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
   appears
 - Parent selection uses the legacy `Isäksi` and `Emäksi` actions
 - Calculation reuses the existing pedigree ancestry loader and inbreeding coefficient code
+- Inbreeding is calculated from the current pedigree graph at request time; v2
+  does not use or update imported/stored legacy `SIITOSASTE` values for virtual
+  pairing
 
 ## What ships now
 
@@ -36,6 +39,21 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
 - Admin-only behavior stays in `packages/server/admin/dogs/virtual-pairing`
 - Web code consumes only the admin action/query surface
 - Placeholder fields are explicit and must not be mistaken for final risk values
+
+## Inbreeding parity target
+
+- v2 should match v1's raw shared-ancestor basis: shared occurrence discovery,
+  included/excluded occurrence rules, raw `Fx` contribution formula, grouped
+  ancestor contributions, and known pedigree coverage.
+- v2 intentionally differs from v1 for the final adjusted percentage when v1's
+  result depends on stored ancestor `SIITOSASTE` values. v2 recalculates each
+  ancestor `Fa` dynamically from current pedigree data so admins do not need to
+  save/recalculate stored percentages before virtual pairing.
+- Expected review outcome for known legacy comparisons is therefore: raw basis
+  parity required; final adjusted percentage may differ when stored legacy
+  ancestor `Fa` differs from dynamically calculated current-data `Fa`.
+- See `docs/notes/inbreeding-v1-v2-dynamic-fa.md` for a concrete comparison
+  where raw `Fx` matches v1 but the adjusted final percentage differs by design.
 
 ## Related files
 
