@@ -5,9 +5,28 @@ import type {
   VirtualPairingSearchResponse,
 } from "@beagle/contracts";
 import { useQuery } from "@tanstack/react-query";
-import { searchAdminVirtualPairingAction } from "@/app/actions/admin/dogs/virtual-pairing";
 import { AdminMutationError } from "@/queries/admin/mutation-error";
 import { adminVirtualPairingSearchQueryKey } from "./query-keys";
+
+type AdminVirtualPairingSearchRouteResponse =
+  | {
+      ok: true;
+      data: VirtualPairingSearchResponse;
+    }
+  | {
+      ok: false;
+      error: string;
+      code?: string;
+    };
+
+function buildSearchUrl(filters: VirtualPairingSearchRequest): string {
+  const params = new URLSearchParams();
+  params.set("field", filters.field);
+  params.set("query", filters.query);
+  params.set("page", String(filters.page ?? 1));
+  params.set("pageSize", String(filters.pageSize ?? 10));
+  return `/api/admin/dogs/virtual-pairing?${params.toString()}`;
+}
 
 export function useAdminVirtualPairingSearchQuery(
   filters: VirtualPairingSearchRequest,
@@ -17,15 +36,43 @@ export function useAdminVirtualPairingSearchQuery(
     queryKey: adminVirtualPairingSearchQueryKey(filters),
     enabled,
     queryFn: async () => {
-      const result = await searchAdminVirtualPairingAction(filters);
-      if (result.hasError || !result.data) {
+      let response: Response;
+      try {
+        response = await fetch(buildSearchUrl(filters), {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+          },
+        });
+      } catch {
         throw new AdminMutationError(
-          result.message ?? "Failed to load virtual pairing search results.",
-          result.errorCode,
+          "Failed to load virtual pairing search results.",
+          "INTERNAL_ERROR",
         );
       }
 
-      return result.data;
+      let payload: AdminVirtualPairingSearchRouteResponse;
+      try {
+        payload =
+          (await response.json()) as AdminVirtualPairingSearchRouteResponse;
+      } catch {
+        throw new AdminMutationError(
+          "Failed to load virtual pairing search results.",
+          "INTERNAL_ERROR",
+        );
+      }
+
+      if (!response.ok || !payload.ok) {
+        throw new AdminMutationError(
+          !payload.ok && payload.error
+            ? payload.error
+            : "Failed to load virtual pairing search results.",
+          !payload.ok ? payload.code : undefined,
+        );
+      }
+
+      return payload.data;
     },
     staleTime: 30_000,
     refetchOnWindowFocus: true,
