@@ -301,7 +301,7 @@ describe("createAdminDog", () => {
     expect(loadDogPedigreeAncestryForParentsDbMock).toHaveBeenCalledWith(
       "sire_1",
       "dam_1",
-      9,
+      17,
     );
     expect(createAdminDogWriteDbMock).toHaveBeenCalledWith(
       expect.objectContaining({

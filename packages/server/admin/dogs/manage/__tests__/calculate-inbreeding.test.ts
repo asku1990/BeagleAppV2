@@ -69,7 +69,11 @@ describe("calculateAdminDogInbreeding", () => {
       },
     });
 
-    expect(loadAncestryForParentsDbMock).toHaveBeenCalledWith("sire", "dam", 9);
+    expect(loadAncestryForParentsDbMock).toHaveBeenCalledWith(
+      "sire",
+      "dam",
+      17,
+    );
   });
 
   it("returns 400 when sire registration is missing", async () => {

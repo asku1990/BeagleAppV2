@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { CalculateAdminVirtualPairingResponse } from "@beagle/contracts";
 import type { TranslateFn } from "../admin-virtual-pairing-page-client";
 
@@ -11,6 +12,27 @@ function formatCoefficient(value: number | null): string {
   return `${value.toFixed(4)} %`;
 }
 
+function formatCoefficientParts(
+  value: number | null,
+  rawValue: number | null,
+): ReactNode {
+  if (value == null) return "-";
+
+  const adjusted = formatCoefficient(value);
+  if (rawValue == null) {
+    return adjusted;
+  }
+
+  return (
+    <>
+      <span>{adjusted}</span>
+      <span className="ml-2 text-sm font-medium text-muted-foreground">
+        ({formatCoefficient(rawValue)})
+      </span>
+    </>
+  );
+}
+
 function formatSummaryPct(value: number): string {
   return `${value.toFixed(2)} %`;
 }
@@ -19,8 +41,20 @@ function formatPlaceholderLabel(value: string): string {
   return `${value}:`;
 }
 
-function formatAncestorLabel(item: { label: string; displayPct: string }) {
-  return `${item.label} => ${item.displayPct}`;
+function formatAncestorLabel(item: {
+  label: string;
+  contributionPct: number;
+  rawContributionPct: number;
+}) {
+  return (
+    <>
+      <span>{item.label}</span>
+      <span className="ml-1">=&gt; {item.contributionPct.toFixed(5)} %</span>
+      <span className="ml-1 text-[11px] font-medium text-muted-foreground">
+        ({item.rawContributionPct.toFixed(5)} %)
+      </span>
+    </>
+  );
 }
 
 // Result card for the admin virtual-pairing workflow.
@@ -39,8 +73,14 @@ export function AdminVirtualPairingResultPanel({ t, result }: Props) {
         <div className="text-sm text-muted-foreground">
           {t("admin.virtualPairing.result.inbreedingLabel")}
         </div>
-        <div className="text-2xl font-semibold">
-          {formatCoefficient(result.inbreedingCoefficientPct)}
+        <div className="text-2xl font-semibold tabular-nums tracking-tight">
+          {formatCoefficientParts(
+            result.inbreedingCoefficientPct,
+            result.diagnostics.contributions.reduce(
+              (sum, item) => sum + item.rawContributionPct,
+              0,
+            ),
+          )}
         </div>
         <div className="mt-2 text-sm text-muted-foreground">
           {result.sire.name} / {result.dam.name}

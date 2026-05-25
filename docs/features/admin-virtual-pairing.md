@@ -15,7 +15,10 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
 - Calculation reuses the existing pedigree ancestry loader and inbreeding coefficient code
 - Inbreeding is calculated from the current pedigree graph at request time; v2
   does not use or update imported/stored legacy `SIITOSASTE` values for virtual
-  pairing
+  pairing. The ancestry loader fetches beyond the selected generation depth so
+  shared ancestors near the cutoff still have enough pedigree data for their own
+  dynamic `Fa`; occurrence discovery and known-pedigree diagnostics remain
+  bounded to the selected depth.
 - `knownPedigreePct` reports known pedigree slots across both sire and dam
   sides; it includes the selected sire and dam as generation 1 and counts
   repeated ancestors by slot, not as unique dogs
@@ -27,6 +30,8 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
 - Selected sire/dam panel
 - Generation-depth selector with the legacy default and range
 - Real inbreeding coefficient calculation
+- The main result card shows the final coefficient and the raw `Fx` in
+  parentheses always, matching the legacy v1 presentation
 - Explicit placeholders for the legacy EPI/Lafora/PUR/risk/PDF sections
 
 ## What is deferred
