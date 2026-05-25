@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/card";
 import { useI18n } from "@/hooks/i18n";
 import {
+  VIRTUAL_PAIRING_DEFAULT_GENERATION_DEPTH,
   readVirtualPairingUrlState,
   toVirtualPairingQueryHref,
 } from "@/lib/admin/dogs/virtual-pairing";
@@ -45,7 +46,8 @@ export function AdminVirtualPairingPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const lastAutoLoadKeyRef = useRef<string | null>(null);
-  const activeCalculationKeyRef = useRef<string | null>(null);
+  const activeCalculationRequestIdRef = useRef(0);
+  const pendingUrlResetTokenRef = useRef(0);
   const [searchField, setSearchField] =
     useState<VirtualPairingSearchField>("name");
   const [searchText, setSearchText] = useState("");
@@ -97,8 +99,35 @@ export function AdminVirtualPairingPageClient() {
   const canCalculate =
     Boolean(selectedSire && selectedDam) && !calculateMutation.isPending;
 
+  const invalidatePendingCalculationRequests = () => {
+    activeCalculationRequestIdRef.current += 1;
+  };
+
+  const queueUrlBackedCalculationStateReset = (
+    generationDepthValue: string,
+  ) => {
+    const token = ++pendingUrlResetTokenRef.current;
+    void Promise.resolve().then(() => {
+      if (pendingUrlResetTokenRef.current !== token) {
+        return;
+      }
+
+      setSelectedSire(null);
+      setSelectedDam(null);
+      setGenerationDepth(generationDepthValue);
+      setSelectionMessage(null);
+      setCalculationMessage(null);
+      setCalculationResult(null);
+    });
+  };
+
   useEffect(() => {
     if (!urlCalculationKey) {
+      lastAutoLoadKeyRef.current = null;
+      invalidatePendingCalculationRequests();
+      queueUrlBackedCalculationStateReset(
+        String(VIRTUAL_PAIRING_DEFAULT_GENERATION_DEPTH),
+      );
       return;
     }
 
@@ -107,11 +136,8 @@ export function AdminVirtualPairingPageClient() {
     }
 
     lastAutoLoadKeyRef.current = urlCalculationKey;
-    activeCalculationKeyRef.current = urlCalculationKey;
-    // Clear stale messages before loading the URL-backed calculation result.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSelectionMessage(null);
-    setCalculationMessage(null);
+    const requestId = ++activeCalculationRequestIdRef.current;
+    queueUrlBackedCalculationStateReset(String(urlState.generationDepth));
 
     void (async () => {
       try {
@@ -121,7 +147,7 @@ export function AdminVirtualPairingPageClient() {
           generationDepth: urlState.generationDepth,
         });
 
-        if (activeCalculationKeyRef.current !== urlCalculationKey) {
+        if (activeCalculationRequestIdRef.current !== requestId) {
           return;
         }
 
@@ -130,7 +156,7 @@ export function AdminVirtualPairingPageClient() {
         setGenerationDepth(String(result.generationDepth));
         setCalculationResult(result);
       } catch (error) {
-        if (activeCalculationKeyRef.current !== urlCalculationKey) {
+        if (activeCalculationRequestIdRef.current !== requestId) {
           return;
         }
 
@@ -180,7 +206,7 @@ export function AdminVirtualPairingPageClient() {
     setSelectionMessage(null);
     setCalculationMessage(null);
     setCalculationResult(null);
-    activeCalculationKeyRef.current = null;
+    invalidatePendingCalculationRequests();
     if (target === "sire") {
       setSelectedSire(candidate);
       return;
@@ -193,10 +219,11 @@ export function AdminVirtualPairingPageClient() {
       return;
     }
 
-    const calculationKey = `${selectedSire.registrationNo}|${selectedDam.registrationNo}|${generationDepth}`;
-    activeCalculationKeyRef.current = calculationKey;
+    const calculationKeyId = ++activeCalculationRequestIdRef.current;
+    lastAutoLoadKeyRef.current = null;
     setSelectionMessage(null);
     setCalculationMessage(null);
+    setCalculationResult(null);
 
     try {
       const result = await calculateMutation.mutateAsync({
@@ -204,7 +231,7 @@ export function AdminVirtualPairingPageClient() {
         damRegistrationNo: selectedDam.registrationNo,
         generationDepth: Number.parseInt(generationDepth, 10),
       });
-      if (activeCalculationKeyRef.current !== calculationKey) {
+      if (activeCalculationRequestIdRef.current !== calculationKeyId) {
         return;
       }
       lastAutoLoadKeyRef.current = `${result.sire.registrationNo}|${result.dam.registrationNo}|${result.generationDepth}`;
@@ -221,7 +248,7 @@ export function AdminVirtualPairingPageClient() {
         { scroll: false },
       );
     } catch (error) {
-      if (activeCalculationKeyRef.current !== calculationKey) {
+      if (activeCalculationRequestIdRef.current !== calculationKeyId) {
         return;
       }
 
@@ -235,24 +262,24 @@ export function AdminVirtualPairingPageClient() {
   };
 
   const clearSelectedSire = () => {
+    invalidatePendingCalculationRequests();
     setSelectedSire(null);
     setCalculationMessage(null);
     setCalculationResult(null);
-    activeCalculationKeyRef.current = null;
   };
 
   const clearSelectedDam = () => {
+    invalidatePendingCalculationRequests();
     setSelectedDam(null);
     setCalculationMessage(null);
     setCalculationResult(null);
-    activeCalculationKeyRef.current = null;
   };
 
   const handleGenerationDepthChange = (value: string) => {
+    invalidatePendingCalculationRequests();
     setGenerationDepth(value);
     setCalculationMessage(null);
     setCalculationResult(null);
-    activeCalculationKeyRef.current = null;
   };
 
   return (

@@ -154,6 +154,17 @@ async function flushMicrotasks() {
   await new Promise<void>((resolve) => setTimeout(resolve, 0));
 }
 
+function createDeferred<T>() {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((promiseResolve, promiseReject) => {
+    resolve = promiseResolve;
+    reject = promiseReject;
+  });
+
+  return { promise, resolve, reject };
+}
+
 describe("AdminVirtualPairingPageClient", () => {
   beforeEach(() => {
     resetHooks();
@@ -461,5 +472,422 @@ describe("AdminVirtualPairingPageClient", () => {
       "Calculation failed.",
     );
     expect(mutateAsync).toHaveBeenCalledTimes(1);
+  });
+
+  it("clears stale URL-backed state when the query string becomes incomplete", async () => {
+    const first = createDeferred<{
+      generationDepth: number;
+      sire: VirtualPairingDogOption;
+      dam: VirtualPairingDogOption;
+      inbreedingCoefficientPct: number;
+      diagnostics: {
+        sharedAncestorCount: number;
+        sharedOccurrenceCount: number;
+        includedOccurrenceCount: number;
+        includedSirePositionCount: number;
+        includedDamPositionCount: number;
+        includedPositionCount: number;
+        knownSlotCount: number;
+        knownPedigreePct: number;
+        contributions: [];
+      };
+      placeholders: Record<string, { label: string; value: string }>;
+    }>();
+
+    const mutateAsync = vi.fn().mockReturnValue(first.promise);
+    calculateMutationMock.mockReturnValue({
+      isPending: false,
+      mutateAsync,
+    });
+    searchParamsState.sire = "FIN18665/07";
+    searchParamsState.dam = "FIN12562/97";
+    searchParamsState.sp = "9";
+
+    renderClient();
+    await flushMicrotasks();
+    first.resolve({
+      generationDepth: 9,
+      sire: {
+        id: "sire-1",
+        ekNo: null,
+        registrationNo: "FIN18665/07",
+        name: "Sire Dog",
+        sex: "U",
+      },
+      dam: {
+        id: "dam-1",
+        ekNo: null,
+        registrationNo: "FIN12562/97",
+        name: "Dam Dog",
+        sex: "N",
+      },
+      inbreedingCoefficientPct: 1.2345,
+      diagnostics: {
+        sharedAncestorCount: 0,
+        sharedOccurrenceCount: 0,
+        includedOccurrenceCount: 0,
+        includedSirePositionCount: 0,
+        includedDamPositionCount: 0,
+        includedPositionCount: 0,
+        knownSlotCount: 2,
+        knownPedigreePct: 0.1957,
+        contributions: [],
+      },
+      placeholders: {
+        epi: { label: "EPI", value: "Soon" },
+        lafora: { label: "Lafora", value: "Soon" },
+        pur: { label: "Pur", value: "Soon" },
+        risk: { label: "Risk", value: "Soon" },
+        diagnostics: { label: "Diagnostics", value: "Soon" },
+        pedigree: { label: "Pedigree", value: "Soon" },
+      },
+    });
+    await flushMicrotasks();
+    renderClient();
+
+    expect(selectionPanelPropsRef.current?.selectedSire).toMatchObject({
+      name: "Sire Dog",
+    });
+    expect(renderClient()).toContain("Sire Dog / Dam Dog");
+
+    searchParamsState.sire = "FIN18665/07";
+    searchParamsState.dam = "";
+    searchParamsState.sp = "";
+
+    renderClient();
+    await flushMicrotasks();
+    renderClient();
+
+    expect(selectionPanelPropsRef.current?.selectedSire).toBeNull();
+    expect(selectionPanelPropsRef.current?.selectedDam).toBeNull();
+    expect(selectionPanelPropsRef.current?.generationDepth).toBe("9");
+    expect(renderClient()).toContain("admin.virtualPairing.result.empty");
+    expect(mutateAsync).toHaveBeenCalledTimes(1);
+  });
+
+  it("clears the old result while a new URL-backed calculation is loading", async () => {
+    const first = createDeferred<{
+      generationDepth: number;
+      sire: VirtualPairingDogOption;
+      dam: VirtualPairingDogOption;
+      inbreedingCoefficientPct: number;
+      diagnostics: {
+        sharedAncestorCount: number;
+        sharedOccurrenceCount: number;
+        includedOccurrenceCount: number;
+        includedSirePositionCount: number;
+        includedDamPositionCount: number;
+        includedPositionCount: number;
+        knownSlotCount: number;
+        knownPedigreePct: number;
+        contributions: [];
+      };
+      placeholders: Record<string, { label: string; value: string }>;
+    }>();
+    const second = createDeferred<{
+      generationDepth: number;
+      sire: VirtualPairingDogOption;
+      dam: VirtualPairingDogOption;
+      inbreedingCoefficientPct: number;
+      diagnostics: {
+        sharedAncestorCount: number;
+        sharedOccurrenceCount: number;
+        includedOccurrenceCount: number;
+        includedSirePositionCount: number;
+        includedDamPositionCount: number;
+        includedPositionCount: number;
+        knownSlotCount: number;
+        knownPedigreePct: number;
+        contributions: [];
+      };
+      placeholders: Record<string, { label: string; value: string }>;
+    }>();
+
+    const mutateAsync = vi
+      .fn()
+      .mockReturnValueOnce(first.promise)
+      .mockReturnValueOnce(second.promise);
+
+    calculateMutationMock.mockReturnValue({
+      isPending: false,
+      mutateAsync,
+    });
+
+    searchParamsState.sire = "FIN18665/07";
+    searchParamsState.dam = "FIN12562/97";
+    searchParamsState.sp = "9";
+
+    renderClient();
+    await flushMicrotasks();
+    first.resolve({
+      generationDepth: 9,
+      sire: {
+        id: "sire-a",
+        ekNo: null,
+        registrationNo: "FIN18665/07",
+        name: "Sire A",
+        sex: "U",
+      },
+      dam: {
+        id: "dam-a",
+        ekNo: null,
+        registrationNo: "FIN12562/97",
+        name: "Dam A",
+        sex: "N",
+      },
+      inbreedingCoefficientPct: 1.1111,
+      diagnostics: {
+        sharedAncestorCount: 0,
+        sharedOccurrenceCount: 0,
+        includedOccurrenceCount: 0,
+        includedSirePositionCount: 0,
+        includedDamPositionCount: 0,
+        includedPositionCount: 0,
+        knownSlotCount: 2,
+        knownPedigreePct: 0.1957,
+        contributions: [],
+      },
+      placeholders: {
+        epi: { label: "EPI", value: "Soon" },
+        lafora: { label: "Lafora", value: "Soon" },
+        pur: { label: "Pur", value: "Soon" },
+        risk: { label: "Risk", value: "Soon" },
+        diagnostics: { label: "Diagnostics", value: "Soon" },
+        pedigree: { label: "Pedigree", value: "Soon" },
+      },
+    });
+    await flushMicrotasks();
+    renderClient();
+
+    expect(renderClient()).toContain("Sire A / Dam A");
+
+    searchParamsState.sire = "FIN11111/11";
+    searchParamsState.dam = "FIN22222/22";
+    searchParamsState.sp = "8";
+
+    renderClient();
+    await flushMicrotasks();
+    renderClient();
+
+    expect(renderClient()).toContain("admin.virtualPairing.result.empty");
+    expect(selectionPanelPropsRef.current?.selectedSire).toBeNull();
+    expect(selectionPanelPropsRef.current?.selectedDam).toBeNull();
+
+    second.resolve({
+      generationDepth: 8,
+      sire: {
+        id: "sire-b",
+        ekNo: null,
+        registrationNo: "FIN11111/11",
+        name: "Sire B",
+        sex: "U",
+      },
+      dam: {
+        id: "dam-b",
+        ekNo: null,
+        registrationNo: "FIN22222/22",
+        name: "Dam B",
+        sex: "N",
+      },
+      inbreedingCoefficientPct: 2.2222,
+      diagnostics: {
+        sharedAncestorCount: 0,
+        sharedOccurrenceCount: 0,
+        includedOccurrenceCount: 0,
+        includedSirePositionCount: 0,
+        includedDamPositionCount: 0,
+        includedPositionCount: 0,
+        knownSlotCount: 2,
+        knownPedigreePct: 0.7813,
+        contributions: [],
+      },
+      placeholders: {
+        epi: { label: "EPI", value: "Soon" },
+        lafora: { label: "Lafora", value: "Soon" },
+        pur: { label: "Pur", value: "Soon" },
+        risk: { label: "Risk", value: "Soon" },
+        diagnostics: { label: "Diagnostics", value: "Soon" },
+        pedigree: { label: "Pedigree", value: "Soon" },
+      },
+    });
+    await flushMicrotasks();
+
+    const finalHtml = renderClient();
+
+    expect(finalHtml).toContain("Sire B / Dam B");
+    expect(finalHtml).toContain("SP 8");
+    expect(mutateAsync).toHaveBeenCalledTimes(2);
+  });
+
+  it("ignores older same-key manual calculation responses", async () => {
+    const first = createDeferred<{
+      generationDepth: number;
+      sire: VirtualPairingDogOption;
+      dam: VirtualPairingDogOption;
+      inbreedingCoefficientPct: number;
+      diagnostics: {
+        sharedAncestorCount: number;
+        sharedOccurrenceCount: number;
+        includedOccurrenceCount: number;
+        includedSirePositionCount: number;
+        includedDamPositionCount: number;
+        includedPositionCount: number;
+        knownSlotCount: number;
+        knownPedigreePct: number;
+        contributions: [];
+      };
+      placeholders: Record<string, { label: string; value: string }>;
+    }>();
+    const second = createDeferred<{
+      generationDepth: number;
+      sire: VirtualPairingDogOption;
+      dam: VirtualPairingDogOption;
+      inbreedingCoefficientPct: number;
+      diagnostics: {
+        sharedAncestorCount: number;
+        sharedOccurrenceCount: number;
+        includedOccurrenceCount: number;
+        includedSirePositionCount: number;
+        includedDamPositionCount: number;
+        includedPositionCount: number;
+        knownSlotCount: number;
+        knownPedigreePct: number;
+        contributions: [];
+      };
+      placeholders: Record<string, { label: string; value: string }>;
+    }>();
+
+    const mutateAsync = vi
+      .fn()
+      .mockReturnValueOnce(first.promise)
+      .mockReturnValueOnce(second.promise);
+
+    calculateMutationMock.mockReturnValue({
+      isPending: false,
+      mutateAsync,
+    });
+
+    const sireCandidate = {
+      id: "candidate-sire",
+      ekNo: null,
+      registrationNo: "FIN18665/07",
+      name: "Sire Dog",
+      sex: "U",
+    } satisfies VirtualPairingDogOption;
+    const damCandidate = {
+      id: "candidate-dam",
+      ekNo: null,
+      registrationNo: "FIN12562/97",
+      name: "Dam Dog",
+      sex: "N",
+    } satisfies VirtualPairingDogOption;
+
+    renderClient();
+
+    (
+      searchPanelPropsRef.current?.onSelectParent as (
+        candidate: VirtualPairingDogOption,
+        target: "sire" | "dam",
+      ) => void
+    )(sireCandidate, "sire");
+    (
+      searchPanelPropsRef.current?.onSelectParent as (
+        candidate: VirtualPairingDogOption,
+        target: "sire" | "dam",
+      ) => void
+    )(damCandidate, "dam");
+
+    renderClient();
+
+    const calculate = selectionPanelPropsRef.current
+      ?.onCalculate as () => Promise<void>;
+    const firstRequest = calculate();
+    const secondRequest = calculate();
+
+    second.resolve({
+      generationDepth: 9,
+      sire: {
+        id: "sire-b",
+        ekNo: null,
+        registrationNo: "FIN18665/07",
+        name: "Sire B",
+        sex: "U",
+      },
+      dam: {
+        id: "dam-b",
+        ekNo: null,
+        registrationNo: "FIN12562/97",
+        name: "Dam B",
+        sex: "N",
+      },
+      inbreedingCoefficientPct: 9.9999,
+      diagnostics: {
+        sharedAncestorCount: 0,
+        sharedOccurrenceCount: 0,
+        includedOccurrenceCount: 0,
+        includedSirePositionCount: 0,
+        includedDamPositionCount: 0,
+        includedPositionCount: 0,
+        knownSlotCount: 2,
+        knownPedigreePct: 0.1957,
+        contributions: [],
+      },
+      placeholders: {
+        epi: { label: "EPI", value: "Soon" },
+        lafora: { label: "Lafora", value: "Soon" },
+        pur: { label: "Pur", value: "Soon" },
+        risk: { label: "Risk", value: "Soon" },
+        diagnostics: { label: "Diagnostics", value: "Soon" },
+        pedigree: { label: "Pedigree", value: "Soon" },
+      },
+    });
+    await flushMicrotasks();
+
+    first.resolve({
+      generationDepth: 9,
+      sire: {
+        id: "sire-a",
+        ekNo: null,
+        registrationNo: "FIN18665/07",
+        name: "Sire A",
+        sex: "U",
+      },
+      dam: {
+        id: "dam-a",
+        ekNo: null,
+        registrationNo: "FIN12562/97",
+        name: "Dam A",
+        sex: "N",
+      },
+      inbreedingCoefficientPct: 1.1111,
+      diagnostics: {
+        sharedAncestorCount: 0,
+        sharedOccurrenceCount: 0,
+        includedOccurrenceCount: 0,
+        includedSirePositionCount: 0,
+        includedDamPositionCount: 0,
+        includedPositionCount: 0,
+        knownSlotCount: 2,
+        knownPedigreePct: 0.1957,
+        contributions: [],
+      },
+      placeholders: {
+        epi: { label: "EPI", value: "Soon" },
+        lafora: { label: "Lafora", value: "Soon" },
+        pur: { label: "Pur", value: "Soon" },
+        risk: { label: "Risk", value: "Soon" },
+        diagnostics: { label: "Diagnostics", value: "Soon" },
+        pedigree: { label: "Pedigree", value: "Soon" },
+      },
+    });
+    await flushMicrotasks();
+    await Promise.allSettled([firstRequest, secondRequest]);
+
+    const finalHtml = renderClient();
+
+    expect(finalHtml).toContain("Sire B / Dam B");
+    expect(finalHtml).not.toContain("Sire A / Dam A");
+    expect(replaceMock).toHaveBeenCalledTimes(1);
+    expect(mutateAsync).toHaveBeenCalledTimes(2);
   });
 });
