@@ -14,6 +14,10 @@ export const fiAdminDogsVirtualPairingMessages = {
   "admin.virtualPairing.search.button": "Hae",
   "admin.virtualPairing.search.helper":
     "Nimihaussa osuma voi tulla myös sanan keskeltä. Käytä % ja _ -merkkejä tarvittaessa.",
+  "admin.virtualPairing.search.limitedWarningPrefix":
+    "Näytetään vain ensimmäiset",
+  "admin.virtualPairing.search.limitedWarningSuffix":
+    "hakutulosta. Tarkenna hakua.",
   "admin.virtualPairing.search.loading": "Ladataan hakutuloksia...",
   "admin.virtualPairing.search.error":
     "Virtuaaliparituksen hakutulosten lataaminen epäonnistui.",
@@ -64,6 +68,9 @@ export const svAdminDogsVirtualPairingMessages = {
   "admin.virtualPairing.search.button": "Sok",
   "admin.virtualPairing.search.helper":
     "Namnsökning kan träffa även mitt i ordet. Använd % och _ vid behov.",
+  "admin.virtualPairing.search.limitedWarningPrefix": "Visar bara de första",
+  "admin.virtualPairing.search.limitedWarningSuffix":
+    "sökresultaten. Förfina sökningen.",
   "admin.virtualPairing.search.loading": "Laddar sokresultat...",
   "admin.virtualPairing.search.error":
     "Det gick inte att ladda sokresultaten for virtuell parning.",

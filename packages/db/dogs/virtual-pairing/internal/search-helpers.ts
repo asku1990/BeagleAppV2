@@ -4,6 +4,9 @@ import type { RegistrationRow } from "../../core/registration";
 
 export type VirtualPairingSearchFieldDb = "ek" | "reg" | "name";
 
+export const VIRTUAL_PAIRING_MAX_PAGE_SIZE = 50;
+export const VIRTUAL_PAIRING_BROAD_CANDIDATE_LIMIT = 1000;
+
 export type VirtualPairingSearchRequestDb = {
   field: VirtualPairingSearchFieldDb;
   query: string;
@@ -25,6 +28,8 @@ export type VirtualPairingSearchResponseDb = {
   total: number;
   totalPages: number;
   page: number;
+  isLimited: boolean;
+  candidateLimit: number | null;
   items: VirtualPairingSearchDogRowDb[];
 };
 
@@ -82,7 +87,10 @@ export function parsePage(value: number | undefined): number {
 
 export function parsePageSize(value: number | undefined): number {
   if (!Number.isFinite(value)) return 10;
-  return Math.min(50, Math.max(1, Math.floor(value ?? 10)));
+  return Math.min(
+    VIRTUAL_PAIRING_MAX_PAGE_SIZE,
+    Math.max(1, Math.floor(value ?? 10)),
+  );
 }
 
 export function resolvePrimaryRegistrationNo(rows: RegistrationRow[]): string {

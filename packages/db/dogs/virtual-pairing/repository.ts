@@ -1,13 +1,10 @@
-import { type Prisma } from "@prisma/client";
 import { prisma } from "@db/core/prisma";
 import {
-  getWildcardProbe,
-  hasWildcard,
+  VIRTUAL_PAIRING_BROAD_CANDIDATE_LIMIT,
   normalizeQuery,
   parsePage,
   parsePageSize,
   resolvePrimaryRegistrationNo,
-  matchesLike,
   toSexCode,
   type RawVirtualPairingDogRow,
   type VirtualPairingSearchDogRowDb,
@@ -15,6 +12,15 @@ import {
   type VirtualPairingSearchRequestDb,
   type VirtualPairingSearchResponseDb,
 } from "./internal/search-helpers";
+import {
+  buildBoundedWhere,
+  buildBroadWhere,
+  compareRows,
+  loadVirtualPairingDogs,
+  matchesField,
+  resolveBoundedOrderBy,
+  resolveBroadOrderBy,
+} from "./internal/search-execution";
 
 export type {
   VirtualPairingSearchDogRowDb,
@@ -22,133 +28,6 @@ export type {
   VirtualPairingSearchRequestDb,
   VirtualPairingSearchResponseDb,
 } from "./internal/search-helpers";
-
-function buildBroadWhere(input: {
-  field: VirtualPairingSearchFieldDb;
-  query: string;
-}): Prisma.DogWhereInput {
-  const query = normalizeQuery(input.query);
-  if (!query) {
-    return { id: "__no_match__" };
-  }
-
-  if (input.field === "ek") {
-    if (hasWildcard(query)) {
-      return { ekNo: { not: null } };
-    }
-    const parsed = Number.parseInt(query, 10);
-    if (!Number.isFinite(parsed)) {
-      return { id: "__no_match__" };
-    }
-    return { ekNo: parsed };
-  }
-
-  if (input.field === "reg") {
-    if (hasWildcard(query)) {
-      const probe = getWildcardProbe(query);
-      return probe
-        ? {
-            registrations: {
-              some: {
-                registrationNo: {
-                  contains: probe,
-                  mode: "insensitive",
-                },
-              },
-            },
-          }
-        : { id: "__no_match__" };
-    }
-
-    return {
-      registrations: {
-        some: {
-          registrationNo: {
-            equals: query.toUpperCase(),
-            mode: "insensitive",
-          },
-        },
-      },
-    };
-  }
-
-  if (hasWildcard(query)) {
-    const probe = getWildcardProbe(query);
-    return probe
-      ? {
-          name: {
-            contains: probe,
-            mode: "insensitive",
-          },
-        }
-      : { id: "__no_match__" };
-  }
-
-  return {
-    name: {
-      contains: query,
-      mode: "insensitive",
-    },
-  };
-}
-
-function matchesField(
-  row: RawVirtualPairingDogRow,
-  field: VirtualPairingSearchFieldDb,
-  query: string,
-): boolean {
-  const normalized = normalizeQuery(query);
-  if (!normalized) return false;
-
-  if (field === "ek") {
-    const value = row.ekNo == null ? "" : String(row.ekNo);
-    return hasWildcard(normalized)
-      ? matchesLike(value, normalized)
-      : value === normalized;
-  }
-
-  if (field === "reg") {
-    return row.registrations.some((registration) =>
-      hasWildcard(normalized)
-        ? matchesLike(registration.registrationNo, normalized)
-        : registration.registrationNo.toUpperCase() ===
-          normalized.toUpperCase(),
-    );
-  }
-
-  return hasWildcard(normalized)
-    ? matchesLike(row.name, normalized)
-    : row.name.toLowerCase().includes(normalized.toLowerCase());
-}
-
-function compareRows(
-  left: RawVirtualPairingDogRow,
-  right: RawVirtualPairingDogRow,
-  field: VirtualPairingSearchFieldDb,
-): number {
-  if (field === "name") {
-    const nameComparison = left.name.localeCompare(right.name, "fi", {
-      sensitivity: "base",
-    });
-    if (nameComparison !== 0) return nameComparison;
-    const leftReg = resolvePrimaryRegistrationNo(left.registrations);
-    const rightReg = resolvePrimaryRegistrationNo(right.registrations);
-    return leftReg.localeCompare(rightReg, "fi", { sensitivity: "base" });
-  }
-
-  if (field === "reg") {
-    const leftReg = resolvePrimaryRegistrationNo(left.registrations);
-    const rightReg = resolvePrimaryRegistrationNo(right.registrations);
-    return leftReg.localeCompare(rightReg, "fi", { sensitivity: "base" });
-  }
-
-  const leftEk = left.ekNo ?? Number.MAX_SAFE_INTEGER;
-  const rightEk = right.ekNo ?? Number.MAX_SAFE_INTEGER;
-  if (leftEk !== rightEk) {
-    return leftEk - rightEk;
-  }
-  return left.name.localeCompare(right.name, "fi", { sensitivity: "base" });
-}
 
 function toRow(row: RawVirtualPairingDogRow): VirtualPairingSearchDogRowDb {
   return {
@@ -174,7 +53,51 @@ export async function searchVirtualPairingDogsDb(
       total: 0,
       totalPages: 0,
       page: 1,
+      isLimited: false,
+      candidateLimit: null,
       items: [],
+    };
+  }
+
+  const boundedWhere = buildBoundedWhere({
+    field: input.field,
+    query,
+  });
+  if (boundedWhere) {
+    const total = await prisma.dog.count({ where: boundedWhere });
+    const totalPages = Math.ceil(total / pageSize);
+    const resolvedPage =
+      totalPages === 0 ? 1 : Math.min(Math.max(1, page), totalPages);
+    const start = (resolvedPage - 1) * pageSize;
+
+    const rows = await loadVirtualPairingDogs({
+      where: boundedWhere,
+      orderBy: resolveBoundedOrderBy(input.field),
+      skip: start,
+      take: pageSize,
+      select: {
+        id: true,
+        ekNo: true,
+        name: true,
+        sex: true,
+        registrations: {
+          select: {
+            registrationNo: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+
+    return {
+      field: input.field,
+      query,
+      total,
+      totalPages,
+      page: resolvedPage,
+      isLimited: false,
+      candidateLimit: null,
+      items: rows.map(toRow),
     };
   }
 
@@ -182,9 +105,23 @@ export async function searchVirtualPairingDogsDb(
     field: input.field,
     query,
   });
+  if (!broadWhere) {
+    return {
+      field: input.field,
+      query,
+      total: 0,
+      totalPages: 0,
+      page: 1,
+      isLimited: false,
+      candidateLimit: null,
+      items: [],
+    };
+  }
 
-  const dogs = (await prisma.dog.findMany({
+  const rows = await loadVirtualPairingDogs({
     where: broadWhere,
+    orderBy: resolveBroadOrderBy(input.field),
+    take: VIRTUAL_PAIRING_BROAD_CANDIDATE_LIMIT + 1,
     select: {
       id: true,
       ekNo: true,
@@ -197,9 +134,15 @@ export async function searchVirtualPairingDogsDb(
         },
       },
     },
-  })) as RawVirtualPairingDogRow[];
+  });
 
-  const matched = dogs.filter((row) => matchesField(row, input.field, query));
+  const isLimited = rows.length > VIRTUAL_PAIRING_BROAD_CANDIDATE_LIMIT;
+  const cappedRows = isLimited
+    ? rows.slice(0, VIRTUAL_PAIRING_BROAD_CANDIDATE_LIMIT)
+    : rows;
+  const matched = cappedRows.filter((row) =>
+    matchesField(row, input.field, query),
+  );
   matched.sort((left, right) => compareRows(left, right, input.field));
 
   const total = matched.length;
@@ -214,6 +157,8 @@ export async function searchVirtualPairingDogsDb(
     total,
     totalPages,
     page: resolvedPage,
+    isLimited,
+    candidateLimit: VIRTUAL_PAIRING_BROAD_CANDIDATE_LIMIT,
     items: matched.slice(start, start + pageSize).map(toRow),
   };
 }

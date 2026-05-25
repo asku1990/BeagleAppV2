@@ -2,6 +2,7 @@ import type { FormEvent } from "react";
 import type {
   VirtualPairingDogOption,
   VirtualPairingSearchField,
+  VirtualPairingSearchResponse,
 } from "@beagle/contracts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,8 @@ type SearchQueryState = {
   data?: {
     total: number;
     items: VirtualPairingDogOption[];
+    isLimited?: boolean;
+    candidateLimit?: VirtualPairingSearchResponse["candidateLimit"];
   };
 };
 
@@ -117,6 +120,15 @@ export function AdminVirtualPairingSearchPanel({
           {t("admin.virtualPairing.search.countPrefix")}{" "}
           {searchQuery.data.total}
         </p>
+      ) : null}
+
+      {searchQuery.data?.isLimited &&
+      searchQuery.data.candidateLimit != null ? (
+        <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-800">
+          <span>{t("admin.virtualPairing.search.limitedWarningPrefix")} </span>
+          <span>{searchQuery.data.candidateLimit}</span>
+          <span> {t("admin.virtualPairing.search.limitedWarningSuffix")}</span>
+        </div>
       ) : null}
 
       {searchEnabled && results.length === 0 && !searchQuery.isLoading ? (

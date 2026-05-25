@@ -68,6 +68,8 @@ export async function searchVirtualPairingDogs(
           total: result.total,
           totalPages: result.totalPages,
           page: result.page,
+          isLimited: result.isLimited,
+          candidateLimit: result.candidateLimit,
           items: result.items,
         },
       },

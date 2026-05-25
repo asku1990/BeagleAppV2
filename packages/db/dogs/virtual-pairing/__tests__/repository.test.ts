@@ -2,12 +2,15 @@ import { DogSex } from "@prisma/client";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { searchVirtualPairingDogsDb } from "../repository";
 
-const { dogFindManyMock, prismaMock } = vi.hoisted(() => {
+const { dogCountMock, dogFindManyMock, prismaMock } = vi.hoisted(() => {
+  const dogCount = vi.fn();
   const dogFindMany = vi.fn();
   return {
+    dogCountMock: dogCount,
     dogFindManyMock: dogFindMany,
     prismaMock: {
       dog: {
+        count: dogCount,
         findMany: dogFindMany,
       },
     },
@@ -34,8 +37,17 @@ function makeRow(input: {
   };
 }
 
+function expectDefaultMetadata(result: {
+  isLimited: boolean;
+  candidateLimit: number | null;
+}) {
+  expect(result.isLimited).toBe(false);
+  expect(result.candidateLimit).toBeNull();
+}
+
 describe("searchVirtualPairingDogsDb", () => {
   beforeEach(() => {
+    dogCountMock.mockReset();
     dogFindManyMock.mockReset();
   });
 
@@ -53,112 +65,80 @@ describe("searchVirtualPairingDogsDb", () => {
       total: 0,
       totalPages: 0,
       page: 1,
+      isLimited: false,
+      candidateLimit: null,
       items: [],
     });
+    expect(dogCountMock).not.toHaveBeenCalled();
     expect(dogFindManyMock).not.toHaveBeenCalled();
   });
 
-  it("filters by wildcard name and returns public-safe dog options", async () => {
-    dogFindManyMock.mockResolvedValue([
-      makeRow({
-        id: "dog_1",
-        name: "Metsapolun Kide",
-        ekNo: 5588,
-        sex: DogSex.FEMALE,
-        registrations: [
-          { registrationNo: "FI12345/21", createdAt: new Date("2021-04-09") },
-        ],
-      }),
-      makeRow({
-        id: "dog_2",
-        name: "Aurinkopolun Aatos",
-        ekNo: 5599,
-        sex: DogSex.MALE,
-        registrations: [
-          { registrationNo: "FI54321/20", createdAt: new Date("2020-03-01") },
-        ],
-      }),
-    ]);
-
-    const result = await searchVirtualPairingDogsDb({
-      field: "name",
-      query: "%kide%",
-      page: 1,
-      pageSize: 10,
-    });
-
-    expect(result.total).toBe(1);
-    expect(result.items).toEqual([
-      {
-        id: "dog_1",
-        ekNo: 5588,
-        registrationNo: "FI12345/21",
-        name: "Metsapolun Kide",
-        sex: "N",
-      },
-    ]);
-    expect(
-      JSON.stringify(dogFindManyMock.mock.calls[0]?.[0].select),
-    ).not.toContain("ownership");
-  });
-
-  it("searches name substrings without explicit wildcards", async () => {
-    dogFindManyMock.mockResolvedValue([
-      makeRow({
-        id: "dog_1",
-        name: "Metsapolun Kide",
-        ekNo: 5588,
-        sex: DogSex.FEMALE,
-        registrations: [
-          { registrationNo: "FI12345/21", createdAt: new Date("2021-04-09") },
-        ],
-      }),
-      makeRow({
-        id: "dog_2",
-        name: "Aurinkopolun Aatos",
-        ekNo: 5599,
-        sex: DogSex.MALE,
-        registrations: [
-          { registrationNo: "FI54321/20", createdAt: new Date("2020-03-01") },
-        ],
-      }),
-    ]);
+  it("uses DB-side count, skip, take, and ordering for plain name search", async () => {
+    dogCountMock.mockResolvedValue(12);
+    dogFindManyMock.mockResolvedValue(
+      Array.from({ length: 5 }, (_, index) =>
+        makeRow({
+          id: `dog_${index + 1}`,
+          name: `Metsapolun Kide ${index + 1}`,
+          ekNo: 5580 + index,
+          sex: index % 2 === 0 ? DogSex.FEMALE : DogSex.MALE,
+          registrations: [
+            {
+              registrationNo: `FI12${index}45/21`,
+              createdAt: new Date("2021-04-09"),
+            },
+          ],
+        }),
+      ),
+    );
 
     const result = await searchVirtualPairingDogsDb({
       field: "name",
       query: "kide",
-      page: 1,
-      pageSize: 10,
+      page: 2,
+      pageSize: 5,
     });
 
-    expect(dogFindManyMock.mock.calls[0]?.[0].where).toEqual({
-      name: {
-        contains: "kide",
-        mode: "insensitive",
+    expect(dogCountMock).toHaveBeenCalledWith({
+      where: {
+        name: {
+          contains: "kide",
+          mode: "insensitive",
+        },
       },
     });
-    expect(result.total).toBe(1);
-    expect(result.items).toEqual([
-      {
-        id: "dog_1",
-        ekNo: 5588,
-        registrationNo: "FI12345/21",
-        name: "Metsapolun Kide",
-        sex: "N",
+    expect(dogFindManyMock).toHaveBeenCalledWith({
+      where: {
+        name: {
+          contains: "kide",
+          mode: "insensitive",
+        },
       },
-    ]);
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+      skip: 5,
+      take: 5,
+      select: {
+        id: true,
+        ekNo: true,
+        name: true,
+        sex: true,
+        registrations: {
+          select: {
+            registrationNo: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+    expect(result.total).toBe(12);
+    expect(result.totalPages).toBe(3);
+    expect(result.page).toBe(2);
+    expectDefaultMetadata(result);
   });
 
-  it("searches by exact registration number and sorts by registration", async () => {
+  it("uses DB-side count and paging for exact registration search", async () => {
+    dogCountMock.mockResolvedValue(1);
     dogFindManyMock.mockResolvedValue([
-      makeRow({
-        id: "dog_2",
-        name: "Aurinkopolun Aatos",
-        ekNo: 5599,
-        registrations: [
-          { registrationNo: "fi54321/20", createdAt: new Date("2020-03-01") },
-        ],
-      }),
       makeRow({
         id: "dog_1",
         name: "Metsapolun Kide",
@@ -177,37 +157,68 @@ describe("searchVirtualPairingDogsDb", () => {
       pageSize: 10,
     });
 
-    expect(dogFindManyMock.mock.calls[0]?.[0].where).toEqual({
-      registrations: {
-        some: {
-          registrationNo: {
-            equals: "FI12345/21",
-            mode: "insensitive",
+    expect(dogCountMock).toHaveBeenCalledWith({
+      where: {
+        registrations: {
+          some: {
+            registrationNo: {
+              equals: "FI12345/21",
+              mode: "insensitive",
+            },
           },
         },
       },
     });
-    expect(result.items).toEqual([
-      {
-        id: "dog_1",
-        ekNo: 5588,
-        registrationNo: "FI12345/21",
-        name: "Metsapolun Kide",
-        sex: "N",
+    expect(dogFindManyMock).toHaveBeenCalledWith({
+      where: {
+        registrations: {
+          some: {
+            registrationNo: {
+              equals: "FI12345/21",
+              mode: "insensitive",
+            },
+          },
+        },
       },
-    ]);
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+      skip: 0,
+      take: 10,
+      select: {
+        id: true,
+        ekNo: true,
+        name: true,
+        sex: true,
+        registrations: {
+          select: {
+            registrationNo: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+    expect(result).toEqual({
+      field: "reg",
+      query: "fi12345/21",
+      total: 1,
+      totalPages: 1,
+      page: 1,
+      isLimited: false,
+      candidateLimit: null,
+      items: [
+        {
+          id: "dog_1",
+          ekNo: 5588,
+          registrationNo: "FI12345/21",
+          name: "Metsapolun Kide",
+          sex: "N",
+        },
+      ],
+    });
   });
 
-  it("searches by wildcard ek number and sorts by ek", async () => {
+  it("uses DB-side count and paging for exact ek search", async () => {
+    dogCountMock.mockResolvedValue(1);
     dogFindManyMock.mockResolvedValue([
-      makeRow({
-        id: "dog_2",
-        name: "Dog 5599",
-        ekNo: 5599,
-        registrations: [
-          { registrationNo: "FI54321/20", createdAt: new Date("2020-03-01") },
-        ],
-      }),
       makeRow({
         id: "dog_1",
         name: "Dog 5588",
@@ -216,59 +227,139 @@ describe("searchVirtualPairingDogsDb", () => {
           { registrationNo: "FI12345/21", createdAt: new Date("2021-04-09") },
         ],
       }),
+    ]);
+
+    const result = await searchVirtualPairingDogsDb({
+      field: "ek",
+      query: "5588",
+      page: 1,
+      pageSize: 10,
+    });
+
+    expect(dogCountMock).toHaveBeenCalledWith({
+      where: {
+        ekNo: 5588,
+      },
+    });
+    expect(dogFindManyMock).toHaveBeenCalledWith({
+      where: {
+        ekNo: 5588,
+      },
+      orderBy: [{ ekNo: "asc" }, { name: "asc" }, { id: "asc" }],
+      skip: 0,
+      take: 10,
+      select: {
+        id: true,
+        ekNo: true,
+        name: true,
+        sex: true,
+        registrations: {
+          select: {
+            registrationNo: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+    expect(result).toEqual({
+      field: "ek",
+      query: "5588",
+      total: 1,
+      totalPages: 1,
+      page: 1,
+      isLimited: false,
+      candidateLimit: null,
+      items: [
+        {
+          id: "dog_1",
+          ekNo: 5588,
+          registrationNo: "FI12345/21",
+          name: "Dog 5588",
+          sex: "U",
+        },
+      ],
+    });
+  });
+
+  it("caps broad wildcard name searches and drops the sentinel row before filtering", async () => {
+    dogFindManyMock.mockResolvedValue([
+      ...Array.from({ length: 1000 }, (_, index) =>
+        makeRow({
+          id: `dog_${index + 1}`,
+          name: `Dog ${String(index + 1).padStart(4, "0")}`,
+          ekNo: 5000 + index,
+          sex: index % 2 === 0 ? DogSex.FEMALE : DogSex.MALE,
+          registrations: [
+            {
+              registrationNo: `FI${10000 + index}/24`,
+              createdAt: new Date("2024-01-01"),
+            },
+          ],
+        }),
+      ),
       makeRow({
-        id: "dog_3",
-        name: "Dog no ek",
-        ekNo: null,
+        id: "dog_1001",
+        name: "Sentinel Kide",
+        ekNo: 6999,
+        sex: DogSex.FEMALE,
         registrations: [
-          { registrationNo: "FI99999/22", createdAt: new Date("2022-01-01") },
+          { registrationNo: "FI99999/24", createdAt: new Date("2024-01-01") },
         ],
       }),
     ]);
 
     const result = await searchVirtualPairingDogsDb({
-      field: "ek",
-      query: "55%",
+      field: "name",
+      query: "%sentinel%",
       page: 1,
       pageSize: 10,
     });
 
-    expect(dogFindManyMock.mock.calls[0]?.[0].where).toEqual({
-      ekNo: { not: null },
-    });
-    expect(result.total).toBe(2);
-    expect(result.items.map((item) => item.ekNo)).toEqual([5588, 5599]);
-  });
-
-  it("rejects nonnumeric ek queries before matching", async () => {
-    dogFindManyMock.mockResolvedValue([]);
-
-    const result = await searchVirtualPairingDogsDb({
-      field: "ek",
-      query: "not-a-number",
-      page: 1,
-      pageSize: 10,
-    });
-
-    expect(dogFindManyMock.mock.calls[0]?.[0].where).toEqual({
-      id: "__no_match__",
+    expect(dogCountMock).not.toHaveBeenCalled();
+    expect(dogFindManyMock).toHaveBeenCalledWith({
+      where: {
+        name: {
+          contains: "sentinel",
+          mode: "insensitive",
+        },
+      },
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+      take: 1001,
+      select: {
+        id: true,
+        ekNo: true,
+        name: true,
+        sex: true,
+        registrations: {
+          select: {
+            registrationNo: true,
+            createdAt: true,
+          },
+        },
+      },
     });
     expect(result).toEqual({
-      field: "ek",
-      query: "not-a-number",
+      field: "name",
+      query: "%sentinel%",
       total: 0,
       totalPages: 0,
       page: 1,
+      isLimited: true,
+      candidateLimit: 1000,
       items: [],
     });
   });
 
-  it("pages and clamps wildcard registration queries", async () => {
+  it.each([
+    ["reg", "FI%"],
+    ["ek", "55%"],
+  ] as const)("caps broad wildcard %s searches", async (field, query) => {
     dogFindManyMock.mockResolvedValue(
-      Array.from({ length: 12 }, (_, index) =>
+      Array.from({ length: 1001 }, (_, index) =>
         makeRow({
           id: `dog_${index + 1}`,
           name: `Dog ${index + 1}`,
+          ekNo: 5500 + (index % 100),
           registrations: [
             {
               registrationNo: `FI${10000 + index}/24`,
@@ -280,21 +371,45 @@ describe("searchVirtualPairingDogsDb", () => {
     );
 
     const result = await searchVirtualPairingDogsDb({
-      field: "reg",
-      query: "FI%",
-      page: 99,
-      pageSize: 100,
+      field,
+      query,
+      page: 1,
+      pageSize: 10,
     });
 
-    expect(result.total).toBe(12);
-    expect(result.totalPages).toBe(1);
-    expect(result.page).toBe(1);
-    expect(result.items).toHaveLength(12);
+    expect(dogCountMock).not.toHaveBeenCalled();
+    expect(dogFindManyMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        take: 1001,
+      }),
+    );
+    expect(result.isLimited).toBe(true);
+    expect(result.candidateLimit).toBe(1000);
+  });
+
+  it("rejects nonnumeric ek queries before matching", async () => {
+    const result = await searchVirtualPairingDogsDb({
+      field: "ek",
+      query: "not-a-number",
+      page: 1,
+      pageSize: 10,
+    });
+
+    expect(dogCountMock).not.toHaveBeenCalled();
+    expect(dogFindManyMock).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      field: "ek",
+      query: "not-a-number",
+      total: 0,
+      totalPages: 0,
+      page: 1,
+      isLimited: false,
+      candidateLimit: null,
+      items: [],
+    });
   });
 
   it("rejects wildcard-only registration and name queries", async () => {
-    dogFindManyMock.mockResolvedValue([]);
-
     const regResult = await searchVirtualPairingDogsDb({
       field: "reg",
       query: "%%%",
@@ -308,13 +423,27 @@ describe("searchVirtualPairingDogsDb", () => {
       pageSize: 10,
     });
 
-    expect(dogFindManyMock.mock.calls[0]?.[0].where).toEqual({
-      id: "__no_match__",
+    expect(dogCountMock).not.toHaveBeenCalled();
+    expect(dogFindManyMock).not.toHaveBeenCalled();
+    expect(regResult).toEqual({
+      field: "reg",
+      query: "%%%",
+      total: 0,
+      totalPages: 0,
+      page: 1,
+      isLimited: false,
+      candidateLimit: null,
+      items: [],
     });
-    expect(dogFindManyMock.mock.calls[1]?.[0].where).toEqual({
-      id: "__no_match__",
+    expect(nameResult).toEqual({
+      field: "name",
+      query: "___",
+      total: 0,
+      totalPages: 0,
+      page: 1,
+      isLimited: false,
+      candidateLimit: null,
+      items: [],
     });
-    expect(regResult.total).toBe(0);
-    expect(nameResult.total).toBe(0);
   });
 });

@@ -21,5 +21,7 @@ export type VirtualPairingSearchResponse = {
   total: number;
   totalPages: number;
   page: number;
+  isLimited: boolean;
+  candidateLimit: number | null;
   items: VirtualPairingDogOption[];
 };
