@@ -53,7 +53,6 @@ async function loadDogPedigreeAncestryFromFrontier(
         id: true,
         sireId: true,
         damId: true,
-        siitosasteProsentti: true,
       },
     });
 
@@ -64,10 +63,7 @@ async function loadDogPedigreeAncestryFromFrontier(
         id: row.id,
         sireId: row.sireId,
         damId: row.damId,
-        siitosasteProsentti:
-          row.siitosasteProsentti == null
-            ? null
-            : Number(row.siitosasteProsentti),
+        siitosasteProsentti: null,
       };
 
       if (row.sireId && !visited.has(row.sireId)) {

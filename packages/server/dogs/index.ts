@@ -1,4 +1,5 @@
 export { createDogsService, dogsService } from "./search";
+export { searchVirtualPairingDogs } from "./virtual-pairing";
 export {
   getBeagleDogProfileService,
   type DogsServiceLogContext,

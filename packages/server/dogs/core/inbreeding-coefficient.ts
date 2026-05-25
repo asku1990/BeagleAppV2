@@ -14,6 +14,44 @@ type SharedOccurrence = {
   include: boolean;
 };
 
+export type InbreedingContributionBreakdown = SharedOccurrence;
+
+export type GroupedInbreedingContributionBreakdown = {
+  id: string;
+  rawContributionPct: number;
+  adjustedContributionPct: number;
+  occurrenceCount: number;
+  sireGeneration: number;
+  sireIndex: number;
+  damGeneration: number;
+  damIndex: number;
+};
+
+export type InbreedingCoefficientBreakdownPct = {
+  sharedAncestorCount: number;
+  sharedOccurrenceCount: number;
+  includedOccurrenceCount: number;
+  includedSirePositionCount: number;
+  includedDamPositionCount: number;
+  includedPositionCount: number;
+  knownSlotCount: number;
+  knownPedigreePct: number;
+  contributionPct: number;
+  contributions: GroupedInbreedingContributionBreakdown[];
+};
+
+type InbreedingCalculationContext = {
+  dynamicInbreedingPctByDogId: Map<string, number>;
+  visitingDogIds: Set<string>;
+};
+
+function createCalculationContext(): InbreedingCalculationContext {
+  return {
+    dynamicInbreedingPctByDogId: new Map(),
+    visitingDogIds: new Set(),
+  };
+}
+
 function getNode(ancestry: DogPedigreeAncestryDb, id: string) {
   return ancestry.nodes[id] ?? null;
 }
@@ -115,6 +153,8 @@ function buildSharedOccurrences(
 function sumInbreedingPct(
   shared: SharedOccurrence[],
   ancestry: DogPedigreeAncestryDb,
+  maxDepth: number,
+  context: InbreedingCalculationContext,
 ): number {
   const perAncestor: Record<string, number> = {};
   for (const occurrence of shared) {
@@ -125,14 +165,130 @@ function sumInbreedingPct(
       (perAncestor[occurrence.id] ?? 0) + occurrence.contributionPct;
   }
   return Object.entries(perAncestor).reduce((sum, [ancestorId, fxPct]) => {
-    const ancestor = getNode(ancestry, ancestorId);
-    const fa =
-      ancestor?.siitosasteProsentti == null ||
-      ancestor.siitosasteProsentti === 0
-        ? 1
-        : 1 + ancestor.siitosasteProsentti / 100;
-    return sum + fxPct * fa;
+    return (
+      sum +
+      fxPct * getAncestorMultiplier(ancestry, ancestorId, maxDepth, context)
+    );
   }, 0);
+}
+
+function getAncestorMultiplier(
+  ancestry: DogPedigreeAncestryDb,
+  ancestorId: string,
+  maxDepth: number,
+  context: InbreedingCalculationContext,
+): number {
+  const ancestorInbreedingPct = calculateDynamicInbreedingCoefficientPct(
+    ancestorId,
+    ancestry,
+    maxDepth,
+    context,
+  );
+  return 1 + ancestorInbreedingPct / 100;
+}
+
+function groupIncludedContributions(
+  shared: SharedOccurrence[],
+  ancestry: DogPedigreeAncestryDb,
+  maxDepth: number,
+  context: InbreedingCalculationContext,
+): GroupedInbreedingContributionBreakdown[] {
+  const grouped = new Map<string, GroupedInbreedingContributionBreakdown>();
+
+  for (const occurrence of shared) {
+    if (!occurrence.include) {
+      continue;
+    }
+
+    const existing = grouped.get(occurrence.id);
+    if (existing) {
+      existing.rawContributionPct += occurrence.contributionPct;
+      existing.occurrenceCount += 1;
+      existing.adjustedContributionPct =
+        existing.rawContributionPct *
+        getAncestorMultiplier(ancestry, occurrence.id, maxDepth, context);
+      continue;
+    }
+
+    const multiplier = getAncestorMultiplier(
+      ancestry,
+      occurrence.id,
+      maxDepth,
+      context,
+    );
+    grouped.set(occurrence.id, {
+      id: occurrence.id,
+      rawContributionPct: occurrence.contributionPct,
+      adjustedContributionPct: occurrence.contributionPct * multiplier,
+      occurrenceCount: 1,
+      sireGeneration: occurrence.sireGeneration,
+      sireIndex: occurrence.sireIndex,
+      damGeneration: occurrence.damGeneration,
+      damIndex: occurrence.damIndex,
+    });
+  }
+
+  return [...grouped.values()].sort(
+    (left, right) =>
+      right.adjustedContributionPct - left.adjustedContributionPct,
+  );
+}
+
+function countKnownPedigreePct(
+  sire: PedigreeMatrix,
+  dam: PedigreeMatrix,
+  maxDepth: number,
+): { knownSlotCount: number; knownPedigreePct: number } {
+  const totalSlotsPerSide = 2 ** maxDepth - 1;
+  const countKnownSlots = (matrix: PedigreeMatrix): number =>
+    Object.values(matrix).reduce(
+      (sum, row) =>
+        sum +
+        Object.values(row).reduce((rowSum, id) => rowSum + (id ? 1 : 0), 0),
+      0,
+    );
+  const knownSlotCount = countKnownSlots(sire) + countKnownSlots(dam);
+  return {
+    knownSlotCount,
+    knownPedigreePct:
+      totalSlotsPerSide <= 0
+        ? 0
+        : (knownSlotCount / (totalSlotsPerSide * 2)) * 100,
+  };
+}
+
+function calculateDynamicInbreedingCoefficientPct(
+  dogId: string,
+  ancestry: DogPedigreeAncestryDb,
+  maxDepth: number,
+  context: InbreedingCalculationContext,
+): number {
+  const cached = context.dynamicInbreedingPctByDogId.get(dogId);
+  if (cached != null) {
+    return cached;
+  }
+
+  const dog = getNode(ancestry, dogId);
+  if (!dog?.sireId || !dog?.damId || maxDepth < 1) {
+    context.dynamicInbreedingPctByDogId.set(dogId, 0);
+    return 0;
+  }
+
+  if (context.visitingDogIds.has(dogId)) {
+    return 0;
+  }
+
+  context.visitingDogIds.add(dogId);
+  const inbreedingPct = calculateInbreedingCoefficientForParentsPctInternal(
+    dog.sireId,
+    dog.damId,
+    ancestry,
+    maxDepth,
+    context,
+  );
+  context.visitingDogIds.delete(dogId);
+  context.dynamicInbreedingPctByDogId.set(dogId, inbreedingPct);
+  return inbreedingPct;
 }
 
 export function calculateInbreedingCoefficientPct(
@@ -156,14 +312,82 @@ export function calculateInbreedingCoefficientPct(
   );
 }
 
+function calculateInbreedingCoefficientForParentsPctInternal(
+  sireId: string,
+  damId: string,
+  ancestry: DogPedigreeAncestryDb,
+  maxDepth: number,
+  context: InbreedingCalculationContext,
+): number {
+  const sireMatrix = buildSideMatrix(ancestry, sireId, maxDepth);
+  const damMatrix = buildSideMatrix(ancestry, damId, maxDepth);
+  const shared = buildSharedOccurrences(sireMatrix, damMatrix, maxDepth);
+  return sumInbreedingPct(shared, ancestry, maxDepth, context);
+}
+
 export function calculateInbreedingCoefficientForParentsPct(
   sireId: string,
   damId: string,
   ancestry: DogPedigreeAncestryDb,
   maxDepth = 9,
 ): number {
+  return calculateInbreedingCoefficientForParentsPctInternal(
+    sireId,
+    damId,
+    ancestry,
+    maxDepth,
+    createCalculationContext(),
+  );
+}
+
+export function calculateInbreedingCoefficientBreakdownForParentsPct(
+  sireId: string,
+  damId: string,
+  ancestry: DogPedigreeAncestryDb,
+  maxDepth = 9,
+): InbreedingCoefficientBreakdownPct {
+  const context = createCalculationContext();
   const sireMatrix = buildSideMatrix(ancestry, sireId, maxDepth);
   const damMatrix = buildSideMatrix(ancestry, damId, maxDepth);
   const shared = buildSharedOccurrences(sireMatrix, damMatrix, maxDepth);
-  return sumInbreedingPct(shared, ancestry);
+  const contributionPct = sumInbreedingPct(shared, ancestry, maxDepth, context);
+  const includedOccurrences = shared.filter((occurrence) => occurrence.include);
+  const contributions = groupIncludedContributions(
+    shared,
+    ancestry,
+    maxDepth,
+    context,
+  );
+  const sharedAncestorCount = new Set(
+    includedOccurrences.map((occurrence) => occurrence.id),
+  ).size;
+  const includedOccurrenceCount = includedOccurrences.length;
+  const includedSirePositionCount = new Set(
+    includedOccurrences.map(
+      (occurrence) => `${occurrence.sireGeneration}-${occurrence.sireIndex}`,
+    ),
+  ).size;
+  const includedDamPositionCount = new Set(
+    includedOccurrences.map(
+      (occurrence) => `${occurrence.damGeneration}-${occurrence.damIndex}`,
+    ),
+  ).size;
+  const { knownSlotCount, knownPedigreePct } = countKnownPedigreePct(
+    sireMatrix,
+    damMatrix,
+    maxDepth,
+  );
+
+  return {
+    sharedAncestorCount,
+    sharedOccurrenceCount: shared.length,
+    includedOccurrenceCount,
+    includedSirePositionCount,
+    includedDamPositionCount,
+    includedPositionCount: includedSirePositionCount + includedDamPositionCount,
+    knownSlotCount,
+    knownPedigreePct,
+    contributionPct,
+    contributions,
+  };
 }

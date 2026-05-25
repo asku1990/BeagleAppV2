@@ -15,6 +15,17 @@ export {
   type AdminDogProfileDb,
 } from "../admin/dogs/profile";
 export {
+  findVirtualPairingAncestorDetailsDb,
+  findVirtualPairingDogByRegistrationNoDb,
+  searchVirtualPairingDogsDb,
+  type VirtualPairingAncestorDetailsDb,
+  type VirtualPairingDogByRegistrationLookupDb,
+  type VirtualPairingSearchDogRowDb,
+  type VirtualPairingSearchFieldDb,
+  type VirtualPairingSearchRequestDb,
+  type VirtualPairingSearchResponseDb,
+} from "./virtual-pairing";
+export {
   loadDogPedigreeAncestryDb,
   loadDogPedigreeAncestryForParentsDb,
   type DogPedigreeAncestorDb,
