@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { loadDogEpiDiseaseFactsDb } from "../epi-disease-facts";
+import {
+  loadDogDiseaseFactsDb,
+  loadDogEpiDiseaseFactsDb,
+} from "../epi-disease-facts";
 
 const { koiranSairausFindManyMock, prismaMock } = vi.hoisted(() => {
   const koiranSairausFindMany = vi.fn();
@@ -77,6 +80,48 @@ describe("loadDogEpiDiseaseFactsDb", () => {
         isaDogId: "dog-2",
         emaDogId: null,
         sairausKoodi: "epi",
+      },
+    ]);
+  });
+
+  it("loads a custom disease code set for virtual pairing", async () => {
+    koiranSairausFindManyMock.mockResolvedValueOnce([
+      {
+        dogId: "dog-1",
+        isaDogId: null,
+        emaDogId: "dog-3",
+        sairausKoodi: "PUR",
+      },
+    ]);
+
+    const result = await loadDogDiseaseFactsDb(
+      ["dog-1"],
+      ["epi", "pur", "ap", "yp", "rp"],
+    );
+
+    expect(koiranSairausFindManyMock).toHaveBeenCalledWith({
+      where: {
+        sairausKoodi: { in: ["epi", "pur", "ap", "yp", "rp"] },
+        OR: [
+          { dogId: { in: ["dog-1"] } },
+          { isaDogId: { in: ["dog-1"] } },
+          { emaDogId: { in: ["dog-1"] } },
+        ],
+      },
+      select: {
+        dogId: true,
+        isaDogId: true,
+        emaDogId: true,
+        sairausKoodi: true,
+      },
+    });
+
+    expect(result).toEqual([
+      {
+        dogId: "dog-1",
+        isaDogId: null,
+        emaDogId: "dog-3",
+        sairausKoodi: "pur",
       },
     ]);
   });

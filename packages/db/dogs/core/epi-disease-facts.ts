@@ -9,18 +9,24 @@ export type DogEpiDiseaseFactDb = {
 
 const EPI_AND_LAFORA_CODES = ["epi", "lepis", "lepik", "lepit"] as const;
 
-// Loads bounded disease facts used by admin profile EPI/Lafora calculations.
-export async function loadDogEpiDiseaseFactsDb(
+function normalizeDiseaseCodes(codes: readonly string[]): string[] {
+  return [...new Set(codes.map((code) => code.trim().toLowerCase()))];
+}
+
+// Loads bounded disease facts used by dog health calculations.
+export async function loadDogDiseaseFactsDb(
   relatedDogIds: string[],
+  diseaseCodes: readonly string[],
 ): Promise<DogEpiDiseaseFactDb[]> {
   if (relatedDogIds.length === 0) {
     return [];
   }
 
   const ids = [...new Set(relatedDogIds)];
+  const codes = normalizeDiseaseCodes(diseaseCodes);
   const rows = await prisma.koiranSairaus.findMany({
     where: {
-      sairausKoodi: { in: [...EPI_AND_LAFORA_CODES] },
+      sairausKoodi: { in: codes },
       OR: [
         { dogId: { in: ids } },
         { isaDogId: { in: ids } },
@@ -41,4 +47,11 @@ export async function loadDogEpiDiseaseFactsDb(
     emaDogId: row.emaDogId,
     sairausKoodi: row.sairausKoodi.toLowerCase(),
   }));
+}
+
+// Loads the legacy EPI/Lafora fact set used by admin dog profile scoring.
+export async function loadDogEpiDiseaseFactsDb(
+  relatedDogIds: string[],
+): Promise<DogEpiDiseaseFactDb[]> {
+  return loadDogDiseaseFactsDb(relatedDogIds, EPI_AND_LAFORA_CODES);
 }

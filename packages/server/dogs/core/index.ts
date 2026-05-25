@@ -4,6 +4,12 @@ export {
   calculateInbreedingCoefficientForParentsPct,
   calculateInbreedingCoefficientPct,
 } from "./inbreeding-coefficient";
+export {
+  calculateDogEpiSummary,
+  calculateDogHealthSummary,
+  type DogEpiSummary,
+  type DogHealthSummary,
+} from "./disease-summary";
 export { getInbreedingAncestryLoadDepth } from "./inbreeding-ancestry-depth";
 export {
   VIRTUAL_PAIRING_DEFAULT_GENERATION_DEPTH,

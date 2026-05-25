@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import type { AdminDogProfileDto } from "@beagle/contracts";
 import { TriangleAlert } from "lucide-react";
 import { type ReactNode } from "react";
+import { EpiLukuWithFlag } from "@web/components/admin/dogs/shared/epi-flag";
 
 const FALLBACK_VALUE = "-";
 
@@ -78,24 +79,6 @@ function formatPercent(value: number | null): string {
   return `${value.toFixed(4)} %`;
 }
 
-function formatEpiLuku(
-  epiLuku: number | null,
-  epiTeksti: string | null,
-): string {
-  if (epiLuku == null) {
-    return FALLBACK_VALUE;
-  }
-
-  return `${epiLuku.toFixed(4)} ${showDash(epiTeksti)}`;
-}
-
-type EpiFlagLevel = "green" | "yellow" | "red";
-
-type EpiFlagMeta = {
-  level: EpiFlagLevel;
-  classNo: 1 | 2 | 3;
-};
-
 function InlineHelpTooltip({
   tooltip,
   ariaLabel,
@@ -118,81 +101,6 @@ function InlineHelpTooltip({
       </TooltipTrigger>
       <TooltipContent>{tooltip}</TooltipContent>
     </Tooltip>
-  );
-}
-
-function getEpiFlagMeta(epiLuku: number | null): EpiFlagMeta | null {
-  if (epiLuku == null) {
-    return null;
-  }
-
-  if (epiLuku < 1.0) {
-    return { level: "green", classNo: 1 };
-  }
-
-  if (epiLuku <= 1.5) {
-    return { level: "yellow", classNo: 2 };
-  }
-
-  return { level: "red", classNo: 3 };
-}
-
-function epiFlagClassName(level: EpiFlagLevel): string {
-  if (level === "green") {
-    return "bg-emerald-500";
-  }
-  if (level === "yellow") {
-    return "bg-amber-400";
-  }
-  return "bg-red-500";
-}
-
-function renderEpiLukuWithFlag(
-  epiLuku: number | null,
-  epiTeksti: string | null,
-): ReactNode {
-  const value = formatEpiLuku(epiLuku, epiTeksti);
-  const flag = getEpiFlagMeta(epiLuku);
-  if (!flag) {
-    return value;
-  }
-
-  const epiVariLabel =
-    flag.classNo === 1
-      ? "Vihreä(1)"
-      : flag.classNo === 2
-        ? "Keltainen(2)"
-        : "Punainen(3)";
-  const tooltipLabel = [
-    `EPI-luku: ${value} => ${epiVariLabel}`,
-    "- Vihreä(1) jos Epi < 1.0",
-    "- Keltainen(2) jos Epi >= 1.0 mutta Epi <= 1.5",
-    "- Punainen(3) jos Epi > 1.5",
-  ].join("\n");
-  const tooltip = (
-    <div className="space-y-1">
-      <div>{`EPI-luku: ${value} => ${epiVariLabel}`}</div>
-      <div>{`- Vihreä(1) jos Epi < 1.0`}</div>
-      <div>{`- Keltainen(2) jos Epi >= 1.0 mutta Epi <= 1.5`}</div>
-      <div>{`- Punainen(3) jos Epi > 1.5`}</div>
-    </div>
-  );
-
-  return (
-    <span className="inline-flex items-center gap-2">
-      <span>{value}</span>
-      <InlineHelpTooltip tooltip={tooltip} ariaLabel={tooltipLabel}>
-        <span
-          data-testid="epi-flag"
-          data-epi-flag={flag.level}
-          className={cn(
-            "inline-block size-2.5 rounded-full align-middle",
-            epiFlagClassName(flag.level),
-          )}
-        />
-      </InlineHelpTooltip>
-      <span>( {flag.classNo} )</span>
-    </span>
   );
 }
 
@@ -312,7 +220,9 @@ function AdminDogProfileBasicsSection({ dog }: { dog: AdminDogProfileDto }) {
         />
         <DetailRow
           label="EPI-luku (5 sp)"
-          value={renderEpiLukuWithFlag(dog.epiLuku, dog.epiTeksti)}
+          value={
+            <EpiLukuWithFlag epiLuku={dog.epiLuku} epiTeksti={dog.epiTeksti} />
+          }
           numeric
         />
         <DetailRow

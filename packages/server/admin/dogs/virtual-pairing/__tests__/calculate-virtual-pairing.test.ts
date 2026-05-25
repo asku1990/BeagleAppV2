@@ -4,10 +4,12 @@ import { calculateAdminVirtualPairing } from "../calculate-virtual-pairing";
 const {
   findVirtualPairingDogByRegistrationNoDbMock,
   findVirtualPairingAncestorDetailsDbMock,
+  loadDogDiseaseFactsDbMock,
   loadDogPedigreeAncestryForParentsDbMock,
 } = vi.hoisted(() => ({
   findVirtualPairingDogByRegistrationNoDbMock: vi.fn(),
   findVirtualPairingAncestorDetailsDbMock: vi.fn(),
+  loadDogDiseaseFactsDbMock: vi.fn(),
   loadDogPedigreeAncestryForParentsDbMock: vi.fn(),
 }));
 
@@ -16,6 +18,10 @@ vi.mock("@beagle/db", () => ({
     findVirtualPairingDogByRegistrationNoDbMock,
   findVirtualPairingAncestorDetailsDb: findVirtualPairingAncestorDetailsDbMock,
   loadDogPedigreeAncestryForParentsDb: loadDogPedigreeAncestryForParentsDbMock,
+}));
+
+vi.mock("@beagle/db/dogs/core/epi-disease-facts", () => ({
+  loadDogDiseaseFactsDb: loadDogDiseaseFactsDbMock,
 }));
 
 const adminUser = {
@@ -29,6 +35,7 @@ describe("calculateAdminVirtualPairing", () => {
   beforeEach(() => {
     findVirtualPairingDogByRegistrationNoDbMock.mockReset();
     findVirtualPairingAncestorDetailsDbMock.mockReset();
+    loadDogDiseaseFactsDbMock.mockReset();
     loadDogPedigreeAncestryForParentsDbMock.mockReset();
   });
 
@@ -71,6 +78,14 @@ describe("calculateAdminVirtualPairing", () => {
         },
       },
     });
+    loadDogDiseaseFactsDbMock.mockResolvedValue([
+      {
+        dogId: "sire",
+        isaDogId: "ancestor",
+        emaDogId: null,
+        sairausKoodi: "lepik",
+      },
+    ]);
     findVirtualPairingAncestorDetailsDbMock.mockResolvedValue([
       {
         id: "ancestor",
@@ -104,6 +119,27 @@ describe("calculateAdminVirtualPairing", () => {
             registrationNo: "FI77777/18",
           },
           inbreedingCoefficientPct: 12.5,
+          health: {
+            epi: {
+              value: 0,
+              text: "-----",
+              tier: 1,
+              display: "0.000 -----",
+            },
+            lafora: {
+              value: 1.5,
+              display: "1.5",
+            },
+            risk: {
+              value: 4,
+              display: "4",
+            },
+            pur: {
+              value: 0,
+              text: "-----",
+              display: "0.000 -----",
+            },
+          },
           diagnostics: expect.objectContaining({
             sharedAncestorCount: 1,
             sharedOccurrenceCount: 1,
@@ -129,6 +165,10 @@ describe("calculateAdminVirtualPairing", () => {
       "sire",
       "dam",
       9,
+    );
+    expect(loadDogDiseaseFactsDbMock).toHaveBeenCalledWith(
+      expect.arrayContaining(["sire", "dam", "ancestor"]),
+      ["epi", "lepis", "lepik", "lepit", "pur", "ap", "yp", "rp"],
     );
   });
 

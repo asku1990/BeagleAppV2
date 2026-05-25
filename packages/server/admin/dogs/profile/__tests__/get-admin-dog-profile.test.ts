@@ -11,9 +11,15 @@ const {
   loadDogEpiDiseaseFactsDbMock: vi.fn(),
 }));
 
-vi.mock("@beagle/db", () => ({
+vi.mock("@beagle/db/admin/dogs/profile", () => ({
   getAdminDogProfileDb: getAdminDogProfileDbMock,
+}));
+
+vi.mock("@beagle/db/dogs/core/pedigree-ancestry", () => ({
   loadDogPedigreeAncestryDb: loadDogPedigreeAncestryDbMock,
+}));
+
+vi.mock("@beagle/db/dogs/core/epi-disease-facts", () => ({
   loadDogEpiDiseaseFactsDb: loadDogEpiDiseaseFactsDbMock,
 }));
 

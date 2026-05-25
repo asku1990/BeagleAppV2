@@ -27,6 +27,27 @@ describe("AdminVirtualPairingResultPanel", () => {
             sex: "N",
           },
           inbreedingCoefficientPct: 1.2345,
+          health: {
+            epi: {
+              value: 0.703,
+              text: "-----",
+              tier: 1,
+              display: "0.703 -----",
+            },
+            lafora: {
+              value: -1,
+              display: "-1",
+            },
+            risk: {
+              value: 1,
+              display: "1",
+            },
+            pur: {
+              value: 0.703,
+              text: "-----",
+              display: "0.703 -----",
+            },
+          },
           diagnostics: {
             sharedAncestorCount: 40,
             sharedOccurrenceCount: 40,
@@ -50,10 +71,6 @@ describe("AdminVirtualPairingResultPanel", () => {
             })),
           },
           placeholders: {
-            epi: { label: "EPI", value: "Soon" },
-            lafora: { label: "Lafora", value: "Soon" },
-            pur: { label: "Pur", value: "Soon" },
-            risk: { label: "Risk", value: "Soon" },
             diagnostics: { label: "Diagnostics", value: "Soon" },
             pedigree: { label: "Pedigree", value: "Soon" },
           },
@@ -66,6 +83,16 @@ describe("AdminVirtualPairingResultPanel", () => {
     expect(html).toContain("1.2345 %");
     expect(html).toContain("41.0000 %");
     expect(html).toContain("1.00000 %");
+    expect(html).toContain("admin.virtualPairing.result.health.epi:");
+    expect(html).toContain("0.7030 -----");
+    expect(html).toContain('data-epi-flag="green"');
+    expect(html).toContain("=&gt; Vihreä(1)");
+    expect(html).toContain("( 1 )");
+    expect(html).toContain("admin.virtualPairing.result.health.lafora: -1");
+    expect(html).toContain("admin.virtualPairing.result.health.risk: 1");
+    expect(html).toContain(
+      "admin.virtualPairing.result.health.pur: 0.703 -----",
+    );
     expect(html).toContain("text-sm font-medium text-muted-foreground");
   });
 });

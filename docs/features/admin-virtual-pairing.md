@@ -19,6 +19,17 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
   shared ancestors near the cutoff still have enough pedigree data for their own
   dynamic `Fa`; occurrence discovery and known-pedigree diagnostics remain
   bounded to the selected depth.
+- Health and risk values are calculated on demand from current database data in
+  `packages/server/dogs/core`, not from stored legacy percentages.
+- The shared server-side health calculator covers EPI, Lafora, PUR, and risk.
+  Virtual pairing loads the relevant disease facts for the current pedigree
+  graph and evaluates a synthetic in-memory puppy root with the selected sire
+  and dam as parents. That synthetic root is only used for scoring and is never
+  persisted.
+- `calculateDogHealthSummary` is the shared server-side entry point for these
+  values. Admin dog profile uses the same calculator for the legacy EPI,
+  Lafora, and risk fields, while virtual pairing also renders PUR from the same
+  current-data disease model.
 - `knownPedigreePct` reports known pedigree slots across both sire and dam
   sides; it includes the selected sire and dam as generation 1 and counts
   repeated ancestors by slot, not as unique dogs
@@ -30,13 +41,14 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
 - Selected sire/dam panel
 - Generation-depth selector with the legacy default and range
 - Real inbreeding coefficient calculation
+- Computed health/risk rows for EPI, Lafora, risk, and PUR
 - The main result card shows the final coefficient and the raw `Fx` in
   parentheses always, matching the legacy v1 presentation
-- Explicit placeholders for the legacy EPI/Lafora/PUR/risk/PDF sections
+- Explicit placeholders remain only for the deferred diagnostics and pedigree
+  sections
 
 ## What is deferred
 
-- Detailed disease and risk calculations
 - Shared-ancestor diagnostics UI
 - Virtual pedigree/PDF generation
 - Public route exposure
@@ -46,7 +58,8 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
 - Shared search and calculation primitives stay in `packages/server/dogs/virtual-pairing`
 - Admin-only behavior stays in `packages/server/admin/dogs/virtual-pairing`
 - Web code consumes only the admin action/query surface
-- Placeholder fields are explicit and must not be mistaken for final risk values
+- Health values are derived at request time and must not be mistaken for stored
+  legacy `SIITOSASTE` or cached disease percentages
 
 ## Inbreeding parity target
 
@@ -69,6 +82,8 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
 - `apps/web/components/admin/dogs/virtual-pairing/admin-virtual-pairing-page-client.tsx`
 - `packages/server/admin/dogs/virtual-pairing/*`
 - `packages/server/dogs/virtual-pairing/*`
+- `packages/server/dogs/core/*`
+- `packages/db/dogs/core/epi-disease-facts.ts`
 
 ## Tests
 

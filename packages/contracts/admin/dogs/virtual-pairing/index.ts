@@ -1,6 +1,9 @@
 export type {
   AdminVirtualPairingContributionDto,
   AdminVirtualPairingDiagnosticsDto,
+  AdminVirtualPairingHealthDto,
+  AdminVirtualPairingHealthTextDto,
+  AdminVirtualPairingHealthTieredDto,
   AdminVirtualPairingPlaceholderSection,
   CalculateAdminVirtualPairingRequest,
   CalculateAdminVirtualPairingResponse,

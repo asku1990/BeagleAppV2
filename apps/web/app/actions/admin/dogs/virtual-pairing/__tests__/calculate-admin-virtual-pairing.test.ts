@@ -59,6 +59,27 @@ describe("calculateAdminVirtualPairingAction", () => {
             sex: "N",
           },
           inbreedingCoefficientPct: 12.5,
+          health: {
+            epi: {
+              value: 0.75,
+              text: "-S--P",
+              tier: 1,
+              display: "0.750 -S--P",
+            },
+            lafora: {
+              value: 5,
+              display: "5",
+            },
+            risk: {
+              value: 6,
+              display: "6",
+            },
+            pur: {
+              value: 0.75,
+              text: "-S--P",
+              display: "0.750 -S--P",
+            },
+          },
           diagnostics: {
             sharedAncestorCount: 2,
             sharedOccurrenceCount: 3,
@@ -84,22 +105,6 @@ describe("calculateAdminVirtualPairingAction", () => {
             ],
           },
           placeholders: {
-            epi: {
-              label: "EPI-luku (5 sp)",
-              value: "Tulossa myöhemmässä vaiheessa",
-            },
-            lafora: {
-              label: "Lafora-luku (-1..7)",
-              value: "Tulossa myöhemmässä vaiheessa",
-            },
-            pur: {
-              label: "PUR-luku (5 sp)",
-              value: "Tulossa myöhemmässä vaiheessa",
-            },
-            risk: {
-              label: "Riskiluku (1-8)",
-              value: "Tulossa myöhemmässä vaiheessa",
-            },
             diagnostics: {
               label: "Tulossa myöhemmässä vaiheessa: diagnostiikka",
               value: "Tulossa myöhemmässä vaiheessa",
@@ -137,6 +142,27 @@ describe("calculateAdminVirtualPairingAction", () => {
           sex: "N",
         },
         inbreedingCoefficientPct: 12.5,
+        health: expect.objectContaining({
+          epi: expect.objectContaining({
+            value: 0.75,
+            text: "-S--P",
+            tier: 1,
+            display: "0.750 -S--P",
+          }),
+          lafora: expect.objectContaining({
+            value: 5,
+            display: "5",
+          }),
+          risk: expect.objectContaining({
+            value: 6,
+            display: "6",
+          }),
+          pur: expect.objectContaining({
+            value: 0.75,
+            text: "-S--P",
+            display: "0.750 -S--P",
+          }),
+        }),
       }),
       hasError: false,
     });

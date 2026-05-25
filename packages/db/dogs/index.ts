@@ -33,6 +33,7 @@ export {
 } from "./core/pedigree-ancestry";
 export {
   loadDogEpiDiseaseFactsDb,
+  loadDogDiseaseFactsDb,
   type DogEpiDiseaseFactDb,
 } from "./core/epi-disease-facts";
 export { getNewestBeagleDogsDb } from "./newest";
