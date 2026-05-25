@@ -4,6 +4,7 @@ import {
   loadDogPedigreeAncestryForParentsDb,
   type VirtualPairingAncestorDetailsDb,
 } from "@beagle/db";
+import { loadDogDiseaseFactsDb } from "@beagle/db/dogs/core/epi-disease-facts";
 import type {
   CalculateAdminVirtualPairingRequest,
   CalculateAdminVirtualPairingResponse,
@@ -13,12 +14,19 @@ import type {
 import {
   calculateInbreedingCoefficientBreakdownForParentsPct,
   getInbreedingAncestryLoadDepth,
+  INBREEDING_DEFAULT_ANCESTOR_FA_DEPTH,
   parseVirtualPairingGenerationDepth,
+  calculateDogHealthSummary,
+  getDogHealthDiseaseFactDogIds,
 } from "@server/dogs/core";
 import { requireAdmin } from "@server/admin/core/service";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
 
+// Admin virtual pairing service.
+// Loads the selected sire/dam, computes current-data inbreeding, then builds a
+// synthetic puppy root so the shared health calculator can evaluate EPI,
+// Lafora, risk, and PUR against the paired parents without persisting anything.
 type CalculateResult = ServiceResult<CalculateAdminVirtualPairingResponse>;
 
 function normalizeRegistrationNo(value: string): string {
@@ -105,13 +113,6 @@ function toDogOption(
   };
 }
 
-function buildPlaceholderSection(label: string) {
-  return {
-    label,
-    value: "Tulossa myöhemmässä vaiheessa",
-  };
-}
-
 function formatGroupedContributionPct(
   adjustedContributionPct: number,
   rawContributionPct: number,
@@ -119,6 +120,37 @@ function formatGroupedContributionPct(
   const adjusted = adjustedContributionPct.toFixed(5);
   const raw = rawContributionPct.toFixed(5);
   return adjusted === raw ? `${adjusted} %` : `${adjusted} % (${raw} %)`;
+}
+
+function buildPlaceholderSection(label: string) {
+  return {
+    label,
+    value: "Tulossa myöhemmässä vaiheessa",
+  };
+}
+
+// Virtual pairing uses an in-memory puppy root whose parents are the selected
+// sire and dam. This lets the shared health calculator treat the pair like a
+// real root dog while keeping the result ephemeral.
+function buildVirtualRootAncestry(
+  ancestry: Awaited<ReturnType<typeof loadDogPedigreeAncestryForParentsDb>>,
+  sireId: string,
+  damId: string,
+) {
+  const rootId = `virtual:${sireId}:${damId}`;
+
+  return {
+    rootId,
+    nodes: {
+      ...ancestry.nodes,
+      [rootId]: {
+        id: rootId,
+        sireId,
+        damId,
+        siitosasteProsentti: null,
+      },
+    },
+  };
 }
 
 export async function calculateAdminVirtualPairing(
@@ -197,18 +229,43 @@ export async function calculateAdminVirtualPairing(
       return invalidDamSexResponse();
     }
 
+    // v1 uses selected SP for pair occurrence discovery, but multiplies each
+    // shared ancestor by a stored 9-generation SIITOSASTE. v2 recalculates
+    // that ancestor Fa dynamically, so keep its depth fixed at the same
+    // default while still honoring selected SP for the pair matrix.
     const ancestry = await loadDogPedigreeAncestryForParentsDb(
       sireRow.id,
       damRow.id,
-      getInbreedingAncestryLoadDepth(generationDepth),
+      getInbreedingAncestryLoadDepth(
+        generationDepth,
+        INBREEDING_DEFAULT_ANCESTOR_FA_DEPTH,
+      ),
+    );
+    const healthAncestry = buildVirtualRootAncestry(
+      ancestry,
+      sireRow.id,
+      damRow.id,
+    );
+    // EPI and PUR are fixed 5 sp health values in v1. Keep the disease fact
+    // query bounded to that health graph so changing the inbreeding SP does not
+    // indirectly change health/risk rows through deeper support ancestry.
+    const diseaseFacts = await loadDogDiseaseFactsDb(
+      getDogHealthDiseaseFactDogIds(healthAncestry.rootId, healthAncestry),
+      ["epi", "lepis", "lepik", "lepit", "pur", "ap", "yp", "rp"],
     );
     const breakdown = calculateInbreedingCoefficientBreakdownForParentsPct(
       sireRow.id,
       damRow.id,
       ancestry,
       generationDepth,
+      { ancestorInbreedingDepth: INBREEDING_DEFAULT_ANCESTOR_FA_DEPTH },
     );
     const inbreedingCoefficientPct = breakdown.contributionPct;
+    const healthSummary = calculateDogHealthSummary(
+      healthAncestry.rootId,
+      healthAncestry,
+      diseaseFacts,
+    );
     const ancestorDetails = await findVirtualPairingAncestorDetailsDb(
       breakdown.contributions.map((contribution) => contribution.id),
     );
@@ -240,6 +297,7 @@ export async function calculateAdminVirtualPairing(
           sire,
           dam,
           inbreedingCoefficientPct,
+          health: healthSummary,
           diagnostics: {
             sharedAncestorCount: breakdown.sharedAncestorCount,
             sharedOccurrenceCount: breakdown.sharedOccurrenceCount,
@@ -271,10 +329,6 @@ export async function calculateAdminVirtualPairing(
             }),
           },
           placeholders: {
-            epi: buildPlaceholderSection("EPI-luku (5 sp)"),
-            lafora: buildPlaceholderSection("Lafora-luku (-1..7)"),
-            pur: buildPlaceholderSection("PUR-luku (5 sp)"),
-            risk: buildPlaceholderSection("Riskiluku (1-8)"),
             diagnostics: buildPlaceholderSection(
               "Tulossa myöhemmässä vaiheessa: diagnostiikka",
             ),

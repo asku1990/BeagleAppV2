@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
+import React, { type ReactNode } from "react";
 import type { CalculateAdminVirtualPairingResponse } from "@beagle/contracts";
+import { EpiLukuWithFlag } from "@web/components/admin/dogs/shared/epi-flag";
 import type { TranslateFn } from "../admin-virtual-pairing-page-client";
 
 type Props = {
@@ -35,6 +36,16 @@ function formatCoefficientParts(
 
 function formatSummaryPct(value: number): string {
   return `${value.toFixed(2)} %`;
+}
+
+function formatKnownPedigreeSummary(
+  template: string,
+  generationDepth: number,
+  knownPedigreePct: number,
+): string {
+  return template
+    .replace("{generationDepth}", String(generationDepth))
+    .replace("{knownPedigreePct}", formatSummaryPct(knownPedigreePct));
 }
 
 function formatPlaceholderLabel(value: string): string {
@@ -90,6 +101,33 @@ export function AdminVirtualPairingResultPanel({ t, result }: Props) {
         </div>
       </div>
 
+      {result.health ? (
+        <div className="rounded-lg border p-4 font-mono text-sm leading-6">
+          <div className="mb-2 text-sm font-semibold tracking-wide">
+            {t("admin.virtualPairing.result.healthTitle")}
+          </div>
+          <div>
+            {t("admin.virtualPairing.result.health.epi")}:{" "}
+            <EpiLukuWithFlag
+              epiLuku={result.health.epi.value}
+              epiTeksti={result.health.epi.text}
+            />
+          </div>
+          <div>
+            {t("admin.virtualPairing.result.health.lafora")}:{" "}
+            {result.health.lafora.display}
+          </div>
+          <div>
+            {t("admin.virtualPairing.result.health.risk")}:{" "}
+            {result.health.risk.display}
+          </div>
+          <div>
+            {t("admin.virtualPairing.result.health.pur")}:{" "}
+            {result.health.pur.display}
+          </div>
+        </div>
+      ) : null}
+
       <div className="rounded-lg border p-4 font-mono text-sm leading-6">
         <div>
           {t("admin.virtualPairing.result.summary.sharedAncestors")}{" "}
@@ -103,9 +141,11 @@ export function AdminVirtualPairingResultPanel({ t, result }: Props) {
           {result.diagnostics.includedDamPositionCount} kpl)
         </div>
         <div>
-          {result.generationDepth}-
-          {t("admin.virtualPairing.result.summary.knownPedigree")}{" "}
-          {formatSummaryPct(result.diagnostics.knownPedigreePct)}
+          {formatKnownPedigreeSummary(
+            t("admin.virtualPairing.result.summary.knownPedigreeLine"),
+            result.generationDepth,
+            result.diagnostics.knownPedigreePct,
+          )}
         </div>
       </div>
 

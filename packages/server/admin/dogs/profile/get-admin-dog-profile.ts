@@ -1,9 +1,9 @@
 import {
   getAdminDogProfileDb,
-  loadDogEpiDiseaseFactsDb,
-  loadDogPedigreeAncestryDb,
   type AdminDogProfileDb,
-} from "@beagle/db";
+} from "@beagle/db/admin/dogs/profile";
+import { loadDogEpiDiseaseFactsDb } from "@beagle/db/dogs/core/epi-disease-facts";
+import { loadDogPedigreeAncestryDb } from "@beagle/db/dogs/core/pedigree-ancestry";
 import type {
   AdminDogProfileDto,
   AdminDogProfileResponse,
@@ -11,10 +11,10 @@ import type {
   CurrentUserDto,
 } from "@beagle/contracts";
 import { requireAdmin } from "@server/admin/core/service";
+import { toBusinessDateOnly } from "@server/core/date-only";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
-import { toBusinessDateOnly } from "@server/core/date-only";
-import { parseDogId } from "@server/dogs/core";
+import { calculateDogEpiSummary, parseDogId } from "@server/dogs/core";
 import {
   buildLitters,
   buildOffspringSummary,
@@ -25,7 +25,6 @@ import {
   toSexCode,
 } from "@db/dogs/profile/internal/profile-mappers";
 import type { BeagleDogProfileSexDb } from "@db/dogs/profile/internal/profile-types";
-import { calculateAdminDogEpiSummary } from "./internal/epi-risk";
 
 type AdminDogProfileResult = ServiceResult<AdminDogProfileResponse>;
 
@@ -57,7 +56,7 @@ function formatHealthSummary(
 
 function toAdminDogProfileDto(
   profile: AdminDogProfileDb,
-  epiSummary: ReturnType<typeof calculateAdminDogEpiSummary>,
+  epiSummary: ReturnType<typeof calculateDogEpiSummary>,
 ): AdminDogProfileDto {
   const sex = toSexCode(profile.base.sex);
   const litters = buildLitters(
@@ -167,7 +166,7 @@ export async function getAdminDogProfile(
     const ancestry = await loadDogPedigreeAncestryDb(parsedDogId, 5);
     const relatedDogIds = Object.keys(ancestry.nodes);
     const diseaseFacts = await loadDogEpiDiseaseFactsDb(relatedDogIds);
-    const epiSummary = calculateAdminDogEpiSummary(
+    const epiSummary = calculateDogEpiSummary(
       parsedDogId,
       ancestry,
       diseaseFacts,

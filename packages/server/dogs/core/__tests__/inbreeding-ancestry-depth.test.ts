@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { getInbreedingAncestryLoadDepth } from "../inbreeding-ancestry-depth";
+import {
+  INBREEDING_DEFAULT_ANCESTOR_FA_DEPTH,
+  getInbreedingAncestryLoadDepth,
+} from "../inbreeding-ancestry-depth";
 
 describe("getInbreedingAncestryLoadDepth", () => {
-  it("loads the selected depth plus enough ancestry for dynamic shared-ancestor Fa", () => {
-    expect(getInbreedingAncestryLoadDepth(6)).toBe(11);
+  it("loads the selected depth plus enough ancestry for default 9-generation dynamic shared-ancestor Fa", () => {
+    expect(INBREEDING_DEFAULT_ANCESTOR_FA_DEPTH).toBe(9);
+    expect(getInbreedingAncestryLoadDepth(6)).toBe(14);
     expect(getInbreedingAncestryLoadDepth(9)).toBe(17);
   });
 });

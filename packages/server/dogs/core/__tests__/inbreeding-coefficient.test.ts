@@ -312,6 +312,75 @@ describe("calculateInbreedingCoefficientPct", () => {
     );
   });
 
+  it("uses default 9-generation ancestor Fa independently from selected pair depth", () => {
+    const ancestry = makeAncestry({
+      root: {
+        id: "root",
+        sireId: "sire",
+        damId: "dam",
+        siitosasteProsentti: null,
+      },
+      sire: {
+        id: "sire",
+        sireId: "ancestor",
+        damId: null,
+        siitosasteProsentti: null,
+      },
+      dam: {
+        id: "dam",
+        sireId: "ancestor",
+        damId: null,
+        siitosasteProsentti: null,
+      },
+      ancestor: {
+        id: "ancestor",
+        sireId: "ancestor-sire",
+        damId: "ancestor-dam",
+        siitosasteProsentti: null,
+      },
+      "ancestor-sire": {
+        id: "ancestor-sire",
+        sireId: "ancestor-sire-parent",
+        damId: null,
+        siitosasteProsentti: null,
+      },
+      "ancestor-dam": {
+        id: "ancestor-dam",
+        sireId: "ancestor-dam-parent",
+        damId: null,
+        siitosasteProsentti: null,
+      },
+      "ancestor-sire-parent": {
+        id: "ancestor-sire-parent",
+        sireId: "deep-shared",
+        damId: null,
+        siitosasteProsentti: null,
+      },
+      "ancestor-dam-parent": {
+        id: "ancestor-dam-parent",
+        sireId: "deep-shared",
+        damId: null,
+        siitosasteProsentti: null,
+      },
+      "deep-shared": {
+        id: "deep-shared",
+        sireId: null,
+        damId: null,
+        siitosasteProsentti: null,
+      },
+    });
+
+    expect(calculateInbreedingCoefficientPct("root", ancestry, 2)).toBeCloseTo(
+      12.890625,
+      5,
+    );
+    expect(
+      calculateInbreedingCoefficientPct("root", ancestry, 2, {
+        ancestorInbreedingDepth: 2,
+      }),
+    ).toBeCloseTo(12.5, 5);
+  });
+
   it("reports legacy-compatible included side-position counts", () => {
     const ancestry = makeAncestry({
       sire: {

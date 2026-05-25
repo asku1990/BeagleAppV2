@@ -25,6 +25,32 @@ export type AdminVirtualPairingDiagnosticsDto = {
   contributions: AdminVirtualPairingContributionDto[];
 };
 
+export type AdminVirtualPairingHealthTieredDto = {
+  value: number;
+  text: string;
+  tier: 1 | 2 | 3;
+  display: string;
+};
+
+export type AdminVirtualPairingHealthTextDto = {
+  value: number;
+  text: string;
+  display: string;
+};
+
+export type AdminVirtualPairingHealthDto = {
+  epi: AdminVirtualPairingHealthTieredDto;
+  lafora: {
+    value: number;
+    display: string;
+  };
+  risk: {
+    value: number;
+    display: string;
+  };
+  pur: AdminVirtualPairingHealthTextDto;
+};
+
 export type CalculateAdminVirtualPairingRequest = {
   sireRegistrationNo: string;
   damRegistrationNo: string;
@@ -41,12 +67,9 @@ export type CalculateAdminVirtualPairingResponse = {
   sire: VirtualPairingDogOption;
   dam: VirtualPairingDogOption;
   inbreedingCoefficientPct: number | null;
+  health: AdminVirtualPairingHealthDto;
   diagnostics: AdminVirtualPairingDiagnosticsDto;
   placeholders: {
-    epi: AdminVirtualPairingPlaceholderSection;
-    lafora: AdminVirtualPairingPlaceholderSection;
-    pur: AdminVirtualPairingPlaceholderSection;
-    risk: AdminVirtualPairingPlaceholderSection;
     diagnostics: AdminVirtualPairingPlaceholderSection;
     pedigree: AdminVirtualPairingPlaceholderSection;
   };

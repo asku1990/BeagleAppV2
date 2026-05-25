@@ -4,10 +4,12 @@ import { calculateAdminVirtualPairing } from "../calculate-virtual-pairing";
 const {
   findVirtualPairingDogByRegistrationNoDbMock,
   findVirtualPairingAncestorDetailsDbMock,
+  loadDogDiseaseFactsDbMock,
   loadDogPedigreeAncestryForParentsDbMock,
 } = vi.hoisted(() => ({
   findVirtualPairingDogByRegistrationNoDbMock: vi.fn(),
   findVirtualPairingAncestorDetailsDbMock: vi.fn(),
+  loadDogDiseaseFactsDbMock: vi.fn(),
   loadDogPedigreeAncestryForParentsDbMock: vi.fn(),
 }));
 
@@ -16,6 +18,10 @@ vi.mock("@beagle/db", () => ({
     findVirtualPairingDogByRegistrationNoDbMock,
   findVirtualPairingAncestorDetailsDb: findVirtualPairingAncestorDetailsDbMock,
   loadDogPedigreeAncestryForParentsDb: loadDogPedigreeAncestryForParentsDbMock,
+}));
+
+vi.mock("@beagle/db/dogs/core/epi-disease-facts", () => ({
+  loadDogDiseaseFactsDb: loadDogDiseaseFactsDbMock,
 }));
 
 const adminUser = {
@@ -29,10 +35,11 @@ describe("calculateAdminVirtualPairing", () => {
   beforeEach(() => {
     findVirtualPairingDogByRegistrationNoDbMock.mockReset();
     findVirtualPairingAncestorDetailsDbMock.mockReset();
+    loadDogDiseaseFactsDbMock.mockReset();
     loadDogPedigreeAncestryForParentsDbMock.mockReset();
   });
 
-  it("calculates inbreeding and loads enough ancestry for dynamic ancestor Fa", async () => {
+  it("calculates inbreeding and loads enough ancestry for default 9-generation dynamic ancestor Fa", async () => {
     findVirtualPairingDogByRegistrationNoDbMock
       .mockResolvedValueOnce({
         id: "sire",
@@ -54,7 +61,7 @@ describe("calculateAdminVirtualPairing", () => {
         sire: {
           id: "sire",
           sireId: "ancestor",
-          damId: null,
+          damId: "health-1",
           siitosasteProsentti: null,
         },
         dam: {
@@ -69,8 +76,52 @@ describe("calculateAdminVirtualPairing", () => {
           damId: null,
           siitosasteProsentti: null,
         },
+        "health-1": {
+          id: "health-1",
+          sireId: "health-2",
+          damId: null,
+          siitosasteProsentti: null,
+        },
+        "health-2": {
+          id: "health-2",
+          sireId: "health-3",
+          damId: null,
+          siitosasteProsentti: null,
+        },
+        "health-3": {
+          id: "health-3",
+          sireId: "health-4",
+          damId: null,
+          siitosasteProsentti: null,
+        },
+        "health-4": {
+          id: "health-4",
+          sireId: "health-5",
+          damId: null,
+          siitosasteProsentti: null,
+        },
+        "health-5": {
+          id: "health-5",
+          sireId: "outside-health",
+          damId: null,
+          siitosasteProsentti: null,
+        },
+        "outside-health": {
+          id: "outside-health",
+          sireId: null,
+          damId: null,
+          siitosasteProsentti: null,
+        },
       },
     });
+    loadDogDiseaseFactsDbMock.mockResolvedValue([
+      {
+        dogId: "sire",
+        isaDogId: "ancestor",
+        emaDogId: null,
+        sairausKoodi: "lepik",
+      },
+    ]);
     findVirtualPairingAncestorDetailsDbMock.mockResolvedValue([
       {
         id: "ancestor",
@@ -104,6 +155,27 @@ describe("calculateAdminVirtualPairing", () => {
             registrationNo: "FI77777/18",
           },
           inbreedingCoefficientPct: 12.5,
+          health: {
+            epi: {
+              value: 0,
+              text: "-----",
+              tier: 1,
+              display: "0.000 -----",
+            },
+            lafora: {
+              value: 1.5,
+              display: "1.5",
+            },
+            risk: {
+              value: 4,
+              display: "4",
+            },
+            pur: {
+              value: 0,
+              text: "-----",
+              display: "0.000 -----",
+            },
+          },
           diagnostics: expect.objectContaining({
             sharedAncestorCount: 1,
             sharedOccurrenceCount: 1,
@@ -128,8 +200,24 @@ describe("calculateAdminVirtualPairing", () => {
     expect(loadDogPedigreeAncestryForParentsDbMock).toHaveBeenCalledWith(
       "sire",
       "dam",
-      9,
+      13,
     );
+    const [healthDogIds, diseaseCodes] =
+      loadDogDiseaseFactsDbMock.mock.calls[0] ?? [];
+    expect(healthDogIds).toEqual(
+      expect.arrayContaining(["sire", "dam", "ancestor"]),
+    );
+    expect(healthDogIds).not.toContain("outside-health");
+    expect(diseaseCodes).toEqual([
+      "epi",
+      "lepis",
+      "lepik",
+      "lepit",
+      "pur",
+      "ap",
+      "yp",
+      "rp",
+    ]);
   });
 
   it("normalizes registration numbers before lookup", async () => {

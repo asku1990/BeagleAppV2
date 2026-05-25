@@ -37,12 +37,19 @@ export const fiAdminDogsVirtualPairingMessages = {
     "Virtuaaliparituksen laskenta epäonnistui.",
   "admin.virtualPairing.result.title": "Tulos",
   "admin.virtualPairing.result.inbreedingLabel": "Sukusiitosaste",
+  "admin.virtualPairing.result.healthTitle": "TERVEYS- JA RISKILUVUT",
+  "admin.virtualPairing.result.health.epi": "EPI-luku (5 sp)",
+  "admin.virtualPairing.result.health.lafora": "Lafora-luku(-1..7)",
+  "admin.virtualPairing.result.health.risk": "Riskiluku(1-8)",
+  "admin.virtualPairing.result.health.pur": "PUR-luku (5 sp)",
   "admin.virtualPairing.result.summary.sharedAncestors":
     "Yhteisiä esivanhempia löytyi",
   "admin.virtualPairing.result.summary.occurrences":
     "Sukutaulussa laskentaan otettavia esiintymiä",
   "admin.virtualPairing.result.summary.knownPedigree":
     "polven sukutaulusta tiedossa",
+  "admin.virtualPairing.result.summary.knownPedigreeLine":
+    "{generationDepth}-polven sukutaulusta tiedossa {knownPedigreePct}",
   "admin.virtualPairing.result.basisTitle": "LASKENTAPERUSTEET",
   "admin.virtualPairing.result.linksTitle": "SIIRRY",
   "admin.virtualPairing.result.empty":
@@ -90,12 +97,19 @@ export const svAdminDogsVirtualPairingMessages = {
     "Det gick inte att beräkna virtuell parning.",
   "admin.virtualPairing.result.title": "Resultat",
   "admin.virtualPairing.result.inbreedingLabel": "Avelsgrad",
+  "admin.virtualPairing.result.healthTitle": "HÄLSO- OCH RISKTAL",
+  "admin.virtualPairing.result.health.epi": "EPI-tal (5 sp)",
+  "admin.virtualPairing.result.health.lafora": "Lafora-tal(-1..7)",
+  "admin.virtualPairing.result.health.risk": "Risktal(1-8)",
+  "admin.virtualPairing.result.health.pur": "PUR-tal (5 sp)",
   "admin.virtualPairing.result.summary.sharedAncestors":
     "Gemensamma anfäder hittades",
   "admin.virtualPairing.result.summary.occurrences":
     "I stamtavlan medräknade förekomster",
   "admin.virtualPairing.result.summary.knownPedigree":
     "generationers stamtavla känd",
+  "admin.virtualPairing.result.summary.knownPedigreeLine":
+    "{generationDepth} generationers stamtavla känd {knownPedigreePct}",
   "admin.virtualPairing.result.basisTitle": "BERÄKNINGSGRUNDER",
   "admin.virtualPairing.result.linksTitle": "GÅ TILL",
   "admin.virtualPairing.result.empty":
