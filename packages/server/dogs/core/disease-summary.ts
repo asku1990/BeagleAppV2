@@ -202,6 +202,31 @@ function scoreFiveGenerationDiseaseEvidence(
   };
 }
 
+// Returns the dog ids needed to evaluate the fixed five-generation health
+// model. Generation 5 is included for parent/sibling evidence of generation 4,
+// but health scoring itself remains root plus generations 1-4.
+export function getDogHealthDiseaseFactDogIds(
+  rootDogId: string,
+  ancestry: DogPedigreeAncestryDb,
+): string[] {
+  const generations = buildGenerationSlots(
+    ancestry,
+    rootDogId,
+    FIVE_GENERATION_DEPTH,
+  );
+  const ids = new Set<string>();
+
+  for (const generation of generations) {
+    for (const dogId of generation) {
+      if (dogId) {
+        ids.add(dogId);
+      }
+    }
+  }
+
+  return [...ids];
+}
+
 function laforaValueFromCode(code: string): number {
   if (code === "lepis") return 7;
   if (code === "lepik") return 3;

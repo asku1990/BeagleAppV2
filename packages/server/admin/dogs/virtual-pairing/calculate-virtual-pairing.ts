@@ -17,6 +17,7 @@ import {
   INBREEDING_DEFAULT_ANCESTOR_FA_DEPTH,
   parseVirtualPairingGenerationDepth,
   calculateDogHealthSummary,
+  getDogHealthDiseaseFactDogIds,
 } from "@server/dogs/core";
 import { requireAdmin } from "@server/admin/core/service";
 import { toErrorLog, withLogContext } from "@server/core/logger";
@@ -240,16 +241,17 @@ export async function calculateAdminVirtualPairing(
         INBREEDING_DEFAULT_ANCESTOR_FA_DEPTH,
       ),
     );
-    // Load every disease row referenced by the current ancestry so the shared
-    // calculator can score EPI, Lafora, risk, and PUR from the current graph.
-    const diseaseFacts = await loadDogDiseaseFactsDb(
-      Object.keys(ancestry.nodes),
-      ["epi", "lepis", "lepik", "lepit", "pur", "ap", "yp", "rp"],
-    );
     const healthAncestry = buildVirtualRootAncestry(
       ancestry,
       sireRow.id,
       damRow.id,
+    );
+    // EPI and PUR are fixed 5 sp health values in v1. Keep the disease fact
+    // query bounded to that health graph so changing the inbreeding SP does not
+    // indirectly change health/risk rows through deeper support ancestry.
+    const diseaseFacts = await loadDogDiseaseFactsDb(
+      getDogHealthDiseaseFactDogIds(healthAncestry.rootId, healthAncestry),
+      ["epi", "lepis", "lepik", "lepit", "pur", "ap", "yp", "rp"],
     );
     const breakdown = calculateInbreedingCoefficientBreakdownForParentsPct(
       sireRow.id,

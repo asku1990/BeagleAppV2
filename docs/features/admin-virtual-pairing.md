@@ -35,6 +35,9 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
   graph and evaluates a synthetic in-memory puppy root with the selected sire
   and dam as parents. That synthetic root is only used for scoring and is never
   persisted.
+- EPI and PUR are fixed `5 sp` health calculations. Their disease fact query is
+  bounded to the five-generation health graph and must not depend on the
+  selected inbreeding `SP`.
 - `calculateDogHealthSummary` is the shared server-side entry point for these
   values. Admin dog profile uses the same calculator for the legacy EPI,
   Lafora, and risk fields, while virtual pairing also renders PUR from the same
@@ -42,6 +45,10 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
 - `knownPedigreePct` reports known pedigree slots across both sire and dam
   sides; it includes the selected sire and dam as generation 1 and counts
   repeated ancestors by slot, not as unique dogs
+- The v1 summary line labelled "Yhteisiä esivanhempia löytyi" displays included
+  shared occurrence pairs first and all found shared occurrence pairs in
+  parentheses. It does not display the number of unique ancestor dogs, even
+  though the grouped contribution list is unique by ancestor.
 
 ## What ships now
 

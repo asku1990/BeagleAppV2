@@ -50,8 +50,8 @@ describe("AdminVirtualPairingResultPanel", () => {
           },
           diagnostics: {
             sharedAncestorCount: 40,
-            sharedOccurrenceCount: 40,
-            includedOccurrenceCount: 40,
+            sharedOccurrenceCount: 90,
+            includedOccurrenceCount: 70,
             includedSirePositionCount: 40,
             includedDamPositionCount: 40,
             includedPositionCount: 80,
@@ -92,6 +92,12 @@ describe("AdminVirtualPairingResultPanel", () => {
     expect(html).toContain("admin.virtualPairing.result.health.risk: 1");
     expect(html).toContain(
       "admin.virtualPairing.result.health.pur: 0.703 -----",
+    );
+    expect(html).toContain(
+      "admin.virtualPairing.result.summary.sharedAncestors 70 kpl (90 kpl)",
+    );
+    expect(html).toContain(
+      "admin.virtualPairing.result.summary.occurrences 80 kpl (I=40 kpl, E=40 kpl)",
     );
     expect(html).toContain("text-sm font-medium text-muted-foreground");
   });

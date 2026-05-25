@@ -61,7 +61,7 @@ describe("calculateAdminVirtualPairing", () => {
         sire: {
           id: "sire",
           sireId: "ancestor",
-          damId: null,
+          damId: "health-1",
           siitosasteProsentti: null,
         },
         dam: {
@@ -72,6 +72,42 @@ describe("calculateAdminVirtualPairing", () => {
         },
         ancestor: {
           id: "ancestor",
+          sireId: null,
+          damId: null,
+          siitosasteProsentti: null,
+        },
+        "health-1": {
+          id: "health-1",
+          sireId: "health-2",
+          damId: null,
+          siitosasteProsentti: null,
+        },
+        "health-2": {
+          id: "health-2",
+          sireId: "health-3",
+          damId: null,
+          siitosasteProsentti: null,
+        },
+        "health-3": {
+          id: "health-3",
+          sireId: "health-4",
+          damId: null,
+          siitosasteProsentti: null,
+        },
+        "health-4": {
+          id: "health-4",
+          sireId: "health-5",
+          damId: null,
+          siitosasteProsentti: null,
+        },
+        "health-5": {
+          id: "health-5",
+          sireId: "outside-health",
+          damId: null,
+          siitosasteProsentti: null,
+        },
+        "outside-health": {
+          id: "outside-health",
           sireId: null,
           damId: null,
           siitosasteProsentti: null,
@@ -166,10 +202,22 @@ describe("calculateAdminVirtualPairing", () => {
       "dam",
       13,
     );
-    expect(loadDogDiseaseFactsDbMock).toHaveBeenCalledWith(
+    const [healthDogIds, diseaseCodes] =
+      loadDogDiseaseFactsDbMock.mock.calls[0] ?? [];
+    expect(healthDogIds).toEqual(
       expect.arrayContaining(["sire", "dam", "ancestor"]),
-      ["epi", "lepis", "lepik", "lepit", "pur", "ap", "yp", "rp"],
     );
+    expect(healthDogIds).not.toContain("outside-health");
+    expect(diseaseCodes).toEqual([
+      "epi",
+      "lepis",
+      "lepik",
+      "lepit",
+      "pur",
+      "ap",
+      "yp",
+      "rp",
+    ]);
   });
 
   it("normalizes registration numbers before lookup", async () => {

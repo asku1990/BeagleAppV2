@@ -7,6 +7,7 @@ export {
 export {
   calculateDogEpiSummary,
   calculateDogHealthSummary,
+  getDogHealthDiseaseFactDogIds,
   type DogEpiSummary,
   type DogHealthSummary,
 } from "./disease-summary";

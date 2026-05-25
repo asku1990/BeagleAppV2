@@ -3,6 +3,7 @@ import type { DogPedigreeAncestryDb } from "@beagle/db/dogs/core/pedigree-ancest
 import {
   calculateDogEpiSummary,
   calculateDogHealthSummary,
+  getDogHealthDiseaseFactDogIds,
 } from "../disease-summary";
 
 function makeAncestry(
@@ -146,6 +147,34 @@ describe("calculateDogHealthSummary", () => {
     expect(summary.pur.value).toBe(0);
     expect(summary.lafora.value).toBe(0);
     expect(summary.risk.value).toBe(3);
+  });
+});
+
+describe("getDogHealthDiseaseFactDogIds", () => {
+  it("returns only the fixed five-generation health graph", () => {
+    const ancestry = makeAncestry({
+      "virtual-root": makeNode("virtual-root", "sire", "dam"),
+      sire: makeNode("sire", "sire-2", null),
+      dam: makeNode("dam", null, null),
+      "sire-2": makeNode("sire-2", "sire-3", null),
+      "sire-3": makeNode("sire-3", "sire-4", null),
+      "sire-4": makeNode("sire-4", "sire-5", null),
+      "sire-5": makeNode("sire-5", "sire-6", null),
+      "sire-6": makeNode("sire-6", "outside-health", null),
+      "outside-health": makeNode("outside-health", null, null),
+    });
+
+    expect(
+      getDogHealthDiseaseFactDogIds("virtual-root", ancestry),
+    ).toStrictEqual([
+      "virtual-root",
+      "sire",
+      "dam",
+      "sire-2",
+      "sire-3",
+      "sire-4",
+      "sire-5",
+    ]);
   });
 });
 
