@@ -30,6 +30,8 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
 - Selected sire/dam panel
 - Generation-depth selector with the legacy default and range
 - Real inbreeding coefficient calculation
+- The main result card shows the final coefficient and the raw `Fx` in
+  parentheses always, matching the legacy v1 presentation
 - Explicit placeholders for the legacy EPI/Lafora/PUR/risk/PDF sections
 
 ## What is deferred

@@ -40,7 +40,7 @@ describe("AdminVirtualPairingResultPanel", () => {
               ancestorId: `ancestor-${index + 1}`,
               label: `Ancestor ${index + 1}`,
               contributionPct: 1,
-              rawContributionPct: 1,
+              rawContributionPct: index === 0 ? 2 : 1,
               occurrenceCount: 1,
               displayPct: "1.00000 %",
               sireGeneration: 1,
@@ -63,5 +63,9 @@ describe("AdminVirtualPairingResultPanel", () => {
 
     expect(html).toContain("Ancestor 37");
     expect(html).toContain("Ancestor 40");
+    expect(html).toContain("1.2345 %");
+    expect(html).toContain("41.0000 %");
+    expect(html).toContain("1.00000 %");
+    expect(html).toContain("text-sm font-medium text-muted-foreground");
   });
 });
