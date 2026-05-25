@@ -81,6 +81,8 @@ export function AdminVirtualPairingPageClient() {
     searchEnabled,
   );
   const calculateMutation = useCalculateAdminVirtualPairingMutation();
+  const { mutateAsync: calculateAsync, isPending: isCalculating } =
+    calculateMutation;
   const urlState = useMemo(
     () => readVirtualPairingUrlState(searchParams),
     [searchParams],
@@ -96,8 +98,7 @@ export function AdminVirtualPairingPageClient() {
     urlState.generationDepth,
     urlState.sireRegistrationNo,
   ]);
-  const canCalculate =
-    Boolean(selectedSire && selectedDam) && !calculateMutation.isPending;
+  const canCalculate = Boolean(selectedSire && selectedDam) && !isCalculating;
 
   const invalidatePendingCalculationRequests = () => {
     activeCalculationRequestIdRef.current += 1;
@@ -141,7 +142,7 @@ export function AdminVirtualPairingPageClient() {
 
     void (async () => {
       try {
-        const result = await calculateMutation.mutateAsync({
+        const result = await calculateAsync({
           sireRegistrationNo: urlState.sireRegistrationNo,
           damRegistrationNo: urlState.damRegistrationNo,
           generationDepth: urlState.generationDepth,
@@ -169,7 +170,7 @@ export function AdminVirtualPairingPageClient() {
       }
     })();
   }, [
-    calculateMutation,
+    calculateAsync,
     t,
     urlCalculationKey,
     urlState.damRegistrationNo,
@@ -226,7 +227,7 @@ export function AdminVirtualPairingPageClient() {
     setCalculationResult(null);
 
     try {
-      const result = await calculateMutation.mutateAsync({
+      const result = await calculateAsync({
         sireRegistrationNo: selectedSire.registrationNo,
         damRegistrationNo: selectedDam.registrationNo,
         generationDepth: Number.parseInt(generationDepth, 10),
@@ -326,7 +327,7 @@ export function AdminVirtualPairingPageClient() {
               selectedSire={selectedSire}
               selectedDam={selectedDam}
               generationDepth={generationDepth}
-              isCalculating={calculateMutation.isPending}
+              isCalculating={isCalculating}
               canCalculate={canCalculate}
               selectionMessage={selectionMessage}
               calculationMessage={calculationMessage}
