@@ -43,7 +43,7 @@ describe("getAdminDogProfile", () => {
     expect(getAdminDogProfileDbMock).not.toHaveBeenCalled();
   });
 
-  it("returns computed EPI fields and admin-only data for an admin user", async () => {
+  it("returns computed health and inbreeding fields for an admin user", async () => {
     getAdminDogProfileDbMock.mockResolvedValue({
       base: {
         id: "dog-1",
@@ -124,29 +124,53 @@ describe("getAdminDogProfile", () => {
         },
       ],
     } as never);
-    loadDogPedigreeAncestryDbMock.mockResolvedValue({
-      rootId: "dog-1",
-      nodes: {
-        "dog-1": {
-          id: "dog-1",
-          sireId: "sire-1",
-          damId: "dam-1",
-          siitosasteProsentti: null,
+    loadDogPedigreeAncestryDbMock
+      .mockResolvedValueOnce({
+        rootId: "dog-1",
+        nodes: {
+          "dog-1": {
+            id: "dog-1",
+            sireId: "sire-1",
+            damId: "dam-1",
+            siitosasteProsentti: null,
+          },
+          "sire-1": {
+            id: "sire-1",
+            sireId: null,
+            damId: null,
+            siitosasteProsentti: null,
+          },
+          "dam-1": {
+            id: "dam-1",
+            sireId: null,
+            damId: null,
+            siitosasteProsentti: null,
+          },
         },
-        "sire-1": {
-          id: "sire-1",
-          sireId: null,
-          damId: null,
-          siitosasteProsentti: null,
+      })
+      .mockResolvedValueOnce({
+        rootId: "dog-1",
+        nodes: {
+          "dog-1": {
+            id: "dog-1",
+            sireId: "sire-1",
+            damId: "dam-1",
+            siitosasteProsentti: null,
+          },
+          "sire-1": {
+            id: "sire-1",
+            sireId: null,
+            damId: null,
+            siitosasteProsentti: null,
+          },
+          "dam-1": {
+            id: "dam-1",
+            sireId: null,
+            damId: null,
+            siitosasteProsentti: null,
+          },
         },
-        "dam-1": {
-          id: "dam-1",
-          sireId: null,
-          damId: null,
-          siitosasteProsentti: null,
-        },
-      },
-    });
+      });
     loadDogEpiDiseaseFactsDbMock.mockResolvedValue([
       {
         dogId: "dog-1",
@@ -179,7 +203,7 @@ describe("getAdminDogProfile", () => {
             ekNo: null,
             offspringCount: 0,
             offspringLitterCount: 0,
-            inbreedingCoefficientPct: 3.0724,
+            inbreedingCoefficientPct: 0,
             epiLuku: 1.5,
             epiTeksti: "I----",
             laforaLuku: 0,
@@ -235,11 +259,77 @@ describe("getAdminDogProfile", () => {
 
     expect(getAdminDogProfileDbMock).toHaveBeenCalledWith("dog-1");
     expect(loadDogPedigreeAncestryDbMock).toHaveBeenCalledWith("dog-1", 5);
+    expect(loadDogPedigreeAncestryDbMock).toHaveBeenCalledWith("dog-1", 17);
     expect(loadDogEpiDiseaseFactsDbMock).toHaveBeenCalledWith([
       "dog-1",
       "sire-1",
       "dam-1",
     ]);
+  });
+
+  it("returns null inbreeding when the dog has no parents", async () => {
+    getAdminDogProfileDbMock.mockResolvedValue({
+      base: {
+        id: "dog-2",
+        name: "JALKA",
+        registrationNos: [
+          {
+            registrationNo: "FIN00000/00",
+            createdAt: new Date("2000-01-01T00:00:00.000Z"),
+          },
+        ],
+        birthDate: null,
+        sex: "MALE",
+        color: null,
+        ekNo: null,
+        sire: null,
+        dam: null,
+        whelpedPuppies: [],
+        siredPuppies: [],
+        breederNameText: null,
+      },
+      note: null,
+      breeder: null,
+      owners: [],
+      diseases: [],
+    } as never);
+    loadDogPedigreeAncestryDbMock
+      .mockResolvedValueOnce({
+        rootId: "dog-2",
+        nodes: {
+          "dog-2": {
+            id: "dog-2",
+            sireId: null,
+            damId: null,
+            siitosasteProsentti: null,
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        rootId: "dog-2",
+        nodes: {
+          "dog-2": {
+            id: "dog-2",
+            sireId: null,
+            damId: null,
+            siitosasteProsentti: null,
+          },
+        },
+      });
+    loadDogEpiDiseaseFactsDbMock.mockResolvedValue([]);
+
+    const result = await getAdminDogProfile("dog-2", {
+      id: "admin-1",
+      email: "admin@example.com",
+      username: "admin",
+      role: "ADMIN",
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.body.ok).toBe(true);
+    if (result.body.ok) {
+      expect(result.body.data.dog.inbreedingCoefficientPct).toBeNull();
+    }
   });
 
   it("rejects invalid dog ids before hitting the database", async () => {

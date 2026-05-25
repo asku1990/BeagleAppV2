@@ -14,7 +14,12 @@ import { requireAdmin } from "@server/admin/core/service";
 import { toBusinessDateOnly } from "@server/core/date-only";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
-import { calculateDogEpiSummary, parseDogId } from "@server/dogs/core";
+import {
+  calculateDogEpiSummary,
+  calculateInbreedingCoefficientPct,
+  getInbreedingAncestryLoadDepth,
+  parseDogId,
+} from "@server/dogs/core";
 import {
   buildLitters,
   buildOffspringSummary,
@@ -57,6 +62,7 @@ function formatHealthSummary(
 function toAdminDogProfileDto(
   profile: AdminDogProfileDb,
   epiSummary: ReturnType<typeof calculateDogEpiSummary>,
+  inbreedingCoefficientPct: number | null,
 ): AdminDogProfileDto {
   const sex = toSexCode(profile.base.sex);
   const litters = buildLitters(
@@ -81,10 +87,7 @@ function toAdminDogProfileDto(
     ekNo: profile.base.ekNo,
     offspringCount: buildOffspringSummary(litters).puppyCount,
     offspringLitterCount: buildOffspringSummary(litters).litterCount,
-    inbreedingCoefficientPct:
-      profile.base.inbreedingCoefficientPct == null
-        ? null
-        : Number(profile.base.inbreedingCoefficientPct),
+    inbreedingCoefficientPct,
     epiLuku: epiSummary.epiLuku,
     epiTeksti: epiSummary.epiTeksti,
     laforaLuku: epiSummary.laforaLuku,
@@ -163,13 +166,21 @@ export async function getAdminDogProfile(
       };
     }
 
-    const ancestry = await loadDogPedigreeAncestryDb(parsedDogId, 5);
-    const relatedDogIds = Object.keys(ancestry.nodes);
+    const [healthAncestry, inbreedingAncestry] = await Promise.all([
+      loadDogPedigreeAncestryDb(parsedDogId, 5),
+      loadDogPedigreeAncestryDb(parsedDogId, getInbreedingAncestryLoadDepth(9)),
+    ]);
+    const relatedDogIds = Object.keys(healthAncestry.nodes);
     const diseaseFacts = await loadDogEpiDiseaseFactsDb(relatedDogIds);
     const epiSummary = calculateDogEpiSummary(
       parsedDogId,
-      ancestry,
+      healthAncestry,
       diseaseFacts,
+    );
+    const inbreedingCoefficientPct = calculateInbreedingCoefficientPct(
+      parsedDogId,
+      inbreedingAncestry,
+      9,
     );
 
     log.info(
@@ -185,7 +196,13 @@ export async function getAdminDogProfile(
       status: 200,
       body: {
         ok: true,
-        data: { dog: toAdminDogProfileDto(profile, epiSummary) },
+        data: {
+          dog: toAdminDogProfileDto(
+            profile,
+            epiSummary,
+            inbreedingCoefficientPct,
+          ),
+        },
       },
     };
   } catch (error) {
