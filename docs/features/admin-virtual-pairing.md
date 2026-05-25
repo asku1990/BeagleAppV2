@@ -12,13 +12,22 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
   stays responsive on large dog datasets; narrow the query when the warning
   appears
 - Parent selection uses the legacy `Isäksi` and `Emäksi` actions
-- Calculation reuses the existing pedigree ancestry loader and inbreeding coefficient code
-- Inbreeding is calculated from the current pedigree graph at request time; v2
-  does not use or update imported/stored legacy `SIITOSASTE` values for virtual
-  pairing. The ancestry loader fetches beyond the selected generation depth so
-  shared ancestors near the cutoff still have enough pedigree data for their own
-  dynamic `Fa`; occurrence discovery and known-pedigree diagnostics remain
-  bounded to the selected depth.
+- Calculation reuses the existing pedigree ancestry loader and inbreeding coefficient code.
+- The selected `SP` controls the virtual pair's visible/shared-ancestor matrix:
+  occurrence discovery, included/excluded occurrence rules, raw `Fx`, grouped
+  basis rows, and known-pedigree diagnostics all remain bounded to selected
+  `SP`.
+- Shared ancestor `Fa` is recalculated dynamically from current pedigree data,
+  but its depth is fixed to the legacy default of 9 generations. This mirrors
+  v1 semantics where virtual pairing used selected `SP` for the pair matrix but
+  multiplied each shared ancestor by that ancestor's already stored
+  `SIITOSASTE`, which was normally maintained as the default 9-generation
+  value. v2 still does not read or update imported/stored legacy `SIITOSASTE`
+  values for virtual pairing.
+- The ancestry loader fetches beyond the selected generation depth so shared
+  ancestors near the cutoff still have enough pedigree data for their fixed
+  9-generation dynamic `Fa`; occurrence discovery and known-pedigree
+  diagnostics remain bounded to the selected depth.
 - Health and risk values are calculated on demand from current database data in
   `packages/server/dogs/core`, not from stored legacy percentages.
 - The shared server-side health calculator covers EPI, Lafora, PUR, and risk.
@@ -63,18 +72,18 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
 
 ## Inbreeding parity target
 
-- v2 should match v1's raw shared-ancestor basis: shared occurrence discovery,
+- v2 should match v1's shared-ancestor basis: shared occurrence discovery,
   included/excluded occurrence rules, raw `Fx` contribution formula, grouped
   ancestor contributions, and known pedigree coverage.
-- v2 intentionally differs from v1 for the final adjusted percentage when v1's
-  result depends on stored ancestor `SIITOSASTE` values. v2 recalculates each
-  ancestor `Fa` dynamically from current pedigree data so admins do not need to
-  save/recalculate stored percentages before virtual pairing.
-- Expected review outcome for known legacy comparisons is therefore: raw basis
-  parity required; final adjusted percentage may differ when stored legacy
-  ancestor `Fa` differs from dynamically calculated current-data `Fa`.
-- See `docs/notes/inbreeding-v1-v2-dynamic-fa.md` for a concrete comparison
-  where raw `Fx` matches v1 but the adjusted final percentage differs by design.
+- For the final adjusted percentage, v2 preserves v1's depth semantics by using
+  selected `SP` only for the pair matrix and fixed 9-generation dynamic `Fa` for
+  shared ancestors. This avoids the SP6/SP9 drift caused by recalculating
+  ancestor `Fa` at the selected pair depth.
+- v2 still differs from v1 if the imported stored ancestor `SIITOSASTE` is
+  stale or otherwise different from a current-data 9-generation dynamic
+  recalculation. v2's source of truth remains current pedigree data.
+- See `docs/notes/inbreeding-v1-v2-dynamic-fa.md` for the concrete comparison
+  that identified this selected-SP versus ancestor-`Fa` depth distinction.
 
 ## Related files
 

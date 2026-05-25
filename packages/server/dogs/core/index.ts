@@ -10,7 +10,10 @@ export {
   type DogEpiSummary,
   type DogHealthSummary,
 } from "./disease-summary";
-export { getInbreedingAncestryLoadDepth } from "./inbreeding-ancestry-depth";
+export {
+  INBREEDING_DEFAULT_ANCESTOR_FA_DEPTH,
+  getInbreedingAncestryLoadDepth,
+} from "./inbreeding-ancestry-depth";
 export {
   VIRTUAL_PAIRING_DEFAULT_GENERATION_DEPTH,
   VIRTUAL_PAIRING_MAX_GENERATION_DEPTH,

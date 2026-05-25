@@ -1,4 +1,5 @@
 import type { DogPedigreeAncestryDb } from "@beagle/db";
+import { INBREEDING_DEFAULT_ANCESTOR_FA_DEPTH } from "./inbreeding-ancestry-depth";
 
 // Calculates the legacy inbreeding percentage from shared ancestor paths in a
 // bounded pedigree matrix, preserving the import-time weighting semantics.
@@ -43,12 +44,25 @@ export type InbreedingCoefficientBreakdownPct = {
 type InbreedingCalculationContext = {
   dynamicInbreedingPctByDogId: Map<string, number>;
   visitingDogIds: Set<string>;
+  ancestorInbreedingDepth: number;
 };
 
-function createCalculationContext(): InbreedingCalculationContext {
+type InbreedingCalculationOptions = {
+  ancestorInbreedingDepth?: number;
+};
+
+// v1 virtual pairing uses the selected SP only for pair occurrence discovery.
+// Shared ancestors are adjusted by a previously stored 9-generation
+// SIITOSASTE. v2 recalculates that value dynamically, but keeps the same fixed
+// default depth so SP6 does not change ancestor Fa semantics.
+function createCalculationContext(
+  options: InbreedingCalculationOptions = {},
+): InbreedingCalculationContext {
   return {
     dynamicInbreedingPctByDogId: new Map(),
     visitingDogIds: new Set(),
+    ancestorInbreedingDepth:
+      options.ancestorInbreedingDepth ?? INBREEDING_DEFAULT_ANCESTOR_FA_DEPTH,
   };
 }
 
@@ -153,7 +167,6 @@ function buildSharedOccurrences(
 function sumInbreedingPct(
   shared: SharedOccurrence[],
   ancestry: DogPedigreeAncestryDb,
-  maxDepth: number,
   context: InbreedingCalculationContext,
 ): number {
   const perAncestor: Record<string, number> = {};
@@ -165,23 +178,18 @@ function sumInbreedingPct(
       (perAncestor[occurrence.id] ?? 0) + occurrence.contributionPct;
   }
   return Object.entries(perAncestor).reduce((sum, [ancestorId, fxPct]) => {
-    return (
-      sum +
-      fxPct * getAncestorMultiplier(ancestry, ancestorId, maxDepth, context)
-    );
+    return sum + fxPct * getAncestorMultiplier(ancestry, ancestorId, context);
   }, 0);
 }
 
 function getAncestorMultiplier(
   ancestry: DogPedigreeAncestryDb,
   ancestorId: string,
-  maxDepth: number,
   context: InbreedingCalculationContext,
 ): number {
   const ancestorInbreedingPct = calculateDynamicInbreedingCoefficientPct(
     ancestorId,
     ancestry,
-    maxDepth,
     context,
   );
   return 1 + ancestorInbreedingPct / 100;
@@ -190,7 +198,6 @@ function getAncestorMultiplier(
 function groupIncludedContributions(
   shared: SharedOccurrence[],
   ancestry: DogPedigreeAncestryDb,
-  maxDepth: number,
   context: InbreedingCalculationContext,
 ): GroupedInbreedingContributionBreakdown[] {
   const grouped = new Map<string, GroupedInbreedingContributionBreakdown>();
@@ -206,16 +213,11 @@ function groupIncludedContributions(
       existing.occurrenceCount += 1;
       existing.adjustedContributionPct =
         existing.rawContributionPct *
-        getAncestorMultiplier(ancestry, occurrence.id, maxDepth, context);
+        getAncestorMultiplier(ancestry, occurrence.id, context);
       continue;
     }
 
-    const multiplier = getAncestorMultiplier(
-      ancestry,
-      occurrence.id,
-      maxDepth,
-      context,
-    );
+    const multiplier = getAncestorMultiplier(ancestry, occurrence.id, context);
     grouped.set(occurrence.id, {
       id: occurrence.id,
       rawContributionPct: occurrence.contributionPct,
@@ -260,7 +262,6 @@ function countKnownPedigreePct(
 function calculateDynamicInbreedingCoefficientPct(
   dogId: string,
   ancestry: DogPedigreeAncestryDb,
-  maxDepth: number,
   context: InbreedingCalculationContext,
 ): number {
   const cached = context.dynamicInbreedingPctByDogId.get(dogId);
@@ -269,7 +270,7 @@ function calculateDynamicInbreedingCoefficientPct(
   }
 
   const dog = getNode(ancestry, dogId);
-  if (!dog?.sireId || !dog?.damId || maxDepth < 1) {
+  if (!dog?.sireId || !dog?.damId || context.ancestorInbreedingDepth < 1) {
     context.dynamicInbreedingPctByDogId.set(dogId, 0);
     return 0;
   }
@@ -283,7 +284,7 @@ function calculateDynamicInbreedingCoefficientPct(
     dog.sireId,
     dog.damId,
     ancestry,
-    maxDepth,
+    context.ancestorInbreedingDepth,
     context,
   );
   context.visitingDogIds.delete(dogId);
@@ -295,6 +296,7 @@ export function calculateInbreedingCoefficientPct(
   dogId: string,
   ancestry: DogPedigreeAncestryDb,
   maxDepth = 9,
+  options?: InbreedingCalculationOptions,
 ): number | null {
   const root = getNode(ancestry, dogId);
   if (!root?.sireId || !root?.damId) {
@@ -309,6 +311,7 @@ export function calculateInbreedingCoefficientPct(
     root.damId,
     ancestry,
     maxDepth,
+    options,
   );
 }
 
@@ -322,7 +325,7 @@ function calculateInbreedingCoefficientForParentsPctInternal(
   const sireMatrix = buildSideMatrix(ancestry, sireId, maxDepth);
   const damMatrix = buildSideMatrix(ancestry, damId, maxDepth);
   const shared = buildSharedOccurrences(sireMatrix, damMatrix, maxDepth);
-  return sumInbreedingPct(shared, ancestry, maxDepth, context);
+  return sumInbreedingPct(shared, ancestry, context);
 }
 
 export function calculateInbreedingCoefficientForParentsPct(
@@ -330,13 +333,14 @@ export function calculateInbreedingCoefficientForParentsPct(
   damId: string,
   ancestry: DogPedigreeAncestryDb,
   maxDepth = 9,
+  options?: InbreedingCalculationOptions,
 ): number {
   return calculateInbreedingCoefficientForParentsPctInternal(
     sireId,
     damId,
     ancestry,
     maxDepth,
-    createCalculationContext(),
+    createCalculationContext(options),
   );
 }
 
@@ -345,19 +349,15 @@ export function calculateInbreedingCoefficientBreakdownForParentsPct(
   damId: string,
   ancestry: DogPedigreeAncestryDb,
   maxDepth = 9,
+  options?: InbreedingCalculationOptions,
 ): InbreedingCoefficientBreakdownPct {
-  const context = createCalculationContext();
+  const context = createCalculationContext(options);
   const sireMatrix = buildSideMatrix(ancestry, sireId, maxDepth);
   const damMatrix = buildSideMatrix(ancestry, damId, maxDepth);
   const shared = buildSharedOccurrences(sireMatrix, damMatrix, maxDepth);
-  const contributionPct = sumInbreedingPct(shared, ancestry, maxDepth, context);
+  const contributionPct = sumInbreedingPct(shared, ancestry, context);
   const includedOccurrences = shared.filter((occurrence) => occurrence.include);
-  const contributions = groupIncludedContributions(
-    shared,
-    ancestry,
-    maxDepth,
-    context,
-  );
+  const contributions = groupIncludedContributions(shared, ancestry, context);
   const sharedAncestorCount = new Set(
     includedOccurrences.map((occurrence) => occurrence.id),
   ).size;

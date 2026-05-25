@@ -14,6 +14,7 @@ import type {
 import {
   calculateInbreedingCoefficientBreakdownForParentsPct,
   getInbreedingAncestryLoadDepth,
+  INBREEDING_DEFAULT_ANCESTOR_FA_DEPTH,
   parseVirtualPairingGenerationDepth,
   calculateDogHealthSummary,
 } from "@server/dogs/core";
@@ -227,10 +228,17 @@ export async function calculateAdminVirtualPairing(
       return invalidDamSexResponse();
     }
 
+    // v1 uses selected SP for pair occurrence discovery, but multiplies each
+    // shared ancestor by a stored 9-generation SIITOSASTE. v2 recalculates
+    // that ancestor Fa dynamically, so keep its depth fixed at the same
+    // default while still honoring selected SP for the pair matrix.
     const ancestry = await loadDogPedigreeAncestryForParentsDb(
       sireRow.id,
       damRow.id,
-      getInbreedingAncestryLoadDepth(generationDepth),
+      getInbreedingAncestryLoadDepth(
+        generationDepth,
+        INBREEDING_DEFAULT_ANCESTOR_FA_DEPTH,
+      ),
     );
     // Load every disease row referenced by the current ancestry so the shared
     // calculator can score EPI, Lafora, risk, and PUR from the current graph.
@@ -248,6 +256,7 @@ export async function calculateAdminVirtualPairing(
       damRow.id,
       ancestry,
       generationDepth,
+      { ancestorInbreedingDepth: INBREEDING_DEFAULT_ANCESTOR_FA_DEPTH },
     );
     const inbreedingCoefficientPct = breakdown.contributionPct;
     const healthSummary = calculateDogHealthSummary(

@@ -1,6 +1,7 @@
 # Inbreeding v1/v2 Dynamic Fa Notes
 
 Date: 2026-05-24
+Updated: 2026-05-25
 
 ## Case
 
@@ -50,6 +51,13 @@ data for virtual pairing, so admins do not need to save or recalculate stored
 percentages before getting an up-to-date result. Imported/stored `SIITOSASTE`
 values are not the source of truth for virtual-pairing calculation.
 
+The depth semantics were tightened after the SP6 comparison below: selected
+`SP` controls the pair matrix only, while each shared ancestor's own dynamic
+`Fa` is recalculated with the legacy default depth of 9 generations. This
+matches v1's practical behavior more closely because v1 reads each shared
+ancestor's stored `SIITOSASTE` instead of recalculating that ancestor at the
+currently selected virtual-pairing `SP`.
+
 ## SP 6 Check
 
 For the same pair at `SP 6`:
@@ -72,9 +80,10 @@ The `SP 6` difference is explained by `ASTALAN RONJA FIN12562/97`:
 - v2 dynamic `Fa SP9` before load-depth fix: `2.5482178 %`.
 - v2 dynamic `Fa SP9` after load-depth fix: `2.632904053 %`.
 
-So the remaining `SP 6` difference exists even when the pair pedigree slots are
-identical. It is not caused by missing dogs for `SP 6`; it is caused by v1 using
-the stored legacy `Fa` value while v2 uses dynamic `Fa` at the selected depth.
+So the original `SP 6` difference existed even when the pair pedigree slots were
+identical. It was not caused by missing dogs for `SP 6`; it was caused by v1
+using the stored legacy `Fa` value while v2 recalculated dynamic `Fa` at the
+selected pair depth.
 
 ## Missing Pedigree Slots At SP 9
 
@@ -98,17 +107,20 @@ v1's final percentage is not always equivalent to v2's current-data
 calculation, because it depends on stored `SIITOSASTE` values that are
 calculated and saved outside the virtual-pairing request. A v1 recalculation of
 `ASTALAN RONJA FIN12562/97` kept the stored value at `2.6329041`; local v2
-diagnostics now reproduce that value for Ronja at `SP 9` when enough ancestry is
-loaded.
+diagnostics reproduce that value for Ronja with a 9-generation dynamic
+ancestor-`Fa` calculation when enough ancestry is loaded.
 
 v2 dynamic calculation is the canonical direction because the product goal is
 an always up-to-date inbreeding percentage from the current pedigree data.
+However, selected `SP` must not be reused as the shared ancestors' own `Fa`
+depth. The pair matrix uses selected `SP`; ancestor `Fa` uses fixed default
+`SP 9`.
 
 When reviewing legacy parity, classify differences as acceptable when:
 
 - raw `Fx` and diagnostic basis counts match v1, and
 - the remaining difference is explained by stored legacy ancestor `Fa` versus
-  dynamically calculated current-data ancestor `Fa`.
+  dynamically calculated current-data 9-generation ancestor `Fa`.
 
 Do not change virtual pairing to read stored `SIITOSASTE` unless the product
 goal changes from current-data calculation to exact legacy output reproduction.
@@ -129,6 +141,6 @@ Observed result: `ASTALAN RONJA FIN12562/97` stayed at `2.6329041`.
 
 Interpretation: the `SP 9` mismatch was caused by insufficient v2 ancestry
 loading for dynamic ancestor `Fa`, not by bad imported Ronja data or a bad raw
-pair calculation. The remaining `SP 6` difference is expected because v1 applies
-Ronja's stored `SIITOSASTE` value, while v2 dynamically calculates Ronja's `Fa`
-at the selected depth.
+pair calculation. The original remaining `SP 6` difference showed that v2 must
+not use the selected pair depth as Ronja's own `Fa` depth; v2 now uses fixed
+default `SP 9` for shared-ancestor dynamic `Fa`.
