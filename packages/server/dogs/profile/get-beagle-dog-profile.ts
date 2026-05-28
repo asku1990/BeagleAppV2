@@ -2,6 +2,7 @@
 // show/trial domain fetches and shared legacy result normalization helpers.
 import {
   getBeagleDogProfileDb,
+  loadDogPedigreeAncestryDb,
   getBeagleShowsForDogDb,
   getBeagleTrialsForDogDb,
   type BeagleDogProfileDb,
@@ -12,7 +13,11 @@ import type { BeagleDogProfileDto } from "@beagle/contracts";
 import { toBusinessDateOnly } from "@server/core/date-only";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
-import { parseDogId } from "@server/dogs/core";
+import {
+  calculateInbreedingCoefficientPct,
+  getInbreedingAncestryLoadDepth,
+  parseDogId,
+} from "@server/dogs/core";
 import { encodeShowId } from "@server/shows/internal/show-id";
 import { formatTrialAward } from "@server/trials/core";
 
@@ -25,6 +30,7 @@ function mapDogProfileFromDb(
   profile: BeagleDogProfileDb,
   shows: BeagleShowDogRowDb[],
   trials: BeagleTrialDogRowDb[],
+  inbreedingCoefficientPct: number | null,
 ): BeagleDogProfileDto {
   return {
     id: profile.id,
@@ -36,7 +42,7 @@ function mapDogProfileFromDb(
     sex: profile.sex,
     color: profile.color,
     ekNo: profile.ekNo,
-    inbreedingCoefficientPct: profile.siitosasteProsentti ?? null,
+    inbreedingCoefficientPct,
     sire: profile.sire,
     dam: profile.dam,
     pedigree: profile.pedigree,
@@ -139,10 +145,16 @@ export async function getBeagleDogProfileService(
       };
     }
 
-    const [shows, trials] = await Promise.all([
+    const [ancestry, shows, trials] = await Promise.all([
+      loadDogPedigreeAncestryDb(parsedDogId, getInbreedingAncestryLoadDepth(9)),
       getBeagleShowsForDogDb(parsedDogId),
       getBeagleTrialsForDogDb(parsedDogId),
     ]);
+    const inbreedingCoefficientPct = calculateInbreedingCoefficientPct(
+      parsedDogId,
+      ancestry,
+      9,
+    );
     log.info(
       {
         event: "success",
@@ -155,7 +167,12 @@ export async function getBeagleDogProfileService(
       status: 200,
       body: {
         ok: true,
-        data: mapDogProfileFromDb(profile, shows, trials),
+        data: mapDogProfileFromDb(
+          profile,
+          shows,
+          trials,
+          inbreedingCoefficientPct,
+        ),
       },
     };
   } catch (error) {
