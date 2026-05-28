@@ -133,6 +133,27 @@ describe("calculateDogHealthSummary", () => {
     expect(summary.pur.text).toBe("-----");
   });
 
+  it("counts parent-linked null-dogId disease rows in the EPI summary", () => {
+    const ancestry = makeAncestry({
+      "virtual-root": makeNode("virtual-root", "sire", "dam"),
+      sire: makeNode("sire", null, null),
+      dam: makeNode("dam", null, null),
+    });
+
+    const summary = calculateDogHealthSummary("virtual-root", ancestry, [
+      {
+        dogId: null,
+        isaDogId: "sire",
+        emaDogId: "dam",
+        sairausKoodi: "epi",
+      },
+    ]);
+
+    expect(summary.epi.value).toBe(1);
+    expect(summary.epi.text).toBe("-S---");
+    expect(summary.epi.display).toBe("1.000 -S---");
+  });
+
   it("handles missing pedigree branches without throwing", () => {
     const summary = calculateDogHealthSummary(
       "virtual-root",

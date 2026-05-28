@@ -25,6 +25,8 @@ This project uses a user-facing changelog format.
 
 ### Fixed
 
+- `phase1.25` preserves legacy `beasairaat` disease rows that only have synthetic or missing REKNO values by importing them with fallback identities and searchable warning issues instead of skipping them.
+
 ### Removed
 
 ## [0.11.0] - 2026-05-06

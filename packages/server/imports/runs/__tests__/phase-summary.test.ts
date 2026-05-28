@@ -79,4 +79,20 @@ describe("formatLegacyImportSummary", () => {
     expect(summary).not.toContain("titles=");
     expect(summary).not.toContain("trialResults=");
   });
+
+  it("includes phase1.25 fallback imports when present", () => {
+    const summary = formatLegacyImportSummary({
+      kind: "LEGACY_PHASE1_25",
+      siitosasteUpdated: 2,
+      sairaudetInserted: 3,
+      koiranSairaudetInserted: 4,
+      koiranSairaudetFallbackImported: 1,
+      epiLuvutInserted: 5,
+      errorsCount: 0,
+    });
+
+    expect(summary).toBe(
+      "Phase 1.25: siitosaste=2, sairaudet=3, koiranSairaudet=4, fallbackImported=1, epiLuvut=5, errors=0.",
+    );
+  });
 });
