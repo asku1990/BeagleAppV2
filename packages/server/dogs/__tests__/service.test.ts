@@ -488,6 +488,9 @@ describe("dogs service", () => {
         },
       },
     });
+    expect(result.body.ok ? result.body.data : null).not.toHaveProperty(
+      "siitosasteProsentti",
+    );
   });
 
   it("returns null inbreeding when the calculator returns null", async () => {
@@ -543,6 +546,54 @@ describe("dogs service", () => {
         },
       },
     });
+  });
+
+  it("skips deep ancestry loading for parentless public profiles", async () => {
+    const mockProfile = {
+      id: "dog-parentless",
+      name: "Parentless Dog",
+      title: null,
+      registrationNo: "FI-99/20",
+      registrationNos: ["FI-99/20"],
+      birthDate: null,
+      sex: "U",
+      color: null,
+      ekNo: null,
+      inbreedingCoefficientPct: null,
+      sire: null,
+      dam: null,
+      pedigree: [],
+      offspringSummary: { litterCount: 0, puppyCount: 0 },
+      litters: [],
+      siblingsSummary: { siblingCount: 0 },
+      siblings: [],
+      titles: [],
+    };
+
+    getBeagleDogProfileDbMock.mockResolvedValue(mockProfile);
+    getBeagleShowsForDogDbMock.mockResolvedValue([]);
+    getBeagleTrialsForDogDbMock.mockResolvedValue([]);
+
+    const service = createDogsService();
+    const result = await service.getBeagleDogProfile("dog-parentless");
+
+    expect(loadDogPedigreeAncestryDbMock).not.toHaveBeenCalled();
+    expect(calculateInbreedingCoefficientPctMock).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          ...mockProfile,
+          inbreedingCoefficientPct: null,
+          shows: [],
+          trials: [],
+        },
+      },
+    });
+    expect(result.body.ok ? result.body.data : null).not.toHaveProperty(
+      "siitosasteProsentti",
+    );
   });
 
   it("maps date-only profile fields in Helsinki timezone", async () => {

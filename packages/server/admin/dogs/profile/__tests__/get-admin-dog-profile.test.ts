@@ -136,12 +136,18 @@ describe("getAdminDogProfile", () => {
           },
           "sire-1": {
             id: "sire-1",
-            sireId: null,
+            sireId: "ancestor-1",
             damId: null,
             siitosasteProsentti: null,
           },
           "dam-1": {
             id: "dam-1",
+            sireId: "ancestor-1",
+            damId: null,
+            siitosasteProsentti: null,
+          },
+          "ancestor-1": {
+            id: "ancestor-1",
             sireId: null,
             damId: null,
             siitosasteProsentti: null,
@@ -159,12 +165,18 @@ describe("getAdminDogProfile", () => {
           },
           "sire-1": {
             id: "sire-1",
-            sireId: null,
+            sireId: "ancestor-1",
             damId: null,
             siitosasteProsentti: null,
           },
           "dam-1": {
             id: "dam-1",
+            sireId: "ancestor-1",
+            damId: null,
+            siitosasteProsentti: null,
+          },
+          "ancestor-1": {
+            id: "ancestor-1",
             sireId: null,
             damId: null,
             siitosasteProsentti: null,
@@ -203,7 +215,7 @@ describe("getAdminDogProfile", () => {
             ekNo: null,
             offspringCount: 0,
             offspringLitterCount: 0,
-            inbreedingCoefficientPct: 0,
+            inbreedingCoefficientPct: 12.5,
             epiLuku: 1.5,
             epiTeksti: "I----",
             laforaLuku: 0,
@@ -256,6 +268,9 @@ describe("getAdminDogProfile", () => {
         },
       },
     });
+    expect(result.body.ok ? result.body.data.dog : null).not.toHaveProperty(
+      "siitosasteProsentti",
+    );
 
     expect(getAdminDogProfileDbMock).toHaveBeenCalledWith("dog-1");
     expect(loadDogPedigreeAncestryDbMock).toHaveBeenCalledWith("dog-1", 5);
@@ -264,6 +279,7 @@ describe("getAdminDogProfile", () => {
       "dog-1",
       "sire-1",
       "dam-1",
+      "ancestor-1",
     ]);
   });
 
@@ -293,29 +309,17 @@ describe("getAdminDogProfile", () => {
       owners: [],
       diseases: [],
     } as never);
-    loadDogPedigreeAncestryDbMock
-      .mockResolvedValueOnce({
-        rootId: "dog-2",
-        nodes: {
-          "dog-2": {
-            id: "dog-2",
-            sireId: null,
-            damId: null,
-            siitosasteProsentti: null,
-          },
+    loadDogPedigreeAncestryDbMock.mockResolvedValueOnce({
+      rootId: "dog-2",
+      nodes: {
+        "dog-2": {
+          id: "dog-2",
+          sireId: null,
+          damId: null,
+          siitosasteProsentti: null,
         },
-      })
-      .mockResolvedValueOnce({
-        rootId: "dog-2",
-        nodes: {
-          "dog-2": {
-            id: "dog-2",
-            sireId: null,
-            damId: null,
-            siitosasteProsentti: null,
-          },
-        },
-      });
+      },
+    });
     loadDogEpiDiseaseFactsDbMock.mockResolvedValue([]);
 
     const result = await getAdminDogProfile("dog-2", {
@@ -330,6 +334,8 @@ describe("getAdminDogProfile", () => {
     if (result.body.ok) {
       expect(result.body.data.dog.inbreedingCoefficientPct).toBeNull();
     }
+    expect(loadDogPedigreeAncestryDbMock).toHaveBeenCalledWith("dog-2", 5);
+    expect(loadDogPedigreeAncestryDbMock).not.toHaveBeenCalledWith("dog-2", 17);
   });
 
   it("rejects invalid dog ids before hitting the database", async () => {

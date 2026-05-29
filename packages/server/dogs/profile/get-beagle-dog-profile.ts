@@ -100,6 +100,22 @@ function mapDogProfileFromDb(
   };
 }
 
+async function calculateProfileInbreedingCoefficientPct(
+  profile: BeagleDogProfileDb,
+  parsedDogId: string,
+): Promise<number | null> {
+  if (!profile.sire || !profile.dam) {
+    return null;
+  }
+
+  const ancestry = await loadDogPedigreeAncestryDb(
+    parsedDogId,
+    getInbreedingAncestryLoadDepth(9),
+  );
+
+  return calculateInbreedingCoefficientPct(parsedDogId, ancestry, 9);
+}
+
 export async function getBeagleDogProfileService(
   dogId: string,
   context?: DogsServiceLogContext,
@@ -145,16 +161,11 @@ export async function getBeagleDogProfileService(
       };
     }
 
-    const [ancestry, shows, trials] = await Promise.all([
-      loadDogPedigreeAncestryDb(parsedDogId, getInbreedingAncestryLoadDepth(9)),
+    const [inbreedingCoefficientPct, shows, trials] = await Promise.all([
+      calculateProfileInbreedingCoefficientPct(profile, parsedDogId),
       getBeagleShowsForDogDb(parsedDogId),
       getBeagleTrialsForDogDb(parsedDogId),
     ]);
-    const inbreedingCoefficientPct = calculateInbreedingCoefficientPct(
-      parsedDogId,
-      ancestry,
-      9,
-    );
     log.info(
       {
         event: "success",

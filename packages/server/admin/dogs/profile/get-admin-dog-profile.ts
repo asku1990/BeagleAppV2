@@ -59,6 +59,22 @@ function formatHealthSummary(
   return summary.join(", ");
 }
 
+async function calculateProfileInbreedingCoefficientPct(
+  profileBase: AdminDogProfileDb["base"],
+  parsedDogId: string,
+): Promise<number | null> {
+  if (!profileBase.sire || !profileBase.dam) {
+    return null;
+  }
+
+  const ancestry = await loadDogPedigreeAncestryDb(
+    parsedDogId,
+    getInbreedingAncestryLoadDepth(9),
+  );
+
+  return calculateInbreedingCoefficientPct(parsedDogId, ancestry, 9);
+}
+
 function toAdminDogProfileDto(
   profile: AdminDogProfileDb,
   epiSummary: ReturnType<typeof calculateDogEpiSummary>,
@@ -166,9 +182,9 @@ export async function getAdminDogProfile(
       };
     }
 
-    const [healthAncestry, inbreedingAncestry] = await Promise.all([
+    const [healthAncestry, inbreedingCoefficientPct] = await Promise.all([
       loadDogPedigreeAncestryDb(parsedDogId, 5),
-      loadDogPedigreeAncestryDb(parsedDogId, getInbreedingAncestryLoadDepth(9)),
+      calculateProfileInbreedingCoefficientPct(profile.base, parsedDogId),
     ]);
     const relatedDogIds = Object.keys(healthAncestry.nodes);
     const diseaseFacts = await loadDogEpiDiseaseFactsDb(relatedDogIds);
@@ -176,11 +192,6 @@ export async function getAdminDogProfile(
       parsedDogId,
       healthAncestry,
       diseaseFacts,
-    );
-    const inbreedingCoefficientPct = calculateInbreedingCoefficientPct(
-      parsedDogId,
-      inbreedingAncestry,
-      9,
     );
 
     log.info(
