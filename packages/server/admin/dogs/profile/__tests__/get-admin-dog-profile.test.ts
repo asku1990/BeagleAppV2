@@ -58,7 +58,6 @@ describe("getAdminDogProfile", () => {
         sex: "MALE",
         color: null,
         ekNo: null,
-        inbreedingCoefficientPct: 3.0724,
         sire: {
           id: "sire-1",
           name: "JUHANNIN ROOPE",

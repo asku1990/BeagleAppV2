@@ -559,7 +559,6 @@ describe("dogs service", () => {
       sex: "U",
       color: null,
       ekNo: null,
-      inbreedingCoefficientPct: null,
       sire: null,
       dam: null,
       pedigree: [],
@@ -607,7 +606,6 @@ describe("dogs service", () => {
       sex: "N",
       color: null,
       ekNo: null,
-      inbreedingCoefficientPct: null,
       sire: null,
       dam: null,
       pedigree: [],
@@ -669,6 +667,7 @@ describe("dogs service", () => {
         ok: true,
         data: {
           ...mockProfile,
+          inbreedingCoefficientPct: null,
           birthDate: "2020-01-01",
           shows: [
             {
@@ -713,7 +712,6 @@ describe("dogs service", () => {
       sex: "N",
       color: null,
       ekNo: null,
-      inbreedingCoefficientPct: null,
       sire: null,
       dam: null,
       pedigree: [],
@@ -754,6 +752,7 @@ describe("dogs service", () => {
         ok: true,
         data: {
           ...mockProfile,
+          inbreedingCoefficientPct: null,
           shows: [
             {
               ...showCase,
@@ -778,7 +777,6 @@ describe("dogs service", () => {
       sex: "U",
       color: null,
       ekNo: null,
-      inbreedingCoefficientPct: null,
       sire: null,
       dam: null,
       pedigree: [],
@@ -819,6 +817,7 @@ describe("dogs service", () => {
         ok: true,
         data: {
           ...mockProfile,
+          inbreedingCoefficientPct: null,
           shows: [
             {
               ...showLegacy,
@@ -873,7 +872,6 @@ describe("dogs service", () => {
       sex: "N",
       color: null,
       ekNo: null,
-      inbreedingCoefficientPct: null,
       sire: null,
       dam: null,
       pedigree: [],
