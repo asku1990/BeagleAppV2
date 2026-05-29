@@ -2,7 +2,8 @@ import type { Prisma } from "@prisma/client";
 import type { AdminDogProfileDb } from "../types";
 import { adminDogProfileSelect } from "./profile-select";
 
-type AdminDogProfileDiseaseGroup = AdminDogProfileDb["diseases"][number]["diseaseGroup"];
+type AdminDogProfileDiseaseGroup =
+  AdminDogProfileDb["diseases"][number]["diseaseGroup"];
 
 type AdminDogProfileRow = Prisma.DogGetPayload<{
   select: typeof adminDogProfileSelect;
@@ -21,7 +22,9 @@ function mapDiseaseGroup(group: string): AdminDogProfileDiseaseGroup {
   return "MUU";
 }
 
-export function mapAdminDogProfileDbRow(dog: AdminDogProfileRow): AdminDogProfileDb {
+export function mapAdminDogProfileDbRow(
+  dog: AdminDogProfileRow,
+): AdminDogProfileDb {
   return {
     base: {
       id: dog.id,
@@ -31,8 +34,6 @@ export function mapAdminDogProfileDbRow(dog: AdminDogProfileRow): AdminDogProfil
       sex: dog.sex,
       color: null,
       ekNo: dog.ekNo,
-      inbreedingCoefficientPct:
-        dog.siitosasteProsentti == null ? null : Number(dog.siitosasteProsentti),
       sire: dog.sire
         ? {
             id: dog.sire.id,

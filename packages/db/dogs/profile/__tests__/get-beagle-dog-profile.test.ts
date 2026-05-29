@@ -167,6 +167,7 @@ describe("getBeagleDogProfileDb", () => {
     expect(result?.litters).toEqual([]);
     expect(result?.siblingsSummary).toEqual({ siblingCount: 0 });
     expect(result?.siblings).toEqual([]);
+    expect(result).not.toHaveProperty("siitosasteProsentti");
     expect(queryArgs.include).not.toHaveProperty("showResults");
     expect(queryArgs.include).toHaveProperty("whelpedPuppies");
     expect(queryArgs.include).toHaveProperty("siredPuppies");

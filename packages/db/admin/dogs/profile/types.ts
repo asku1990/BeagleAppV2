@@ -35,7 +35,6 @@ export type AdminDogProfileDb = {
     sex: DogSex;
     color: string | null;
     ekNo: number | null;
-    inbreedingCoefficientPct: number | null;
     sire: ParentDogNode | null;
     dam: ParentDogNode | null;
     whelpedPuppies: OffspringDogNode[];

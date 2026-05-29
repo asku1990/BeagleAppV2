@@ -73,8 +73,6 @@ export async function getBeagleDogProfileDb(
     sex,
     color: null,
     ekNo: dog.ekNo,
-    siitosasteProsentti:
-      dog.siitosasteProsentti == null ? null : Number(dog.siitosasteProsentti),
     sire: mapParent(dog.sire),
     dam: mapParent(dog.dam),
     pedigree,

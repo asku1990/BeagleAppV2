@@ -12,7 +12,6 @@ export const adminDogProfileSelect = Prisma.validator<Prisma.DogSelect>()({
   birthDate: true,
   sex: true,
   ekNo: true,
-  siitosasteProsentti: true,
   sire: {
     select: {
       id: true,
