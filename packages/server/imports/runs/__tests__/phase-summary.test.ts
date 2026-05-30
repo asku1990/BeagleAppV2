@@ -35,6 +35,22 @@ describe("formatLegacyImportSummary", () => {
     expect(summary).not.toContain("showResults=");
   });
 
+  it("formats phase1.25 with disease import fallback counters", () => {
+    const summary = formatLegacyImportSummary({
+      kind: "LEGACY_PHASE1_25",
+      siitosasteUpdated: 10,
+      sairaudetInserted: 3,
+      koiranSairaudetInserted: 8,
+      koiranSairaudetFallbackImported: 2,
+      epiLuvutInserted: 0,
+      errorsCount: 1,
+    });
+
+    expect(summary).toBe(
+      "Phase 1.25: siitosaste=10, sairaudet=3, koiranSairaudet=8, fallbackImported=2, epiLuvut=0, errors=1.",
+    );
+  });
+
   it("formats phase2 mirror import with source and stored counters", () => {
     const summary = formatLegacyImportSummary({
       kind: "LEGACY_TRIAL_MIRROR",

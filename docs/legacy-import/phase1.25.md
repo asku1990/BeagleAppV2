@@ -20,6 +20,9 @@ imports titles.
 - Imported rows store v2 dog ids when a registration resolves.
 - Imported disease rows keep the row dog's raw legacy registration number as
   `rekisterinumero` for traceability.
+- Synthetic or missing `beasairaat.REKNO` values are preserved with a null
+  `dogId` instead of being skipped, so anonymous affected puppy/litter evidence
+  can be audited and used by later disease-model cleanup.
 - Unresolved dog, sire, or dam ids do not fail the import.
 
 ## Data rules
