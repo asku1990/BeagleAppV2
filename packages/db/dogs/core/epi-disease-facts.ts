@@ -5,6 +5,7 @@ export type DogEpiDiseaseFactDb = {
   isaDogId: string | null;
   emaDogId: string | null;
   sairausKoodi: string;
+  evidenceKind: "DOG" | "LITTER";
 };
 
 const EPI_AND_LAFORA_CODES = ["epi", "lepis", "lepik", "lepit"] as const;
@@ -29,8 +30,10 @@ export async function loadDogDiseaseFactsDb(
       sairausKoodi: { in: codes },
       OR: [
         { dogId: { in: ids } },
-        { isaDogId: { in: ids } },
-        { emaDogId: { in: ids } },
+        { dog: { sireId: { in: ids } } },
+        { dog: { damId: { in: ids } } },
+        { dogId: null, isaDogId: { in: ids } },
+        { dogId: null, emaDogId: { in: ids } },
       ],
     },
     select: {
@@ -38,14 +41,21 @@ export async function loadDogDiseaseFactsDb(
       isaDogId: true,
       emaDogId: true,
       sairausKoodi: true,
+      dog: {
+        select: {
+          sireId: true,
+          damId: true,
+        },
+      },
     },
   });
 
   return rows.map((row) => ({
     dogId: row.dogId,
-    isaDogId: row.isaDogId,
-    emaDogId: row.emaDogId,
+    isaDogId: row.dogId ? (row.dog?.sireId ?? null) : row.isaDogId,
+    emaDogId: row.dogId ? (row.dog?.damId ?? null) : row.emaDogId,
     sairausKoodi: row.sairausKoodi.toLowerCase(),
+    evidenceKind: row.dogId ? "DOG" : "LITTER",
   }));
 }
 

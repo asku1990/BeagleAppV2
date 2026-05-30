@@ -33,19 +33,24 @@ describe("loadDogEpiDiseaseFactsDb", () => {
     expect(koiranSairausFindManyMock).not.toHaveBeenCalled();
   });
 
-  it("loads only EPI/Lafora disease facts and lowercases disease code", async () => {
+  it("loads real EPI/Lafora facts with canonical dog parents", async () => {
     koiranSairausFindManyMock.mockResolvedValueOnce([
       {
         dogId: "dog-1",
-        isaDogId: null,
-        emaDogId: "dog-3",
+        isaDogId: "stale-sire",
+        emaDogId: "stale-dam",
         sairausKoodi: "LEPIS",
+        dog: {
+          sireId: "canonical-sire",
+          damId: "canonical-dam",
+        },
       },
       {
         dogId: null,
         isaDogId: "dog-2",
-        emaDogId: null,
+        emaDogId: "dog-3",
         sairausKoodi: "EPI",
+        dog: null,
       },
     ]);
 
@@ -56,8 +61,10 @@ describe("loadDogEpiDiseaseFactsDb", () => {
         sairausKoodi: { in: ["epi", "lepis", "lepik", "lepit"] },
         OR: [
           { dogId: { in: ["dog-1", "dog-2"] } },
-          { isaDogId: { in: ["dog-1", "dog-2"] } },
-          { emaDogId: { in: ["dog-1", "dog-2"] } },
+          { dog: { sireId: { in: ["dog-1", "dog-2"] } } },
+          { dog: { damId: { in: ["dog-1", "dog-2"] } } },
+          { dogId: null, isaDogId: { in: ["dog-1", "dog-2"] } },
+          { dogId: null, emaDogId: { in: ["dog-1", "dog-2"] } },
         ],
       },
       select: {
@@ -65,21 +72,29 @@ describe("loadDogEpiDiseaseFactsDb", () => {
         isaDogId: true,
         emaDogId: true,
         sairausKoodi: true,
+        dog: {
+          select: {
+            sireId: true,
+            damId: true,
+          },
+        },
       },
     });
 
     expect(result).toEqual([
       {
         dogId: "dog-1",
-        isaDogId: null,
-        emaDogId: "dog-3",
+        isaDogId: "canonical-sire",
+        emaDogId: "canonical-dam",
         sairausKoodi: "lepis",
+        evidenceKind: "DOG",
       },
       {
         dogId: null,
         isaDogId: "dog-2",
-        emaDogId: null,
+        emaDogId: "dog-3",
         sairausKoodi: "epi",
+        evidenceKind: "LITTER",
       },
     ]);
   });
@@ -88,9 +103,13 @@ describe("loadDogEpiDiseaseFactsDb", () => {
     koiranSairausFindManyMock.mockResolvedValueOnce([
       {
         dogId: "dog-1",
-        isaDogId: null,
-        emaDogId: "dog-3",
+        isaDogId: "stale-sire",
+        emaDogId: "stale-dam",
         sairausKoodi: "PUR",
+        dog: {
+          sireId: null,
+          damId: "canonical-dam",
+        },
       },
     ]);
 
@@ -104,8 +123,10 @@ describe("loadDogEpiDiseaseFactsDb", () => {
         sairausKoodi: { in: ["epi", "pur", "ap", "yp", "rp"] },
         OR: [
           { dogId: { in: ["dog-1"] } },
-          { isaDogId: { in: ["dog-1"] } },
-          { emaDogId: { in: ["dog-1"] } },
+          { dog: { sireId: { in: ["dog-1"] } } },
+          { dog: { damId: { in: ["dog-1"] } } },
+          { dogId: null, isaDogId: { in: ["dog-1"] } },
+          { dogId: null, emaDogId: { in: ["dog-1"] } },
         ],
       },
       select: {
@@ -113,6 +134,12 @@ describe("loadDogEpiDiseaseFactsDb", () => {
         isaDogId: true,
         emaDogId: true,
         sairausKoodi: true,
+        dog: {
+          select: {
+            sireId: true,
+            damId: true,
+          },
+        },
       },
     });
 
@@ -120,8 +147,9 @@ describe("loadDogEpiDiseaseFactsDb", () => {
       {
         dogId: "dog-1",
         isaDogId: null,
-        emaDogId: "dog-3",
+        emaDogId: "canonical-dam",
         sairausKoodi: "pur",
+        evidenceKind: "DOG",
       },
     ]);
   });

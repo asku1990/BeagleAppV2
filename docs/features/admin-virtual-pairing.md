@@ -37,7 +37,9 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
   persisted.
 - EPI and PUR are fixed `5 sp` health calculations. Their disease fact query is
   bounded to the five-generation health graph and must not depend on the
-  selected inbreeding `SP`.
+  selected inbreeding `SP`. Real disease rows use canonical `Dog.sireId` and
+  `Dog.damId`; anonymous rows with no `dogId` can contribute only EPI/PUR
+  relationship evidence through their resolved source parents.
 - `calculateDogHealthSummary` is the shared server-side entry point for these
   values. Admin dog profile uses the same calculator for the legacy EPI,
   Lafora, and risk fields, while virtual pairing also renders PUR from the same

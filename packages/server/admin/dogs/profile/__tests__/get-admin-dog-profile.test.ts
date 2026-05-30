@@ -188,6 +188,7 @@ describe("getAdminDogProfile", () => {
         isaDogId: "sire-1",
         emaDogId: "dam-1",
         sairausKoodi: "epi",
+        evidenceKind: "DOG",
       },
     ]);
 
