@@ -11,7 +11,25 @@ Legacy `beasairaat` rows mix three responsibilities:
 In v2 this should be cleaned up. Canonical dog relationships must come from
 `Dog.sireId` and `Dog.damId`, not from disease rows.
 
-## Decision
+## Current State
+
+The current implementation is an incremental step toward the evidence model:
+
+- Real disease rows have `KoiranSairaus.dogId` set.
+- Anonymous imported rows keep `dogId = null`.
+- For real disease rows, calculation loads parent relationships from canonical
+  `Dog.sireId` and `Dog.damId`.
+- For anonymous rows, calculation still uses stored `isaDogId` and `emaDogId`
+  as anonymous litter relationship evidence.
+- `evidenceKind` is currently derived in the disease fact loader:
+  - `dogId != null` -> `DOG`
+  - `dogId == null` -> `LITTER`
+- `UNRESOLVED` is not a stored or returned evidence kind yet. Rows with an
+  unresolved valid `REKNO` are imported with `dogId = null` for audit/manual
+  cleanup; whether they affect calculations depends on resolved parent links.
+- Lafora uses only real `DOG` disease rows. Anonymous rows do not affect Lafora.
+
+## Target Decision
 
 Model disease rows as evidence:
 
@@ -46,6 +64,28 @@ For `UNRESOLVED` evidence:
 - Invalid/synthetic/missing `REKNO` with both parents resolved -> `LITTER`.
 - No resolved dog and no resolved complete parent pair -> `UNRESOLVED`.
 - Always preserve raw source registration strings.
+
+## Follow-up: Remove Parent Dog Relations From Disease Rows
+
+`KoiranSairaus.isaDogId` and `KoiranSairaus.emaDogId` duplicate pedigree data
+and make the disease table look like a second parent source. They should be
+removed in a separate migration.
+
+Replace them with raw source parent registration fields, for example:
+
+- `isaRekisterinumero String?`
+- `emaRekisterinumero String?`
+
+Desired behavior after that migration:
+
+- For rows with `dogId`, ignore source parent registrations in calculations and
+  use canonical `Dog.sireId` and `Dog.damId`.
+- For rows with `dogId = null`, resolve `isaRekisterinumero` and
+  `emaRekisterinumero` through `DogRegistration` at read time and use those
+  resolved dogs only as anonymous EPI/PUR litter relationship evidence.
+- Preserve source parent registrations even when they do not resolve, so import
+  issues can be fixed manually without losing the original legacy values.
+- Do not create placeholder dogs for anonymous or unresolved disease rows.
 
 ## Examples
 
