@@ -37,11 +37,13 @@ type RegistrationIndex = {
 type KoiranSairausIdentityResolution = {
   registrationNo: string;
   dogId: string | null;
-  fallbackIssue: {
+  issue: {
     code:
       | "KOIRAN_SAIRAUS_REGISTRATION_SYNTHETIC_IMPORTED"
-      | "KOIRAN_SAIRAUS_REGISTRATION_GENERATED_IMPORTED";
+      | "KOIRAN_SAIRAUS_REGISTRATION_GENERATED_IMPORTED"
+      | "KOIRAN_SAIRAUS_REGISTRATION_UNRESOLVED";
     message: string;
+    counter: "fallback" | "unresolved";
   } | null;
 };
 
@@ -200,10 +202,11 @@ function resolveKoiranSairausIdentity(
     return {
       registrationNo: `LEGACY_BEASAIRAAT_${row.legacyId}`,
       dogId: null,
-      fallbackIssue: {
+      issue: {
         code: "KOIRAN_SAIRAUS_REGISTRATION_GENERATED_IMPORTED",
         message:
           "beasairaat row is missing REKNO, so a legacy fallback registration number was generated.",
+        counter: "fallback",
       },
     };
   }
@@ -212,18 +215,33 @@ function resolveKoiranSairausIdentity(
     return {
       registrationNo: normalizedRegistrationNo,
       dogId: null,
-      fallbackIssue: {
+      issue: {
         code: "KOIRAN_SAIRAUS_REGISTRATION_SYNTHETIC_IMPORTED",
         message:
           "beasairaat row has a synthetic or invalid REKNO that was preserved as imported identity.",
+        counter: "fallback",
+      },
+    };
+  }
+
+  const dogId = index.dogIdByRegistration.get(normalizedRegistrationNo) ?? null;
+  if (!dogId) {
+    return {
+      registrationNo: normalizedRegistrationNo,
+      dogId: null,
+      issue: {
+        code: "KOIRAN_SAIRAUS_REGISTRATION_UNRESOLVED",
+        message:
+          "beasairaat row has a valid REKNO that did not resolve to DogRegistration.",
+        counter: "unresolved",
       },
     };
   }
 
   return {
     registrationNo: normalizedRegistrationNo,
-    dogId: index.dogIdByRegistration.get(normalizedRegistrationNo) ?? null,
-    fallbackIssue: null,
+    dogId,
+    issue: null,
   };
 }
 
@@ -498,46 +516,55 @@ export async function runLegacyPhase1_25(
     >[0]["data"] = [];
     let koiranSairaudetSkipped = 0;
     let koiranSairaudetFallbackImported = 0;
+    let koiranSairaudetUnresolvedDogImported = 0;
     let koiranSairaudetProcessed = 0;
     let koiranSairaudetParentInvalid = 0;
     let koiranSairaudetParentUnresolved = 0;
     for (const row of legacy.koiranSairaudet) {
       koiranSairaudetProcessed += 1;
       const dog = resolveKoiranSairausIdentity(registrationIndex, row);
-      const isa = resolveRegistration(
-        registrationIndex,
-        row.sireRegistrationNo,
-      );
-      const ema = resolveRegistration(registrationIndex, row.damRegistrationNo);
+      const shouldKeepSourceParents = dog.dogId === null;
+      const isa = shouldKeepSourceParents
+        ? resolveRegistration(registrationIndex, row.sireRegistrationNo)
+        : { registrationNo: null, dogId: null };
+      const ema = shouldKeepSourceParents
+        ? resolveRegistration(registrationIndex, row.damRegistrationNo)
+        : { registrationNo: null, dogId: null };
       const sairausKoodi = normalizeDiseaseCode(row.diseaseCode);
-      if (dog.fallbackIssue) {
-        koiranSairaudetFallbackImported += 1;
+      if (dog.issue) {
+        if (dog.issue.counter === "fallback") {
+          koiranSairaudetFallbackImported += 1;
+        } else {
+          koiranSairaudetUnresolvedDogImported += 1;
+        }
         await recordIssue({
           stage: "koiran-sairaudet",
-          code: dog.fallbackIssue.code,
-          message: dog.fallbackIssue.message,
+          code: dog.issue.code,
+          message: dog.issue.message,
           registrationNo: dog.registrationNo,
           sourceRowId: row.legacyId,
           sourceTable: "beasairaat",
           payloadJson: JSON.stringify(row),
         });
       }
-      for (const [role, parent] of [
-        ["sire", isa],
-        ["dam", ema],
-      ] as const) {
-        const result = await recordParentResolutionIssue({
-          stage: "koiran-sairaudet",
-          sourceTable: "beasairaat",
-          sourceRowId: row.legacyId,
-          rowRegistrationNo: dog.registrationNo,
-          role,
-          parentRegistrationNo: parent.registrationNo,
-          parentDogId: parent.dogId,
-          payloadJson: JSON.stringify(row),
-        });
-        if (result === "invalid") koiranSairaudetParentInvalid += 1;
-        if (result === "unresolved") koiranSairaudetParentUnresolved += 1;
+      if (shouldKeepSourceParents) {
+        for (const [role, parent] of [
+          ["sire", isa],
+          ["dam", ema],
+        ] as const) {
+          const result = await recordParentResolutionIssue({
+            stage: "koiran-sairaudet",
+            sourceTable: "beasairaat",
+            sourceRowId: row.legacyId,
+            rowRegistrationNo: dog.registrationNo,
+            role,
+            parentRegistrationNo: parent.registrationNo,
+            parentDogId: parent.dogId,
+            payloadJson: JSON.stringify(row),
+          });
+          if (result === "invalid") koiranSairaudetParentInvalid += 1;
+          if (result === "unresolved") koiranSairaudetParentUnresolved += 1;
+        }
       }
       if (!sairausKoodi) {
         koiranSairaudetSkipped += 1;
@@ -620,7 +647,7 @@ export async function runLegacyPhase1_25(
         : 0;
     finishStage(
       "koiran-sairaudet",
-      `source=${legacy.koiranSairaudet.length}, inserted=${koiranSairaudetInserted}, skipped=${koiranSairaudetSkipped}, fallbackImported=${koiranSairaudetFallbackImported}, parentInvalid=${koiranSairaudetParentInvalid}, parentUnresolved=${koiranSairaudetParentUnresolved}`,
+      `source=${legacy.koiranSairaudet.length}, inserted=${koiranSairaudetInserted}, skipped=${koiranSairaudetSkipped}, fallbackImported=${koiranSairaudetFallbackImported}, unresolvedDogImported=${koiranSairaudetUnresolvedDogImported}, parentInvalid=${koiranSairaudetParentInvalid}, parentUnresolved=${koiranSairaudetParentUnresolved}`,
     );
 
     await flushIssueBuffer();
@@ -641,6 +668,7 @@ export async function runLegacyPhase1_25(
           sairaudetInserted,
           koiranSairaudetInserted,
           koiranSairaudetFallbackImported,
+          koiranSairaudetUnresolvedDogImported,
           epiLuvutInserted: 0,
           errorsCount,
         }),

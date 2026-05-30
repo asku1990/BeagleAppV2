@@ -217,6 +217,106 @@ describe("runLegacyPhase1_25", () => {
     );
   });
 
+  it("imports resolved dog rows without duplicating source parent relations", async () => {
+    fetchLegacyPhase1_25RowsMock.mockResolvedValue({
+      inbreeding: [],
+      sairaudet: makeSairausRows(),
+      koiranSairaudet: [
+        makeLegacyRow({
+          legacyId: 10,
+          registrationNo: "FI00001/21",
+          sireRegistrationNo: "BAD-SIRE",
+          damRegistrationNo: "BAD-DAM",
+          diseaseCode: "epi",
+        }),
+      ],
+    });
+    koiranSairausCreateManyMock.mockResolvedValue({ count: 1 });
+
+    const result = await runLegacyPhase1_25("user-1");
+
+    expect(result.status).toBe(202);
+    expect(koiranSairausCreateManyMock).toHaveBeenCalledWith({
+      data: [
+        expect.objectContaining({
+          vanhaId: 10,
+          dogId: "dog-real",
+          isaDogId: null,
+          emaDogId: null,
+          rekisterinumero: "FI00001/21",
+          sairausId: "sairaus-epi",
+          sairausKoodi: "epi",
+        }),
+      ],
+      skipDuplicates: true,
+    });
+    expect(createImportRunIssuesBulkMock).not.toHaveBeenCalled();
+    expect(markImportRunFinishedMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.objectContaining({
+        status: "SUCCEEDED",
+        errorsCount: 0,
+      }),
+      expect.any(Object),
+    );
+  });
+
+  it("imports valid unresolved REKNO rows with an unresolved warning and resolved parents", async () => {
+    fetchLegacyPhase1_25RowsMock.mockResolvedValue({
+      inbreeding: [],
+      sairaudet: makeSairausRows(),
+      koiranSairaudet: [
+        makeLegacyRow({
+          legacyId: 11,
+          registrationNo: "FI99999/21",
+          diseaseCode: "epi",
+        }),
+      ],
+    });
+    koiranSairausCreateManyMock.mockResolvedValue({ count: 1 });
+
+    const result = await runLegacyPhase1_25("user-1");
+
+    expect(result.status).toBe(202);
+    expect(koiranSairausCreateManyMock).toHaveBeenCalledWith({
+      data: [
+        expect.objectContaining({
+          vanhaId: 11,
+          dogId: null,
+          isaDogId: "dog-sire",
+          emaDogId: "dog-dam",
+          rekisterinumero: "FI99999/21",
+          sairausId: "sairaus-epi",
+          sairausKoodi: "epi",
+        }),
+      ],
+      skipDuplicates: true,
+    });
+    expect(createImportRunIssuesBulkMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.arrayContaining([
+        expect.objectContaining({
+          stage: "koiran-sairaudet",
+          severity: "WARNING",
+          code: "KOIRAN_SAIRAUS_REGISTRATION_UNRESOLVED",
+          registrationNo: "FI99999/21",
+          sourceRowId: 11,
+          sourceTable: "beasairaat",
+        }),
+      ]),
+      expect.any(Object),
+    );
+    expect(markImportRunFinishedMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.objectContaining({
+        status: "SUCCEEDED",
+        errorsCount: 0,
+        errorSummary: expect.stringContaining("unresolvedDogImported=1"),
+      }),
+      expect.any(Object),
+    );
+  });
+
   it("imports missing REKNO rows with a generated legacy identity and a warning issue", async () => {
     fetchLegacyPhase1_25RowsMock.mockResolvedValue({
       inbreeding: [],
