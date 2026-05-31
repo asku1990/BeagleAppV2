@@ -16,20 +16,27 @@ imports titles.
 
 ## Relationship rules
 
-- Dog, sire, and dam links are resolved through `DogRegistration.registrationNo`.
+- Dog identity and anonymous source parent registrations are resolved through
+  `DogRegistration.registrationNo`.
 - Imported rows store v2 dog ids when `REKNO` resolves. For these real dog
-  disease rows, source `ISREK` and `EMREK` are not stored because canonical
-  parentage comes from `Dog.sireId` and `Dog.damId`.
+  disease rows, canonical calculation parentage comes from `Dog.sireId` and
+  `Dog.damId`.
 - Imported disease rows keep the row dog's raw legacy registration number as
   `rekisterinumero` for traceability.
+- Imported disease rows also preserve normalized source `ISREK` and `EMREK` as
+  raw registration fields for traceability and anonymous litter matching. For
+  `DOG` evidence these source parent fields are ignored by calculations.
+- Each imported row stores an explicit evidence kind:
+  - `DOG`: valid `REKNO` resolves to a real dog.
+  - `LITTER`: missing, generated, synthetic, or invalid `REKNO` with both
+    source parent registrations resolving.
 - Synthetic or missing `beasairaat.REKNO` values are preserved with a null
-  `dogId` instead of being skipped, so anonymous affected puppy/litter evidence
-  can be audited and used by later disease-model cleanup.
-- Valid `REKNO` values that do not resolve are preserved with a null `dogId`
-  and a warning issue.
-- Source `ISREK` and `EMREK` parent ids are stored only for rows without a
-  resolved real dog.
-- Unresolved dog, sire, or dam ids do not fail the import.
+  `dogId` only when both source parent registrations resolve, so anonymous
+  affected puppy/litter evidence can be used by EPI/PUR calculations.
+- Valid `REKNO` values that do not resolve are recorded only as import issues
+  for manual cleanup.
+- Rows that cannot become `DOG` or `LITTER` do not fail the import, but they are
+  skipped from `KoiranSairaus` and recorded as issues.
 
 ## Data rules
 

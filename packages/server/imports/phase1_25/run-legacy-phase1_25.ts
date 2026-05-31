@@ -34,6 +34,8 @@ type RegistrationIndex = {
   dogIdByRegistration: Map<string, string>;
 };
 
+type KoiranSairausEvidenceKind = "DOG" | "LITTER";
+
 type KoiranSairausIdentityResolution = {
   registrationNo: string;
   dogId: string | null;
@@ -67,8 +69,9 @@ type KoiranSairausDelegate = {
     data: Array<{
       vanhaId: number;
       dogId: string | null;
-      isaDogId: string | null;
-      emaDogId: string | null;
+      evidenceKind: KoiranSairausEvidenceKind;
+      isaRekisterinumero: string | null;
+      emaRekisterinumero: string | null;
       rekisterinumero: string;
       sairausId: string;
       sairausKoodi: string;
@@ -247,6 +250,24 @@ function resolveKoiranSairausIdentity(
 
 function isUnknownLegacyParentRegistration(value: string): boolean {
   return value === "-" || value === "0" || /^U0+$/u.test(value);
+}
+
+function classifyKoiranSairausEvidence(input: {
+  dog: KoiranSairausIdentityResolution;
+  isaDogId: string | null;
+  emaDogId: string | null;
+}): KoiranSairausEvidenceKind | null {
+  if (input.dog.dogId) {
+    return "DOG";
+  }
+  if (
+    input.dog.issue?.counter === "fallback" &&
+    input.isaDogId &&
+    input.emaDogId
+  ) {
+    return "LITTER";
+  }
+  return null;
 }
 
 // Imports v1 virtual pairing support tables after phase1 has created dogs and registrations.
@@ -523,13 +544,16 @@ export async function runLegacyPhase1_25(
     for (const row of legacy.koiranSairaudet) {
       koiranSairaudetProcessed += 1;
       const dog = resolveKoiranSairausIdentity(registrationIndex, row);
-      const shouldKeepSourceParents = dog.dogId === null;
-      const isa = shouldKeepSourceParents
-        ? resolveRegistration(registrationIndex, row.sireRegistrationNo)
-        : { registrationNo: null, dogId: null };
-      const ema = shouldKeepSourceParents
-        ? resolveRegistration(registrationIndex, row.damRegistrationNo)
-        : { registrationNo: null, dogId: null };
+      const isa = resolveRegistration(
+        registrationIndex,
+        row.sireRegistrationNo,
+      );
+      const ema = resolveRegistration(registrationIndex, row.damRegistrationNo);
+      const evidenceKind = classifyKoiranSairausEvidence({
+        dog,
+        isaDogId: isa.dogId,
+        emaDogId: ema.dogId,
+      });
       const sairausKoodi = normalizeDiseaseCode(row.diseaseCode);
       if (dog.issue) {
         if (dog.issue.counter === "fallback") {
@@ -547,7 +571,7 @@ export async function runLegacyPhase1_25(
           payloadJson: JSON.stringify(row),
         });
       }
-      if (shouldKeepSourceParents) {
+      if (evidenceKind !== "DOG") {
         for (const [role, parent] of [
           ["sire", isa],
           ["dam", ema],
@@ -609,11 +633,23 @@ export async function runLegacyPhase1_25(
         }
         continue;
       }
+      if (!evidenceKind) {
+        koiranSairaudetSkipped += 1;
+        if (koiranSairaudetProcessed % 1000 === 0) {
+          logProgress(
+            "koiran-sairaudet",
+            koiranSairaudetProcessed,
+            legacy.koiranSairaudet.length,
+          );
+        }
+        continue;
+      }
       koiranSairaudetData.push({
         vanhaId: row.legacyId,
         dogId: dog.dogId,
-        isaDogId: isa.dogId,
-        emaDogId: ema.dogId,
+        evidenceKind,
+        isaRekisterinumero: isa.registrationNo,
+        emaRekisterinumero: ema.registrationNo,
         rekisterinumero: dog.registrationNo,
         sairausId,
         sairausKoodi,

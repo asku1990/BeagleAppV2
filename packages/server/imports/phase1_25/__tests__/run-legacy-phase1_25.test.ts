@@ -183,8 +183,9 @@ describe("runLegacyPhase1_25", () => {
         expect.objectContaining({
           vanhaId: 94,
           dogId: null,
-          isaDogId: "dog-sire",
-          emaDogId: "dog-dam",
+          evidenceKind: "LITTER",
+          isaRekisterinumero: "SF14404/90",
+          emaRekisterinumero: "SF19531/89",
           rekisterinumero: "EPI_1/94",
           sairausId: "sairaus-epi",
           sairausKoodi: "epi",
@@ -241,8 +242,9 @@ describe("runLegacyPhase1_25", () => {
         expect.objectContaining({
           vanhaId: 10,
           dogId: "dog-real",
-          isaDogId: null,
-          emaDogId: null,
+          evidenceKind: "DOG",
+          isaRekisterinumero: "BAD-SIRE",
+          emaRekisterinumero: "BAD-DAM",
           rekisterinumero: "FI00001/21",
           sairausId: "sairaus-epi",
           sairausKoodi: "epi",
@@ -261,7 +263,7 @@ describe("runLegacyPhase1_25", () => {
     );
   });
 
-  it("imports valid unresolved REKNO rows with an unresolved warning and resolved parents", async () => {
+  it("skips valid unresolved REKNO rows after recording an import issue", async () => {
     fetchLegacyPhase1_25RowsMock.mockResolvedValue({
       inbreeding: [],
       sairaudet: makeSairausRows(),
@@ -273,25 +275,11 @@ describe("runLegacyPhase1_25", () => {
         }),
       ],
     });
-    koiranSairausCreateManyMock.mockResolvedValue({ count: 1 });
 
     const result = await runLegacyPhase1_25("user-1");
 
     expect(result.status).toBe(202);
-    expect(koiranSairausCreateManyMock).toHaveBeenCalledWith({
-      data: [
-        expect.objectContaining({
-          vanhaId: 11,
-          dogId: null,
-          isaDogId: "dog-sire",
-          emaDogId: "dog-dam",
-          rekisterinumero: "FI99999/21",
-          sairausId: "sairaus-epi",
-          sairausKoodi: "epi",
-        }),
-      ],
-      skipDuplicates: true,
-    });
+    expect(koiranSairausCreateManyMock).not.toHaveBeenCalled();
     expect(createImportRunIssuesBulkMock).toHaveBeenCalledWith(
       "run-1",
       expect.arrayContaining([
@@ -339,8 +327,9 @@ describe("runLegacyPhase1_25", () => {
         expect.objectContaining({
           vanhaId: 1,
           dogId: null,
-          isaDogId: "dog-sire",
-          emaDogId: "dog-dam",
+          evidenceKind: "LITTER",
+          isaRekisterinumero: "SF14404/90",
+          emaRekisterinumero: "SF19531/89",
           rekisterinumero: "LEGACY_BEASAIRAAT_1",
           sairausId: "sairaus-pur",
           sairausKoodi: "pur",
@@ -369,6 +358,40 @@ describe("runLegacyPhase1_25", () => {
         errorsCount: 0,
         errorSummary: expect.stringContaining("fallbackImported=1"),
       }),
+      expect.any(Object),
+    );
+  });
+
+  it("skips synthetic REKNO rows with incomplete parents after recording an import issue", async () => {
+    dogRegistrationFindManyMock.mockResolvedValue([
+      { registrationNo: "SF14404/90", dogId: "dog-sire" },
+      { registrationNo: "FI00001/21", dogId: "dog-real" },
+    ]);
+    fetchLegacyPhase1_25RowsMock.mockResolvedValue({
+      inbreeding: [],
+      sairaudet: makeSairausRows(),
+      koiranSairaudet: [
+        makeLegacyRow({
+          legacyId: 95,
+          registrationNo: "EPI_2/94",
+          diseaseCode: "epi",
+        }),
+      ],
+    });
+
+    const result = await runLegacyPhase1_25("user-1");
+
+    expect(result.status).toBe(202);
+    expect(koiranSairausCreateManyMock).not.toHaveBeenCalled();
+    expect(createImportRunIssuesBulkMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "KOIRAN_SAIRAUS_DAM_UNRESOLVED",
+          registrationNo: "EPI_2/94",
+          sourceRowId: 95,
+        }),
+      ]),
       expect.any(Object),
     );
   });

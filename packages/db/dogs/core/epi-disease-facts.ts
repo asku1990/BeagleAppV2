@@ -25,21 +25,45 @@ export async function loadDogDiseaseFactsDb(
 
   const ids = [...new Set(relatedDogIds)];
   const codes = normalizeDiseaseCodes(diseaseCodes);
+  const relatedRegistrations = await prisma.dogRegistration.findMany({
+    where: {
+      dogId: { in: ids },
+    },
+    select: {
+      dogId: true,
+      registrationNo: true,
+    },
+  });
+  const dogIdByRegistrationNo = new Map(
+    relatedRegistrations.map((row) => [row.registrationNo, row.dogId]),
+  );
+  const registrationNos = [...dogIdByRegistrationNo.keys()];
   const rows = await prisma.koiranSairaus.findMany({
     where: {
       sairausKoodi: { in: codes },
       OR: [
-        { dogId: { in: ids } },
-        { dog: { sireId: { in: ids } } },
-        { dog: { damId: { in: ids } } },
-        { dogId: null, isaDogId: { in: ids } },
-        { dogId: null, emaDogId: { in: ids } },
+        {
+          evidenceKind: "DOG",
+          OR: [
+            { dogId: { in: ids } },
+            { dog: { sireId: { in: ids } } },
+            { dog: { damId: { in: ids } } },
+          ],
+        },
+        {
+          evidenceKind: "LITTER",
+          OR: [
+            { isaRekisterinumero: { in: registrationNos } },
+            { emaRekisterinumero: { in: registrationNos } },
+          ],
+        },
       ],
     },
     select: {
       dogId: true,
-      isaDogId: true,
-      emaDogId: true,
+      evidenceKind: true,
+      isaRekisterinumero: true,
+      emaRekisterinumero: true,
       sairausKoodi: true,
       dog: {
         select: {
@@ -50,13 +74,38 @@ export async function loadDogDiseaseFactsDb(
     },
   });
 
-  return rows.map((row) => ({
-    dogId: row.dogId,
-    isaDogId: row.dogId ? (row.dog?.sireId ?? null) : row.isaDogId,
-    emaDogId: row.dogId ? (row.dog?.damId ?? null) : row.emaDogId,
-    sairausKoodi: row.sairausKoodi.toLowerCase(),
-    evidenceKind: row.dogId ? "DOG" : "LITTER",
-  }));
+  return rows.flatMap<DogEpiDiseaseFactDb>((row) => {
+    if (row.evidenceKind === "DOG") {
+      return [
+        {
+          dogId: row.dogId,
+          isaDogId: row.dog?.sireId ?? null,
+          emaDogId: row.dog?.damId ?? null,
+          sairausKoodi: row.sairausKoodi.toLowerCase(),
+          evidenceKind: "DOG" as const,
+        },
+      ];
+    }
+    const isaDogId = row.isaRekisterinumero
+      ? (dogIdByRegistrationNo.get(row.isaRekisterinumero) ?? null)
+      : null;
+    const emaDogId = row.emaRekisterinumero
+      ? (dogIdByRegistrationNo.get(row.emaRekisterinumero) ?? null)
+      : null;
+    if (!isaDogId || !emaDogId) {
+      return [];
+    }
+
+    return [
+      {
+        dogId: null,
+        isaDogId,
+        emaDogId,
+        sairausKoodi: row.sairausKoodi.toLowerCase(),
+        evidenceKind: "LITTER" as const,
+      },
+    ];
+  });
 }
 
 // Loads the legacy EPI/Lafora fact set used by admin dog profile scoring.

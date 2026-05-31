@@ -4,18 +4,24 @@ import {
   loadDogEpiDiseaseFactsDb,
 } from "../epi-disease-facts";
 
-const { koiranSairausFindManyMock, prismaMock } = vi.hoisted(() => {
-  const koiranSairausFindMany = vi.fn();
+const { dogRegistrationFindManyMock, koiranSairausFindManyMock, prismaMock } =
+  vi.hoisted(() => {
+    const dogRegistrationFindMany = vi.fn();
+    const koiranSairausFindMany = vi.fn();
 
-  return {
-    koiranSairausFindManyMock: koiranSairausFindMany,
-    prismaMock: {
-      koiranSairaus: {
-        findMany: koiranSairausFindMany,
+    return {
+      dogRegistrationFindManyMock: dogRegistrationFindMany,
+      koiranSairausFindManyMock: koiranSairausFindMany,
+      prismaMock: {
+        dogRegistration: {
+          findMany: dogRegistrationFindMany,
+        },
+        koiranSairaus: {
+          findMany: koiranSairausFindMany,
+        },
       },
-    },
-  };
-});
+    };
+  });
 
 vi.mock("@db/core/prisma", () => ({
   prisma: prismaMock,
@@ -23,6 +29,7 @@ vi.mock("@db/core/prisma", () => ({
 
 describe("loadDogEpiDiseaseFactsDb", () => {
   beforeEach(() => {
+    dogRegistrationFindManyMock.mockReset();
     koiranSairausFindManyMock.mockReset();
   });
 
@@ -30,15 +37,22 @@ describe("loadDogEpiDiseaseFactsDb", () => {
     const result = await loadDogEpiDiseaseFactsDb([]);
 
     expect(result).toEqual([]);
+    expect(dogRegistrationFindManyMock).not.toHaveBeenCalled();
     expect(koiranSairausFindManyMock).not.toHaveBeenCalled();
   });
 
   it("loads real EPI/Lafora facts with canonical dog parents", async () => {
+    dogRegistrationFindManyMock.mockResolvedValueOnce([
+      { dogId: "dog-1", registrationNo: "FI00001/21" },
+      { dogId: "dog-2", registrationNo: "FI00002/21" },
+      { dogId: "dog-3", registrationNo: "FI00003/21" },
+    ]);
     koiranSairausFindManyMock.mockResolvedValueOnce([
       {
         dogId: "dog-1",
-        isaDogId: "stale-sire",
-        emaDogId: "stale-dam",
+        evidenceKind: "DOG",
+        isaRekisterinumero: "STALE-SIRE",
+        emaRekisterinumero: "STALE-DAM",
         sairausKoodi: "LEPIS",
         dog: {
           sireId: "canonical-sire",
@@ -47,8 +61,9 @@ describe("loadDogEpiDiseaseFactsDb", () => {
       },
       {
         dogId: null,
-        isaDogId: "dog-2",
-        emaDogId: "dog-3",
+        evidenceKind: "LITTER",
+        isaRekisterinumero: "FI00002/21",
+        emaRekisterinumero: "FI00003/21",
         sairausKoodi: "EPI",
         dog: null,
       },
@@ -56,21 +71,49 @@ describe("loadDogEpiDiseaseFactsDb", () => {
 
     const result = await loadDogEpiDiseaseFactsDb(["dog-1", "dog-2", "dog-1"]);
 
+    expect(dogRegistrationFindManyMock).toHaveBeenCalledWith({
+      where: {
+        dogId: { in: ["dog-1", "dog-2"] },
+      },
+      select: {
+        dogId: true,
+        registrationNo: true,
+      },
+    });
     expect(koiranSairausFindManyMock).toHaveBeenCalledWith({
       where: {
         sairausKoodi: { in: ["epi", "lepis", "lepik", "lepit"] },
         OR: [
-          { dogId: { in: ["dog-1", "dog-2"] } },
-          { dog: { sireId: { in: ["dog-1", "dog-2"] } } },
-          { dog: { damId: { in: ["dog-1", "dog-2"] } } },
-          { dogId: null, isaDogId: { in: ["dog-1", "dog-2"] } },
-          { dogId: null, emaDogId: { in: ["dog-1", "dog-2"] } },
+          {
+            evidenceKind: "DOG",
+            OR: [
+              { dogId: { in: ["dog-1", "dog-2"] } },
+              { dog: { sireId: { in: ["dog-1", "dog-2"] } } },
+              { dog: { damId: { in: ["dog-1", "dog-2"] } } },
+            ],
+          },
+          {
+            evidenceKind: "LITTER",
+            OR: [
+              {
+                isaRekisterinumero: {
+                  in: ["FI00001/21", "FI00002/21", "FI00003/21"],
+                },
+              },
+              {
+                emaRekisterinumero: {
+                  in: ["FI00001/21", "FI00002/21", "FI00003/21"],
+                },
+              },
+            ],
+          },
         ],
       },
       select: {
         dogId: true,
-        isaDogId: true,
-        emaDogId: true,
+        evidenceKind: true,
+        isaRekisterinumero: true,
+        emaRekisterinumero: true,
         sairausKoodi: true,
         dog: {
           select: {
@@ -100,11 +143,15 @@ describe("loadDogEpiDiseaseFactsDb", () => {
   });
 
   it("loads a custom disease code set for virtual pairing", async () => {
+    dogRegistrationFindManyMock.mockResolvedValueOnce([
+      { dogId: "dog-1", registrationNo: "FI00001/21" },
+    ]);
     koiranSairausFindManyMock.mockResolvedValueOnce([
       {
         dogId: "dog-1",
-        isaDogId: "stale-sire",
-        emaDogId: "stale-dam",
+        evidenceKind: "DOG",
+        isaRekisterinumero: "STALE-SIRE",
+        emaRekisterinumero: "STALE-DAM",
         sairausKoodi: "PUR",
         dog: {
           sireId: null,
@@ -122,17 +169,28 @@ describe("loadDogEpiDiseaseFactsDb", () => {
       where: {
         sairausKoodi: { in: ["epi", "pur", "ap", "yp", "rp"] },
         OR: [
-          { dogId: { in: ["dog-1"] } },
-          { dog: { sireId: { in: ["dog-1"] } } },
-          { dog: { damId: { in: ["dog-1"] } } },
-          { dogId: null, isaDogId: { in: ["dog-1"] } },
-          { dogId: null, emaDogId: { in: ["dog-1"] } },
+          {
+            evidenceKind: "DOG",
+            OR: [
+              { dogId: { in: ["dog-1"] } },
+              { dog: { sireId: { in: ["dog-1"] } } },
+              { dog: { damId: { in: ["dog-1"] } } },
+            ],
+          },
+          {
+            evidenceKind: "LITTER",
+            OR: [
+              { isaRekisterinumero: { in: ["FI00001/21"] } },
+              { emaRekisterinumero: { in: ["FI00001/21"] } },
+            ],
+          },
         ],
       },
       select: {
         dogId: true,
-        isaDogId: true,
-        emaDogId: true,
+        evidenceKind: true,
+        isaRekisterinumero: true,
+        emaRekisterinumero: true,
         sairausKoodi: true,
         dog: {
           select: {

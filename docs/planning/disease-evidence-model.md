@@ -13,20 +13,17 @@ In v2 this should be cleaned up. Canonical dog relationships must come from
 
 ## Current State
 
-The current implementation is an incremental step toward the evidence model:
+Disease rows are stored as explicit evidence:
 
-- Real disease rows have `KoiranSairaus.dogId` set.
-- Anonymous imported rows keep `dogId = null`.
+- `DOG`: real disease rows have `KoiranSairaus.dogId` set.
+- `LITTER`: anonymous affected puppy/litter rows have `dogId = null`, no valid
+  real dog registration, and a complete source parent pair.
+- Rows that cannot become `DOG` or `LITTER` are skipped from `KoiranSairaus`
+  and recorded as import issues for manual cleanup.
 - For real disease rows, calculation loads parent relationships from canonical
   `Dog.sireId` and `Dog.damId`.
-- For anonymous rows, calculation still uses stored `isaDogId` and `emaDogId`
-  as anonymous litter relationship evidence.
-- `evidenceKind` is currently derived in the disease fact loader:
-  - `dogId != null` -> `DOG`
-  - `dogId == null` -> `LITTER`
-- `UNRESOLVED` is not a stored or returned evidence kind yet. Rows with an
-  unresolved valid `REKNO` are imported with `dogId = null` for audit/manual
-  cleanup; whether they affect calculations depends on resolved parent links.
+- For anonymous rows, calculation resolves stored source parent registrations
+  through `DogRegistration` inside the bounded health graph.
 - Lafora uses only real `DOG` disease rows. Anonymous rows do not affect Lafora.
 
 ## Target Decision
@@ -35,7 +32,6 @@ Model disease rows as evidence:
 
 - `DOG`: linked to a real affected dog.
 - `LITTER`: anonymous affected puppy/litter linked to resolved sire and dam.
-- `UNRESOLVED`: preserved import/source row, excluded from calculations.
 
 Do not create fake dogs for anonymous disease rows.
 
@@ -49,29 +45,24 @@ For `DOG` evidence:
 
 For `LITTER` evidence:
 
+- Source row has no valid real dog registration, meaning missing/generated or
+  synthetic/invalid `REKNO`, and both source parent registrations resolve.
 - Use resolved sire and dam as anonymous affected litter evidence.
 - Allow it to contribute to EPI/PUR relationship evidence.
 - Never count it as direct disease for any real dog.
-
-For `UNRESOLVED` evidence:
-
-- Preserve for audit/manual cleanup.
-- Exclude from calculations.
 
 ## Import Policy
 
 - Real `REKNO` resolving to dog -> `DOG`.
 - Invalid/synthetic/missing `REKNO` with both parents resolved -> `LITTER`.
-- No resolved dog and no resolved complete parent pair -> `UNRESOLVED`.
+- Valid unresolved `REKNO`, or no resolved complete parent pair -> import issue
+  only; do not insert a `KoiranSairaus` row.
 - Always preserve raw source registration strings.
 
-## Follow-up: Remove Parent Dog Relations From Disease Rows
+## Parent Registration Storage
 
-`KoiranSairaus.isaDogId` and `KoiranSairaus.emaDogId` duplicate pedigree data
-and make the disease table look like a second parent source. They should be
-removed in a separate migration.
-
-Replace them with raw source parent registration fields, for example:
+`KoiranSairaus` stores source parent registration strings, not parent dog
+relations:
 
 - `isaRekisterinumero String?`
 - `emaRekisterinumero String?`
@@ -83,16 +74,15 @@ Desired behavior after that migration:
 - For rows with `dogId = null`, resolve `isaRekisterinumero` and
   `emaRekisterinumero` through `DogRegistration` at read time and use those
   resolved dogs only as anonymous EPI/PUR litter relationship evidence.
-- Preserve source parent registrations even when they do not resolve, so import
-  issues can be fixed manually without losing the original legacy values.
-- Do not create placeholder dogs for anonymous or unresolved disease rows.
+- Preserve unresolved source data in import issues for manual cleanup.
+- Do not create placeholder dogs for anonymous disease rows.
 
 ## Examples
 
 - `FI15813/15` should be `DOG` evidence because the dog exists.
 - `PKR.VI-15268` vs `PKRVI-15268` is an alias/import cleanup issue, not a reason to lose dog evidence.
 - `EPI_1/94` with resolved sire/dam should be `LITTER` evidence.
-- Missing `REKNO` with unresolved parents should be `UNRESOLVED`.
+- Missing `REKNO` with unresolved parents should be an import issue only.
 
 ## Out Of Scope
 

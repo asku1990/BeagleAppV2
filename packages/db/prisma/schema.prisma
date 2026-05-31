@@ -25,6 +25,11 @@ enum SairausRyhma {
   MUU
 }
 
+enum KoiranSairausEvidenceKind {
+  DOG
+  LITTER
+}
+
 enum ImportKind {
   LEGACY_PHASE1
   LEGACY_PHASE1_25
@@ -215,8 +220,6 @@ model Dog {
   trialEntries        TrialEntry[]
   showEntries         ShowEntry[]
   sairaudet           KoiranSairaus[]   @relation("KoiranSairausDog")
-  sairauksienIsana    KoiranSairaus[]   @relation("KoiranSairausIsa")
-  sairauksienEmana    KoiranSairaus[]   @relation("KoiranSairausEma")
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
 
@@ -269,29 +272,29 @@ model Sairaus {
 }
 
 model KoiranSairaus {
-  id                String    @id @default(cuid())
-  vanhaId           Int       @unique
-  dogId             String?
-  isaDogId          String?
-  emaDogId          String?
-  rekisterinumero   String
-  sairausId         String
-  sairausKoodi      String
-  pentue            String?
-  kuvaus            String?   @db.Text
-  julkinen          Boolean   @default(false)
-  tietolahde        String?
-  muokattuLahteessa DateTime?
-  dog               Dog?      @relation("KoiranSairausDog", fields: [dogId], references: [id], onDelete: SetNull)
-  isaDog            Dog?      @relation("KoiranSairausIsa", fields: [isaDogId], references: [id], onDelete: SetNull)
-  emaDog            Dog?      @relation("KoiranSairausEma", fields: [emaDogId], references: [id], onDelete: SetNull)
-  sairaus           Sairaus   @relation(fields: [sairausId], references: [id], onDelete: Restrict)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  id                 String                    @id @default(cuid())
+  vanhaId            Int                       @unique
+  dogId              String?
+  evidenceKind       KoiranSairausEvidenceKind
+  isaRekisterinumero String?
+  emaRekisterinumero String?
+  rekisterinumero    String
+  sairausId          String
+  sairausKoodi       String
+  pentue             String?
+  kuvaus             String?                   @db.Text
+  julkinen           Boolean                   @default(false)
+  tietolahde         String?
+  muokattuLahteessa  DateTime?
+  dog                Dog?                      @relation("KoiranSairausDog", fields: [dogId], references: [id], onDelete: SetNull)
+  sairaus            Sairaus                   @relation(fields: [sairausId], references: [id], onDelete: Restrict)
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
 
   @@index([dogId])
-  @@index([isaDogId])
-  @@index([emaDogId])
+  @@index([evidenceKind])
+  @@index([isaRekisterinumero])
+  @@index([emaRekisterinumero])
   @@index([rekisterinumero])
   @@index([sairausId])
   @@index([sairausKoodi])
