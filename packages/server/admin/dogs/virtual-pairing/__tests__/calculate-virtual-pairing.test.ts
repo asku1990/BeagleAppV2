@@ -120,6 +120,7 @@ describe("calculateAdminVirtualPairing", () => {
         isaDogId: "ancestor",
         emaDogId: null,
         sairausKoodi: "lepik",
+        evidenceKind: "DOG",
       },
     ]);
     findVirtualPairingAncestorDetailsDbMock.mockResolvedValue([

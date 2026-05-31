@@ -46,36 +46,42 @@ describe("calculateDogHealthSummary", () => {
         isaDogId: "sire",
         emaDogId: "dam",
         sairausKoodi: "epi",
+        evidenceKind: "DOG",
       },
       {
         dogId: "half-sibling",
         isaDogId: "sire",
         emaDogId: "other-dam",
         sairausKoodi: "epi",
+        evidenceKind: "DOG",
       },
       {
         dogId: "sire",
         isaDogId: "sire-sire",
         emaDogId: "sire-dam",
         sairausKoodi: "lepik",
+        evidenceKind: "DOG",
       },
       {
         dogId: "dam",
         isaDogId: "dam-sire",
         emaDogId: "dam-dam",
         sairausKoodi: "lepis",
+        evidenceKind: "DOG",
       },
       {
         dogId: "full-sibling",
         isaDogId: "sire",
         emaDogId: "dam",
         sairausKoodi: "pur",
+        evidenceKind: "DOG",
       },
       {
         dogId: "half-sibling",
         isaDogId: "sire",
         emaDogId: "other-dam",
         sairausKoodi: "ap",
+        evidenceKind: "DOG",
       },
     ]);
 
@@ -118,12 +124,14 @@ describe("calculateDogHealthSummary", () => {
         isaDogId: null,
         emaDogId: null,
         sairausKoodi: "epi",
+        evidenceKind: "DOG",
       },
       {
         dogId: "sire-6",
         isaDogId: null,
         emaDogId: null,
         sairausKoodi: "pur",
+        evidenceKind: "DOG",
       },
     ]);
 
@@ -147,6 +155,51 @@ describe("calculateDogHealthSummary", () => {
     expect(summary.pur.value).toBe(0);
     expect(summary.lafora.value).toBe(0);
     expect(summary.risk.value).toBe(3);
+  });
+
+  it("uses anonymous litter rows only as EPI/PUR relationship evidence", () => {
+    const ancestry = makeAncestry({
+      "virtual-root": makeNode("virtual-root", "sire", "dam"),
+      sire: makeNode("sire", null, null),
+      dam: makeNode("dam", null, null),
+    });
+
+    const summary = calculateDogHealthSummary("virtual-root", ancestry, [
+      {
+        dogId: null,
+        isaDogId: "sire",
+        emaDogId: "dam",
+        sairausKoodi: "epi",
+        evidenceKind: "LITTER",
+      },
+      {
+        dogId: null,
+        isaDogId: "sire",
+        emaDogId: "dam",
+        sairausKoodi: "pur",
+        evidenceKind: "LITTER",
+      },
+      {
+        dogId: null,
+        isaDogId: "sire",
+        emaDogId: "dam",
+        sairausKoodi: "lepis",
+        evidenceKind: "LITTER",
+      },
+    ]);
+
+    expect(summary.epi).toEqual({
+      value: 1,
+      text: "-S---",
+      display: "1.000 -S---",
+      tier: 2,
+    });
+    expect(summary.pur).toEqual({
+      value: 1,
+      text: "-S---",
+      display: "1.000 -S---",
+    });
+    expect(summary.lafora.value).toBe(0);
   });
 });
 

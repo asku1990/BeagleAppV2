@@ -158,6 +158,7 @@ function scoreFiveGenerationDiseaseEvidence(
 ): DiseaseEvidence {
   const diseaseByDogId = new Set(
     diseaseRows
+      .filter((row) => row.evidenceKind === "DOG")
       .map((row) => row.dogId)
       .filter((id): id is string => Boolean(id)),
   );
@@ -240,7 +241,11 @@ function laforaValueFromCode(code: string): number {
 function buildLaforaByDogId(rows: DogEpiDiseaseFactDb[]): Map<string, number> {
   const byDogId = new Map<string, number>();
   for (const row of rows) {
-    if (!row.dogId || !LAFORA_DISEASE_CODES.has(row.sairausKoodi)) {
+    if (
+      row.evidenceKind !== "DOG" ||
+      !row.dogId ||
+      !LAFORA_DISEASE_CODES.has(row.sairausKoodi)
+    ) {
       continue;
     }
 
