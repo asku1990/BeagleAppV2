@@ -1,8 +1,7 @@
 # Legacy Import Phase 1.25
 
-This phase imports legacy disease data and stored dog inbreeding percentages
-after phase1 has created canonical dogs and registrations, and before phase1.5
-imports titles.
+This phase imports legacy disease data after phase1 has created canonical dogs
+and registrations, and before phase1.5 imports titles.
 
 ## Command
 
@@ -10,7 +9,6 @@ imports titles.
 
 ## Source tables
 
-- `bearek_id.SIITOSASTE` updates `Dog.siitosasteProsentti`.
 - `beasairaudet` imports disease definitions into `Sairaus`.
 - `beasairaat` imports dog disease rows into `KoiranSairaus`.
 
@@ -40,8 +38,6 @@ imports titles.
 
 ## Data rules
 
-- `SIITOSASTE` `NULL` and `0` import as `null`.
-- Positive `SIITOSASTE` imports as `Dog.siitosasteProsentti`.
 - `Sairaus.sairausRyhma` is derived from `beasairaudet.SAIRAUS`.
 - No other legacy source tables are imported by this phase.
 

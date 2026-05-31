@@ -175,7 +175,6 @@ describe("AdminDogsPageClient", () => {
             showCount: 1,
             titlesText: null,
             ekNo: 5588,
-            inbreedingCoefficientPct: 12.5,
             note: null,
             titles: [],
           },

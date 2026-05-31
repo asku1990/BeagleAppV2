@@ -38,7 +38,7 @@ describe("formatLegacyImportSummary", () => {
   it("formats phase1.25 with disease import identity issue counters", () => {
     const summary = formatLegacyImportSummary({
       kind: "LEGACY_PHASE1_25",
-      siitosasteUpdated: 10,
+      dogsUpserted: 0,
       sairaudetInserted: 3,
       koiranSairaudetInserted: 8,
       koiranSairaudetFallbackIdentityIssues: 2,
@@ -48,7 +48,7 @@ describe("formatLegacyImportSummary", () => {
     });
 
     expect(summary).toBe(
-      "Phase 1.25: siitosaste=10, sairaudet=3, koiranSairaudet=8, fallbackIdentityIssues=2, unresolvedDogSkipped=1, epiLuvut=0, errors=1.",
+      "Phase 1.25: sairaudet=3, koiranSairaudet=8, fallbackIdentityIssues=2, unresolvedDogSkipped=1, epiLuvut=0, errors=1.",
     );
   });
 

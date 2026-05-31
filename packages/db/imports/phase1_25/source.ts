@@ -1,12 +1,11 @@
 import { connectLegacyDatabase } from "../internal";
 import type {
-  LegacyDogInbreedingRow,
   LegacyKoiranSairausRow,
   LegacyPhase1_25Rows,
   LegacySairausRow,
 } from "../types";
 
-// Loads legacy disease rows and stored inbreeding percentages for phase1.25 import.
+// Loads legacy disease rows for phase1.25 import.
 export async function fetchLegacyPhase1_25Rows(options?: {
   log?: (message: string) => void;
 }): Promise<LegacyPhase1_25Rows> {
@@ -16,16 +15,6 @@ export async function fetchLegacyPhase1_25Rows(options?: {
   const connection = await connectLegacyDatabase();
   try {
     log("Connected to legacy database");
-
-    const inbreedingStartedAt = Date.now();
-    const inbreeding = (await connection.query(
-      `SELECT REKNO as registrationNo,
-              SIITOSASTE as siitosasteRaw
-       FROM bearek_id`,
-    )) as LegacyDogInbreedingRow[];
-    log(
-      `Fetched bearek_id inbreeding rows: total=${inbreeding.length}, elapsed=${Math.round((Date.now() - inbreedingStartedAt) / 1000)}s`,
-    );
 
     const sairaudetStartedAt = Date.now();
     const sairaudet = (await connection.query(
@@ -61,7 +50,6 @@ export async function fetchLegacyPhase1_25Rows(options?: {
     );
 
     return {
-      inbreeding,
       sairaudet,
       koiranSairaudet,
     };

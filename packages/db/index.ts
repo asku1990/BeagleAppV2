@@ -48,7 +48,6 @@ export { fetchLegacyPhase1_5Rows } from "./imports/phase1_5";
 export {
   type LegacyBreederRow,
   type LegacyDogRow,
-  type LegacyDogInbreedingRow,
   type LegacyEkRow,
   type LegacyDogTitleRow,
   type LegacyKoiranSairausRow,

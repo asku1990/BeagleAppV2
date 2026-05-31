@@ -65,7 +65,6 @@ function buildTargetDog(): AdminDogRecord {
     titlesText: null,
     ownershipPreview: ["Tiina Virtanen"],
     ekNo: 5588,
-    inbreedingCoefficientPct: 12.5,
     note: "Important note",
     registrationNo: "FI12345/21",
     secondaryRegistrationNos: ["FI54321/21"],
@@ -310,7 +309,7 @@ describe("useAdminDogFormFlow", () => {
     );
   });
 
-  it("prefills displayed inbreeding result from persisted edit dog value", () => {
+  it("starts edit modal inbreeding preview empty until recalculated", () => {
     const target = buildTargetDog();
     const setFormValues = vi.fn();
     const setFormState = vi.fn();
@@ -338,7 +337,7 @@ describe("useAdminDogFormFlow", () => {
         name: "Metsapolun Kide",
         sirePreviewRegistrationNo: "FI54321/20",
         damPreviewRegistrationNo: "FI77777/18",
-        inbreedingCoefficientPct: 12.5,
+        inbreedingCoefficientPct: null,
       }),
     );
     expect(setFormState).toHaveBeenCalledWith({

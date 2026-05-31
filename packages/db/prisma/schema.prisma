@@ -207,7 +207,6 @@ model Dog {
   breederId           String?
   ekNo                Int?              @unique
   note                String?
-  siitosasteProsentti Decimal?          @db.Decimal(10, 7)
   sire                Dog?              @relation("SireRelation", fields: [sireId], references: [id])
   siredPuppies        Dog[]             @relation("SireRelation")
   dam                 Dog?              @relation("DamRelation", fields: [damId], references: [id])

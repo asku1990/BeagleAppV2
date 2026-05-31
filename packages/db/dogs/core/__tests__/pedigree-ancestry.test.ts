@@ -47,25 +47,21 @@ describe("loadDogPedigreeAncestryDb", () => {
           id: "root",
           sireId: "sire",
           damId: "dam",
-          siitosasteProsentti: null,
         },
         sire: {
           id: "sire",
           sireId: "sire-parent",
           damId: null,
-          siitosasteProsentti: null,
         },
         dam: {
           id: "dam",
           sireId: null,
           damId: null,
-          siitosasteProsentti: null,
         },
         "sire-parent": {
           id: "sire-parent",
           sireId: null,
           damId: null,
-          siitosasteProsentti: null,
         },
       },
     });
@@ -89,7 +85,6 @@ describe("loadDogPedigreeAncestryDb", () => {
       id: "ancestor",
       sireId: null,
       damId: null,
-      siitosasteProsentti: null,
     });
   });
 });

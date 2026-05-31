@@ -41,13 +41,11 @@ function mockRequiredParentResolution(): void {
         id: "sire_1",
         sireId: null,
         damId: null,
-        siitosasteProsentti: null,
       },
       dam_1: {
         id: "dam_1",
         sireId: null,
         damId: null,
-        siitosasteProsentti: null,
       },
     },
   });
@@ -232,7 +230,6 @@ describe("createAdminDog", () => {
         damId: "dam_1",
         ownerNames: ["Tiina Virtanen"],
         ekNo: 5588,
-        siitosasteProsentti: 0,
         note: "Important",
         registrationNo: "FI12345/21",
         secondaryRegistrationNos: [],
@@ -247,7 +244,7 @@ describe("createAdminDog", () => {
     );
   });
 
-  it("ignores injected inbreeding values and persists the server calculation", async () => {
+  it("creates dog without persisting any inbreeding field", async () => {
     findDogByRegistrationNoDbMock.mockImplementation(
       async (registrationNo: string) => {
         if (registrationNo === "FI11111/11") {
@@ -261,23 +258,6 @@ describe("createAdminDog", () => {
         return null;
       },
     );
-    loadDogPedigreeAncestryForParentsDbMock.mockResolvedValue({
-      rootId: "sire_1:dam_1",
-      nodes: {
-        sire_1: {
-          id: "sire_1",
-          sireId: null,
-          damId: null,
-          siitosasteProsentti: null,
-        },
-        dam_1: {
-          id: "dam_1",
-          sireId: null,
-          damId: null,
-          siitosasteProsentti: null,
-        },
-      },
-    });
     createAdminDogWriteDbMock.mockResolvedValue({
       id: "dog_1",
       name: "Metsapolun Kide",
@@ -292,22 +272,13 @@ describe("createAdminDog", () => {
         registrationNo: "FI12345/21",
         sireRegistrationNo: "FI11111/11",
         damRegistrationNo: "FI22222/22",
-        inbreedingCoefficientPct: 99,
-      } as Parameters<typeof createAdminDog>[0] & {
-        inbreedingCoefficientPct: number;
       }),
     ).resolves.toMatchObject({ status: 201 });
 
-    expect(loadDogPedigreeAncestryForParentsDbMock).toHaveBeenCalledWith(
-      "sire_1",
-      "dam_1",
-      17,
-    );
     expect(createAdminDogWriteDbMock).toHaveBeenCalledWith(
       expect.objectContaining({
         sireId: "sire_1",
         damId: "dam_1",
-        siitosasteProsentti: 0,
       }),
       {},
     );

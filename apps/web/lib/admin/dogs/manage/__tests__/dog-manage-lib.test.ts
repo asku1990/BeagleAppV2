@@ -102,12 +102,11 @@ describe("admin dog manage lib", () => {
       showCount: 2,
       titlesText: "FI JVA, SE JCH",
       ekNo: 5588,
-      inbreedingCoefficientPct: 12.5,
       note: null,
       titles: [],
     });
 
     expect(mapped.titlesText).toBe("FI JVA, SE JCH");
-    expect(mapped.inbreedingCoefficientPct).toBe(12.5);
+    expect(mapped).not.toHaveProperty("inbreedingCoefficientPct");
   });
 });

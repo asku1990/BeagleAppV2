@@ -4,7 +4,6 @@ export type DogPedigreeAncestorDb = {
   id: string;
   sireId: string | null;
   damId: string | null;
-  siitosasteProsentti: number | null;
 };
 
 export type DogPedigreeAncestryDb = {
@@ -63,7 +62,6 @@ async function loadDogPedigreeAncestryFromFrontier(
         id: row.id,
         sireId: row.sireId,
         damId: row.damId,
-        siitosasteProsentti: null,
       };
 
       if (row.sireId && !visited.has(row.sireId)) {

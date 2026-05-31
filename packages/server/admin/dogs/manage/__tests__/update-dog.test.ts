@@ -45,13 +45,11 @@ describe("updateAdminDog", () => {
           id: "sire_1",
           sireId: null,
           damId: null,
-          siitosasteProsentti: null,
         },
         dam_1: {
           id: "dam_1",
           sireId: null,
           damId: null,
-          siitosasteProsentti: null,
         },
       },
     });
@@ -243,71 +241,6 @@ describe("updateAdminDog", () => {
       {},
     );
     expect(loadDogPedigreeAncestryForParentsDbMock).not.toHaveBeenCalled();
-    expect(updateAdminDogWriteDbMock.mock.calls[0]?.[0]).not.toHaveProperty(
-      "siitosasteProsentti",
-    );
-  });
-
-  it("ignores injected inbreeding values and persists the server calculation", async () => {
-    findDogByIdDbMock.mockResolvedValue({
-      id: "dog_1",
-      sire: { id: "old_sire", sex: "MALE" },
-      dam: null,
-    });
-    findDogByRegistrationNoDbMock.mockResolvedValue({
-      id: "dam_1",
-      sex: "FEMALE",
-    });
-    loadDogPedigreeAncestryForParentsDbMock.mockResolvedValue({
-      rootId: "old_sire:dam_1",
-      nodes: {
-        old_sire: {
-          id: "old_sire",
-          sireId: null,
-          damId: null,
-          siitosasteProsentti: null,
-        },
-        dam_1: {
-          id: "dam_1",
-          sireId: null,
-          damId: null,
-          siitosasteProsentti: null,
-        },
-      },
-    });
-    updateAdminDogWriteDbMock.mockResolvedValue({
-      id: "dog_1",
-      name: "Metsapolun Kide",
-      sex: "FEMALE",
-      registrationNo: "FI12345/21",
-    });
-
-    await expect(
-      updateAdminDog({
-        id: "dog_1",
-        name: "Metsapolun Kide",
-        sex: "FEMALE",
-        registrationNo: "FI12345/21",
-        damRegistrationNo: "FI22222/22",
-        inbreedingCoefficientPct: 99,
-      } as Parameters<typeof updateAdminDog>[0] & {
-        inbreedingCoefficientPct: number;
-      }),
-    ).resolves.toMatchObject({ status: 200 });
-
-    expect(loadDogPedigreeAncestryForParentsDbMock).toHaveBeenCalledWith(
-      "old_sire",
-      "dam_1",
-      17,
-    );
-    expect(updateAdminDogWriteDbMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sireId: undefined,
-        damId: "dam_1",
-        siitosasteProsentti: 0,
-      }),
-      {},
-    );
   });
 
   it("returns 400 for duplicate registration numbers in payload", async () => {
@@ -372,9 +305,6 @@ describe("updateAdminDog", () => {
       {},
     );
     expect(loadDogPedigreeAncestryForParentsDbMock).not.toHaveBeenCalled();
-    expect(updateAdminDogWriteDbMock.mock.calls[0]?.[0]).not.toHaveProperty(
-      "siitosasteProsentti",
-    );
   });
 
   it("passes null values to clear optional non-required fields", async () => {

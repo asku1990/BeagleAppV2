@@ -18,7 +18,7 @@ type LegacyImportSummaryInput =
     }
   | {
       kind: "LEGACY_PHASE1_25";
-      siitosasteUpdated: number;
+      dogsUpserted: number;
       sairaudetInserted: number;
       koiranSairaudetInserted: number;
       koiranSairaudetFallbackIdentityIssues?: number;
@@ -90,7 +90,7 @@ export function formatLegacyImportSummary(
     case "LEGACY_PHASE1":
       return `${phaseLabel}: ${formatMetric("dogs", input.dogsUpserted)}, ${formatMetric("owners", input.ownersUpserted)}, ${formatMetric("ownerships", input.ownershipsUpserted)}, ${formatMetric("errors", input.errorsCount)}.`;
     case "LEGACY_PHASE1_25":
-      return `${phaseLabel}: ${formatMetric("siitosaste", input.siitosasteUpdated)}, ${formatMetric("sairaudet", input.sairaudetInserted)}, ${formatMetric("koiranSairaudet", input.koiranSairaudetInserted)}, ${formatMetric("fallbackIdentityIssues", input.koiranSairaudetFallbackIdentityIssues ?? 0)}, ${formatMetric("unresolvedDogSkipped", input.koiranSairaudetUnresolvedDogSkipped ?? 0)}, ${formatMetric("epiLuvut", input.epiLuvutInserted)}, ${formatMetric("errors", input.errorsCount)}.`;
+      return `${phaseLabel}: ${formatMetric("sairaudet", input.sairaudetInserted)}, ${formatMetric("koiranSairaudet", input.koiranSairaudetInserted)}, ${formatMetric("fallbackIdentityIssues", input.koiranSairaudetFallbackIdentityIssues ?? 0)}, ${formatMetric("unresolvedDogSkipped", input.koiranSairaudetUnresolvedDogSkipped ?? 0)}, ${formatMetric("epiLuvut", input.epiLuvutInserted)}, ${formatMetric("errors", input.errorsCount)}.`;
     case "LEGACY_PHASE1_5":
       return `${phaseLabel}: ${formatMetric("titles", input.titlesInserted)}, ${formatMetric("skippedBlank", input.skippedBlank)}, ${formatMetric("conflicts", input.conflicts)}, ${formatMetric("errors", input.errorsCount)}.`;
     case "LEGACY_TRIAL_MIRROR":

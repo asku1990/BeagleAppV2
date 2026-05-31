@@ -131,25 +131,21 @@ describe("getAdminDogProfile", () => {
             id: "dog-1",
             sireId: "sire-1",
             damId: "dam-1",
-            siitosasteProsentti: null,
           },
           "sire-1": {
             id: "sire-1",
             sireId: "ancestor-1",
             damId: null,
-            siitosasteProsentti: null,
           },
           "dam-1": {
             id: "dam-1",
             sireId: "ancestor-1",
             damId: null,
-            siitosasteProsentti: null,
           },
           "ancestor-1": {
             id: "ancestor-1",
             sireId: null,
             damId: null,
-            siitosasteProsentti: null,
           },
         },
       })
@@ -160,25 +156,21 @@ describe("getAdminDogProfile", () => {
             id: "dog-1",
             sireId: "sire-1",
             damId: "dam-1",
-            siitosasteProsentti: null,
           },
           "sire-1": {
             id: "sire-1",
             sireId: "ancestor-1",
             damId: null,
-            siitosasteProsentti: null,
           },
           "dam-1": {
             id: "dam-1",
             sireId: "ancestor-1",
             damId: null,
-            siitosasteProsentti: null,
           },
           "ancestor-1": {
             id: "ancestor-1",
             sireId: null,
             damId: null,
-            siitosasteProsentti: null,
           },
         },
       });
@@ -268,10 +260,6 @@ describe("getAdminDogProfile", () => {
         },
       },
     });
-    expect(result.body.ok ? result.body.data.dog : null).not.toHaveProperty(
-      "siitosasteProsentti",
-    );
-
     expect(getAdminDogProfileDbMock).toHaveBeenCalledWith("dog-1");
     expect(loadDogPedigreeAncestryDbMock).toHaveBeenCalledWith("dog-1", 5);
     expect(loadDogPedigreeAncestryDbMock).toHaveBeenCalledWith("dog-1", 17);
@@ -316,7 +304,6 @@ describe("getAdminDogProfile", () => {
           id: "dog-2",
           sireId: null,
           damId: null,
-          siitosasteProsentti: null,
         },
       },
     });
