@@ -212,7 +212,7 @@ describe("runLegacyPhase1_25", () => {
       expect.objectContaining({
         status: "SUCCEEDED",
         errorsCount: 0,
-        errorSummary: expect.stringContaining("fallbackImported=1"),
+        errorSummary: expect.stringContaining("fallbackIdentityIssues=1"),
       }),
       expect.any(Object),
     );
@@ -356,7 +356,7 @@ describe("runLegacyPhase1_25", () => {
       expect.objectContaining({
         status: "SUCCEEDED",
         errorsCount: 0,
-        errorSummary: expect.stringContaining("fallbackImported=1"),
+        errorSummary: expect.stringContaining("fallbackIdentityIssues=1"),
       }),
       expect.any(Object),
     );

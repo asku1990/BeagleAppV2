@@ -536,7 +536,7 @@ export async function runLegacyPhase1_25(
       KoiranSairausDelegate["createMany"]
     >[0]["data"] = [];
     let koiranSairaudetSkipped = 0;
-    let koiranSairaudetFallbackImported = 0;
+    let koiranSairaudetFallbackIdentityIssues = 0;
     let koiranSairaudetUnresolvedDogSkipped = 0;
     let koiranSairaudetProcessed = 0;
     let koiranSairaudetParentInvalid = 0;
@@ -557,7 +557,7 @@ export async function runLegacyPhase1_25(
       const sairausKoodi = normalizeDiseaseCode(row.diseaseCode);
       if (dog.issue) {
         if (dog.issue.counter === "fallback") {
-          koiranSairaudetFallbackImported += 1;
+          koiranSairaudetFallbackIdentityIssues += 1;
         } else {
           koiranSairaudetUnresolvedDogSkipped += 1;
         }
@@ -683,7 +683,7 @@ export async function runLegacyPhase1_25(
         : 0;
     finishStage(
       "koiran-sairaudet",
-      `source=${legacy.koiranSairaudet.length}, inserted=${koiranSairaudetInserted}, skipped=${koiranSairaudetSkipped}, fallbackImported=${koiranSairaudetFallbackImported}, unresolvedDogSkipped=${koiranSairaudetUnresolvedDogSkipped}, parentInvalid=${koiranSairaudetParentInvalid}, parentUnresolved=${koiranSairaudetParentUnresolved}`,
+      `source=${legacy.koiranSairaudet.length}, inserted=${koiranSairaudetInserted}, skipped=${koiranSairaudetSkipped}, fallbackIdentityIssues=${koiranSairaudetFallbackIdentityIssues}, unresolvedDogSkipped=${koiranSairaudetUnresolvedDogSkipped}, parentInvalid=${koiranSairaudetParentInvalid}, parentUnresolved=${koiranSairaudetParentUnresolved}`,
     );
 
     await flushIssueBuffer();
@@ -703,7 +703,7 @@ export async function runLegacyPhase1_25(
           siitosasteUpdated,
           sairaudetInserted,
           koiranSairaudetInserted,
-          koiranSairaudetFallbackImported,
+          koiranSairaudetFallbackIdentityIssues,
           koiranSairaudetUnresolvedDogSkipped,
           epiLuvutInserted: 0,
           errorsCount,
