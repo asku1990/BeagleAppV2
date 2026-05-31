@@ -77,9 +77,8 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
 - Shared search and calculation primitives stay in `packages/server/dogs/virtual-pairing`
 - Admin-only behavior stays in `packages/server/admin/dogs/virtual-pairing`
 - Web code consumes only the admin action/query surface
-- Health values are derived at request time and must not be mistaken for stored
-  legacy `SIITOSASTE`, a persisted dog inbreeding field, or cached disease
-  percentages
+- Health values are derived at request time and must not be mistaken for legacy
+  `SIITOSASTE` values or cached disease percentages.
 
 ## Inbreeding parity target
 

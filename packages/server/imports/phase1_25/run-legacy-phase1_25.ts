@@ -629,7 +629,6 @@ export async function runLegacyPhase1_25(
         errorsCount,
         errorSummary: formatLegacyImportSummary({
           kind: "LEGACY_PHASE1_25",
-          dogsUpserted: 0,
           sairaudetInserted,
           koiranSairaudetInserted,
           koiranSairaudetFallbackIdentityIssues,

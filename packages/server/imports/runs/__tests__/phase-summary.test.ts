@@ -38,7 +38,6 @@ describe("formatLegacyImportSummary", () => {
   it("formats phase1.25 with disease import identity issue counters", () => {
     const summary = formatLegacyImportSummary({
       kind: "LEGACY_PHASE1_25",
-      dogsUpserted: 0,
       sairaudetInserted: 3,
       koiranSairaudetInserted: 8,
       koiranSairaudetFallbackIdentityIssues: 2,

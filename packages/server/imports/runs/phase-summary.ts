@@ -18,7 +18,6 @@ type LegacyImportSummaryInput =
     }
   | {
       kind: "LEGACY_PHASE1_25";
-      dogsUpserted: number;
       sairaudetInserted: number;
       koiranSairaudetInserted: number;
       koiranSairaudetFallbackIdentityIssues?: number;
