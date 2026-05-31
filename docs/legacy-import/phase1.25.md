@@ -33,8 +33,8 @@ imports titles.
 - Synthetic or missing `beasairaat.REKNO` values are preserved with a null
   `dogId` only when both source parent registrations resolve, so anonymous
   affected puppy/litter evidence can be used by EPI/PUR calculations.
-- Valid `REKNO` values that do not resolve are recorded only as import issues
-  for manual cleanup.
+- Valid `REKNO` values that do not resolve are not stored in
+  `KoiranSairaus`; they are recorded as import issues only for manual cleanup.
 - Rows that cannot become `DOG` or `LITTER` do not fail the import, but they are
   skipped from `KoiranSairaus` and recorded as issues.
 

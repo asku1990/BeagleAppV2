@@ -42,13 +42,13 @@ describe("formatLegacyImportSummary", () => {
       sairaudetInserted: 3,
       koiranSairaudetInserted: 8,
       koiranSairaudetFallbackImported: 2,
-      koiranSairaudetUnresolvedDogImported: 1,
+      koiranSairaudetUnresolvedDogSkipped: 1,
       epiLuvutInserted: 0,
       errorsCount: 1,
     });
 
     expect(summary).toBe(
-      "Phase 1.25: siitosaste=10, sairaudet=3, koiranSairaudet=8, fallbackImported=2, unresolvedDogImported=1, epiLuvut=0, errors=1.",
+      "Phase 1.25: siitosaste=10, sairaudet=3, koiranSairaudet=8, fallbackImported=2, unresolvedDogSkipped=1, epiLuvut=0, errors=1.",
     );
   });
 
