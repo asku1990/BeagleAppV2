@@ -22,8 +22,9 @@ Disease rows are stored as explicit evidence:
   and recorded as import issues for manual cleanup.
 - For real disease rows, calculation loads parent relationships from canonical
   `Dog.sireId` and `Dog.damId`.
-- For anonymous rows, calculation resolves stored source parent registrations
-  through `DogRegistration` inside the bounded health graph.
+- For anonymous rows, calculation matches rows through registrations in the
+  bounded health graph, then resolves both stored source parent registrations
+  through `DogRegistration`.
 - Lafora uses only real `DOG` disease rows. Anonymous rows do not affect Lafora.
 
 ## Target Decision
@@ -71,8 +72,9 @@ Desired behavior after that migration:
 
 - For rows with `dogId`, ignore source parent registrations in calculations and
   use canonical `Dog.sireId` and `Dog.damId`.
-- For rows with `dogId = null`, resolve `isaRekisterinumero` and
-  `emaRekisterinumero` through `DogRegistration` at read time and use those
+- For rows with `dogId = null`, match `isaRekisterinumero` or
+  `emaRekisterinumero` against the bounded health graph, resolve both source
+  parent registrations through `DogRegistration` at read time, and use those
   resolved dogs only as anonymous EPI/PUR litter relationship evidence.
 - Preserve unresolved source data in import issues for manual cleanup.
 - Do not create placeholder dogs for anonymous disease rows.

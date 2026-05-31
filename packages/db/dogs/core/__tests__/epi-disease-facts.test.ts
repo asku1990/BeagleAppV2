@@ -45,6 +45,8 @@ describe("loadDogEpiDiseaseFactsDb", () => {
     dogRegistrationFindManyMock.mockResolvedValueOnce([
       { dogId: "dog-1", registrationNo: "FI00001/21" },
       { dogId: "dog-2", registrationNo: "FI00002/21" },
+    ]);
+    dogRegistrationFindManyMock.mockResolvedValueOnce([
       { dogId: "dog-3", registrationNo: "FI00003/21" },
     ]);
     koiranSairausFindManyMock.mockResolvedValueOnce([
@@ -71,7 +73,7 @@ describe("loadDogEpiDiseaseFactsDb", () => {
 
     const result = await loadDogEpiDiseaseFactsDb(["dog-1", "dog-2", "dog-1"]);
 
-    expect(dogRegistrationFindManyMock).toHaveBeenCalledWith({
+    expect(dogRegistrationFindManyMock).toHaveBeenNthCalledWith(1, {
       where: {
         dogId: { in: ["dog-1", "dog-2"] },
       },
@@ -97,12 +99,12 @@ describe("loadDogEpiDiseaseFactsDb", () => {
             OR: [
               {
                 isaRekisterinumero: {
-                  in: ["FI00001/21", "FI00002/21", "FI00003/21"],
+                  in: ["FI00001/21", "FI00002/21"],
                 },
               },
               {
                 emaRekisterinumero: {
-                  in: ["FI00001/21", "FI00002/21", "FI00003/21"],
+                  in: ["FI00001/21", "FI00002/21"],
                 },
               },
             ],
@@ -121,6 +123,15 @@ describe("loadDogEpiDiseaseFactsDb", () => {
             damId: true,
           },
         },
+      },
+    });
+    expect(dogRegistrationFindManyMock).toHaveBeenNthCalledWith(2, {
+      where: {
+        registrationNo: { in: ["FI00003/21"] },
+      },
+      select: {
+        dogId: true,
+        registrationNo: true,
       },
     });
 

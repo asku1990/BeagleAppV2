@@ -34,7 +34,7 @@ export async function loadDogDiseaseFactsDb(
       registrationNo: true,
     },
   });
-  const dogIdByRegistrationNo = new Map(
+  const dogIdByRegistrationNo = new Map<string, string>(
     relatedRegistrations.map((row) => [row.registrationNo, row.dogId]),
   );
   const registrationNos = [...dogIdByRegistrationNo.keys()];
@@ -73,6 +73,32 @@ export async function loadDogDiseaseFactsDb(
       },
     },
   });
+  const unmatchedLitterParentRegistrationNos = [
+    ...new Set(
+      rows.flatMap((row) =>
+        row.evidenceKind === "LITTER"
+          ? [row.isaRekisterinumero, row.emaRekisterinumero]
+          : [],
+      ),
+    ),
+  ].filter(
+    (registrationNo): registrationNo is string =>
+      registrationNo != null && !dogIdByRegistrationNo.has(registrationNo),
+  );
+  if (unmatchedLitterParentRegistrationNos.length > 0) {
+    const litterParentRegistrations = await prisma.dogRegistration.findMany({
+      where: {
+        registrationNo: { in: unmatchedLitterParentRegistrationNos },
+      },
+      select: {
+        dogId: true,
+        registrationNo: true,
+      },
+    });
+    for (const row of litterParentRegistrations) {
+      dogIdByRegistrationNo.set(row.registrationNo, row.dogId);
+    }
+  }
 
   return rows.flatMap<DogEpiDiseaseFactDb>((row) => {
     if (row.evidenceKind === "DOG") {
