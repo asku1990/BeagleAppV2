@@ -20,10 +20,8 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
 - Shared ancestor `Fa` is recalculated dynamically from current pedigree data,
   but its depth is fixed to the legacy default of 9 generations. This mirrors
   v1 semantics where virtual pairing used selected `SP` for the pair matrix but
-  multiplied each shared ancestor by that ancestor's already stored
-  `SIITOSASTE`, which was normally maintained as the default 9-generation
-  value. v2 still does not read or update imported/stored legacy `SIITOSASTE`
-  values for virtual pairing.
+  evaluated shared ancestors at the legacy 9-generation depth. v2 does not
+  read or update any persisted inbreeding field for virtual pairing.
 - The ancestry loader fetches beyond the selected generation depth so shared
   ancestors near the cutoff still have enough pedigree data for their fixed
   9-generation dynamic `Fa`; occurrence discovery and known-pedigree
@@ -89,9 +87,9 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
   selected `SP` only for the pair matrix and fixed 9-generation dynamic `Fa` for
   shared ancestors. This avoids the SP6/SP9 drift caused by recalculating
   ancestor `Fa` at the selected pair depth.
-- v2 still differs from v1 if the imported stored ancestor `SIITOSASTE` is
-  stale or otherwise different from a current-data 9-generation dynamic
-  recalculation. v2's source of truth remains current pedigree data.
+- v2 still differs from v1 if a current-data 9-generation dynamic
+  recalculation differs from the legacy v1 result. v2's source of truth remains
+  current pedigree data.
 - See `docs/notes/inbreeding-v1-v2-dynamic-fa.md` for the concrete comparison
   that identified this selected-SP versus ancestor-`Fa` depth distinction.
 
