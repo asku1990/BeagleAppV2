@@ -35,6 +35,22 @@ describe("formatLegacyImportSummary", () => {
     expect(summary).not.toContain("showResults=");
   });
 
+  it("formats phase1.25 with disease import identity issue counters", () => {
+    const summary = formatLegacyImportSummary({
+      kind: "LEGACY_PHASE1_25",
+      sairaudetInserted: 3,
+      koiranSairaudetInserted: 8,
+      koiranSairaudetFallbackIdentityIssues: 2,
+      koiranSairaudetUnresolvedDogSkipped: 1,
+      epiLuvutInserted: 0,
+      errorsCount: 1,
+    });
+
+    expect(summary).toBe(
+      "Phase 1.25: sairaudet=3, koiranSairaudet=8, fallbackIdentityIssues=2, unresolvedDogSkipped=1, epiLuvut=0, errors=1.",
+    );
+  });
+
   it("formats phase2 mirror import with source and stored counters", () => {
     const summary = formatLegacyImportSummary({
       kind: "LEGACY_TRIAL_MIRROR",

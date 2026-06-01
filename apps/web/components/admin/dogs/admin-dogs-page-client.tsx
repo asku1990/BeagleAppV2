@@ -17,6 +17,7 @@ import {
   useAdminDogOwnerOptionsQuery,
   useAdminDogParentOptionsQuery,
   useAdminDogsQuery,
+  useCalculateAdminDogInbreedingMutation,
   useCreateAdminDogMutation,
   useUpdateAdminDogMutation,
 } from "@/queries/admin/dogs";
@@ -43,12 +44,14 @@ export function AdminDogsPageClient() {
   );
 
   const dogsQuery = useAdminDogsQuery(filters);
+  const calculateInbreedingMutation = useCalculateAdminDogInbreedingMutation();
   const createDogMutation = useCreateAdminDogMutation();
   const updateDogMutation = useUpdateAdminDogMutation();
   const deleteDogMutation = useDeleteAdminDogMutation();
 
   const dogFormFlow = useAdminDogFormFlow({
     t,
+    calculateInbreedingMutation,
     createDogMutation,
     updateDogMutation,
     deleteDogMutation,
@@ -164,6 +167,8 @@ export function AdminDogsPageClient() {
         onClose={dogFormFlow.closeFormModal}
         onValuesChange={dogFormFlow.setFormValues}
         onSubmit={dogFormFlow.handleSubmit}
+        onCalculateInbreeding={dogFormFlow.handleCalculateInbreeding}
+        isCalculatingInbreeding={dogFormFlow.isCalculatingInbreeding}
         isSubmitting={dogFormFlow.isSubmitting}
       />
 

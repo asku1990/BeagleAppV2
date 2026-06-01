@@ -42,6 +42,7 @@ export {
 export { loadLegacyTrialMirrorValidationRowsDb } from "./imports/trial-mirror-validation";
 export { fetchLegacyShowRows } from "./imports/phase3";
 export { fetchLegacyPhase1Rows } from "./imports/phase1";
+export { fetchLegacyPhase1_25Rows } from "./imports/phase1_25";
 export { fetchLegacyPhase1_5Rows } from "./imports/phase1_5";
 
 export {
@@ -49,7 +50,9 @@ export {
   type LegacyDogRow,
   type LegacyEkRow,
   type LegacyDogTitleRow,
+  type LegacyKoiranSairausRow,
   type LegacyOwnerRow,
+  type LegacyPhase1_25Rows,
   type LegacyTrialMirrorAkoeallRow,
   type LegacyTrialMirrorAkoeallValidationRow,
   type LegacyTrialMirrorBealtCommonRow,
@@ -61,6 +64,7 @@ export {
   type LegacyTrialMirrorValidationRows,
   type LegacyShowResultRow,
   type LegacySamakoiraRow,
+  type LegacySairausRow,
   type LegacyPhase1Rows,
 } from "./imports/types";
 
@@ -69,7 +73,14 @@ export { getHomeStatisticsSnapshot, type HomeStatisticsSnapshot } from "./home";
 export {
   getBeagleDogProfileDb,
   getNewestBeagleDogsDb,
+  loadDogPedigreeAncestryDb,
+  loadDogPedigreeAncestryForParentsDb,
+  loadDogEpiDiseaseFactsDb,
+  findVirtualPairingDogByRegistrationNoDb,
+  findVirtualPairingAncestorDetailsDb,
+  searchVirtualPairingDogsDb,
   searchBeagleDogsDb,
+  getAdminDogProfileDb,
   type BeagleDogProfileDb,
   type BeagleDogProfileLitterDb,
   type BeagleDogProfileOffspringRowDb,
@@ -79,6 +90,16 @@ export {
   type BeagleDogProfilePedigreeGenerationDb,
   type BeagleDogProfileSexDb,
   type BeagleDogProfileTitleDb,
+  type DogPedigreeAncestorDb,
+  type DogPedigreeAncestryDb,
+  type DogEpiDiseaseFactDb,
+  type AdminDogProfileDb,
+  type VirtualPairingDogByRegistrationLookupDb,
+  type VirtualPairingAncestorDetailsDb,
+  type VirtualPairingSearchDogRowDb,
+  type VirtualPairingSearchFieldDb,
+  type VirtualPairingSearchRequestDb,
+  type VirtualPairingSearchResponseDb,
   type BeagleSearchModeDb,
   type BeagleSearchRequestDb,
   type BeagleSearchResponseDb,

@@ -10,6 +10,12 @@ export type {
   BeagleNewestRequest,
   BeagleNewestResponse,
 } from "./newest/beagle-newest";
+export type {
+  VirtualPairingDogOption,
+  VirtualPairingSearchField,
+  VirtualPairingSearchRequest,
+  VirtualPairingSearchResponse,
+} from "./virtual-pairing";
 
 export type {
   BeagleDogProfileDto,
