@@ -7,6 +7,7 @@ export {
   createAdminUser,
   deleteAdminUser,
   listAdminBreederOptions,
+  listAdminDogDiseases,
   listAdminDogParentOptions,
   listAdminDogs,
   listAdminUsers,

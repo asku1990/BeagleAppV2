@@ -8,7 +8,6 @@ import {
   toSexCode,
   type RawVirtualPairingDogRow,
   type VirtualPairingSearchDogRowDb,
-  type VirtualPairingSearchFieldDb,
   type VirtualPairingSearchRequestDb,
   type VirtualPairingSearchResponseDb,
 } from "./internal/search-helpers";
@@ -24,7 +23,6 @@ import {
 
 export type {
   VirtualPairingSearchDogRowDb,
-  VirtualPairingSearchFieldDb,
   VirtualPairingSearchRequestDb,
   VirtualPairingSearchResponseDb,
 } from "./internal/search-helpers";

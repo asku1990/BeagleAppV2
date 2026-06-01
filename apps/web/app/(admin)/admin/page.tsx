@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { FileText, Link2 } from "lucide-react";
 import { useI18n } from "@/hooks/i18n";
 
 export default function AdminHomePage() {
@@ -34,6 +35,18 @@ export default function AdminHomePage() {
             </Button>
             <Button asChild variant="outline">
               <Link href="/admin/dogs">{t("admin.home.modules.openDogs")}</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/admin/dogs/diseases">
+                <FileText className="size-4" />
+                {t("admin.home.modules.openDiseases")}
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/admin/dogs/virtual-pairing">
+                <Link2 className="size-4" />
+                {t("admin.home.modules.openVirtualPairing")}
+              </Link>
             </Button>
             <Button asChild variant="outline">
               <Link href="/admin/trials">
