@@ -1,6 +1,12 @@
-import { listAdminDogDiseasesDb } from "@beagle/db";
+import {
+  listAdminDogDiseasesDb,
+  type AdminDogDiseaseBrowseDogDb,
+  type AdminDogDiseaseBrowseItemDb,
+  type AdminDogDiseaseBrowseResponseDb,
+} from "@beagle/db";
 import type {
   AdminDogDiseaseBrowseRequest,
+  AdminDogDiseaseBrowseItem,
   AdminDogDiseaseBrowseResponse,
   CurrentUserDto,
 } from "@beagle/contracts";
@@ -12,6 +18,62 @@ type ServiceLogContext = {
   requestId?: string;
   actorUserId?: string;
 };
+
+const UNKNOWN_NAME = "Nimi ei ole tiedossa";
+
+function toSex(
+  value: AdminDogDiseaseBrowseDogDb["sex"],
+): AdminDogDiseaseBrowseItem["sex"] {
+  if (value === "MALE") {
+    return "MALE";
+  }
+
+  if (value === "FEMALE") {
+    return "FEMALE";
+  }
+
+  if (value === "UNKNOWN") {
+    return "UNKNOWN";
+  }
+
+  return null;
+}
+
+function mapDiseaseItem(
+  row: AdminDogDiseaseBrowseItemDb,
+): AdminDogDiseaseBrowseItem {
+  const isDog = row.evidenceKind === "DOG" && Boolean(row.dog);
+
+  return {
+    id: row.id,
+    evidenceKind: row.evidenceKind,
+    diseaseCode: row.sairaus.koodi,
+    diseaseText: row.sairaus.sairausTeksti,
+    public: row.julkinen,
+    registrationNo: row.rekisterinumero,
+    ekNo: isDog ? (row.dog?.ekNo ?? null) : null,
+    sex: isDog && row.dog ? toSex(row.dog.sex) : null,
+    name: isDog ? row.dog?.name?.trim() || UNKNOWN_NAME : UNKNOWN_NAME,
+    dogId: isDog ? (row.dog?.id ?? null) : null,
+    trialCount: isDog ? (row.dog?._count.trialResults ?? null) : null,
+    showCount: isDog ? (row.dog?._count.showEntries ?? null) : null,
+    sire: row.sire,
+    dam: row.dam,
+  };
+}
+
+function mapDiseaseResponse(
+  response: AdminDogDiseaseBrowseResponseDb,
+): AdminDogDiseaseBrowseResponse {
+  return {
+    selectedDiseaseCode: response.selectedDiseaseCode,
+    total: response.total,
+    totalPages: response.totalPages,
+    page: response.page,
+    diseaseOptions: response.diseaseOptions,
+    items: response.items.map(mapDiseaseItem),
+  };
+}
 
 export async function listAdminDogDiseases(
   input: AdminDogDiseaseBrowseRequest,
@@ -59,12 +121,14 @@ export async function listAdminDogDiseases(
       pageSize: 15,
     });
 
+    const data = mapDiseaseResponse(result);
+
     log.info(
       {
         event: "success",
-        selectedDiseaseCode: result.selectedDiseaseCode,
-        total: result.total,
-        itemCount: result.items.length,
+        selectedDiseaseCode: data.selectedDiseaseCode,
+        total: data.total,
+        itemCount: data.items.length,
         durationMs: Date.now() - startedAt,
       },
       "admin dog diseases browse succeeded",
@@ -74,7 +138,7 @@ export async function listAdminDogDiseases(
       status: 200,
       body: {
         ok: true,
-        data: result,
+        data,
       },
     };
   } catch (error) {

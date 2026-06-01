@@ -249,21 +249,26 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
   const total = data?.total ?? 0;
   const totalPages = data?.totalPages ?? 0;
   const currentPage = data?.page ?? page;
+  const allDiseaseCount = useMemo(() => {
+    return (
+      data?.diseaseOptions.reduce((sum, option) => sum + option.count, 0) ?? 0
+    );
+  }, [data?.diseaseOptions]);
 
   const diseaseOptions = useMemo(() => {
     const options = data?.diseaseOptions ?? [];
     return [
-      { diseaseCode: "all", diseaseText: "Kaikki", count: total },
+      { diseaseCode: "all", diseaseText: "Kaikki", count: allDiseaseCount },
       ...options,
     ];
-  }, [data?.diseaseOptions, total]);
+  }, [allDiseaseCount, data?.diseaseOptions]);
 
   return (
     <div className="space-y-4" suppressHydrationWarning>
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight">Sairaustiedot</h1>
         <p className="text-sm text-muted-foreground">
-          Haulla löytyi {total} beaglea.
+          Haulla löytyi {total} sairausriviä.
         </p>
       </div>
 
@@ -282,9 +287,7 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
             >
               {diseaseOptions.map((option) => (
                 <option key={option.diseaseCode} value={option.diseaseCode}>
-                  {option.diseaseCode === "all"
-                    ? option.diseaseText
-                    : `${option.diseaseText} ${option.count} kpl`}
+                  {`${option.diseaseText} ${option.count} kpl`}
                 </option>
               ))}
             </LabeledSelect>

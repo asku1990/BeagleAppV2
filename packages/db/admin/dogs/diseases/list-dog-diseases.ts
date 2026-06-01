@@ -18,19 +18,42 @@ export type AdminDogDiseaseBrowseParentPreviewDb = {
   name: string | null;
 };
 
+type DiseaseDefinitionRow = {
+  koodi: string;
+  sairausTeksti: string;
+  _count: {
+    koirat: number;
+  };
+};
+
+type ParentDogPreviewRow = {
+  name: string;
+  registrations: Array<{ registrationNo: string }>;
+};
+
+export type AdminDogDiseaseBrowseDogDb = {
+  id: string;
+  name: string;
+  sex: DogSex;
+  ekNo: number | null;
+  _count: {
+    trialResults: number;
+    showEntries: number;
+  };
+};
+
 export type AdminDogDiseaseBrowseItemDb = {
   id: string;
   evidenceKind: "DOG" | "LITTER";
-  diseaseCode: string;
-  diseaseText: string;
-  public: boolean;
-  registrationNo: string;
-  ekNo: number | null;
-  sex: "MALE" | "FEMALE" | "UNKNOWN" | null;
-  name: string;
-  dogId: string | null;
-  trialCount: number | null;
-  showCount: number | null;
+  rekisterinumero: string;
+  julkinen: boolean;
+  isaRekisterinumero: string | null;
+  emaRekisterinumero: string | null;
+  sairaus: {
+    koodi: string;
+    sairausTeksti: string;
+  };
+  dog: AdminDogDiseaseBrowseDogDb | null;
   sire: AdminDogDiseaseBrowseParentPreviewDb;
   dam: AdminDogDiseaseBrowseParentPreviewDb;
 };
@@ -47,51 +70,6 @@ export type AdminDogDiseaseBrowseResponseDb = {
 const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 15;
 const MAX_PAGE_SIZE = 100;
-const UNKNOWN_NAME = "Nimi ei ole tiedossa";
-
-type DiseaseDefinitionRow = {
-  koodi: string;
-  sairausTeksti: string;
-  _count: {
-    koirat: number;
-  };
-};
-
-type ParentDogPreviewRow = {
-  name: string;
-  registrations: Array<{ registrationNo: string }>;
-};
-
-type DiseaseRow = {
-  id: string;
-  evidenceKind: "DOG" | "LITTER";
-  rekisterinumero: string;
-  julkinen: boolean;
-  isaRekisterinumero: string | null;
-  emaRekisterinumero: string | null;
-  sairaus: {
-    koodi: string;
-    sairausTeksti: string;
-  };
-  dog: {
-    id: string;
-    name: string;
-    sex: DogSex;
-    ekNo: number | null;
-    sire: {
-      name: string;
-      registrations: Array<{ registrationNo: string }>;
-    } | null;
-    dam: {
-      name: string;
-      registrations: Array<{ registrationNo: string }>;
-    } | null;
-    _count: {
-      trialResults: number;
-      showEntries: number;
-    };
-  } | null;
-};
 
 function parsePage(value: number | undefined): number {
   if (!Number.isFinite(value)) {
@@ -149,22 +127,6 @@ function resolveSelectedDiseaseCode(
   }
 
   return diseaseDefinitions.find(isEpiDisease)?.koodi ?? null;
-}
-
-function toSex(value: DogSex | null): "MALE" | "FEMALE" | "UNKNOWN" | null {
-  if (value === DogSex.MALE) {
-    return "MALE";
-  }
-
-  if (value === DogSex.FEMALE) {
-    return "FEMALE";
-  }
-
-  if (value === DogSex.UNKNOWN) {
-    return "UNKNOWN";
-  }
-
-  return null;
 }
 
 function normalizeRegistrationNo(
@@ -355,7 +317,30 @@ export async function listAdminDogDiseasesDb(
     ],
     skip: (safePage - 1) * pageSize,
     take: pageSize,
-  })) as DiseaseRow[];
+  })) as Array<{
+    id: string;
+    evidenceKind: "DOG" | "LITTER";
+    rekisterinumero: string;
+    julkinen: boolean;
+    isaRekisterinumero: string | null;
+    emaRekisterinumero: string | null;
+    sairaus: {
+      koodi: string;
+      sairausTeksti: string;
+    };
+    dog: {
+      id: string;
+      name: string;
+      sex: DogSex;
+      ekNo: number | null;
+      sire: ParentDogPreviewRow | null;
+      dam: ParentDogPreviewRow | null;
+      _count: {
+        trialResults: number;
+        showEntries: number;
+      };
+    } | null;
+  }>;
 
   const parentRegistrationNos = new Set<string>();
   for (const row of rows) {
@@ -407,28 +392,31 @@ export async function listAdminDogDiseasesDb(
     diseaseOptions,
     items: rows.map((row) => {
       const isDog = row.evidenceKind === "DOG" && Boolean(row.dog);
-      const dog = row.dog;
       const sire = isDog
-        ? toParentPreview(dog?.sire ?? null, null)
+        ? toParentPreview(row.dog?.sire ?? null, null)
         : resolveParentFromLookup(row.isaRekisterinumero, parentLookup);
       const dam = isDog
-        ? toParentPreview(dog?.dam ?? null, null)
+        ? toParentPreview(row.dog?.dam ?? null, null)
         : resolveParentFromLookup(row.emaRekisterinumero, parentLookup);
 
       return {
         id: row.id,
         evidenceKind: row.evidenceKind,
-        diseaseCode: row.sairaus.koodi,
-        diseaseText: row.sairaus.sairausTeksti,
-        public: row.julkinen,
-        registrationNo:
+        rekisterinumero:
           normalizeRegistrationNo(row.rekisterinumero) ?? row.rekisterinumero,
-        ekNo: isDog ? (dog?.ekNo ?? null) : null,
-        sex: isDog ? toSex(dog?.sex ?? null) : null,
-        name: isDog ? (dog?.name ?? UNKNOWN_NAME) : UNKNOWN_NAME,
-        dogId: isDog ? (dog?.id ?? null) : null,
-        trialCount: isDog ? (dog?._count.trialResults ?? null) : null,
-        showCount: isDog ? (dog?._count.showEntries ?? null) : null,
+        julkinen: row.julkinen,
+        isaRekisterinumero: row.isaRekisterinumero,
+        emaRekisterinumero: row.emaRekisterinumero,
+        sairaus: row.sairaus,
+        dog: row.dog
+          ? {
+              id: row.dog.id,
+              name: row.dog.name,
+              sex: row.dog.sex,
+              ekNo: row.dog.ekNo,
+              _count: row.dog._count,
+            }
+          : null,
         sire,
         dam,
       };

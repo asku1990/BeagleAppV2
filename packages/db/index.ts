@@ -221,6 +221,7 @@ export {
   type AdminDogParentPreviewDb,
   type AdminDogDiseaseBrowseRequestDb,
   type AdminDogDiseaseBrowseResponseDb,
+  type AdminDogDiseaseBrowseDogDb,
   type AdminDogDiseaseBrowseItemDb,
   type AdminDogDiseaseBrowseFilterOptionDb,
   type AdminDogDiseaseBrowseParentPreviewDb,

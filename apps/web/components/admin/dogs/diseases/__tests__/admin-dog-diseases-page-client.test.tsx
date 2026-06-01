@@ -119,8 +119,8 @@ describe("AdminDogDiseasesPageClient", () => {
     );
 
     expect(html).toContain("Sairaustiedot");
-    expect(html).toContain("Haulla löytyi 174 beaglea.");
-    expect(html).toContain("Kaikki");
+    expect(html).toContain("Haulla löytyi 174 sairausriviä.");
+    expect(html).toContain("Kaikki 182 kpl");
     expect(html).toContain("Epilepsia 174 kpl");
     expect(html).toContain("FI12345/21 / EK 5588");
     expect(html).toContain("/admin/dogs/dog-1/profile");
