@@ -1,6 +1,6 @@
 import { type DogSex } from "@prisma/client";
-import { getFirstInsertedRegistrationNo } from "../../core/registration";
-import type { RegistrationRow } from "../../core/registration";
+import { getFirstInsertedRegistrationNo } from "@db/dogs/core/registration";
+import type { RegistrationRow } from "@db/dogs/core/registration";
 
 export type VirtualPairingSearchFieldDb = "ek" | "reg" | "name";
 

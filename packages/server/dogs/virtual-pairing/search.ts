@@ -3,9 +3,9 @@ import type {
   VirtualPairingSearchRequest,
   VirtualPairingSearchResponse,
 } from "@beagle/contracts";
-import { toErrorLog, withLogContext } from "../../core/logger";
-import type { ServiceResult } from "../../core/result";
-import type { DogsServiceLogContext } from "../profile/get-beagle-dog-profile";
+import { toErrorLog, withLogContext } from "@server/core/logger";
+import type { ServiceResult } from "@server/core/result";
+import type { DogsServiceLogContext } from "@server/dogs/profile/get-beagle-dog-profile";
 
 function parsePage(value: number | undefined): number {
   if (!Number.isFinite(value)) return 1;

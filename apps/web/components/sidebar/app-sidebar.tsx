@@ -127,6 +127,12 @@ const adminModuleNavItems: NavItem[] = [
     availability: "enabled",
   },
   {
+    labelKey: "sidebar.nav.adminDiseases",
+    icon: FileText,
+    href: "/admin/dogs/diseases",
+    availability: "enabled",
+  },
+  {
     labelKey: "sidebar.nav.adminVirtualPairing",
     icon: Link2,
     href: "/admin/dogs/virtual-pairing",

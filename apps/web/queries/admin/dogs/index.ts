@@ -7,5 +7,6 @@ export * from "./manage/use-update-admin-dog-mutation";
 export * from "./lookups/use-admin-dog-breeder-options-query";
 export * from "./lookups/use-admin-dog-owner-options-query";
 export * from "./lookups/use-admin-dog-parent-options-query";
+export * from "./diseases";
 export * from "./profile";
 export * from "./virtual-pairing";

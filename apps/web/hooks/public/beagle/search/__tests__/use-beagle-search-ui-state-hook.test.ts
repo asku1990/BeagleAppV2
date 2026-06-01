@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 const {
   pathnameMock,
-  replaceMock,
+  pushMock,
   searchParamsMock,
   setFormStateMock,
   stateTupleMock,
@@ -19,7 +19,7 @@ const {
   };
   return {
     pathnameMock: "/beagles/search",
-    replaceMock: vi.fn(),
+    pushMock: vi.fn(),
     searchParamsMock: {
       get: vi.fn((key: string) => {
         const params: Record<string, string> = {
@@ -44,7 +44,7 @@ const {
 
 vi.mock("next/navigation", () => ({
   usePathname: () => pathnameMock,
-  useRouter: () => ({ replace: replaceMock }),
+  useRouter: () => ({ push: pushMock }),
   useSearchParams: () => searchParamsMock,
 }));
 
@@ -85,15 +85,15 @@ describe("useBeagleSearchUiState hook", () => {
     ui.toggleAdvanced();
 
     expect(setFormStateMock).toHaveBeenCalled();
-    expect(replaceMock).toHaveBeenCalled();
-    const hrefs = replaceMock.mock.calls.map((call) => String(call[0]));
+    expect(pushMock).toHaveBeenCalled();
+    const hrefs = pushMock.mock.calls.map((call) => String(call[0]));
     expect(hrefs.some((href) => href === "/beagles/search")).toBe(true);
     expect(hrefs.some((href) => href.includes("page=4"))).toBe(true);
     expect(hrefs.some((href) => href.includes("pageSize=25"))).toBe(true);
     expect(hrefs.some((href) => href.includes("sort=reg-desc"))).toBe(true);
     expect(hrefs.some((href) => href.includes("adv=1"))).toBe(true);
     expect(
-      replaceMock.mock.calls.every(
+      pushMock.mock.calls.every(
         (call) =>
           typeof call[1] === "object" &&
           call[1] !== null &&
