@@ -1,5 +1,18 @@
 import { DogSex, type Prisma } from "@prisma/client";
 import { prisma } from "@db/core/prisma";
+import {
+  parsePage,
+  parsePageSize,
+  resolveSelectedDiseaseCode,
+  type DiseaseDefinitionRow,
+} from "./internal/disease-selection";
+import {
+  createParentPreview,
+  getParentPreview,
+  mapParentPreviews,
+  normalizeRegistrationNo,
+  type ParentDogPreviewRow,
+} from "./internal/parent-preview";
 
 export type AdminDogDiseaseBrowseRequestDb = {
   diseaseCode?: string | null;
@@ -16,19 +29,6 @@ export type AdminDogDiseaseBrowseFilterOptionDb = {
 export type AdminDogDiseaseBrowseParentPreviewDb = {
   registrationNo: string | null;
   name: string | null;
-};
-
-type DiseaseDefinitionRow = {
-  koodi: string;
-  sairausTeksti: string;
-  _count: {
-    koirat: number;
-  };
-};
-
-type ParentDogPreviewRow = {
-  name: string;
-  registrations: Array<{ registrationNo: string }>;
 };
 
 export type AdminDogDiseaseBrowseDogDb = {
@@ -66,141 +66,6 @@ export type AdminDogDiseaseBrowseResponseDb = {
   diseaseOptions: AdminDogDiseaseBrowseFilterOptionDb[];
   items: AdminDogDiseaseBrowseItemDb[];
 };
-
-const DEFAULT_PAGE = 1;
-const DEFAULT_PAGE_SIZE = 15;
-const MAX_PAGE_SIZE = 100;
-
-function parsePage(value: number | undefined): number {
-  if (!Number.isFinite(value)) {
-    return DEFAULT_PAGE;
-  }
-
-  return Math.max(DEFAULT_PAGE, Math.floor(value ?? DEFAULT_PAGE));
-}
-
-function parsePageSize(value: number | undefined): number {
-  if (!Number.isFinite(value)) {
-    return DEFAULT_PAGE_SIZE;
-  }
-
-  return Math.min(
-    MAX_PAGE_SIZE,
-    Math.max(1, Math.floor(value ?? DEFAULT_PAGE_SIZE)),
-  );
-}
-
-function normalizeDiseaseCode(
-  value: string | null | undefined,
-): string | null | undefined {
-  if (value == null) {
-    return value;
-  }
-
-  const normalized = value.trim();
-  return normalized.length > 0 ? normalized : undefined;
-}
-
-function isEpiDisease(definition: DiseaseDefinitionRow): boolean {
-  const text = definition.sairausTeksti.trim().toLowerCase();
-  const code = definition.koodi.trim().toLowerCase();
-
-  return text === "epilepsia" || code === "epi";
-}
-
-function resolveSelectedDiseaseCode(
-  inputDiseaseCode: string | null | undefined,
-  diseaseDefinitions: DiseaseDefinitionRow[],
-): string | null {
-  if (inputDiseaseCode === null) {
-    return null;
-  }
-
-  const normalized = normalizeDiseaseCode(inputDiseaseCode);
-  if (normalized) {
-    const match = diseaseDefinitions.find(
-      (definition) => definition.koodi === normalized,
-    );
-    if (match) {
-      return match.koodi;
-    }
-  }
-
-  return diseaseDefinitions.find(isEpiDisease)?.koodi ?? null;
-}
-
-function normalizeRegistrationNo(
-  value: string | null | undefined,
-): string | null {
-  if (value == null) {
-    return null;
-  }
-
-  const normalized = value.trim();
-  return normalized.length > 0 ? normalized : null;
-}
-
-function toParentPreview(
-  parent: ParentDogPreviewRow | null,
-  fallbackRegistrationNo: string | null,
-): AdminDogDiseaseBrowseParentPreviewDb {
-  if (!parent) {
-    return {
-      registrationNo: fallbackRegistrationNo,
-      name: null,
-    };
-  }
-
-  return {
-    registrationNo:
-      parent.registrations[0]?.registrationNo ?? fallbackRegistrationNo,
-    name: parent.name.trim().length > 0 ? parent.name : null,
-  };
-}
-
-function buildParentLookup(
-  parentDogs: ParentDogPreviewRow[],
-): Map<string, AdminDogDiseaseBrowseParentPreviewDb> {
-  const lookup = new Map<string, AdminDogDiseaseBrowseParentPreviewDb>();
-
-  for (const dog of parentDogs) {
-    const preview = {
-      registrationNo: dog.registrations[0]?.registrationNo ?? null,
-      name: dog.name.trim().length > 0 ? dog.name : null,
-    };
-
-    for (const registration of dog.registrations) {
-      const key = normalizeRegistrationNo(registration.registrationNo);
-      if (!key) {
-        continue;
-      }
-
-      lookup.set(key, preview);
-    }
-  }
-
-  return lookup;
-}
-
-function resolveParentFromLookup(
-  registrationNo: string | null,
-  lookup: Map<string, AdminDogDiseaseBrowseParentPreviewDb>,
-): AdminDogDiseaseBrowseParentPreviewDb {
-  const normalized = normalizeRegistrationNo(registrationNo);
-  if (!normalized) {
-    return {
-      registrationNo: null,
-      name: null,
-    };
-  }
-
-  return (
-    lookup.get(normalized) ?? {
-      registrationNo: normalized,
-      name: null,
-    }
-  );
-}
 
 export async function listAdminDogDiseasesDb(
   input: AdminDogDiseaseBrowseRequestDb,
@@ -247,7 +112,7 @@ export async function listAdminDogDiseasesDb(
       selectedDiseaseCode,
       total: 0,
       totalPages: 0,
-      page: DEFAULT_PAGE,
+      page: 1,
       diseaseOptions,
       items: [],
     };
@@ -382,7 +247,7 @@ export async function listAdminDogDiseasesDb(
         })) as ParentDogPreviewRow[])
       : [];
 
-  const parentLookup = buildParentLookup(parentDogs);
+  const parentLookup = mapParentPreviews(parentDogs);
 
   return {
     selectedDiseaseCode,
@@ -393,11 +258,11 @@ export async function listAdminDogDiseasesDb(
     items: rows.map((row) => {
       const isDog = row.evidenceKind === "DOG" && Boolean(row.dog);
       const sire = isDog
-        ? toParentPreview(row.dog?.sire ?? null, null)
-        : resolveParentFromLookup(row.isaRekisterinumero, parentLookup);
+        ? createParentPreview(row.dog?.sire ?? null, null)
+        : getParentPreview(row.isaRekisterinumero, parentLookup);
       const dam = isDog
-        ? toParentPreview(row.dog?.dam ?? null, null)
-        : resolveParentFromLookup(row.emaRekisterinumero, parentLookup);
+        ? createParentPreview(row.dog?.dam ?? null, null)
+        : getParentPreview(row.emaRekisterinumero, parentLookup);
 
       return {
         id: row.id,
