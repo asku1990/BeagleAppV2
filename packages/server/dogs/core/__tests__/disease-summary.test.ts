@@ -21,7 +21,6 @@ function makeNode(
     id,
     sireId,
     damId,
-    siitosasteProsentti: null,
   };
 }
 

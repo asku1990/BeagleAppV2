@@ -26,7 +26,6 @@ import {
   resolveUpdateParents,
   validateUpdateParentGuards,
 } from "./internal/update-parent-validation";
-import { calculatePersistedInbreedingCoefficientPct } from "./internal/inbreeding-persistence";
 
 const DOG_NAME_MAX_LENGTH = 120;
 const DOG_REGISTRATION_NO_MAX_LENGTH = 40;
@@ -128,14 +127,6 @@ export async function updateAdminDog(
       return parentGuardResult.response;
     }
 
-    const inbreedingCoefficientPct =
-      parentGuardResult?.ok === true
-        ? await calculatePersistedInbreedingCoefficientPct(
-            parentGuardResult.data.effectiveSire,
-            parentGuardResult.data.effectiveDam,
-          )
-        : undefined;
-
     const updatedDog = await runAdminDogWriteTransactionDb(
       async (tx) =>
         updateAdminDogWriteDb(
@@ -155,9 +146,6 @@ export async function updateAdminDog(
                 : (resolvedParents.data.dam?.id ?? null),
             ownerNames: inTryValidation.data.ownerNames,
             ekNo: preflight.data.ekNo,
-            ...(inbreedingCoefficientPct === undefined
-              ? {}
-              : { siitosasteProsentti: inbreedingCoefficientPct }),
             note: inTryValidation.data.note,
             registrationNo: preflight.data.primaryRegistrationNo,
             secondaryRegistrationNos:

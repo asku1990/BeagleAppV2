@@ -144,7 +144,6 @@ describe("runLegacyPhase1_25", () => {
     }));
 
     fetchLegacyPhase1_25RowsMock.mockResolvedValue({
-      inbreeding: [],
       sairaudet: makeSairausRows(),
       koiranSairaudet: [],
     });
@@ -163,7 +162,6 @@ describe("runLegacyPhase1_25", () => {
 
   it("imports synthetic REKNO rows with null dogId, resolved parents, and a warning issue", async () => {
     fetchLegacyPhase1_25RowsMock.mockResolvedValue({
-      inbreeding: [],
       sairaudet: makeSairausRows(),
       koiranSairaudet: [
         makeLegacyRow({
@@ -220,7 +218,6 @@ describe("runLegacyPhase1_25", () => {
 
   it("imports resolved dog rows without duplicating source parent relations", async () => {
     fetchLegacyPhase1_25RowsMock.mockResolvedValue({
-      inbreeding: [],
       sairaudet: makeSairausRows(),
       koiranSairaudet: [
         makeLegacyRow({
@@ -265,7 +262,6 @@ describe("runLegacyPhase1_25", () => {
 
   it("skips valid unresolved REKNO rows after recording an import issue", async () => {
     fetchLegacyPhase1_25RowsMock.mockResolvedValue({
-      inbreeding: [],
       sairaudet: makeSairausRows(),
       koiranSairaudet: [
         makeLegacyRow({
@@ -307,7 +303,6 @@ describe("runLegacyPhase1_25", () => {
 
   it("imports missing REKNO rows with a generated legacy identity and a warning issue", async () => {
     fetchLegacyPhase1_25RowsMock.mockResolvedValue({
-      inbreeding: [],
       sairaudet: makeSairausRows(),
       koiranSairaudet: [
         makeLegacyRow({
@@ -368,7 +363,6 @@ describe("runLegacyPhase1_25", () => {
       { registrationNo: "FI00001/21", dogId: "dog-real" },
     ]);
     fetchLegacyPhase1_25RowsMock.mockResolvedValue({
-      inbreeding: [],
       sairaudet: makeSairausRows(),
       koiranSairaudet: [
         makeLegacyRow({
@@ -398,7 +392,6 @@ describe("runLegacyPhase1_25", () => {
 
   it("still skips rows missing disease code or unresolved disease definitions", async () => {
     fetchLegacyPhase1_25RowsMock.mockResolvedValue({
-      inbreeding: [],
       sairaudet: makeSairausRows(),
       koiranSairaudet: [
         makeLegacyRow({

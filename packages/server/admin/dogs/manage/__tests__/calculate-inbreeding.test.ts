@@ -36,19 +36,16 @@ describe("calculateAdminDogInbreeding", () => {
           id: "sire",
           sireId: "ancestor",
           damId: null,
-          siitosasteProsentti: null,
         },
         dam: {
           id: "dam",
           sireId: "ancestor",
           damId: null,
-          siitosasteProsentti: null,
         },
         ancestor: {
           id: "ancestor",
           sireId: null,
           damId: null,
-          siitosasteProsentti: null,
         },
       },
     });

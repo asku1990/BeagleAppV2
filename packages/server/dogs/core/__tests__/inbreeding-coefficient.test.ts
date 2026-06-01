@@ -21,7 +21,6 @@ function makeNode(
     id,
     sireId,
     damId,
-    siitosasteProsentti: null,
   };
 }
 
@@ -55,13 +54,11 @@ describe("calculateInbreedingCoefficientPct", () => {
         id: "root",
         sireId: "sire",
         damId: null,
-        siitosasteProsentti: null,
       },
       sire: {
         id: "sire",
         sireId: null,
         damId: null,
-        siitosasteProsentti: null,
       },
     });
 
@@ -74,31 +71,26 @@ describe("calculateInbreedingCoefficientPct", () => {
         id: "root",
         sireId: "sire",
         damId: "dam",
-        siitosasteProsentti: null,
       },
       sire: {
         id: "sire",
         sireId: "sire-parent",
         damId: null,
-        siitosasteProsentti: null,
       },
       dam: {
         id: "dam",
         sireId: null,
         damId: "dam-parent",
-        siitosasteProsentti: null,
       },
       "sire-parent": {
         id: "sire-parent",
         sireId: null,
         damId: null,
-        siitosasteProsentti: null,
       },
       "dam-parent": {
         id: "dam-parent",
         sireId: null,
         damId: null,
-        siitosasteProsentti: null,
       },
     });
 
@@ -111,25 +103,21 @@ describe("calculateInbreedingCoefficientPct", () => {
         id: "root",
         sireId: "sire",
         damId: "dam",
-        siitosasteProsentti: null,
       },
       sire: {
         id: "sire",
         sireId: "ancestor",
         damId: null,
-        siitosasteProsentti: null,
       },
       dam: {
         id: "dam",
         sireId: "ancestor",
         damId: null,
-        siitosasteProsentti: null,
       },
       ancestor: {
         id: "ancestor",
         sireId: null,
         damId: null,
-        siitosasteProsentti: null,
       },
     });
 
@@ -145,19 +133,16 @@ describe("calculateInbreedingCoefficientPct", () => {
         id: "sire",
         sireId: "ancestor",
         damId: null,
-        siitosasteProsentti: null,
       },
       dam: {
         id: "dam",
         sireId: "ancestor",
         damId: null,
-        siitosasteProsentti: null,
       },
       ancestor: {
         id: "ancestor",
         sireId: null,
         damId: null,
-        siitosasteProsentti: null,
       },
     });
 
@@ -172,31 +157,26 @@ describe("calculateInbreedingCoefficientPct", () => {
         id: "root",
         sireId: "sire",
         damId: "dam",
-        siitosasteProsentti: null,
       },
       sire: {
         id: "sire",
         sireId: "ancestor-a",
         damId: "ancestor-b",
-        siitosasteProsentti: null,
       },
       dam: {
         id: "dam",
         sireId: "ancestor-a",
         damId: "ancestor-b",
-        siitosasteProsentti: null,
       },
       "ancestor-a": {
         id: "ancestor-a",
         sireId: null,
         damId: null,
-        siitosasteProsentti: null,
       },
       "ancestor-b": {
         id: "ancestor-b",
         sireId: null,
         damId: null,
-        siitosasteProsentti: null,
       },
     });
 
@@ -212,45 +192,39 @@ describe("calculateInbreedingCoefficientPct", () => {
         id: "root",
         sireId: "sire",
         damId: "dam",
-        siitosasteProsentti: null,
       },
       sire: {
         id: "sire",
         sireId: "root",
         damId: null,
-        siitosasteProsentti: null,
       },
-      dam: { id: "dam", sireId: null, damId: null, siitosasteProsentti: null },
+      dam: { id: "dam", sireId: null, damId: null },
     });
 
     expect(calculateInbreedingCoefficientPct("root", ancestry)).not.toBeNull();
   });
 
-  it("ignores stored ancestor siitosasteProsentti values", () => {
+  it("calculates shared ancestor path without stored ancestry data", () => {
     const ancestry = makeAncestry({
       root: {
         id: "root",
         sireId: "sire",
         damId: "dam",
-        siitosasteProsentti: null,
       },
       sire: {
         id: "sire",
         sireId: "ancestor",
         damId: null,
-        siitosasteProsentti: null,
       },
       dam: {
         id: "dam",
         sireId: "ancestor",
         damId: null,
-        siitosasteProsentti: null,
       },
       ancestor: {
         id: "ancestor",
         sireId: null,
         damId: null,
-        siitosasteProsentti: 10,
       },
     });
 
@@ -266,43 +240,36 @@ describe("calculateInbreedingCoefficientPct", () => {
         id: "root",
         sireId: "sire",
         damId: "dam",
-        siitosasteProsentti: null,
       },
       sire: {
         id: "sire",
         sireId: "ancestor",
         damId: null,
-        siitosasteProsentti: null,
       },
       dam: {
         id: "dam",
         sireId: "ancestor",
         damId: null,
-        siitosasteProsentti: null,
       },
       ancestor: {
         id: "ancestor",
         sireId: "ancestor-sire",
         damId: "ancestor-dam",
-        siitosasteProsentti: 99,
       },
       "ancestor-sire": {
         id: "ancestor-sire",
         sireId: "deep-shared",
         damId: null,
-        siitosasteProsentti: null,
       },
       "ancestor-dam": {
         id: "ancestor-dam",
         sireId: "deep-shared",
         damId: null,
-        siitosasteProsentti: null,
       },
       "deep-shared": {
         id: "deep-shared",
         sireId: null,
         damId: null,
-        siitosasteProsentti: null,
       },
     });
 
@@ -318,55 +285,46 @@ describe("calculateInbreedingCoefficientPct", () => {
         id: "root",
         sireId: "sire",
         damId: "dam",
-        siitosasteProsentti: null,
       },
       sire: {
         id: "sire",
         sireId: "ancestor",
         damId: null,
-        siitosasteProsentti: null,
       },
       dam: {
         id: "dam",
         sireId: "ancestor",
         damId: null,
-        siitosasteProsentti: null,
       },
       ancestor: {
         id: "ancestor",
         sireId: "ancestor-sire",
         damId: "ancestor-dam",
-        siitosasteProsentti: null,
       },
       "ancestor-sire": {
         id: "ancestor-sire",
         sireId: "ancestor-sire-parent",
         damId: null,
-        siitosasteProsentti: null,
       },
       "ancestor-dam": {
         id: "ancestor-dam",
         sireId: "ancestor-dam-parent",
         damId: null,
-        siitosasteProsentti: null,
       },
       "ancestor-sire-parent": {
         id: "ancestor-sire-parent",
         sireId: "deep-shared",
         damId: null,
-        siitosasteProsentti: null,
       },
       "ancestor-dam-parent": {
         id: "ancestor-dam-parent",
         sireId: "deep-shared",
         damId: null,
-        siitosasteProsentti: null,
       },
       "deep-shared": {
         id: "deep-shared",
         sireId: null,
         damId: null,
-        siitosasteProsentti: null,
       },
     });
 
@@ -387,25 +345,21 @@ describe("calculateInbreedingCoefficientPct", () => {
         id: "sire",
         sireId: "shared-a",
         damId: "shared-b",
-        siitosasteProsentti: null,
       },
       dam: {
         id: "dam",
         sireId: "shared-a",
         damId: "shared-b",
-        siitosasteProsentti: null,
       },
       "shared-a": {
         id: "shared-a",
         sireId: null,
         damId: null,
-        siitosasteProsentti: null,
       },
       "shared-b": {
         id: "shared-b",
         sireId: null,
         damId: null,
-        siitosasteProsentti: null,
       },
     });
 
@@ -432,31 +386,26 @@ describe("calculateInbreedingCoefficientPct", () => {
         id: "sire",
         sireId: "shared",
         damId: "sire-dam",
-        siitosasteProsentti: null,
       },
       dam: {
         id: "dam",
         sireId: "shared",
         damId: "dam-dam",
-        siitosasteProsentti: null,
       },
       "sire-dam": {
         id: "sire-dam",
         sireId: "shared",
         damId: null,
-        siitosasteProsentti: null,
       },
       "dam-dam": {
         id: "dam-dam",
         sireId: "shared",
         damId: null,
-        siitosasteProsentti: null,
       },
       shared: {
         id: "shared",
         sireId: null,
         damId: null,
-        siitosasteProsentti: 10,
       },
     });
 

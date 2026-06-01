@@ -45,7 +45,7 @@ function buildEditValues(): AdminDogFormValues {
     breederNameText: "Metsapolun",
     ownershipNames: ["Tiina Virtanen", "Antti Virtanen"],
     ekNo: "5588",
-    inbreedingCoefficientPct: 12.5,
+    inbreedingCoefficientPct: null,
     note: "Important note",
     registrationNo: "FI12345/21",
     secondaryRegistrationNos: ["FI54321/21"],
@@ -104,7 +104,6 @@ function buildDog(values: AdminDogFormValues): AdminDogRecord {
     titlesText:
       values.titles.map((title) => title.titleCode).join(", ") || null,
     ekNo: Number(values.ekNo),
-    inbreedingCoefficientPct: 12.5,
     note: values.note,
     registrationNo: values.registrationNo,
     secondaryRegistrationNos: values.secondaryRegistrationNos,
@@ -161,7 +160,7 @@ describe("DogFormModal", () => {
     expect(html).toContain("admin.dogs.form.inbreedingLabel");
     expect(html).toContain("admin.dogs.form.sireSelectLabel *");
     expect(html).toContain("admin.dogs.form.damSelectLabel *");
-    expect(html).toContain("12.5 %");
+    expect(html).toContain("admin.dogs.form.inbreedingEmpty");
     expect(html).toContain("admin.dogs.form.recordIdPrefix dog_1");
   });
 

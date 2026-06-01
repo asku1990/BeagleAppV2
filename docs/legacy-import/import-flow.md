@@ -20,7 +20,7 @@ Phase-specific docs:
 ## Commands
 
 - Phase 1 (foundation only): `pnpm import:phase1`
-- Phase 1.25 (disease data and stored inbreeding percentages): `pnpm import:phase1.25`
+- Phase 1.25 (disease data): `pnpm import:phase1.25`
 - Phase 1.5 (dog titles): `pnpm import:phase1.5`
 - Phase 2 (trials): `pnpm import:phase2`
 - Trial mirror validation: `pnpm import:trials:validate-mirror`
@@ -82,9 +82,8 @@ Issue tooling:
 - relations (sire/dam links)
 - owners and ownerships
 
-2. `phase1.25` imports disease data and stored dog inbreeding percentages:
+2. `phase1.25` imports disease data:
 
-- `Dog.siitosasteProsentti` from `bearek_id.SIITOSASTE`
 - disease definitions (`Sairaus`) from `beasairaudet`
 - dog disease rows (`KoiranSairaus`) from `beasairaat`
 

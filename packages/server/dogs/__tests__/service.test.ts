@@ -368,7 +368,6 @@ describe("dogs service", () => {
           id: "dog1",
           sireId: "sire-1",
           damId: "dam-1",
-          siitosasteProsentti: null,
         },
       },
     };
@@ -488,9 +487,6 @@ describe("dogs service", () => {
         },
       },
     });
-    expect(result.body.ok ? result.body.data : null).not.toHaveProperty(
-      "siitosasteProsentti",
-    );
   });
 
   it("returns null inbreeding when the calculator returns null", async () => {
@@ -520,7 +516,6 @@ describe("dogs service", () => {
           id: "dog-null",
           sireId: "sire-1",
           damId: "dam-1",
-          siitosasteProsentti: null,
         },
       },
     };
@@ -590,9 +585,6 @@ describe("dogs service", () => {
         },
       },
     });
-    expect(result.body.ok ? result.body.data : null).not.toHaveProperty(
-      "siitosasteProsentti",
-    );
   });
 
   it("maps date-only profile fields in Helsinki timezone", async () => {

@@ -147,7 +147,6 @@ function buildVirtualRootAncestry(
         id: rootId,
         sireId,
         damId,
-        siitosasteProsentti: null,
       },
     },
   };

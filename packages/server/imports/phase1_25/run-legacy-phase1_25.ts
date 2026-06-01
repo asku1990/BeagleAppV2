@@ -92,25 +92,6 @@ function getPhase1_25Db() {
   };
 }
 
-function parseLegacyDecimal(
-  value: string | number | null | undefined,
-): string | null {
-  if (value == null) return null;
-  const normalized =
-    typeof value === "number" ? String(value) : value.trim().replace(",", ".");
-  if (!normalized) return null;
-  const parsed = Number.parseFloat(normalized);
-  return Number.isFinite(parsed) ? normalized : null;
-}
-
-function parseSiitosastePercent(
-  value: string | number | null | undefined,
-): string | null {
-  const parsed = parseLegacyDecimal(value);
-  if (parsed == null) return null;
-  return parsed;
-}
-
 function parseLegacyTimestamp(
   value: string | Date | null | undefined,
 ): Date | null {
@@ -404,7 +385,7 @@ export async function runLegacyPhase1_25(
     });
     finishStage(
       "load",
-      `inbreeding=${legacy.inbreeding.length}, sairaudet=${legacy.sairaudet.length}, koiranSairaudet=${legacy.koiranSairaudet.length}`,
+      `sairaudet=${legacy.sairaudet.length}, koiranSairaudet=${legacy.koiranSairaudet.length}`,
     );
 
     startStage("index");
@@ -422,58 +403,6 @@ export async function runLegacyPhase1_25(
     finishStage(
       "index",
       `registrations=${registrationIndex.dogIdByRegistration.size}`,
-    );
-
-    startStage("siitosaste");
-    let siitosasteUpdated = 0;
-    let siitosasteSkippedMissingRegistration = 0;
-    let siitosasteSkippedUnresolved = 0;
-    let siitosasteProcessed = 0;
-    for (const row of legacy.inbreeding) {
-      siitosasteProcessed += 1;
-      const registrationNo = normalizeRegistrationNo(row.registrationNo);
-      if (!registrationNo || !isValidRegistrationNo(registrationNo)) {
-        siitosasteSkippedMissingRegistration += 1;
-        if (siitosasteProcessed % 1000 === 0) {
-          logProgress(
-            "siitosaste",
-            siitosasteProcessed,
-            legacy.inbreeding.length,
-          );
-        }
-        continue;
-      }
-      const dogId = registrationIndex.dogIdByRegistration.get(registrationNo);
-      if (!dogId) {
-        siitosasteSkippedUnresolved += 1;
-        if (siitosasteProcessed % 1000 === 0) {
-          logProgress(
-            "siitosaste",
-            siitosasteProcessed,
-            legacy.inbreeding.length,
-          );
-        }
-        continue;
-      }
-      await prisma.dog.update({
-        where: { id: dogId },
-        data: {
-          siitosasteProsentti: parseSiitosastePercent(row.siitosasteRaw),
-        } as unknown as Parameters<typeof prisma.dog.update>[0]["data"],
-      });
-      siitosasteUpdated += 1;
-      if (siitosasteProcessed % 1000 === 0) {
-        logProgress(
-          "siitosaste",
-          siitosasteProcessed,
-          legacy.inbreeding.length,
-        );
-      }
-    }
-    logProgress("siitosaste", siitosasteProcessed, legacy.inbreeding.length);
-    finishStage(
-      "siitosaste",
-      `updated=${siitosasteUpdated}, skippedMissingRegistration=${siitosasteSkippedMissingRegistration}, skippedUnresolved=${siitosasteSkippedUnresolved}`,
     );
 
     const phaseDb = getPhase1_25Db();
@@ -692,7 +621,7 @@ export async function runLegacyPhase1_25(
       run.id,
       {
         status: "SUCCEEDED",
-        dogsUpserted: siitosasteUpdated,
+        dogsUpserted: 0,
         ownersUpserted: 0,
         ownershipsUpserted: 0,
         trialResultsUpserted: 0,
@@ -700,7 +629,6 @@ export async function runLegacyPhase1_25(
         errorsCount,
         errorSummary: formatLegacyImportSummary({
           kind: "LEGACY_PHASE1_25",
-          siitosasteUpdated,
           sairaudetInserted,
           koiranSairaudetInserted,
           koiranSairaudetFallbackIdentityIssues,

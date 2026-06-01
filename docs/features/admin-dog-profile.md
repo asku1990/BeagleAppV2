@@ -33,7 +33,7 @@ The page renders the legacy basics that were visible in the old hallinta view:
 
 ## Calculation notes
 
-- `Sukusiitosaste (9 sp)` is read from the imported legacy `Dog.siitosasteProsentti` value and surfaced as-is in the profile DTO. The admin profile read path does not recalculate it.
+- `Sukusiitosaste (9 sp)` is calculated on demand from current pedigree data in shared server code and surfaced in the profile DTO. The admin profile read path does not persist or reuse a stored legacy percentage.
 - `EPI-luku` and `EPITEKSTI` are calculated on demand in shared server code from imported `KoiranSairaus` disease rows (`epi`, `lepis`, `lepik`, `lepit`) plus the bounded pedigree ancestry loaded for the profile dog. Real `DOG` evidence rows use canonical `Dog.sireId` and `Dog.damId`; anonymous `LITTER` evidence rows are matched through source parent registrations in the bounded health graph, then both source parents are resolved for relationship evidence. Rows that cannot become usable evidence are skipped during import and recorded as import issues.
 - `EPITEKSTI` describes only the root dog and is always five characters: `I` self, `S` full sibling, `V` parent, `J` offspring, `P` half-sibling, `-` no evidence.
 - `EPI-luku` adds the root dog's evidence at full weight and then repeats the same scoring for generations 1-4 using weights `1/2`, `1/4`, `1/8`, and `1/16`; the final value is rounded to 5 decimals before returning.

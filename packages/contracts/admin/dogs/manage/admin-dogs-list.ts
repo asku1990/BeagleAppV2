@@ -36,7 +36,6 @@ export type AdminDogListItem = {
   showCount: number;
   titlesText: string | null;
   ekNo: number | null;
-  inbreedingCoefficientPct: number | null;
   note: string | null;
   titles?: AdminDogTitleItem[];
 };

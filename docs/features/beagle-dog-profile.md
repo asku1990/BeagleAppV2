@@ -31,7 +31,7 @@ Developer notes for the public beagle dog profile feature.
 3. The web page renders details and lineage always, renders titles when title rows exist, and renders secondary cards conditionally by data (siblings, litters, shows, trials).
 4. Siblings are resolved in DB from one reliable birth litter and rendered after lineage.
 5. Litters are rendered between siblings and result sections.
-6. Public inbreeding is calculated at read time from current pedigree data rather than read from the persisted `Dog.siitosasteProsentti` field.
+6. Public inbreeding is calculated at read time from current pedigree data rather than from any stored legacy percentage.
 
 ## Current contract rules
 

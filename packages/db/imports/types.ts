@@ -27,11 +27,6 @@ export type LegacyDogTitleRow = {
   titleCodeRaw: string | null;
 };
 
-export type LegacyDogInbreedingRow = {
-  registrationNo: string | null;
-  siitosasteRaw: string | number | null;
-};
-
 export type LegacySairausRow = {
   legacyId: number;
   code: string | null;
@@ -52,7 +47,6 @@ export type LegacyKoiranSairausRow = {
 };
 
 export type LegacyPhase1_25Rows = {
-  inbreeding: LegacyDogInbreedingRow[];
   sairaudet: LegacySairausRow[];
   koiranSairaudet: LegacyKoiranSairausRow[];
 };
