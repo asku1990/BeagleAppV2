@@ -6,9 +6,11 @@ import {
   type AuditContextDb,
 } from "@beagle/db";
 import type {
+  CurrentUserDto,
   CreateAdminDogDiseaseRequest,
   CreateAdminDogDiseaseResponse,
 } from "@beagle/contracts";
+import { requireAdmin } from "@server/admin/core/service";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
 import { isValidRegistrationNo } from "@server/admin/dogs/manage/normalization";
@@ -33,6 +35,7 @@ function validationResponse(
 
 export async function createAdminDogDisease(
   input: CreateAdminDogDiseaseRequest,
+  currentUser: CurrentUserDto | null,
   auditContext?: AuditContextDb,
 ): Promise<ServiceResult<CreateAdminDogDiseaseResponse>> {
   const startedAt = Date.now();
@@ -54,6 +57,22 @@ export async function createAdminDogDisease(
     },
     "admin dog disease create started",
   );
+
+  const authResult = requireAdmin(currentUser);
+  if (!authResult.body.ok) {
+    log.warn(
+      {
+        event: "forbidden",
+        status: authResult.status,
+        durationMs: Date.now() - startedAt,
+      },
+      "admin dog disease create rejected by authorization",
+    );
+    return {
+      status: authResult.status,
+      body: authResult.body,
+    };
+  }
 
   const validation = validateCreateDogDiseaseInput(input);
   if (!validation.ok) {

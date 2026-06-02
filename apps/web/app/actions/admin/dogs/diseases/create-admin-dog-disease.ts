@@ -38,11 +38,20 @@ export async function createAdminDogDiseaseAction(
     };
   }
 
-  const result = await createAdminDogDisease(input, {
-    actorUserId: currentUser.id,
-    actorSessionId: currentUser.sessionId,
-    source: "WEB",
-  });
+  const result = await createAdminDogDisease(
+    input,
+    {
+      id: currentUser.id,
+      email: currentUser.email,
+      username: currentUser.name,
+      role: currentUser.role,
+    },
+    {
+      actorUserId: currentUser.id,
+      actorSessionId: currentUser.sessionId,
+      source: "WEB",
+    },
+  );
 
   if (!result.body.ok) {
     return {

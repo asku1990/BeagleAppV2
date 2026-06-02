@@ -52,6 +52,9 @@ describe("createAdminDogDiseaseAction", () => {
     requireAdminLayoutAccessMock.mockResolvedValue({ ok: true });
     getSessionCurrentUserMock.mockResolvedValue({
       id: "u_1",
+      email: "admin@example.test",
+      name: "Admin",
+      role: "ADMIN",
       sessionId: "s_1",
     });
     createAdminDogDiseaseMock.mockResolvedValue({
@@ -73,10 +76,19 @@ describe("createAdminDogDiseaseAction", () => {
       data: { id: "row-1" },
       hasError: false,
     });
-    expect(createAdminDogDiseaseMock).toHaveBeenCalledWith(input, {
-      actorUserId: "u_1",
-      actorSessionId: "s_1",
-      source: "WEB",
-    });
+    expect(createAdminDogDiseaseMock).toHaveBeenCalledWith(
+      input,
+      {
+        id: "u_1",
+        email: "admin@example.test",
+        username: "Admin",
+        role: "ADMIN",
+      },
+      {
+        actorUserId: "u_1",
+        actorSessionId: "s_1",
+        source: "WEB",
+      },
+    );
   });
 });

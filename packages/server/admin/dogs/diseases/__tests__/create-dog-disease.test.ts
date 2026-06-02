@@ -23,6 +23,13 @@ vi.mock("@beagle/db", () => ({
     runAdminDogDiseaseWriteTransactionDbMock,
 }));
 
+const adminUser = {
+  id: "u_1",
+  email: "admin@example.test",
+  username: "admin",
+  role: "ADMIN" as const,
+};
+
 describe("createAdminDogDisease", () => {
   beforeEach(() => {
     createAdminDogDiseaseDbMock.mockReset();
@@ -54,6 +61,7 @@ describe("createAdminDogDisease", () => {
           description: "Omistaja ilmoitti",
           source: "Puhelu",
         },
+        adminUser,
         { actorUserId: "u_1", source: "WEB" },
       ),
     ).resolves.toEqual({
@@ -90,6 +98,37 @@ describe("createAdminDogDisease", () => {
     );
   });
 
+  it("rejects non-admin users before DB access", async () => {
+    await expect(
+      createAdminDogDisease(
+        {
+          evidenceKind: "DOG",
+          diseaseCode: "epi",
+          registrationNo: "FI12345/21",
+          public: false,
+        },
+        {
+          id: "u_2",
+          email: "user@example.test",
+          username: "user",
+          role: "USER",
+        },
+      ),
+    ).resolves.toEqual({
+      status: 403,
+      body: {
+        ok: false,
+        error: "Admin role required.",
+        code: "FORBIDDEN",
+      },
+    });
+
+    expect(runAdminDogDiseaseWriteTransactionDbMock).not.toHaveBeenCalled();
+    expect(findAdminDogDiseaseDefinitionByCodeDbMock).not.toHaveBeenCalled();
+    expect(findAdminDiseaseDogByRegistrationNoDbMock).not.toHaveBeenCalled();
+    expect(createAdminDogDiseaseDbMock).not.toHaveBeenCalled();
+  });
+
   it("creates LITTER evidence with resolved source parents", async () => {
     findAdminDogDiseaseDefinitionByCodeDbMock.mockResolvedValue({
       id: "sairaus-epi",
@@ -102,14 +141,17 @@ describe("createAdminDogDisease", () => {
     createAdminDogDiseaseDbMock.mockResolvedValue({ id: "row-litter" });
 
     await expect(
-      createAdminDogDisease({
-        evidenceKind: "LITTER",
-        diseaseCode: "epi",
-        registrationNo: "EPI_1/94",
-        sireRegistrationNo: "SF14404/90",
-        damRegistrationNo: "SF19531/89",
-        public: false,
-      }),
+      createAdminDogDisease(
+        {
+          evidenceKind: "LITTER",
+          diseaseCode: "epi",
+          registrationNo: "EPI_1/94",
+          sireRegistrationNo: "SF14404/90",
+          damRegistrationNo: "SF19531/89",
+          public: false,
+        },
+        adminUser,
+      ),
     ).resolves.toEqual({
       status: 201,
       body: {
@@ -142,14 +184,17 @@ describe("createAdminDogDisease", () => {
     createAdminDogDiseaseDbMock.mockResolvedValue({ id: "row-litter" });
 
     await expect(
-      createAdminDogDisease({
-        evidenceKind: "LITTER",
-        diseaseCode: "epi",
-        registrationNo: "EPI1/26",
-        sireRegistrationNo: "SF14404/90",
-        damRegistrationNo: "SF19531/89",
-        public: false,
-      }),
+      createAdminDogDisease(
+        {
+          evidenceKind: "LITTER",
+          diseaseCode: "epi",
+          registrationNo: "EPI1/26",
+          sireRegistrationNo: "SF14404/90",
+          damRegistrationNo: "SF19531/89",
+          public: false,
+        },
+        adminUser,
+      ),
     ).resolves.toMatchObject({
       status: 201,
       body: {
@@ -171,14 +216,17 @@ describe("createAdminDogDisease", () => {
     createAdminDogDiseaseDbMock.mockResolvedValue({ id: "row-litter" });
 
     await expect(
-      createAdminDogDisease({
-        evidenceKind: "LITTER",
-        diseaseCode: "pur",
-        registrationNo: "PUR1/06",
-        sireRegistrationNo: "SF14404/90",
-        damRegistrationNo: "SF19531/89",
-        public: false,
-      }),
+      createAdminDogDisease(
+        {
+          evidenceKind: "LITTER",
+          diseaseCode: "pur",
+          registrationNo: "PUR1/06",
+          sireRegistrationNo: "SF14404/90",
+          damRegistrationNo: "SF19531/89",
+          public: false,
+        },
+        adminUser,
+      ),
     ).resolves.toMatchObject({
       status: 201,
       body: {
@@ -196,14 +244,17 @@ describe("createAdminDogDisease", () => {
     findAdminDiseaseDogByRegistrationNoDbMock.mockResolvedValueOnce(null);
 
     await expect(
-      createAdminDogDisease({
-        evidenceKind: "LITTER",
-        diseaseCode: "epi",
-        registrationNo: "FI12345/21",
-        sireRegistrationNo: "SF14404/90",
-        damRegistrationNo: "SF19531/89",
-        public: false,
-      }),
+      createAdminDogDisease(
+        {
+          evidenceKind: "LITTER",
+          diseaseCode: "epi",
+          registrationNo: "FI12345/21",
+          sireRegistrationNo: "SF14404/90",
+          damRegistrationNo: "SF19531/89",
+          public: false,
+        },
+        adminUser,
+      ),
     ).resolves.toEqual({
       status: 400,
       body: {
@@ -225,12 +276,15 @@ describe("createAdminDogDisease", () => {
     findAdminDiseaseDogByRegistrationNoDbMock.mockResolvedValueOnce(null);
 
     await expect(
-      createAdminDogDisease({
-        evidenceKind: "DOG",
-        diseaseCode: "epi",
-        registrationNo: "FI12345/21",
-        public: false,
-      }),
+      createAdminDogDisease(
+        {
+          evidenceKind: "DOG",
+          diseaseCode: "epi",
+          registrationNo: "FI12345/21",
+          public: false,
+        },
+        adminUser,
+      ),
     ).resolves.toEqual({
       status: 400,
       body: {
