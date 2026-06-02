@@ -17,3 +17,7 @@ export {
   type CreateAdminDogDiseaseDbInput,
   type CreatedAdminDogDiseaseDb,
 } from "./create-dog-disease";
+export {
+  deleteAdminDogDiseaseDb,
+  type DeleteAdminDogDiseaseDbResult,
+} from "./delete-dog-disease";

@@ -10,3 +10,7 @@ export type {
   CreateAdminDogDiseaseRequest,
   CreateAdminDogDiseaseResponse,
 } from "./create-admin-dog-disease";
+export type {
+  DeleteAdminDogDiseaseRequest,
+  DeleteAdminDogDiseaseResponse,
+} from "./delete-admin-dog-disease";

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { AdminDogDiseaseBrowseItem } from "@beagle/contracts";
+import { AdminRowActionsMenu } from "@/components/admin";
 import { ListingResponsiveResults } from "@/components/listing";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -35,6 +36,7 @@ type DiseaseResultsLabels = {
     name: string;
     counts: string;
     other: string;
+    actions: string;
   };
   cardLabels: {
     public: string;
@@ -43,6 +45,10 @@ type DiseaseResultsLabels = {
     name: string;
     counts: string;
     other: string;
+  };
+  actions: {
+    more: string;
+    delete: string;
   };
 };
 
@@ -53,9 +59,11 @@ function buildDogProfileHref(dogId: string): string {
 function DiseaseRowContent({
   row,
   labels,
+  onDelete,
 }: {
   row: AdminDogDiseaseBrowseItem;
   labels: DiseaseResultsLabels;
+  onDelete: (row: AdminDogDiseaseBrowseItem) => void;
 }) {
   const name = row.dogId ? (
     <Link
@@ -94,6 +102,19 @@ function DiseaseRowContent({
       <td className="px-2 py-2 max-w-[20rem] whitespace-pre-wrap">
         {formatParentLine(row.sire, row.dam, labels.parents)}
       </td>
+      <td className="px-2 py-2">
+        <AdminRowActionsMenu
+          triggerAriaLabel={labels.actions.more}
+          actions={[
+            {
+              id: "delete",
+              label: labels.actions.delete,
+              onSelect: () => onDelete(row),
+              destructive: true,
+            },
+          ]}
+        />
+      </td>
     </>
   );
 }
@@ -101,9 +122,11 @@ function DiseaseRowContent({
 function DiseaseCard({
   row,
   labels,
+  onDelete,
 }: {
   row: AdminDogDiseaseBrowseItem;
   labels: DiseaseResultsLabels;
+  onDelete: (row: AdminDogDiseaseBrowseItem) => void;
 }) {
   const name = row.dogId ? (
     <Link
@@ -119,11 +142,24 @@ function DiseaseCard({
   return (
     <Card>
       <CardContent className="space-y-2 pt-4 text-sm">
-        <div className="space-y-1">
-          <p className="font-medium">{showDash(row.diseaseText)}</p>
-          <p className="text-muted-foreground">
-            {formatPublicStatus(row.public, labels.public)}
-          </p>
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-1">
+            <p className="font-medium">{showDash(row.diseaseText)}</p>
+            <p className="text-muted-foreground">
+              {formatPublicStatus(row.public, labels.public)}
+            </p>
+          </div>
+          <AdminRowActionsMenu
+            triggerAriaLabel={labels.actions.more}
+            actions={[
+              {
+                id: "delete",
+                label: labels.actions.delete,
+                onSelect: () => onDelete(row),
+                destructive: true,
+              },
+            ]}
+          />
         </div>
         <p>
           <span className="text-muted-foreground">
@@ -172,9 +208,11 @@ function DiseaseCard({
 export function DiseaseResults({
   items,
   labels,
+  onDelete,
 }: {
   items: AdminDogDiseaseBrowseItem[];
   labels: DiseaseResultsLabels;
+  onDelete: (row: AdminDogDiseaseBrowseItem) => void;
 }) {
   if (items.length === 0) {
     return <p className="text-sm text-muted-foreground">{labels.empty}</p>;
@@ -195,19 +233,29 @@ export function DiseaseResults({
               <th className="px-2 py-2">{labels.tableHeaders.name}</th>
               <th className="px-2 py-2">{labels.tableHeaders.counts}</th>
               <th className="px-2 py-2">{labels.tableHeaders.other}</th>
+              <th className="px-2 py-2">{labels.tableHeaders.actions}</th>
             </tr>
           </thead>
           <tbody>
             {items.map((row) => (
               <tr key={row.id} className="border-b align-top">
-                <DiseaseRowContent row={row} labels={labels} />
+                <DiseaseRowContent
+                  row={row}
+                  labels={labels}
+                  onDelete={onDelete}
+                />
               </tr>
             ))}
           </tbody>
         </table>
       }
       mobile={items.map((row) => (
-        <DiseaseCard key={row.id} row={row} labels={labels} />
+        <DiseaseCard
+          key={row.id}
+          row={row}
+          labels={labels}
+          onDelete={onDelete}
+        />
       ))}
     />
   );

@@ -214,6 +214,8 @@ export type {
   CreateAdminDogDiseaseEvidenceKind,
   CreateAdminDogDiseaseRequest,
   CreateAdminDogDiseaseResponse,
+  DeleteAdminDogDiseaseRequest,
+  DeleteAdminDogDiseaseResponse,
   AdminVirtualPairingContributionDto,
   AdminVirtualPairingDiagnosticsDto,
   CalculateAdminVirtualPairingRequest,

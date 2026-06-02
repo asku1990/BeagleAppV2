@@ -1,6 +1,7 @@
 export {
   createAdminDog,
   createAdminDogDisease,
+  deleteAdminDogDisease,
   calculateAdminDogInbreeding,
   getAdminDogProfile,
   updateAdminDog,

@@ -11,7 +11,7 @@ import type {
 } from "@beagle/contracts";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
-import { isValidRegistrationNo } from "../manage/normalization";
+import { isValidRegistrationNo } from "@server/admin/dogs/manage/normalization";
 import {
   validateCreateDogDiseaseInput,
   type CreateDogDiseaseValidationResult,

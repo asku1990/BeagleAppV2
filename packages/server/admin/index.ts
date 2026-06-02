@@ -16,6 +16,7 @@ export { listAdminDogs } from "./dogs";
 export { listAdminOwnerOptions } from "./dogs";
 export { listAdminDogDiseases } from "./dogs";
 export { createAdminDogDisease } from "./dogs";
+export { deleteAdminDogDisease } from "./dogs";
 export { listAdminTrialEvents } from "./trials";
 export { getAdminTrialEvent } from "./trials";
 export { deleteAdminTrialEntry } from "./trials";
