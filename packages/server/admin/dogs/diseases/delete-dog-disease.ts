@@ -18,7 +18,6 @@ export async function deleteAdminDogDisease(
   auditContext?: AuditContextDb,
 ): Promise<ServiceResult<DeleteAdminDogDiseaseResponse>> {
   const startedAt = Date.now();
-  const id = input.id.trim();
   const log = withLogContext({
     layer: "service",
     useCase: "admin-dogs.deleteAdminDogDisease",
@@ -26,21 +25,6 @@ export async function deleteAdminDogDisease(
       ? { actorUserId: auditContext.actorUserId }
       : {}),
   });
-
-  if (!id) {
-    log.warn(
-      { event: "invalid_id", durationMs: Date.now() - startedAt },
-      "admin dog disease delete rejected because id is invalid",
-    );
-    return {
-      status: 400,
-      body: {
-        ok: false,
-        error: "Disease row id is required.",
-        code: "INVALID_DISEASE_ROW_ID",
-      },
-    };
-  }
 
   const authResult = requireAdmin(currentUser);
   if (!authResult.body.ok) {
@@ -55,6 +39,22 @@ export async function deleteAdminDogDisease(
     return {
       status: authResult.status,
       body: authResult.body,
+    };
+  }
+
+  const id = input.id.trim();
+  if (!id) {
+    log.warn(
+      { event: "invalid_id", durationMs: Date.now() - startedAt },
+      "admin dog disease delete rejected because id is invalid",
+    );
+    return {
+      status: 400,
+      body: {
+        ok: false,
+        error: "Disease row id is required.",
+        code: "INVALID_DISEASE_ROW_ID",
+      },
     };
   }
 

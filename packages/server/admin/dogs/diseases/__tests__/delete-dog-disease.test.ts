@@ -80,10 +80,10 @@ describe("deleteAdminDogDisease", () => {
     expect(deleteAdminDogDiseaseDbMock).not.toHaveBeenCalled();
   });
 
-  it("rejects non-admin users", async () => {
+  it("rejects non-admin users before validating the id", async () => {
     await expect(
       deleteAdminDogDisease(
-        { id: "row-1" },
+        { id: " " },
         {
           id: "u_2",
           email: "user@example.test",
@@ -101,6 +101,7 @@ describe("deleteAdminDogDisease", () => {
     });
 
     expect(deleteAdminDogDiseaseDbMock).not.toHaveBeenCalled();
+    expect(runAdminDogDiseaseWriteTransactionDbMock).not.toHaveBeenCalled();
   });
 
   it("returns not found when the disease row does not exist", async () => {
