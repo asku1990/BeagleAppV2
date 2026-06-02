@@ -2,6 +2,8 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { AdminDogDiseaseBrowseResponse } from "@beagle/contracts";
+import { messages } from "@/lib/i18n/messages";
+import type { Locale } from "@/lib/i18n/types";
 import { AdminDogDiseasesPageClient } from "../admin-dog-diseases-page-client";
 
 const { useAdminDogDiseasesQueryMock } = vi.hoisted(() => ({
@@ -10,6 +12,12 @@ const { useAdminDogDiseasesQueryMock } = vi.hoisted(() => ({
 
 const { useAdminDogDiseasesUiStateMock } = vi.hoisted(() => ({
   useAdminDogDiseasesUiStateMock: vi.fn(),
+}));
+
+const { localeState } = vi.hoisted(() => ({
+  localeState: {
+    current: "fi" as Locale,
+  },
 }));
 
 vi.mock("next/link", () => ({
@@ -30,6 +38,15 @@ vi.mock("@/queries/admin/dogs", () => ({
 
 vi.mock("@/hooks/admin/dogs/diseases", () => ({
   useAdminDogDiseasesUiState: useAdminDogDiseasesUiStateMock,
+}));
+
+vi.mock("@/hooks/i18n", () => ({
+  useI18n: () => ({
+    locale: localeState.current,
+    setLocale: vi.fn(),
+    t: (key: keyof (typeof messages)["fi"]) =>
+      messages[localeState.current][key],
+  }),
 }));
 
 function buildInitialData(): AdminDogDiseaseBrowseResponse {
@@ -95,9 +112,10 @@ describe("AdminDogDiseasesPageClient", () => {
   beforeEach(() => {
     useAdminDogDiseasesQueryMock.mockReset();
     useAdminDogDiseasesUiStateMock.mockReset();
+    localeState.current = "fi";
   });
 
-  it("renders the default disease browse table and mobile cards", () => {
+  it("renders localized Finnish disease browser text", () => {
     useAdminDogDiseasesUiStateMock.mockReturnValue({
       diseaseCode: "epi",
       page: 1,
@@ -118,10 +136,13 @@ describe("AdminDogDiseasesPageClient", () => {
       }),
     );
 
+    expect(html).toContain("BEAGLEHAKU sairaustiedoilla");
     expect(html).toContain("Sairaustiedot");
     expect(html).toContain("Haulla löytyi 174 sairausriviä.");
     expect(html).toContain("Kaikki 182 kpl");
     expect(html).toContain("Epilepsia 174 kpl");
+    expect(html).toContain("TERVEYSTIETO");
+    expect(html).toContain("JULKINEN");
     expect(html).toContain("FI12345/21 / EK 5588");
     expect(html).toContain("/admin/dogs/dog-1/profile");
     expect(html).toContain("EPI_1/94 / -");
@@ -132,6 +153,41 @@ describe("AdminDogDiseasesPageClient", () => {
     expect(html).toContain(
       "I: Isäkoira (SF14404/90) | E: Emäkoira (SF19531/89)",
     );
+    expect(html).toContain("Edelliset");
+    expect(html).toContain("Seuraavat");
+  });
+
+  it("renders localized Swedish disease browser text", () => {
+    localeState.current = "sv";
+    useAdminDogDiseasesUiStateMock.mockReturnValue({
+      diseaseCode: "epi",
+      page: 1,
+      isPending: false,
+      setDiseaseCode: vi.fn(),
+      setPage: vi.fn(),
+    });
+    useAdminDogDiseasesQueryMock.mockReturnValue({
+      data: buildInitialData(),
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+
+    const html = renderToStaticMarkup(
+      React.createElement(AdminDogDiseasesPageClient, {
+        initialData: buildInitialData(),
+      }),
+    );
+
+    expect(html).toContain("BEAGLESÖK med sjukdomsuppgifter");
+    expect(html).toContain("Sjukdomsuppgifter");
+    expect(html).toContain("Sökningen hittade 174 sjukdomsrader.");
+    expect(html).toContain("Alla 182 st");
+    expect(html).toContain("SJUKDOMSUPPGIFT");
+    expect(html).toContain("OFFENTLIG");
+    expect(html).toContain("Namnet är okänt");
+    expect(html).toContain("Föregående");
+    expect(html).toContain("Nästa");
   });
 
   it("renders loading, empty, and error states", () => {

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { LabeledSelect } from "@/components/ui/form-fields/labeled-select";
 import { useAdminDogDiseasesUiState } from "@/hooks/admin/dogs/diseases";
+import { useI18n } from "@/hooks/i18n";
 import { useAdminDogDiseasesQuery } from "@/queries/admin/dogs";
 import { DiseaseResults } from "./internal/disease-results";
 
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export function AdminDogDiseasesPageClient({ initialData }: Props) {
+  const { t } = useI18n();
   const initialDiseaseCode = initialData
     ? initialData.selectedDiseaseCode
     : "epi";
@@ -56,28 +58,89 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
     );
   }, [data?.diseaseOptions]);
 
+  const labels = useMemo(
+    () => ({
+      pageTitle: t("admin.dogs.diseases.page.title"),
+      sectionTitle: t("admin.dogs.diseases.section.title"),
+      filterLabel: t("admin.dogs.diseases.filter.label"),
+      allFilterLabel: t("admin.dogs.diseases.filter.all"),
+      countSuffix: t("admin.dogs.diseases.countSuffix"),
+      summaryPrefix: t("admin.dogs.diseases.summary.prefix"),
+      summarySuffix: t("admin.dogs.diseases.summary.suffix"),
+      loading: t("admin.dogs.diseases.loading"),
+      error: t("admin.dogs.diseases.error"),
+      empty: t("admin.dogs.diseases.empty"),
+      public: {
+        yes: t("admin.dogs.diseases.public.yes"),
+        no: t("admin.dogs.diseases.public.no"),
+      },
+      unknownName: t("admin.dogs.diseases.unknownName"),
+      sex: {
+        male: t("admin.dogs.sex.male"),
+        female: t("admin.dogs.sex.female"),
+        unknown: t("admin.dogs.sex.unknown"),
+      },
+      parents: {
+        sire: "I",
+        dam: "E",
+      },
+      tableHeaders: {
+        disease: t("admin.dogs.diseases.columns.disease"),
+        public: t("admin.dogs.diseases.columns.public"),
+        registration: t("admin.dogs.diseases.columns.registration"),
+        sex: t("admin.dogs.diseases.columns.sex"),
+        name: t("admin.dogs.diseases.columns.name"),
+        counts: t("admin.dogs.diseases.columns.counts"),
+        other: t("admin.dogs.diseases.columns.other"),
+      },
+      cardLabels: {
+        public: t("admin.dogs.diseases.card.public"),
+        registration: t("admin.dogs.diseases.card.registration"),
+        sex: t("admin.dogs.diseases.card.sex"),
+        name: t("admin.dogs.diseases.card.name"),
+        counts: t("admin.dogs.diseases.card.counts"),
+        other: t("admin.dogs.diseases.card.other"),
+      },
+    }),
+    [t],
+  );
+
   const diseaseOptions = useMemo(() => {
     const options = data?.diseaseOptions ?? [];
     return [
-      { diseaseCode: "all", diseaseText: "Kaikki", count: allDiseaseCount },
+      {
+        diseaseCode: "all",
+        diseaseText: labels.allFilterLabel,
+        count: allDiseaseCount,
+      },
       ...options,
-    ];
-  }, [allDiseaseCount, data?.diseaseOptions]);
+    ].map((option) => ({
+      ...option,
+      label: `${option.diseaseText} ${option.count} ${labels.countSuffix}`,
+    }));
+  }, [
+    allDiseaseCount,
+    data?.diseaseOptions,
+    labels.allFilterLabel,
+    labels.countSuffix,
+  ]);
 
   return (
     <div className="space-y-4" suppressHydrationWarning>
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Sairaustiedot</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {labels.pageTitle}
+        </h1>
         <p className="text-sm text-muted-foreground">
-          Haulla löytyi {total} sairausriviä.
+          {labels.summaryPrefix} {total} {labels.summarySuffix}.
         </p>
       </div>
 
-      <ListingSectionShell title="Sairaustiedot">
+      <ListingSectionShell title={labels.sectionTitle}>
         <div className="space-y-4">
           <div className="max-w-sm">
             <LabeledSelect
-              label="Rajaus"
+              label={labels.filterLabel}
               value={diseaseCode ?? "all"}
               disabled={isPending}
               onChange={(event) => {
@@ -88,7 +151,7 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
             >
               {diseaseOptions.map((option) => (
                 <option key={option.diseaseCode} value={option.diseaseCode}>
-                  {`${option.diseaseText} ${option.count} kpl`}
+                  {option.label}
                 </option>
               ))}
             </LabeledSelect>
@@ -97,7 +160,7 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
           {query.isLoading ? (
             <Card>
               <CardContent className="p-5 text-sm text-muted-foreground">
-                Ladataan sairaustietoja...
+                {labels.loading}
               </CardContent>
             </Card>
           ) : null}
@@ -107,13 +170,13 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
               <CardContent className="p-5 text-sm text-destructive">
                 {query.error instanceof Error
                   ? query.error.message
-                  : "Sairaustietojen lataaminen epäonnistui."}
+                  : labels.error}
               </CardContent>
             </Card>
           ) : null}
 
           {!query.isLoading && !query.isError ? (
-            <DiseaseResults items={items} />
+            <DiseaseResults items={items} labels={labels} />
           ) : null}
 
           {totalPages > 1 && !query.isLoading && !query.isError ? (
@@ -125,10 +188,11 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
                 disabled={currentPage <= 1 || isPending}
                 onClick={() => setPage(currentPage - 1)}
               >
-                Edellinen
+                {t("admin.dogs.diseases.pagination.previous")}
               </Button>
               <span>
-                Sivu {currentPage} / {totalPages}
+                {t("admin.dogs.diseases.pagination.page")} {currentPage} /{" "}
+                {totalPages}
               </span>
               <Button
                 type="button"
@@ -137,7 +201,7 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
                 disabled={currentPage >= totalPages || isPending}
                 onClick={() => setPage(currentPage + 1)}
               >
-                Seuraava
+                {t("admin.dogs.diseases.pagination.next")}
               </Button>
             </div>
           ) : null}

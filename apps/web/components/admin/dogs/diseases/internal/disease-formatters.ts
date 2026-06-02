@@ -2,6 +2,22 @@ import type { AdminDogDiseaseBrowseItem } from "@beagle/contracts";
 
 const UNKNOWN_VALUE = "-";
 
+type BinaryLabels = {
+  yes: string;
+  no: string;
+};
+
+type SexLabels = {
+  male: string;
+  female: string;
+  unknown: string;
+};
+
+type ParentLabels = {
+  sire: string;
+  dam: string;
+};
+
 export function showDash(value: string | number | null | undefined): string {
   if (value == null) {
     return UNKNOWN_VALUE;
@@ -11,17 +27,27 @@ export function showDash(value: string | number | null | undefined): string {
   return normalized.length > 0 ? normalized : UNKNOWN_VALUE;
 }
 
-export function formatSex(sex: AdminDogDiseaseBrowseItem["sex"]): string {
+export function formatPublicStatus(
+  isPublic: boolean,
+  labels: BinaryLabels,
+): string {
+  return isPublic ? labels.yes : labels.no;
+}
+
+export function formatSex(
+  sex: AdminDogDiseaseBrowseItem["sex"],
+  labels: SexLabels,
+): string {
   if (sex === "MALE") {
-    return "Uros";
+    return labels.male;
   }
 
   if (sex === "FEMALE") {
-    return "Narttu";
+    return labels.female;
   }
 
   if (sex === "UNKNOWN") {
-    return "Tuntematon";
+    return labels.unknown;
   }
 
   return UNKNOWN_VALUE;
@@ -45,6 +71,7 @@ export function formatRegistrationAndEk(
 export function formatParentLine(
   sire: AdminDogDiseaseBrowseItem["sire"],
   dam: AdminDogDiseaseBrowseItem["dam"],
+  labels: ParentLabels,
 ): string {
   const formatParent = (label: string, parent: typeof sire) => {
     const name = parent.name?.trim() || UNKNOWN_VALUE;
@@ -52,5 +79,5 @@ export function formatParentLine(
     return `${label}: ${name} (${registrationNo})`;
   };
 
-  return `${formatParent("I", sire)} | ${formatParent("E", dam)}`;
+  return `${formatParent(labels.sire, sire)} | ${formatParent(labels.dam, dam)}`;
 }
