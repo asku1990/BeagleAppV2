@@ -6,6 +6,10 @@ import {
   fiAdminDogsVirtualPairingMessages,
   svAdminDogsVirtualPairingMessages,
 } from "./virtual-pairing";
+import {
+  fiAdminDogsDiseasesMessages,
+  svAdminDogsDiseasesMessages,
+} from "./diseases";
 
 export const fiAdminDogsMessages = {
   ...fiAdminDogsCommonMessages,
@@ -13,6 +17,7 @@ export const fiAdminDogsMessages = {
   ...fiAdminDogsFormMessages,
   ...fiAdminDogsModalMessages,
   ...fiAdminDogsVirtualPairingMessages,
+  ...fiAdminDogsDiseasesMessages,
 } as const;
 
 export const svAdminDogsMessages = {
@@ -21,4 +26,5 @@ export const svAdminDogsMessages = {
   ...svAdminDogsFormMessages,
   ...svAdminDogsModalMessages,
   ...svAdminDogsVirtualPairingMessages,
+  ...svAdminDogsDiseasesMessages,
 } as const;
