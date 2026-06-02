@@ -1,14 +1,19 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { AdminDogDiseaseBrowseResponse } from "@beagle/contracts";
 import { ListingSectionShell } from "@/components/listing";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { LabeledSelect } from "@/components/ui/form-fields/labeled-select";
+import { toast } from "@/components/ui/sonner";
 import { useAdminDogDiseasesUiState } from "@/hooks/admin/dogs/diseases";
 import { useI18n } from "@/hooks/i18n";
-import { useAdminDogDiseasesQuery } from "@/queries/admin/dogs";
+import {
+  useAdminDogDiseasesQuery,
+  useCreateAdminDogDiseaseMutation,
+} from "@/queries/admin/dogs";
+import { CreateDiseaseModal } from "./internal/create-disease-modal";
 import { DiseaseResults } from "./internal/disease-results";
 
 type Props = {
@@ -17,6 +22,7 @@ type Props = {
 
 export function AdminDogDiseasesPageClient({ initialData }: Props) {
   const { t } = useI18n();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const initialDiseaseCode = initialData
     ? initialData.selectedDiseaseCode
     : "epi";
@@ -46,6 +52,7 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
     page,
     initialData: queryInitialData,
   });
+  const createDiseaseMutation = useCreateAdminDogDiseaseMutation();
 
   const data = query.data ?? queryInitialData ?? null;
   const items = data?.items ?? [];
@@ -101,6 +108,29 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
         counts: t("admin.dogs.diseases.card.counts"),
         other: t("admin.dogs.diseases.card.other"),
       },
+      create: {
+        open: t("admin.dogs.diseases.create.open"),
+        title: t("admin.dogs.diseases.create.title"),
+        aria: t("admin.dogs.diseases.create.aria"),
+        mode: t("admin.dogs.diseases.create.mode"),
+        modeDog: t("admin.dogs.diseases.create.modeDog"),
+        modeLitter: t("admin.dogs.diseases.create.modeLitter"),
+        disease: t("admin.dogs.diseases.create.disease"),
+        registration: t("admin.dogs.diseases.create.registration"),
+        sire: t("admin.dogs.diseases.create.sire"),
+        dam: t("admin.dogs.diseases.create.dam"),
+        litter: t("admin.dogs.diseases.create.litter"),
+        description: t("admin.dogs.diseases.create.description"),
+        source: t("admin.dogs.diseases.create.source"),
+        public: t("admin.dogs.diseases.create.public"),
+        publicNo: t("admin.dogs.diseases.create.publicNo"),
+        publicYes: t("admin.dogs.diseases.create.publicYes"),
+        save: t("admin.dogs.diseases.create.save"),
+        saving: t("admin.dogs.diseases.create.saving"),
+        cancel: t("admin.dogs.diseases.create.cancel"),
+        success: t("admin.dogs.diseases.create.success"),
+        error: t("admin.dogs.diseases.create.error"),
+      },
     }),
     [t],
   );
@@ -138,23 +168,28 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
 
       <ListingSectionShell title={labels.sectionTitle}>
         <div className="space-y-4">
-          <div className="max-w-sm">
-            <LabeledSelect
-              label={labels.filterLabel}
-              value={diseaseCode ?? "all"}
-              disabled={isPending}
-              onChange={(event) => {
-                setDiseaseCode(
-                  event.target.value === "all" ? null : event.target.value,
-                );
-              }}
-            >
-              {diseaseOptions.map((option) => (
-                <option key={option.diseaseCode} value={option.diseaseCode}>
-                  {option.label}
-                </option>
-              ))}
-            </LabeledSelect>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div className="max-w-sm flex-1">
+              <LabeledSelect
+                label={labels.filterLabel}
+                value={diseaseCode ?? "all"}
+                disabled={isPending}
+                onChange={(event) => {
+                  setDiseaseCode(
+                    event.target.value === "all" ? null : event.target.value,
+                  );
+                }}
+              >
+                {diseaseOptions.map((option) => (
+                  <option key={option.diseaseCode} value={option.diseaseCode}>
+                    {option.label}
+                  </option>
+                ))}
+              </LabeledSelect>
+            </div>
+            <Button type="button" onClick={() => setIsCreateOpen(true)}>
+              {labels.create.open}
+            </Button>
           </div>
 
           {query.isLoading ? (
@@ -207,6 +242,30 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
           ) : null}
         </div>
       </ListingSectionShell>
+
+      {isCreateOpen ? (
+        <CreateDiseaseModal
+          open={isCreateOpen}
+          diseaseOptions={
+            data?.diseaseOptions ?? initialData?.diseaseOptions ?? []
+          }
+          selectedDiseaseCode={data?.selectedDiseaseCode ?? initialDiseaseCode}
+          labels={labels.create}
+          isSubmitting={createDiseaseMutation.isPending}
+          onClose={() => setIsCreateOpen(false)}
+          onSubmit={async (input) => {
+            try {
+              await createDiseaseMutation.mutateAsync(input);
+              toast.success(labels.create.success);
+              setIsCreateOpen(false);
+            } catch (error) {
+              toast.error(
+                error instanceof Error ? error.message : labels.create.error,
+              );
+            }
+          }}
+        />
+      ) : null}
     </div>
   );
 }

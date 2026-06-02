@@ -6,9 +6,11 @@ import { messages } from "@/lib/i18n/messages";
 import type { Locale } from "@/lib/i18n/types";
 import { AdminDogDiseasesPageClient } from "../admin-dog-diseases-page-client";
 
-const { useAdminDogDiseasesQueryMock } = vi.hoisted(() => ({
-  useAdminDogDiseasesQueryMock: vi.fn(),
-}));
+const { useAdminDogDiseasesQueryMock, useCreateAdminDogDiseaseMutationMock } =
+  vi.hoisted(() => ({
+    useAdminDogDiseasesQueryMock: vi.fn(),
+    useCreateAdminDogDiseaseMutationMock: vi.fn(),
+  }));
 
 const { useAdminDogDiseasesUiStateMock } = vi.hoisted(() => ({
   useAdminDogDiseasesUiStateMock: vi.fn(),
@@ -34,6 +36,7 @@ vi.mock("next/link", () => ({
 
 vi.mock("@/queries/admin/dogs", () => ({
   useAdminDogDiseasesQuery: useAdminDogDiseasesQueryMock,
+  useCreateAdminDogDiseaseMutation: useCreateAdminDogDiseaseMutationMock,
 }));
 
 vi.mock("@/hooks/admin/dogs/diseases", () => ({
@@ -111,8 +114,13 @@ function buildInitialData(): AdminDogDiseaseBrowseResponse {
 describe("AdminDogDiseasesPageClient", () => {
   beforeEach(() => {
     useAdminDogDiseasesQueryMock.mockReset();
+    useCreateAdminDogDiseaseMutationMock.mockReset();
     useAdminDogDiseasesUiStateMock.mockReset();
     localeState.current = "fi";
+    useCreateAdminDogDiseaseMutationMock.mockReturnValue({
+      isPending: false,
+      mutateAsync: vi.fn(),
+    });
   });
 
   it("renders localized Finnish disease browser text", () => {
@@ -142,6 +150,7 @@ describe("AdminDogDiseasesPageClient", () => {
     expect(html).toContain("Kaikki 182 kpl");
     expect(html).toContain("Epilepsia 174 kpl");
     expect(html).toContain("TERVEYSTIETO");
+    expect(html).toContain("Lisää sairaustieto");
     expect(html).toContain("JULKINEN");
     expect(html).toContain("FI12345/21 / EK 5588");
     expect(html).toContain("/admin/dogs/dog-1/profile");
