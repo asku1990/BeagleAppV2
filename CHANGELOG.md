@@ -21,6 +21,8 @@ This project uses a user-facing changelog format.
 - Ylläpitoon lisättiin uusi virtuaaliparituksen MVP-sivu, jossa voi hakea koiria EK-numerolla, rekisterinumerolla tai nimellä, valita uroksen ja emän sekä laskea sukusiitosasteen v1-tyylisellä hakukäytöksellä.
 - Virtuaaliparituksen tulos on nyt jaettavissa URL:n kautta. Valitut uros, emä ja SP tallentuvat osoitteeseen onnistuneen laskennan jälkeen, ja kelvollinen URL laskee tuloksen automaattisesti sivun avauksessa.
 - Ylläpitoon lisättiin uusi sairaustietojen selaussivu (`/admin/dogs/diseases`), jossa voi tarkastella tuotuja sairausrivejä v1:n kaltaisella sairausvalinnalla, 15 rivin sivutuksella ja koiran profiiliin linkitettyinä DOG-riveinä.
+- Ylläpidon sairaustietojen selaussivulla voi nyt lisätä koira- ja pentuekohtaisia sairausrivejä.
+- Ylläpidon sairaustietojen selaussivulla voi nyt poistaa virheellisiä sairausrivejä.
 
 ### Changed
 

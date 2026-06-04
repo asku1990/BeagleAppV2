@@ -8,5 +8,7 @@ export { listAdminOwnerOptions } from "./lookups/list-owner-options";
 export { listAdminDogParentOptions } from "./lookups/list-parent-options";
 export { getAdminDogProfile } from "./profile";
 export { listAdminDogDiseases } from "./diseases/list-dog-diseases";
+export { createAdminDogDisease } from "./diseases/create-dog-disease";
+export { deleteAdminDogDisease } from "./diseases/delete-dog-disease";
 export { calculateAdminVirtualPairing } from "./virtual-pairing";
 export { searchAdminVirtualPairing } from "./virtual-pairing";

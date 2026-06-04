@@ -1,14 +1,24 @@
 "use client";
 
-import { useMemo } from "react";
-import type { AdminDogDiseaseBrowseResponse } from "@beagle/contracts";
+import { useMemo, useState } from "react";
+import type {
+  AdminDogDiseaseBrowseItem,
+  AdminDogDiseaseBrowseResponse,
+} from "@beagle/contracts";
 import { ListingSectionShell } from "@/components/listing";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { LabeledSelect } from "@/components/ui/form-fields/labeled-select";
+import { toast } from "@/components/ui/sonner";
 import { useAdminDogDiseasesUiState } from "@/hooks/admin/dogs/diseases";
 import { useI18n } from "@/hooks/i18n";
-import { useAdminDogDiseasesQuery } from "@/queries/admin/dogs";
+import {
+  useAdminDogDiseasesQuery,
+  useCreateAdminDogDiseaseMutation,
+  useDeleteAdminDogDiseaseMutation,
+} from "@/queries/admin/dogs";
+import { CreateDiseaseModal } from "./internal/create-disease-modal";
 import { DiseaseResults } from "./internal/disease-results";
 
 type Props = {
@@ -17,6 +27,9 @@ type Props = {
 
 export function AdminDogDiseasesPageClient({ initialData }: Props) {
   const { t } = useI18n();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] =
+    useState<AdminDogDiseaseBrowseItem | null>(null);
   const initialDiseaseCode = initialData
     ? initialData.selectedDiseaseCode
     : "epi";
@@ -46,6 +59,8 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
     page,
     initialData: queryInitialData,
   });
+  const createDiseaseMutation = useCreateAdminDogDiseaseMutation();
+  const deleteDiseaseMutation = useDeleteAdminDogDiseaseMutation();
 
   const data = query.data ?? queryInitialData ?? null;
   const items = data?.items ?? [];
@@ -92,6 +107,7 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
         name: t("admin.dogs.diseases.columns.name"),
         counts: t("admin.dogs.diseases.columns.counts"),
         other: t("admin.dogs.diseases.columns.other"),
+        actions: t("admin.dogs.diseases.columns.actions"),
       },
       cardLabels: {
         public: t("admin.dogs.diseases.card.public"),
@@ -100,6 +116,45 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
         name: t("admin.dogs.diseases.card.name"),
         counts: t("admin.dogs.diseases.card.counts"),
         other: t("admin.dogs.diseases.card.other"),
+      },
+      actions: {
+        more: t("admin.dogs.diseases.actions.more"),
+        delete: t("admin.dogs.diseases.actions.delete"),
+      },
+      create: {
+        open: t("admin.dogs.diseases.create.open"),
+        title: t("admin.dogs.diseases.create.title"),
+        aria: t("admin.dogs.diseases.create.aria"),
+        mode: t("admin.dogs.diseases.create.mode"),
+        modeDog: t("admin.dogs.diseases.create.modeDog"),
+        modeLitter: t("admin.dogs.diseases.create.modeLitter"),
+        disease: t("admin.dogs.diseases.create.disease"),
+        registration: t("admin.dogs.diseases.create.registration"),
+        sire: t("admin.dogs.diseases.create.sire"),
+        dam: t("admin.dogs.diseases.create.dam"),
+        litter: t("admin.dogs.diseases.create.litter"),
+        description: t("admin.dogs.diseases.create.description"),
+        source: t("admin.dogs.diseases.create.source"),
+        public: t("admin.dogs.diseases.create.public"),
+        publicNo: t("admin.dogs.diseases.create.publicNo"),
+        publicYes: t("admin.dogs.diseases.create.publicYes"),
+        save: t("admin.dogs.diseases.create.save"),
+        saving: t("admin.dogs.diseases.create.saving"),
+        cancel: t("admin.dogs.diseases.create.cancel"),
+        success: t("admin.dogs.diseases.create.success"),
+        error: t("admin.dogs.diseases.create.error"),
+      },
+      delete: {
+        title: t("admin.dogs.diseases.delete.title"),
+        descriptionPrefix: t("admin.dogs.diseases.delete.descriptionPrefix"),
+        registrationLabel: t("admin.dogs.diseases.delete.registrationLabel"),
+        dogLabel: t("admin.dogs.diseases.delete.dogLabel"),
+        confirm: t("admin.dogs.diseases.delete.confirm"),
+        confirming: t("admin.dogs.diseases.delete.confirming"),
+        cancel: t("admin.dogs.diseases.delete.cancel"),
+        aria: t("admin.dogs.diseases.delete.aria"),
+        success: t("admin.dogs.diseases.delete.success"),
+        error: t("admin.dogs.diseases.delete.error"),
       },
     }),
     [t],
@@ -138,23 +193,28 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
 
       <ListingSectionShell title={labels.sectionTitle}>
         <div className="space-y-4">
-          <div className="max-w-sm">
-            <LabeledSelect
-              label={labels.filterLabel}
-              value={diseaseCode ?? "all"}
-              disabled={isPending}
-              onChange={(event) => {
-                setDiseaseCode(
-                  event.target.value === "all" ? null : event.target.value,
-                );
-              }}
-            >
-              {diseaseOptions.map((option) => (
-                <option key={option.diseaseCode} value={option.diseaseCode}>
-                  {option.label}
-                </option>
-              ))}
-            </LabeledSelect>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div className="max-w-sm flex-1">
+              <LabeledSelect
+                label={labels.filterLabel}
+                value={diseaseCode ?? "all"}
+                disabled={isPending}
+                onChange={(event) => {
+                  setDiseaseCode(
+                    event.target.value === "all" ? null : event.target.value,
+                  );
+                }}
+              >
+                {diseaseOptions.map((option) => (
+                  <option key={option.diseaseCode} value={option.diseaseCode}>
+                    {option.label}
+                  </option>
+                ))}
+              </LabeledSelect>
+            </div>
+            <Button type="button" onClick={() => setIsCreateOpen(true)}>
+              {labels.create.open}
+            </Button>
           </div>
 
           {query.isLoading ? (
@@ -176,7 +236,11 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
           ) : null}
 
           {!query.isLoading && !query.isError ? (
-            <DiseaseResults items={items} labels={labels} />
+            <DiseaseResults
+              items={items}
+              labels={labels}
+              onDelete={setDeleteTarget}
+            />
           ) : null}
 
           {totalPages > 1 && !query.isLoading && !query.isError ? (
@@ -207,6 +271,72 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
           ) : null}
         </div>
       </ListingSectionShell>
+
+      {isCreateOpen ? (
+        <CreateDiseaseModal
+          open={isCreateOpen}
+          diseaseOptions={
+            data?.diseaseOptions ?? initialData?.diseaseOptions ?? []
+          }
+          selectedDiseaseCode={data?.selectedDiseaseCode ?? initialDiseaseCode}
+          labels={labels.create}
+          isSubmitting={createDiseaseMutation.isPending}
+          onClose={() => setIsCreateOpen(false)}
+          onSubmit={async (input) => {
+            try {
+              await createDiseaseMutation.mutateAsync(input);
+              toast.success(labels.create.success);
+              setIsCreateOpen(false);
+            } catch (error) {
+              toast.error(
+                error instanceof Error ? error.message : labels.create.error,
+              );
+            }
+          }}
+        />
+      ) : null}
+
+      {deleteTarget ? (
+        <ConfirmModal
+          open={Boolean(deleteTarget)}
+          title={labels.delete.title}
+          description={
+            <div className="space-y-1">
+              <p>
+                {labels.delete.descriptionPrefix}{" "}
+                <strong>{deleteTarget.diseaseText}</strong>.
+              </p>
+              <p>
+                {labels.delete.registrationLabel}:{" "}
+                <strong>{deleteTarget.registrationNo}</strong>
+              </p>
+              {deleteTarget.dogId ? (
+                <p>
+                  {labels.delete.dogLabel}: <strong>{deleteTarget.name}</strong>
+                </p>
+              ) : null}
+            </div>
+          }
+          confirmLabel={labels.delete.confirm}
+          cancelLabel={labels.delete.cancel}
+          confirmVariant="destructive"
+          isConfirming={deleteDiseaseMutation.isPending}
+          confirmingLabel={labels.delete.confirming}
+          ariaLabel={labels.delete.aria}
+          onCancel={() => setDeleteTarget(null)}
+          onConfirm={async () => {
+            try {
+              await deleteDiseaseMutation.mutateAsync({ id: deleteTarget.id });
+              toast.success(labels.delete.success);
+              setDeleteTarget(null);
+            } catch (error) {
+              toast.error(
+                error instanceof Error ? error.message : labels.delete.error,
+              );
+            }
+          }}
+        />
+      ) : null}
     </div>
   );
 }

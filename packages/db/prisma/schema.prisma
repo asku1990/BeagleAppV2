@@ -272,7 +272,7 @@ model Sairaus {
 
 model KoiranSairaus {
   id                 String                    @id @default(cuid())
-  vanhaId            Int                       @unique
+  vanhaId            Int?                      @unique
   dogId              String?
   evidenceKind       KoiranSairausEvidenceKind
   isaRekisterinumero String?
