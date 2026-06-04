@@ -2,6 +2,7 @@ import {
   createAdminDogDiseaseDb,
   findAdminDiseaseDogByRegistrationNoDb,
   findAdminDogDiseaseDefinitionByCodeDb,
+  findAdminDogDiseaseDuplicateDb,
   runAdminDogDiseaseWriteTransactionDb,
   type AuditContextDb,
 } from "@beagle/db";
@@ -29,6 +30,17 @@ function validationResponse(
       ok: false,
       error: validation.error,
       code: validation.code,
+    },
+  };
+}
+
+function duplicateResponse(): ServiceResult<CreateAdminDogDiseaseResponse> {
+  return {
+    status: 400,
+    body: {
+      ok: false,
+      code: "DISEASE_ROW_ALREADY_EXISTS",
+      error: "Disease evidence already exists.",
     },
   };
 }
@@ -108,6 +120,21 @@ export async function createAdminDogDisease(
             throw new Error("DOG_NOT_FOUND");
           }
 
+          const existing = await findAdminDogDiseaseDuplicateDb(
+            {
+              evidenceKind: "DOG",
+              dogId: dog.id,
+              sairausId: disease.id,
+              rekisterinumero: validation.data.registrationNo,
+              isaRekisterinumero: null,
+              emaRekisterinumero: null,
+            },
+            tx,
+          );
+          if (existing) {
+            throw new Error("DISEASE_ROW_ALREADY_EXISTS");
+          }
+
           return createAdminDogDiseaseDb(
             {
               evidenceKind: "DOG",
@@ -154,6 +181,21 @@ export async function createAdminDogDisease(
           throw new Error("LITTER_PARENT_NOT_FOUND");
         }
 
+        const existing = await findAdminDogDiseaseDuplicateDb(
+          {
+            evidenceKind: "LITTER",
+            dogId: null,
+            sairausId: disease.id,
+            rekisterinumero: validation.data.registrationNo,
+            isaRekisterinumero: validation.data.sireRegistrationNo,
+            emaRekisterinumero: validation.data.damRegistrationNo,
+          },
+          tx,
+        );
+        if (existing) {
+          throw new Error("DISEASE_ROW_ALREADY_EXISTS");
+        }
+
         return createAdminDogDiseaseDb(
           {
             evidenceKind: "LITTER",
@@ -197,6 +239,10 @@ export async function createAdminDogDisease(
         code: "DISEASE_NOT_FOUND",
         error: "Disease was not found.",
       },
+      DISEASE_ROW_ALREADY_EXISTS: {
+        code: "DISEASE_ROW_ALREADY_EXISTS",
+        error: "Disease evidence already exists.",
+      },
       DOG_NOT_FOUND: {
         code: "DOG_NOT_FOUND",
         error: "Dog was not found.",
@@ -213,6 +259,17 @@ export async function createAdminDogDisease(
     };
     const mappedError = errorMap[message];
     if (mappedError) {
+      if (mappedError.code === "DISEASE_ROW_ALREADY_EXISTS") {
+        log.warn(
+          {
+            event: "duplicate",
+            durationMs: Date.now() - startedAt,
+          },
+          "admin dog disease create rejected because duplicate evidence exists",
+        );
+        return duplicateResponse();
+      }
+
       log.warn(
         {
           event: "business_error",

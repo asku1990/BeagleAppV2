@@ -199,6 +199,7 @@ export {
   deleteAdminDogDiseaseDb,
   findAdminDiseaseDogByRegistrationNoDb,
   findAdminDogDiseaseDefinitionByCodeDb,
+  findAdminDogDiseaseDuplicateDb,
   runAdminDogDiseaseWriteTransactionDb,
   createAdminUserDb,
   listAdminDogsDb,

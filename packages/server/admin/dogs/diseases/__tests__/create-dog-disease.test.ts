@@ -5,11 +5,13 @@ const {
   createAdminDogDiseaseDbMock,
   findAdminDiseaseDogByRegistrationNoDbMock,
   findAdminDogDiseaseDefinitionByCodeDbMock,
+  findAdminDogDiseaseDuplicateDbMock,
   runAdminDogDiseaseWriteTransactionDbMock,
 } = vi.hoisted(() => ({
   createAdminDogDiseaseDbMock: vi.fn(),
   findAdminDiseaseDogByRegistrationNoDbMock: vi.fn(),
   findAdminDogDiseaseDefinitionByCodeDbMock: vi.fn(),
+  findAdminDogDiseaseDuplicateDbMock: vi.fn(),
   runAdminDogDiseaseWriteTransactionDbMock: vi.fn(),
 }));
 
@@ -19,6 +21,7 @@ vi.mock("@beagle/db", () => ({
     findAdminDiseaseDogByRegistrationNoDbMock,
   findAdminDogDiseaseDefinitionByCodeDb:
     findAdminDogDiseaseDefinitionByCodeDbMock,
+  findAdminDogDiseaseDuplicateDb: findAdminDogDiseaseDuplicateDbMock,
   runAdminDogDiseaseWriteTransactionDb:
     runAdminDogDiseaseWriteTransactionDbMock,
 }));
@@ -35,10 +38,12 @@ describe("createAdminDogDisease", () => {
     createAdminDogDiseaseDbMock.mockReset();
     findAdminDiseaseDogByRegistrationNoDbMock.mockReset();
     findAdminDogDiseaseDefinitionByCodeDbMock.mockReset();
+    findAdminDogDiseaseDuplicateDbMock.mockReset();
     runAdminDogDiseaseWriteTransactionDbMock.mockReset();
     runAdminDogDiseaseWriteTransactionDbMock.mockImplementation(
       async (callback) => callback({ tx: true }),
     );
+    findAdminDogDiseaseDuplicateDbMock.mockResolvedValue(null);
   });
 
   it("creates DOG evidence for a resolved dog", async () => {
@@ -85,6 +90,17 @@ describe("createAdminDogDisease", () => {
         kuvaus: "Omistaja ilmoitti",
         julkinen: false,
         tietolahde: "Puhelu",
+      },
+      { tx: true },
+    );
+    expect(findAdminDogDiseaseDuplicateDbMock).toHaveBeenCalledWith(
+      {
+        evidenceKind: "DOG",
+        dogId: "dog-1",
+        sairausId: "sairaus-epi",
+        rekisterinumero: "FI12345/21",
+        isaRekisterinumero: null,
+        emaRekisterinumero: null,
       },
       { tx: true },
     );
@@ -168,6 +184,17 @@ describe("createAdminDogDisease", () => {
         isaRekisterinumero: "SF14404/90",
         emaRekisterinumero: "SF19531/89",
       }),
+      { tx: true },
+    );
+    expect(findAdminDogDiseaseDuplicateDbMock).toHaveBeenCalledWith(
+      {
+        evidenceKind: "LITTER",
+        dogId: null,
+        sairausId: "sairaus-epi",
+        rekisterinumero: "EPI_1/94",
+        isaRekisterinumero: "SF14404/90",
+        emaRekisterinumero: "SF19531/89",
+      },
       { tx: true },
     );
   });
@@ -265,6 +292,99 @@ describe("createAdminDogDisease", () => {
       },
     });
 
+    expect(createAdminDogDiseaseDbMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects duplicate DOG evidence before inserting", async () => {
+    findAdminDogDiseaseDefinitionByCodeDbMock.mockResolvedValue({
+      id: "sairaus-epi",
+      koodi: "epi",
+    });
+    findAdminDiseaseDogByRegistrationNoDbMock.mockResolvedValueOnce({
+      id: "dog-1",
+    });
+    findAdminDogDiseaseDuplicateDbMock.mockResolvedValueOnce({
+      id: "existing-row",
+    });
+
+    await expect(
+      createAdminDogDisease(
+        {
+          evidenceKind: "DOG",
+          diseaseCode: "epi",
+          registrationNo: "FI12345/21",
+          public: false,
+        },
+        adminUser,
+      ),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        code: "DISEASE_ROW_ALREADY_EXISTS",
+        error: "Disease evidence already exists.",
+      },
+    });
+
+    expect(findAdminDogDiseaseDuplicateDbMock).toHaveBeenCalledWith(
+      {
+        evidenceKind: "DOG",
+        dogId: "dog-1",
+        sairausId: "sairaus-epi",
+        rekisterinumero: "FI12345/21",
+        isaRekisterinumero: null,
+        emaRekisterinumero: null,
+      },
+      { tx: true },
+    );
+    expect(createAdminDogDiseaseDbMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects duplicate LITTER evidence before inserting", async () => {
+    findAdminDogDiseaseDefinitionByCodeDbMock.mockResolvedValue({
+      id: "sairaus-epi",
+      koodi: "epi",
+    });
+    findAdminDiseaseDogByRegistrationNoDbMock
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ id: "sire-1" })
+      .mockResolvedValueOnce({ id: "dam-1" });
+    findAdminDogDiseaseDuplicateDbMock.mockResolvedValueOnce({
+      id: "existing-row",
+    });
+
+    await expect(
+      createAdminDogDisease(
+        {
+          evidenceKind: "LITTER",
+          diseaseCode: "epi",
+          registrationNo: "EPI_1/94",
+          sireRegistrationNo: "SF14404/90",
+          damRegistrationNo: "SF19531/89",
+          public: false,
+        },
+        adminUser,
+      ),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        code: "DISEASE_ROW_ALREADY_EXISTS",
+        error: "Disease evidence already exists.",
+      },
+    });
+
+    expect(findAdminDogDiseaseDuplicateDbMock).toHaveBeenCalledWith(
+      {
+        evidenceKind: "LITTER",
+        dogId: null,
+        sairausId: "sairaus-epi",
+        rekisterinumero: "EPI_1/94",
+        isaRekisterinumero: "SF14404/90",
+        emaRekisterinumero: "SF19531/89",
+      },
+      { tx: true },
+    );
     expect(createAdminDogDiseaseDbMock).not.toHaveBeenCalled();
   });
 

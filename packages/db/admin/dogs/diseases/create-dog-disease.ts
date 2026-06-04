@@ -34,6 +34,19 @@ export type AdminDogDiseaseDogLookupDb = {
   id: string;
 };
 
+export type AdminDogDiseaseDuplicateLookupDb = {
+  id: string;
+};
+
+export type FindAdminDogDiseaseDuplicateDbInput = {
+  evidenceKind: KoiranSairausEvidenceKind;
+  dogId: string | null;
+  sairausId: string;
+  rekisterinumero: string;
+  isaRekisterinumero: string | null;
+  emaRekisterinumero: string | null;
+};
+
 export async function findAdminDogDiseaseDefinitionByCodeDb(
   diseaseCode: string,
   dbClient: AdminDogDiseaseDbClient = prisma,
@@ -63,6 +76,35 @@ export async function findAdminDiseaseDogByRegistrationNoDb(
   });
 
   return row?.dog ?? null;
+}
+
+export async function findAdminDogDiseaseDuplicateDb(
+  input: FindAdminDogDiseaseDuplicateDbInput,
+  dbClient: AdminDogDiseaseDbClient = prisma,
+): Promise<AdminDogDiseaseDuplicateLookupDb | null> {
+  const where: Prisma.KoiranSairausWhereInput =
+    input.evidenceKind === "DOG"
+      ? {
+          evidenceKind: "DOG",
+          dogId: input.dogId,
+          sairausId: input.sairausId,
+          rekisterinumero: input.rekisterinumero,
+        }
+      : {
+          evidenceKind: "LITTER",
+          dogId: null,
+          sairausId: input.sairausId,
+          rekisterinumero: input.rekisterinumero,
+          isaRekisterinumero: input.isaRekisterinumero,
+          emaRekisterinumero: input.emaRekisterinumero,
+        };
+
+  return dbClient.koiranSairaus.findFirst({
+    where,
+    select: {
+      id: true,
+    },
+  });
 }
 
 export async function createAdminDogDiseaseDb(
