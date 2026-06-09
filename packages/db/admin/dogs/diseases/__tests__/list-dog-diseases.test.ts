@@ -45,13 +45,11 @@ const diseaseDefinitions: AdminDogDiseaseDefinitionOptionDb[] = [
   {
     diseaseCode: "epi",
     diseaseText: "Epilepsia",
-    diseaseGroup: "EPILEPSIA",
     count: 174,
   },
   {
     diseaseCode: "pur",
     diseaseText: "Purema",
-    diseaseGroup: "PURENTA",
     count: 8,
   },
 ];
@@ -69,13 +67,11 @@ describe("listAdminDogDiseasesDb", () => {
       {
         koodi: "epi",
         sairausTeksti: "Epilepsia",
-        sairausRyhma: "EPILEPSIA",
         _count: { koirat: 174 },
       },
       {
         koodi: "pur",
         sairausTeksti: "Purema",
-        sairausRyhma: "PURENTA",
         _count: { koirat: 8 },
       },
     ]);
@@ -84,13 +80,11 @@ describe("listAdminDogDiseasesDb", () => {
       {
         diseaseCode: "epi",
         diseaseText: "Epilepsia",
-        diseaseGroup: "EPILEPSIA",
         count: 174,
       },
       {
         diseaseCode: "pur",
         diseaseText: "Purema",
-        diseaseGroup: "PURENTA",
         count: 8,
       },
     ]);
@@ -115,13 +109,11 @@ describe("listAdminDogDiseasesDb", () => {
       {
         koodi: "epi",
         sairausTeksti: "Epilepsia",
-        sairausRyhma: "EPILEPSIA",
         _count: { koirat: 174 },
       },
       {
         koodi: "pur",
         sairausTeksti: "Purema",
-        sairausRyhma: "PURENTA",
         _count: { koirat: 8 },
       },
     ]);
@@ -158,8 +150,7 @@ describe("listAdminDogDiseasesDb", () => {
 
     const result = await listAdminDogDiseasesDb(
       {
-        selectedDiseaseCode: null,
-        selectedDiseaseGroup: "EPILEPSIA",
+        selectedDiseaseCode: "epi",
         query: "",
         page: 1,
         pageSize: 15,
@@ -167,16 +158,11 @@ describe("listAdminDogDiseasesDb", () => {
       diseaseDefinitions,
     );
 
-    expect(result.selectedDiseaseCode).toBeNull();
-    expect(result.selectedDiseaseGroup).toBe("EPILEPSIA");
+    expect(result.selectedDiseaseCode).toBe("epi");
     expect(result.total).toBe(1);
     expect(result.diseaseOptions).toEqual([
       { diseaseCode: "epi", diseaseText: "Epilepsia", count: 174 },
       { diseaseCode: "pur", diseaseText: "Purema", count: 8 },
-    ]);
-    expect(result.diseaseGroupOptions).toEqual([
-      { diseaseGroup: "EPILEPSIA", count: 174 },
-      { diseaseGroup: "PURENTA", count: 8 },
     ]);
     expect(result.items[0]).toEqual({
       id: "disease-1",
@@ -215,7 +201,6 @@ describe("listAdminDogDiseasesDb", () => {
       {
         koodi: "epi",
         sairausTeksti: "Epilepsia",
-        sairausRyhma: "EPILEPSIA",
         _count: { koirat: 174 },
       },
     ]);
@@ -225,7 +210,6 @@ describe("listAdminDogDiseasesDb", () => {
     const result = await listAdminDogDiseasesDb(
       {
         selectedDiseaseCode: null,
-        selectedDiseaseGroup: null,
         query: "",
         page: 9,
         pageSize: 10,
@@ -246,12 +230,11 @@ describe("listAdminDogDiseasesDb", () => {
     expect(findManyArgs.take).toBe(10);
   });
 
-  it("filters by disease group and text query", async () => {
+  it("filters by disease code and text query", async () => {
     sairausFindManyMock.mockResolvedValue([
       {
         koodi: "epi",
         sairausTeksti: "Epilepsia",
-        sairausRyhma: "EPILEPSIA",
         _count: { koirat: 174 },
       },
       {
@@ -265,8 +248,7 @@ describe("listAdminDogDiseasesDb", () => {
 
     const result = await listAdminDogDiseasesDb(
       {
-        selectedDiseaseCode: null,
-        selectedDiseaseGroup: "PURENTA",
+        selectedDiseaseCode: "pur",
         query: "FI123",
         page: 1,
         pageSize: 15,
@@ -274,12 +256,11 @@ describe("listAdminDogDiseasesDb", () => {
       diseaseDefinitions,
     );
 
-    expect(result.selectedDiseaseCode).toBeNull();
-    expect(result.selectedDiseaseGroup).toBe("PURENTA");
+    expect(result.selectedDiseaseCode).toBe("pur");
     expect(result.query).toBe("FI123");
     expect(koiranSairausCountMock).toHaveBeenCalledWith({
       where: {
-        sairaus: { sairausRyhma: "PURENTA" },
+        sairaus: { koodi: "pur" },
         OR: [
           {
             rekisterinumero: {
@@ -340,7 +321,6 @@ describe("listAdminDogDiseasesDb", () => {
     const result = await listAdminDogDiseasesDb(
       {
         selectedDiseaseCode: null,
-        selectedDiseaseGroup: null,
         query: "",
         page: 1,
         pageSize: 15,
@@ -404,7 +384,6 @@ describe("listAdminDogDiseasesDb", () => {
     const result = await listAdminDogDiseasesDb(
       {
         selectedDiseaseCode: "epi",
-        selectedDiseaseGroup: "EPILEPSIA",
         query: "",
         page: 1,
         pageSize: 15,

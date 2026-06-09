@@ -1,9 +1,6 @@
 import { prisma } from "@db/core/prisma";
 import { buildDiseaseBrowseWhere } from "./internal/browse-filter";
-import {
-  mapDiseaseGroupOptions,
-  mapDiseaseOptions,
-} from "./internal/browse-options";
+import { mapDiseaseOptions } from "./internal/browse-options";
 import {
   diseaseBrowseRowSelect,
   loadLitterParentPreviews,
@@ -21,19 +18,16 @@ export async function listAdminDogDiseasesDb(
   diseaseDefinitions: AdminDogDiseaseDefinitionOptionDb[],
 ): Promise<AdminDogDiseaseBrowseResponseDb> {
   const diseaseOptions = mapDiseaseOptions(diseaseDefinitions);
-  const diseaseGroupOptions = mapDiseaseGroupOptions(diseaseDefinitions);
   const where = buildDiseaseBrowseWhere(input);
 
   const total = await prisma.koiranSairaus.count({ where });
   if (total === 0) {
     return {
       selectedDiseaseCode: input.selectedDiseaseCode,
-      selectedDiseaseGroup: input.selectedDiseaseGroup,
       query: input.query,
       total: 0,
       totalPages: 0,
       page: 1,
-      diseaseGroupOptions,
       diseaseOptions,
       items: [],
     };
@@ -58,12 +52,10 @@ export async function listAdminDogDiseasesDb(
 
   return {
     selectedDiseaseCode: input.selectedDiseaseCode,
-    selectedDiseaseGroup: input.selectedDiseaseGroup,
     query: input.query,
     total,
     totalPages,
     page: safePage,
-    diseaseGroupOptions,
     diseaseOptions,
     items: mapDiseaseBrowseRows(rows, parentLookup),
   };

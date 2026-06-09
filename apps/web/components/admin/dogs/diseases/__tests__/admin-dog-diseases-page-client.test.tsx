@@ -60,15 +60,10 @@ vi.mock("@/hooks/i18n", () => ({
 function buildInitialData(): AdminDogDiseaseBrowseResponse {
   return {
     selectedDiseaseCode: "epi",
-    selectedDiseaseGroup: "EPILEPSIA",
     query: "",
     total: 174,
     totalPages: 12,
     page: 1,
-    diseaseGroupOptions: [
-      { diseaseGroup: "EPILEPSIA", count: 174 },
-      { diseaseGroup: "PURENTA", count: 8 },
-    ],
     diseaseOptions: [
       { diseaseCode: "epi", diseaseText: "Epilepsia", count: 174 },
       { diseaseCode: "pur", diseaseText: "Purema", count: 8 },

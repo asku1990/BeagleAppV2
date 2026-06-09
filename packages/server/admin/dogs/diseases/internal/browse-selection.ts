@@ -1,10 +1,5 @@
 import type { AdminDogDiseaseDefinitionOptionDb } from "@beagle/db";
-import type {
-  AdminDogDiseaseBrowseRequest,
-  AdminDogDiseaseGroup,
-} from "@beagle/contracts";
 
-const DEFAULT_DISEASE_GROUP: AdminDogDiseaseGroup = "EPILEPSIA";
 const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 15;
 const MAX_PAGE_SIZE = 100;
@@ -71,28 +66,4 @@ export function resolveSelectedDiseaseCode(
   }
 
   return diseaseDefinitions.find(isEpiDisease)?.diseaseCode ?? null;
-}
-
-export function resolveSelectedDiseaseGroup(
-  input: AdminDogDiseaseBrowseRequest,
-  selectedDiseaseCode: string | null,
-  diseaseDefinitions: AdminDogDiseaseDefinitionOptionDb[],
-): AdminDogDiseaseGroup | null {
-  if (input.diseaseCode !== undefined) {
-    if (selectedDiseaseCode === null) {
-      return null;
-    }
-
-    return (
-      (diseaseDefinitions.find(
-        (definition) => definition.diseaseCode === selectedDiseaseCode,
-      )?.diseaseGroup as AdminDogDiseaseGroup | undefined) ?? null
-    );
-  }
-
-  if (input.diseaseGroup === null) {
-    return null;
-  }
-
-  return input.diseaseGroup ?? DEFAULT_DISEASE_GROUP;
 }

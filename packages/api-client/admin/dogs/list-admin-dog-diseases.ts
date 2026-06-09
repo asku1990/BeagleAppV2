@@ -11,11 +11,6 @@ function toQueryString(input: AdminDogDiseaseBrowseRequest) {
   } else if (typeof input.diseaseCode === "string") {
     params.set("diseaseCode", input.diseaseCode);
   }
-  if (input.diseaseGroup === null) {
-    params.set("diseaseGroup", "all");
-  } else if (typeof input.diseaseGroup === "string") {
-    params.set("diseaseGroup", input.diseaseGroup);
-  }
   if (typeof input.query === "string" && input.query.trim().length > 0) {
     params.set("query", input.query.trim());
   }

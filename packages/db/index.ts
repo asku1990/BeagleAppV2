@@ -232,7 +232,6 @@ export {
   type AdminDogDiseaseBrowseDogDb,
   type AdminDogDiseaseBrowseItemDb,
   type AdminDogDiseaseBrowseFilterOptionDb,
-  type AdminDogDiseaseBrowseGroupOptionDb,
   type DeleteAdminDogDiseaseDbResult,
   type AdminDogDiseaseBrowseParentPreviewDb,
   type AdminDogDiseaseDefinitionOptionDb,

@@ -2,7 +2,6 @@ import type { DogSex, SairausRyhma } from "@prisma/client";
 
 export type AdminDogDiseaseBrowseRequestDb = {
   selectedDiseaseCode: string | null;
-  selectedDiseaseGroup: SairausRyhma | null;
   query: string;
   page: number;
   pageSize: number;
@@ -18,11 +17,6 @@ export type AdminDogDiseaseDefinitionOptionDb = {
 export type AdminDogDiseaseBrowseFilterOptionDb = {
   diseaseCode: string;
   diseaseText: string;
-  count: number;
-};
-
-export type AdminDogDiseaseBrowseGroupOptionDb = {
-  diseaseGroup: SairausRyhma;
   count: number;
 };
 
@@ -63,12 +57,10 @@ export type AdminDogDiseaseBrowseItemDb = {
 
 export type AdminDogDiseaseBrowseResponseDb = {
   selectedDiseaseCode: string | null;
-  selectedDiseaseGroup: SairausRyhma | null;
   query: string;
   total: number;
   totalPages: number;
   page: number;
-  diseaseGroupOptions: AdminDogDiseaseBrowseGroupOptionDb[];
   diseaseOptions: AdminDogDiseaseBrowseFilterOptionDb[];
   items: AdminDogDiseaseBrowseItemDb[];
 };

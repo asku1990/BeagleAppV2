@@ -1,7 +1,5 @@
 export type {
-  AdminDogDiseaseBrowseGroupOption,
   AdminDogDiseaseBrowseFilterOption,
-  AdminDogDiseaseGroup,
   AdminDogDiseaseBrowseItem,
   AdminDogDiseaseBrowseParentPreview,
   AdminDogDiseaseBrowseRequest,

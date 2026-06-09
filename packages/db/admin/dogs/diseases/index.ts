@@ -1,7 +1,6 @@
 export { listAdminDogDiseasesDb } from "./list-dog-diseases";
 export {
   type AdminDogDiseaseBrowseFilterOptionDb,
-  type AdminDogDiseaseBrowseGroupOptionDb,
   type AdminDogDiseaseBrowseDogDb,
   type AdminDogDiseaseBrowseItemDb,
   type AdminDogDiseaseBrowseParentPreviewDb,

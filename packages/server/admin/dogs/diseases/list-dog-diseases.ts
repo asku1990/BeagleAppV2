@@ -9,7 +9,6 @@ import type {
   AdminDogDiseaseBrowseRequest,
   AdminDogDiseaseBrowseItem,
   AdminDogDiseaseBrowseResponse,
-  AdminDogDiseaseGroup,
   CurrentUserDto,
 } from "@beagle/contracts";
 import { requireAdmin } from "@server/admin/core/service";
@@ -20,7 +19,6 @@ import {
   parseDiseaseBrowsePage,
   parseDiseaseBrowsePageSize,
   resolveSelectedDiseaseCode,
-  resolveSelectedDiseaseGroup,
 } from "./internal/browse-selection";
 
 type ServiceLogContext = {
@@ -79,13 +77,10 @@ function mapDiseaseResponse(
 ): AdminDogDiseaseBrowseResponse {
   return {
     selectedDiseaseCode: response.selectedDiseaseCode,
-    selectedDiseaseGroup:
-      response.selectedDiseaseGroup as AdminDogDiseaseGroup | null,
     query: response.query,
     total: response.total,
     totalPages: response.totalPages,
     page: response.page,
-    diseaseGroupOptions: response.diseaseGroupOptions,
     diseaseOptions: response.diseaseOptions,
     items: response.items.map(mapDiseaseItem),
   };
@@ -126,13 +121,8 @@ export async function listAdminDogDiseases(
     const page = parseDiseaseBrowsePage(input.page);
     const pageSize = parseDiseaseBrowsePageSize(undefined);
     const diseaseDefinitions = await listAdminDogDiseaseDefinitionsDb();
-    const selectedDiseaseCode =
-      input.diseaseCode === undefined
-        ? null
-        : resolveSelectedDiseaseCode(input.diseaseCode, diseaseDefinitions);
-    const selectedDiseaseGroup = resolveSelectedDiseaseGroup(
-      input,
-      selectedDiseaseCode,
+    const selectedDiseaseCode = resolveSelectedDiseaseCode(
+      input.diseaseCode,
       diseaseDefinitions,
     );
 
@@ -140,7 +130,6 @@ export async function listAdminDogDiseases(
       {
         event: "start",
         diseaseCode: selectedDiseaseCode,
-        diseaseGroup: selectedDiseaseGroup,
         query,
         page,
       },
@@ -150,7 +139,6 @@ export async function listAdminDogDiseases(
     const result = await listAdminDogDiseasesDb(
       {
         selectedDiseaseCode,
-        selectedDiseaseGroup,
         query,
         page,
         pageSize,
@@ -164,7 +152,6 @@ export async function listAdminDogDiseases(
       {
         event: "success",
         selectedDiseaseCode: data.selectedDiseaseCode,
-        selectedDiseaseGroup: data.selectedDiseaseGroup,
         query: data.query,
         total: data.total,
         itemCount: data.items.length,

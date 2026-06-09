@@ -1,13 +1,5 @@
-export type AdminDogDiseaseGroup =
-  | "EPILEPSIA"
-  | "LAFORA"
-  | "PURENTA"
-  | "MLS"
-  | "MUU";
-
 export type AdminDogDiseaseBrowseRequest = {
   diseaseCode?: string | null;
-  diseaseGroup?: AdminDogDiseaseGroup | null;
   query?: string | null;
   page?: number;
 };
@@ -15,11 +7,6 @@ export type AdminDogDiseaseBrowseRequest = {
 export type AdminDogDiseaseBrowseFilterOption = {
   diseaseCode: string;
   diseaseText: string;
-  count: number;
-};
-
-export type AdminDogDiseaseBrowseGroupOption = {
-  diseaseGroup: AdminDogDiseaseGroup;
   count: number;
 };
 
@@ -50,12 +37,10 @@ export type AdminDogDiseaseBrowseItem = {
 
 export type AdminDogDiseaseBrowseResponse = {
   selectedDiseaseCode: string | null;
-  selectedDiseaseGroup: AdminDogDiseaseGroup | null;
   query: string;
   total: number;
   totalPages: number;
   page: number;
-  diseaseGroupOptions: AdminDogDiseaseBrowseGroupOption[];
   diseaseOptions: AdminDogDiseaseBrowseFilterOption[];
   items: AdminDogDiseaseBrowseItem[];
 };
