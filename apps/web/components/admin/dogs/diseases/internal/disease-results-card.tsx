@@ -97,25 +97,25 @@ export function DiseaseCard({
           </span>{" "}
           {formatCounts(row.trialCount, row.showCount)}
         </p>
-        <p className="whitespace-pre-wrap break-words">
+        <p className="whitespace-pre-wrap wrap-break-word">
           <span className="text-muted-foreground">
             {labels.cardLabels.litter}:
           </span>{" "}
           {showDash(row.pentue)}
         </p>
-        <p className="whitespace-pre-wrap break-words">
+        <p className="whitespace-pre-wrap wrap-break-word">
           <span className="text-muted-foreground">
             {labels.cardLabels.description}:
           </span>{" "}
           {showDash(row.kuvaus)}
         </p>
-        <p className="whitespace-pre-wrap break-words">
+        <p className="whitespace-pre-wrap wrap-break-word">
           <span className="text-muted-foreground">
             {labels.cardLabels.source}:
           </span>{" "}
           {showDash(row.tietolahde)}
         </p>
-        <p className="whitespace-pre-wrap break-words">
+        <p className="whitespace-pre-wrap wrap-break-word">
           <span className="text-muted-foreground">
             {labels.cardLabels.other}:
           </span>{" "}

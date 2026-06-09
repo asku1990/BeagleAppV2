@@ -64,7 +64,7 @@ function DiseaseRowContent({
       <td className="px-2 py-2">
         {formatCounts(row.trialCount, row.showCount)}
       </td>
-      <td className="px-2 py-2 max-w-[22rem] whitespace-pre-wrap break-words">
+      <td className="px-2 py-2 max-w-88 whitespace-pre-wrap wrap-break-word">
         <div className="space-y-1">
           <p>
             <span className="text-muted-foreground">
