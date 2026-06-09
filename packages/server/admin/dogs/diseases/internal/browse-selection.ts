@@ -3,6 +3,7 @@ import type { AdminDogDiseaseDefinitionOptionDb } from "@beagle/db";
 const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 15;
 const MAX_PAGE_SIZE = 100;
+export const MAX_DISEASE_SEARCH_QUERY_LENGTH = 100;
 
 export function parseDiseaseBrowsePage(value: number | undefined): number {
   if (!Number.isFinite(value)) {
@@ -26,7 +27,7 @@ export function parseDiseaseBrowsePageSize(value: number | undefined): number {
 export function normalizeDiseaseSearchQuery(
   value: string | null | undefined,
 ): string {
-  return value?.trim() ?? "";
+  return (value?.trim() ?? "").slice(0, MAX_DISEASE_SEARCH_QUERY_LENGTH);
 }
 
 function normalizeDiseaseCode(

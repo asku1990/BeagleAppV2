@@ -45,6 +45,39 @@ describe("listAdminDogDiseases", () => {
     expect(listAdminDogDiseasesDbMock).not.toHaveBeenCalled();
   });
 
+  it("passes normalized query text to the db layer", async () => {
+    listAdminDogDiseasesDbMock.mockResolvedValue({
+      selectedDiseaseCode: "epi",
+      query: "kide",
+      total: 0,
+      totalPages: 0,
+      page: 1,
+      diseaseOptions: [],
+      items: [],
+    });
+
+    const longQuery = `  ${"x".repeat(120)}  `;
+
+    await listAdminDogDiseases(
+      {
+        query: longQuery,
+      },
+      {
+        id: "u_1",
+        email: "admin@example.com",
+        username: null,
+        role: "ADMIN",
+      },
+    );
+
+    expect(listAdminDogDiseasesDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        query: "x".repeat(100),
+      }),
+      diseaseDefinitions,
+    );
+  });
+
   it("maps db rows and defaults the disease filter to Epi", async () => {
     listAdminDogDiseasesDbMock.mockResolvedValue({
       selectedDiseaseCode: "epi",
