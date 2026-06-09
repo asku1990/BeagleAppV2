@@ -19,8 +19,11 @@ export type AdminDogDiseaseBrowseItem = {
   evidenceKind: "DOG" | "LITTER";
   diseaseCode: string;
   diseaseText: string;
+  pentue: string | null;
+  kuvaus: string | null;
   public: boolean;
   registrationNo: string;
+  tietolahde: string | null;
   ekNo: number | null;
   sex: "MALE" | "FEMALE" | "UNKNOWN" | null;
   name: string;

@@ -58,9 +58,12 @@ describe("listAdminDogDiseasesDb", () => {
         id: "disease-1",
         evidenceKind: "DOG",
         rekisterinumero: "FI12345/21",
+        pentue: "PENTUE-1",
+        kuvaus: "Kuvaus koiralle",
         julkinen: true,
         isaRekisterinumero: null,
         emaRekisterinumero: null,
+        tietolahde: "Lomake",
         sairaus: { koodi: "epi", sairausTeksti: "Epilepsia" },
         dog: {
           id: "dog-1",
@@ -92,9 +95,12 @@ describe("listAdminDogDiseasesDb", () => {
       id: "disease-1",
       evidenceKind: "DOG",
       rekisterinumero: "FI12345/21",
+      pentue: "PENTUE-1",
+      kuvaus: "Kuvaus koiralle",
       julkinen: true,
       isaRekisterinumero: null,
       emaRekisterinumero: null,
+      tietolahde: "Lomake",
       sairaus: {
         koodi: "epi",
         sairausTeksti: "Epilepsia",
@@ -153,9 +159,12 @@ describe("listAdminDogDiseasesDb", () => {
         id: "disease-1",
         evidenceKind: "LITTER",
         rekisterinumero: "EPI_1/94",
+        pentue: null,
+        kuvaus: "",
         julkinen: false,
         isaRekisterinumero: "SF14404/90",
         emaRekisterinumero: "SF19531/89",
+        tietolahde: null,
         sairaus: { koodi: "epi", sairausTeksti: "Epilepsia" },
         dog: null,
       },
@@ -178,9 +187,12 @@ describe("listAdminDogDiseasesDb", () => {
       id: "disease-1",
       evidenceKind: "LITTER",
       rekisterinumero: "EPI_1/94",
+      pentue: null,
+      kuvaus: "",
       julkinen: false,
       isaRekisterinumero: "SF14404/90",
       emaRekisterinumero: "SF19531/89",
+      tietolahde: null,
       sairaus: {
         koodi: "epi",
         sairausTeksti: "Epilepsia",
@@ -193,6 +205,55 @@ describe("listAdminDogDiseasesDb", () => {
       dam: {
         registrationNo: "SF19531/89",
         name: "Emäkoira",
+      },
+    });
+  });
+
+  it("preserves empty and null metadata values from the db row", async () => {
+    sairausFindManyMock.mockResolvedValue([
+      { koodi: "epi", sairausTeksti: "Epilepsia", _count: { koirat: 174 } },
+    ]);
+    koiranSairausCountMock.mockResolvedValue(1);
+    koiranSairausFindManyMock.mockResolvedValue([
+      {
+        id: "disease-1",
+        evidenceKind: "DOG",
+        rekisterinumero: "FI12345/21",
+        pentue: "",
+        kuvaus: null,
+        julkinen: true,
+        isaRekisterinumero: null,
+        emaRekisterinumero: null,
+        tietolahde: "  ",
+        sairaus: { koodi: "epi", sairausTeksti: "Epilepsia" },
+        dog: null,
+      },
+    ]);
+
+    const result = await listAdminDogDiseasesDb({ diseaseCode: "epi" });
+
+    expect(result.items[0]).toEqual({
+      id: "disease-1",
+      evidenceKind: "DOG",
+      rekisterinumero: "FI12345/21",
+      pentue: "",
+      kuvaus: null,
+      julkinen: true,
+      isaRekisterinumero: null,
+      emaRekisterinumero: null,
+      tietolahde: "  ",
+      sairaus: {
+        koodi: "epi",
+        sairausTeksti: "Epilepsia",
+      },
+      dog: null,
+      sire: {
+        registrationNo: null,
+        name: null,
+      },
+      dam: {
+        registrationNo: null,
+        name: null,
       },
     });
   });
