@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import type {
+  AdminDogDiseaseGroup,
   AdminDogDiseaseBrowseItem,
   AdminDogDiseaseBrowseResponse,
 } from "@beagle/contracts";
@@ -10,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { LabeledSelect } from "@/components/ui/form-fields/labeled-select";
+import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/sonner";
 import { useAdminDogDiseasesUiState } from "@/hooks/admin/dogs/diseases";
 import { useI18n } from "@/hooks/i18n";
@@ -25,25 +27,126 @@ type Props = {
   initialData?: AdminDogDiseaseBrowseResponse | null;
 };
 
+type DiseaseGroupOption = {
+  diseaseGroup: AdminDogDiseaseGroup | "all";
+  label: string;
+};
+
+type SearchFormProps = {
+  diseaseGroup: AdminDogDiseaseGroup | null;
+  query: string;
+  diseaseGroupOptions: DiseaseGroupOption[];
+  isPending: boolean;
+  labels: {
+    groupFilterLabel: string;
+    queryLabel: string;
+    queryPlaceholder: string;
+    searchButton: string;
+    createOpen: string;
+  };
+  onCreate: () => void;
+  onSubmit: (input: {
+    diseaseGroup: AdminDogDiseaseGroup | null;
+    query: string;
+  }) => void;
+};
+
+function DiseaseSearchForm({
+  diseaseGroup,
+  query,
+  diseaseGroupOptions,
+  isPending,
+  labels,
+  onCreate,
+  onSubmit,
+}: SearchFormProps) {
+  const [draftDiseaseGroup, setDraftDiseaseGroup] =
+    useState<AdminDogDiseaseGroup | null>(diseaseGroup);
+  const [draftQuery, setDraftQuery] = useState(query);
+
+  const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    onSubmit({
+      diseaseGroup: draftDiseaseGroup,
+      query: draftQuery,
+    });
+  };
+
+  return (
+    <form
+      className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between"
+      onSubmit={handleSearchSubmit}
+    >
+      <div className="grid flex-1 gap-3 sm:grid-cols-[minmax(14rem,20rem)_minmax(16rem,1fr)]">
+        <LabeledSelect
+          label={labels.groupFilterLabel}
+          value={draftDiseaseGroup ?? "all"}
+          disabled={isPending}
+          onChange={(event) => {
+            setDraftDiseaseGroup(
+              event.target.value === "all"
+                ? null
+                : (event.target.value as AdminDogDiseaseGroup),
+            );
+          }}
+        >
+          {diseaseGroupOptions.map((option) => (
+            <option key={option.diseaseGroup} value={option.diseaseGroup}>
+              {option.label}
+            </option>
+          ))}
+        </LabeledSelect>
+        <label className="space-y-1 text-sm font-medium">
+          <span>{labels.queryLabel}</span>
+          <Input
+            value={draftQuery}
+            disabled={isPending}
+            onChange={(event) => setDraftQuery(event.target.value)}
+            placeholder={labels.queryPlaceholder}
+          />
+        </label>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Button type="submit" disabled={isPending}>
+          {labels.searchButton}
+        </Button>
+        <Button type="button" onClick={onCreate}>
+          {labels.createOpen}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
 export function AdminDogDiseasesPageClient({ initialData }: Props) {
   const { t } = useI18n();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] =
     useState<AdminDogDiseaseBrowseItem | null>(null);
-  const initialDiseaseCode = initialData
-    ? initialData.selectedDiseaseCode
-    : "epi";
-  const { diseaseCode, page, isPending, setDiseaseCode, setPage } =
-    useAdminDogDiseasesUiState({
-      initialDiseaseCode,
-    });
+  const initialDiseaseGroup = initialData
+    ? initialData.selectedDiseaseGroup
+    : "EPILEPSIA";
+  const {
+    diseaseGroup,
+    query: submittedQuery,
+    page,
+    isPending,
+    submitSearch,
+    setPage,
+  } = useAdminDogDiseasesUiState({
+    initialDiseaseGroup,
+  });
 
   const queryInitialData = useMemo(() => {
     if (!initialData) {
       return undefined;
     }
 
-    if (initialData.selectedDiseaseCode !== diseaseCode) {
+    if (initialData.selectedDiseaseGroup !== diseaseGroup) {
+      return undefined;
+    }
+
+    if (initialData.query !== submittedQuery) {
       return undefined;
     }
 
@@ -52,10 +155,11 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
     }
 
     return initialData;
-  }, [diseaseCode, initialData, page]);
+  }, [diseaseGroup, initialData, page, submittedQuery]);
 
   const query = useAdminDogDiseasesQuery({
-    diseaseCode,
+    diseaseGroup,
+    query: submittedQuery,
     page,
     initialData: queryInitialData,
   });
@@ -77,8 +181,11 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
     () => ({
       pageTitle: t("admin.dogs.diseases.page.title"),
       sectionTitle: t("admin.dogs.diseases.section.title"),
-      filterLabel: t("admin.dogs.diseases.filter.label"),
-      allFilterLabel: t("admin.dogs.diseases.filter.all"),
+      groupFilterLabel: t("admin.dogs.diseases.filter.groupLabel"),
+      allGroupFilterLabel: t("admin.dogs.diseases.filter.allGroups"),
+      queryLabel: t("admin.dogs.diseases.filter.queryLabel"),
+      queryPlaceholder: t("admin.dogs.diseases.filter.queryPlaceholder"),
+      searchButton: t("admin.dogs.diseases.filter.search"),
       countSuffix: t("admin.dogs.diseases.countSuffix"),
       summaryPrefix: t("admin.dogs.diseases.summary.prefix"),
       summarySuffix: t("admin.dogs.diseases.summary.suffix"),
@@ -168,24 +275,42 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
     [t],
   );
 
-  const diseaseOptions = useMemo(() => {
-    const options = data?.diseaseOptions ?? [];
-    return [
+  const diseaseGroupOptions = useMemo<DiseaseGroupOption[]>(() => {
+    const options = data?.diseaseGroupOptions ?? [];
+    const groupLabels: Record<AdminDogDiseaseGroup, string> = {
+      EPILEPSIA: t("admin.dogs.diseases.groups.epilepsia"),
+      LAFORA: t("admin.dogs.diseases.groups.lafora"),
+      PURENTA: t("admin.dogs.diseases.groups.purenta"),
+      MLS: t("admin.dogs.diseases.groups.mls"),
+      MUU: t("admin.dogs.diseases.groups.muu"),
+    };
+    const browseOptions: Array<{
+      diseaseGroup: AdminDogDiseaseGroup | "all";
+      diseaseText: string;
+      count: number;
+    }> = [
       {
-        diseaseCode: "all",
-        diseaseText: labels.allFilterLabel,
+        diseaseGroup: "all",
+        diseaseText: labels.allGroupFilterLabel,
         count: allDiseaseCount,
       },
-      ...options,
-    ].map((option) => ({
+      ...options.map((option) => ({
+        diseaseGroup: option.diseaseGroup,
+        diseaseText: groupLabels[option.diseaseGroup],
+        count: option.count,
+      })),
+    ];
+
+    return browseOptions.map((option) => ({
       ...option,
       label: `${option.diseaseText} ${option.count} ${labels.countSuffix}`,
     }));
   }, [
     allDiseaseCount,
-    data?.diseaseOptions,
-    labels.allFilterLabel,
+    data?.diseaseGroupOptions,
+    labels.allGroupFilterLabel,
     labels.countSuffix,
+    t,
   ]);
 
   return (
@@ -201,29 +326,22 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
 
       <ListingSectionShell title={labels.sectionTitle}>
         <div className="space-y-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div className="max-w-sm flex-1">
-              <LabeledSelect
-                label={labels.filterLabel}
-                value={diseaseCode ?? "all"}
-                disabled={isPending}
-                onChange={(event) => {
-                  setDiseaseCode(
-                    event.target.value === "all" ? null : event.target.value,
-                  );
-                }}
-              >
-                {diseaseOptions.map((option) => (
-                  <option key={option.diseaseCode} value={option.diseaseCode}>
-                    {option.label}
-                  </option>
-                ))}
-              </LabeledSelect>
-            </div>
-            <Button type="button" onClick={() => setIsCreateOpen(true)}>
-              {labels.create.open}
-            </Button>
-          </div>
+          <DiseaseSearchForm
+            key={`${diseaseGroup ?? "all"}:${submittedQuery}`}
+            diseaseGroup={diseaseGroup}
+            query={submittedQuery}
+            diseaseGroupOptions={diseaseGroupOptions}
+            isPending={isPending}
+            labels={{
+              groupFilterLabel: labels.groupFilterLabel,
+              queryLabel: labels.queryLabel,
+              queryPlaceholder: labels.queryPlaceholder,
+              searchButton: labels.searchButton,
+              createOpen: labels.create.open,
+            }}
+            onCreate={() => setIsCreateOpen(true)}
+            onSubmit={submitSearch}
+          />
 
           {query.isLoading ? (
             <Card>
@@ -286,7 +404,7 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
           diseaseOptions={
             data?.diseaseOptions ?? initialData?.diseaseOptions ?? []
           }
-          selectedDiseaseCode={data?.selectedDiseaseCode ?? initialDiseaseCode}
+          selectedDiseaseCode={data?.selectedDiseaseCode ?? "epi"}
           labels={labels.create}
           isSubmitting={createDiseaseMutation.isPending}
           onClose={() => setIsCreateOpen(false)}

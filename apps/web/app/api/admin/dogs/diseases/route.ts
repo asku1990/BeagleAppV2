@@ -18,12 +18,32 @@ function parseDiseaseCode(value: string | null): string | null | undefined {
     return undefined;
   }
 
-  if (value === "all") {
+  const trimmed = value.trim();
+  if (trimmed.toLowerCase() === "all") {
     return null;
   }
 
-  const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : undefined;
+}
+
+function parseDiseaseGroup(value: string | null) {
+  if (value === null) {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  if (trimmed.toLowerCase() === "all") {
+    return null;
+  }
+
+  const normalized = trimmed.toUpperCase();
+  return normalized === "EPILEPSIA" ||
+    normalized === "LAFORA" ||
+    normalized === "PURENTA" ||
+    normalized === "MLS" ||
+    normalized === "MUU"
+    ? normalized
+    : undefined;
 }
 
 export async function OPTIONS(request: NextRequest) {
@@ -38,11 +58,17 @@ export async function GET(request: NextRequest) {
     const diseaseCode = parseDiseaseCode(
       request.nextUrl.searchParams.get("diseaseCode"),
     );
+    const diseaseGroup = parseDiseaseGroup(
+      request.nextUrl.searchParams.get("diseaseGroup"),
+    );
+    const query = request.nextUrl.searchParams.get("query")?.trim() ?? "";
     const page = parseOptionalNumber(request.nextUrl.searchParams.get("page"));
 
     const result = await listAdminDogDiseases(
       {
         diseaseCode,
+        diseaseGroup,
+        query,
         page,
       },
       toAdminUserContext(currentUser),

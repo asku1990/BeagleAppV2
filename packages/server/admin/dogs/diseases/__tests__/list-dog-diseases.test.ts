@@ -1,16 +1,36 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { listAdminDogDiseases } from "../list-dog-diseases";
 
-const { listAdminDogDiseasesDbMock } = vi.hoisted(() => ({
-  listAdminDogDiseasesDbMock: vi.fn(),
-}));
+const { listAdminDogDiseaseDefinitionsDbMock, listAdminDogDiseasesDbMock } =
+  vi.hoisted(() => ({
+    listAdminDogDiseaseDefinitionsDbMock: vi.fn(),
+    listAdminDogDiseasesDbMock: vi.fn(),
+  }));
+
+const diseaseDefinitions = [
+  {
+    diseaseCode: "epi",
+    diseaseText: "Epilepsia",
+    diseaseGroup: "EPILEPSIA",
+    count: 174,
+  },
+  {
+    diseaseCode: "pur",
+    diseaseText: "Purenta",
+    diseaseGroup: "PURENTA",
+    count: 8,
+  },
+];
 
 vi.mock("@beagle/db", () => ({
+  listAdminDogDiseaseDefinitionsDb: listAdminDogDiseaseDefinitionsDbMock,
   listAdminDogDiseasesDb: listAdminDogDiseasesDbMock,
 }));
 
 describe("listAdminDogDiseases", () => {
   beforeEach(() => {
+    listAdminDogDiseaseDefinitionsDbMock.mockReset();
+    listAdminDogDiseaseDefinitionsDbMock.mockResolvedValue(diseaseDefinitions);
     listAdminDogDiseasesDbMock.mockReset();
   });
 
@@ -29,10 +49,13 @@ describe("listAdminDogDiseases", () => {
 
   it("maps db rows and defaults the disease filter to Epi", async () => {
     listAdminDogDiseasesDbMock.mockResolvedValue({
-      selectedDiseaseCode: "epi",
+      selectedDiseaseCode: null,
+      selectedDiseaseGroup: "EPILEPSIA",
+      query: "kide",
       total: 1,
       totalPages: 1,
       page: 1,
+      diseaseGroupOptions: [{ diseaseGroup: "EPILEPSIA", count: 174 }],
       diseaseOptions: [
         { diseaseCode: "epi", diseaseText: "Epilepsia", count: 174 },
       ],
@@ -90,10 +113,13 @@ describe("listAdminDogDiseases", () => {
       body: {
         ok: true,
         data: {
-          selectedDiseaseCode: "epi",
+          selectedDiseaseCode: null,
+          selectedDiseaseGroup: "EPILEPSIA",
+          query: "kide",
           total: 1,
           totalPages: 1,
           page: 1,
+          diseaseGroupOptions: [{ diseaseGroup: "EPILEPSIA", count: 174 }],
           diseaseOptions: [
             { diseaseCode: "epi", diseaseText: "Epilepsia", count: 174 },
           ],
@@ -128,19 +154,27 @@ describe("listAdminDogDiseases", () => {
       },
     });
 
-    expect(listAdminDogDiseasesDbMock).toHaveBeenCalledWith({
-      diseaseCode: undefined,
-      page: 2,
-      pageSize: 15,
-    });
+    expect(listAdminDogDiseasesDbMock).toHaveBeenCalledWith(
+      {
+        selectedDiseaseCode: null,
+        selectedDiseaseGroup: "EPILEPSIA",
+        query: "",
+        page: 2,
+        pageSize: 15,
+      },
+      diseaseDefinitions,
+    );
   });
 
   it("maps litter rows and unknown dog sex without leaking dog-only fields", async () => {
     listAdminDogDiseasesDbMock.mockResolvedValue({
-      selectedDiseaseCode: "epi",
+      selectedDiseaseCode: null,
+      selectedDiseaseGroup: "EPILEPSIA",
+      query: "",
       total: 2,
       totalPages: 1,
       page: 1,
+      diseaseGroupOptions: [{ diseaseGroup: "EPILEPSIA", count: 174 }],
       diseaseOptions: [
         { diseaseCode: "epi", diseaseText: "Epilepsia", count: 174 },
       ],
@@ -220,10 +254,13 @@ describe("listAdminDogDiseases", () => {
       body: {
         ok: true,
         data: {
-          selectedDiseaseCode: "epi",
+          selectedDiseaseCode: null,
+          selectedDiseaseGroup: "EPILEPSIA",
+          query: "",
           total: 2,
           totalPages: 1,
           page: 1,
+          diseaseGroupOptions: [{ diseaseGroup: "EPILEPSIA", count: 174 }],
           diseaseOptions: [
             { diseaseCode: "epi", diseaseText: "Epilepsia", count: 174 },
           ],
@@ -282,6 +319,95 @@ describe("listAdminDogDiseases", () => {
         },
       },
     });
+  });
+
+  it("preserves explicit all filters when forwarding to db", async () => {
+    listAdminDogDiseasesDbMock.mockResolvedValue({
+      selectedDiseaseCode: null,
+      selectedDiseaseGroup: null,
+      query: "sako",
+      total: 0,
+      totalPages: 0,
+      page: 1,
+      diseaseGroupOptions: [],
+      diseaseOptions: [],
+      items: [],
+    });
+
+    await expect(
+      listAdminDogDiseases(
+        {
+          diseaseCode: null,
+          diseaseGroup: null,
+          query: "sako",
+        },
+        {
+          id: "u_1",
+          email: "admin@example.com",
+          username: null,
+          role: "ADMIN",
+        },
+      ),
+    ).resolves.toMatchObject({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          selectedDiseaseCode: null,
+          selectedDiseaseGroup: null,
+          query: "sako",
+        },
+      },
+    });
+
+    expect(listAdminDogDiseasesDbMock).toHaveBeenCalledWith(
+      {
+        selectedDiseaseCode: null,
+        selectedDiseaseGroup: null,
+        query: "sako",
+        page: 1,
+        pageSize: 15,
+      },
+      diseaseDefinitions,
+    );
+  });
+
+  it("lets disease code win over group when resolving filters", async () => {
+    listAdminDogDiseasesDbMock.mockResolvedValue({
+      selectedDiseaseCode: "pur",
+      selectedDiseaseGroup: "PURENTA",
+      query: "",
+      total: 0,
+      totalPages: 0,
+      page: 1,
+      diseaseGroupOptions: [],
+      diseaseOptions: [],
+      items: [],
+    });
+
+    await listAdminDogDiseases(
+      {
+        diseaseCode: "pur",
+        diseaseGroup: "EPILEPSIA",
+      },
+      {
+        id: "u_1",
+        email: "admin@example.com",
+        username: null,
+        role: "ADMIN",
+      },
+    );
+
+    expect(listAdminDogDiseasesDbMock).toHaveBeenCalledWith(
+      {
+        selectedDiseaseCode: "pur",
+        selectedDiseaseGroup: "PURENTA",
+        query: "",
+        page: 1,
+        pageSize: 15,
+      },
+      diseaseDefinitions,
+    );
   });
 
   it("returns internal error when the db throws", async () => {

@@ -1,4 +1,5 @@
 import {
+  listAdminDogDiseaseDefinitionsDb,
   listAdminDogDiseasesDb,
   type AdminDogDiseaseBrowseDogDb,
   type AdminDogDiseaseBrowseItemDb,
@@ -8,11 +9,19 @@ import type {
   AdminDogDiseaseBrowseRequest,
   AdminDogDiseaseBrowseItem,
   AdminDogDiseaseBrowseResponse,
+  AdminDogDiseaseGroup,
   CurrentUserDto,
 } from "@beagle/contracts";
 import { requireAdmin } from "@server/admin/core/service";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
+import {
+  normalizeDiseaseSearchQuery,
+  parseDiseaseBrowsePage,
+  parseDiseaseBrowsePageSize,
+  resolveSelectedDiseaseCode,
+  resolveSelectedDiseaseGroup,
+} from "./internal/browse-selection";
 
 type ServiceLogContext = {
   requestId?: string;
@@ -70,9 +79,13 @@ function mapDiseaseResponse(
 ): AdminDogDiseaseBrowseResponse {
   return {
     selectedDiseaseCode: response.selectedDiseaseCode,
+    selectedDiseaseGroup:
+      response.selectedDiseaseGroup as AdminDogDiseaseGroup | null,
+    query: response.query,
     total: response.total,
     totalPages: response.totalPages,
     page: response.page,
+    diseaseGroupOptions: response.diseaseGroupOptions,
     diseaseOptions: response.diseaseOptions,
     items: response.items.map(mapDiseaseItem),
   };
@@ -90,15 +103,6 @@ export async function listAdminDogDiseases(
     ...(context?.requestId ? { requestId: context.requestId } : {}),
     ...(context?.actorUserId ? { actorUserId: context.actorUserId } : {}),
   });
-
-  log.info(
-    {
-      event: "start",
-      diseaseCode: input.diseaseCode ?? null,
-      page: input.page ?? 1,
-    },
-    "admin dog diseases browse started",
-  );
 
   const authResult = requireAdmin(currentUser);
   if (!authResult.body.ok) {
@@ -118,11 +122,41 @@ export async function listAdminDogDiseases(
   }
 
   try {
-    const result = await listAdminDogDiseasesDb({
-      diseaseCode: input.diseaseCode ?? undefined,
-      page: input.page,
-      pageSize: 15,
-    });
+    const query = normalizeDiseaseSearchQuery(input.query);
+    const page = parseDiseaseBrowsePage(input.page);
+    const pageSize = parseDiseaseBrowsePageSize(undefined);
+    const diseaseDefinitions = await listAdminDogDiseaseDefinitionsDb();
+    const selectedDiseaseCode =
+      input.diseaseCode === undefined
+        ? null
+        : resolveSelectedDiseaseCode(input.diseaseCode, diseaseDefinitions);
+    const selectedDiseaseGroup = resolveSelectedDiseaseGroup(
+      input,
+      selectedDiseaseCode,
+      diseaseDefinitions,
+    );
+
+    log.info(
+      {
+        event: "start",
+        diseaseCode: selectedDiseaseCode,
+        diseaseGroup: selectedDiseaseGroup,
+        query,
+        page,
+      },
+      "admin dog diseases browse started",
+    );
+
+    const result = await listAdminDogDiseasesDb(
+      {
+        selectedDiseaseCode,
+        selectedDiseaseGroup,
+        query,
+        page,
+        pageSize,
+      },
+      diseaseDefinitions,
+    );
 
     const data = mapDiseaseResponse(result);
 
@@ -130,6 +164,8 @@ export async function listAdminDogDiseases(
       {
         event: "success",
         selectedDiseaseCode: data.selectedDiseaseCode,
+        selectedDiseaseGroup: data.selectedDiseaseGroup,
+        query: data.query,
         total: data.total,
         itemCount: data.items.length,
         durationMs: Date.now() - startedAt,

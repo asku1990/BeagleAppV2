@@ -23,6 +23,7 @@ This project uses a user-facing changelog format.
 - Ylläpitoon lisättiin uusi sairaustietojen selaussivu (`/admin/dogs/diseases`), jossa voi tarkastella tuotuja sairausrivejä v1:n kaltaisella sairausvalinnalla, 15 rivin sivutuksella ja koiran profiiliin linkitettyinä DOG-riveinä.
 - Ylläpidon sairaustietojen selaussivulla voi nyt lisätä koira- ja pentuekohtaisia sairausrivejä.
 - Ylläpidon sairaustietojen selaussivulla voi nyt poistaa virheellisiä sairausrivejä.
+- Ylläpidon sairaustietojen selaussivulla voi nyt hakea sairausryhmällä sekä koiran nimellä tai rekisterinumerolla erillisellä hakupainikkeella.
 
 ### Changed
 

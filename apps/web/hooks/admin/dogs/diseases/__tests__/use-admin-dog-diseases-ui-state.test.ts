@@ -10,7 +10,8 @@ const { pathnameMock, pushMock, searchParamsMock } = vi.hoisted(() => ({
   searchParamsMock: {
     get: vi.fn((key: string) => {
       const params: Record<string, string> = {
-        diseaseCode: "pur",
+        diseaseGroup: "PURENTA",
+        query: "kide",
         page: "3",
       };
       return params[key] ?? null;
@@ -37,23 +38,27 @@ vi.mock("react", async () => {
 describe("admin dog diseases ui state", () => {
   it("parses the URL state", () => {
     expect(readAdminDogDiseasesUrlState(searchParamsMock)).toEqual({
-      diseaseCode: "pur",
+      diseaseGroup: "PURENTA",
+      query: "kide",
       page: 3,
     });
   });
 
-  it("commits disease and page changes to the URL", () => {
-    const ui = useAdminDogDiseasesUiState({ initialDiseaseCode: "epi" });
+  it("commits search and page changes to the URL", () => {
+    const ui = useAdminDogDiseasesUiState({
+      initialDiseaseGroup: "EPILEPSIA",
+    });
 
-    expect(ui.diseaseCode).toBe("pur");
+    expect(ui.diseaseGroup).toBe("PURENTA");
+    expect(ui.query).toBe("kide");
     expect(ui.page).toBe(3);
 
-    ui.setDiseaseCode(null);
+    ui.submitSearch({ diseaseGroup: null, query: " FI12345/21 " });
     ui.setPage(8);
 
     expect(pushMock.mock.calls.map((call) => call[0])).toEqual([
-      "/admin/dogs/diseases?diseaseCode=all",
-      "/admin/dogs/diseases?diseaseCode=pur&page=8",
+      "/admin/dogs/diseases?diseaseGroup=all&query=FI12345%2F21",
+      "/admin/dogs/diseases?diseaseGroup=PURENTA&query=kide&page=8",
     ]);
     expect(
       pushMock.mock.calls.every(

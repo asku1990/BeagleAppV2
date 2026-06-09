@@ -62,10 +62,13 @@ describe("admin dog diseases api route", () => {
       body: {
         ok: true,
         data: {
-          selectedDiseaseCode: "epi",
+          selectedDiseaseCode: null,
+          selectedDiseaseGroup: "EPILEPSIA",
+          query: "kide",
           total: 1,
           totalPages: 1,
           page: 1,
+          diseaseGroupOptions: [],
           diseaseOptions: [],
           items: [],
         },
@@ -74,7 +77,7 @@ describe("admin dog diseases api route", () => {
 
     const { GET } = await import("../route");
     const request = new NextRequest(
-      "http://localhost/api/admin/dogs/diseases?diseaseCode=all&page=2",
+      "http://localhost/api/admin/dogs/diseases?diseaseGroup=PURENTA&query=kide&page=2",
       {
         headers: { origin: "http://localhost:3000" },
       },
@@ -85,17 +88,22 @@ describe("admin dog diseases api route", () => {
     await expect(response.json()).resolves.toEqual({
       ok: true,
       data: {
-        selectedDiseaseCode: "epi",
+        selectedDiseaseCode: null,
+        selectedDiseaseGroup: "EPILEPSIA",
+        query: "kide",
         total: 1,
         totalPages: 1,
         page: 1,
+        diseaseGroupOptions: [],
         diseaseOptions: [],
         items: [],
       },
     });
     expect(listAdminDogDiseasesMock).toHaveBeenCalledWith(
       {
-        diseaseCode: null,
+        diseaseCode: undefined,
+        diseaseGroup: "PURENTA",
+        query: "kide",
         page: 2,
       },
       {
@@ -125,10 +133,13 @@ describe("admin dog diseases api route", () => {
       body: {
         ok: true,
         data: {
-          selectedDiseaseCode: "epi",
+          selectedDiseaseCode: null,
+          selectedDiseaseGroup: "EPILEPSIA",
+          query: "",
           total: 0,
           totalPages: 0,
           page: 1,
+          diseaseGroupOptions: [],
           diseaseOptions: [],
           items: [],
         },
@@ -137,7 +148,7 @@ describe("admin dog diseases api route", () => {
 
     const { GET } = await import("../route");
     const request = new NextRequest(
-      "http://localhost/api/admin/dogs/diseases?diseaseCode=%20%20",
+      "http://localhost/api/admin/dogs/diseases?diseaseCode=%20ALL%20&diseaseGroup=%20ALL%20&query=%20%20",
       {
         headers: { origin: "http://localhost:3000" },
       },
@@ -147,7 +158,9 @@ describe("admin dog diseases api route", () => {
     expect(response.status).toBe(200);
     expect(listAdminDogDiseasesMock).toHaveBeenCalledWith(
       {
-        diseaseCode: undefined,
+        diseaseCode: null,
+        diseaseGroup: null,
+        query: "",
         page: undefined,
       },
       {

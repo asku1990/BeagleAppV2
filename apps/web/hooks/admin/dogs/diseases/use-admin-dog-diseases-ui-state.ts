@@ -2,21 +2,24 @@
 
 import { useCallback, useMemo, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import type { AdminDogDiseaseGroup } from "@beagle/contracts";
 
 type SearchParamsLike = {
   get: (key: string) => string | null;
 };
 
 type UseAdminDogDiseasesUiStateInput = {
-  initialDiseaseCode?: string | null;
+  initialDiseaseGroup?: AdminDogDiseaseGroup | null;
+  initialQuery?: string;
 };
 
 type AdminDogDiseasesRouteState = {
-  diseaseCode: string | null;
+  diseaseGroup: AdminDogDiseaseGroup | null;
+  query: string;
   page: number;
 };
 
-const DEFAULT_DISEASE_CODE = "epi";
+const DEFAULT_DISEASE_GROUP: AdminDogDiseaseGroup = "EPILEPSIA";
 
 function readPage(value: string | null): number {
   if (!value) {
@@ -27,17 +30,34 @@ function readPage(value: string | null): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
 }
 
-function readDiseaseCode(value: string | null): string | null | undefined {
+function readDiseaseGroup(
+  value: string | null,
+): AdminDogDiseaseGroup | null | undefined {
   if (value === null) {
     return undefined;
   }
 
-  if (value === "all") {
+  const trimmed = value.trim();
+  if (trimmed.toLowerCase() === "all") {
     return null;
   }
 
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : undefined;
+  const normalized = trimmed.toUpperCase();
+  if (
+    normalized === "EPILEPSIA" ||
+    normalized === "LAFORA" ||
+    normalized === "PURENTA" ||
+    normalized === "MLS" ||
+    normalized === "MUU"
+  ) {
+    return normalized;
+  }
+
+  return undefined;
+}
+
+function readQuery(value: string | null): string {
+  return value?.trim() ?? "";
 }
 
 function normalizePage(value: number): number {
@@ -51,10 +71,15 @@ function normalizePage(value: number): number {
 function toQueryString(state: AdminDogDiseasesRouteState): string {
   const params = new URLSearchParams();
 
-  if (state.diseaseCode === null) {
-    params.set("diseaseCode", "all");
-  } else if (typeof state.diseaseCode === "string") {
-    params.set("diseaseCode", state.diseaseCode);
+  if (state.diseaseGroup === null) {
+    params.set("diseaseGroup", "all");
+  } else {
+    params.set("diseaseGroup", state.diseaseGroup);
+  }
+
+  const query = state.query.trim();
+  if (query) {
+    params.set("query", query);
   }
 
   if (state.page > 1) {
@@ -65,17 +90,20 @@ function toQueryString(state: AdminDogDiseasesRouteState): string {
 }
 
 export function readAdminDogDiseasesUrlState(params: SearchParamsLike): {
-  diseaseCode: string | null | undefined;
+  diseaseGroup: AdminDogDiseaseGroup | null | undefined;
+  query: string;
   page: number;
 } {
   return {
-    diseaseCode: readDiseaseCode(params.get("diseaseCode")),
+    diseaseGroup: readDiseaseGroup(params.get("diseaseGroup")),
+    query: readQuery(params.get("query")),
     page: readPage(params.get("page")),
   };
 }
 
 export function useAdminDogDiseasesUiState({
-  initialDiseaseCode = DEFAULT_DISEASE_CODE,
+  initialDiseaseGroup = DEFAULT_DISEASE_GROUP,
+  initialQuery = "",
 }: UseAdminDogDiseasesUiStateInput = {}) {
   const pathname = usePathname();
   const router = useRouter();
@@ -87,10 +115,11 @@ export function useAdminDogDiseasesUiState({
     [searchParams],
   );
 
-  const diseaseCode =
-    urlState.diseaseCode === undefined
-      ? initialDiseaseCode
-      : urlState.diseaseCode;
+  const diseaseGroup =
+    urlState.diseaseGroup === undefined
+      ? initialDiseaseGroup
+      : urlState.diseaseGroup;
+  const query = urlState.query || initialQuery.trim();
 
   const commitState = useCallback(
     (nextState: AdminDogDiseasesRouteState) => {
@@ -104,10 +133,14 @@ export function useAdminDogDiseasesUiState({
     [pathname, router],
   );
 
-  const setDiseaseCode = useCallback(
-    (nextDiseaseCode: string | null) => {
+  const submitSearch = useCallback(
+    (nextState: {
+      diseaseGroup: AdminDogDiseaseGroup | null;
+      query: string;
+    }) => {
       commitState({
-        diseaseCode: nextDiseaseCode,
+        diseaseGroup: nextState.diseaseGroup,
+        query: nextState.query,
         page: 1,
       });
     },
@@ -117,18 +150,20 @@ export function useAdminDogDiseasesUiState({
   const setPage = useCallback(
     (nextPage: number) => {
       commitState({
-        diseaseCode,
+        diseaseGroup,
+        query,
         page: normalizePage(nextPage),
       });
     },
-    [commitState, diseaseCode],
+    [commitState, diseaseGroup, query],
   );
 
   return {
-    diseaseCode,
+    diseaseGroup,
+    query,
     page: urlState.page,
     isPending,
-    setDiseaseCode,
+    submitSearch,
     setPage,
   };
 }
