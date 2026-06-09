@@ -239,7 +239,6 @@ describe("listAdminDogDiseasesDb", () => {
       {
         koodi: "pur",
         sairausTeksti: "Purema",
-        sairausRyhma: "PURENTA",
         _count: { koirat: 8 },
       },
     ]);
@@ -286,7 +285,6 @@ describe("listAdminDogDiseasesDb", () => {
       {
         koodi: "epi",
         sairausTeksti: "Epilepsia",
-        sairausRyhma: "EPILEPSIA",
         _count: { koirat: 174 },
       },
     ]);
@@ -359,7 +357,6 @@ describe("listAdminDogDiseasesDb", () => {
       {
         koodi: "epi",
         sairausTeksti: "Epilepsia",
-        sairausRyhma: "EPILEPSIA",
         _count: { koirat: 174 },
       },
     ]);
