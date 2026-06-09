@@ -27,6 +27,7 @@ describe("useAdminDogDiseasesQuery", () => {
     useQueryMock.mockImplementation((options) => options);
 
     useAdminDogDiseasesQuery({
+      diseaseCode: "epi",
       diseaseGroup: "EPILEPSIA",
       query: "kide",
       page: 2,
@@ -41,6 +42,7 @@ describe("useAdminDogDiseasesQuery", () => {
 
     expect(options.queryKey).toEqual(
       adminDogDiseasesQueryKey({
+        diseaseCode: "epi",
         diseaseGroup: "EPILEPSIA",
         query: "kide",
         page: 2,
@@ -95,6 +97,7 @@ describe("useAdminDogDiseasesQuery", () => {
     });
 
     useAdminDogDiseasesQuery({
+      diseaseCode: "epi",
       diseaseGroup: "LAFORA",
       query: "kide",
       page: 3,
@@ -117,7 +120,7 @@ describe("useAdminDogDiseasesQuery", () => {
     });
 
     expect(listAdminDogDiseasesMock).toHaveBeenCalledWith({
-      diseaseCode: undefined,
+      diseaseCode: "epi",
       diseaseGroup: "LAFORA",
       query: "kide",
       page: 3,

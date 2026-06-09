@@ -115,6 +115,63 @@ describe("admin dog diseases api route", () => {
     );
   });
 
+  it("preserves diseaseCode filters in the api request", async () => {
+    getSessionCurrentUserMock.mockResolvedValue({
+      id: "u_3",
+      email: "admin@example.com",
+      name: "Admin",
+      role: "ADMIN",
+    });
+    toAdminUserContextMock.mockReturnValue({
+      id: "u_3",
+      email: "admin@example.com",
+      username: "admin",
+      role: "ADMIN",
+    });
+    listAdminDogDiseasesMock.mockResolvedValue({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          selectedDiseaseCode: "epi",
+          selectedDiseaseGroup: "EPILEPSIA",
+          query: "",
+          total: 1,
+          totalPages: 1,
+          page: 1,
+          diseaseGroupOptions: [],
+          diseaseOptions: [],
+          items: [],
+        },
+      },
+    });
+
+    const { GET } = await import("../route");
+    const request = new NextRequest(
+      "http://localhost/api/admin/dogs/diseases?diseaseCode=epi&page=1",
+      {
+        headers: { origin: "http://localhost:3000" },
+      },
+    );
+    const response = await GET(request);
+
+    expect(response.status).toBe(200);
+    expect(listAdminDogDiseasesMock).toHaveBeenCalledWith(
+      {
+        diseaseCode: "epi",
+        diseaseGroup: undefined,
+        query: "",
+        page: 1,
+      },
+      {
+        id: "u_3",
+        email: "admin@example.com",
+        username: "admin",
+        role: "ADMIN",
+      },
+    );
+  });
+
   it("treats blank filters as undefined and returns structured errors", async () => {
     getSessionCurrentUserMock.mockResolvedValue({
       id: "u_2",

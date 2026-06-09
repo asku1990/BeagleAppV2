@@ -1,16 +1,15 @@
 import { useState, type FormEvent } from "react";
-import type { AdminDogDiseaseGroup } from "@beagle/contracts";
 import { Button } from "@/components/ui/button";
 import { LabeledSelect } from "@/components/ui/form-fields/labeled-select";
 import { Input } from "@/components/ui/input";
 
-export type DiseaseGroupOption = {
-  diseaseGroup: AdminDogDiseaseGroup | "all";
+export type DiseaseCodeOption = {
+  diseaseCode: string | "all";
   label: string;
 };
 
 export type DiseaseSearchLabels = {
-  groupFilterLabel: string;
+  filterLabel: string;
   queryLabel: string;
   queryPlaceholder: string;
   searchButton: string;
@@ -18,33 +17,31 @@ export type DiseaseSearchLabels = {
 };
 
 export function DiseaseSearchForm({
-  diseaseGroup,
+  diseaseCode,
   query,
-  diseaseGroupOptions,
+  diseaseCodeOptions,
   isPending,
   labels,
   onCreate,
   onSubmit,
 }: {
-  diseaseGroup: AdminDogDiseaseGroup | null;
+  diseaseCode: string | null;
   query: string;
-  diseaseGroupOptions: DiseaseGroupOption[];
+  diseaseCodeOptions: DiseaseCodeOption[];
   isPending: boolean;
   labels: DiseaseSearchLabels;
   onCreate: () => void;
-  onSubmit: (input: {
-    diseaseGroup: AdminDogDiseaseGroup | null;
-    query: string;
-  }) => void;
+  onSubmit: (input: { diseaseCode: string | null; query: string }) => void;
 }) {
-  const [draftDiseaseGroup, setDraftDiseaseGroup] =
-    useState<AdminDogDiseaseGroup | null>(diseaseGroup);
+  const [draftDiseaseCode, setDraftDiseaseCode] = useState<string | null>(
+    diseaseCode,
+  );
   const [draftQuery, setDraftQuery] = useState(query);
 
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     onSubmit({
-      diseaseGroup: draftDiseaseGroup,
+      diseaseCode: draftDiseaseCode,
       query: draftQuery,
     });
   };
@@ -56,19 +53,17 @@ export function DiseaseSearchForm({
     >
       <div className="grid flex-1 gap-3 sm:grid-cols-[minmax(14rem,20rem)_minmax(16rem,1fr)]">
         <LabeledSelect
-          label={labels.groupFilterLabel}
-          value={draftDiseaseGroup ?? "all"}
+          label={labels.filterLabel}
+          value={draftDiseaseCode ?? "all"}
           disabled={isPending}
           onChange={(event) => {
-            setDraftDiseaseGroup(
-              event.target.value === "all"
-                ? null
-                : (event.target.value as AdminDogDiseaseGroup),
+            setDraftDiseaseCode(
+              event.target.value === "all" ? null : event.target.value,
             );
           }}
         >
-          {diseaseGroupOptions.map((option) => (
-            <option key={option.diseaseGroup} value={option.diseaseGroup}>
+          {diseaseCodeOptions.map((option) => (
+            <option key={option.diseaseCode} value={option.diseaseCode}>
               {option.label}
             </option>
           ))}

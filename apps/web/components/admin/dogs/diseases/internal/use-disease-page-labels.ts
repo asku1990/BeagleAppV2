@@ -8,8 +8,8 @@ export function useDiseasePageLabels() {
     () => ({
       pageTitle: t("admin.dogs.diseases.page.title"),
       sectionTitle: t("admin.dogs.diseases.section.title"),
-      groupFilterLabel: t("admin.dogs.diseases.filter.groupLabel"),
-      allGroupFilterLabel: t("admin.dogs.diseases.filter.allGroups"),
+      filterLabel: t("admin.dogs.diseases.filter.label"),
+      allFilterLabel: t("admin.dogs.diseases.filter.all"),
       queryLabel: t("admin.dogs.diseases.filter.queryLabel"),
       queryPlaceholder: t("admin.dogs.diseases.filter.queryPlaceholder"),
       searchButton: t("admin.dogs.diseases.filter.search"),
@@ -97,13 +97,6 @@ export function useDiseasePageLabels() {
         aria: t("admin.dogs.diseases.delete.aria"),
         success: t("admin.dogs.diseases.delete.success"),
         error: t("admin.dogs.diseases.delete.error"),
-      },
-      groups: {
-        EPILEPSIA: t("admin.dogs.diseases.groups.epilepsia"),
-        LAFORA: t("admin.dogs.diseases.groups.lafora"),
-        PURENTA: t("admin.dogs.diseases.groups.purenta"),
-        MLS: t("admin.dogs.diseases.groups.mls"),
-        MUU: t("admin.dogs.diseases.groups.muu"),
       },
       pagination: {
         previous: t("admin.dogs.diseases.pagination.previous"),

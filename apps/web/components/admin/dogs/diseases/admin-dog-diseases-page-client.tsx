@@ -17,7 +17,7 @@ import {
   useDeleteAdminDogDiseaseMutation,
 } from "@/queries/admin/dogs";
 import { CreateDiseaseModal } from "./internal/create-disease-modal";
-import { mapDiseaseGroupOptions } from "./internal/disease-group-options";
+import { mapDiseaseCodeOptions } from "./internal/disease-code-options";
 import { DiseaseResults } from "./internal/disease-results";
 import { DiseaseSearchForm } from "./internal/disease-search-form";
 import { useDiseasePageLabels } from "./internal/use-disease-page-labels";
@@ -31,18 +31,15 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] =
     useState<AdminDogDiseaseBrowseItem | null>(null);
-  const initialDiseaseGroup = initialData
-    ? initialData.selectedDiseaseGroup
-    : "EPILEPSIA";
   const {
-    diseaseGroup,
+    diseaseCode,
     query: submittedQuery,
     page,
     isPending,
     submitSearch,
     setPage,
   } = useAdminDogDiseasesUiState({
-    initialDiseaseGroup,
+    initialDiseaseCode: initialData?.selectedDiseaseCode ?? "epi",
   });
 
   const queryInitialData = useMemo(() => {
@@ -50,7 +47,7 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
       return undefined;
     }
 
-    if (initialData.selectedDiseaseGroup !== diseaseGroup) {
+    if (initialData.selectedDiseaseCode !== (diseaseCode ?? null)) {
       return undefined;
     }
 
@@ -63,10 +60,10 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
     }
 
     return initialData;
-  }, [diseaseGroup, initialData, page, submittedQuery]);
+  }, [diseaseCode, initialData, page, submittedQuery]);
 
   const query = useAdminDogDiseasesQuery({
-    diseaseGroup,
+    diseaseCode,
     query: submittedQuery,
     page,
     initialData: queryInitialData,
@@ -79,28 +76,15 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
   const total = data?.total ?? 0;
   const totalPages = data?.totalPages ?? 0;
   const currentPage = data?.page ?? page;
-  const allDiseaseCount = useMemo(() => {
-    return (
-      data?.diseaseOptions.reduce((sum, option) => sum + option.count, 0) ?? 0
-    );
-  }, [data?.diseaseOptions]);
 
-  const diseaseGroupOptions = useMemo(
+  const diseaseCodeOptions = useMemo(
     () =>
-      mapDiseaseGroupOptions({
+      mapDiseaseCodeOptions({
         data,
-        allDiseaseCount,
-        allGroupLabel: labels.allGroupFilterLabel,
+        allFilterLabel: labels.allFilterLabel,
         countSuffix: labels.countSuffix,
-        groupLabels: labels.groups,
       }),
-    [
-      allDiseaseCount,
-      data,
-      labels.allGroupFilterLabel,
-      labels.countSuffix,
-      labels.groups,
-    ],
+    [data, labels.allFilterLabel, labels.countSuffix],
   );
 
   return (
@@ -117,13 +101,13 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
       <ListingSectionShell title={labels.sectionTitle}>
         <div className="space-y-4">
           <DiseaseSearchForm
-            key={`${diseaseGroup ?? "all"}:${submittedQuery}`}
-            diseaseGroup={diseaseGroup}
+            key={`${diseaseCode ?? "all"}:${submittedQuery}`}
+            diseaseCode={diseaseCode ?? null}
             query={submittedQuery}
-            diseaseGroupOptions={diseaseGroupOptions}
+            diseaseCodeOptions={diseaseCodeOptions}
             isPending={isPending}
             labels={{
-              groupFilterLabel: labels.groupFilterLabel,
+              filterLabel: labels.filterLabel,
               queryLabel: labels.queryLabel,
               queryPlaceholder: labels.queryPlaceholder,
               searchButton: labels.searchButton,
