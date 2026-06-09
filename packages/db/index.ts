@@ -3,7 +3,6 @@ export {
   ImportKind,
   ImportStatus,
   Role,
-  SairausRyhma,
   TrialEntryHuomautus,
   TrialEntryKoetyyppi,
   TrialSourceTag,
