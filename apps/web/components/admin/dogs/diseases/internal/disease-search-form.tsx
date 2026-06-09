@@ -13,7 +13,6 @@ export type DiseaseSearchLabels = {
   queryLabel: string;
   queryPlaceholder: string;
   searchButton: string;
-  createOpen: string;
 };
 
 export function DiseaseSearchForm({
@@ -22,7 +21,6 @@ export function DiseaseSearchForm({
   diseaseCodeOptions,
   isPending,
   labels,
-  onCreate,
   onSubmit,
 }: {
   diseaseCode: string | null;
@@ -30,7 +28,6 @@ export function DiseaseSearchForm({
   diseaseCodeOptions: DiseaseCodeOption[];
   isPending: boolean;
   labels: DiseaseSearchLabels;
-  onCreate: () => void;
   onSubmit: (input: { diseaseCode: string | null; query: string }) => void;
 }) {
   const [draftDiseaseCode, setDraftDiseaseCode] = useState<string | null>(
@@ -81,9 +78,6 @@ export function DiseaseSearchForm({
       <div className="flex flex-wrap gap-2">
         <Button type="submit" disabled={isPending}>
           {labels.searchButton}
-        </Button>
-        <Button type="button" onClick={onCreate}>
-          {labels.createOpen}
         </Button>
       </div>
     </form>

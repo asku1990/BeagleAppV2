@@ -90,13 +90,18 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
 
   return (
     <div className="space-y-4" suppressHydrationWarning>
-      <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {labels.pageTitle}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {labels.summaryPrefix} {total} {labels.summarySuffix}.
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-2">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {labels.pageTitle}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {labels.summaryPrefix} {total} {labels.summarySuffix}.
+          </p>
+        </div>
+        <Button type="button" onClick={() => setIsCreateOpen(true)}>
+          {labels.create.open}
+        </Button>
       </div>
 
       <ListingSectionShell title={labels.sectionTitle}>
@@ -112,9 +117,7 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
               queryLabel: labels.queryLabel,
               queryPlaceholder: labels.queryPlaceholder,
               searchButton: labels.searchButton,
-              createOpen: labels.create.open,
             }}
-            onCreate={() => setIsCreateOpen(true)}
             onSubmit={submitSearch}
           />
 
