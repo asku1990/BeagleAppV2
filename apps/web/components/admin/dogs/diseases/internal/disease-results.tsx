@@ -40,7 +40,7 @@ type DiseaseResultsLabels = {
     sex: string;
     name: string;
     counts: string;
-    other: string;
+    metadata: string;
     actions: string;
   };
   cardLabels: {
@@ -298,7 +298,7 @@ export function DiseaseResults({
               <th className="px-2 py-2">{labels.tableHeaders.sex}</th>
               <th className="px-2 py-2">{labels.tableHeaders.name}</th>
               <th className="px-2 py-2">{labels.tableHeaders.counts}</th>
-              <th className="px-2 py-2">{labels.tableHeaders.other}</th>
+              <th className="px-2 py-2">{labels.tableHeaders.metadata}</th>
               <th className="px-2 py-2">{labels.tableHeaders.actions}</th>
             </tr>
           </thead>

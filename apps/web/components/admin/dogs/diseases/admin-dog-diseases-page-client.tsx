@@ -111,7 +111,7 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
         sex: t("admin.dogs.diseases.columns.sex"),
         name: t("admin.dogs.diseases.columns.name"),
         counts: t("admin.dogs.diseases.columns.counts"),
-        other: t("admin.dogs.diseases.columns.other"),
+        metadata: t("admin.dogs.diseases.columns.metadata"),
         actions: t("admin.dogs.diseases.columns.actions"),
       },
       cardLabels: {

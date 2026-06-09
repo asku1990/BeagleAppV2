@@ -170,6 +170,7 @@ describe("AdminDogDiseasesPageClient", () => {
     expect(html).toContain("Lisää sairaustieto");
     expect(html).toContain("Sairaustiedon toiminnot");
     expect(html).toContain("JULKINEN");
+    expect(html).toContain("LISÄTIEDOT");
     expect(html).toContain("Koira");
     expect(html).toContain("Pentue");
     expect(html).toContain("Lisätiedot");
@@ -222,6 +223,7 @@ describe("AdminDogDiseasesPageClient", () => {
     expect(html).toContain("Alla 182 st");
     expect(html).toContain("SJUKDOMSUPPGIFT");
     expect(html).toContain("TYP");
+    expect(html).toContain("TILLÄGGSUPPGIFTER");
     expect(html).toContain("OFFENTLIG");
     expect(html).toContain("Namnet är okänt");
     expect(html).toContain("Föregående");
