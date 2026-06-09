@@ -8,7 +8,6 @@ export async function listAdminDogDiseaseDefinitionsDb(): Promise<
     select: {
       koodi: true,
       sairausTeksti: true,
-      sairausRyhma: true,
       _count: {
         select: {
           koirat: true,
@@ -21,7 +20,6 @@ export async function listAdminDogDiseaseDefinitionsDb(): Promise<
   return rows.map((row) => ({
     diseaseCode: row.koodi,
     diseaseText: row.sairausTeksti,
-    diseaseGroup: row.sairausRyhma,
     count: row._count.koirat,
   }));
 }

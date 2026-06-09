@@ -20,6 +20,7 @@ import { CreateDiseaseModal } from "./internal/create-disease-modal";
 import { mapDiseaseCodeOptions } from "./internal/disease-code-options";
 import { DiseaseResults } from "./internal/disease-results";
 import { DiseaseSearchForm } from "./internal/disease-search-form";
+import { resolveCreateDiseaseSelectedCode } from "./internal/create-disease-form-state";
 import { useDiseasePageLabels } from "./internal/use-disease-page-labels";
 
 type Props = {
@@ -177,7 +178,10 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
           diseaseOptions={
             data?.diseaseOptions ?? initialData?.diseaseOptions ?? []
           }
-          selectedDiseaseCode={data?.selectedDiseaseCode ?? "epi"}
+          selectedDiseaseCode={resolveCreateDiseaseSelectedCode(
+            data?.selectedDiseaseCode,
+            diseaseCode,
+          )}
           labels={labels.create}
           isSubmitting={createDiseaseMutation.isPending}
           onClose={() => setIsCreateOpen(false)}

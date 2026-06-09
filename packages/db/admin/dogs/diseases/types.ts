@@ -1,4 +1,4 @@
-import type { DogSex, SairausRyhma } from "@prisma/client";
+import type { DogSex } from "@prisma/client";
 
 export type AdminDogDiseaseBrowseRequestDb = {
   selectedDiseaseCode: string | null;
@@ -10,7 +10,6 @@ export type AdminDogDiseaseBrowseRequestDb = {
 export type AdminDogDiseaseDefinitionOptionDb = {
   diseaseCode: string;
   diseaseText: string;
-  diseaseGroup: SairausRyhma;
   count: number;
 };
 

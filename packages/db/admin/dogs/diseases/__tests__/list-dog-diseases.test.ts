@@ -93,7 +93,6 @@ describe("listAdminDogDiseasesDb", () => {
       select: {
         koodi: true,
         sairausTeksti: true,
-        sairausRyhma: true,
         _count: {
           select: {
             koirat: true,
