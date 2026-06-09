@@ -15,6 +15,12 @@ Admin-facing disease evidence browsing, creation, and deletion for `KoiranSairau
 - Disease creation supports two evidence kinds:
   - `DOG`: links the row to a resolved real dog.
   - `LITTER`: stores anonymous litter evidence with resolved sire and dam registration numbers.
+- The browse list now surfaces the persisted create-modal metadata directly in each row/card:
+  - evidence kind
+  - `pentue`
+  - `kuvaus`
+  - `tietolahde`
+- Long metadata wraps in the list so the page stays readable on desktop and mobile.
 - Disease deletion is admin-only and runs through the audit transaction path used by the server write use-case.
 
 ## Validation rules

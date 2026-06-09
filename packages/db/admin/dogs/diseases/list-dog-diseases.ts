@@ -46,9 +46,12 @@ export type AdminDogDiseaseBrowseItemDb = {
   id: string;
   evidenceKind: "DOG" | "LITTER";
   rekisterinumero: string;
+  pentue: string | null;
+  kuvaus: string | null;
   julkinen: boolean;
   isaRekisterinumero: string | null;
   emaRekisterinumero: string | null;
+  tietolahde: string | null;
   sairaus: {
     koodi: string;
     sairausTeksti: string;
@@ -127,9 +130,12 @@ export async function listAdminDogDiseasesDb(
       id: true,
       evidenceKind: true,
       rekisterinumero: true,
+      pentue: true,
+      kuvaus: true,
       julkinen: true,
       isaRekisterinumero: true,
       emaRekisterinumero: true,
+      tietolahde: true,
       sairaus: {
         select: {
           koodi: true,
@@ -186,9 +192,12 @@ export async function listAdminDogDiseasesDb(
     id: string;
     evidenceKind: "DOG" | "LITTER";
     rekisterinumero: string;
+    pentue: string | null;
+    kuvaus: string | null;
     julkinen: boolean;
     isaRekisterinumero: string | null;
     emaRekisterinumero: string | null;
+    tietolahde: string | null;
     sairaus: {
       koodi: string;
       sairausTeksti: string;
@@ -269,9 +278,12 @@ export async function listAdminDogDiseasesDb(
         evidenceKind: row.evidenceKind,
         rekisterinumero:
           normalizeRegistrationNo(row.rekisterinumero) ?? row.rekisterinumero,
+        pentue: row.pentue,
+        kuvaus: row.kuvaus,
         julkinen: row.julkinen,
         isaRekisterinumero: row.isaRekisterinumero,
         emaRekisterinumero: row.emaRekisterinumero,
+        tietolahde: row.tietolahde,
         sairaus: row.sairaus,
         dog: row.dog
           ? {

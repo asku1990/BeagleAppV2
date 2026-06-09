@@ -73,8 +73,11 @@ function buildInitialData(): AdminDogDiseaseBrowseResponse {
         evidenceKind: "DOG",
         diseaseCode: "epi",
         diseaseText: "Epilepsia",
+        pentue: "PENTUE-1",
+        kuvaus: "Kuvaus koiralle",
         public: true,
         registrationNo: "FI12345/21",
+        tietolahde: "Lomake",
         ekNo: 5588,
         sex: "FEMALE",
         name: "Metsapolun Kide",
@@ -95,8 +98,11 @@ function buildInitialData(): AdminDogDiseaseBrowseResponse {
         evidenceKind: "LITTER",
         diseaseCode: "epi",
         diseaseText: "Epilepsia",
+        pentue: null,
+        kuvaus: "",
         public: false,
         registrationNo: "EPI_1/94",
+        tietolahde: null,
         ekNo: null,
         sex: null,
         name: "Nimi ei ole tiedossa",
@@ -160,9 +166,20 @@ describe("AdminDogDiseasesPageClient", () => {
     expect(html).toContain("Kaikki 182 kpl");
     expect(html).toContain("Epilepsia 174 kpl");
     expect(html).toContain("TERVEYSTIETO");
+    expect(html).toContain("TYYPPI");
     expect(html).toContain("Lisää sairaustieto");
     expect(html).toContain("Sairaustiedon toiminnot");
     expect(html).toContain("JULKINEN");
+    expect(html).toContain("Koira");
+    expect(html).toContain("Pentue");
+    expect(html).toContain("Lisätiedot");
+    expect(html).toContain("Tietolähde");
+    expect(html).toContain("PENTUE-1");
+    expect(html).toContain("Kuvaus koiralle");
+    expect(html).toContain("Lomake");
+    expect(html).toContain("Pentue:</span> -");
+    expect(html).toContain("Lisätiedot:</span> -");
+    expect(html).toContain("Tietolähde:</span> -");
     expect(html).toContain("FI12345/21 / EK 5588");
     expect(html).toContain("/admin/dogs/dog-1/profile");
     expect(html).toContain("EPI_1/94 / -");
@@ -204,6 +221,7 @@ describe("AdminDogDiseasesPageClient", () => {
     expect(html).toContain("Sökningen hittade 174 sjukdomsrader.");
     expect(html).toContain("Alla 182 st");
     expect(html).toContain("SJUKDOMSUPPGIFT");
+    expect(html).toContain("TYP");
     expect(html).toContain("OFFENTLIG");
     expect(html).toContain("Namnet är okänt");
     expect(html).toContain("Föregående");

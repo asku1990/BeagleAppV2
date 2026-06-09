@@ -89,6 +89,10 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
         yes: t("admin.dogs.diseases.public.yes"),
         no: t("admin.dogs.diseases.public.no"),
       },
+      evidenceKind: {
+        dog: t("admin.dogs.diseases.create.modeDog"),
+        litter: t("admin.dogs.diseases.create.modeLitter"),
+      },
       unknownName: t("admin.dogs.diseases.unknownName"),
       sex: {
         male: t("admin.dogs.sex.male"),
@@ -101,6 +105,7 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
       },
       tableHeaders: {
         disease: t("admin.dogs.diseases.columns.disease"),
+        evidenceKind: t("admin.dogs.diseases.columns.evidenceKind"),
         public: t("admin.dogs.diseases.columns.public"),
         registration: t("admin.dogs.diseases.columns.registration"),
         sex: t("admin.dogs.diseases.columns.sex"),
@@ -115,6 +120,9 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
         sex: t("admin.dogs.diseases.card.sex"),
         name: t("admin.dogs.diseases.card.name"),
         counts: t("admin.dogs.diseases.card.counts"),
+        litter: t("admin.dogs.diseases.create.litter"),
+        description: t("admin.dogs.diseases.create.description"),
+        source: t("admin.dogs.diseases.create.source"),
         other: t("admin.dogs.diseases.card.other"),
       },
       actions: {
