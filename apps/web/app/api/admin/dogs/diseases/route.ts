@@ -18,11 +18,11 @@ function parseDiseaseCode(value: string | null): string | null | undefined {
     return undefined;
   }
 
-  if (value === "all") {
+  const trimmed = value.trim();
+  if (trimmed.toLowerCase() === "all") {
     return null;
   }
 
-  const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : undefined;
 }
 
@@ -38,11 +38,13 @@ export async function GET(request: NextRequest) {
     const diseaseCode = parseDiseaseCode(
       request.nextUrl.searchParams.get("diseaseCode"),
     );
+    const query = request.nextUrl.searchParams.get("query")?.trim() ?? "";
     const page = parseOptionalNumber(request.nextUrl.searchParams.get("page"));
 
     const result = await listAdminDogDiseases(
       {
         diseaseCode,
+        query,
         page,
       },
       toAdminUserContext(currentUser),

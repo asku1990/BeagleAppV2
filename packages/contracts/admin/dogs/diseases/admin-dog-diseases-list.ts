@@ -1,5 +1,6 @@
 export type AdminDogDiseaseBrowseRequest = {
   diseaseCode?: string | null;
+  query?: string | null;
   page?: number;
 };
 
@@ -36,6 +37,7 @@ export type AdminDogDiseaseBrowseItem = {
 
 export type AdminDogDiseaseBrowseResponse = {
   selectedDiseaseCode: string | null;
+  query: string;
   total: number;
   totalPages: number;
   page: number;

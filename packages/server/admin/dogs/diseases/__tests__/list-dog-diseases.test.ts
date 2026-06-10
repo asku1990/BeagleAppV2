@@ -1,16 +1,34 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { listAdminDogDiseases } from "../list-dog-diseases";
 
-const { listAdminDogDiseasesDbMock } = vi.hoisted(() => ({
-  listAdminDogDiseasesDbMock: vi.fn(),
-}));
+const { listAdminDogDiseaseDefinitionsDbMock, listAdminDogDiseasesDbMock } =
+  vi.hoisted(() => ({
+    listAdminDogDiseaseDefinitionsDbMock: vi.fn(),
+    listAdminDogDiseasesDbMock: vi.fn(),
+  }));
+
+const diseaseDefinitions = [
+  {
+    diseaseCode: "epi",
+    diseaseText: "Epilepsia",
+    count: 174,
+  },
+  {
+    diseaseCode: "pur",
+    diseaseText: "Purenta",
+    count: 8,
+  },
+];
 
 vi.mock("@beagle/db", () => ({
+  listAdminDogDiseaseDefinitionsDb: listAdminDogDiseaseDefinitionsDbMock,
   listAdminDogDiseasesDb: listAdminDogDiseasesDbMock,
 }));
 
 describe("listAdminDogDiseases", () => {
   beforeEach(() => {
+    listAdminDogDiseaseDefinitionsDbMock.mockReset();
+    listAdminDogDiseaseDefinitionsDbMock.mockResolvedValue(diseaseDefinitions);
     listAdminDogDiseasesDbMock.mockReset();
   });
 
@@ -27,9 +45,43 @@ describe("listAdminDogDiseases", () => {
     expect(listAdminDogDiseasesDbMock).not.toHaveBeenCalled();
   });
 
+  it("passes normalized query text to the db layer", async () => {
+    listAdminDogDiseasesDbMock.mockResolvedValue({
+      selectedDiseaseCode: "epi",
+      query: "kide",
+      total: 0,
+      totalPages: 0,
+      page: 1,
+      diseaseOptions: [],
+      items: [],
+    });
+
+    const longQuery = `  ${"x".repeat(120)}  `;
+
+    await listAdminDogDiseases(
+      {
+        query: longQuery,
+      },
+      {
+        id: "u_1",
+        email: "admin@example.com",
+        username: null,
+        role: "ADMIN",
+      },
+    );
+
+    expect(listAdminDogDiseasesDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        query: "x".repeat(100),
+      }),
+      diseaseDefinitions,
+    );
+  });
+
   it("maps db rows and defaults the disease filter to Epi", async () => {
     listAdminDogDiseasesDbMock.mockResolvedValue({
       selectedDiseaseCode: "epi",
+      query: "kide",
       total: 1,
       totalPages: 1,
       page: 1,
@@ -91,6 +143,7 @@ describe("listAdminDogDiseases", () => {
         ok: true,
         data: {
           selectedDiseaseCode: "epi",
+          query: "kide",
           total: 1,
           totalPages: 1,
           page: 1,
@@ -128,16 +181,21 @@ describe("listAdminDogDiseases", () => {
       },
     });
 
-    expect(listAdminDogDiseasesDbMock).toHaveBeenCalledWith({
-      diseaseCode: undefined,
-      page: 2,
-      pageSize: 15,
-    });
+    expect(listAdminDogDiseasesDbMock).toHaveBeenCalledWith(
+      {
+        selectedDiseaseCode: "epi",
+        query: "",
+        page: 2,
+        pageSize: 15,
+      },
+      diseaseDefinitions,
+    );
   });
 
   it("maps litter rows and unknown dog sex without leaking dog-only fields", async () => {
     listAdminDogDiseasesDbMock.mockResolvedValue({
       selectedDiseaseCode: "epi",
+      query: "",
       total: 2,
       totalPages: 1,
       page: 1,
@@ -221,6 +279,7 @@ describe("listAdminDogDiseases", () => {
         ok: true,
         data: {
           selectedDiseaseCode: "epi",
+          query: "",
           total: 2,
           totalPages: 1,
           page: 1,
@@ -282,6 +341,86 @@ describe("listAdminDogDiseases", () => {
         },
       },
     });
+  });
+
+  it("preserves explicit all filters when forwarding to db", async () => {
+    listAdminDogDiseasesDbMock.mockResolvedValue({
+      selectedDiseaseCode: null,
+      query: "sako",
+      total: 0,
+      totalPages: 0,
+      page: 1,
+      diseaseOptions: [],
+      items: [],
+    });
+
+    await expect(
+      listAdminDogDiseases(
+        {
+          diseaseCode: null,
+          query: "sako",
+        },
+        {
+          id: "u_1",
+          email: "admin@example.com",
+          username: null,
+          role: "ADMIN",
+        },
+      ),
+    ).resolves.toMatchObject({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          selectedDiseaseCode: null,
+          query: "sako",
+        },
+      },
+    });
+
+    expect(listAdminDogDiseasesDbMock).toHaveBeenCalledWith(
+      {
+        selectedDiseaseCode: null,
+        query: "sako",
+        page: 1,
+        pageSize: 15,
+      },
+      diseaseDefinitions,
+    );
+  });
+
+  it("preserves explicit disease code filters", async () => {
+    listAdminDogDiseasesDbMock.mockResolvedValue({
+      selectedDiseaseCode: "pur",
+      query: "",
+      total: 0,
+      totalPages: 0,
+      page: 1,
+      diseaseOptions: [],
+      items: [],
+    });
+
+    await listAdminDogDiseases(
+      {
+        diseaseCode: "pur",
+      },
+      {
+        id: "u_1",
+        email: "admin@example.com",
+        username: null,
+        role: "ADMIN",
+      },
+    );
+
+    expect(listAdminDogDiseasesDbMock).toHaveBeenCalledWith(
+      {
+        selectedDiseaseCode: "pur",
+        query: "",
+        page: 1,
+        pageSize: 15,
+      },
+      diseaseDefinitions,
+    );
   });
 
   it("returns internal error when the db throws", async () => {

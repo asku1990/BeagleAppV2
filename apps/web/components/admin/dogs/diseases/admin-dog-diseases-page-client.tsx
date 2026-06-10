@@ -9,41 +9,50 @@ import { ListingSectionShell } from "@/components/listing";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
-import { LabeledSelect } from "@/components/ui/form-fields/labeled-select";
 import { toast } from "@/components/ui/sonner";
 import { useAdminDogDiseasesUiState } from "@/hooks/admin/dogs/diseases";
-import { useI18n } from "@/hooks/i18n";
 import {
   useAdminDogDiseasesQuery,
   useCreateAdminDogDiseaseMutation,
   useDeleteAdminDogDiseaseMutation,
 } from "@/queries/admin/dogs";
 import { CreateDiseaseModal } from "./internal/create-disease-modal";
+import { mapDiseaseCodeOptions } from "./internal/disease-code-options";
 import { DiseaseResults } from "./internal/disease-results";
+import { DiseaseSearchForm } from "./internal/disease-search-form";
+import { resolveCreateDiseaseSelectedCode } from "./internal/create-disease-form-state";
+import { useDiseasePageLabels } from "./internal/use-disease-page-labels";
 
 type Props = {
   initialData?: AdminDogDiseaseBrowseResponse | null;
 };
 
 export function AdminDogDiseasesPageClient({ initialData }: Props) {
-  const { t } = useI18n();
+  const labels = useDiseasePageLabels();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] =
     useState<AdminDogDiseaseBrowseItem | null>(null);
-  const initialDiseaseCode = initialData
-    ? initialData.selectedDiseaseCode
-    : "epi";
-  const { diseaseCode, page, isPending, setDiseaseCode, setPage } =
-    useAdminDogDiseasesUiState({
-      initialDiseaseCode,
-    });
+  const {
+    diseaseCode,
+    query: submittedQuery,
+    page,
+    isPending,
+    submitSearch,
+    setPage,
+  } = useAdminDogDiseasesUiState({
+    initialDiseaseCode: initialData?.selectedDiseaseCode ?? "epi",
+  });
 
   const queryInitialData = useMemo(() => {
     if (!initialData) {
       return undefined;
     }
 
-    if (initialData.selectedDiseaseCode !== diseaseCode) {
+    if (initialData.selectedDiseaseCode !== (diseaseCode ?? null)) {
+      return undefined;
+    }
+
+    if (initialData.query !== submittedQuery) {
       return undefined;
     }
 
@@ -52,10 +61,11 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
     }
 
     return initialData;
-  }, [diseaseCode, initialData, page]);
+  }, [diseaseCode, initialData, page, submittedQuery]);
 
   const query = useAdminDogDiseasesQuery({
     diseaseCode,
+    query: submittedQuery,
     page,
     initialData: queryInitialData,
   });
@@ -67,163 +77,49 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
   const total = data?.total ?? 0;
   const totalPages = data?.totalPages ?? 0;
   const currentPage = data?.page ?? page;
-  const allDiseaseCount = useMemo(() => {
-    return (
-      data?.diseaseOptions.reduce((sum, option) => sum + option.count, 0) ?? 0
-    );
-  }, [data?.diseaseOptions]);
 
-  const labels = useMemo(
-    () => ({
-      pageTitle: t("admin.dogs.diseases.page.title"),
-      sectionTitle: t("admin.dogs.diseases.section.title"),
-      filterLabel: t("admin.dogs.diseases.filter.label"),
-      allFilterLabel: t("admin.dogs.diseases.filter.all"),
-      countSuffix: t("admin.dogs.diseases.countSuffix"),
-      summaryPrefix: t("admin.dogs.diseases.summary.prefix"),
-      summarySuffix: t("admin.dogs.diseases.summary.suffix"),
-      loading: t("admin.dogs.diseases.loading"),
-      error: t("admin.dogs.diseases.error"),
-      empty: t("admin.dogs.diseases.empty"),
-      public: {
-        yes: t("admin.dogs.diseases.public.yes"),
-        no: t("admin.dogs.diseases.public.no"),
-      },
-      evidenceKind: {
-        dog: t("admin.dogs.diseases.create.modeDog"),
-        litter: t("admin.dogs.diseases.create.modeLitter"),
-      },
-      unknownName: t("admin.dogs.diseases.unknownName"),
-      sex: {
-        male: t("admin.dogs.sex.male"),
-        female: t("admin.dogs.sex.female"),
-        unknown: t("admin.dogs.sex.unknown"),
-      },
-      parents: {
-        sire: "I",
-        dam: "E",
-      },
-      tableHeaders: {
-        disease: t("admin.dogs.diseases.columns.disease"),
-        evidenceKind: t("admin.dogs.diseases.columns.evidenceKind"),
-        public: t("admin.dogs.diseases.columns.public"),
-        registration: t("admin.dogs.diseases.columns.registration"),
-        sex: t("admin.dogs.diseases.columns.sex"),
-        name: t("admin.dogs.diseases.columns.name"),
-        counts: t("admin.dogs.diseases.columns.counts"),
-        metadata: t("admin.dogs.diseases.columns.metadata"),
-        actions: t("admin.dogs.diseases.columns.actions"),
-      },
-      cardLabels: {
-        public: t("admin.dogs.diseases.card.public"),
-        registration: t("admin.dogs.diseases.card.registration"),
-        sex: t("admin.dogs.diseases.card.sex"),
-        name: t("admin.dogs.diseases.card.name"),
-        counts: t("admin.dogs.diseases.card.counts"),
-        litter: t("admin.dogs.diseases.create.litter"),
-        description: t("admin.dogs.diseases.create.description"),
-        source: t("admin.dogs.diseases.create.source"),
-        other: t("admin.dogs.diseases.card.other"),
-      },
-      actions: {
-        more: t("admin.dogs.diseases.actions.more"),
-        delete: t("admin.dogs.diseases.actions.delete"),
-      },
-      create: {
-        open: t("admin.dogs.diseases.create.open"),
-        title: t("admin.dogs.diseases.create.title"),
-        aria: t("admin.dogs.diseases.create.aria"),
-        mode: t("admin.dogs.diseases.create.mode"),
-        modeDog: t("admin.dogs.diseases.create.modeDog"),
-        modeLitter: t("admin.dogs.diseases.create.modeLitter"),
-        disease: t("admin.dogs.diseases.create.disease"),
-        registration: t("admin.dogs.diseases.create.registration"),
-        sire: t("admin.dogs.diseases.create.sire"),
-        dam: t("admin.dogs.diseases.create.dam"),
-        litter: t("admin.dogs.diseases.create.litter"),
-        description: t("admin.dogs.diseases.create.description"),
-        source: t("admin.dogs.diseases.create.source"),
-        public: t("admin.dogs.diseases.create.public"),
-        publicNo: t("admin.dogs.diseases.create.publicNo"),
-        publicYes: t("admin.dogs.diseases.create.publicYes"),
-        save: t("admin.dogs.diseases.create.save"),
-        saving: t("admin.dogs.diseases.create.saving"),
-        cancel: t("admin.dogs.diseases.create.cancel"),
-        success: t("admin.dogs.diseases.create.success"),
-        error: t("admin.dogs.diseases.create.error"),
-      },
-      delete: {
-        title: t("admin.dogs.diseases.delete.title"),
-        descriptionPrefix: t("admin.dogs.diseases.delete.descriptionPrefix"),
-        registrationLabel: t("admin.dogs.diseases.delete.registrationLabel"),
-        dogLabel: t("admin.dogs.diseases.delete.dogLabel"),
-        confirm: t("admin.dogs.diseases.delete.confirm"),
-        confirming: t("admin.dogs.diseases.delete.confirming"),
-        cancel: t("admin.dogs.diseases.delete.cancel"),
-        aria: t("admin.dogs.diseases.delete.aria"),
-        success: t("admin.dogs.diseases.delete.success"),
-        error: t("admin.dogs.diseases.delete.error"),
-      },
-    }),
-    [t],
+  const diseaseCodeOptions = useMemo(
+    () =>
+      mapDiseaseCodeOptions({
+        data,
+        allFilterLabel: labels.allFilterLabel,
+        countSuffix: labels.countSuffix,
+      }),
+    [data, labels.allFilterLabel, labels.countSuffix],
   );
-
-  const diseaseOptions = useMemo(() => {
-    const options = data?.diseaseOptions ?? [];
-    return [
-      {
-        diseaseCode: "all",
-        diseaseText: labels.allFilterLabel,
-        count: allDiseaseCount,
-      },
-      ...options,
-    ].map((option) => ({
-      ...option,
-      label: `${option.diseaseText} ${option.count} ${labels.countSuffix}`,
-    }));
-  }, [
-    allDiseaseCount,
-    data?.diseaseOptions,
-    labels.allFilterLabel,
-    labels.countSuffix,
-  ]);
 
   return (
     <div className="space-y-4" suppressHydrationWarning>
-      <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {labels.pageTitle}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {labels.summaryPrefix} {total} {labels.summarySuffix}.
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-2">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {labels.pageTitle}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {labels.summaryPrefix} {total} {labels.summarySuffix}.
+          </p>
+        </div>
+        <Button type="button" onClick={() => setIsCreateOpen(true)}>
+          {labels.create.open}
+        </Button>
       </div>
 
       <ListingSectionShell title={labels.sectionTitle}>
         <div className="space-y-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div className="max-w-sm flex-1">
-              <LabeledSelect
-                label={labels.filterLabel}
-                value={diseaseCode ?? "all"}
-                disabled={isPending}
-                onChange={(event) => {
-                  setDiseaseCode(
-                    event.target.value === "all" ? null : event.target.value,
-                  );
-                }}
-              >
-                {diseaseOptions.map((option) => (
-                  <option key={option.diseaseCode} value={option.diseaseCode}>
-                    {option.label}
-                  </option>
-                ))}
-              </LabeledSelect>
-            </div>
-            <Button type="button" onClick={() => setIsCreateOpen(true)}>
-              {labels.create.open}
-            </Button>
-          </div>
+          <DiseaseSearchForm
+            key={`${diseaseCode ?? "all"}:${submittedQuery}`}
+            diseaseCode={diseaseCode ?? null}
+            query={submittedQuery}
+            diseaseCodeOptions={diseaseCodeOptions}
+            isPending={isPending}
+            labels={{
+              filterLabel: labels.filterLabel,
+              queryLabel: labels.queryLabel,
+              queryPlaceholder: labels.queryPlaceholder,
+              searchButton: labels.searchButton,
+            }}
+            onSubmit={submitSearch}
+          />
 
           {query.isLoading ? (
             <Card>
@@ -260,11 +156,10 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
                 disabled={currentPage <= 1 || isPending}
                 onClick={() => setPage(currentPage - 1)}
               >
-                {t("admin.dogs.diseases.pagination.previous")}
+                {labels.pagination.previous}
               </Button>
               <span>
-                {t("admin.dogs.diseases.pagination.page")} {currentPage} /{" "}
-                {totalPages}
+                {labels.pagination.page} {currentPage} / {totalPages}
               </span>
               <Button
                 type="button"
@@ -273,7 +168,7 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
                 disabled={currentPage >= totalPages || isPending}
                 onClick={() => setPage(currentPage + 1)}
               >
-                {t("admin.dogs.diseases.pagination.next")}
+                {labels.pagination.next}
               </Button>
             </div>
           ) : null}
@@ -286,7 +181,10 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
           diseaseOptions={
             data?.diseaseOptions ?? initialData?.diseaseOptions ?? []
           }
-          selectedDiseaseCode={data?.selectedDiseaseCode ?? initialDiseaseCode}
+          selectedDiseaseCode={resolveCreateDiseaseSelectedCode(
+            data?.selectedDiseaseCode,
+            diseaseCode,
+          )}
           labels={labels.create}
           isSubmitting={createDiseaseMutation.isPending}
           onClose={() => setIsCreateOpen(false)}

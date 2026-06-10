@@ -30,6 +30,7 @@ export function useAdminDogDiseasesQuery(input: UseAdminDogDiseasesQueryInput) {
     queryFn: async () => {
       const result = await adminDogsApiClient.listAdminDogDiseases({
         diseaseCode: input.diseaseCode,
+        query: input.query,
         page: input.page,
       });
 

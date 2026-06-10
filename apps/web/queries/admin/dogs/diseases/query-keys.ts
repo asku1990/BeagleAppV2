@@ -15,6 +15,7 @@ export function adminDogDiseasesQueryKey(
   return [
     ...adminDogDiseasesQueryKeyRoot,
     diseaseCodeKey,
+    filters.query?.trim() ?? "",
     filters.page ?? 1,
   ] as const;
 }

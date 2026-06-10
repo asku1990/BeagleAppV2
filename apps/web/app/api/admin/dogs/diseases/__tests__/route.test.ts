@@ -63,6 +63,7 @@ describe("admin dog diseases api route", () => {
         ok: true,
         data: {
           selectedDiseaseCode: "epi",
+          query: "kide",
           total: 1,
           totalPages: 1,
           page: 1,
@@ -74,7 +75,7 @@ describe("admin dog diseases api route", () => {
 
     const { GET } = await import("../route");
     const request = new NextRequest(
-      "http://localhost/api/admin/dogs/diseases?diseaseCode=all&page=2",
+      "http://localhost/api/admin/dogs/diseases?query=kide&page=2",
       {
         headers: { origin: "http://localhost:3000" },
       },
@@ -86,6 +87,7 @@ describe("admin dog diseases api route", () => {
       ok: true,
       data: {
         selectedDiseaseCode: "epi",
+        query: "kide",
         total: 1,
         totalPages: 1,
         page: 1,
@@ -95,11 +97,66 @@ describe("admin dog diseases api route", () => {
     });
     expect(listAdminDogDiseasesMock).toHaveBeenCalledWith(
       {
-        diseaseCode: null,
+        diseaseCode: undefined,
+        query: "kide",
         page: 2,
       },
       {
         id: "u_1",
+        email: "admin@example.com",
+        username: "admin",
+        role: "ADMIN",
+      },
+    );
+  });
+
+  it("preserves diseaseCode filters in the api request", async () => {
+    getSessionCurrentUserMock.mockResolvedValue({
+      id: "u_3",
+      email: "admin@example.com",
+      name: "Admin",
+      role: "ADMIN",
+    });
+    toAdminUserContextMock.mockReturnValue({
+      id: "u_3",
+      email: "admin@example.com",
+      username: "admin",
+      role: "ADMIN",
+    });
+    listAdminDogDiseasesMock.mockResolvedValue({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          selectedDiseaseCode: "epi",
+          query: "",
+          total: 1,
+          totalPages: 1,
+          page: 1,
+          diseaseOptions: [],
+          items: [],
+        },
+      },
+    });
+
+    const { GET } = await import("../route");
+    const request = new NextRequest(
+      "http://localhost/api/admin/dogs/diseases?diseaseCode=epi&page=1",
+      {
+        headers: { origin: "http://localhost:3000" },
+      },
+    );
+    const response = await GET(request);
+
+    expect(response.status).toBe(200);
+    expect(listAdminDogDiseasesMock).toHaveBeenCalledWith(
+      {
+        diseaseCode: "epi",
+        query: "",
+        page: 1,
+      },
+      {
+        id: "u_3",
         email: "admin@example.com",
         username: "admin",
         role: "ADMIN",
@@ -125,7 +182,8 @@ describe("admin dog diseases api route", () => {
       body: {
         ok: true,
         data: {
-          selectedDiseaseCode: "epi",
+          selectedDiseaseCode: null,
+          query: "",
           total: 0,
           totalPages: 0,
           page: 1,
@@ -137,7 +195,7 @@ describe("admin dog diseases api route", () => {
 
     const { GET } = await import("../route");
     const request = new NextRequest(
-      "http://localhost/api/admin/dogs/diseases?diseaseCode=%20%20",
+      "http://localhost/api/admin/dogs/diseases?diseaseCode=%20ALL%20&query=%20%20",
       {
         headers: { origin: "http://localhost:3000" },
       },
@@ -147,7 +205,8 @@ describe("admin dog diseases api route", () => {
     expect(response.status).toBe(200);
     expect(listAdminDogDiseasesMock).toHaveBeenCalledWith(
       {
-        diseaseCode: undefined,
+        diseaseCode: null,
+        query: "",
         page: undefined,
       },
       {

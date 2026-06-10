@@ -3,6 +3,10 @@ export const fiAdminDogsDiseasesMessages = {
   "admin.dogs.diseases.section.title": "Sairaustiedot",
   "admin.dogs.diseases.filter.label": "Rajaus",
   "admin.dogs.diseases.filter.all": "Kaikki",
+  "admin.dogs.diseases.filter.queryLabel": "Nimi tai rekisterinumero",
+  "admin.dogs.diseases.filter.queryPlaceholder":
+    "Hae nimellä tai rekisterinumerolla",
+  "admin.dogs.diseases.filter.search": "Hae",
   "admin.dogs.diseases.countSuffix": "kpl",
   "admin.dogs.diseases.summary.prefix": "Haulla löytyi",
   "admin.dogs.diseases.summary.suffix": "sairausriviä",
@@ -70,6 +74,10 @@ export const svAdminDogsDiseasesMessages = {
   "admin.dogs.diseases.section.title": "Sjukdomsuppgifter",
   "admin.dogs.diseases.filter.label": "Avgränsning",
   "admin.dogs.diseases.filter.all": "Alla",
+  "admin.dogs.diseases.filter.queryLabel": "Namn eller registreringsnummer",
+  "admin.dogs.diseases.filter.queryPlaceholder":
+    "Sök med namn eller registreringsnummer",
+  "admin.dogs.diseases.filter.search": "Sök",
   "admin.dogs.diseases.countSuffix": "st",
   "admin.dogs.diseases.summary.prefix": "Sökningen hittade",
   "admin.dogs.diseases.summary.suffix": "sjukdomsrader",

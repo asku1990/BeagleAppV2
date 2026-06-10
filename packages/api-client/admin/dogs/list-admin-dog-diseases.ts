@@ -11,6 +11,9 @@ function toQueryString(input: AdminDogDiseaseBrowseRequest) {
   } else if (typeof input.diseaseCode === "string") {
     params.set("diseaseCode", input.diseaseCode);
   }
+  if (typeof input.query === "string" && input.query.trim().length > 0) {
+    params.set("query", input.query.trim());
+  }
   if (typeof input.page === "number") params.set("page", String(input.page));
   const query = params.toString();
   return query ? `?${query}` : "";

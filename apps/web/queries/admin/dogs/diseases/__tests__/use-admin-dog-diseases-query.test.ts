@@ -26,7 +26,11 @@ describe("useAdminDogDiseasesQuery", () => {
   it("uses the expected query key and options", () => {
     useQueryMock.mockImplementation((options) => options);
 
-    useAdminDogDiseasesQuery({ diseaseCode: "epi", page: 2 });
+    useAdminDogDiseasesQuery({
+      diseaseCode: "epi",
+      query: "kide",
+      page: 2,
+    });
 
     const options = useQueryMock.mock.calls[0]?.[0] as {
       queryKey: readonly unknown[];
@@ -38,6 +42,7 @@ describe("useAdminDogDiseasesQuery", () => {
     expect(options.queryKey).toEqual(
       adminDogDiseasesQueryKey({
         diseaseCode: "epi",
+        query: "kide",
         page: 2,
       }),
     );
@@ -51,20 +56,22 @@ describe("useAdminDogDiseasesQuery", () => {
       "admin-dogs",
       "diseases",
       "__default__",
+      "",
       1,
     ]);
     expect(adminDogDiseasesQueryKey({ diseaseCode: null })).toEqual([
       "admin-dogs",
       "diseases",
       "__all__",
+      "",
       1,
     ]);
-    expect(adminDogDiseasesQueryKey({ diseaseCode: "epi", page: 2 })).toEqual([
-      "admin-dogs",
-      "diseases",
-      "epi",
-      2,
-    ]);
+    expect(
+      adminDogDiseasesQueryKey({
+        query: "kide",
+        page: 2,
+      }),
+    ).toEqual(["admin-dogs", "diseases", "__default__", "kide", 2]);
   });
 
   it("returns disease results when the request succeeds", async () => {
@@ -73,6 +80,7 @@ describe("useAdminDogDiseasesQuery", () => {
       ok: true,
       data: {
         selectedDiseaseCode: "epi",
+        query: "kide",
         total: 1,
         totalPages: 1,
         page: 1,
@@ -81,7 +89,11 @@ describe("useAdminDogDiseasesQuery", () => {
       },
     });
 
-    useAdminDogDiseasesQuery({ diseaseCode: null, page: 3 });
+    useAdminDogDiseasesQuery({
+      diseaseCode: "epi",
+      query: "kide",
+      page: 3,
+    });
 
     const options = useQueryMock.mock.calls[0]?.[0] as {
       queryFn: () => Promise<unknown>;
@@ -89,6 +101,7 @@ describe("useAdminDogDiseasesQuery", () => {
 
     await expect(options.queryFn()).resolves.toEqual({
       selectedDiseaseCode: "epi",
+      query: "kide",
       total: 1,
       totalPages: 1,
       page: 1,
@@ -97,7 +110,8 @@ describe("useAdminDogDiseasesQuery", () => {
     });
 
     expect(listAdminDogDiseasesMock).toHaveBeenCalledWith({
-      diseaseCode: null,
+      diseaseCode: "epi",
+      query: "kide",
       page: 3,
     });
   });

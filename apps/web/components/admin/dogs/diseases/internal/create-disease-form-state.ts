@@ -54,6 +54,13 @@ export function createInitialDiseaseFormValues(
   };
 }
 
+export function resolveCreateDiseaseSelectedCode(
+  selectedDiseaseCode: string | null | undefined,
+  fallbackDiseaseCode: string | null | undefined,
+): string {
+  return selectedDiseaseCode ?? fallbackDiseaseCode ?? "epi";
+}
+
 export function isCreateDiseaseSubmitDisabled(
   values: CreateDiseaseFormValues,
   isSubmitting: boolean,

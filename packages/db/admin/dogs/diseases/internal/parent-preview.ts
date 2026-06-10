@@ -1,4 +1,4 @@
-import type { AdminDogDiseaseBrowseParentPreviewDb } from "../list-dog-diseases";
+import type { AdminDogDiseaseBrowseParentPreviewDb } from "../types";
 
 type ParentDogPreviewRow = {
   name: string;

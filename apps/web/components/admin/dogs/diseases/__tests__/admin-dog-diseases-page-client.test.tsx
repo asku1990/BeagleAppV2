@@ -60,12 +60,13 @@ vi.mock("@/hooks/i18n", () => ({
 function buildInitialData(): AdminDogDiseaseBrowseResponse {
   return {
     selectedDiseaseCode: "epi",
+    query: "",
     total: 174,
     totalPages: 12,
     page: 1,
     diseaseOptions: [
       { diseaseCode: "epi", diseaseText: "Epilepsia", count: 174 },
-      { diseaseCode: "pur", diseaseText: "Purema", count: 8 },
+      { diseaseCode: "pur", diseaseText: "Purenta", count: 8 },
     ],
     items: [
       {
@@ -142,9 +143,10 @@ describe("AdminDogDiseasesPageClient", () => {
   it("renders localized Finnish disease browser text", () => {
     useAdminDogDiseasesUiStateMock.mockReturnValue({
       diseaseCode: "epi",
+      query: "",
       page: 1,
       isPending: false,
-      setDiseaseCode: vi.fn(),
+      submitSearch: vi.fn(),
       setPage: vi.fn(),
     });
     useAdminDogDiseasesQueryMock.mockReturnValue({
@@ -165,6 +167,8 @@ describe("AdminDogDiseasesPageClient", () => {
     expect(html).toContain("Haulla löytyi 174 sairausriviä.");
     expect(html).toContain("Kaikki 182 kpl");
     expect(html).toContain("Epilepsia 174 kpl");
+    expect(html).toContain("Nimi tai rekisterinumero");
+    expect(html).toContain("Hae");
     expect(html).toContain("TERVEYSTIETO");
     expect(html).toContain("TYYPPI");
     expect(html).toContain("Lisää sairaustieto");
@@ -193,15 +197,23 @@ describe("AdminDogDiseasesPageClient", () => {
     );
     expect(html).toContain("Edelliset");
     expect(html).toContain("Seuraavat");
+    expect(useAdminDogDiseasesQueryMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        diseaseCode: "epi",
+        query: "",
+        page: 1,
+      }),
+    );
   });
 
   it("renders localized Swedish disease browser text", () => {
     localeState.current = "sv";
     useAdminDogDiseasesUiStateMock.mockReturnValue({
       diseaseCode: "epi",
+      query: "",
       page: 1,
       isPending: false,
-      setDiseaseCode: vi.fn(),
+      submitSearch: vi.fn(),
       setPage: vi.fn(),
     });
     useAdminDogDiseasesQueryMock.mockReturnValue({
@@ -232,10 +244,11 @@ describe("AdminDogDiseasesPageClient", () => {
 
   it("renders loading, empty, and error states", () => {
     useAdminDogDiseasesUiStateMock.mockReturnValue({
-      diseaseCode: "epi",
+      diseaseCode: undefined,
+      query: "",
       page: 1,
       isPending: false,
-      setDiseaseCode: vi.fn(),
+      submitSearch: vi.fn(),
       setPage: vi.fn(),
     });
     useAdminDogDiseasesQueryMock.mockReturnValue({
@@ -288,10 +301,11 @@ describe("AdminDogDiseasesPageClient", () => {
 
   it("uses the api-clamped page for pagination controls", () => {
     useAdminDogDiseasesUiStateMock.mockReturnValue({
-      diseaseCode: "epi",
+      diseaseCode: undefined,
+      query: "",
       page: 999,
       isPending: false,
-      setDiseaseCode: vi.fn(),
+      submitSearch: vi.fn(),
       setPage: vi.fn(),
     });
     useAdminDogDiseasesQueryMock.mockReturnValue({

@@ -11,7 +11,14 @@ Admin-facing disease evidence browsing, creation, and deletion for `KoiranSairau
 
 ## Behavior
 
-- The page lists disease rows by disease filter and supports create/delete actions.
+- The page lists disease rows by disease code and supports create/delete actions.
+- Browse filtering is explicit-submit: changing the disease code or typing a
+  name or registration number does not reload data until the admin presses
+  `Hae`.
+- The text search matches the disease row registration number and linked dog
+  name. Pagination preserves the submitted disease code and text filters.
+- The disease code filter defaults to `epi` and supports an explicit `all`
+  option to show every disease row.
 - Disease creation supports two evidence kinds:
   - `DOG`: links the row to a resolved real dog.
   - `LITTER`: stores anonymous litter evidence with resolved sire and dam registration numbers.
