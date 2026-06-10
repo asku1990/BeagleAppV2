@@ -49,7 +49,7 @@ const diseaseDefinitions: AdminDogDiseaseDefinitionOptionDb[] = [
   },
   {
     diseaseCode: "pur",
-    diseaseText: "Purema",
+    diseaseText: "Purenta",
     count: 8,
   },
 ];
@@ -71,7 +71,7 @@ describe("listAdminDogDiseasesDb", () => {
       },
       {
         koodi: "pur",
-        sairausTeksti: "Purema",
+        sairausTeksti: "Purenta",
         _count: { koirat: 8 },
       },
     ]);
@@ -84,7 +84,7 @@ describe("listAdminDogDiseasesDb", () => {
       },
       {
         diseaseCode: "pur",
-        diseaseText: "Purema",
+        diseaseText: "Purenta",
         count: 8,
       },
     ]);
@@ -112,7 +112,7 @@ describe("listAdminDogDiseasesDb", () => {
       },
       {
         koodi: "pur",
-        sairausTeksti: "Purema",
+        sairausTeksti: "Purenta",
         _count: { koirat: 8 },
       },
     ]);
@@ -161,7 +161,7 @@ describe("listAdminDogDiseasesDb", () => {
     expect(result.total).toBe(1);
     expect(result.diseaseOptions).toEqual([
       { diseaseCode: "epi", diseaseText: "Epilepsia", count: 174 },
-      { diseaseCode: "pur", diseaseText: "Purema", count: 8 },
+      { diseaseCode: "pur", diseaseText: "Purenta", count: 8 },
     ]);
     expect(result.items[0]).toEqual({
       id: "disease-1",
@@ -238,7 +238,7 @@ describe("listAdminDogDiseasesDb", () => {
       },
       {
         koodi: "pur",
-        sairausTeksti: "Purema",
+        sairausTeksti: "Purenta",
         _count: { koirat: 8 },
       },
     ]);

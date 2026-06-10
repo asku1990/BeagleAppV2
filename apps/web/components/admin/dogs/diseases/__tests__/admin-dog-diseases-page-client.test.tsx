@@ -66,7 +66,7 @@ function buildInitialData(): AdminDogDiseaseBrowseResponse {
     page: 1,
     diseaseOptions: [
       { diseaseCode: "epi", diseaseText: "Epilepsia", count: 174 },
-      { diseaseCode: "pur", diseaseText: "Purema", count: 8 },
+      { diseaseCode: "pur", diseaseText: "Purenta", count: 8 },
     ],
     items: [
       {
