@@ -10,6 +10,32 @@ export {
   type BeagleDogProfileSexDb,
   type BeagleDogProfileTitleDb,
 } from "./profile/get-beagle-dog-profile";
+export {
+  getAdminDogProfileDb,
+  type AdminDogProfileDb,
+} from "../admin/dogs/profile";
+export {
+  findVirtualPairingAncestorDetailsDb,
+  findVirtualPairingDogByRegistrationNoDb,
+  searchVirtualPairingDogsDb,
+  type VirtualPairingAncestorDetailsDb,
+  type VirtualPairingDogByRegistrationLookupDb,
+  type VirtualPairingSearchDogRowDb,
+  type VirtualPairingSearchFieldDb,
+  type VirtualPairingSearchRequestDb,
+  type VirtualPairingSearchResponseDb,
+} from "./virtual-pairing";
+export {
+  loadDogPedigreeAncestryDb,
+  loadDogPedigreeAncestryForParentsDb,
+  type DogPedigreeAncestorDb,
+  type DogPedigreeAncestryDb,
+} from "./core/pedigree-ancestry";
+export {
+  loadDogEpiDiseaseFactsDb,
+  loadDogDiseaseFactsDb,
+  type DogEpiDiseaseFactDb,
+} from "./core/epi-disease-facts";
 export { getNewestBeagleDogsDb } from "./newest";
 export {
   searchBeagleDogsDb,

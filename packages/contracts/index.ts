@@ -43,6 +43,7 @@ export type ImportStatusResponse = {
 
 export type ImportRunKind =
   | "LEGACY_PHASE1"
+  | "LEGACY_PHASE1_25"
   | "LEGACY_PHASE1_5"
   | "LEGACY_PHASE3"
   | "LEGACY_TRIAL_MIRROR"
@@ -112,6 +113,10 @@ export type {
   BeagleDogProfileSiblingsSummaryDto,
   BeagleDogProfileTitleRowDto,
   BeagleDogProfileTrialRowDto,
+  VirtualPairingDogOption,
+  VirtualPairingSearchField,
+  VirtualPairingSearchRequest,
+  VirtualPairingSearchResponse,
 } from "./dogs";
 export type {
   BeagleShowDetailsEvent,
@@ -178,6 +183,16 @@ export type {
   AdminDogParentPreview,
   AdminDogTitleInput,
   AdminDogTitleItem,
+  AdminDogProfileBreederDto,
+  AdminDogProfileDiseaseDto,
+  AdminDogProfileDto,
+  AdminDogProfileOwnerDto,
+  AdminDogProfileParentDto,
+  AdminDogProfileRequest,
+  AdminDogProfileResponse,
+  AdminDogProfileSex,
+  CalculateAdminDogInbreedingRequest,
+  CalculateAdminDogInbreedingResponse,
   CreateAdminDogRequest,
   CreateAdminDogResponse,
   UpdateAdminDogRequest,
@@ -191,6 +206,20 @@ export type {
   AdminBreederLookupResponse,
   AdminOwnerLookupResponse,
   AdminDogParentLookupResponse,
+  AdminDogDiseaseBrowseFilterOption,
+  AdminDogDiseaseBrowseItem,
+  AdminDogDiseaseBrowseParentPreview,
+  AdminDogDiseaseBrowseRequest,
+  AdminDogDiseaseBrowseResponse,
+  CreateAdminDogDiseaseEvidenceKind,
+  CreateAdminDogDiseaseRequest,
+  CreateAdminDogDiseaseResponse,
+  DeleteAdminDogDiseaseRequest,
+  DeleteAdminDogDiseaseResponse,
+  AdminVirtualPairingContributionDto,
+  AdminVirtualPairingDiagnosticsDto,
+  CalculateAdminVirtualPairingRequest,
+  CalculateAdminVirtualPairingResponse,
   AdminShowDetailsEvent,
   AdminShowDetailsRequest,
   AdminShowDetailsResponse,

@@ -9,6 +9,10 @@ export type {
   AdminDogTitleItem,
 } from "./admin-dogs-list";
 export type {
+  CalculateAdminDogInbreedingRequest,
+  CalculateAdminDogInbreedingResponse,
+} from "./calculate-inbreeding";
+export type {
   CreateAdminDogRequest,
   CreateAdminDogResponse,
 } from "./create-admin-dog";

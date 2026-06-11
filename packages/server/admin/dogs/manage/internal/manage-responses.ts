@@ -1,4 +1,5 @@
 import type {
+  CalculateAdminDogInbreedingResponse,
   CreateAdminDogResponse,
   UpdateAdminDogResponse,
 } from "@beagle/contracts";
@@ -6,7 +7,10 @@ import type { ServiceResult } from "@server/core/result";
 
 type CreateResult = ServiceResult<CreateAdminDogResponse>;
 type UpdateResult = ServiceResult<UpdateAdminDogResponse>;
-type ManageErrorTarget = CreateAdminDogResponse | UpdateAdminDogResponse;
+type ManageErrorTarget =
+  | CalculateAdminDogInbreedingResponse
+  | CreateAdminDogResponse
+  | UpdateAdminDogResponse;
 
 type CreateDogSummary = {
   id: string;
@@ -185,6 +189,32 @@ export function invalidDamRegistrationResponse<
       ok: false,
       error: "Dam registration number was not found.",
       code: "INVALID_DAM_REGISTRATION",
+    },
+  } as ServiceResult<T>;
+}
+
+export function requiredSireRegistrationResponse<
+  T extends ManageErrorTarget,
+>(): ServiceResult<T> {
+  return {
+    status: 400,
+    body: {
+      ok: false,
+      error: "Sire registration number is required.",
+      code: "REQUIRED_SIRE_REGISTRATION",
+    },
+  } as ServiceResult<T>;
+}
+
+export function requiredDamRegistrationResponse<
+  T extends ManageErrorTarget,
+>(): ServiceResult<T> {
+  return {
+    status: 400,
+    body: {
+      ok: false,
+      error: "Dam registration number is required.",
+      code: "REQUIRED_DAM_REGISTRATION",
     },
   } as ServiceResult<T>;
 }

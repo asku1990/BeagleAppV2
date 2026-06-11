@@ -45,6 +45,7 @@ export type AdminDogFormValues = {
   breederNameText: string;
   ownershipNames: string[];
   ekNo: string;
+  inbreedingCoefficientPct: number | null;
   note: string;
   registrationNo: string;
   secondaryRegistrationNos: string[];

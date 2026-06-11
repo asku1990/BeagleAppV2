@@ -1,8 +1,8 @@
-import { ImportKind } from "@beagle/db";
 import type { LegacyTrialMirrorCounts } from "@beagle/db";
 
 type LegacyImportKind =
   | "LEGACY_PHASE1"
+  | "LEGACY_PHASE1_25"
   | "LEGACY_PHASE1_5"
   | "LEGACY_PHASE3"
   | "LEGACY_TRIAL_MIRROR"
@@ -14,6 +14,15 @@ type LegacyImportSummaryInput =
       dogsUpserted: number;
       ownersUpserted: number;
       ownershipsUpserted: number;
+      errorsCount: number;
+    }
+  | {
+      kind: "LEGACY_PHASE1_25";
+      sairaudetInserted: number;
+      koiranSairaudetInserted: number;
+      koiranSairaudetFallbackIdentityIssues?: number;
+      koiranSairaudetUnresolvedDogSkipped?: number;
+      epiLuvutInserted: number;
       errorsCount: number;
     }
   | {
@@ -55,11 +64,13 @@ function formatMetric(label: string, value: number): string {
 
 function toPhaseLabel(kind: LegacyImportKind): string {
   switch (kind) {
-    case ImportKind.LEGACY_PHASE1:
+    case "LEGACY_PHASE1":
       return "Phase 1";
-    case ImportKind.LEGACY_PHASE1_5:
+    case "LEGACY_PHASE1_25":
+      return "Phase 1.25";
+    case "LEGACY_PHASE1_5":
       return "Phase 1.5";
-    case ImportKind.LEGACY_PHASE3:
+    case "LEGACY_PHASE3":
       return "Phase 3";
     case "LEGACY_TRIAL_MIRROR":
       return "Phase 2";
@@ -75,13 +86,15 @@ export function formatLegacyImportSummary(
   const phaseLabel = toPhaseLabel(input.kind);
 
   switch (input.kind) {
-    case ImportKind.LEGACY_PHASE1:
+    case "LEGACY_PHASE1":
       return `${phaseLabel}: ${formatMetric("dogs", input.dogsUpserted)}, ${formatMetric("owners", input.ownersUpserted)}, ${formatMetric("ownerships", input.ownershipsUpserted)}, ${formatMetric("errors", input.errorsCount)}.`;
-    case ImportKind.LEGACY_PHASE1_5:
+    case "LEGACY_PHASE1_25":
+      return `${phaseLabel}: ${formatMetric("sairaudet", input.sairaudetInserted)}, ${formatMetric("koiranSairaudet", input.koiranSairaudetInserted)}, ${formatMetric("fallbackIdentityIssues", input.koiranSairaudetFallbackIdentityIssues ?? 0)}, ${formatMetric("unresolvedDogSkipped", input.koiranSairaudetUnresolvedDogSkipped ?? 0)}, ${formatMetric("epiLuvut", input.epiLuvutInserted)}, ${formatMetric("errors", input.errorsCount)}.`;
+    case "LEGACY_PHASE1_5":
       return `${phaseLabel}: ${formatMetric("titles", input.titlesInserted)}, ${formatMetric("skippedBlank", input.skippedBlank)}, ${formatMetric("conflicts", input.conflicts)}, ${formatMetric("errors", input.errorsCount)}.`;
     case "LEGACY_TRIAL_MIRROR":
       return `${phaseLabel}: ${formatMetric("mirrorRows", input.mirrorRowsUpserted)}, ${formatMetric("sourceRows", input.sourceCounts.akoeall + input.sourceCounts.bealt + input.sourceCounts.bealt0 + input.sourceCounts.bealt1 + input.sourceCounts.bealt2 + input.sourceCounts.bealt3)}, ${formatMetric("storedRows", input.mirrorCounts.akoeall + input.mirrorCounts.bealt + input.mirrorCounts.bealt0 + input.mirrorCounts.bealt1 + input.mirrorCounts.bealt2 + input.mirrorCounts.bealt3)}, ${formatMetric("zeroDateMuokattu", input.zeroDateRows)}, ${formatMetric("warnings", input.warningsCount)}, ${formatMetric("errors", input.errorsCount)}.`;
-    case ImportKind.LEGACY_PHASE3:
+    case "LEGACY_PHASE3":
       return `${phaseLabel}: ${formatMetric("showResults", input.showResultsUpserted)}, ${formatMetric("errors", input.errorsCount)}.`;
     case "LEGACY_PHASE5":
       return `${phaseLabel}: ${formatMetric("events", input.eventsProjected)}, ${formatMetric("entries", input.entriesProjected)}, ${formatMetric("eras", input.erasProjected)}, ${formatMetric("eraLisatiedot", input.eraLisatiedotProjected)}, ${formatMetric("skippedOrphans", input.skippedOrphanDetails)}, ${formatMetric("skippedNonSelected", input.skippedNonSelectedDetails)}, ${formatMetric("unresolvedRules", input.unresolvedRules)}, ${formatMetric("errors", input.errorsCount)}.`;

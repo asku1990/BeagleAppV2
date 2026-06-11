@@ -41,6 +41,8 @@ if [ "${DUMP_INCLUDE_AUDIT_LOGS:-}" != "1" ]; then
   exclude_table_data_args+=(--exclude-table-data='public."AuditEvent"')
 fi
 
-pg_dump --no-owner --no-privileges --clean --if-exists "${exclude_table_data_args[@]}" "$DATABASE_URL" > "$output_file"
+pg_dump --no-owner --no-privileges --clean --if-exists "${exclude_table_data_args[@]}" "$DATABASE_URL" \
+  | sed '/^SET transaction_timeout/d' \
+  > "$output_file"
 
 echo "Dump created: $output_file"

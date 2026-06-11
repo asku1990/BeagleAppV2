@@ -37,7 +37,7 @@ export function AnalyticsConsentBanner() {
             className={cn(
               "min-h-10 cursor-pointer rounded-md border px-4 text-sm font-semibold transition-colors duration-150",
               beagleTheme.border,
-              "bg-[var(--beagle-surface)] hover:bg-[var(--beagle-accent-soft)]",
+              "bg-(--beagle-surface) hover:bg-(--beagle-accent-soft)",
               beagleTheme.inkStrongText,
               beagleTheme.focusRing,
             )}
@@ -50,7 +50,7 @@ export function AnalyticsConsentBanner() {
             className={cn(
               "min-h-10 cursor-pointer rounded-md border px-4 text-sm font-semibold transition-colors duration-150",
               beagleTheme.border,
-              "bg-[var(--beagle-surface)] hover:bg-[var(--beagle-accent-soft)]",
+              "bg-(--beagle-surface) hover:bg-(--beagle-accent-soft)",
               beagleTheme.inkStrongText,
               beagleTheme.focusRing,
             )}

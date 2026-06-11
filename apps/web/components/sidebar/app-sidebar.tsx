@@ -127,6 +127,18 @@ const adminModuleNavItems: NavItem[] = [
     availability: "enabled",
   },
   {
+    labelKey: "sidebar.nav.adminDiseases",
+    icon: FileText,
+    href: "/admin/dogs/diseases",
+    availability: "enabled",
+  },
+  {
+    labelKey: "sidebar.nav.adminVirtualPairing",
+    icon: Link2,
+    href: "/admin/dogs/virtual-pairing",
+    availability: "enabled",
+  },
+  {
     labelKey: "sidebar.nav.adminTrials",
     icon: FileText,
     href: "/admin/trials",
@@ -249,7 +261,7 @@ export function AppSidebar() {
                       beagleTheme.interactive,
                       beagleTheme.focusRing,
                       "min-h-9 md:min-h-8",
-                      "data-[active=true]:bg-[var(--beagle-accent-soft)]",
+                      "data-[active=true]:bg-(--beagle-accent-soft)",
                     )}
                   >
                     <Link href={item.href} onClick={closeSidebarOnMobile}>
@@ -261,7 +273,7 @@ export function AppSidebar() {
               ))}
               {isAdmin ? (
                 <>
-                  <SidebarMenuItem className="my-1 border-t border-[var(--beagle-border)] pt-1">
+                  <SidebarMenuItem className="my-1 border-t border-(--beagle-border) pt-1">
                     <span
                       className={cn(
                         "block px-2 py-1 text-xs font-semibold tracking-wide uppercase group-data-[collapsible=icon]:hidden",
@@ -281,7 +293,7 @@ export function AppSidebar() {
                         beagleTheme.interactive,
                         beagleTheme.focusRing,
                         "min-h-9 md:min-h-8",
-                        "data-[active=true]:bg-[var(--beagle-accent-soft)]",
+                        "data-[active=true]:bg-(--beagle-accent-soft)",
                       )}
                     >
                       <Link
@@ -304,7 +316,7 @@ export function AppSidebar() {
                           beagleTheme.interactive,
                           beagleTheme.focusRing,
                           "min-h-9 md:min-h-8",
-                          "data-[active=true]:bg-[var(--beagle-accent-soft)]",
+                          "data-[active=true]:bg-(--beagle-accent-soft)",
                         )}
                       >
                         <Link
@@ -409,7 +421,7 @@ export function AppSidebar() {
               beagleTheme.interactive,
               beagleTheme.focusRing,
               "min-h-9 md:min-h-8",
-              "data-[active=true]:bg-[var(--beagle-accent-soft)]",
+              "data-[active=true]:bg-(--beagle-accent-soft)",
             )}
           >
             <Link href="/sign-in" onClick={closeSidebarOnMobile}>
@@ -421,7 +433,7 @@ export function AppSidebar() {
           </SidebarMenuButton>
         )}
 
-        <SidebarMenu className="mt-1 border-t border-[var(--beagle-border)] pt-1">
+        <SidebarMenu className="mt-1 border-t border-(--beagle-border) pt-1">
           <SidebarMenuItem className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
             <SidebarMenuButton
               asChild
@@ -432,7 +444,7 @@ export function AppSidebar() {
                 beagleTheme.interactive,
                 beagleTheme.focusRing,
                 "min-h-9 md:min-h-8",
-                "data-[active=true]:bg-[var(--beagle-accent-soft)]",
+                "data-[active=true]:bg-(--beagle-accent-soft)",
               )}
             >
               <Link href="/privacy" onClick={closeSidebarOnMobile}>

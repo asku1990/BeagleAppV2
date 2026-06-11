@@ -94,9 +94,17 @@ export async function updateAdminDog(
       return inTryValidation.response;
     }
 
+    const parentFieldsWereEdited =
+      inTryValidation.data.sireRegistrationNo !== undefined ||
+      inTryValidation.data.damRegistrationNo !== undefined;
+
     const resolvedParents = await resolveUpdateParents(
-      inTryValidation.data.sireRegistrationNo,
-      inTryValidation.data.damRegistrationNo,
+      parentFieldsWereEdited
+        ? inTryValidation.data.sireRegistrationNo
+        : undefined,
+      parentFieldsWereEdited
+        ? inTryValidation.data.damRegistrationNo
+        : undefined,
     );
     if (!resolvedParents.ok) {
       return resolvedParents.response;
@@ -107,13 +115,15 @@ export async function updateAdminDog(
       return dogNotFoundResponse();
     }
 
-    const parentGuardResult = validateUpdateParentGuards(
-      preflight.data.id,
-      existingDog,
-      resolvedParents.data.sire,
-      resolvedParents.data.dam,
-    );
-    if (!parentGuardResult.ok) {
+    const parentGuardResult = parentFieldsWereEdited
+      ? validateUpdateParentGuards(
+          preflight.data.id,
+          existingDog,
+          resolvedParents.data.sire,
+          resolvedParents.data.dam,
+        )
+      : undefined;
+    if (parentGuardResult && !parentGuardResult.ok) {
       return parentGuardResult.response;
     }
 

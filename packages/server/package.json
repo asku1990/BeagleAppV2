@@ -1,6 +1,6 @@
 {
   "name": "@beagle/server",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "private": true,
   "type": "module",
   "main": "./index.ts",
@@ -13,6 +13,7 @@
     "test:unit": "node ../../node_modules/vitest/vitest.mjs run",
     "test:coverage": "node ../../node_modules/vitest/vitest.mjs run --coverage",
     "import:phase1": "node --import tsx/esm scripts/imports/phase1/run.ts",
+    "import:phase1.25": "node --import tsx/esm scripts/imports/phase1_25/run.ts",
     "import:phase1.5": "node --import tsx/esm scripts/imports/phase1_5/run.ts",
     "import:phase2": "node --import tsx/esm scripts/imports/phase2/run.ts",
     "import:trials:validate-mirror": "node --import tsx/esm scripts/imports/trial-mirror-validation/run.ts",
