@@ -37,6 +37,10 @@ export const fiAdminDogsCommonMessages = {
     "Uroksen rekisterinumeroa ei löytynyt.",
   "admin.dogs.mutation.errorInvalidDamRegistration":
     "Emän rekisterinumeroa ei löytynyt.",
+  "admin.dogs.mutation.errorRequiredSireRegistration":
+    "Uroksen rekisterinumero on pakollinen.",
+  "admin.dogs.mutation.errorRequiredDamRegistration":
+    "Emän rekisterinumero on pakollinen.",
   "admin.dogs.mutation.errorInvalidParentCombination":
     "Uros ja emä eivät voi olla sama koira.",
   "admin.dogs.mutation.errorInvalidSelfParent":
@@ -96,6 +100,10 @@ export const svAdminDogsCommonMessages = {
     "Hanens registreringsnummer hittades inte.",
   "admin.dogs.mutation.errorInvalidDamRegistration":
     "Tikens registreringsnummer hittades inte.",
+  "admin.dogs.mutation.errorRequiredSireRegistration":
+    "Hanens registreringsnummer ar obligatoriskt.",
+  "admin.dogs.mutation.errorRequiredDamRegistration":
+    "Tikens registreringsnummer ar obligatoriskt.",
   "admin.dogs.mutation.errorInvalidParentCombination":
     "Hane och tik kan inte vara samma hund.",
   "admin.dogs.mutation.errorInvalidSelfParent":

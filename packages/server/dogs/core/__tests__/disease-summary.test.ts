@@ -1,0 +1,250 @@
+import { describe, expect, it } from "vitest";
+import type { DogPedigreeAncestryDb } from "@beagle/db/dogs/core/pedigree-ancestry";
+import {
+  calculateDogEpiSummary,
+  calculateDogHealthSummary,
+  getDogHealthDiseaseFactDogIds,
+} from "../disease-summary";
+
+function makeAncestry(
+  nodes: DogPedigreeAncestryDb["nodes"],
+): DogPedigreeAncestryDb {
+  return { rootId: "virtual-root", nodes };
+}
+
+function makeNode(
+  id: string,
+  sireId: string | null,
+  damId: string | null,
+): DogPedigreeAncestryDb["nodes"][string] {
+  return {
+    id,
+    sireId,
+    damId,
+  };
+}
+
+describe("calculateDogHealthSummary", () => {
+  it("calculates EPI, Lafora, risk, and PUR summaries from current data", () => {
+    const ancestry = makeAncestry({
+      "virtual-root": makeNode("virtual-root", "sire", "dam"),
+      sire: makeNode("sire", "sire-sire", "sire-dam"),
+      dam: makeNode("dam", "dam-sire", "dam-dam"),
+      "sire-sire": makeNode("sire-sire", null, null),
+      "sire-dam": makeNode("sire-dam", null, null),
+      "dam-sire": makeNode("dam-sire", null, null),
+      "dam-dam": makeNode("dam-dam", null, null),
+      "full-sibling": makeNode("full-sibling", "sire", "dam"),
+      "half-sibling": makeNode("half-sibling", "sire", "other-dam"),
+      "other-dam": makeNode("other-dam", null, null),
+    });
+
+    const summary = calculateDogHealthSummary("virtual-root", ancestry, [
+      {
+        dogId: "full-sibling",
+        isaDogId: "sire",
+        emaDogId: "dam",
+        sairausKoodi: "epi",
+        evidenceKind: "DOG",
+      },
+      {
+        dogId: "half-sibling",
+        isaDogId: "sire",
+        emaDogId: "other-dam",
+        sairausKoodi: "epi",
+        evidenceKind: "DOG",
+      },
+      {
+        dogId: "sire",
+        isaDogId: "sire-sire",
+        emaDogId: "sire-dam",
+        sairausKoodi: "lepik",
+        evidenceKind: "DOG",
+      },
+      {
+        dogId: "dam",
+        isaDogId: "dam-sire",
+        emaDogId: "dam-dam",
+        sairausKoodi: "lepis",
+        evidenceKind: "DOG",
+      },
+      {
+        dogId: "full-sibling",
+        isaDogId: "sire",
+        emaDogId: "dam",
+        sairausKoodi: "pur",
+        evidenceKind: "DOG",
+      },
+      {
+        dogId: "half-sibling",
+        isaDogId: "sire",
+        emaDogId: "other-dam",
+        sairausKoodi: "ap",
+        evidenceKind: "DOG",
+      },
+    ]);
+
+    expect(summary.epi).toEqual({
+      value: 1.25,
+      text: "-S--P",
+      display: "1.250 -S--P",
+      tier: 2,
+    });
+    expect(summary.lafora).toEqual({
+      value: 5,
+      display: "5",
+    });
+    expect(summary.risk).toEqual({
+      value: 6,
+      display: "6",
+    });
+    expect(summary.pur).toEqual({
+      value: 1.25,
+      text: "-S--P",
+      display: "1.250 -S--P",
+    });
+  });
+
+  it("ignores disease facts beyond the fixed five-generation depth", () => {
+    const ancestry = makeAncestry({
+      "virtual-root": makeNode("virtual-root", "sire", "dam"),
+      sire: makeNode("sire", "sire-2", null),
+      dam: makeNode("dam", null, null),
+      "sire-2": makeNode("sire-2", "sire-3", null),
+      "sire-3": makeNode("sire-3", "sire-4", null),
+      "sire-4": makeNode("sire-4", "sire-5", null),
+      "sire-5": makeNode("sire-5", "sire-6", null),
+      "sire-6": makeNode("sire-6", null, null),
+    });
+
+    const summary = calculateDogHealthSummary("virtual-root", ancestry, [
+      {
+        dogId: "sire-6",
+        isaDogId: null,
+        emaDogId: null,
+        sairausKoodi: "epi",
+        evidenceKind: "DOG",
+      },
+      {
+        dogId: "sire-6",
+        isaDogId: null,
+        emaDogId: null,
+        sairausKoodi: "pur",
+        evidenceKind: "DOG",
+      },
+    ]);
+
+    expect(summary.epi.value).toBe(0);
+    expect(summary.pur.value).toBe(0);
+    expect(summary.epi.text).toBe("-----");
+    expect(summary.pur.text).toBe("-----");
+  });
+
+  it("handles missing pedigree branches without throwing", () => {
+    const summary = calculateDogHealthSummary(
+      "virtual-root",
+      makeAncestry({
+        "virtual-root": makeNode("virtual-root", "sire", "dam"),
+        sire: makeNode("sire", null, null),
+      }),
+      [],
+    );
+
+    expect(summary.epi.value).toBe(0);
+    expect(summary.pur.value).toBe(0);
+    expect(summary.lafora.value).toBe(0);
+    expect(summary.risk.value).toBe(3);
+  });
+
+  it("uses anonymous litter rows only as EPI/PUR relationship evidence", () => {
+    const ancestry = makeAncestry({
+      "virtual-root": makeNode("virtual-root", "sire", "dam"),
+      sire: makeNode("sire", null, null),
+      dam: makeNode("dam", null, null),
+    });
+
+    const summary = calculateDogHealthSummary("virtual-root", ancestry, [
+      {
+        dogId: null,
+        isaDogId: "sire",
+        emaDogId: "dam",
+        sairausKoodi: "epi",
+        evidenceKind: "LITTER",
+      },
+      {
+        dogId: null,
+        isaDogId: "sire",
+        emaDogId: "dam",
+        sairausKoodi: "pur",
+        evidenceKind: "LITTER",
+      },
+      {
+        dogId: null,
+        isaDogId: "sire",
+        emaDogId: "dam",
+        sairausKoodi: "lepis",
+        evidenceKind: "LITTER",
+      },
+    ]);
+
+    expect(summary.epi).toEqual({
+      value: 1,
+      text: "-S---",
+      display: "1.000 -S---",
+      tier: 2,
+    });
+    expect(summary.pur).toEqual({
+      value: 1,
+      text: "-S---",
+      display: "1.000 -S---",
+    });
+    expect(summary.lafora.value).toBe(0);
+  });
+});
+
+describe("getDogHealthDiseaseFactDogIds", () => {
+  it("returns only the fixed five-generation health graph", () => {
+    const ancestry = makeAncestry({
+      "virtual-root": makeNode("virtual-root", "sire", "dam"),
+      sire: makeNode("sire", "sire-2", null),
+      dam: makeNode("dam", null, null),
+      "sire-2": makeNode("sire-2", "sire-3", null),
+      "sire-3": makeNode("sire-3", "sire-4", null),
+      "sire-4": makeNode("sire-4", "sire-5", null),
+      "sire-5": makeNode("sire-5", "sire-6", null),
+      "sire-6": makeNode("sire-6", "outside-health", null),
+      "outside-health": makeNode("outside-health", null, null),
+    });
+
+    expect(
+      getDogHealthDiseaseFactDogIds("virtual-root", ancestry),
+    ).toStrictEqual([
+      "virtual-root",
+      "sire",
+      "dam",
+      "sire-2",
+      "sire-3",
+      "sire-4",
+      "sire-5",
+    ]);
+  });
+});
+
+describe("calculateDogEpiSummary", () => {
+  it("keeps the legacy flat summary shape for admin profile callers", () => {
+    const summary = calculateDogEpiSummary(
+      "virtual-root",
+      makeAncestry({
+        "virtual-root": makeNode("virtual-root", "sire", "dam"),
+      }),
+      [],
+    );
+
+    expect(summary).toEqual({
+      epiLuku: 0,
+      epiTeksti: "-----",
+      laforaLuku: 0,
+      epiRiskLuku: 3,
+    });
+  });
+});

@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createDogsService } from "@server/dogs";
+import { getInbreedingAncestryLoadDepth } from "@server/dogs/core";
 import { encodeShowId } from "@server/shows/internal/show-id";
 
 const {
@@ -8,12 +9,16 @@ const {
   getBeagleDogProfileDbMock,
   getBeagleShowsForDogDbMock,
   getBeagleTrialsForDogDbMock,
+  loadDogPedigreeAncestryDbMock,
+  calculateInbreedingCoefficientPctMock,
 } = vi.hoisted(() => ({
   searchBeagleDogsDbMock: vi.fn(),
   getNewestBeagleDogsDbMock: vi.fn(),
   getBeagleDogProfileDbMock: vi.fn(),
   getBeagleShowsForDogDbMock: vi.fn(),
   getBeagleTrialsForDogDbMock: vi.fn(),
+  loadDogPedigreeAncestryDbMock: vi.fn(),
+  calculateInbreedingCoefficientPctMock: vi.fn(),
 }));
 
 vi.mock("@beagle/db", async () => {
@@ -25,6 +30,22 @@ vi.mock("@beagle/db", async () => {
     getBeagleDogProfileDb: getBeagleDogProfileDbMock,
     getBeagleShowsForDogDb: getBeagleShowsForDogDbMock,
     getBeagleTrialsForDogDb: getBeagleTrialsForDogDbMock,
+    loadDogPedigreeAncestryDb: loadDogPedigreeAncestryDbMock,
+  };
+});
+
+vi.mock("@server/dogs/core/inbreeding-coefficient", () => ({
+  calculateInbreedingCoefficientPct: calculateInbreedingCoefficientPctMock,
+}));
+
+vi.mock("@server/dogs/core", async () => {
+  const actual =
+    await vi.importActual<typeof import("@server/dogs/core")>(
+      "@server/dogs/core",
+    );
+  return {
+    ...actual,
+    calculateInbreedingCoefficientPct: calculateInbreedingCoefficientPctMock,
   };
 });
 
@@ -43,6 +64,13 @@ describe("dogs service", () => {
     getBeagleDogProfileDbMock.mockReset();
     getBeagleShowsForDogDbMock.mockReset();
     getBeagleTrialsForDogDbMock.mockReset();
+    loadDogPedigreeAncestryDbMock.mockReset();
+    calculateInbreedingCoefficientPctMock.mockReset();
+    loadDogPedigreeAncestryDbMock.mockResolvedValue({
+      rootId: "default",
+      nodes: {},
+    });
+    calculateInbreedingCoefficientPctMock.mockReturnValue(null);
   });
 
   it("returns 400 for invalid sort and does not call DB", async () => {
@@ -281,7 +309,6 @@ describe("dogs service", () => {
       sex: "U",
       color: null,
       ekNo: 42,
-      inbreedingCoefficientPct: null,
       sire: { name: "Sire", registrationNo: "FI-2/18" },
       dam: { name: "Dam", registrationNo: "FI-3/18" },
       pedigree: [],
@@ -334,6 +361,16 @@ describe("dogs service", () => {
         },
       ],
     };
+    const mockAncestry = {
+      rootId: "dog1",
+      nodes: {
+        dog1: {
+          id: "dog1",
+          sireId: "sire-1",
+          damId: "dam-1",
+        },
+      },
+    };
     const mockShows = [
       {
         id: "show1",
@@ -373,6 +410,8 @@ describe("dogs service", () => {
       },
     ];
     getBeagleDogProfileDbMock.mockResolvedValue(mockProfile);
+    loadDogPedigreeAncestryDbMock.mockResolvedValue(mockAncestry);
+    calculateInbreedingCoefficientPctMock.mockReturnValue(12.5);
     getBeagleShowsForDogDbMock.mockResolvedValue(mockShows);
     getBeagleTrialsForDogDbMock.mockResolvedValue(mockTrials);
 
@@ -380,6 +419,15 @@ describe("dogs service", () => {
     const result = await service.getBeagleDogProfile("dog1");
 
     expect(getBeagleDogProfileDbMock).toHaveBeenCalledWith("dog1");
+    expect(loadDogPedigreeAncestryDbMock).toHaveBeenCalledWith(
+      "dog1",
+      getInbreedingAncestryLoadDepth(9),
+    );
+    expect(calculateInbreedingCoefficientPctMock).toHaveBeenCalledWith(
+      "dog1",
+      mockAncestry,
+      9,
+    );
     expect(getBeagleShowsForDogDbMock).toHaveBeenCalledWith("dog1");
     expect(getBeagleTrialsForDogDbMock).toHaveBeenCalledWith("dog1");
     const show1 = withoutEventKey(mockShows[0]);
@@ -389,6 +437,7 @@ describe("dogs service", () => {
         ok: true,
         data: {
           ...mockProfile,
+          inbreedingCoefficientPct: 12.5,
           birthDate: "2020-01-01",
           litters: [
             {
@@ -440,6 +489,104 @@ describe("dogs service", () => {
     });
   });
 
+  it("returns null inbreeding when the calculator returns null", async () => {
+    const mockProfile = {
+      id: "dog-null",
+      name: "Null Dog",
+      title: null,
+      registrationNo: "FI-9/20",
+      registrationNos: ["FI-9/20"],
+      birthDate: null,
+      sex: "N",
+      color: null,
+      ekNo: null,
+      sire: { name: "Sire", registrationNo: "FI-2/18" },
+      dam: { name: "Dam", registrationNo: "FI-3/18" },
+      pedigree: [],
+      offspringSummary: { litterCount: 0, puppyCount: 0 },
+      litters: [],
+      siblingsSummary: { siblingCount: 0 },
+      siblings: [],
+      titles: [],
+    };
+    const mockAncestry = {
+      rootId: "dog-null",
+      nodes: {
+        "dog-null": {
+          id: "dog-null",
+          sireId: "sire-1",
+          damId: "dam-1",
+        },
+      },
+    };
+
+    getBeagleDogProfileDbMock.mockResolvedValue(mockProfile);
+    loadDogPedigreeAncestryDbMock.mockResolvedValue(mockAncestry);
+    calculateInbreedingCoefficientPctMock.mockReturnValue(null);
+    getBeagleShowsForDogDbMock.mockResolvedValue([]);
+    getBeagleTrialsForDogDbMock.mockResolvedValue([]);
+
+    const service = createDogsService();
+    const result = await service.getBeagleDogProfile("dog-null");
+
+    expect(result).toEqual({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          ...mockProfile,
+          inbreedingCoefficientPct: null,
+          shows: [],
+          trials: [],
+        },
+      },
+    });
+  });
+
+  it("skips deep ancestry loading for parentless public profiles", async () => {
+    const mockProfile = {
+      id: "dog-parentless",
+      name: "Parentless Dog",
+      title: null,
+      registrationNo: "FI-99/20",
+      registrationNos: ["FI-99/20"],
+      birthDate: null,
+      sex: "U",
+      color: null,
+      ekNo: null,
+      sire: null,
+      dam: null,
+      pedigree: [],
+      offspringSummary: { litterCount: 0, puppyCount: 0 },
+      litters: [],
+      siblingsSummary: { siblingCount: 0 },
+      siblings: [],
+      titles: [],
+    };
+
+    getBeagleDogProfileDbMock.mockResolvedValue(mockProfile);
+    getBeagleShowsForDogDbMock.mockResolvedValue([]);
+    getBeagleTrialsForDogDbMock.mockResolvedValue([]);
+
+    const service = createDogsService();
+    const result = await service.getBeagleDogProfile("dog-parentless");
+
+    expect(loadDogPedigreeAncestryDbMock).not.toHaveBeenCalled();
+    expect(calculateInbreedingCoefficientPctMock).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          ...mockProfile,
+          inbreedingCoefficientPct: null,
+          shows: [],
+          trials: [],
+        },
+      },
+    });
+  });
+
   it("maps date-only profile fields in Helsinki timezone", async () => {
     const mockProfile = {
       id: "dog2",
@@ -451,7 +598,6 @@ describe("dogs service", () => {
       sex: "N",
       color: null,
       ekNo: null,
-      inbreedingCoefficientPct: null,
       sire: null,
       dam: null,
       pedigree: [],
@@ -513,6 +659,7 @@ describe("dogs service", () => {
         ok: true,
         data: {
           ...mockProfile,
+          inbreedingCoefficientPct: null,
           birthDate: "2020-01-01",
           shows: [
             {
@@ -557,7 +704,6 @@ describe("dogs service", () => {
       sex: "N",
       color: null,
       ekNo: null,
-      inbreedingCoefficientPct: null,
       sire: null,
       dam: null,
       pedigree: [],
@@ -598,6 +744,7 @@ describe("dogs service", () => {
         ok: true,
         data: {
           ...mockProfile,
+          inbreedingCoefficientPct: null,
           shows: [
             {
               ...showCase,
@@ -622,7 +769,6 @@ describe("dogs service", () => {
       sex: "U",
       color: null,
       ekNo: null,
-      inbreedingCoefficientPct: null,
       sire: null,
       dam: null,
       pedigree: [],
@@ -663,6 +809,7 @@ describe("dogs service", () => {
         ok: true,
         data: {
           ...mockProfile,
+          inbreedingCoefficientPct: null,
           shows: [
             {
               ...showLegacy,
@@ -688,6 +835,8 @@ describe("dogs service", () => {
 
     expect(getBeagleShowsForDogDbMock).not.toHaveBeenCalled();
     expect(getBeagleTrialsForDogDbMock).not.toHaveBeenCalled();
+    expect(loadDogPedigreeAncestryDbMock).not.toHaveBeenCalled();
+    expect(calculateInbreedingCoefficientPctMock).not.toHaveBeenCalled();
     expect(result).toEqual({
       status: 404,
       body: { ok: false, error: "Dog profile not found." },
@@ -715,7 +864,6 @@ describe("dogs service", () => {
       sex: "N",
       color: null,
       ekNo: null,
-      inbreedingCoefficientPct: null,
       sire: null,
       dam: null,
       pedigree: [],

@@ -45,6 +45,7 @@ function buildEditValues(): AdminDogFormValues {
     breederNameText: "Metsapolun",
     ownershipNames: ["Tiina Virtanen", "Antti Virtanen"],
     ekNo: "5588",
+    inbreedingCoefficientPct: null,
     note: "Important note",
     registrationNo: "FI12345/21",
     secondaryRegistrationNos: ["FI54321/21"],
@@ -70,6 +71,7 @@ function buildCreateValues(): AdminDogFormValues {
     breederNameText: "",
     ownershipNames: [],
     ekNo: "",
+    inbreedingCoefficientPct: null,
     note: "",
     registrationNo: "",
     secondaryRegistrationNos: [],
@@ -139,6 +141,7 @@ describe("DogFormModal", () => {
         onClose: vi.fn(),
         onValuesChange: vi.fn(),
         onSubmit: vi.fn(),
+        onCalculateInbreeding: vi.fn(),
       }),
     );
 
@@ -154,6 +157,10 @@ describe("DogFormModal", () => {
     expect(html).toContain('value="2022-01-10"');
     expect(html).toContain('value="FI JVA"');
     expect(html).toContain('value="Valio"');
+    expect(html).toContain("admin.dogs.form.inbreedingLabel");
+    expect(html).toContain("admin.dogs.form.sireSelectLabel *");
+    expect(html).toContain("admin.dogs.form.damSelectLabel *");
+    expect(html).toContain("admin.dogs.form.inbreedingEmpty");
     expect(html).toContain("admin.dogs.form.recordIdPrefix dog_1");
   });
 
@@ -181,6 +188,7 @@ describe("DogFormModal", () => {
         onClose: vi.fn(),
         onValuesChange: vi.fn(),
         onSubmit: vi.fn(),
+        onCalculateInbreeding: vi.fn(),
       }),
     );
 
@@ -204,11 +212,14 @@ describe("DogFormModal", () => {
         onClose: vi.fn(),
         onValuesChange: vi.fn(),
         onSubmit: vi.fn(),
+        onCalculateInbreeding: vi.fn(),
       }),
     );
 
     expect(html).toContain("admin.dogs.form.birthDateUnknown");
     expect(html).toContain("admin.dogs.form.birthDateSet");
     expect(html).not.toContain("admin.dogs.form.birthDateClear");
+    expect(html).toContain("admin.dogs.form.inbreedingCalculate");
+    expect(html).toContain("disabled");
   });
 });

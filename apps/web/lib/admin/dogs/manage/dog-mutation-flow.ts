@@ -155,6 +155,10 @@ export function getAdminDogMutationErrorMessageKey(
       return "admin.dogs.mutation.errorInvalidSireRegistration";
     case "INVALID_DAM_REGISTRATION":
       return "admin.dogs.mutation.errorInvalidDamRegistration";
+    case "REQUIRED_SIRE_REGISTRATION":
+      return "admin.dogs.mutation.errorRequiredSireRegistration";
+    case "REQUIRED_DAM_REGISTRATION":
+      return "admin.dogs.mutation.errorRequiredDamRegistration";
     case "INVALID_PARENT_COMBINATION":
       return "admin.dogs.mutation.errorInvalidParentCombination";
     case "INVALID_SELF_PARENT":

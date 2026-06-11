@@ -211,7 +211,7 @@ export function useBeagleSearchUiState() {
       const href = query ? `${pathname}?${query}` : pathname;
 
       startTransition(() => {
-        router.replace(href, { scroll: false });
+        router.push(href, { scroll: false });
       });
     },
     [pathname, router],

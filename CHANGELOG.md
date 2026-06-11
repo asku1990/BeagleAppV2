@@ -20,6 +20,25 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.12.0] - 2026-06-11
+
+### Julkinen
+
+- Koiraprofiili näyttää nyt sukusiitosasteen ajantasaisesta sukutaulusta.
+
+### Ylläpito
+
+- Virtuaaliparitusta voi nyt käyttää omalla ylläpitosivulla: koirat on helppo hakea, valita ja laskea pariksi yhdellä näkymällä.
+- Virtuaaliparituksen tulos on nyt jaettavissa linkillä.
+- Koirien sairaustiedot voi nyt selata, hakea, lisätä ja poistaa omalla ylläpitosivulla.
+- Koiran terveyssummat, kuten EPI ja Lafora, perustuvat nyt tuoduille sairausmerkinnöille, joten ne lasketaan aina uudestaan nykyisistä tiedoista.
+- Koiran ylläpitoprofiili sai uuden selkeämmän näkymän, joka kokoaa tärkeimmät tausta- ja terveystiedot yhteen paikkaan.
+- phase1.25-tuonti tuo nyt mukaan myös koirien sairaustiedot ja muut tuonnissa tarvittavat taustatiedot vanhasta tietokannasta.
+- Sukusiitosaste näkyy nyt yhdenmukaisesti julkisessa koiraprofiilissa, ylläpitoprofiilissa, koiran ylläpitolomakkeessa ja virtuaaliparituksessa.
+- Sukusiitosaste lasketaan nyt yhteisten esivanhempien perusteella, ja esivanhempien oma sukusiitos vaikuttaa lopputulokseen.
+
+### Removed
+
 ## [0.11.0] - 2026-05-06
 
 ### Added

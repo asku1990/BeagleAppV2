@@ -17,8 +17,22 @@ enum DogSex {
   UNKNOWN
 }
 
+enum SairausRyhma {
+  EPILEPSIA
+  LAFORA
+  PURENTA
+  MLS
+  MUU
+}
+
+enum KoiranSairausEvidenceKind {
+  DOG
+  LITTER
+}
+
 enum ImportKind {
   LEGACY_PHASE1
+  LEGACY_PHASE1_25
   LEGACY_PHASE1_5
   LEGACY_PHASE3
   LEGACY_TRIAL_MIRROR
@@ -183,29 +197,30 @@ model BetterAuthVerification {
 }
 
 model Dog {
-  id              String            @id @default(cuid())
-  name            String
-  sex             DogSex            @default(UNKNOWN)
-  birthDate       DateTime?
-  breederNameText String?
-  sireId          String?
-  damId           String?
-  breederId       String?
-  ekNo            Int?              @unique
-  note            String?
-  sire            Dog?              @relation("SireRelation", fields: [sireId], references: [id])
-  siredPuppies    Dog[]             @relation("SireRelation")
-  dam             Dog?              @relation("DamRelation", fields: [damId], references: [id])
-  whelpedPuppies  Dog[]             @relation("DamRelation")
-  breeder         Breeder?          @relation(fields: [breederId], references: [id])
-  registrations   DogRegistration[]
-  ownerships      DogOwnership[]
-  titles          DogTitle[]
-  trialResults    TrialResult[]
-  trialEntries    TrialEntry[]
-  showEntries     ShowEntry[]
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id                  String            @id @default(cuid())
+  name                String
+  sex                 DogSex            @default(UNKNOWN)
+  birthDate           DateTime?
+  breederNameText     String?
+  sireId              String?
+  damId               String?
+  breederId           String?
+  ekNo                Int?              @unique
+  note                String?
+  sire                Dog?              @relation("SireRelation", fields: [sireId], references: [id])
+  siredPuppies        Dog[]             @relation("SireRelation")
+  dam                 Dog?              @relation("DamRelation", fields: [damId], references: [id])
+  whelpedPuppies      Dog[]             @relation("DamRelation")
+  breeder             Breeder?          @relation(fields: [breederId], references: [id])
+  registrations       DogRegistration[]
+  ownerships          DogOwnership[]
+  titles              DogTitle[]
+  trialResults        TrialResult[]
+  trialEntries        TrialEntry[]
+  showEntries         ShowEntry[]
+  sairaudet           KoiranSairaus[]   @relation("KoiranSairausDog")
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
 
   @@index([name])
   @@index([sex])
@@ -240,6 +255,48 @@ model DogRegistration {
   updatedAt      DateTime @updatedAt
 
   @@index([dogId])
+}
+
+model Sairaus {
+  id            String          @id @default(cuid())
+  vanhaId       Int             @unique
+  koodi         String          @unique
+  sairausTeksti String
+  sairausRyhma  SairausRyhma
+  koirat        KoiranSairaus[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([sairausRyhma])
+}
+
+model KoiranSairaus {
+  id                 String                    @id @default(cuid())
+  vanhaId            Int?                      @unique
+  dogId              String?
+  evidenceKind       KoiranSairausEvidenceKind
+  isaRekisterinumero String?
+  emaRekisterinumero String?
+  rekisterinumero    String
+  sairausId          String
+  sairausKoodi       String
+  pentue             String?
+  kuvaus             String?                   @db.Text
+  julkinen           Boolean                   @default(false)
+  tietolahde         String?
+  muokattuLahteessa  DateTime?
+  dog                Dog?                      @relation("KoiranSairausDog", fields: [dogId], references: [id], onDelete: SetNull)
+  sairaus            Sairaus                   @relation(fields: [sairausId], references: [id], onDelete: Restrict)
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
+
+  @@index([dogId])
+  @@index([evidenceKind])
+  @@index([isaRekisterinumero])
+  @@index([emaRekisterinumero])
+  @@index([rekisterinumero])
+  @@index([sairausId])
+  @@index([sairausKoodi])
 }
 
 model Breeder {

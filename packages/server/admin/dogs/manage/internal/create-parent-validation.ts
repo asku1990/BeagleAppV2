@@ -7,6 +7,8 @@ import {
   invalidParentCombinationResponse,
   invalidSireRegistrationResponse,
   invalidSireSexResponse,
+  requiredDamRegistrationResponse,
+  requiredSireRegistrationResponse,
 } from "./manage-responses";
 import {
   resolveParentByRegistration,
@@ -40,6 +42,20 @@ export async function resolveAndValidateCreateParents(input: {
   const damRegistrationNo = normalizeOptionalText(
     input.damRegistrationNo ?? undefined,
   );
+
+  if (!sireRegistrationNo) {
+    return {
+      ok: false,
+      response: requiredSireRegistrationResponse(),
+    };
+  }
+
+  if (!damRegistrationNo) {
+    return {
+      ok: false,
+      response: requiredDamRegistrationResponse(),
+    };
+  }
 
   const sire = await resolveParentByRegistration(sireRegistrationNo);
   if (sireRegistrationNo && !sire) {
