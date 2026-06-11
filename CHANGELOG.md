@@ -14,22 +14,28 @@ This project uses a user-facing changelog format.
 
 ### Added
 
-- Uusi `phase1.25`-tuontivaihe tuo vanhan kannan sairaustiedot sekä koirille tallennetut sukusiitosasteet.
-- Ylläpidon koiralomakkeella voi laskea valitun uroksen ja emän sukusiitosasteen esikatseluna; arvo tallennetaan aina automaattisesti uutta koiraa luotaessa tai kun emä tai isä muuttuu.
-- Ylläpitoon lisättiin uusi erillinen koiraprofiili, joka näyttää vanhan hallinnan perustiedot omalla luku-API:lla ja pitää julkisen profiilin tiedot erillään ylläpitonäkymästä.
-- Ylläpitoprofiilin `EPI-luku`, `EPITEKSTI`, `Lafora-luku` ja `EPI-riskiluku` lasketaan nyt palvelinpuolella vanhan hallinnan sääntöjen mukaisesti tuoduista sairaustiedoista ja sukutaulusta.
-- Ylläpitoon lisättiin uusi virtuaaliparituksen MVP-sivu, jossa voi hakea koiria EK-numerolla, rekisterinumerolla tai nimellä, valita uroksen ja emän sekä laskea sukusiitosasteen v1-tyylisellä hakukäytöksellä.
-- Virtuaaliparituksen tulos on nyt jaettavissa URL:n kautta. Valitut uros, emä ja SP tallentuvat osoitteeseen onnistuneen laskennan jälkeen, ja kelvollinen URL laskee tuloksen automaattisesti sivun avauksessa.
-- Ylläpitoon lisättiin uusi sairaustietojen selaussivu (`/admin/dogs/diseases`), jossa voi tarkastella tuotuja sairausrivejä v1:n kaltaisella sairausvalinnalla, 15 rivin sivutuksella ja koiran profiiliin linkitettyinä DOG-riveinä.
-- Ylläpidon sairaustietojen selaussivulla voi nyt lisätä koira- ja pentuekohtaisia sairausrivejä.
-- Ylläpidon sairaustietojen selaussivulla voi nyt poistaa virheellisiä sairausrivejä.
-- Ylläpidon sairaustietojen selaussivulla voi nyt hakea sairauskoodilla sekä koiran nimellä tai rekisterinumerolla erillisellä hakupainikkeella.
-
 ### Changed
 
 ### Fixed
 
-- Sairaustietojen selaussivun sairausvalinta ja sivutus päivittävät nyt URL:n, joten valittu rajaus voidaan jakaa ja selaimen historia toimii odotetusti.
+### Removed
+
+## [0.12.0] - 2026-06-11
+
+### Julkinen
+
+- Koiraprofiili näyttää nyt sukusiitosasteen ajantasaisesta sukutaulusta.
+
+### Ylläpito
+
+- Virtuaaliparitusta voi nyt käyttää omalla ylläpitosivulla: koirat on helppo hakea, valita ja laskea pariksi yhdellä näkymällä.
+- Virtuaaliparituksen tulos on nyt jaettavissa linkillä.
+- Koirien sairaustiedot voi nyt selata, hakea, lisätä ja poistaa omalla ylläpitosivulla.
+- Koiran terveyssummat, kuten EPI ja Lafora, perustuvat nyt tuoduille sairausmerkinnöille, joten ne lasketaan aina uudestaan nykyisistä tiedoista.
+- Koiran ylläpitoprofiili sai uuden selkeämmän näkymän, joka kokoaa tärkeimmät tausta- ja terveystiedot yhteen paikkaan.
+- phase1.25-tuonti tuo nyt mukaan myös koirien sairaustiedot ja muut tuonnissa tarvittavat taustatiedot vanhasta tietokannasta.
+- Sukusiitosaste näkyy nyt yhdenmukaisesti julkisessa koiraprofiilissa, ylläpitoprofiilissa, koiran ylläpitolomakkeessa ja virtuaaliparituksessa.
+- Sukusiitosaste lasketaan nyt yhteisten esivanhempien perusteella, ja esivanhempien oma sukusiitos vaikuttaa lopputulokseen.
 
 ### Removed
 
