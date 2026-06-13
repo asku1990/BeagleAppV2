@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { VirtualPairingDogOption } from "@beagle/contracts";
 import { useBeagleVirtualPairingUiState } from "../use-beagle-virtual-pairing-ui-state";
 
 const {
@@ -112,9 +113,12 @@ vi.mock("@/queries/public/beagle/dogs/virtual-pairing", () => ({
 
 type HookResult = {
   calculationResult: { generationDepth: number } | null;
-  selectedSire: { name: string } | null;
-  selectedDam: { name: string } | null;
+  selectedSire: VirtualPairingDogOption | null;
+  selectedDam: VirtualPairingDogOption | null;
   generationDepth: string;
+  onSelectSire: (candidate: VirtualPairingDogOption) => void;
+  onSelectDam: (candidate: VirtualPairingDogOption) => void;
+  onGenerationDepthChange: (value: string) => void;
 };
 
 function resetHooks() {
@@ -123,36 +127,22 @@ function resetHooks() {
   hookState.refSlots = [];
 }
 
-function decodeHtmlEntities(value: string): string {
-  return value
-    .replaceAll("&quot;", '"')
-    .replaceAll("&#39;", "'")
-    .replaceAll("&amp;", "&")
-    .replaceAll("&lt;", "<")
-    .replaceAll("&gt;", ">");
-}
+let latestHookResult: HookResult | null = null;
 
 function renderHookHarness(): HookResult | null {
   hookState.index = 0;
   function Harness() {
     const hookResult = useBeagleVirtualPairingUiState();
-    return React.createElement(
-      "div",
-      null,
-      JSON.stringify({
-        calculationResult: hookResult.calculationResult,
-        generationDepth: hookResult.generationDepth,
-        selectedDam: hookResult.selectedDam,
-        selectedSire: hookResult.selectedSire,
-      }),
-    );
+
+    useEffect(() => {
+      latestHookResult = hookResult;
+    }, [hookResult]);
+
+    return React.createElement("div", null, "ok");
   }
 
-  const markup = renderToStaticMarkup(React.createElement(Harness));
-  const json = decodeHtmlEntities(
-    markup.slice(markup.indexOf(">") + 1, markup.lastIndexOf("<")),
-  );
-  return JSON.parse(json) as HookResult;
+  renderToStaticMarkup(React.createElement(Harness));
+  return latestHookResult;
 }
 
 async function flushMicrotasks() {
@@ -162,6 +152,7 @@ async function flushMicrotasks() {
 describe("useBeagleVirtualPairingUiState", () => {
   beforeEach(() => {
     resetHooks();
+    latestHookResult = null;
     replaceMock.mockReset();
     calculateMutationMock.mockReset();
     searchQueryMock.mockReset();
@@ -250,6 +241,49 @@ describe("useBeagleVirtualPairingUiState", () => {
     expect(replaceMock).toHaveBeenCalledWith(
       "/beagle/virtual-pairing?sire=FIN18665%2F07&dam=FIN12562%2F97&sp=12",
     );
+  });
+
+  it("keeps the selected pair when generation depth changes", async () => {
+    calculateMutationMock.mockReturnValue({
+      isPending: false,
+      mutateAsync: vi.fn(),
+    });
+
+    const sire: VirtualPairingDogOption = {
+      id: "sire-1",
+      ekNo: null,
+      registrationNo: "FIN18665/07",
+      name: "Sire Dog",
+      sex: "U",
+    };
+    const dam: VirtualPairingDogOption = {
+      id: "dam-1",
+      ekNo: null,
+      registrationNo: "FIN12562/97",
+      name: "Dam Dog",
+      sex: "N",
+    };
+
+    renderHookHarness();
+    latestHookResult?.onSelectSire(sire);
+    latestHookResult?.onSelectDam(dam);
+
+    let hook = renderHookHarness();
+    expect(hook).not.toBeNull();
+    expect(hook!.selectedSire).toMatchObject({ name: "Sire Dog" });
+    expect(hook!.selectedDam).toMatchObject({ name: "Dam Dog" });
+    expect(hook!.generationDepth).toBe("9");
+
+    const replaceCallsAfterSelection = replaceMock.mock.calls.length;
+    latestHookResult?.onGenerationDepthChange("12");
+
+    hook = renderHookHarness();
+    expect(hook).not.toBeNull();
+    expect(hook!.selectedSire).toMatchObject({ name: "Sire Dog" });
+    expect(hook!.selectedDam).toMatchObject({ name: "Dam Dog" });
+    expect(hook!.generationDepth).toBe("12");
+    expect(hook!.calculationResult).toBeNull();
+    expect(replaceMock.mock.calls.length).toBe(replaceCallsAfterSelection);
   });
 
   it("clears stale URL-backed state when the query string becomes incomplete", async () => {

@@ -10,6 +10,7 @@ health diagnostics.
 - Search by one active field at a time: `EK-numero`, `Rekisterinumero`, or `Nimi`
 - Search results show EK, registration number, sex, name, trial count, and show count
 - Parent selection uses separate sire and dam actions
+- Changing generation depth keeps the selected sire and dam in place, clears the previous result, and waits for an explicit recalculation
 - Calculation reuses the shared current-data inbreeding and health services
 - Result presentation shows the adjusted inbreeding coefficient, raw `Fx` only when it differs, known pedigree percentage, EPI risk, risk number, and grouped basis rows
 - Optional position display shows all included sire/dam positions per shared ancestor

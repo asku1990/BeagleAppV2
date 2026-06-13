@@ -234,11 +234,11 @@ export function useBeagleVirtualPairingCalculationState() {
       invalidatePendingCalculationRequests();
       forgetAutoLoadKey();
       setGenerationDepth(value);
+      setSelectionMessage(null);
       setCalculationResult(null);
       setCalculationMessage(null);
-      clearUrlState();
     },
-    [clearUrlState, forgetAutoLoadKey, invalidatePendingCalculationRequests],
+    [forgetAutoLoadKey, invalidatePendingCalculationRequests],
   );
 
   return {
