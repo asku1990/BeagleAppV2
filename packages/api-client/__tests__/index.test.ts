@@ -43,4 +43,27 @@ describe("api client request headers", () => {
     );
     expect(init?.method).toBe("GET");
   });
+
+  it("builds public virtual pairing search endpoint via createApiClient", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, data: { items: [] } }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    const client = createApiClient({ baseUrl: "http://example.test" });
+
+    await client.searchPublicVirtualPairing({
+      field: "name",
+      query: "Kide",
+      page: 2,
+      pageSize: 10,
+    });
+
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe(
+      "http://example.test/api/beagle/dogs/virtual-pairing?field=name&query=Kide&page=2&pageSize=10",
+    );
+    expect(init?.method).toBe("GET");
+  });
 });

@@ -49,6 +49,10 @@ import {
   svBeagleTrialsMessages,
 } from "@/lib/i18n/messages/beagle/trials";
 import {
+  fiBeagleVirtualPairingMessages,
+  svBeagleVirtualPairingMessages,
+} from "@/lib/i18n/messages/beagle/virtual-pairing";
+import {
   fiPrivacyMessages,
   svPrivacyMessages,
 } from "@/lib/i18n/messages/privacy";
@@ -70,6 +74,7 @@ const fi = {
   ...fiBeagleDogProfileMessages,
   ...fiBeagleShowsMessages,
   ...fiBeagleTrialsMessages,
+  ...fiBeagleVirtualPairingMessages,
   ...fiPrivacyMessages,
 } as const;
 
@@ -93,6 +98,7 @@ const sv: Messages = {
   ...svBeagleDogProfileMessages,
   ...svBeagleShowsMessages,
   ...svBeagleTrialsMessages,
+  ...svBeagleVirtualPairingMessages,
   ...svPrivacyMessages,
 };
 

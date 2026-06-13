@@ -27,6 +27,8 @@ function makeRow(input: {
   ekNo?: number | null;
   sex?: DogSex;
   registrations: Array<{ registrationNo: string; createdAt: Date }>;
+  trialCount?: number;
+  showCount?: number;
 }) {
   return {
     id: input.id,
@@ -34,6 +36,10 @@ function makeRow(input: {
     name: input.name,
     sex: input.sex ?? DogSex.MALE,
     registrations: input.registrations,
+    _count: {
+      trialEntries: input.trialCount ?? 0,
+      showEntries: input.showCount ?? 0,
+    },
   };
 }
 
@@ -122,6 +128,12 @@ describe("searchVirtualPairingDogsDb", () => {
         ekNo: true,
         name: true,
         sex: true,
+        _count: {
+          select: {
+            trialEntries: true,
+            showEntries: true,
+          },
+        },
         registrations: {
           select: {
             registrationNo: true,
@@ -188,6 +200,12 @@ describe("searchVirtualPairingDogsDb", () => {
         ekNo: true,
         name: true,
         sex: true,
+        _count: {
+          select: {
+            trialEntries: true,
+            showEntries: true,
+          },
+        },
         registrations: {
           select: {
             registrationNo: true,
@@ -211,6 +229,8 @@ describe("searchVirtualPairingDogsDb", () => {
           registrationNo: "FI12345/21",
           name: "Metsapolun Kide",
           sex: "N",
+          trialCount: 0,
+          showCount: 0,
         },
       ],
     });
@@ -253,6 +273,12 @@ describe("searchVirtualPairingDogsDb", () => {
         ekNo: true,
         name: true,
         sex: true,
+        _count: {
+          select: {
+            trialEntries: true,
+            showEntries: true,
+          },
+        },
         registrations: {
           select: {
             registrationNo: true,
@@ -276,6 +302,8 @@ describe("searchVirtualPairingDogsDb", () => {
           registrationNo: "FI12345/21",
           name: "Dog 5588",
           sex: "U",
+          trialCount: 0,
+          showCount: 0,
         },
       ],
     });
@@ -330,6 +358,12 @@ describe("searchVirtualPairingDogsDb", () => {
         ekNo: true,
         name: true,
         sex: true,
+        _count: {
+          select: {
+            trialEntries: true,
+            showEntries: true,
+          },
+        },
         registrations: {
           select: {
             registrationNo: true,

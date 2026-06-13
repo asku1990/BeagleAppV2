@@ -131,7 +131,7 @@ export function AdminVirtualPairingResultPanel({ t, result }: Props) {
       <div className="rounded-lg border p-4 font-mono text-sm leading-6">
         <div>
           {t("admin.virtualPairing.result.summary.sharedAncestors")}{" "}
-          {result.diagnostics.includedOccurrenceCount} kpl (
+          {result.diagnostics.sharedAncestorCount} kpl (
           {result.diagnostics.sharedOccurrenceCount} kpl)
         </div>
         <div>

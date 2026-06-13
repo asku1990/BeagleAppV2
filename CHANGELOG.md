@@ -14,6 +14,9 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+- Public virtuaaliparitus flow with public search, calculation, result display,
+  and EPI info page.
+
 ### Changed
 
 ### Fixed

@@ -20,6 +20,8 @@ export type VirtualPairingSearchDogRowDb = {
   registrationNo: string;
   name: string;
   sex: "U" | "N" | "-";
+  trialCount: number;
+  showCount: number;
 };
 
 export type VirtualPairingSearchResponseDb = {
@@ -39,6 +41,10 @@ export type RawVirtualPairingDogRow = {
   name: string;
   sex: DogSex;
   registrations: RegistrationRow[];
+  _count: {
+    trialEntries: number;
+    showEntries: number;
+  };
 };
 
 export function normalizeQuery(value: string): string {
