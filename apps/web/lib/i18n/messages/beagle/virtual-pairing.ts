@@ -73,10 +73,26 @@ export const fiBeagleVirtualPairingMessages = {
   "beagle.virtualPairing.result.rawFx": "Raaka Fx",
 
   "beagle.virtualPairing.epiInfo.title": "EPI-info",
-  "beagle.virtualPairing.epiInfo.description":
-    "Epilepsiariski perustuu virtuaaliparituksen sukutaulussa esiintyviin sairastuneisiin koiriin sekä niiden lähisukulaisiin. Mitä lähempänä nämä koirat ovat sukutaulussa, sitä suurempi on laskettu riski.",
+  "beagle.virtualPairing.epiInfo.headline": "Mitä tarkoittaa epilepsiariski?",
+  "beagle.virtualPairing.epiInfo.intro":
+    "Virtuaaliyhdistelmän epilepsiariskin suuruuteen vaikuttaa vanhempien suvussa esiintyvät epilepsiaan sairastuneet koirat ja sairastuneiden koirien lähisukulaiset. Ratkaisevaa on, kuinka lähellä riskiä nostavat esivanhemmat ovat sukutaulussa. Virtuaaliyhdistelmän epilepsiariskilaskennassa ovat mukana sekä aiemmin kerätty epilepsia-aineisto että Lafora- testatut koirat.",
   "beagle.virtualPairing.epiInfo.paragraph2":
-    "Lafora on peittyvästi periytyvä epilepsian muoto, joten testitulokset ja vanhan epilepsia-aineiston havainnot yhdistetään riskilaskennassa. Riski on laskennallinen arvio, ei geneettinen varmuus.",
+    "Vanhaan epilepsia-aineistoon pohjautuva riski on laskennallinen. Näissä tapauksissa riskin arviointi perustuu kerättyyn epilepsia-aineistoon ja laskennallisen riskin huomioon ottaminen on näissä tapauksissa ainoa keino vaikuttaa suunniteltujen pentueiden sairastumistodennäköisyyksiin.",
+  "beagle.virtualPairing.epiInfo.paragraph3":
+    "Lafora-epilepsia on peittyvästi periytyvä eli resessiivinen, eli vain molemmilta vanhemmilta saatu sama geenivirhe johtaa Lafora sairaan koiran syntymään. Se on tällä hetkellä ainoa periytyvän epilepsian muoto, johon on olemassa geenitesti. Testillä pystytään todentamaan sairaat koirat, geenivirheen kantajat ja Lafora-geenivirheettömät koirat. Lafora-epilepsiariskin arviointi perustuukin virtuaalipentueen sukutaulussa olevien koirien geenitestituloksiin.",
+  "beagle.virtualPairing.epiInfo.paragraph4":
+    "Vanhassa epilepsia-aineistossa on suurella todennäköisyydellä myös Lafora-epileptikkoja. Tästä syystä vanhan epilepsia-aineiston riskilaskenta ja Lafora-riskilaskenta on tässä yhdistetty.",
+  "beagle.virtualPairing.epiInfo.riskIntro":
+    "Riskin suuruutta kuvataan numeroilla seuraavasti:",
+  "beagle.virtualPairing.epiInfo.risk.oneTwo":
+    "Numerot 1 - 2 tarkoittavat, että Lafora-sairaan pennun syntymismahdollisuus on varmuudella poissuljettu. Myös muiden epilepsiamuotojen osalta riski on laskennallisesti vähäinen. Lafora-kantajien syntyminen on mahdollista, mutta epätodennäköistä.",
+  "beagle.virtualPairing.epiInfo.risk.threeFive":
+    "Numerot 3 - 5 kuvaavat kohonnutta riskiä. Tällaisissa tapauksissa kasvattajan kannattaa ottaa yhteyttä jalostusjaostoon tarkempaa analyysiä varten. Kasvattaja saa samalla arvion siitä, onko syytä Lafora-testata jompikumpi vanhemmista ennen paritusyhdistelmän toteuttamista.",
+  "beagle.virtualPairing.epiInfo.risk.sixEight":
+    "Numerot 6 - 8 tarkoittavat selvästi kohonnutta riskiä. Tällaisissa tapauksissa kannattaa harkita vakavasti muuta siitosyhdistelmää. Joka tapauksessa kasvattajan on otettava yhteyttä jalostusjaostoon ennen parituksen toteuttamista. Numerot 6 - 8 ilmaistaan lisäksi punaisella värillä riskin huomioimiseksi.",
+  "beagle.virtualPairing.epiInfo.closing":
+    "Järjestö ei pysty kieltämään minkään yhdistelmän toteuttamista, joten paritusyhdistelmien valinta on edelleen kasvattajan vastuulla. Tämän virtuaaliparitustyökalun tarkoituksena on kuitenkin helpottaa kasvattajien työtä ja tarjota apua sairausriskien minimoimiseksi.",
+  "beagle.virtualPairing.epiInfo.signature": "SBJ, jalostusjaosto",
 } as const;
 
 export const svBeagleVirtualPairingMessages = {
@@ -149,8 +165,24 @@ export const svBeagleVirtualPairingMessages = {
   "beagle.virtualPairing.result.rawFx": "Rå Fx",
 
   "beagle.virtualPairing.epiInfo.title": "EPI-info",
-  "beagle.virtualPairing.epiInfo.description":
-    "Risken för epilepsi bygger på sjuka hundar i den virtuella parningens stamtavla samt deras nära släktingar. Ju närmare dessa hundar finns i stamtavlan, desto högre blir den beräknade risken.",
+  "beagle.virtualPairing.epiInfo.headline": "Vad innebär epilepsirisk?",
+  "beagle.virtualPairing.epiInfo.intro":
+    "Graden av risk för epilepsi är beroende av insjuknade föräldrar och släktingar som förekommer i den virtuella parningskombinationens stamtavla. Risken ökar ju närmare de insjuknade hundarna och dess förfäder förekommer i stamtavlan. Då risken för epilepsi räknas ut för den virtuella parningskombinationen, har man tagit med både det tidigare insamlade materialet om hundar med epilepsi och hundar som testats för Lafora.",
   "beagle.virtualPairing.epiInfo.paragraph2":
-    "Lafora är en recessivt ärftlig form av epilepsi, så testresultat och observationer från det äldre epilepsimaterialet kombineras i riskberäkningen. Risken är en beräknad uppskattning, inte ett genetiskt facit.",
+    "Tidigare har det enda sättet att räkna ut risken för att insjukna i epilepsi hos planerade valpkullar baserat sej på det tidigare insamlade materialet om hundar med epilepsi.",
+  "beagle.virtualPairing.epiInfo.paragraph3":
+    "Lafora nedärvs recessivt, vilket innebär att hunden måste ärva två förändrade kopior av samma gen (en förändrad kopia från varje förälder) för att insjukna. För tillfället är Lafora den enda kända formen av ärftlig epilepsi som kan konstateras med ett test. Genom att testa konstaterar man om hunden är sjuk, bärare eller fri från den defekta genen. Följaktligen bygger uppskattningen av risken för Lafora-epilepsi på de testresultat som förekommer i den virtuella parningens stamtavla.",
+  "beagle.virtualPairing.epiInfo.paragraph4":
+    "Med stor sannolikhet förekommer det hundar med Lafora epilepsi i det tidigare insamlade materialet om hundar med epilepsi. Detta är orsaken till att man i uträkningen av `risk för epilepsi` nu har sammanfört materialet.",
+  "beagle.virtualPairing.epiInfo.riskIntro":
+    "Graden av risk beskrivs med följande numrering:",
+  "beagle.virtualPairing.epiInfo.risk.oneTwo":
+    "Siffrorna 1-2 innebär, att det är uteslutet att valpen insjuknar i Lafora epilepsi. Risken att insjukna i någon annan form av epilepsi är också liten. Det är möjligt att det föds hundar som är bärare av Lafora, men det är inte troligt.",
+  "beagle.virtualPairing.epiInfo.risk.threeFive":
+    "Siffrorna 3-5 indikerar en förhöjd risk. I dessa fall uppmanas uppfödaren vara i kontakt med avelsrådgivningen för mera ingående analys. Vid detta tillfälle får uppfödaren en uppskattning om det är skäl att antingen testa den ena eller den andra föräldern för Lafora, innan förverkligandet av parningen.",
+  "beagle.virtualPairing.epiInfo.risk.sixEight":
+    "Siffrorna 6-8 innebär en tydligt förhöjd risk. I dessa fall är det skäl att noggrant begrunda en annan kombination av hundar. Oberoende skall uppfödaren vara i kontakt med avelsrådgivningen innan parning förverkligas. Siffrorna 6-8 indikeras dessutom med röd färg för att uppmärksamma risken.",
+  "beagle.virtualPairing.epiInfo.closing":
+    "Rasklubben har inte befogenhet att förhindra någon kombination. Därför är valet av kombination fortfarande på uppfödarens ansvar. Avsikten med detta verktyg för virtuell parning är att göra uppfödarnas uppdrag lättare och att erbjuda hjälp för att minimera risken för att det föds sjuka hundar.",
+  "beagle.virtualPairing.epiInfo.signature": "FBK, avelskommitén.",
 } as const;

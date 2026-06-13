@@ -13,7 +13,7 @@ health diagnostics.
 - Calculation reuses the shared current-data inbreeding and health services
 - Result presentation shows the adjusted inbreeding coefficient, raw `Fx` only when it differs, known pedigree percentage, EPI risk, risk number, and grouped basis rows
 - Optional position display shows all included sire/dam positions per shared ancestor
-- `epi-info` opens a public explanation page instead of an admin popup
+- `epi-info` opens a public explanation page with the longer legacy-style risk explanation instead of an admin popup
 
 ## Boundary rules
 
