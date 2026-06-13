@@ -123,6 +123,15 @@ function resetHooks() {
   hookState.refSlots = [];
 }
 
+function decodeHtmlEntities(value: string): string {
+  return value
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#39;", "'")
+    .replaceAll("&amp;", "&")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">");
+}
+
 function renderHookHarness(): HookResult | null {
   hookState.index = 0;
   function Harness() {
@@ -140,7 +149,9 @@ function renderHookHarness(): HookResult | null {
   }
 
   const markup = renderToStaticMarkup(React.createElement(Harness));
-  const json = markup.slice(markup.indexOf(">") + 1, markup.lastIndexOf("<"));
+  const json = decodeHtmlEntities(
+    markup.slice(markup.indexOf(">") + 1, markup.lastIndexOf("<")),
+  );
   return JSON.parse(json) as HookResult;
 }
 
