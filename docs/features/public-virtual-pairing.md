@@ -21,13 +21,16 @@ health diagnostics.
 - Public UI must not import `packages/server` or `packages/db`
 - Public search and calculation stay in `packages/server/dogs/virtual-pairing`
 - Shared inbreeding grouping preserves all included occurrences so the public result can show every position for an ancestor
+- Public calculation reads through `/api/beagle/dogs/virtual-pairing/calculate` and the matching feature-scoped api-client helper
+- Public virtual pairing URL/search/selection state lives in `apps/web/hooks/public/beagle/dogs/virtual-pairing`
 
 ## Related files
 
 - `apps/web/app/(public)/beagle/virtual-pairing/page.tsx`
 - `apps/web/app/(public)/beagle/virtual-pairing/epi-info/page.tsx`
 - `apps/web/components/beagle-virtual-pairing/*`
-- `apps/web/app/actions/public/beagle/dogs/virtual-pairing/*`
+- `apps/web/app/api/beagle/dogs/virtual-pairing/calculate/*`
+- `apps/web/hooks/public/beagle/dogs/virtual-pairing/*`
 - `apps/web/queries/public/beagle/dogs/virtual-pairing/*`
 - `apps/web/lib/public/beagle/dogs/virtual-pairing/*`
 - `packages/contracts/dogs/virtual-pairing/*`

@@ -352,7 +352,7 @@ describe("searchVirtualPairingDogsDb", () => {
         },
       },
       orderBy: [{ name: "asc" }, { id: "asc" }],
-      take: 1001,
+      take: 501,
       select: {
         id: true,
         ekNo: true,
@@ -379,7 +379,7 @@ describe("searchVirtualPairingDogsDb", () => {
       totalPages: 0,
       page: 1,
       isLimited: true,
-      candidateLimit: 1000,
+      candidateLimit: 500,
       items: [],
     });
   });
@@ -414,11 +414,11 @@ describe("searchVirtualPairingDogsDb", () => {
     expect(dogCountMock).not.toHaveBeenCalled();
     expect(dogFindManyMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        take: 1001,
+        take: 501,
       }),
     );
     expect(result.isLimited).toBe(true);
-    expect(result.candidateLimit).toBe(1000);
+    expect(result.candidateLimit).toBe(500);
   });
 
   it("rejects nonnumeric ek queries before matching", async () => {

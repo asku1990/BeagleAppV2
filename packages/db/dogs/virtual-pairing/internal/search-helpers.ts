@@ -5,7 +5,7 @@ import type { RegistrationRow } from "@db/dogs/core/registration";
 export type VirtualPairingSearchFieldDb = "ek" | "reg" | "name";
 
 export const VIRTUAL_PAIRING_MAX_PAGE_SIZE = 50;
-export const VIRTUAL_PAIRING_BROAD_CANDIDATE_LIMIT = 1000;
+export const VIRTUAL_PAIRING_BROAD_CANDIDATE_LIMIT = 500;
 
 export type VirtualPairingSearchRequestDb = {
   field: VirtualPairingSearchFieldDb;

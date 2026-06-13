@@ -6,11 +6,13 @@ import type {
   VirtualPairingSearchResponse,
 } from "@beagle/contracts";
 import type { FormEvent } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { cn } from "@/lib/utils";
 import type { MessageKey } from "@/lib/i18n/messages";
+import { VirtualPairingSearchForm } from "./virtual-pairing-search-form";
+import { VirtualPairingSearchResultsCards } from "./virtual-pairing-search-results-cards";
+import { VirtualPairingSearchResultsTable } from "./virtual-pairing-search-results-table";
 
 type TranslateFn = (key: MessageKey) => string;
 
@@ -31,167 +33,6 @@ type Props = {
   onSelectSire: (candidate: VirtualPairingDogOption) => void;
   onSelectDam: (candidate: VirtualPairingDogOption) => void;
 };
-
-function formatSex(
-  value: VirtualPairingDogOption["sex"],
-  t: TranslateFn,
-): string {
-  if (value === "U") return t("beagle.virtualPairing.search.sex.male");
-  if (value === "N") return t("beagle.virtualPairing.search.sex.female");
-  return t("beagle.virtualPairing.search.sex.unknown");
-}
-
-function SearchResultActions({
-  candidate,
-  onSelectSire,
-  onSelectDam,
-  t,
-}: {
-  candidate: VirtualPairingDogOption;
-  onSelectSire: (candidate: VirtualPairingDogOption) => void;
-  onSelectDam: (candidate: VirtualPairingDogOption) => void;
-  t: TranslateFn;
-}) {
-  const canSelectSire = candidate.sex === "U";
-  const canSelectDam = candidate.sex === "N";
-
-  return (
-    <div className="flex flex-wrap gap-2">
-      <Button
-        type="button"
-        size="sm"
-        variant="outline"
-        disabled={!canSelectSire}
-        onClick={() => onSelectSire(candidate)}
-      >
-        {t("beagle.virtualPairing.search.selectSire")}
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        variant="outline"
-        disabled={!canSelectDam}
-        onClick={() => onSelectDam(candidate)}
-      >
-        {t("beagle.virtualPairing.search.selectDam")}
-      </Button>
-    </div>
-  );
-}
-
-function SearchResultsTable({
-  rows,
-  onSelectSire,
-  onSelectDam,
-  t,
-}: {
-  rows: VirtualPairingSearchResponse["items"];
-  onSelectSire: (candidate: VirtualPairingDogOption) => void;
-  onSelectDam: (candidate: VirtualPairingDogOption) => void;
-  t: TranslateFn;
-}) {
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full border-collapse text-sm">
-        <thead>
-          <tr className={cn("border-b text-left", beagleTheme.border)}>
-            <th className="py-2 pr-3">
-              {t("beagle.virtualPairing.search.col.ek")}
-            </th>
-            <th className="py-2 pr-3">
-              {t("beagle.virtualPairing.search.col.reg")}
-            </th>
-            <th className="py-2 pr-3">
-              {t("beagle.virtualPairing.search.col.sex")}
-            </th>
-            <th className="py-2 pr-3">
-              {t("beagle.virtualPairing.search.col.name")}
-            </th>
-            <th className="py-2 pr-3">
-              {t("beagle.virtualPairing.search.col.trials")}
-            </th>
-            <th className="py-2 pr-3">
-              {t("beagle.virtualPairing.search.col.shows")}
-            </th>
-            <th className="py-2 pr-3">
-              {t("beagle.virtualPairing.search.col.select")}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr
-              key={row.id}
-              className={cn("border-b last:border-b-0", beagleTheme.border)}
-            >
-              <td className="py-2 pr-3 tabular-nums">{row.ekNo ?? "-"}</td>
-              <td className="py-2 pr-3">{row.registrationNo}</td>
-              <td className="py-2 pr-3">{formatSex(row.sex, t)}</td>
-              <td className="py-2 pr-3 font-medium">{row.name}</td>
-              <td className="py-2 pr-3 tabular-nums">{row.trialCount}</td>
-              <td className="py-2 pr-3 tabular-nums">{row.showCount}</td>
-              <td className="py-2 pr-3">
-                <SearchResultActions
-                  candidate={row}
-                  onSelectSire={onSelectSire}
-                  onSelectDam={onSelectDam}
-                  t={t}
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function SearchResultsCards({
-  rows,
-  onSelectSire,
-  onSelectDam,
-  t,
-}: {
-  rows: VirtualPairingSearchResponse["items"];
-  onSelectSire: (candidate: VirtualPairingDogOption) => void;
-  onSelectDam: (candidate: VirtualPairingDogOption) => void;
-  t: TranslateFn;
-}) {
-  return (
-    <div className="space-y-3">
-      {rows.map((row) => (
-        <Card key={row.id} className={cn(beagleTheme.subpanel, "gap-0 py-0")}>
-          <CardContent className="px-4 py-4">
-            <div className="space-y-2">
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <div className="font-semibold">{row.name}</div>
-                  <div className={cn("text-sm", beagleTheme.mutedText)}>
-                    {row.registrationNo}
-                  </div>
-                </div>
-                <div className="text-sm tabular-nums text-right">
-                  <div>EK {row.ekNo ?? "-"}</div>
-                  <div>{formatSex(row.sex, t)}</div>
-                </div>
-              </div>
-              <div className={cn("text-sm", beagleTheme.mutedText)}>
-                {t("beagle.virtualPairing.search.col.trials")}: {row.trialCount}{" "}
-                {t("beagle.virtualPairing.search.col.shows")}: {row.showCount}
-              </div>
-              <SearchResultActions
-                candidate={row}
-                onSelectSire={onSelectSire}
-                onSelectDam={onSelectDam}
-                t={t}
-              />
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
-}
 
 export function VirtualPairingSearchPanel({
   t,
@@ -226,67 +67,16 @@ export function VirtualPairingSearchPanel({
             {t("beagle.virtualPairing.search.description")}
           </p>
         </CardHeader>
-        <CardContent className="px-5 pb-5 md:px-6 md:pb-6">
-          <form className="space-y-4" onSubmit={onSubmit}>
-            <div className="grid gap-3 md:grid-cols-[180px_1fr_auto] md:items-end">
-              <label className="space-y-1">
-                <span
-                  className={cn(
-                    "text-sm font-medium",
-                    beagleTheme.inkStrongText,
-                  )}
-                >
-                  {t("beagle.virtualPairing.search.fieldLabel")}
-                </span>
-                <select
-                  value={field}
-                  onChange={(event) =>
-                    onFieldChange(
-                      event.target.value as VirtualPairingSearchField,
-                    )
-                  }
-                  className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-                >
-                  <option value="ek">
-                    {t("beagle.virtualPairing.search.field.ek")}
-                  </option>
-                  <option value="reg">
-                    {t("beagle.virtualPairing.search.field.reg")}
-                  </option>
-                  <option value="name">
-                    {t("beagle.virtualPairing.search.field.name")}
-                  </option>
-                </select>
-              </label>
-              <label className="space-y-1">
-                <span
-                  className={cn(
-                    "text-sm font-medium",
-                    beagleTheme.inkStrongText,
-                  )}
-                >
-                  {t("beagle.virtualPairing.search.inputAria")}
-                </span>
-                <input
-                  value={query}
-                  onChange={(event) => onQueryChange(event.target.value)}
-                  placeholder={t(
-                    "beagle.virtualPairing.search.inputPlaceholder",
-                  )}
-                  className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-                />
-              </label>
-              <Button type="submit" disabled={!canSubmit || isPending}>
-                {isPending
-                  ? t("beagle.virtualPairing.search.loading")
-                  : t("beagle.virtualPairing.search.button")}
-              </Button>
-            </div>
-            <p className={cn("text-sm", beagleTheme.mutedText)}>
-              {t("beagle.virtualPairing.search.helper")}
-            </p>
-          </form>
-        </CardContent>
+        <VirtualPairingSearchForm
+          t={t}
+          field={field}
+          query={query}
+          isPending={isPending}
+          canSubmit={canSubmit}
+          onFieldChange={onFieldChange}
+          onQueryChange={onQueryChange}
+          onSubmit={onSubmit}
+        />
       </Card>
 
       {isLoading ? (
@@ -335,7 +125,7 @@ export function VirtualPairingSearchPanel({
           <CardContent className="px-5 pb-5 md:px-6 md:pb-6">
             <div className="space-y-4">
               <div className="hidden md:block">
-                <SearchResultsTable
+                <VirtualPairingSearchResultsTable
                   rows={results.items}
                   onSelectSire={onSelectSire}
                   onSelectDam={onSelectDam}
@@ -343,7 +133,7 @@ export function VirtualPairingSearchPanel({
                 />
               </div>
               <div className="md:hidden">
-                <SearchResultsCards
+                <VirtualPairingSearchResultsCards
                   rows={results.items}
                   onSelectSire={onSelectSire}
                   onSelectDam={onSelectDam}

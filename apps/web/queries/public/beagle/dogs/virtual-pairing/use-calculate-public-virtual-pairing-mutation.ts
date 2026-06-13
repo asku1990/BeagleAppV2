@@ -5,7 +5,7 @@ import type {
   CalculatePublicVirtualPairingResponse,
 } from "@beagle/contracts";
 import { useMutation } from "@tanstack/react-query";
-import { calculatePublicVirtualPairingAction } from "@/app/actions/public/beagle/dogs/virtual-pairing/calculate-virtual-pairing";
+import { apiClient } from "@/lib/api-client";
 
 export function useCalculatePublicVirtualPairingMutation() {
   return useMutation<
@@ -14,10 +14,10 @@ export function useCalculatePublicVirtualPairingMutation() {
     CalculatePublicVirtualPairingRequest
   >({
     mutationFn: async (input) => {
-      const result = await calculatePublicVirtualPairingAction(input);
-      if (result.hasError || !result.data) {
+      const result = await apiClient.calculatePublicVirtualPairing(input);
+      if (!result.ok) {
         throw new Error(
-          result.error ?? "Failed to calculate virtual pairing data.",
+          result.error?.trim() || "Failed to calculate virtual pairing data.",
         );
       }
       return result.data;

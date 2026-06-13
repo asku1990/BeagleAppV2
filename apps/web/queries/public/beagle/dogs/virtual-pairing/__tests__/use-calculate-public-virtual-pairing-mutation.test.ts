@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useCalculatePublicVirtualPairingMutation } from "../use-calculate-public-virtual-pairing-mutation";
 
-const { useMutationMock, calculatePublicVirtualPairingActionMock } = vi.hoisted(
+const { useMutationMock, calculatePublicVirtualPairingMock } = vi.hoisted(
   () => ({
     useMutationMock: vi.fn(),
-    calculatePublicVirtualPairingActionMock: vi.fn(),
+    calculatePublicVirtualPairingMock: vi.fn(),
   }),
 );
 
@@ -12,24 +12,22 @@ vi.mock("@tanstack/react-query", () => ({
   useMutation: useMutationMock,
 }));
 
-vi.mock(
-  "@/app/actions/public/beagle/dogs/virtual-pairing/calculate-virtual-pairing",
-  () => ({
-    calculatePublicVirtualPairingAction:
-      calculatePublicVirtualPairingActionMock,
-  }),
-);
+vi.mock("@/lib/api-client", () => ({
+  apiClient: {
+    calculatePublicVirtualPairing: calculatePublicVirtualPairingMock,
+  },
+}));
 
 describe("useCalculatePublicVirtualPairingMutation", () => {
   beforeEach(() => {
     useMutationMock.mockReset();
-    calculatePublicVirtualPairingActionMock.mockReset();
+    calculatePublicVirtualPairingMock.mockReset();
   });
 
-  it("returns the payload from the action", async () => {
+  it("returns the payload from the api client", async () => {
     useMutationMock.mockImplementation((options) => options);
-    calculatePublicVirtualPairingActionMock.mockResolvedValue({
-      hasError: false,
+    calculatePublicVirtualPairingMock.mockResolvedValue({
+      ok: true,
       data: {
         generationDepth: 9,
         sire: {
@@ -102,12 +100,10 @@ describe("useCalculatePublicVirtualPairingMutation", () => {
     });
   });
 
-  it("throws when the action returns an error", async () => {
+  it("throws when the api client returns an error", async () => {
     useMutationMock.mockImplementation((options) => options);
-    calculatePublicVirtualPairingActionMock.mockResolvedValue({
-      hasError: true,
-      data: null,
-      errorCode: "INVALID_PARENT_COMBINATION",
+    calculatePublicVirtualPairingMock.mockResolvedValue({
+      ok: false,
       error: "Sire and dam must be different dogs.",
     });
 
