@@ -14,8 +14,17 @@ This project uses a user-facing changelog format.
 
 ### Added
 
-- Public virtuaaliparitus flow with public search, calculation, result display,
-  and EPI info page.
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.13.0] - 2026-06-14
+
+### Added
+
+- Julkinen virtuaaliparitus: koirien haku, parilaskenta, tulosnäkymä ja EPI-tietosivu.
 
 ### Changed
 
