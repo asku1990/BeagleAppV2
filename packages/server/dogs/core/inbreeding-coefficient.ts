@@ -26,6 +26,7 @@ export type GroupedInbreedingContributionBreakdown = {
   sireIndex: number;
   damGeneration: number;
   damIndex: number;
+  includedOccurrences: InbreedingContributionBreakdown[];
 };
 
 export type InbreedingCoefficientBreakdownPct = {
@@ -211,6 +212,7 @@ function groupIncludedContributions(
     if (existing) {
       existing.rawContributionPct += occurrence.contributionPct;
       existing.occurrenceCount += 1;
+      existing.includedOccurrences.push(occurrence);
       existing.adjustedContributionPct =
         existing.rawContributionPct *
         getAncestorMultiplier(ancestry, occurrence.id, context);
@@ -227,6 +229,7 @@ function groupIncludedContributions(
       sireIndex: occurrence.sireIndex,
       damGeneration: occurrence.damGeneration,
       damIndex: occurrence.damIndex,
+      includedOccurrences: [occurrence],
     });
   }
 

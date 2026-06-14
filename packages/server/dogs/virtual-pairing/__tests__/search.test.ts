@@ -57,6 +57,8 @@ describe("searchVirtualPairingDogs", () => {
           registrationNo: "FI12345/21",
           name: "Metsapolun Kide",
           sex: "N",
+          trialCount: 0,
+          showCount: 0,
         },
       ],
     });
@@ -85,6 +87,8 @@ describe("searchVirtualPairingDogs", () => {
               registrationNo: "FI12345/21",
               name: "Metsapolun Kide",
               sex: "N",
+              trialCount: 0,
+              showCount: 0,
             },
           ],
         },

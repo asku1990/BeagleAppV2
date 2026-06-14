@@ -27,6 +27,8 @@ function makeRow(input: {
   ekNo?: number | null;
   sex?: DogSex;
   registrations: Array<{ registrationNo: string; createdAt: Date }>;
+  trialCount?: number;
+  showCount?: number;
 }) {
   return {
     id: input.id,
@@ -34,6 +36,10 @@ function makeRow(input: {
     name: input.name,
     sex: input.sex ?? DogSex.MALE,
     registrations: input.registrations,
+    _count: {
+      trialEntries: input.trialCount ?? 0,
+      showEntries: input.showCount ?? 0,
+    },
   };
 }
 
@@ -122,6 +128,12 @@ describe("searchVirtualPairingDogsDb", () => {
         ekNo: true,
         name: true,
         sex: true,
+        _count: {
+          select: {
+            trialEntries: true,
+            showEntries: true,
+          },
+        },
         registrations: {
           select: {
             registrationNo: true,
@@ -188,6 +200,12 @@ describe("searchVirtualPairingDogsDb", () => {
         ekNo: true,
         name: true,
         sex: true,
+        _count: {
+          select: {
+            trialEntries: true,
+            showEntries: true,
+          },
+        },
         registrations: {
           select: {
             registrationNo: true,
@@ -211,6 +229,8 @@ describe("searchVirtualPairingDogsDb", () => {
           registrationNo: "FI12345/21",
           name: "Metsapolun Kide",
           sex: "N",
+          trialCount: 0,
+          showCount: 0,
         },
       ],
     });
@@ -253,6 +273,12 @@ describe("searchVirtualPairingDogsDb", () => {
         ekNo: true,
         name: true,
         sex: true,
+        _count: {
+          select: {
+            trialEntries: true,
+            showEntries: true,
+          },
+        },
         registrations: {
           select: {
             registrationNo: true,
@@ -276,6 +302,8 @@ describe("searchVirtualPairingDogsDb", () => {
           registrationNo: "FI12345/21",
           name: "Dog 5588",
           sex: "U",
+          trialCount: 0,
+          showCount: 0,
         },
       ],
     });
@@ -324,12 +352,18 @@ describe("searchVirtualPairingDogsDb", () => {
         },
       },
       orderBy: [{ name: "asc" }, { id: "asc" }],
-      take: 1001,
+      take: 501,
       select: {
         id: true,
         ekNo: true,
         name: true,
         sex: true,
+        _count: {
+          select: {
+            trialEntries: true,
+            showEntries: true,
+          },
+        },
         registrations: {
           select: {
             registrationNo: true,
@@ -345,7 +379,7 @@ describe("searchVirtualPairingDogsDb", () => {
       totalPages: 0,
       page: 1,
       isLimited: true,
-      candidateLimit: 1000,
+      candidateLimit: 500,
       items: [],
     });
   });
@@ -380,11 +414,11 @@ describe("searchVirtualPairingDogsDb", () => {
     expect(dogCountMock).not.toHaveBeenCalled();
     expect(dogFindManyMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        take: 1001,
+        take: 501,
       }),
     );
     expect(result.isLimited).toBe(true);
-    expect(result.candidateLimit).toBe(1000);
+    expect(result.candidateLimit).toBe(500);
   });
 
   it("rejects nonnumeric ek queries before matching", async () => {

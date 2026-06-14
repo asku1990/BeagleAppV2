@@ -34,6 +34,8 @@ function toRow(row: RawVirtualPairingDogRow): VirtualPairingSearchDogRowDb {
     registrationNo: resolvePrimaryRegistrationNo(row.registrations),
     name: row.name,
     sex: toSexCode(row.sex),
+    trialCount: row._count.trialEntries,
+    showCount: row._count.showEntries,
   };
 }
 
@@ -78,6 +80,12 @@ export async function searchVirtualPairingDogsDb(
         ekNo: true,
         name: true,
         sex: true,
+        _count: {
+          select: {
+            trialEntries: true,
+            showEntries: true,
+          },
+        },
         registrations: {
           select: {
             registrationNo: true,
@@ -125,6 +133,12 @@ export async function searchVirtualPairingDogsDb(
       ekNo: true,
       name: true,
       sex: true,
+      _count: {
+        select: {
+          trialEntries: true,
+          showEntries: true,
+        },
+      },
       registrations: {
         select: {
           registrationNo: true,

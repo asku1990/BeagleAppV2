@@ -1,8 +1,17 @@
-import type { ImportIssueSeverity } from "@beagle/contracts";
+import type {
+  ApiResult,
+  ImportIssueSeverity,
+  CalculatePublicVirtualPairingRequest,
+  CalculatePublicVirtualPairingResponse,
+  VirtualPairingSearchRequest,
+  VirtualPairingSearchResponse,
+} from "@beagle/contracts";
 import type { ClientOptions } from "./core/client-options";
 import { createRequest } from "./core/request";
 import { getImportRun } from "./imports/get-import-run";
 import { getImportRunIssues } from "./imports/get-import-run-issues";
+import { calculatePublicVirtualPairing as calculatePublicVirtualPairingRequest } from "./public/dogs/calculate-public-virtual-pairing";
+import { searchPublicVirtualPairing } from "./public/dogs/search-public-virtual-pairing";
 
 export function createApiClient(options: ClientOptions = {}) {
   const request = createRequest(options);
@@ -23,6 +32,18 @@ export function createApiClient(options: ClientOptions = {}) {
       },
     ) {
       return getImportRunIssues(request, id, options);
+    },
+
+    searchPublicVirtualPairing(
+      input: VirtualPairingSearchRequest,
+    ): Promise<ApiResult<VirtualPairingSearchResponse>> {
+      return searchPublicVirtualPairing(request, input);
+    },
+
+    calculatePublicVirtualPairing(
+      input: CalculatePublicVirtualPairingRequest,
+    ): Promise<ApiResult<CalculatePublicVirtualPairingResponse>> {
+      return calculatePublicVirtualPairingRequest(request, input);
     },
   };
 }

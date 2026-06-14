@@ -421,6 +421,12 @@ describe("calculateInbreedingCoefficientPct", () => {
       id: "shared",
       occurrenceCount: 4,
     });
+    expect(breakdown.contributions[0]?.includedOccurrences).toHaveLength(4);
+    expect(breakdown.contributions[0]?.includedOccurrences[0]).toMatchObject({
+      id: "shared",
+      sireGeneration: 2,
+      damGeneration: 2,
+    });
     expect(breakdown.contributions[0]?.rawContributionPct).toBeCloseTo(
       28.125,
       5,

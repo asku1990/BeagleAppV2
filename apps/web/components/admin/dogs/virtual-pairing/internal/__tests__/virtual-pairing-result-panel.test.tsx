@@ -100,7 +100,7 @@ describe("AdminVirtualPairingResultPanel", () => {
       "admin.virtualPairing.result.health.pur: 0.703 -----",
     );
     expect(html).toContain(
-      "admin.virtualPairing.result.summary.sharedAncestors 70 kpl (90 kpl)",
+      "admin.virtualPairing.result.summary.sharedAncestors 40 kpl (90 kpl)",
     );
     expect(html).toContain(
       "admin.virtualPairing.result.summary.occurrences 80 kpl (I=40 kpl, E=40 kpl)",

@@ -68,7 +68,8 @@ Admin-only virtual pairing is the first slice of the legacy paritus flow in v2.
 
 - Shared-ancestor diagnostics UI
 - Virtual pedigree/PDF generation
-- Public route exposure
+- Public route exposure now lives in `/beagle/virtual-pairing` and uses the
+  public-safe DTO layer documented in `docs/features/public-virtual-pairing.md`
 
 ## Safety boundary
 
