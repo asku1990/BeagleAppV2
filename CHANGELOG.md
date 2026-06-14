@@ -18,6 +18,8 @@ This project uses a user-facing changelog format.
 
 ### Fixed
 
+- Admin dog create now links existing unlinked show and trial entries when registration numbers match.
+
 ### Removed
 
 ## [0.12.0] - 2026-06-11
