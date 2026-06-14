@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { CalculatePublicVirtualPairingResponse } from "@beagle/contracts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LabeledCheckbox } from "@/components/ui/form-fields";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { cn } from "@/lib/utils";
 import type { MessageKey } from "@/lib/i18n/messages";
@@ -138,16 +139,14 @@ export function VirtualPairingResultPanel({
                   {result.summary.includedSirePositionCount} kpl, E=
                   {result.summary.includedDamPositionCount} kpl)
                 </div>
-                <div className="mt-3 flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={showPositions}
-                    onChange={(event) =>
-                      onShowPositionsChange(event.target.checked)
-                    }
-                  />
-                  <span>{t("beagle.virtualPairing.result.positions")}</span>
-                </div>
+                <LabeledCheckbox
+                  className="mt-3"
+                  label={t("beagle.virtualPairing.result.positions")}
+                  checked={showPositions}
+                  onChange={(event) =>
+                    onShowPositionsChange(event.target.checked)
+                  }
+                />
               </div>
 
               <div className="rounded-lg border p-4">

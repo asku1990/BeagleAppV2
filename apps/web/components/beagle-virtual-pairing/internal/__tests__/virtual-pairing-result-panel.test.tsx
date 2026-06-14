@@ -66,6 +66,8 @@ describe("VirtualPairingResultPanel", () => {
     expect(html).toContain(
       "beagle.virtualPairing.result.sharedAncestors 1 kpl (2 kpl)",
     );
+    expect(html).toContain("<label");
+    expect(html).toContain("beagle.virtualPairing.result.positions");
     expect(html).toContain("epi-info");
     expect(html).not.toContain("0.1563");
     expect(html).not.toContain("EPI-riski (5 sp)");
