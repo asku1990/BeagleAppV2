@@ -6,11 +6,13 @@ const {
   runAdminDogWriteTransactionDbMock,
   findDogByRegistrationNoDbMock,
   loadDogPedigreeAncestryForParentsDbMock,
+  linkHistoricalEntriesOnDogCreateMock,
 } = vi.hoisted(() => ({
   createAdminDogWriteDbMock: vi.fn(),
   runAdminDogWriteTransactionDbMock: vi.fn(),
   findDogByRegistrationNoDbMock: vi.fn(),
   loadDogPedigreeAncestryForParentsDbMock: vi.fn(),
+  linkHistoricalEntriesOnDogCreateMock: vi.fn(),
 }));
 
 vi.mock("@beagle/db", () => ({
@@ -18,6 +20,10 @@ vi.mock("@beagle/db", () => ({
   runAdminDogWriteTransactionDb: runAdminDogWriteTransactionDbMock,
   findDogByRegistrationNoDb: findDogByRegistrationNoDbMock,
   loadDogPedigreeAncestryForParentsDb: loadDogPedigreeAncestryForParentsDbMock,
+}));
+
+vi.mock("../link-historical-entries-on-dog-create", () => ({
+  linkHistoricalEntriesOnDogCreate: linkHistoricalEntriesOnDogCreateMock,
 }));
 
 function mockRequiredParentResolution(): void {
@@ -57,6 +63,11 @@ describe("createAdminDog", () => {
     runAdminDogWriteTransactionDbMock.mockReset();
     findDogByRegistrationNoDbMock.mockReset();
     loadDogPedigreeAncestryForParentsDbMock.mockReset();
+    linkHistoricalEntriesOnDogCreateMock.mockReset();
+    linkHistoricalEntriesOnDogCreateMock.mockResolvedValue({
+      showLinkedCount: 0,
+      trialLinkedCount: 0,
+    });
     runAdminDogWriteTransactionDbMock.mockImplementation(async (callback) =>
       callback({}),
     );
@@ -241,6 +252,15 @@ describe("createAdminDog", () => {
     expect(runAdminDogWriteTransactionDbMock).toHaveBeenCalledWith(
       expect.any(Function),
       { intent: "CREATE_DOG" },
+    );
+
+    expect(linkHistoricalEntriesOnDogCreateMock).toHaveBeenCalledWith(
+      {
+        dogId: "dog_1",
+        primaryRegistrationNo: "FI12345/21",
+        secondaryRegistrationNos: [],
+      },
+      {},
     );
   });
 

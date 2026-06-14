@@ -9,7 +9,10 @@ import type {
 } from "@beagle/contracts";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
-import { normalizeDistinctNames } from "./normalization";
+import {
+  normalizeDistinctNames,
+  normalizeRegistrationNos,
+} from "./normalization";
 import { isPrismaUniqueConstraintError } from "./internal/prisma-errors";
 import {
   createInternalErrorResponse,
@@ -21,6 +24,7 @@ import {
   validateCreatePreflight,
 } from "./internal/create-input-validation";
 import { resolveAndValidateCreateParents } from "./internal/create-parent-validation";
+import { linkHistoricalEntriesOnDogCreate } from "./link-historical-entries-on-dog-create";
 
 const DOG_NAME_MAX_LENGTH = 120;
 const DOG_REGISTRATION_NO_MAX_LENGTH = 40;
@@ -84,9 +88,9 @@ export async function createAdminDog(
       return parentValidation.response;
     }
 
-    const createdDog = await runAdminDogWriteTransactionDb(
-      async (tx) =>
-        createAdminDogWriteDb(
+    const { createdDog, linkResult } = await runAdminDogWriteTransactionDb(
+      async (tx) => {
+        const created = await createAdminDogWriteDb(
           {
             name: preflight.data.name,
             sex: preflight.data.sex,
@@ -102,7 +106,19 @@ export async function createAdminDog(
             titles: inTryValidation.data.parsedTitles.titles,
           },
           tx,
-        ),
+        );
+
+        const linkResult = await linkHistoricalEntriesOnDogCreate(
+          {
+            dogId: created.id,
+            primaryRegistrationNo: preflight.data.primaryRegistrationNo,
+            secondaryRegistrationNos: preflight.data.secondaryRegistrationNos,
+          },
+          tx,
+        );
+
+        return { createdDog: created, linkResult };
+      },
       { ...auditContext, intent: "CREATE_DOG" },
     );
 
@@ -110,6 +126,12 @@ export async function createAdminDog(
       {
         event: "success",
         dogId: createdDog.id,
+        showEntriesLinked: linkResult.showLinkedCount,
+        trialEntriesLinked: linkResult.trialLinkedCount,
+        registrationCount: normalizeRegistrationNos([
+          preflight.data.primaryRegistrationNo,
+          ...preflight.data.secondaryRegistrationNos,
+        ]).length,
         durationMs: Date.now() - startedAt,
       },
       "admin dog create succeeded",
