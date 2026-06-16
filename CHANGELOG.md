@@ -18,6 +18,8 @@ This project uses a user-facing changelog format.
 
 ### Fixed
 
+- Kun uusi koira lisätään tietokantaan, tarkistetaan onko kyseinen koira jo käynyt kokeissa tai näyttelyissä rekisterinumeron perusteella. Jos on, linkitetään käynnit.
+
 ### Removed
 
 ## [0.13.0] - 2026-06-14

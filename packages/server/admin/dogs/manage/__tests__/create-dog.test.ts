@@ -6,11 +6,13 @@ const {
   runAdminDogWriteTransactionDbMock,
   findDogByRegistrationNoDbMock,
   loadDogPedigreeAncestryForParentsDbMock,
+  linkHistoricalEntriesOnDogCreateMock,
 } = vi.hoisted(() => ({
   createAdminDogWriteDbMock: vi.fn(),
   runAdminDogWriteTransactionDbMock: vi.fn(),
   findDogByRegistrationNoDbMock: vi.fn(),
   loadDogPedigreeAncestryForParentsDbMock: vi.fn(),
+  linkHistoricalEntriesOnDogCreateMock: vi.fn(),
 }));
 
 vi.mock("@beagle/db", () => ({
@@ -18,6 +20,10 @@ vi.mock("@beagle/db", () => ({
   runAdminDogWriteTransactionDb: runAdminDogWriteTransactionDbMock,
   findDogByRegistrationNoDb: findDogByRegistrationNoDbMock,
   loadDogPedigreeAncestryForParentsDb: loadDogPedigreeAncestryForParentsDbMock,
+}));
+
+vi.mock("../link-historical-entries-on-dog-create", () => ({
+  linkHistoricalEntriesOnDogCreate: linkHistoricalEntriesOnDogCreateMock,
 }));
 
 function mockRequiredParentResolution(): void {
@@ -57,6 +63,11 @@ describe("createAdminDog", () => {
     runAdminDogWriteTransactionDbMock.mockReset();
     findDogByRegistrationNoDbMock.mockReset();
     loadDogPedigreeAncestryForParentsDbMock.mockReset();
+    linkHistoricalEntriesOnDogCreateMock.mockReset();
+    linkHistoricalEntriesOnDogCreateMock.mockResolvedValue({
+      showLinkedCount: 0,
+      trialLinkedCount: 0,
+    });
     runAdminDogWriteTransactionDbMock.mockImplementation(async (callback) =>
       callback({}),
     );
@@ -242,6 +253,49 @@ describe("createAdminDog", () => {
       expect.any(Function),
       { intent: "CREATE_DOG" },
     );
+
+    expect(linkHistoricalEntriesOnDogCreateMock).toHaveBeenCalledWith(
+      {
+        dogId: "dog_1",
+        primaryRegistrationNo: "FI12345/21",
+        secondaryRegistrationNos: [],
+      },
+      {},
+    );
+  });
+
+  it("returns an internal error if historical linking fails after dog creation", async () => {
+    mockRequiredParentResolution();
+    createAdminDogWriteDbMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Metsapolun Kide",
+      sex: "FEMALE",
+      registrationNo: "FI12345/21",
+    });
+    linkHistoricalEntriesOnDogCreateMock.mockRejectedValueOnce(
+      new Error("link failed"),
+    );
+
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        sireRegistrationNo: "FI11111/11",
+        damRegistrationNo: "FI22222/22",
+      }),
+    ).resolves.toEqual({
+      status: 500,
+      body: {
+        ok: false,
+        error: "Failed to create dog.",
+        code: "INTERNAL_ERROR",
+      },
+    });
+
+    expect(createAdminDogWriteDbMock).toHaveBeenCalledTimes(1);
+    expect(linkHistoricalEntriesOnDogCreateMock).toHaveBeenCalledTimes(1);
+    expect(runAdminDogWriteTransactionDbMock).toHaveBeenCalledTimes(1);
   });
 
   it("creates dog without persisting any inbreeding field", async () => {
