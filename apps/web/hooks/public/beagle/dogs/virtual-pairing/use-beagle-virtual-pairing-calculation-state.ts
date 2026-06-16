@@ -133,6 +133,7 @@ export function useBeagleVirtualPairingCalculationState() {
       setCalculationMessage(null);
       setCalculationResult(null);
       invalidatePendingCalculationRequests();
+      // Parent changes are draft edits, not permission to reuse the old URL result.
       suppressCurrentUrlCalculation();
       forgetAutoLoadKey();
       clearUrlState();
@@ -254,6 +255,7 @@ export function useBeagleVirtualPairingCalculationState() {
   const onGenerationDepthChange = useCallback(
     (value: string) => {
       invalidatePendingCalculationRequests();
+      // SP changes clear the result and wait for the next explicit calculation.
       suppressCurrentUrlCalculation();
       forgetAutoLoadKey();
       setGenerationDepth(value);

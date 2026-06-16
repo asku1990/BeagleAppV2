@@ -54,6 +54,7 @@ export function useBeagleVirtualPairingCalculationUrlSync({
   const searchParams = useSearchParams();
   const lastAutoLoadKeyRef = useRef<string | null>(null);
   const pendingUrlResetTokenRef = useRef(0);
+  // Local pairing edits should win over the previous share-link calculation.
   const suppressedUrlCalculationKeyRef = useRef<string | null>(null);
 
   const urlState = useMemo(
@@ -83,6 +84,7 @@ export function useBeagleVirtualPairingCalculationUrlSync({
   }, []);
 
   const suppressCurrentUrlCalculation = useCallback(() => {
+    // Prevent the stale URL-backed result from immediately recalculating.
     suppressedUrlCalculationKeyRef.current = urlCalculationKey;
     pendingUrlResetTokenRef.current += 1;
   }, [urlCalculationKey]);
