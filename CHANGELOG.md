@@ -18,7 +18,7 @@ This project uses a user-facing changelog format.
 
 ### Fixed
 
-- Admin dog create now links existing unlinked show and trial entries when registration numbers match, and the whole write rolls back if linking fails.
+- Kun uusi koira lisätään tietokantaan, tarkistetaan onko kyseinen koira jo käynyt kokeissa tai näyttelyissä rekisterinumeron perusteella. Jos on, linkitetään käynnit.
 
 ### Removed
 
