@@ -97,19 +97,22 @@ export function useBeagleVirtualPairingCalculationState() {
     [],
   );
 
-  const { rememberAutoLoadKey, forgetAutoLoadKey } =
-    useBeagleVirtualPairingCalculationUrlSync({
-      calculateAsync,
-      beginCalculationRequest,
-      isCurrentCalculationRequest,
-      invalidatePendingCalculationRequests,
-      onUrlCalculationResolved: applyCalculatedResult,
-      onUrlCalculationReset: resetUrlBackedCalculationState,
-      onUrlCalculationError: (message) => {
-        setCalculationResult(null);
-        setCalculationMessage(message);
-      },
-    });
+  const {
+    rememberAutoLoadKey,
+    forgetAutoLoadKey,
+    suppressCurrentUrlCalculation,
+  } = useBeagleVirtualPairingCalculationUrlSync({
+    calculateAsync,
+    beginCalculationRequest,
+    isCurrentCalculationRequest,
+    invalidatePendingCalculationRequests,
+    onUrlCalculationResolved: applyCalculatedResult,
+    onUrlCalculationReset: resetUrlBackedCalculationState,
+    onUrlCalculationError: (message) => {
+      setCalculationResult(null);
+      setCalculationMessage(message);
+    },
+  });
 
   const assignParent = useCallback(
     (candidate: VirtualPairingDogOption, target: "sire" | "dam") => {
@@ -130,6 +133,8 @@ export function useBeagleVirtualPairingCalculationState() {
       setCalculationMessage(null);
       setCalculationResult(null);
       invalidatePendingCalculationRequests();
+      // Parent changes are draft edits, not permission to reuse the old URL result.
+      suppressCurrentUrlCalculation();
       forgetAutoLoadKey();
       clearUrlState();
       if (target === "sire") {
@@ -138,7 +143,13 @@ export function useBeagleVirtualPairingCalculationState() {
       }
       setSelectedDam(candidate);
     },
-    [clearUrlState, forgetAutoLoadKey, invalidatePendingCalculationRequests, t],
+    [
+      clearUrlState,
+      forgetAutoLoadKey,
+      invalidatePendingCalculationRequests,
+      suppressCurrentUrlCalculation,
+      t,
+    ],
   );
 
   const handleCalculate = useCallback(async () => {
@@ -211,34 +222,54 @@ export function useBeagleVirtualPairingCalculationState() {
 
   const onClearSire = useCallback(() => {
     invalidatePendingCalculationRequests();
+    suppressCurrentUrlCalculation();
     forgetAutoLoadKey();
     setSelectedSire(null);
     setCalculationResult(null);
     setSelectionMessage(null);
     setCalculationMessage(null);
     clearUrlState();
-  }, [clearUrlState, forgetAutoLoadKey, invalidatePendingCalculationRequests]);
+  }, [
+    clearUrlState,
+    forgetAutoLoadKey,
+    invalidatePendingCalculationRequests,
+    suppressCurrentUrlCalculation,
+  ]);
 
   const onClearDam = useCallback(() => {
     invalidatePendingCalculationRequests();
+    suppressCurrentUrlCalculation();
     forgetAutoLoadKey();
     setSelectedDam(null);
     setCalculationResult(null);
     setSelectionMessage(null);
     setCalculationMessage(null);
     clearUrlState();
-  }, [clearUrlState, forgetAutoLoadKey, invalidatePendingCalculationRequests]);
+  }, [
+    clearUrlState,
+    forgetAutoLoadKey,
+    invalidatePendingCalculationRequests,
+    suppressCurrentUrlCalculation,
+  ]);
 
   const onGenerationDepthChange = useCallback(
     (value: string) => {
       invalidatePendingCalculationRequests();
+      // SP changes clear the result and wait for the next explicit calculation.
+      suppressCurrentUrlCalculation();
       forgetAutoLoadKey();
       setGenerationDepth(value);
       setSelectionMessage(null);
       setCalculationResult(null);
       setCalculationMessage(null);
+      clearUrlState();
     },
-    [forgetAutoLoadKey, invalidatePendingCalculationRequests],
+    [
+      clearUrlState,
+      forgetAutoLoadKey,
+      invalidatePendingCalculationRequests,
+      suppressCurrentUrlCalculation,
+    ],
   );
 
   return {

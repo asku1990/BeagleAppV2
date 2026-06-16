@@ -119,6 +119,7 @@ type HookResult = {
   onSelectSire: (candidate: VirtualPairingDogOption) => void;
   onSelectDam: (candidate: VirtualPairingDogOption) => void;
   onGenerationDepthChange: (value: string) => void;
+  onCalculate: () => void;
 };
 
 function resetHooks() {
@@ -149,6 +150,50 @@ async function flushMicrotasks() {
   await new Promise<void>((resolve) => setTimeout(resolve, 0));
 }
 
+function buildCalculationResult(generationDepth: number) {
+  return {
+    generationDepth,
+    sire: {
+      id: "sire-1",
+      ekNo: null,
+      registrationNo: "FIN18665/07",
+      name: "Sire Dog",
+      sex: "U",
+    },
+    dam: {
+      id: "dam-1",
+      ekNo: null,
+      registrationNo: "FIN12562/97",
+      name: "Dam Dog",
+      sex: "N",
+    },
+    inbreedingCoefficientPct: 1.2345,
+    rawInbreedingCoefficientPct: 1.2345,
+    health: {
+      epi: {
+        value: 0,
+        text: "-----",
+        tier: 1,
+        display: "0.000 -----",
+      },
+      risk: {
+        value: 4,
+        display: "4",
+      },
+    },
+    summary: {
+      sharedAncestorCount: 1,
+      sharedOccurrenceCount: 2,
+      includedOccurrenceCount: 3,
+      includedSirePositionCount: 4,
+      includedDamPositionCount: 5,
+      includedPositionCount: 6,
+      knownPedigreePct: 88.5,
+      contributions: [],
+    },
+  } as const;
+}
+
 describe("useBeagleVirtualPairingUiState", () => {
   beforeEach(() => {
     resetHooks();
@@ -170,47 +215,7 @@ describe("useBeagleVirtualPairingUiState", () => {
   });
 
   it("auto-loads a URL-backed calculation once and syncs the result into the URL", async () => {
-    const mutateAsync = vi.fn().mockResolvedValue({
-      generationDepth: 12,
-      sire: {
-        id: "sire-1",
-        ekNo: null,
-        registrationNo: "FIN18665/07",
-        name: "Sire Dog",
-        sex: "U",
-      },
-      dam: {
-        id: "dam-1",
-        ekNo: null,
-        registrationNo: "FIN12562/97",
-        name: "Dam Dog",
-        sex: "N",
-      },
-      inbreedingCoefficientPct: 12.3456,
-      rawInbreedingCoefficientPct: 12.3456,
-      health: {
-        epi: {
-          value: 0,
-          text: "-----",
-          tier: 1,
-          display: "0.000 -----",
-        },
-        risk: {
-          value: 4,
-          display: "4",
-        },
-      },
-      summary: {
-        sharedAncestorCount: 1,
-        sharedOccurrenceCount: 2,
-        includedOccurrenceCount: 3,
-        includedSirePositionCount: 4,
-        includedDamPositionCount: 5,
-        includedPositionCount: 6,
-        knownPedigreePct: 88.5,
-        contributions: [],
-      },
-    });
+    const mutateAsync = vi.fn().mockResolvedValue(buildCalculationResult(12));
 
     calculateMutationMock.mockReturnValue({
       isPending: false,
@@ -274,7 +279,6 @@ describe("useBeagleVirtualPairingUiState", () => {
     expect(hook!.selectedDam).toMatchObject({ name: "Dam Dog" });
     expect(hook!.generationDepth).toBe("9");
 
-    const replaceCallsAfterSelection = replaceMock.mock.calls.length;
     latestHookResult?.onGenerationDepthChange("12");
 
     hook = renderHookHarness();
@@ -283,51 +287,77 @@ describe("useBeagleVirtualPairingUiState", () => {
     expect(hook!.selectedDam).toMatchObject({ name: "Dam Dog" });
     expect(hook!.generationDepth).toBe("12");
     expect(hook!.calculationResult).toBeNull();
-    expect(replaceMock.mock.calls.length).toBe(replaceCallsAfterSelection);
+    expect(replaceMock).toHaveBeenLastCalledWith("/beagle/virtual-pairing");
+  });
+
+  it("does not auto-recalculate from stale URL state after generation depth changes", async () => {
+    const mutateAsync = vi
+      .fn()
+      .mockResolvedValueOnce(buildCalculationResult(9))
+      .mockResolvedValueOnce(buildCalculationResult(12));
+
+    calculateMutationMock.mockReturnValue({
+      isPending: false,
+      mutateAsync,
+    });
+    searchParamsState.sire = "FIN18665/07";
+    searchParamsState.dam = "FIN12562/97";
+    searchParamsState.sp = "9";
+
+    renderHookHarness();
+    await flushMicrotasks();
+    let hook = renderHookHarness();
+
+    expect(mutateAsync).toHaveBeenCalledTimes(1);
+    expect(hook).not.toBeNull();
+    expect(hook!.selectedSire).toMatchObject({ name: "Sire Dog" });
+    expect(hook!.selectedDam).toMatchObject({ name: "Dam Dog" });
+    expect(hook!.calculationResult).toEqual(
+      expect.objectContaining({ generationDepth: 9 }),
+    );
+
+    latestHookResult?.onGenerationDepthChange("12");
+    hook = renderHookHarness();
+
+    expect(mutateAsync).toHaveBeenCalledTimes(1);
+    expect(hook).not.toBeNull();
+    expect(hook!.selectedSire).toMatchObject({ name: "Sire Dog" });
+    expect(hook!.selectedDam).toMatchObject({ name: "Dam Dog" });
+    expect(hook!.generationDepth).toBe("12");
+    expect(hook!.calculationResult).toBeNull();
+
+    searchParamsState.sire = "";
+    searchParamsState.dam = "";
+    searchParamsState.sp = "";
+    renderHookHarness();
+    await flushMicrotasks();
+    hook = renderHookHarness();
+
+    expect(mutateAsync).toHaveBeenCalledTimes(1);
+    expect(hook).not.toBeNull();
+    expect(hook!.selectedSire).toMatchObject({ name: "Sire Dog" });
+    expect(hook!.selectedDam).toMatchObject({ name: "Dam Dog" });
+    expect(hook!.generationDepth).toBe("12");
+    expect(hook!.calculationResult).toBeNull();
+
+    latestHookResult?.onCalculate();
+    await flushMicrotasks();
+    hook = renderHookHarness();
+
+    expect(mutateAsync).toHaveBeenCalledTimes(2);
+    expect(mutateAsync).toHaveBeenLastCalledWith({
+      sireRegistrationNo: "FIN18665/07",
+      damRegistrationNo: "FIN12562/97",
+      generationDepth: 12,
+    });
+    expect(hook).not.toBeNull();
+    expect(hook!.calculationResult).toEqual(
+      expect.objectContaining({ generationDepth: 12 }),
+    );
   });
 
   it("clears stale URL-backed state when the query string becomes incomplete", async () => {
-    const mutateAsync = vi.fn().mockResolvedValue({
-      generationDepth: 9,
-      sire: {
-        id: "sire-1",
-        ekNo: null,
-        registrationNo: "FIN18665/07",
-        name: "Sire Dog",
-        sex: "U",
-      },
-      dam: {
-        id: "dam-1",
-        ekNo: null,
-        registrationNo: "FIN12562/97",
-        name: "Dam Dog",
-        sex: "N",
-      },
-      inbreedingCoefficientPct: 1.2345,
-      rawInbreedingCoefficientPct: 1.2345,
-      health: {
-        epi: {
-          value: 0,
-          text: "-----",
-          tier: 1,
-          display: "0.000 -----",
-        },
-        risk: {
-          value: 4,
-          display: "4",
-        },
-      },
-      summary: {
-        sharedAncestorCount: 0,
-        sharedOccurrenceCount: 0,
-        includedOccurrenceCount: 0,
-        includedSirePositionCount: 0,
-        includedDamPositionCount: 0,
-        includedPositionCount: 0,
-        knownPedigreePct: 0,
-        contributions: [],
-      },
-    });
+    const mutateAsync = vi.fn().mockResolvedValue(buildCalculationResult(9));
 
     calculateMutationMock.mockReturnValue({
       isPending: false,
