@@ -4,6 +4,11 @@ export {
   type CreateAdminDogDbInput,
   type CreatedAdminDogRowDb,
 } from "./create-dog";
+export {
+  linkUnlinkedShowTrialEntriesByRegistrationDb,
+  type LinkUnlinkedShowTrialEntriesDbInput,
+  type LinkUnlinkedShowTrialEntriesDbResult,
+} from "./link-unlinked-show-trial-entries";
 export { deleteAdminDogWriteDb } from "./delete-dog";
 export { findDogByIdDb, type DogByIdLookupDb } from "./find-dog-by-id";
 export {
