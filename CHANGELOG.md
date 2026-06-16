@@ -18,7 +18,17 @@ This project uses a user-facing changelog format.
 
 ### Fixed
 
-- Julkinen virtuaaliparitus ei enää laske tulosta automaattisesti vanhalla SP-arvolla, kun SP-valintaa muutetaan jaettu linkki -laskennan jälkeen.
+### Removed
+
+## [0.13.1] - 2026-06-16
+
+### Added
+
+### Changed
+
+### Fixed
+
+- Korjattu bugi: Julkinen virtuaaliparitus ei enää laske tulosta automaattisesti vanhalla SP-arvolla, kun SP-valintaa muutetaan jaettu linkki -laskennan jälkeen.
 - Kun uusi koira lisätään tietokantaan, tarkistetaan onko kyseinen koira jo käynyt kokeissa tai näyttelyissä rekisterinumeron perusteella. Jos on, linkitetään käynnit.
 
 ### Removed
