@@ -54,6 +54,7 @@ export function useBeagleVirtualPairingCalculationUrlSync({
   const searchParams = useSearchParams();
   const lastAutoLoadKeyRef = useRef<string | null>(null);
   const pendingUrlResetTokenRef = useRef(0);
+  const suppressedUrlCalculationKeyRef = useRef<string | null>(null);
 
   const urlState = useMemo(
     () => readPublicVirtualPairingUrlState(searchParams),
@@ -81,6 +82,11 @@ export function useBeagleVirtualPairingCalculationUrlSync({
     lastAutoLoadKeyRef.current = null;
   }, []);
 
+  const suppressCurrentUrlCalculation = useCallback(() => {
+    suppressedUrlCalculationKeyRef.current = urlCalculationKey;
+    pendingUrlResetTokenRef.current += 1;
+  }, [urlCalculationKey]);
+
   const queueUrlBackedCalculationStateReset = useCallback(
     (generationDepthValue: string) => {
       const token = ++pendingUrlResetTokenRef.current;
@@ -97,6 +103,11 @@ export function useBeagleVirtualPairingCalculationUrlSync({
 
   useEffect(() => {
     if (!urlCalculationKey) {
+      if (suppressedUrlCalculationKeyRef.current != null) {
+        suppressedUrlCalculationKeyRef.current = null;
+        return;
+      }
+
       if (lastAutoLoadKeyRef.current != null) {
         forgetAutoLoadKey();
         invalidatePendingCalculationRequests();
@@ -106,6 +117,12 @@ export function useBeagleVirtualPairingCalculationUrlSync({
       }
       return;
     }
+
+    if (suppressedUrlCalculationKeyRef.current === urlCalculationKey) {
+      return;
+    }
+
+    suppressedUrlCalculationKeyRef.current = null;
 
     if (lastAutoLoadKeyRef.current === urlCalculationKey) {
       return;
@@ -163,5 +180,6 @@ export function useBeagleVirtualPairingCalculationUrlSync({
     urlState,
     rememberAutoLoadKey,
     forgetAutoLoadKey,
+    suppressCurrentUrlCalculation,
   };
 }
