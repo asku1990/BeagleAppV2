@@ -18,7 +18,7 @@ This project uses a user-facing changelog format.
 
 ### Fixed
 
-- Admin dog create now links existing unlinked show and trial entries when registration numbers match.
+- Admin dog create now links existing unlinked show and trial entries when registration numbers match, and the whole write rolls back if linking fails.
 
 ### Removed
 

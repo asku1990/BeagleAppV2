@@ -1,7 +1,6 @@
 import type { Prisma } from "@prisma/client";
-import { prisma } from "@db/core/prisma";
 
-type AdminDogDbClient = Prisma.TransactionClient | typeof prisma;
+type AdminDogDbClient = Prisma.TransactionClient;
 
 export type LinkUnlinkedShowTrialEntriesDbInput = {
   dogId: string;
@@ -12,10 +11,6 @@ export type LinkUnlinkedShowTrialEntriesDbResult = {
   showLinkedCount: number;
   trialLinkedCount: number;
 };
-
-function resolveDbClient(dbClient?: AdminDogDbClient): AdminDogDbClient {
-  return dbClient ?? prisma;
-}
 
 function buildShowRegistrationSnapshotMatchFilter(
   registrationNos: string[],
@@ -54,9 +49,9 @@ function buildTrialRegistrationSnapshotMatchFilter(
 // Links historical show/trial rows to a dog when registration snapshots match.
 export async function linkUnlinkedShowTrialEntriesByRegistrationDb(
   input: LinkUnlinkedShowTrialEntriesDbInput,
-  dbClient?: AdminDogDbClient,
+  dbClient: AdminDogDbClient,
 ): Promise<LinkUnlinkedShowTrialEntriesDbResult> {
-  const client = resolveDbClient(dbClient);
+  const client = dbClient;
   const registrationNos = [...new Set(input.registrationNos)];
 
   if (registrationNos.length === 0) {
