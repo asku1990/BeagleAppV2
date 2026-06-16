@@ -11,8 +11,17 @@ export type {
   BeagleNewestResponse,
 } from "./newest/beagle-newest";
 export type {
+  CalculatePublicVirtualPairingRequest,
+  CalculatePublicVirtualPairingResponse,
+  PublicVirtualPairingHealthDto,
+  PublicVirtualPairingSummaryDto,
+  VirtualPairingContributionDto,
+  VirtualPairingContributionPosition,
   VirtualPairingDogOption,
+  VirtualPairingHealthTextDto,
+  VirtualPairingHealthTieredDto,
   VirtualPairingSearchField,
+  VirtualPairingSearchDogRow,
   VirtualPairingSearchRequest,
   VirtualPairingSearchResponse,
 } from "./virtual-pairing";

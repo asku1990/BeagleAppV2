@@ -5,3 +5,5 @@ export {
   parseVirtualPairingGenerationDepth,
 } from "./generation-depth";
 export { searchVirtualPairingDogs } from "./search";
+export { calculateVirtualPairing } from "./calculate-virtual-pairing";
+export { calculatePublicVirtualPairing } from "./calculate-public-virtual-pairing";

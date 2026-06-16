@@ -96,7 +96,7 @@ const publicNavItems: NavItem[] = [
     labelKey: "sidebar.nav.virtualPairing",
     icon: Link2,
     href: "/beagle/virtual-pairing",
-    availability: "planned",
+    availability: "enabled",
   },
   {
     labelKey: "sidebar.nav.bestDriver",

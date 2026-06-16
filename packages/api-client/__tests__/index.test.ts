@@ -43,4 +43,49 @@ describe("api client request headers", () => {
     );
     expect(init?.method).toBe("GET");
   });
+
+  it("builds public virtual pairing search endpoint via createApiClient", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, data: { items: [] } }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    const client = createApiClient({ baseUrl: "http://example.test" });
+
+    await client.searchPublicVirtualPairing({
+      field: "name",
+      query: "Kide",
+      page: 2,
+      pageSize: 10,
+    });
+
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe(
+      "http://example.test/api/beagle/dogs/virtual-pairing?field=name&query=Kide&page=2&pageSize=10",
+    );
+    expect(init?.method).toBe("GET");
+  });
+
+  it("builds public virtual pairing calculate endpoint via createApiClient", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, data: {} }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    const client = createApiClient({ baseUrl: "http://example.test" });
+
+    await client.calculatePublicVirtualPairing({
+      sireRegistrationNo: "FI12345/21",
+      damRegistrationNo: "FI54321/21",
+      generationDepth: 9,
+    });
+
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe(
+      "http://example.test/api/beagle/dogs/virtual-pairing/calculate?sireRegistrationNo=FI12345%2F21&damRegistrationNo=FI54321%2F21&generationDepth=9",
+    );
+    expect(init?.method).toBe("GET");
+  });
 });
