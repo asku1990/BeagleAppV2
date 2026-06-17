@@ -11,26 +11,18 @@ import {
 
 type DogFormBreederOwnersSectionProps = {
   values: AdminDogFormValues;
-  breederOptions: NamedEntityOption[];
   ownerOptions: NamedEntityOption[];
-  breederSelectedId: string;
-  breederComboboxOptions: ComboboxOption[];
   ownerComboboxOptions: ComboboxOption[];
   onValuesChange: (values: AdminDogFormValues) => void;
-  onBreederSearchChange: (value: string) => void;
   onOwnerSearchChange: (value: string) => void;
   t: (key: MessageKey) => string;
 };
 
 export function DogFormBreederOwnersSection({
   values,
-  breederOptions,
   ownerOptions,
-  breederSelectedId,
-  breederComboboxOptions,
   ownerComboboxOptions,
   onValuesChange,
-  onBreederSearchChange,
   onOwnerSearchChange,
   t,
 }: DogFormBreederOwnersSectionProps) {
@@ -39,30 +31,6 @@ export function DogFormBreederOwnersSection({
 
   return (
     <>
-      <div className="space-y-1">
-        <p className="text-sm text-muted-foreground">
-          {t("admin.dogs.form.breederSelectLabel")}
-        </p>
-        <Combobox
-          value={breederSelectedId}
-          options={breederComboboxOptions}
-          onChange={(value) => {
-            const selected = breederOptions.find(
-              (option) => option.id === value,
-            );
-            onValuesChange({
-              ...values,
-              breederNameText: selected?.name ?? "",
-            });
-          }}
-          onSearchChange={onBreederSearchChange}
-          placeholder={t("admin.dogs.form.breederNameTextPlaceholder")}
-          searchPlaceholder={t("admin.dogs.form.searchPlaceholder")}
-          clearLabel={t("admin.dogs.form.selectNone")}
-          emptyLabel={t("admin.dogs.form.noOptions")}
-        />
-      </div>
-
       <div className="space-y-1">
         <p className="text-sm text-muted-foreground">
           {t("admin.dogs.form.ownersSelectLabel")}

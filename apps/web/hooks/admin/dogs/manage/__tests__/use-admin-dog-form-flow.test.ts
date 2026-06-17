@@ -85,7 +85,6 @@ describe("useAdminDogFormFlow", () => {
     const setDeleteTarget = vi.fn();
     const setFormState = vi.fn();
     const setFormValues = vi.fn();
-    const setBreederLookupQuery = vi.fn();
     const setOwnerLookupQuery = vi.fn();
     const setParentLookupQuery = vi.fn();
 
@@ -96,7 +95,6 @@ describe("useAdminDogFormFlow", () => {
         setFormState,
       ])
       .mockImplementationOnce((initial) => [initial, setFormValues])
-      .mockImplementationOnce((initial) => [initial, setBreederLookupQuery])
       .mockImplementationOnce((initial) => [initial, setOwnerLookupQuery])
       .mockImplementationOnce((initial) => [initial, setParentLookupQuery]);
 

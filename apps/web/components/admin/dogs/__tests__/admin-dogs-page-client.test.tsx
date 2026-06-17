@@ -5,7 +5,6 @@ import type { AdminDogFormValues } from "../types";
 
 const {
   useAdminDogsQueryMock,
-  useAdminDogBreederOptionsQueryMock,
   useAdminDogOwnerOptionsQueryMock,
   useAdminDogParentOptionsQueryMock,
   useCalculateAdminDogInbreedingMutationMock,
@@ -19,7 +18,6 @@ const {
   dogResultsPropsMock,
 } = vi.hoisted(() => ({
   useAdminDogsQueryMock: vi.fn(),
-  useAdminDogBreederOptionsQueryMock: vi.fn(),
   useAdminDogOwnerOptionsQueryMock: vi.fn(),
   useAdminDogParentOptionsQueryMock: vi.fn(),
   useCalculateAdminDogInbreedingMutationMock: vi.fn(),
@@ -45,7 +43,6 @@ vi.mock("@/hooks/admin/dogs/manage", () => ({
 
 vi.mock("@/queries/admin/dogs", () => ({
   useAdminDogsQuery: useAdminDogsQueryMock,
-  useAdminDogBreederOptionsQuery: useAdminDogBreederOptionsQueryMock,
   useAdminDogOwnerOptionsQuery: useAdminDogOwnerOptionsQueryMock,
   useAdminDogParentOptionsQuery: useAdminDogParentOptionsQueryMock,
   useCalculateAdminDogInbreedingMutation:
@@ -127,7 +124,6 @@ function buildFormValues(): AdminDogFormValues {
 describe("AdminDogsPageClient", () => {
   beforeEach(() => {
     useAdminDogsQueryMock.mockReset();
-    useAdminDogBreederOptionsQueryMock.mockReset();
     useAdminDogOwnerOptionsQueryMock.mockReset();
     useAdminDogParentOptionsQueryMock.mockReset();
     useCalculateAdminDogInbreedingMutationMock.mockReset();
@@ -183,9 +179,6 @@ describe("AdminDogsPageClient", () => {
       isLoading: false,
       isError: false,
     });
-    useAdminDogBreederOptionsQueryMock.mockReturnValue({
-      data: [{ id: "b_1", name: "Metsapolun" }],
-    });
     useAdminDogOwnerOptionsQueryMock.mockReturnValue({
       data: [{ id: "o_1", name: "Tiina Virtanen" }],
     });
@@ -205,8 +198,6 @@ describe("AdminDogsPageClient", () => {
       formState: { open: true, mode: "create", target: null },
       formValues: buildFormValues(),
       setFormValues: vi.fn(),
-      breederLookupQuery: "",
-      setBreederLookupQuery: vi.fn(),
       ownerLookupQuery: "",
       setOwnerLookupQuery: vi.fn(),
       parentLookupQuery: "",
@@ -248,16 +239,19 @@ describe("AdminDogsPageClient", () => {
     expect(deleteProps.onConfirm).toBe(formFlow.handleDeleteConfirm);
   });
 
-  it("passes shaped breeder/owner/parent options into DogFormModal", () => {
+  it("passes shaped owner/parent options into DogFormModal", () => {
     renderToStaticMarkup(React.createElement(AdminDogsPageClient));
 
     const dogFormProps = dogFormModalPropsMock.mock.calls[0][0];
     const dogResultsProps = dogResultsPropsMock.mock.calls[0][0];
 
-    expect(dogFormProps.breederOptions).toEqual([
-      { id: "selected:Selected Breeder", name: "Selected Breeder" },
-      { id: "b_1", name: "Metsapolun" },
-    ]);
+    expect(dogFormProps.breederOptions).toBeUndefined();
+    expect(dogFormProps.onBreederSearchChange).toBeUndefined();
+    expect(useAdminDogOwnerOptionsQueryMock).toHaveBeenCalledWith({
+      query: "",
+      limit: 100,
+      enabled: true,
+    });
     expect(dogFormProps.ownerOptions).toEqual([
       { id: "o_1", name: "Tiina Virtanen" },
     ]);

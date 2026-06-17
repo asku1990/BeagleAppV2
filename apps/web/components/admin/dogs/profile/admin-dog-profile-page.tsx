@@ -2,15 +2,9 @@
 
 import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { AdminDogProfileDto } from "@beagle/contracts";
-import { TriangleAlert } from "lucide-react";
 import { type ReactNode } from "react";
 import { EpiLukuWithFlag } from "@web/components/admin/dogs/shared/epi-flag";
 
@@ -79,31 +73,6 @@ function formatPercent(value: number | null): string {
   return `${value.toFixed(4)} %`;
 }
 
-function InlineHelpTooltip({
-  tooltip,
-  ariaLabel,
-  children,
-}: {
-  tooltip: ReactNode;
-  ariaLabel: string;
-  children: ReactNode;
-}) {
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          type="button"
-          aria-label={ariaLabel}
-          className="inline-flex cursor-help appearance-none border-0 bg-transparent p-0 align-middle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
-        >
-          {children}
-        </button>
-      </TooltipTrigger>
-      <TooltipContent>{tooltip}</TooltipContent>
-    </Tooltip>
-  );
-}
-
 function formatRegistrationNo(
   registrationNo: string,
   registrationNos: string[],
@@ -127,39 +96,6 @@ function formatOwnerAddress(owners: AdminDogProfileDto["owners"]): string {
 
   const primary = owners[0];
   return `${primary.postalCode} ${primary.city}`.trim();
-}
-
-function formatBreederOwnerName(
-  breeder: AdminDogProfileDto["breeder"],
-): string {
-  return showDash(breeder?.ownerName);
-}
-
-function formatBreederCity(breeder: AdminDogProfileDto["breeder"]): string {
-  return showDash(breeder?.city);
-}
-
-function renderBreederName(dog: AdminDogProfileDto): ReactNode {
-  if (dog.breeder) {
-    return dog.breeder.name;
-  }
-
-  const fallbackName = dog.breederNameText?.trim();
-  if (!fallbackName) {
-    return FALLBACK_VALUE;
-  }
-
-  return (
-    <span className="inline-flex items-center gap-1">
-      <span>{fallbackName}</span>
-      <InlineHelpTooltip
-        tooltip="Kasvattaja tulee koirataulusta suoraan eikä ole linkitetty kasvattaja tauluun"
-        ariaLabel="Kasvattaja tulee koirataulusta suoraan eikä ole linkitetty kasvattaja tauluun"
-      >
-        <TriangleAlert className="size-4 text-amber-500" />
-      </InlineHelpTooltip>
-    </span>
-  );
 }
 
 function DetailRow({
@@ -241,15 +177,6 @@ function AdminDogProfileBasicsSection({ dog }: { dog: AdminDogProfileDto }) {
         <DetailRow
           label="Omistajan Osoite"
           value={formatOwnerAddress(dog.owners)}
-        />
-        <DetailRow label="Kennel" value={renderBreederName(dog)} />
-        <DetailRow
-          label="Kennelin omistajat"
-          value={formatBreederOwnerName(dog.breeder)}
-        />
-        <DetailRow
-          label="Kennelin paikkakunta"
-          value={formatBreederCity(dog.breeder)}
         />
         <DetailRow label="Muut tiedot" value={showDash(dog.note)} />
       </dl>

@@ -7,12 +7,10 @@ import { useI18n } from "@/hooks/i18n";
 import { useAdminDogFormFlow } from "@/hooks/admin/dogs/manage";
 import {
   mapAdminDogFromQuery,
-  toAdminDogBreederOptions,
   toAdminDogOwnerOptions,
   toAdminDogParentOptions,
 } from "@/lib/admin/dogs/manage";
 import {
-  useAdminDogBreederOptionsQuery,
   useDeleteAdminDogMutation,
   useAdminDogOwnerOptionsQuery,
   useAdminDogParentOptionsQuery,
@@ -57,11 +55,6 @@ export function AdminDogsPageClient() {
     deleteDogMutation,
   });
 
-  const breederOptionsQuery = useAdminDogBreederOptionsQuery({
-    query: dogFormFlow.breederLookupQuery,
-    limit: 100,
-    enabled: dogFormFlow.formState.open,
-  });
   const ownerOptionsQuery = useAdminDogOwnerOptionsQuery({
     query: dogFormFlow.ownerLookupQuery,
     limit: 100,
@@ -76,15 +69,6 @@ export function AdminDogsPageClient() {
   const dogs = useMemo(
     () => (dogsQuery.data?.items ?? []).map(mapAdminDogFromQuery),
     [dogsQuery.data?.items],
-  );
-
-  const breederOptions = useMemo(
-    () =>
-      toAdminDogBreederOptions(
-        breederOptionsQuery.data,
-        dogFormFlow.formValues.breederNameText,
-      ),
-    [breederOptionsQuery.data, dogFormFlow.formValues.breederNameText],
   );
 
   const ownerOptions = useMemo(
@@ -158,10 +142,8 @@ export function AdminDogsPageClient() {
         mode={dogFormFlow.formState.mode}
         dog={dogFormFlow.formState.target}
         values={dogFormFlow.formValues}
-        breederOptions={breederOptions}
         ownerOptions={ownerOptions}
         parentOptions={parentOptions}
-        onBreederSearchChange={dogFormFlow.setBreederLookupQuery}
         onOwnerSearchChange={dogFormFlow.setOwnerLookupQuery}
         onParentSearchChange={dogFormFlow.setParentLookupQuery}
         onClose={dogFormFlow.closeFormModal}

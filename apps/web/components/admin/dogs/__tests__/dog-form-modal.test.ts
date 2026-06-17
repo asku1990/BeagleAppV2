@@ -125,7 +125,6 @@ describe("DogFormModal", () => {
         mode: "edit",
         dog: buildDog(values),
         values,
-        breederOptions: [{ id: "b_1", name: "Metsapolun" }],
         ownerOptions: [
           { id: "o_1", name: "Tiina Virtanen" },
           { id: "o_2", name: "Antti Virtanen" },
@@ -134,7 +133,6 @@ describe("DogFormModal", () => {
           { registrationNo: "FI54321/20", name: "Korven Aatos" },
           { registrationNo: "FI77777/18", name: "Havupolun Helmi" },
         ],
-        onBreederSearchChange: vi.fn(),
         onOwnerSearchChange: vi.fn(),
         onParentSearchChange: vi.fn(),
         open: true,
@@ -149,7 +147,7 @@ describe("DogFormModal", () => {
     expect(html).toContain('value="FI54321/21"');
     expect(html).toContain('value="Metsapolun Kide"');
     expect(html).toContain('value="2021-04-09"');
-    expect(html).toContain('value="Metsapolun"');
+    expect(html).not.toContain("admin.dogs.form.breederSelectLabel");
     expect(html).toContain(">Tiina Virtanen<");
     expect(html).toContain(">Antti Virtanen<");
     expect(html).toContain('value="5588"');
@@ -172,7 +170,6 @@ describe("DogFormModal", () => {
         mode: "edit",
         dog: buildDog(values),
         values,
-        breederOptions: [{ id: "b_1", name: "Metsapolun" }],
         ownerOptions: [
           { id: "o_1", name: "Tiina Virtanen" },
           { id: "o_2", name: "Antti Virtanen" },
@@ -181,7 +178,6 @@ describe("DogFormModal", () => {
           { registrationNo: "FI54321/20", name: "Korven Aatos" },
           { registrationNo: "FI77777/18", name: "Havupolun Helmi" },
         ],
-        onBreederSearchChange: vi.fn(),
         onOwnerSearchChange: vi.fn(),
         onParentSearchChange: vi.fn(),
         open: true,
@@ -202,10 +198,8 @@ describe("DogFormModal", () => {
         mode: "create",
         dog: null,
         values,
-        breederOptions: [],
         ownerOptions: [],
         parentOptions: [],
-        onBreederSearchChange: vi.fn(),
         onOwnerSearchChange: vi.fn(),
         onParentSearchChange: vi.fn(),
         open: true,
