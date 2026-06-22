@@ -10,6 +10,7 @@ export { searchAdminVirtualPairing } from "./dogs";
 export { createAdminDog } from "./dogs";
 export { updateAdminDog } from "./dogs";
 export { deleteAdminDog } from "./dogs";
+export { getAdminDogDeleteImpact } from "./dogs";
 export { listAdminBreederOptions } from "./dogs";
 export { listAdminDogColorOptions } from "./dogs";
 export { listAdminDogParentOptions } from "./dogs";
