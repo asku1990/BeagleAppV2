@@ -20,6 +20,8 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+- Ylläpidon koiranäkymistä piilotettiin kasvattajatiedot, kunnes kasvattajan historiatiedon ja kennelrekisterin suhde on päätetty.
+
 ## [0.13.1] - 2026-06-16
 
 ### Added

@@ -62,12 +62,10 @@ export function useAdminDogFormFlow({
   const [formValues, setFormValues] = useState<AdminDogFormValues>(
     createEmptyAdminDogFormValues,
   );
-  const [breederLookupQuery, setBreederLookupQuery] = useState("");
   const [ownerLookupQuery, setOwnerLookupQuery] = useState("");
   const [parentLookupQuery, setParentLookupQuery] = useState("");
 
   function resetLookups() {
-    setBreederLookupQuery("");
     setOwnerLookupQuery("");
     setParentLookupQuery("");
   }
@@ -187,8 +185,6 @@ export function useAdminDogFormFlow({
     formState,
     formValues,
     setFormValues: handleValuesChange,
-    breederLookupQuery,
-    setBreederLookupQuery,
     ownerLookupQuery,
     setOwnerLookupQuery,
     parentLookupQuery,

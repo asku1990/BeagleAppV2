@@ -92,8 +92,9 @@ describe("AdminDogProfilePage", () => {
     expect(html).toContain("HUPI");
     expect(html).toContain("Hurskainen Jaakko");
     expect(html).toContain("82900 Ilomantsi");
-    expect(html).toContain("Karppi Raija");
-    expect(html).toContain("Maukkula");
+    expect(html).not.toContain("Kennel");
+    expect(html).not.toContain("Karppi Raija");
+    expect(html).not.toContain("Maukkula");
     expect(html).toContain('data-epi-flag="green"');
     expect(html).toContain("=&gt; Vihreä(1)");
     expect(html).toContain("- Vihreä(1) jos Epi &lt; 1.0");
@@ -132,7 +133,7 @@ describe("AdminDogProfilePage", () => {
     expect(html).toContain("( 3 )");
   });
 
-  it("shows breeder text fallback with warning tooltip when breeder link is missing", () => {
+  it("hides breeder fallback text when breeder link is missing", () => {
     const html = renderToStaticMarkup(
       React.createElement(AdminDogProfilePage, {
         dog: {
@@ -163,10 +164,8 @@ describe("AdminDogProfilePage", () => {
       }),
     );
 
-    expect(html).toContain("ROLIN CHRISTINA");
-    expect(html).toContain(
-      "Kasvattaja tulee koirataulusta suoraan eik\u00E4 ole linkitetty kasvattaja tauluun",
-    );
+    expect(html).not.toContain("ROLIN CHRISTINA");
+    expect(html).not.toContain("Kasvattaja tulee koirataulusta");
     expect(html).not.toContain("data-epi-flag=");
   });
 });
