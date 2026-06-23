@@ -36,7 +36,8 @@ Developer notes for the admin dog management flow.
 - `AdminDogsPageClient` stays a composition shell.
 - Non-UI form flow logic stays in feature-local hook/lib modules.
 - `DogFormModal` remains presentational and receives prepared options/handlers as props.
-- Admin create/update payloads include optional `colorCode`; the form edits it with lookup-backed options from `DogColor`.
+- Admin create/update payloads include optional `colorCode`; the form lists only `SELECTABLE` `DogColor` rows in the active UI language.
+- Existing hidden or legacy-unknown colors remain visible on edit and may be preserved, but cannot be newly assigned.
 
 ## Tests
 

@@ -4,6 +4,8 @@ import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { formatDogColor } from "@/lib/dogs/color";
+import { useI18n } from "@/hooks/i18n";
 import type { AdminDogProfileDto } from "@beagle/contracts";
 import { type ReactNode } from "react";
 import { EpiLukuWithFlag } from "@web/components/admin/dogs/shared/epi-flag";
@@ -129,6 +131,7 @@ function DetailRow({
 }
 
 function AdminDogProfileBasicsSection({ dog }: { dog: AdminDogProfileDto }) {
+  const { locale } = useI18n();
   return (
     <ListingSectionShell title="PERUSTIEDOT">
       <dl className="space-y-1 text-sm">
@@ -143,7 +146,10 @@ function AdminDogProfileBasicsSection({ dog }: { dog: AdminDogProfileDto }) {
           value={formatBirthDateWithAge(dog.birthDate)}
         />
         <DetailRow label="Sukupuoli" value={formatSex(dog.sex)} />
-        <DetailRow label="Väri" value="Tulossa" />
+        <DetailRow
+          label="Väri"
+          value={formatDogColor(dog.color, locale) ?? FALLBACK_VALUE}
+        />
         <DetailRow label="EK-numero" value={showDash(dog.ekNo)} />
         <DetailRow
           label="Jälkeläisiä(EK)[2p]"

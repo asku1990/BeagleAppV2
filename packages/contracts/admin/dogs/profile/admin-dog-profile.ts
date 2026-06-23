@@ -1,3 +1,5 @@
+import type { DogColorDto } from "@contracts/dogs/colors";
+
 export type AdminDogProfileRequest = {
   dogId: string;
 };
@@ -39,7 +41,7 @@ export type AdminDogProfileDto = {
   registrationNos: string[];
   birthDate: string | null;
   sex: AdminDogProfileSex;
-  color: string | null;
+  color: DogColorDto | null;
   ekNo: number | null;
   offspringCount: number;
   offspringLitterCount: number;

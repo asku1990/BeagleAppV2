@@ -12,6 +12,7 @@ export const adminDogProfileSelect = Prisma.validator<Prisma.DogSelect>()({
   birthDate: true,
   sex: true,
   ekNo: true,
+  color: true,
   sire: {
     select: {
       id: true,
@@ -40,6 +41,7 @@ export const adminDogProfileSelect = Prisma.validator<Prisma.DogSelect>()({
   },
   whelpedPuppies: {
     include: {
+      color: true,
       registrations: true,
       sire: { include: { registrations: true } },
       dam: { include: { registrations: true } },
@@ -89,6 +91,7 @@ export const adminDogProfileSelect = Prisma.validator<Prisma.DogSelect>()({
   },
   siredPuppies: {
     include: {
+      color: true,
       registrations: true,
       sire: { include: { registrations: true } },
       dam: { include: { registrations: true } },

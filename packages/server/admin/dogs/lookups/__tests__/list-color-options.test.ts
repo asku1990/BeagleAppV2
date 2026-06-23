@@ -46,8 +46,20 @@ describe("listAdminDogColorOptions", () => {
   it("returns color options on success", async () => {
     listAdminDogColorOptionsDbMock.mockResolvedValue({
       items: [
-        { code: 1, nameFi: "Musta", nameSv: "Svart", nameEn: "Black" },
-        { code: 2, nameFi: "Valkoinen", nameSv: null, nameEn: "White" },
+        {
+          code: 1,
+          nameFi: "Musta",
+          nameSv: "Svart",
+          nameEn: "Black",
+          status: "SELECTABLE",
+        },
+        {
+          code: 2,
+          nameFi: "Valkoinen",
+          nameSv: null,
+          nameEn: "White",
+          status: "HIDDEN",
+        },
       ],
     });
 
@@ -70,8 +82,20 @@ describe("listAdminDogColorOptions", () => {
         ok: true,
         data: {
           items: [
-            { code: 1, nameFi: "Musta", nameSv: "Svart", nameEn: "Black" },
-            { code: 2, nameFi: "Valkoinen", nameSv: null, nameEn: "White" },
+            {
+              code: 1,
+              nameFi: "Musta",
+              nameSv: "Svart",
+              nameEn: "Black",
+              status: "SELECTABLE",
+            },
+            {
+              code: 2,
+              nameFi: "Valkoinen",
+              nameSv: null,
+              nameEn: "White",
+              status: "HIDDEN",
+            },
           ],
         },
       },

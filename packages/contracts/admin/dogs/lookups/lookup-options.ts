@@ -1,4 +1,5 @@
 import type { AdminDogListSex } from "../manage/admin-dogs-list";
+import type { DogColorDto } from "@contracts/dogs/colors";
 
 export type AdminDogLookupRequest = {
   query?: string;
@@ -22,12 +23,7 @@ export type AdminDogParentLookupOption = {
   registrationNo: string | null;
 };
 
-export type AdminDogColorLookupOption = {
-  code: number;
-  nameFi: string;
-  nameSv: string | null;
-  nameEn: string | null;
-};
+export type AdminDogColorLookupOption = DogColorDto;
 
 export type AdminBreederLookupResponse = {
   items: AdminBreederLookupOption[];

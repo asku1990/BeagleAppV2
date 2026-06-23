@@ -21,7 +21,6 @@ describe("fetchLegacyPhase1Rows", () => {
         .fn()
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([])
         .mockResolvedValueOnce([
           { registrationNo: "FI-1/20", ekNo: 123 },
           { registrationNo: "FI-2/20", ekNo: null },

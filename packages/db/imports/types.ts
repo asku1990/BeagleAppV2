@@ -9,11 +9,6 @@ export type LegacyDogRow = {
   colorCode: number | string | null;
 };
 
-export type LegacyDogColorRow = {
-  code: number | string | null;
-  name: string | null;
-};
-
 export type LegacyBreederRow = {
   name: string | null;
   shortCode: string | null;
@@ -264,7 +259,6 @@ export type LegacySamakoiraRow = {
 
 export type LegacyPhase1Rows = {
   dogs: LegacyDogRow[];
-  dogColors: LegacyDogColorRow[];
   breeders: LegacyBreederRow[];
   eks: LegacyEkRow[];
   owners: LegacyOwnerRow[];

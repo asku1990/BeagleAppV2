@@ -1,5 +1,6 @@
 export {
   DogSex,
+  DogColorStatus,
   ImportKind,
   ImportStatus,
   Role,
@@ -72,6 +73,7 @@ export { getHomeStatisticsSnapshot, type HomeStatisticsSnapshot } from "./home";
 
 export {
   getBeagleDogProfileDb,
+  seedDogColorsDb,
   getNewestBeagleDogsDb,
   loadDogPedigreeAncestryDb,
   loadDogPedigreeAncestryForParentsDb,
@@ -215,6 +217,7 @@ export {
   linkUnlinkedShowTrialEntriesByRegistrationDb,
   listAdminBreederOptionsDb,
   listAdminDogColorOptionsDb,
+  findAdminDogColorOptionDb,
   listAdminOwnerOptionsDb,
   listAdminDogParentOptionsDb,
   runAdminUserWriteTransactionDb,

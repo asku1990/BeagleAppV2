@@ -186,7 +186,15 @@ describe("AdminDogsPageClient", () => {
       isError: false,
     });
     useAdminDogColorOptionsQueryMock.mockReturnValue({
-      data: [{ code: 121, nameFi: "Kolmivärinen", nameSv: null, nameEn: null }],
+      data: [
+        {
+          code: 121,
+          nameFi: "Kolmivärinen",
+          nameSv: "Trefärgad",
+          nameEn: null,
+          status: "SELECTABLE",
+        },
+      ],
     });
     useAdminDogOwnerOptionsQueryMock.mockReturnValue({
       data: [{ id: "o_1", name: "Tiina Virtanen" }],
@@ -272,7 +280,7 @@ describe("AdminDogsPageClient", () => {
       {
         value: "121",
         label: "121 - Kolmivärinen",
-        keywords: ["121", "Kolmivärinen", "", ""],
+        keywords: ["121", "Kolmivärinen", "Trefärgad", ""],
       },
     ]);
     expect(dogResultsProps.dogs[0]?.titlesText).toBeNull();

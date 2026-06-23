@@ -94,6 +94,8 @@ export type ImportRunIssuesResponse = {
 export type {
   BeagleNewestRequest,
   BeagleNewestResponse,
+  DogColorDto,
+  DogColorStatus,
   BeagleSearchMode,
   BeagleSearchRequest,
   BeagleSearchResponse,

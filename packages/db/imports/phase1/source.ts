@@ -35,16 +35,6 @@ export async function fetchLegacyPhase1Rows(options?: {
       `Fetched dogs rows: count=${dogs.length}, elapsed=${Math.round((Date.now() - dogsStartedAt) / 1000)}s`,
     );
 
-    const dogColorsStartedAt = Date.now();
-    const dogColors = (await connection.query(
-      `SELECT COLCODE as code,
-              COLOR as name
-       FROM beacolor`,
-    )) as LegacyPhase1Rows["dogColors"];
-    log(
-      `Fetched dog color rows: count=${dogColors.length}, elapsed=${Math.round((Date.now() - dogColorsStartedAt) / 1000)}s`,
-    );
-
     const breedersStartedAt = Date.now();
     const breeders = (await connection.query(
       `SELECT KENNEL as name,
@@ -102,7 +92,6 @@ export async function fetchLegacyPhase1Rows(options?: {
 
     return {
       dogs,
-      dogColors,
       breeders,
       eks,
       owners,

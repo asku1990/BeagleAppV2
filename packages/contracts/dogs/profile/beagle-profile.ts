@@ -1,4 +1,5 @@
 import type { BeagleShowStructuredResultDto } from "@contracts/shows/beagle-shows";
+import type { DogColorDto } from "../colors";
 
 export type BeagleDogProfileSex = "U" | "N" | "-";
 
@@ -70,6 +71,7 @@ export type BeagleDogProfileOffspringRowDto = {
   trialCount: number;
   showCount: number;
   litterCount: number;
+  color: DogColorDto | null;
 };
 
 export type BeagleDogProfileLitterDto = {
@@ -94,6 +96,7 @@ export type BeagleDogProfileSiblingRowDto = {
   trialCount: number;
   showCount: number;
   litterCount: number;
+  color: DogColorDto | null;
 };
 
 export type BeagleDogProfileDto = {
@@ -104,7 +107,7 @@ export type BeagleDogProfileDto = {
   registrationNos: string[];
   birthDate: string | null;
   sex: BeagleDogProfileSex;
-  color: string | null;
+  color: DogColorDto | null;
   ekNo: number | null;
   inbreedingCoefficientPct: number | null;
   sire: BeagleDogProfileParentDto | null;

@@ -9,6 +9,7 @@ function resolveDbClient(dbClient?: AdminDogDbClient): AdminDogDbClient {
 
 export type DogByIdLookupDb = {
   id: string;
+  colorCode: number | null;
   sire: { id: string; sex: DogSex } | null;
   dam: { id: string; sex: DogSex } | null;
 };
@@ -21,6 +22,7 @@ export async function findDogByIdDb(
     where: { id },
     select: {
       id: true,
+      colorCode: true,
       sire: {
         select: {
           id: true,
@@ -42,6 +44,7 @@ export async function findDogByIdDb(
 
   return {
     id: row.id,
+    colorCode: row.colorCode,
     sire: row.sire ? { id: row.sire.id, sex: row.sire.sex } : null,
     dam: row.dam ? { id: row.dam.id, sex: row.dam.sex } : null,
   };

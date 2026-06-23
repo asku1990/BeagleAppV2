@@ -5,6 +5,7 @@ export type AdminDogColorLookupOptionDb = {
   nameFi: string;
   nameSv: string | null;
   nameEn: string | null;
+  status: "SELECTABLE" | "HIDDEN" | "LEGACY_UNKNOWN";
 };
 
 export type AdminDogColorLookupResponseDb = {
@@ -18,6 +19,7 @@ export async function listAdminDogColorOptionsDb(): Promise<AdminDogColorLookupR
       nameFi: true,
       nameSv: true,
       nameEn: true,
+      status: true,
     },
     orderBy: { code: "asc" },
   });

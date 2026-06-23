@@ -53,10 +53,11 @@ Current note:
 - grouped litter data is already part of the profile contract and backend mapping
 - title rows are stored and rendered as structured row data (`awardedOn`, `titleCode`, `titleName`)
 - `inbreedingCoefficientPct` is derived dynamically from current pedigree ancestry in the public profile read path
-- dog color comes from the `DogColor` lookup linked by `Dog.colorCode`; missing/unknown color renders as the standard fallback
+- dog colors come from the multilingual `DogColor` lookup linked by `Dog.colorCode` and render in the active Finnish/Swedish locale
+- legacy codes without a known name render as a localized unknown color with the original numeric code
 - the UI renders litters as grouped pentue blocks with summary counts, co-parent links, and puppy profile links
 - each litter uses the shared desktop/mobile listing pattern instead of a custom flat row list
-- puppy rows currently include registration number, name, sex, EK number, trial count, show count, litter count, and a placeholder color column
+- puppy and sibling rows include registration number, name, sex, color, EK number, trial count, show count, and litter count
 - siblings use the same row columns/pattern as litter puppy rows, without litter-group blocks
 
 ## Sibling resolution rules

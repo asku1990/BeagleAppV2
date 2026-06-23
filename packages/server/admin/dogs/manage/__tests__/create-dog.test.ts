@@ -7,12 +7,14 @@ const {
   findDogByRegistrationNoDbMock,
   loadDogPedigreeAncestryForParentsDbMock,
   linkHistoricalEntriesOnDogCreateMock,
+  findAdminDogColorOptionDbMock,
 } = vi.hoisted(() => ({
   createAdminDogWriteDbMock: vi.fn(),
   runAdminDogWriteTransactionDbMock: vi.fn(),
   findDogByRegistrationNoDbMock: vi.fn(),
   loadDogPedigreeAncestryForParentsDbMock: vi.fn(),
   linkHistoricalEntriesOnDogCreateMock: vi.fn(),
+  findAdminDogColorOptionDbMock: vi.fn(),
 }));
 
 vi.mock("@beagle/db", () => ({
@@ -20,6 +22,7 @@ vi.mock("@beagle/db", () => ({
   runAdminDogWriteTransactionDb: runAdminDogWriteTransactionDbMock,
   findDogByRegistrationNoDb: findDogByRegistrationNoDbMock,
   loadDogPedigreeAncestryForParentsDb: loadDogPedigreeAncestryForParentsDbMock,
+  findAdminDogColorOptionDb: findAdminDogColorOptionDbMock,
 }));
 
 vi.mock("../link-historical-entries-on-dog-create", () => ({
@@ -64,6 +67,7 @@ describe("createAdminDog", () => {
     findDogByRegistrationNoDbMock.mockReset();
     loadDogPedigreeAncestryForParentsDbMock.mockReset();
     linkHistoricalEntriesOnDogCreateMock.mockReset();
+    findAdminDogColorOptionDbMock.mockReset();
     linkHistoricalEntriesOnDogCreateMock.mockResolvedValue({
       showLinkedCount: 0,
       trialLinkedCount: 0,
@@ -263,6 +267,30 @@ describe("createAdminDog", () => {
       },
       {},
     );
+  });
+
+  it("rejects a hidden color for a new dog", async () => {
+    mockRequiredParentResolution();
+    findAdminDogColorOptionDbMock.mockResolvedValue({
+      code: 112,
+      status: "HIDDEN",
+    });
+
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        colorCode: 112,
+        sireRegistrationNo: "FI11111/11",
+        damRegistrationNo: "FI22222/22",
+      }),
+    ).resolves.toMatchObject({
+      status: 400,
+      body: { ok: false, code: "INVALID_COLOR_CODE" },
+    });
+
+    expect(createAdminDogWriteDbMock).not.toHaveBeenCalled();
   });
 
   it("returns an internal error if historical linking fails after dog creation", async () => {

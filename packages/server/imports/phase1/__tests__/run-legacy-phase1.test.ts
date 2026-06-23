@@ -8,6 +8,7 @@ const {
   createImportRunIssueMock,
   createImportRunIssuesBulkMock,
   fetchLegacyPhase1RowsMock,
+  seedDogColorsDbMock,
   breederFindManyMock,
   dogRegistrationFindUniqueMock,
   dogRegistrationFindManyMock,
@@ -15,7 +16,6 @@ const {
   dogRegistrationUpdateMock,
   dogCreateMock,
   dogUpdateMock,
-  dogColorUpsertMock,
   ownerFindFirstMock,
   ownerCreateMock,
   dogOwnershipCreateManyMock,
@@ -26,6 +26,7 @@ const {
   createImportRunIssueMock: vi.fn(),
   createImportRunIssuesBulkMock: vi.fn(),
   fetchLegacyPhase1RowsMock: vi.fn(),
+  seedDogColorsDbMock: vi.fn(),
   breederFindManyMock: vi.fn(),
   dogRegistrationFindUniqueMock: vi.fn(),
   dogRegistrationFindManyMock: vi.fn(),
@@ -33,7 +34,6 @@ const {
   dogRegistrationUpdateMock: vi.fn(),
   dogCreateMock: vi.fn(),
   dogUpdateMock: vi.fn(),
-  dogColorUpsertMock: vi.fn(),
   ownerFindFirstMock: vi.fn(),
   ownerCreateMock: vi.fn(),
   dogOwnershipCreateManyMock: vi.fn(),
@@ -54,6 +54,7 @@ vi.mock("@beagle/db", () => ({
   createImportRunIssue: createImportRunIssueMock,
   createImportRunIssuesBulk: createImportRunIssuesBulkMock,
   fetchLegacyPhase1Rows: fetchLegacyPhase1RowsMock,
+  seedDogColorsDb: seedDogColorsDbMock,
   prisma: {
     breeder: { findMany: breederFindManyMock },
     dogRegistration: {
@@ -67,9 +68,6 @@ vi.mock("@beagle/db", () => ({
       create: dogCreateMock,
       update: dogUpdateMock,
       findUnique: vi.fn(),
-    },
-    dogColor: {
-      upsert: dogColorUpsertMock,
     },
     owner: {
       findFirst: ownerFindFirstMock,
@@ -90,6 +88,7 @@ describe("runLegacyPhase1", () => {
     createImportRunIssueMock.mockReset();
     createImportRunIssuesBulkMock.mockReset();
     fetchLegacyPhase1RowsMock.mockReset();
+    seedDogColorsDbMock.mockReset();
     breederFindManyMock.mockReset();
     dogRegistrationFindUniqueMock.mockReset();
     dogRegistrationFindManyMock.mockReset();
@@ -97,7 +96,6 @@ describe("runLegacyPhase1", () => {
     dogRegistrationUpdateMock.mockReset();
     dogCreateMock.mockReset();
     dogUpdateMock.mockReset();
-    dogColorUpsertMock.mockReset();
     ownerFindFirstMock.mockReset();
     ownerCreateMock.mockReset();
     dogOwnershipCreateManyMock.mockReset();
@@ -144,6 +142,7 @@ describe("runLegacyPhase1", () => {
       owners: [],
       samakoira: [],
     });
+    seedDogColorsDbMock.mockResolvedValue({ codes: [121, 539, 886] });
 
     breederFindManyMock.mockResolvedValue([]);
     dogRegistrationFindUniqueMock.mockImplementation(({ select }) => {
@@ -195,6 +194,36 @@ describe("runLegacyPhase1", () => {
         errorSummary: expect.stringContaining("Phase 1:"),
       }),
       expect.any(Object),
+    );
+  });
+
+  it("links a dog to a seeded legacy placeholder color", async () => {
+    seedDogColorsDbMock.mockResolvedValue({ codes: [391] });
+    fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogs: [
+        {
+          registrationNo: "FI12345/21",
+          name: "Aino",
+          sex: "N",
+          birthDateRaw: "20240101",
+          sireRegistrationNo: null,
+          damRegistrationNo: null,
+          breederName: null,
+          colorCode: 391,
+        },
+      ],
+      breeders: [],
+      eks: [],
+      owners: [],
+      samakoira: [],
+    });
+
+    await runLegacyPhase1("user-1");
+
+    expect(dogCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ colorCode: 391 }),
+      }),
     );
   });
 

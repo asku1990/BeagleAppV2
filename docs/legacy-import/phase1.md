@@ -14,7 +14,6 @@ Phase 1 imports foundation entities and link structures. It does not import tria
 ## Primary source tables
 
 - `bearek_id`
-- `beacolor`
 - `kennel`
 - `beaom`
 - `bea_apu`
@@ -29,7 +28,7 @@ Phase 1 imports foundation entities and link structures. It does not import tria
   - `SYNTY` -> `Dog.birthDate`
   - `KASVA` -> breeder text + breeder link candidate
   - `COLCODE` -> `Dog.colorCode`
-- `beacolor` -> `DogColor` lookup rows (`code`, Finnish name).
+- the canonical typed dog-color catalog -> `DogColor` lookup rows before dog writes
 - `kennel` -> `Breeder` details (`name`, short code, city, granted/raw fields).
 - `bea_apu` -> `Dog.ekNo` by registration lookup.
 - `beaom` -> `Owner` + `DogOwnership` rows by registration lookup.
@@ -65,9 +64,10 @@ Phase 1 imports foundation entities and link structures. It does not import tria
   - malformed `registrationNo` values are still recorded as issues before the `EKNO` check
   - the phase log reports both the raw `bea_apu` row count and the subset that has a non-empty `EKNO`
 - Color rows:
-  - `beacolor` is imported before dogs and is the single color label source
+  - the canonical typed catalog is seeded before dogs and is the single color label/status source
+  - legacy source codes without a known label use hidden `LEGACY_UNKNOWN` lookup rows, preserving the original code without making it selectable
   - `bearek_id.COLCODE` values of `0`, empty, or null are treated as unknown
-  - invalid or missing lookup color codes are reported as issues and stored as unknown
+  - invalid or codes outside the canonical catalog are reported as issues and stored as unknown
 
 ## Idempotency and rerun behavior
 

@@ -10,6 +10,7 @@ import {
   markImportRunFinished,
   markImportRunRunning,
   prisma,
+  seedDogColorsDb,
 } from "@beagle/db";
 import type { ImportRunResponse } from "@beagle/contracts";
 import type { ServiceResult } from "../../core/result";
@@ -302,50 +303,14 @@ export async function runLegacyPhase1(
       (row) => row.ekNo != null,
     ).length;
     log(
-      `Loaded legacy source rows: dogs=${legacy.dogs.length}, dogColors=${legacy.dogColors.length}, breeders=${legacy.breeders.length}, bea_apuRows=${beaApuRows}, bea_apuRowsWithEkNo=${beaApuRowsWithEkNo}, owners=${legacy.owners.length}, samakoira=${legacy.samakoira.length}`,
+      `Loaded legacy source rows: dogs=${legacy.dogs.length}, breeders=${legacy.breeders.length}, bea_apuRows=${beaApuRows}, bea_apuRowsWithEkNo=${beaApuRowsWithEkNo}, owners=${legacy.owners.length}, samakoira=${legacy.samakoira.length}`,
     );
     finishStage("load");
 
     startStage("dogColors");
-    let dogColorsProcessed = 0;
-    let dogColorsUpserted = 0;
-    let dogColorsSkipped = 0;
-    const totalDogColors = legacy.dogColors.length;
-    const importedDogColorCodes = new Set<number>();
-    for (const row of legacy.dogColors) {
-      dogColorsProcessed += 1;
-      const code = parseLegacyColorCode(row.code);
-      const name = normalizeNullable(row.name);
-
-      if (code === "INVALID" || code == null || !name) {
-        dogColorsSkipped += 1;
-        await recordIssue({
-          stage: "dogColors",
-          code: "DOG_COLOR_INVALID_LOOKUP_ROW",
-          message: "Dog color lookup row has invalid code or missing name.",
-          sourceTable: "beacolor",
-          payloadJson: JSON.stringify(row),
-        });
-        continue;
-      }
-
-      await prisma.dogColor.upsert({
-        where: { code },
-        create: {
-          code,
-          nameFi: name,
-        },
-        update: {
-          nameFi: name,
-        },
-      });
-      importedDogColorCodes.add(code);
-      dogColorsUpserted += 1;
-    }
-    finishStage(
-      "dogColors",
-      `upserted=${dogColorsUpserted}, skipped=${dogColorsSkipped}`,
-    );
+    const seededDogColors = await seedDogColorsDb();
+    const importedDogColorCodes = new Set(seededDogColors.codes);
+    finishStage("dogColors", `upserted=${seededDogColors.codes.length}`);
 
     startStage("breeders");
     let breederRowsProcessed = 0;
@@ -541,7 +506,7 @@ export async function runLegacyPhase1(
           stage: "dogs",
           code: "DOG_COLOR_LOOKUP_NOT_FOUND",
           message:
-            "Dog row references a color code missing from beacolor; color was treated as unknown.",
+            "Dog row references a color code missing from the canonical catalog; color was treated as unknown.",
           registrationNo,
           sourceTable: "bearek_id",
           payloadJson: JSON.stringify({

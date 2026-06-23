@@ -66,7 +66,7 @@ erDiagram
 ### Core dog data
 
 - `Dog`: central dog entity (pedigree links, breeder link, color code, timestamps).
-- `DogColor`: Kennelliitto-style dog color lookup referenced by `Dog.colorCode`.
+- `DogColor`: multilingual dog color lookup referenced by `Dog.colorCode`; status distinguishes selectable, hidden, and unnamed legacy colors.
 - `DogRegistration`: unique registration numbers per dog.
 - `Breeder`: breeder registry and metadata.
 - `Owner`: normalized owner identity (`name + postalCode + city` unique).

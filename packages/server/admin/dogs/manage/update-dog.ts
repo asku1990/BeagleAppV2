@@ -1,6 +1,6 @@
 import {
   findDogByIdDb,
-  listAdminDogColorOptionsDb,
+  findAdminDogColorOptionDb,
   runAdminDogWriteTransactionDb,
   updateAdminDogWriteDb,
   type AuditContextDb,
@@ -128,17 +128,26 @@ export async function updateAdminDog(
       return parentGuardResult.response;
     }
     if (preflight.data.colorCode != null) {
-      const colorOptions = await listAdminDogColorOptionsDb();
-      if (
-        !colorOptions.items.some(
-          (item) => item.code === preflight.data.colorCode,
-        )
-      ) {
+      const colorOption = await findAdminDogColorOptionDb(
+        preflight.data.colorCode,
+      );
+      const preservesExistingColor =
+        existingDog.colorCode === preflight.data.colorCode;
+      if (colorOption?.status !== "SELECTABLE" && !preservesExistingColor) {
+        log.warn(
+          {
+            event: "color_not_selectable",
+            dogId: preflight.data.id,
+            colorCode: preflight.data.colorCode,
+            durationMs: Date.now() - startedAt,
+          },
+          "admin dog update rejected because color is not selectable",
+        );
         return {
           status: 400,
           body: {
             ok: false,
-            error: "Color code was not found.",
+            error: "Color code is not selectable.",
             code: "INVALID_COLOR_CODE",
           },
         };

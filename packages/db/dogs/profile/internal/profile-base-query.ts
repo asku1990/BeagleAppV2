@@ -47,6 +47,7 @@ export async function getDogProfileBaseRow(dogId: string) {
       },
       whelpedPuppies: {
         include: {
+          color: true,
           registrations: true,
           sire: { include: { registrations: true } },
           dam: { include: { registrations: true } },
@@ -96,6 +97,7 @@ export async function getDogProfileBaseRow(dogId: string) {
       },
       siredPuppies: {
         include: {
+          color: true,
           registrations: true,
           sire: { include: { registrations: true } },
           dam: { include: { registrations: true } },
@@ -156,9 +158,11 @@ export async function getDogProfileBaseRow(dogId: string) {
       },
       color: {
         select: {
+          code: true,
           nameFi: true,
           nameSv: true,
           nameEn: true,
+          status: true,
         },
       },
     },
