@@ -2,23 +2,30 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { adminDogColorOptionsQueryKey } from "@/queries/admin/dogs/manage/query-keys";
 import { useAdminDogColorOptionsQuery } from "../use-admin-dog-color-options-query";
 
-const { useQueryMock, getAdminDogColorOptionsActionMock } = vi.hoisted(() => ({
+const {
+  useQueryMock,
+  createAdminDogsApiClientMock,
+  listAdminDogColorOptionsMock,
+} = vi.hoisted(() => ({
   useQueryMock: vi.fn(),
-  getAdminDogColorOptionsActionMock: vi.fn(),
+  createAdminDogsApiClientMock: vi.fn(() => ({
+    listAdminDogColorOptions: listAdminDogColorOptionsMock,
+  })),
+  listAdminDogColorOptionsMock: vi.fn(),
 }));
 
 vi.mock("@tanstack/react-query", () => ({
   useQuery: useQueryMock,
 }));
 
-vi.mock("@/app/actions/admin/dogs/lookups/get-admin-dog-color-options", () => ({
-  getAdminDogColorOptionsAction: getAdminDogColorOptionsActionMock,
+vi.mock("@beagle/api-client", () => ({
+  createAdminDogsApiClient: createAdminDogsApiClientMock,
 }));
 
 describe("useAdminDogColorOptionsQuery", () => {
   beforeEach(() => {
     useQueryMock.mockReset();
-    getAdminDogColorOptionsActionMock.mockReset();
+    listAdminDogColorOptionsMock.mockReset();
   });
 
   it("uses expected query key and options", () => {
@@ -41,8 +48,8 @@ describe("useAdminDogColorOptionsQuery", () => {
 
   it("returns options when action succeeds", async () => {
     useQueryMock.mockImplementation((options) => options);
-    getAdminDogColorOptionsActionMock.mockResolvedValue({
-      hasError: false,
+    listAdminDogColorOptionsMock.mockResolvedValue({
+      ok: true,
       data: {
         items: [{ id: "dc_1", name: "Musta" }],
       },
@@ -60,10 +67,10 @@ describe("useAdminDogColorOptionsQuery", () => {
 
   it("throws when action returns error", async () => {
     useQueryMock.mockImplementation((options) => options);
-    getAdminDogColorOptionsActionMock.mockResolvedValue({
-      hasError: true,
-      data: null,
-      errorCode: "INTERNAL_ERROR",
+    listAdminDogColorOptionsMock.mockResolvedValue({
+      ok: false,
+      error: "Failed to load dog color options.",
+      code: "INTERNAL_ERROR",
     });
 
     useAdminDogColorOptionsQuery();
