@@ -15,6 +15,7 @@ This project uses a user-facing changelog format.
 ### Added
 
 - Koirien viralliset ja historialliset värikoodit säilyvät tuonnissa, näkyvät suomeksi ja ruotsiksi koiraprofiileissa ja ovat hallittavissa ylläpidon koiralomakkeella.
+- Ylläpidon koiran poistovahvistus näyttää nyt ennen poistoa, mitä tietoja poistetaan, mitä vain irrotetaan ja jääkö omistaja tai kasvattaja ilman koiria.
 
 ### Changed
 

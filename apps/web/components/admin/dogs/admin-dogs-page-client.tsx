@@ -14,6 +14,7 @@ import { formatDogColor } from "@/lib/dogs/color";
 import {
   useAdminDogColorOptionsQuery,
   useDeleteAdminDogMutation,
+  useAdminDogDeleteImpactQuery,
   useAdminDogOwnerOptionsQuery,
   useAdminDogParentOptionsQuery,
   useAdminDogsQuery,
@@ -55,6 +56,11 @@ export function AdminDogsPageClient() {
     createDogMutation,
     updateDogMutation,
     deleteDogMutation,
+  });
+
+  const deleteImpactQuery = useAdminDogDeleteImpactQuery({
+    dogId: dogFormFlow.deleteTarget?.id ?? null,
+    enabled: Boolean(dogFormFlow.deleteTarget),
   });
 
   const ownerOptionsQuery = useAdminDogOwnerOptionsQuery({
@@ -193,6 +199,9 @@ export function AdminDogsPageClient() {
 
       <DeleteDogConfirmModal
         dog={dogFormFlow.deleteTarget}
+        impact={deleteImpactQuery.data ?? null}
+        isImpactLoading={deleteImpactQuery.isLoading}
+        isImpactError={deleteImpactQuery.isError}
         onCancel={() => dogFormFlow.setDeleteTarget(null)}
         onConfirm={dogFormFlow.handleDeleteConfirm}
         isDeleting={dogFormFlow.isDeleting}

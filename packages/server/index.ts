@@ -4,6 +4,7 @@ export {
   deleteAdminDogDisease,
   calculateAdminDogInbreeding,
   getAdminDogProfile,
+  getAdminDogDeleteImpact,
   updateAdminDog,
   deleteAdminDog,
   createAdminUser,

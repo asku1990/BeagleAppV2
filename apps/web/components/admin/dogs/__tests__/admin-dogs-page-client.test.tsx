@@ -8,6 +8,7 @@ const {
   useAdminDogColorOptionsQueryMock,
   useAdminDogOwnerOptionsQueryMock,
   useAdminDogParentOptionsQueryMock,
+  useAdminDogDeleteImpactQueryMock,
   useCalculateAdminDogInbreedingMutationMock,
   useCreateAdminDogMutationMock,
   useUpdateAdminDogMutationMock,
@@ -22,6 +23,7 @@ const {
   useAdminDogColorOptionsQueryMock: vi.fn(),
   useAdminDogOwnerOptionsQueryMock: vi.fn(),
   useAdminDogParentOptionsQueryMock: vi.fn(),
+  useAdminDogDeleteImpactQueryMock: vi.fn(),
   useCalculateAdminDogInbreedingMutationMock: vi.fn(),
   useCreateAdminDogMutationMock: vi.fn(),
   useUpdateAdminDogMutationMock: vi.fn(),
@@ -48,6 +50,7 @@ vi.mock("@/queries/admin/dogs", () => ({
   useAdminDogColorOptionsQuery: useAdminDogColorOptionsQueryMock,
   useAdminDogOwnerOptionsQuery: useAdminDogOwnerOptionsQueryMock,
   useAdminDogParentOptionsQuery: useAdminDogParentOptionsQueryMock,
+  useAdminDogDeleteImpactQuery: useAdminDogDeleteImpactQueryMock,
   useCalculateAdminDogInbreedingMutation:
     useCalculateAdminDogInbreedingMutationMock,
   useCreateAdminDogMutation: useCreateAdminDogMutationMock,
@@ -125,12 +128,39 @@ function buildFormValues(): AdminDogFormValues {
   };
 }
 
+function buildFormFlow(overrides: Record<string, unknown> = {}) {
+  return {
+    deleteTarget: null,
+    setDeleteTarget: vi.fn(),
+    formState: { open: true, mode: "create", target: null },
+    formValues: buildFormValues(),
+    setFormValues: vi.fn(),
+    ownerLookupQuery: "",
+    setOwnerLookupQuery: vi.fn(),
+    parentLookupQuery: "",
+    setParentLookupQuery: vi.fn(),
+    openCreateModal: vi.fn(),
+    openEditModal: vi.fn(),
+    closeFormModal: vi.fn(),
+    handleCalculateInbreeding: vi.fn(),
+    handleSubmit: vi.fn(),
+    handleDeleteConfirm: vi.fn(),
+    inbreedingCalculationPct: null,
+    hasInbreedingCalculation: false,
+    isCalculatingInbreeding: false,
+    isSubmitting: false,
+    isDeleting: false,
+    ...overrides,
+  };
+}
+
 describe("AdminDogsPageClient", () => {
   beforeEach(() => {
     useAdminDogsQueryMock.mockReset();
     useAdminDogColorOptionsQueryMock.mockReset();
     useAdminDogOwnerOptionsQueryMock.mockReset();
     useAdminDogParentOptionsQueryMock.mockReset();
+    useAdminDogDeleteImpactQueryMock.mockReset();
     useCalculateAdminDogInbreedingMutationMock.mockReset();
     useCreateAdminDogMutationMock.mockReset();
     useUpdateAdminDogMutationMock.mockReset();
@@ -209,28 +239,12 @@ describe("AdminDogsPageClient", () => {
         },
       ],
     });
-    useAdminDogFormFlowMock.mockReturnValue({
-      deleteTarget: null,
-      setDeleteTarget: vi.fn(),
-      formState: { open: true, mode: "create", target: null },
-      formValues: buildFormValues(),
-      setFormValues: vi.fn(),
-      ownerLookupQuery: "",
-      setOwnerLookupQuery: vi.fn(),
-      parentLookupQuery: "",
-      setParentLookupQuery: vi.fn(),
-      openCreateModal: vi.fn(),
-      openEditModal: vi.fn(),
-      closeFormModal: vi.fn(),
-      handleCalculateInbreeding: vi.fn(),
-      handleSubmit: vi.fn(),
-      handleDeleteConfirm: vi.fn(),
-      inbreedingCalculationPct: null,
-      hasInbreedingCalculation: false,
-      isCalculatingInbreeding: false,
-      isSubmitting: false,
-      isDeleting: false,
+    useAdminDogDeleteImpactQueryMock.mockReturnValue({
+      data: null,
+      isLoading: false,
+      isError: false,
     });
+    useAdminDogFormFlowMock.mockReturnValue(buildFormFlow());
   });
 
   it("wires create/edit/delete handlers from form flow into page composition", () => {
@@ -254,6 +268,68 @@ describe("AdminDogsPageClient", () => {
       formFlow.handleCalculateInbreeding,
     );
     expect(deleteProps.onConfirm).toBe(formFlow.handleDeleteConfirm);
+    expect(useAdminDogDeleteImpactQueryMock).toHaveBeenCalledWith({
+      dogId: null,
+      enabled: false,
+    });
+  });
+
+  it("passes delete impact state into confirm modal", () => {
+    const impact = {
+      dogId: "dog_1",
+      deleted: {
+        registrations: 1,
+        ownerships: 2,
+        titles: 3,
+        legacyTrialResults: 4,
+      },
+      detached: {
+        canonicalTrialEntries: 5,
+        showEntries: 6,
+        diseaseRows: 7,
+        sireReferences: 8,
+        damReferences: 9,
+      },
+      orphanWarnings: { owners: [], breeder: null },
+    };
+    const formFlow = buildFormFlow({
+      deleteTarget: {
+        id: "dog_1",
+        registrationNo: "FI12345/21",
+        secondaryRegistrationNos: [],
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        birthDate: "2021-04-09",
+        breederNameText: null,
+        ownerNames: [],
+        ownershipPreview: [],
+        sirePreview: null,
+        damPreview: null,
+        trialCount: 0,
+        showCount: 0,
+        titlesText: null,
+        ekNo: null,
+        note: null,
+        titles: [],
+      },
+    });
+    useAdminDogFormFlowMock.mockReturnValue(formFlow);
+    useAdminDogDeleteImpactQueryMock.mockReturnValue({
+      data: impact,
+      isLoading: false,
+      isError: false,
+    });
+
+    renderToStaticMarkup(React.createElement(AdminDogsPageClient));
+
+    const deleteProps = deleteModalPropsMock.mock.calls[0][0];
+    expect(useAdminDogDeleteImpactQueryMock).toHaveBeenCalledWith({
+      dogId: "dog_1",
+      enabled: true,
+    });
+    expect(deleteProps.impact).toBe(impact);
+    expect(deleteProps.isImpactLoading).toBe(false);
+    expect(deleteProps.isImpactError).toBe(false);
   });
 
   it("passes shaped owner/parent options into DogFormModal", () => {

@@ -71,7 +71,7 @@ describe("listAdminDogsDb", () => {
           registrations: [{ registrationNo: "FI77777/18" }],
         },
         _count: {
-          trialResults: 7,
+          trialEntries: 7,
           showEntries: 4,
         },
         titles: [
@@ -190,7 +190,7 @@ describe("listAdminDogsDb", () => {
         sire: null,
         dam: null,
         _count: {
-          trialResults: 0,
+          trialEntries: 0,
           showEntries: 0,
         },
         titles: [],

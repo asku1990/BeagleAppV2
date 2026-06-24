@@ -3,6 +3,7 @@ export { calculateAdminDogInbreeding } from "./manage/calculate-inbreeding";
 export { createAdminDog } from "./manage/create-dog";
 export { updateAdminDog } from "./manage/update-dog";
 export { deleteAdminDog } from "./manage/delete-dog";
+export { getAdminDogDeleteImpact } from "./manage/get-delete-impact";
 export { listAdminBreederOptions } from "./lookups/list-breeder-options";
 export { listAdminDogColorOptions } from "./lookups/list-color-options";
 export { listAdminOwnerOptions } from "./lookups/list-owner-options";
