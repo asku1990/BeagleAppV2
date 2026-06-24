@@ -277,7 +277,7 @@ export async function listAdminDogsDb(
       },
       _count: {
         select: {
-          trialResults: true,
+          trialEntries: true,
           showEntries: true,
         },
       },
@@ -321,7 +321,7 @@ export async function listAdminDogsDb(
         ),
         sire: toParentPreview(row.sire),
         dam: toParentPreview(row.dam),
-        trialCount: row._count.trialResults,
+        trialCount: row._count.trialEntries,
         showCount: row._count.showEntries,
         titlesText: titleCodes.length > 0 ? titleCodes.join(", ") : null,
         ekNo: row.ekNo,
