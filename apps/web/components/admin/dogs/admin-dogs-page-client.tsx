@@ -7,13 +7,14 @@ import { useI18n } from "@/hooks/i18n";
 import { useAdminDogFormFlow } from "@/hooks/admin/dogs/manage";
 import {
   mapAdminDogFromQuery,
-  toAdminDogBreederOptions,
   toAdminDogOwnerOptions,
   toAdminDogParentOptions,
 } from "@/lib/admin/dogs/manage";
+import { formatDogColor } from "@/lib/dogs/color";
 import {
-  useAdminDogBreederOptionsQuery,
+  useAdminDogColorOptionsQuery,
   useDeleteAdminDogMutation,
+  useAdminDogDeleteImpactQuery,
   useAdminDogOwnerOptionsQuery,
   useAdminDogParentOptionsQuery,
   useAdminDogsQuery,
@@ -28,7 +29,7 @@ import { DogResults } from "./dog-results";
 import type { AdminDogSex } from "./types";
 
 export function AdminDogsPageClient() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [query, setQuery] = useState("");
   const [sex, setSex] = useState<"all" | AdminDogSex>("all");
 
@@ -57,11 +58,11 @@ export function AdminDogsPageClient() {
     deleteDogMutation,
   });
 
-  const breederOptionsQuery = useAdminDogBreederOptionsQuery({
-    query: dogFormFlow.breederLookupQuery,
-    limit: 100,
-    enabled: dogFormFlow.formState.open,
+  const deleteImpactQuery = useAdminDogDeleteImpactQuery({
+    dogId: dogFormFlow.deleteTarget?.id ?? null,
+    enabled: Boolean(dogFormFlow.deleteTarget),
   });
+
   const ownerOptionsQuery = useAdminDogOwnerOptionsQuery({
     query: dogFormFlow.ownerLookupQuery,
     limit: 100,
@@ -72,19 +73,13 @@ export function AdminDogsPageClient() {
     limit: 100,
     enabled: dogFormFlow.formState.open,
   });
+  const colorOptionsQuery = useAdminDogColorOptionsQuery(
+    dogFormFlow.formState.open,
+  );
 
   const dogs = useMemo(
     () => (dogsQuery.data?.items ?? []).map(mapAdminDogFromQuery),
     [dogsQuery.data?.items],
-  );
-
-  const breederOptions = useMemo(
-    () =>
-      toAdminDogBreederOptions(
-        breederOptionsQuery.data,
-        dogFormFlow.formValues.breederNameText,
-      ),
-    [breederOptionsQuery.data, dogFormFlow.formValues.breederNameText],
   );
 
   const ownerOptions = useMemo(
@@ -109,6 +104,37 @@ export function AdminDogsPageClient() {
       dogFormFlow.formValues.damPreviewRegistrationNo,
       dogFormFlow.formValues.damPreviewName,
     ],
+  );
+  const colorOptions = useMemo(
+    () =>
+      (colorOptionsQuery.data ?? [])
+        .filter(
+          (option) =>
+            option.status === "SELECTABLE" ||
+            String(option.code) === dogFormFlow.formValues.colorCode,
+        )
+        .map((option) => {
+          const localizedName =
+            formatDogColor(option, locale) ?? String(option.code);
+          const hiddenSuffix =
+            option.status === "SELECTABLE"
+              ? ""
+              : locale === "sv"
+                ? " (dold)"
+                : " (piilotettu)";
+
+          return {
+            value: String(option.code),
+            label: `${option.code} - ${localizedName}${hiddenSuffix}`,
+            keywords: [
+              String(option.code),
+              option.nameFi,
+              option.nameSv ?? "",
+              option.nameEn ?? "",
+            ],
+          };
+        }),
+    [colorOptionsQuery.data, dogFormFlow.formValues.colorCode, locale],
   );
 
   const resultCount = dogs.length;
@@ -158,10 +184,9 @@ export function AdminDogsPageClient() {
         mode={dogFormFlow.formState.mode}
         dog={dogFormFlow.formState.target}
         values={dogFormFlow.formValues}
-        breederOptions={breederOptions}
+        colorOptions={colorOptions}
         ownerOptions={ownerOptions}
         parentOptions={parentOptions}
-        onBreederSearchChange={dogFormFlow.setBreederLookupQuery}
         onOwnerSearchChange={dogFormFlow.setOwnerLookupQuery}
         onParentSearchChange={dogFormFlow.setParentLookupQuery}
         onClose={dogFormFlow.closeFormModal}
@@ -174,6 +199,9 @@ export function AdminDogsPageClient() {
 
       <DeleteDogConfirmModal
         dog={dogFormFlow.deleteTarget}
+        impact={deleteImpactQuery.data ?? null}
+        isImpactLoading={deleteImpactQuery.isLoading}
+        isImpactError={deleteImpactQuery.isError}
         onCancel={() => dogFormFlow.setDeleteTarget(null)}
         onConfirm={dogFormFlow.handleDeleteConfirm}
         isDeleting={dogFormFlow.isDeleting}

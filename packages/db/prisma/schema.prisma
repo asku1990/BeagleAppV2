@@ -17,6 +17,12 @@ enum DogSex {
   UNKNOWN
 }
 
+enum DogColorStatus {
+  SELECTABLE
+  HIDDEN
+  LEGACY_UNKNOWN
+}
+
 enum SairausRyhma {
   EPILEPSIA
   LAFORA
@@ -197,30 +203,32 @@ model BetterAuthVerification {
 }
 
 model Dog {
-  id                  String            @id @default(cuid())
-  name                String
-  sex                 DogSex            @default(UNKNOWN)
-  birthDate           DateTime?
-  breederNameText     String?
-  sireId              String?
-  damId               String?
-  breederId           String?
-  ekNo                Int?              @unique
-  note                String?
-  sire                Dog?              @relation("SireRelation", fields: [sireId], references: [id])
-  siredPuppies        Dog[]             @relation("SireRelation")
-  dam                 Dog?              @relation("DamRelation", fields: [damId], references: [id])
-  whelpedPuppies      Dog[]             @relation("DamRelation")
-  breeder             Breeder?          @relation(fields: [breederId], references: [id])
-  registrations       DogRegistration[]
-  ownerships          DogOwnership[]
-  titles              DogTitle[]
-  trialResults        TrialResult[]
-  trialEntries        TrialEntry[]
-  showEntries         ShowEntry[]
-  sairaudet           KoiranSairaus[]   @relation("KoiranSairausDog")
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
+  id              String            @id @default(cuid())
+  name            String
+  sex             DogSex            @default(UNKNOWN)
+  birthDate       DateTime?
+  breederNameText String?
+  sireId          String?
+  damId           String?
+  breederId       String?
+  ekNo            Int?              @unique
+  colorCode       Int?
+  note            String?
+  sire            Dog?              @relation("SireRelation", fields: [sireId], references: [id])
+  siredPuppies    Dog[]             @relation("SireRelation")
+  dam             Dog?              @relation("DamRelation", fields: [damId], references: [id])
+  whelpedPuppies  Dog[]             @relation("DamRelation")
+  breeder         Breeder?          @relation(fields: [breederId], references: [id])
+  color           DogColor?         @relation(fields: [colorCode], references: [code])
+  registrations   DogRegistration[]
+  ownerships      DogOwnership[]
+  titles          DogTitle[]
+  trialResults    TrialResult[]
+  trialEntries    TrialEntry[]
+  showEntries     ShowEntry[]
+  sairaudet       KoiranSairaus[]   @relation("KoiranSairausDog")
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 
   @@index([name])
   @@index([sex])
@@ -228,6 +236,18 @@ model Dog {
   @@index([sireId])
   @@index([damId])
   @@index([breederId])
+  @@index([colorCode])
+}
+
+model DogColor {
+  code      Int            @id
+  nameFi    String
+  nameSv    String?
+  nameEn    String?
+  status    DogColorStatus @default(HIDDEN)
+  dogs      Dog[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 }
 
 model DogTitle {

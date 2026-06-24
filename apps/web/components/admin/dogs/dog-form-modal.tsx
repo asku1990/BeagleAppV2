@@ -18,10 +18,9 @@ type DogFormModalProps = {
   mode: "create" | "edit";
   dog: AdminDogRecord | null;
   values: AdminDogFormValues;
-  breederOptions: NamedEntityOption[];
+  colorOptions: ComboboxOption[];
   ownerOptions: NamedEntityOption[];
   parentOptions: DogParentOption[];
-  onBreederSearchChange: (value: string) => void;
   onOwnerSearchChange: (value: string) => void;
   onParentSearchChange: (value: string) => void;
   open: boolean;
@@ -37,10 +36,9 @@ export function DogFormModal({
   mode,
   dog,
   values,
-  breederOptions,
+  colorOptions,
   ownerOptions,
   parentOptions,
-  onBreederSearchChange,
   onOwnerSearchChange,
   onParentSearchChange,
   open,
@@ -72,22 +70,6 @@ export function DogFormModal({
     values.sirePreviewRegistrationNo,
     values.damPreviewRegistrationNo,
   ]);
-
-  const breederSelectedId = useMemo(
-    () =>
-      breederOptions.find((option) => option.name === values.breederNameText)
-        ?.id ?? "",
-    [breederOptions, values.breederNameText],
-  );
-
-  const breederComboboxOptions = useMemo<ComboboxOption[]>(
-    () =>
-      breederOptions.map((option) => ({
-        value: option.id,
-        label: option.name,
-      })),
-    [breederOptions],
-  );
 
   const ownerComboboxOptions = useMemo<ComboboxOption[]>(
     () =>
@@ -166,13 +148,9 @@ export function DogFormModal({
 
         <DogFormBreederOwnersSection
           values={values}
-          breederOptions={breederOptions}
           ownerOptions={ownerOptions}
-          breederSelectedId={breederSelectedId}
-          breederComboboxOptions={breederComboboxOptions}
           ownerComboboxOptions={ownerComboboxOptions}
           onValuesChange={onValuesChange}
-          onBreederSearchChange={onBreederSearchChange}
           onOwnerSearchChange={onOwnerSearchChange}
           t={t}
         />
@@ -190,6 +168,7 @@ export function DogFormModal({
 
         <DogFormMetadataSection
           values={values}
+          colorOptions={colorOptions}
           onValuesChange={onValuesChange}
           t={t}
         />

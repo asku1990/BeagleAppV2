@@ -1,6 +1,6 @@
 {
   "name": "beagle-app-v2",
-  "version": "0.13.1",
+  "version": "0.14.0",
   "private": true,
   "packageManager": "pnpm@10.33.0",
   "scripts": {
@@ -26,6 +26,7 @@
     "db:deploy": "pnpm --filter @beagle/db exec prisma migrate deploy",
     "db:migrate:deploy": "pnpm db:deploy",
     "db:seed:initial-test-data": "pnpm --filter @beagle/db seed:initial-test-data",
+    "db:seed:dog-colors": "pnpm --filter @beagle/db seed:dog-colors",
     "db:dump": "bash ./scripts/db/dump.sh",
     "db:restore": "bash ./scripts/db/restore.sh",
     "legacy:restore": "bash ./scripts/db/restore-legacy.sh",

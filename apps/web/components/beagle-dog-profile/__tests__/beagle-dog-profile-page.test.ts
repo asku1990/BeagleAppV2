@@ -77,6 +77,7 @@ describe("BeagleDogProfilePage", () => {
               trialCount: 3,
               showCount: 1,
               litterCount: 0,
+              color: null,
             },
           ],
           titles: [
@@ -113,6 +114,7 @@ describe("BeagleDogProfilePage", () => {
                   trialCount: 4,
                   showCount: 2,
                   litterCount: 1,
+                  color: null,
                 },
                 {
                   id: "puppy_2",
@@ -124,6 +126,7 @@ describe("BeagleDogProfilePage", () => {
                   trialCount: 0,
                   showCount: 0,
                   litterCount: 0,
+                  color: null,
                 },
               ],
             },

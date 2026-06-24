@@ -10,6 +10,7 @@ import {
   markImportRunFinished,
   markImportRunRunning,
   prisma,
+  seedDogColorsDb,
 } from "@beagle/db";
 import type { ImportRunResponse } from "@beagle/contracts";
 import type { ServiceResult } from "../../core/result";
@@ -70,6 +71,18 @@ function parseRegistrationNo(value: string | null | undefined): {
     registrationNo,
     isInvalid: !isValidRegistrationNo(registrationNo),
   };
+}
+
+function parseLegacyColorCode(
+  value: string | number | null | undefined,
+): number | null | "INVALID" {
+  if (value == null) return null;
+  const normalized = String(value).trim();
+  if (!normalized) return null;
+  if (!/^\d+$/u.test(normalized)) return "INVALID";
+  const parsed = Number(normalized);
+  if (!Number.isSafeInteger(parsed)) return "INVALID";
+  return parsed > 0 ? parsed : null;
 }
 
 function formatPlaceholderRelationMessage(role: "Sire" | "Dam"): string {
@@ -294,6 +307,11 @@ export async function runLegacyPhase1(
     );
     finishStage("load");
 
+    startStage("dogColors");
+    const seededDogColors = await seedDogColorsDb();
+    const importedDogColorCodes = new Set(seededDogColors.codes);
+    finishStage("dogColors", `upserted=${seededDogColors.codes.length}`);
+
     startStage("breeders");
     let breederRowsProcessed = 0;
     let breederRowsUpserted = 0;
@@ -469,6 +487,40 @@ export async function runLegacyPhase1(
       }
 
       const breederNameText = normalizeNullable(row.breederName);
+      const colorCode = parseLegacyColorCode(row.colorCode);
+      if (colorCode === "INVALID") {
+        await recordIssue({
+          stage: "dogs",
+          code: "DOG_COLOR_INVALID_CODE",
+          message:
+            "Dog row has invalid color code; color was treated as unknown.",
+          registrationNo,
+          sourceTable: "bearek_id",
+          payloadJson: JSON.stringify({
+            registrationNo: row.registrationNo,
+            colorCode: row.colorCode,
+          }),
+        });
+      } else if (colorCode != null && !importedDogColorCodes.has(colorCode)) {
+        await recordIssue({
+          stage: "dogs",
+          code: "DOG_COLOR_LOOKUP_NOT_FOUND",
+          message:
+            "Dog row references a color code missing from the canonical catalog; color was treated as unknown.",
+          registrationNo,
+          sourceTable: "bearek_id",
+          payloadJson: JSON.stringify({
+            registrationNo: row.registrationNo,
+            colorCode,
+          }),
+        });
+      }
+      const dogColorCode =
+        colorCode === "INVALID" ||
+        !colorCode ||
+        !importedDogColorCodes.has(colorCode)
+          ? null
+          : colorCode;
       if (breederNameText) {
         dogsWithBreederText += 1;
       }
@@ -513,6 +565,7 @@ export async function runLegacyPhase1(
             birthDate: parseLegacyDate(row.birthDateRaw),
             breederNameText,
             breederId,
+            colorCode: dogColorCode,
           },
         });
 
@@ -530,6 +583,7 @@ export async function runLegacyPhase1(
             birthDate: parseLegacyDate(row.birthDateRaw),
             breederNameText,
             breederId,
+            colorCode: dogColorCode,
             registrations: {
               create: {
                 registrationNo,

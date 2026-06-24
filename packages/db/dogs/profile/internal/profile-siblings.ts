@@ -190,6 +190,7 @@ function mapSiblingRow(dog: OffspringDogNode): BeagleDogProfileSiblingRowDb {
     trialCount: dog._count.trialEntries,
     showCount: dog._count.showEntries,
     litterCount: countOffspringLitters(dog),
+    color: dog.color,
   };
 }
 

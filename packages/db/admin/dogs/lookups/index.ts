@@ -16,3 +16,9 @@ export {
   type AdminDogParentLookupOptionDb,
   type AdminDogParentLookupResponseDb,
 } from "./list-parent-options";
+export {
+  listAdminDogColorOptionsDb,
+  type AdminDogColorLookupOptionDb,
+  type AdminDogColorLookupResponseDb,
+} from "./list-color-options";
+export { findAdminDogColorOptionDb } from "./find-color-option";

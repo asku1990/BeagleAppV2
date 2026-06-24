@@ -1,5 +1,6 @@
 import {
   createAdminDogWriteDb,
+  findAdminDogColorOptionDb,
   runAdminDogWriteTransactionDb,
   type AuditContextDb,
 } from "@beagle/db";
@@ -23,6 +24,7 @@ import {
   validateCreateInTry,
   validateCreatePreflight,
 } from "./internal/create-input-validation";
+import { validateAdminDogColorSelection } from "./internal/color-validation";
 import { resolveAndValidateCreateParents } from "./internal/create-parent-validation";
 import { linkHistoricalEntriesOnDogCreate } from "./link-historical-entries-on-dog-create";
 
@@ -87,6 +89,27 @@ export async function createAdminDog(
     if (!parentValidation.ok) {
       return parentValidation.response;
     }
+    if (preflight.data.colorCode != null) {
+      const colorOption = await findAdminDogColorOptionDb(
+        preflight.data.colorCode,
+      );
+      const colorValidation =
+        validateAdminDogColorSelection<CreateAdminDogResponse>(
+          preflight.data.colorCode,
+          colorOption,
+        );
+      if (!colorValidation.ok) {
+        log.warn(
+          {
+            ...colorValidation.logContext,
+            colorCode: preflight.data.colorCode,
+            durationMs: Date.now() - startedAt,
+          },
+          colorValidation.logMessage,
+        );
+        return colorValidation.response;
+      }
+    }
 
     const { createdDog, linkResult } = await runAdminDogWriteTransactionDb(
       async (tx) => {
@@ -100,6 +123,7 @@ export async function createAdminDog(
             damId: parentValidation.data.dam?.id ?? null,
             ownerNames: inTryValidation.data.ownerNames,
             ekNo: preflight.data.ekNo,
+            colorCode: preflight.data.colorCode,
             note: inTryValidation.data.note,
             registrationNo: preflight.data.primaryRegistrationNo,
             secondaryRegistrationNos: preflight.data.secondaryRegistrationNos,

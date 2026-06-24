@@ -46,6 +46,7 @@ function buildEditValues(): AdminDogFormValues {
     ownershipNames: ["Tiina Virtanen", "Antti Virtanen"],
     ekNo: "5588",
     inbreedingCoefficientPct: null,
+    colorCode: "121",
     note: "Important note",
     registrationNo: "FI12345/21",
     secondaryRegistrationNos: ["FI54321/21"],
@@ -72,6 +73,7 @@ function buildCreateValues(): AdminDogFormValues {
     ownershipNames: [],
     ekNo: "",
     inbreedingCoefficientPct: null,
+    colorCode: "",
     note: "",
     registrationNo: "",
     secondaryRegistrationNos: [],
@@ -104,6 +106,7 @@ function buildDog(values: AdminDogFormValues): AdminDogRecord {
     titlesText:
       values.titles.map((title) => title.titleCode).join(", ") || null,
     ekNo: Number(values.ekNo),
+    colorCode: values.colorCode ? Number(values.colorCode) : null,
     note: values.note,
     registrationNo: values.registrationNo,
     secondaryRegistrationNos: values.secondaryRegistrationNos,
@@ -125,7 +128,7 @@ describe("DogFormModal", () => {
         mode: "edit",
         dog: buildDog(values),
         values,
-        breederOptions: [{ id: "b_1", name: "Metsapolun" }],
+        colorOptions: [{ value: "121", label: "121 - Kolmivärinen" }],
         ownerOptions: [
           { id: "o_1", name: "Tiina Virtanen" },
           { id: "o_2", name: "Antti Virtanen" },
@@ -134,7 +137,6 @@ describe("DogFormModal", () => {
           { registrationNo: "FI54321/20", name: "Korven Aatos" },
           { registrationNo: "FI77777/18", name: "Havupolun Helmi" },
         ],
-        onBreederSearchChange: vi.fn(),
         onOwnerSearchChange: vi.fn(),
         onParentSearchChange: vi.fn(),
         open: true,
@@ -149,7 +151,7 @@ describe("DogFormModal", () => {
     expect(html).toContain('value="FI54321/21"');
     expect(html).toContain('value="Metsapolun Kide"');
     expect(html).toContain('value="2021-04-09"');
-    expect(html).toContain('value="Metsapolun"');
+    expect(html).not.toContain("admin.dogs.form.breederSelectLabel");
     expect(html).toContain(">Tiina Virtanen<");
     expect(html).toContain(">Antti Virtanen<");
     expect(html).toContain('value="5588"');
@@ -172,7 +174,7 @@ describe("DogFormModal", () => {
         mode: "edit",
         dog: buildDog(values),
         values,
-        breederOptions: [{ id: "b_1", name: "Metsapolun" }],
+        colorOptions: [{ value: "121", label: "121 - Kolmivärinen" }],
         ownerOptions: [
           { id: "o_1", name: "Tiina Virtanen" },
           { id: "o_2", name: "Antti Virtanen" },
@@ -181,7 +183,6 @@ describe("DogFormModal", () => {
           { registrationNo: "FI54321/20", name: "Korven Aatos" },
           { registrationNo: "FI77777/18", name: "Havupolun Helmi" },
         ],
-        onBreederSearchChange: vi.fn(),
         onOwnerSearchChange: vi.fn(),
         onParentSearchChange: vi.fn(),
         open: true,
@@ -202,10 +203,9 @@ describe("DogFormModal", () => {
         mode: "create",
         dog: null,
         values,
-        breederOptions: [],
+        colorOptions: [],
         ownerOptions: [],
         parentOptions: [],
-        onBreederSearchChange: vi.fn(),
         onOwnerSearchChange: vi.fn(),
         onParentSearchChange: vi.fn(),
         open: true,

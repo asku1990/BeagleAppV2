@@ -205,6 +205,16 @@ pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db seed:show-resul
 CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm --filter @beagle/db seed:show-result-definitions
 ```
 
+Dog color seed (canonical registration colors):
+
+```bash
+pass-cli run --env-file .env.local -- pnpm --filter @beagle/db seed:dog-colors
+pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db seed:dog-colors
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm --filter @beagle/db seed:dog-colors
+```
+
+Phase 1 runs this seed before importing dogs. The standalone command applies catalog updates without running the legacy import.
+
 Show workbook import schema seed (Kennelliitto workbook metadata):
 
 ```bash

@@ -5,9 +5,10 @@ import type { AdminDogFormValues } from "../types";
 
 const {
   useAdminDogsQueryMock,
-  useAdminDogBreederOptionsQueryMock,
+  useAdminDogColorOptionsQueryMock,
   useAdminDogOwnerOptionsQueryMock,
   useAdminDogParentOptionsQueryMock,
+  useAdminDogDeleteImpactQueryMock,
   useCalculateAdminDogInbreedingMutationMock,
   useCreateAdminDogMutationMock,
   useUpdateAdminDogMutationMock,
@@ -19,9 +20,10 @@ const {
   dogResultsPropsMock,
 } = vi.hoisted(() => ({
   useAdminDogsQueryMock: vi.fn(),
-  useAdminDogBreederOptionsQueryMock: vi.fn(),
+  useAdminDogColorOptionsQueryMock: vi.fn(),
   useAdminDogOwnerOptionsQueryMock: vi.fn(),
   useAdminDogParentOptionsQueryMock: vi.fn(),
+  useAdminDogDeleteImpactQueryMock: vi.fn(),
   useCalculateAdminDogInbreedingMutationMock: vi.fn(),
   useCreateAdminDogMutationMock: vi.fn(),
   useUpdateAdminDogMutationMock: vi.fn(),
@@ -45,9 +47,10 @@ vi.mock("@/hooks/admin/dogs/manage", () => ({
 
 vi.mock("@/queries/admin/dogs", () => ({
   useAdminDogsQuery: useAdminDogsQueryMock,
-  useAdminDogBreederOptionsQuery: useAdminDogBreederOptionsQueryMock,
+  useAdminDogColorOptionsQuery: useAdminDogColorOptionsQueryMock,
   useAdminDogOwnerOptionsQuery: useAdminDogOwnerOptionsQueryMock,
   useAdminDogParentOptionsQuery: useAdminDogParentOptionsQueryMock,
+  useAdminDogDeleteImpactQuery: useAdminDogDeleteImpactQueryMock,
   useCalculateAdminDogInbreedingMutation:
     useCalculateAdminDogInbreedingMutationMock,
   useCreateAdminDogMutation: useCreateAdminDogMutationMock,
@@ -113,6 +116,7 @@ function buildFormValues(): AdminDogFormValues {
     ownershipNames: ["Tiina Virtanen"],
     ekNo: "5588",
     inbreedingCoefficientPct: null,
+    colorCode: "121",
     note: "",
     registrationNo: "FI12345/21",
     secondaryRegistrationNos: [],
@@ -124,12 +128,39 @@ function buildFormValues(): AdminDogFormValues {
   };
 }
 
+function buildFormFlow(overrides: Record<string, unknown> = {}) {
+  return {
+    deleteTarget: null,
+    setDeleteTarget: vi.fn(),
+    formState: { open: true, mode: "create", target: null },
+    formValues: buildFormValues(),
+    setFormValues: vi.fn(),
+    ownerLookupQuery: "",
+    setOwnerLookupQuery: vi.fn(),
+    parentLookupQuery: "",
+    setParentLookupQuery: vi.fn(),
+    openCreateModal: vi.fn(),
+    openEditModal: vi.fn(),
+    closeFormModal: vi.fn(),
+    handleCalculateInbreeding: vi.fn(),
+    handleSubmit: vi.fn(),
+    handleDeleteConfirm: vi.fn(),
+    inbreedingCalculationPct: null,
+    hasInbreedingCalculation: false,
+    isCalculatingInbreeding: false,
+    isSubmitting: false,
+    isDeleting: false,
+    ...overrides,
+  };
+}
+
 describe("AdminDogsPageClient", () => {
   beforeEach(() => {
     useAdminDogsQueryMock.mockReset();
-    useAdminDogBreederOptionsQueryMock.mockReset();
+    useAdminDogColorOptionsQueryMock.mockReset();
     useAdminDogOwnerOptionsQueryMock.mockReset();
     useAdminDogParentOptionsQueryMock.mockReset();
+    useAdminDogDeleteImpactQueryMock.mockReset();
     useCalculateAdminDogInbreedingMutationMock.mockReset();
     useCreateAdminDogMutationMock.mockReset();
     useUpdateAdminDogMutationMock.mockReset();
@@ -175,6 +206,7 @@ describe("AdminDogsPageClient", () => {
             showCount: 1,
             titlesText: null,
             ekNo: 5588,
+            colorCode: 121,
             note: null,
             titles: [],
           },
@@ -183,8 +215,16 @@ describe("AdminDogsPageClient", () => {
       isLoading: false,
       isError: false,
     });
-    useAdminDogBreederOptionsQueryMock.mockReturnValue({
-      data: [{ id: "b_1", name: "Metsapolun" }],
+    useAdminDogColorOptionsQueryMock.mockReturnValue({
+      data: [
+        {
+          code: 121,
+          nameFi: "Kolmivärinen",
+          nameSv: "Trefärgad",
+          nameEn: null,
+          status: "SELECTABLE",
+        },
+      ],
     });
     useAdminDogOwnerOptionsQueryMock.mockReturnValue({
       data: [{ id: "o_1", name: "Tiina Virtanen" }],
@@ -199,30 +239,12 @@ describe("AdminDogsPageClient", () => {
         },
       ],
     });
-    useAdminDogFormFlowMock.mockReturnValue({
-      deleteTarget: null,
-      setDeleteTarget: vi.fn(),
-      formState: { open: true, mode: "create", target: null },
-      formValues: buildFormValues(),
-      setFormValues: vi.fn(),
-      breederLookupQuery: "",
-      setBreederLookupQuery: vi.fn(),
-      ownerLookupQuery: "",
-      setOwnerLookupQuery: vi.fn(),
-      parentLookupQuery: "",
-      setParentLookupQuery: vi.fn(),
-      openCreateModal: vi.fn(),
-      openEditModal: vi.fn(),
-      closeFormModal: vi.fn(),
-      handleCalculateInbreeding: vi.fn(),
-      handleSubmit: vi.fn(),
-      handleDeleteConfirm: vi.fn(),
-      inbreedingCalculationPct: null,
-      hasInbreedingCalculation: false,
-      isCalculatingInbreeding: false,
-      isSubmitting: false,
-      isDeleting: false,
+    useAdminDogDeleteImpactQueryMock.mockReturnValue({
+      data: null,
+      isLoading: false,
+      isError: false,
     });
+    useAdminDogFormFlowMock.mockReturnValue(buildFormFlow());
   });
 
   it("wires create/edit/delete handlers from form flow into page composition", () => {
@@ -246,24 +268,97 @@ describe("AdminDogsPageClient", () => {
       formFlow.handleCalculateInbreeding,
     );
     expect(deleteProps.onConfirm).toBe(formFlow.handleDeleteConfirm);
+    expect(useAdminDogDeleteImpactQueryMock).toHaveBeenCalledWith({
+      dogId: null,
+      enabled: false,
+    });
   });
 
-  it("passes shaped breeder/owner/parent options into DogFormModal", () => {
+  it("passes delete impact state into confirm modal", () => {
+    const impact = {
+      dogId: "dog_1",
+      deleted: {
+        registrations: 1,
+        ownerships: 2,
+        titles: 3,
+        legacyTrialResults: 4,
+      },
+      detached: {
+        canonicalTrialEntries: 5,
+        showEntries: 6,
+        diseaseRows: 7,
+        sireReferences: 8,
+        damReferences: 9,
+      },
+      orphanWarnings: { owners: [], breeder: null },
+    };
+    const formFlow = buildFormFlow({
+      deleteTarget: {
+        id: "dog_1",
+        registrationNo: "FI12345/21",
+        secondaryRegistrationNos: [],
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        birthDate: "2021-04-09",
+        breederNameText: null,
+        ownerNames: [],
+        ownershipPreview: [],
+        sirePreview: null,
+        damPreview: null,
+        trialCount: 0,
+        showCount: 0,
+        titlesText: null,
+        ekNo: null,
+        colorCode: null,
+        note: null,
+        titles: [],
+      },
+    });
+    useAdminDogFormFlowMock.mockReturnValue(formFlow);
+    useAdminDogDeleteImpactQueryMock.mockReturnValue({
+      data: impact,
+      isLoading: false,
+      isError: false,
+    });
+
+    renderToStaticMarkup(React.createElement(AdminDogsPageClient));
+
+    const deleteProps = deleteModalPropsMock.mock.calls[0][0];
+    expect(useAdminDogDeleteImpactQueryMock).toHaveBeenCalledWith({
+      dogId: "dog_1",
+      enabled: true,
+    });
+    expect(deleteProps.impact).toBe(impact);
+    expect(deleteProps.isImpactLoading).toBe(false);
+    expect(deleteProps.isImpactError).toBe(false);
+  });
+
+  it("passes shaped owner/parent options into DogFormModal", () => {
     renderToStaticMarkup(React.createElement(AdminDogsPageClient));
 
     const dogFormProps = dogFormModalPropsMock.mock.calls[0][0];
     const dogResultsProps = dogResultsPropsMock.mock.calls[0][0];
 
-    expect(dogFormProps.breederOptions).toEqual([
-      { id: "selected:Selected Breeder", name: "Selected Breeder" },
-      { id: "b_1", name: "Metsapolun" },
-    ]);
+    expect(dogFormProps.breederOptions).toBeUndefined();
+    expect(dogFormProps.onBreederSearchChange).toBeUndefined();
+    expect(useAdminDogOwnerOptionsQueryMock).toHaveBeenCalledWith({
+      query: "",
+      limit: 100,
+      enabled: true,
+    });
     expect(dogFormProps.ownerOptions).toEqual([
       { id: "o_1", name: "Tiina Virtanen" },
     ]);
     expect(dogFormProps.parentOptions).toEqual([
       { registrationNo: "FI77777/18", name: "Havupolun Helmi" },
       { registrationNo: "FI54321/20", name: "Korven Aatos" },
+    ]);
+    expect(dogFormProps.colorOptions).toEqual([
+      {
+        value: "121",
+        label: "121 - Kolmivärinen",
+        keywords: ["121", "Kolmivärinen", "Trefärgad", ""],
+      },
     ]);
     expect(dogResultsProps.dogs[0]?.titlesText).toBeNull();
   });

@@ -22,6 +22,7 @@ function createValues(): AdminDogFormValues {
     ownershipNames: ["Tiina Virtanen"],
     ekNo: "5588",
     inbreedingCoefficientPct: null,
+    colorCode: "",
     note: "",
     registrationNo: "FI12345/21",
     secondaryRegistrationNos: ["FI54321/21"],

@@ -1,6 +1,14 @@
 // Internal dog profile DB types for Prisma row shaping and profile mapping.
 // Public DB DTO types are re-exported through the profile entrypoint.
-import { DogSex } from "@prisma/client";
+import { DogColorStatus, DogSex } from "@prisma/client";
+
+export type DogColorDb = {
+  code: number;
+  nameFi: string;
+  nameSv: string | null;
+  nameEn: string | null;
+  status: DogColorStatus;
+};
 
 export type BeagleDogProfileSexDb = "U" | "N" | "-";
 
@@ -37,6 +45,7 @@ export type BeagleDogProfileOffspringRowDb = {
   trialCount: number;
   showCount: number;
   litterCount: number;
+  color: DogColorDb | null;
 };
 
 export type BeagleDogProfileLitterDb = {
@@ -61,6 +70,7 @@ export type BeagleDogProfileSiblingRowDb = {
   trialCount: number;
   showCount: number;
   litterCount: number;
+  color: DogColorDb | null;
 };
 
 export type BeagleDogProfileTitleDb = {
@@ -77,7 +87,7 @@ export type BeagleDogProfileDb = {
   registrationNos: string[];
   birthDate: Date | null;
   sex: BeagleDogProfileSexDb;
-  color: string | null;
+  color: DogColorDb | null;
   ekNo: number | null;
   sire: BeagleDogProfileParentDb | null;
   dam: BeagleDogProfileParentDb | null;
@@ -112,6 +122,7 @@ export type OffspringDogNode = {
   sex: DogSex;
   birthDate: Date | null;
   ekNo?: number | null;
+  color: DogColorDb | null;
   registrations: RegistrationNode[];
   sire: ParentDogNode | null;
   dam: ParentDogNode | null;

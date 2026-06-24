@@ -9,6 +9,12 @@ export {
   type LinkUnlinkedShowTrialEntriesDbInput,
   type LinkUnlinkedShowTrialEntriesDbResult,
 } from "./link-unlinked-show-trial-entries";
+export {
+  getAdminDogDeleteImpactDb,
+  type AdminDogDeleteImpactBreederDb,
+  type AdminDogDeleteImpactDb,
+  type AdminDogDeleteImpactOwnerDb,
+} from "./delete-impact";
 export { deleteAdminDogWriteDb } from "./delete-dog";
 export { findDogByIdDb, type DogByIdLookupDb } from "./find-dog-by-id";
 export {

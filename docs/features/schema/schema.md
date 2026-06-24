@@ -65,7 +65,8 @@ erDiagram
 
 ### Core dog data
 
-- `Dog`: central dog entity (pedigree links, breeder link, timestamps).
+- `Dog`: central dog entity (pedigree links, breeder link, color code, timestamps).
+- `DogColor`: multilingual dog color lookup referenced by `Dog.colorCode`; status distinguishes selectable, hidden, and unnamed legacy colors.
 - `DogRegistration`: unique registration numbers per dog.
 - `Breeder`: breeder registry and metadata.
 - `Owner`: normalized owner identity (`name + postalCode + city` unique).
@@ -113,6 +114,7 @@ erDiagram
 - `BetterAuthUser -> BetterAuthSession/BetterAuthAccount`: `Cascade`
 - `BetterAuthUser -> ImportRun(createdByUser)`: `SetNull`
 - `Dog -> DogRegistration/DogOwnership/TrialResult`: `Cascade`
+- `Dog -> DogColor`: `SetNull` for unknown or removed lookup values.
 - `Dog -> TrialEntry`: `SetNull` (allows trial rows without local dog)
 - `TrialEvent -> TrialEntry`: `Cascade`
 - `TrialEntry -> TrialEra`: `Cascade`
@@ -128,6 +130,7 @@ erDiagram
 ## Identity and unique constraints (key ones)
 
 - `Dog.ekNo` unique
+- `DogColor.code` primary key
 - `DogRegistration.registrationNo` unique
 - `TrialResult.sourceKey` unique
 - `TrialEvent.sklKoeId` unique (nullable in legacy phase2 fallback)

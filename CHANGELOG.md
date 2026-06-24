@@ -20,6 +20,27 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.14.0] - 2026-06-24
+
+### Added
+
+- Lisätty tuki koirien väritiedolle.
+- Kaikki vanhat värikoodit säilyy koirilla.
+- Värikoodit on nyt jaettu kennelliiton listan mukaan virallisiin, piilotettuihin sekä piilotettuihin että tuntemattomiin koodeihin.
+- Koiraa luotaise voi valita vain virallisia värikoodeja. (jos halutaan ulkolaisia asettaa koirille, täytyy tähän tehdä pieni muutos).
+- Vahnat värikoodit säilyy koiraa muokattaessa vaikka se olisikin piilotettu.
+- Koiria poistettaessa näytetään nyt informatiivinen ikkuna jossa kerrotaan mitä poistetaa, mitä säilyy ja onko mahdollisesti omistaja ilman koiraa tämän jälkeen.
+
+### Changed
+
+### Fixed
+
+- Korjattu bugi joka esti ylläpitonäkymän koirahaussa koetietojen näyttämisen.
+
+### Removed
+
+- Ylläpidon koiranäkymistä piilotettiin kasvattajatiedot, kunnes kasvattajan historiatiedon ja kennelrekisterin suhde on päätetty.
+
 ## [0.13.1] - 2026-06-16
 
 ### Added

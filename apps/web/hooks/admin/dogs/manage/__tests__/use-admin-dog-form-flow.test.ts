@@ -36,6 +36,7 @@ function buildFormValues(): AdminDogFormValues {
     ownershipNames: ["Tiina Virtanen"],
     ekNo: "5588",
     inbreedingCoefficientPct: null,
+    colorCode: "121",
     note: "Important note",
     registrationNo: "fi12345/21",
     secondaryRegistrationNos: [" fi54321/21 "],
@@ -65,6 +66,7 @@ function buildTargetDog(): AdminDogRecord {
     titlesText: null,
     ownershipPreview: ["Tiina Virtanen"],
     ekNo: 5588,
+    colorCode: 121,
     note: "Important note",
     registrationNo: "FI12345/21",
     secondaryRegistrationNos: ["FI54321/21"],
@@ -85,7 +87,6 @@ describe("useAdminDogFormFlow", () => {
     const setDeleteTarget = vi.fn();
     const setFormState = vi.fn();
     const setFormValues = vi.fn();
-    const setBreederLookupQuery = vi.fn();
     const setOwnerLookupQuery = vi.fn();
     const setParentLookupQuery = vi.fn();
 
@@ -96,7 +97,6 @@ describe("useAdminDogFormFlow", () => {
         setFormState,
       ])
       .mockImplementationOnce((initial) => [initial, setFormValues])
-      .mockImplementationOnce((initial) => [initial, setBreederLookupQuery])
       .mockImplementationOnce((initial) => [initial, setOwnerLookupQuery])
       .mockImplementationOnce((initial) => [initial, setParentLookupQuery]);
 
@@ -118,6 +118,7 @@ describe("useAdminDogFormFlow", () => {
       breederNameText: "Metsapolun",
       ownerNames: ["Tiina Virtanen"],
       ekNo: 5588,
+      colorCode: 121,
       note: "Important note",
       registrationNo: "fi12345/21",
       secondaryRegistrationNos: ["FI54321/21"],

@@ -17,8 +17,13 @@ export type {
   CreateAdminDogResponse,
 } from "./create-admin-dog";
 export type {
+  AdminDogDeleteImpact,
+  AdminDogDeleteImpactBreeder,
+  AdminDogDeleteImpactOwner,
   DeleteAdminDogRequest,
   DeleteAdminDogResponse,
+  GetAdminDogDeleteImpactRequest,
+  GetAdminDogDeleteImpactResponse,
 } from "./delete-admin-dog";
 export type {
   UpdateAdminDogRequest,

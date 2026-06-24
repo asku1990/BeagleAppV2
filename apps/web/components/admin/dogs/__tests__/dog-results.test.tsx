@@ -45,12 +45,13 @@ function buildDog(overrides: Partial<AdminDogRecord> = {}): AdminDogRecord {
     name: "Metsapolun Kide",
     sex: "FEMALE",
     birthDate: "2021-04-09",
-    breederNameText: "Metsapolun",
+    breederNameText: "Hidden Breeder",
     trialCount: 2,
     showCount: 1,
     titlesText: "FI JVA, SE JCH",
     ownershipPreview: ["Tiina Virtanen"],
     ekNo: 5588,
+    colorCode: 121,
     note: "Important",
     sirePreview: { name: "Korven Aatos", registrationNo: "FI54321/20" },
     damPreview: { name: "Havupolun Helmi", registrationNo: "FI77777/18" },
@@ -70,6 +71,9 @@ describe("DogResults", () => {
     );
 
     expect(html).toContain("admin.dogs.columns.titles");
+    expect(html).not.toContain("admin.dogs.columns.breeder");
+    expect(html).not.toContain("admin.dogs.mobile.breederLabel");
+    expect(html).not.toContain("Hidden Breeder");
     expect(html).toContain("FI JVA, SE JCH");
     expect(html).toContain("admin.dogs.mobile.titlesLabel");
     expect(html).toContain('href="/admin/dogs/dog_1/profile"');

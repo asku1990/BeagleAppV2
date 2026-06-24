@@ -14,6 +14,7 @@ import {
   renderRegistrationNameText,
 } from "@/lib/public/beagle/dogs/profile";
 import { cn } from "@/lib/utils";
+import { formatDogColor } from "@/lib/dogs/color";
 import type {
   BeagleDogProfileDto,
   BeagleDogProfileLitterDto,
@@ -81,16 +82,14 @@ function formatEkNo(value: number | null): string {
   return value == null ? FALLBACK_VALUE : String(value);
 }
 
-function formatColorPlaceholder(t: (key: MessageKey) => string): string {
-  return `${FALLBACK_VALUE} ${t("dog.profile.field.comingSoon")}`;
-}
-
 function LitterDesktopTable({
   litter,
   t,
+  locale,
 }: {
   litter: BeagleDogProfileLitterDto;
   t: (key: MessageKey) => string;
+  locale: "fi" | "sv";
 }) {
   return (
     <div className="overflow-x-auto">
@@ -146,7 +145,9 @@ function LitterDesktopTable({
                 </Link>
               </td>
               <td className="px-2 py-2">{mapSexLabel(puppy.sex, t)}</td>
-              <td className="px-2 py-2">{formatColorPlaceholder(t)}</td>
+              <td className="px-2 py-2">
+                {formatDogColor(puppy.color, locale) ?? FALLBACK_VALUE}
+              </td>
               <td className="px-2 py-2">{puppy.trialCount}</td>
               <td className="px-2 py-2">{puppy.showCount}</td>
               <td className="px-2 py-2">{puppy.litterCount}</td>
@@ -162,9 +163,11 @@ function LitterDesktopTable({
 function LitterMobileCards({
   litter,
   t,
+  locale,
 }: {
   litter: BeagleDogProfileLitterDto;
   t: (key: MessageKey) => string;
+  locale: "fi" | "sv";
 }) {
   return (
     <div className="space-y-2">
@@ -234,7 +237,9 @@ function LitterMobileCards({
               <span className={beagleTheme.mutedText}>
                 {t("dog.profile.litters.col.color")}:{" "}
               </span>
-              <span>{formatColorPlaceholder(t)}</span>
+              <span>
+                {formatDogColor(puppy.color, locale) ?? FALLBACK_VALUE}
+              </span>
             </p>
           </div>
         </article>
@@ -280,8 +285,8 @@ function LitterBlock({
 
       <div className="pt-4">
         <ListingResponsiveResults
-          desktop={<LitterDesktopTable litter={litter} t={t} />}
-          mobile={<LitterMobileCards litter={litter} t={t} />}
+          desktop={<LitterDesktopTable litter={litter} t={t} locale={locale} />}
+          mobile={<LitterMobileCards litter={litter} t={t} locale={locale} />}
         />
       </div>
     </article>

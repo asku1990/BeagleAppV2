@@ -131,7 +131,6 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
               <th className="px-2 py-2">{t("admin.dogs.columns.name")}</th>
               <th className="px-2 py-2">{t("admin.dogs.columns.sex")}</th>
               <th className="px-2 py-2">{t("admin.dogs.columns.birthDate")}</th>
-              <th className="px-2 py-2">{t("admin.dogs.columns.breeder")}</th>
               <th className="px-2 py-2">{t("admin.dogs.columns.owners")}</th>
               <th className="px-2 py-2">{t("admin.dogs.columns.sire")}</th>
               <th className="px-2 py-2">{t("admin.dogs.columns.dam")}</th>
@@ -178,7 +177,6 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
                 <td className="px-2 py-2">
                   {showDash(formatBirthDate(dog.birthDate, locale))}
                 </td>
-                <td className="px-2 py-2">{showDash(dog.breederNameText)}</td>
                 <td className="px-2 py-2">
                   {formatOwners(dog.ownershipPreview)}
                 </td>
@@ -247,10 +245,6 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
               <p>
                 {t("admin.dogs.mobile.additionalRegistrationNosLabel")}:{" "}
                 {formatAdditionalRegistrations(dog.secondaryRegistrationNos)}
-              </p>
-              <p>
-                {t("admin.dogs.mobile.breederLabel")}:{" "}
-                {showDash(dog.breederNameText)}
               </p>
               <p>
                 {t("admin.dogs.mobile.ownersLabel")}:{" "}

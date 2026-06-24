@@ -13,6 +13,14 @@ export const adminDogParentOptionsQueryKeyRoot = [
   "admin-dogs",
   "parent-options",
 ] as const;
+export const adminDogColorOptionsQueryKeyRoot = [
+  "admin-dogs",
+  "color-options",
+] as const;
+export const adminDogDeleteImpactQueryKeyRoot = [
+  "admin-dogs",
+  "delete-impact",
+] as const;
 
 export function adminDogsQueryKey(filters: AdminDogListRequest) {
   return [
@@ -35,4 +43,12 @@ export function adminDogOwnerOptionsQueryKey(query: string, limit: number) {
 
 export function adminDogParentOptionsQueryKey(query: string, limit: number) {
   return [...adminDogParentOptionsQueryKeyRoot, query, limit] as const;
+}
+
+export function adminDogColorOptionsQueryKey() {
+  return adminDogColorOptionsQueryKeyRoot;
+}
+
+export function adminDogDeleteImpactQueryKey(dogId: string) {
+  return [...adminDogDeleteImpactQueryKeyRoot, dogId] as const;
 }

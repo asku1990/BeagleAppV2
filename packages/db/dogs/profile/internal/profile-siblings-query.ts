@@ -7,6 +7,7 @@ import {
 } from "./profile-siblings";
 
 const siblingCandidateInclude = {
+  color: true,
   registrations: true,
   sire: { include: { registrations: true } },
   dam: { include: { registrations: true } },
