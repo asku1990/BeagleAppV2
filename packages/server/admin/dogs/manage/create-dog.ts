@@ -24,6 +24,7 @@ import {
   validateCreateInTry,
   validateCreatePreflight,
 } from "./internal/create-input-validation";
+import { validateAdminDogColorSelection } from "./internal/color-validation";
 import { resolveAndValidateCreateParents } from "./internal/create-parent-validation";
 import { linkHistoricalEntriesOnDogCreate } from "./link-historical-entries-on-dog-create";
 
@@ -92,23 +93,21 @@ export async function createAdminDog(
       const colorOption = await findAdminDogColorOptionDb(
         preflight.data.colorCode,
       );
-      if (colorOption?.status !== "SELECTABLE") {
+      const colorValidation =
+        validateAdminDogColorSelection<CreateAdminDogResponse>(
+          preflight.data.colorCode,
+          colorOption,
+        );
+      if (!colorValidation.ok) {
         log.warn(
           {
-            event: "color_not_selectable",
+            ...colorValidation.logContext,
             colorCode: preflight.data.colorCode,
             durationMs: Date.now() - startedAt,
           },
-          "admin dog create rejected because color is not selectable",
+          colorValidation.logMessage,
         );
-        return {
-          status: 400,
-          body: {
-            ok: false,
-            error: "Color code is not selectable.",
-            code: "INVALID_COLOR_CODE",
-          },
-        };
+        return colorValidation.response;
       }
     }
 

@@ -19,6 +19,7 @@ import {
   updateInternalErrorResponse,
   updateSuccessResponse,
 } from "./internal/manage-responses";
+import { validateAdminDogColorSelection } from "./internal/color-validation";
 import {
   validateUpdateInTry,
   validateUpdatePreflight,
@@ -131,26 +132,23 @@ export async function updateAdminDog(
       const colorOption = await findAdminDogColorOptionDb(
         preflight.data.colorCode,
       );
-      const preservesExistingColor =
-        existingDog.colorCode === preflight.data.colorCode;
-      if (colorOption?.status !== "SELECTABLE" && !preservesExistingColor) {
+      const colorValidation =
+        validateAdminDogColorSelection<UpdateAdminDogResponse>(
+          preflight.data.colorCode,
+          colorOption,
+          existingDog.colorCode,
+        );
+      if (!colorValidation.ok) {
         log.warn(
           {
-            event: "color_not_selectable",
+            ...colorValidation.logContext,
             dogId: preflight.data.id,
             colorCode: preflight.data.colorCode,
             durationMs: Date.now() - startedAt,
           },
-          "admin dog update rejected because color is not selectable",
+          colorValidation.logMessage,
         );
-        return {
-          status: 400,
-          body: {
-            ok: false,
-            error: "Color code is not selectable.",
-            code: "INVALID_COLOR_CODE",
-          },
-        };
+        return colorValidation.response;
       }
     }
 

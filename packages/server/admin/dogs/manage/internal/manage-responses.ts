@@ -109,8 +109,47 @@ export function invalidColorCodeResponse<
     status: 400,
     body: {
       ok: false,
-      error: "Color code was not found.",
+      error: "Invalid color code.",
       code: "INVALID_COLOR_CODE",
+    },
+  } as ServiceResult<T>;
+}
+
+export function colorCodeNotFoundResponse<
+  T extends ManageErrorTarget,
+>(): ServiceResult<T> {
+  return {
+    status: 400,
+    body: {
+      ok: false,
+      error: "Color code was not found.",
+      code: "COLOR_CODE_NOT_FOUND",
+    },
+  } as ServiceResult<T>;
+}
+
+export function hiddenColorCodeResponse<
+  T extends ManageErrorTarget,
+>(): ServiceResult<T> {
+  return {
+    status: 400,
+    body: {
+      ok: false,
+      error: "Color code is hidden and cannot be selected.",
+      code: "COLOR_CODE_HIDDEN",
+    },
+  } as ServiceResult<T>;
+}
+
+export function legacyUnknownColorCodeResponse<
+  T extends ManageErrorTarget,
+>(): ServiceResult<T> {
+  return {
+    status: 400,
+    body: {
+      ok: false,
+      error: "Color code is a legacy unknown value and cannot be selected.",
+      code: "COLOR_CODE_LEGACY_UNKNOWN",
     },
   } as ServiceResult<T>;
 }
