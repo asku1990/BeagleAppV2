@@ -7,12 +7,14 @@ const {
   findDogByIdDbMock,
   findDogByRegistrationNoDbMock,
   loadDogPedigreeAncestryForParentsDbMock,
+  findAdminDogColorOptionDbMock,
 } = vi.hoisted(() => ({
   updateAdminDogWriteDbMock: vi.fn(),
   runAdminDogWriteTransactionDbMock: vi.fn(),
   findDogByIdDbMock: vi.fn(),
   findDogByRegistrationNoDbMock: vi.fn(),
   loadDogPedigreeAncestryForParentsDbMock: vi.fn(),
+  findAdminDogColorOptionDbMock: vi.fn(),
 }));
 
 vi.mock("@beagle/db", () => ({
@@ -21,6 +23,7 @@ vi.mock("@beagle/db", () => ({
   findDogByIdDb: findDogByIdDbMock,
   findDogByRegistrationNoDb: findDogByRegistrationNoDbMock,
   loadDogPedigreeAncestryForParentsDb: loadDogPedigreeAncestryForParentsDbMock,
+  findAdminDogColorOptionDb: findAdminDogColorOptionDbMock,
 }));
 
 describe("updateAdminDog", () => {
@@ -30,11 +33,13 @@ describe("updateAdminDog", () => {
     findDogByIdDbMock.mockReset();
     findDogByRegistrationNoDbMock.mockReset();
     loadDogPedigreeAncestryForParentsDbMock.mockReset();
+    findAdminDogColorOptionDbMock.mockReset();
     runAdminDogWriteTransactionDbMock.mockImplementation(async (callback) =>
       callback({}),
     );
     findDogByIdDbMock.mockResolvedValue({
       id: "dog_1",
+      colorCode: null,
       sire: { id: "sire_1", sex: "MALE" },
       dam: { id: "dam_1", sex: "FEMALE" },
     });
@@ -53,6 +58,151 @@ describe("updateAdminDog", () => {
         },
       },
     });
+  });
+
+  it("allows an existing hidden color to be preserved", async () => {
+    findDogByIdDbMock.mockResolvedValue({
+      id: "dog_1",
+      colorCode: 112,
+      sire: null,
+      dam: null,
+    });
+    findAdminDogColorOptionDbMock.mockResolvedValue({
+      code: 112,
+      status: "HIDDEN",
+    });
+    updateAdminDogWriteDbMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Metsapolun Kide",
+      sex: "FEMALE",
+      registrationNo: "FI12345/21",
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        colorCode: 112,
+      }),
+    ).resolves.toMatchObject({ status: 200 });
+  });
+
+  it("allows an existing legacy unknown color to be preserved", async () => {
+    findDogByIdDbMock.mockResolvedValue({
+      id: "dog_1",
+      colorCode: 493,
+      sire: null,
+      dam: null,
+    });
+    findAdminDogColorOptionDbMock.mockResolvedValue({
+      code: 493,
+      status: "LEGACY_UNKNOWN",
+    });
+    updateAdminDogWriteDbMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Metsapolun Kide",
+      sex: "FEMALE",
+      registrationNo: "FI12345/21",
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        colorCode: 493,
+      }),
+    ).resolves.toMatchObject({ status: 200 });
+  });
+
+  it("rejects assigning a missing color code", async () => {
+    findAdminDogColorOptionDbMock.mockResolvedValue(null);
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        colorCode: 999,
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Color code was not found.",
+        code: "COLOR_CODE_NOT_FOUND",
+      },
+    });
+
+    expect(updateAdminDogWriteDbMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects assigning a different hidden color", async () => {
+    findDogByIdDbMock.mockResolvedValue({
+      id: "dog_1",
+      colorCode: 121,
+      sire: null,
+      dam: null,
+    });
+    findAdminDogColorOptionDbMock.mockResolvedValue({
+      code: 112,
+      status: "HIDDEN",
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        colorCode: 112,
+      }),
+    ).resolves.toMatchObject({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Color code is hidden and cannot be selected.",
+        code: "COLOR_CODE_HIDDEN",
+      },
+    });
+
+    expect(updateAdminDogWriteDbMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects assigning a different legacy unknown color", async () => {
+    findDogByIdDbMock.mockResolvedValue({
+      id: "dog_1",
+      colorCode: 121,
+      sire: null,
+      dam: null,
+    });
+    findAdminDogColorOptionDbMock.mockResolvedValue({
+      code: 493,
+      status: "LEGACY_UNKNOWN",
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        colorCode: 493,
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Color code is a legacy unknown value and cannot be selected.",
+        code: "COLOR_CODE_LEGACY_UNKNOWN",
+      },
+    });
+
+    expect(updateAdminDogWriteDbMock).not.toHaveBeenCalled();
   });
 
   it("returns 400 for invalid id", async () => {

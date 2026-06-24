@@ -1,5 +1,6 @@
 import {
   findDogByIdDb,
+  findAdminDogColorOptionDb,
   runAdminDogWriteTransactionDb,
   updateAdminDogWriteDb,
   type AuditContextDb,
@@ -18,6 +19,7 @@ import {
   updateInternalErrorResponse,
   updateSuccessResponse,
 } from "./internal/manage-responses";
+import { validateAdminDogColorSelection } from "./internal/color-validation";
 import {
   validateUpdateInTry,
   validateUpdatePreflight,
@@ -126,6 +128,29 @@ export async function updateAdminDog(
     if (parentGuardResult && !parentGuardResult.ok) {
       return parentGuardResult.response;
     }
+    if (preflight.data.colorCode != null) {
+      const colorOption = await findAdminDogColorOptionDb(
+        preflight.data.colorCode,
+      );
+      const colorValidation =
+        validateAdminDogColorSelection<UpdateAdminDogResponse>(
+          preflight.data.colorCode,
+          colorOption,
+          existingDog.colorCode,
+        );
+      if (!colorValidation.ok) {
+        log.warn(
+          {
+            ...colorValidation.logContext,
+            dogId: preflight.data.id,
+            colorCode: preflight.data.colorCode,
+            durationMs: Date.now() - startedAt,
+          },
+          colorValidation.logMessage,
+        );
+        return colorValidation.response;
+      }
+    }
 
     const updatedDog = await runAdminDogWriteTransactionDb(
       async (tx) =>
@@ -146,6 +171,7 @@ export async function updateAdminDog(
                 : (resolvedParents.data.dam?.id ?? null),
             ownerNames: inTryValidation.data.ownerNames,
             ekNo: preflight.data.ekNo,
+            colorCode: preflight.data.colorCode,
             note: inTryValidation.data.note,
             registrationNo: preflight.data.primaryRegistrationNo,
             secondaryRegistrationNos:

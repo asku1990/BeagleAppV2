@@ -37,6 +37,7 @@ export {
   type DogEpiDiseaseFactDb,
 } from "./core/epi-disease-facts";
 export { getNewestBeagleDogsDb } from "./newest";
+export { seedDogColorsDb } from "./colors";
 export {
   searchBeagleDogsDb,
   type BeagleSearchModeDb,

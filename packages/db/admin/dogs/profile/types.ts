@@ -1,4 +1,5 @@
 import type {
+  DogColorDb,
   OffspringDogNode,
   ParentDogNode,
   RegistrationNode,
@@ -33,7 +34,7 @@ export type AdminDogProfileDb = {
     registrationNos: RegistrationNode[];
     birthDate: Date | null;
     sex: DogSex;
-    color: string | null;
+    color: DogColorDb | null;
     ekNo: number | null;
     sire: ParentDogNode | null;
     dam: ParentDogNode | null;

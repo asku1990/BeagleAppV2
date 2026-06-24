@@ -27,7 +27,8 @@ export async function fetchLegacyPhase1Rows(options?: {
               SYNTY as birthDateRaw,
               ISREK as sireRegistrationNo,
               EMREK as damRegistrationNo,
-              KASVA as breederName
+              KASVA as breederName,
+              COLCODE as colorCode
        FROM bearek_id`,
     )) as LegacyDogRow[];
     log(

@@ -17,10 +17,16 @@ describe("fetchLegacyPhase1Rows", () => {
   it("logs raw bea_apu rows and the subset with EKNO", async () => {
     const log = vi.fn();
     const connection = {
-      query: vi.fn().mockResolvedValue([
-        { registrationNo: "FI-1/20", ekNo: 123 },
-        { registrationNo: "FI-2/20", ekNo: null },
-      ]),
+      query: vi
+        .fn()
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([
+          { registrationNo: "FI-1/20", ekNo: 123 },
+          { registrationNo: "FI-2/20", ekNo: null },
+        ])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([]),
       end: vi.fn().mockResolvedValue(undefined),
     };
     connectLegacyDatabaseMock.mockResolvedValue(connection);

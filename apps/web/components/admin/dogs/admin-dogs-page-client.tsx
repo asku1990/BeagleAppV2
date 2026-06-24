@@ -10,7 +10,9 @@ import {
   toAdminDogOwnerOptions,
   toAdminDogParentOptions,
 } from "@/lib/admin/dogs/manage";
+import { formatDogColor } from "@/lib/dogs/color";
 import {
+  useAdminDogColorOptionsQuery,
   useDeleteAdminDogMutation,
   useAdminDogOwnerOptionsQuery,
   useAdminDogParentOptionsQuery,
@@ -26,7 +28,7 @@ import { DogResults } from "./dog-results";
 import type { AdminDogSex } from "./types";
 
 export function AdminDogsPageClient() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [query, setQuery] = useState("");
   const [sex, setSex] = useState<"all" | AdminDogSex>("all");
 
@@ -65,6 +67,9 @@ export function AdminDogsPageClient() {
     limit: 100,
     enabled: dogFormFlow.formState.open,
   });
+  const colorOptionsQuery = useAdminDogColorOptionsQuery(
+    dogFormFlow.formState.open,
+  );
 
   const dogs = useMemo(
     () => (dogsQuery.data?.items ?? []).map(mapAdminDogFromQuery),
@@ -93,6 +98,37 @@ export function AdminDogsPageClient() {
       dogFormFlow.formValues.damPreviewRegistrationNo,
       dogFormFlow.formValues.damPreviewName,
     ],
+  );
+  const colorOptions = useMemo(
+    () =>
+      (colorOptionsQuery.data ?? [])
+        .filter(
+          (option) =>
+            option.status === "SELECTABLE" ||
+            String(option.code) === dogFormFlow.formValues.colorCode,
+        )
+        .map((option) => {
+          const localizedName =
+            formatDogColor(option, locale) ?? String(option.code);
+          const hiddenSuffix =
+            option.status === "SELECTABLE"
+              ? ""
+              : locale === "sv"
+                ? " (dold)"
+                : " (piilotettu)";
+
+          return {
+            value: String(option.code),
+            label: `${option.code} - ${localizedName}${hiddenSuffix}`,
+            keywords: [
+              String(option.code),
+              option.nameFi,
+              option.nameSv ?? "",
+              option.nameEn ?? "",
+            ],
+          };
+        }),
+    [colorOptionsQuery.data, dogFormFlow.formValues.colorCode, locale],
   );
 
   const resultCount = dogs.length;
@@ -142,6 +178,7 @@ export function AdminDogsPageClient() {
         mode={dogFormFlow.formState.mode}
         dog={dogFormFlow.formState.target}
         values={dogFormFlow.formValues}
+        colorOptions={colorOptions}
         ownerOptions={ownerOptions}
         parentOptions={parentOptions}
         onOwnerSearchChange={dogFormFlow.setOwnerLookupQuery}

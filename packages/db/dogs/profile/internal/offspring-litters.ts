@@ -173,6 +173,7 @@ function mapOffspringRow(
     trialCount: puppy._count.trialEntries,
     showCount: puppy._count.showEntries,
     litterCount: countOffspringLitters(puppy),
+    color: puppy.color,
   };
 }
 

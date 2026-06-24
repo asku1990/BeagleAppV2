@@ -8,6 +8,7 @@ import { useI18n } from "@/hooks/i18n";
 import type { MessageKey } from "@/lib/i18n";
 import { getDogProfileHref } from "@/lib/public/beagle/dogs/profile";
 import { cn } from "@/lib/utils";
+import { formatDogColor } from "@/lib/dogs/color";
 import type {
   BeagleDogProfileDto,
   BeagleDogProfileSex,
@@ -35,16 +36,14 @@ function formatEkNo(value: number | null): string {
   return value == null ? FALLBACK_VALUE : String(value);
 }
 
-function formatColorPlaceholder(t: (key: MessageKey) => string): string {
-  return `${FALLBACK_VALUE} ${t("dog.profile.field.comingSoon")}`;
-}
-
 function SiblingsDesktopTable({
   siblings,
   t,
+  locale,
 }: {
   siblings: BeagleDogProfileSiblingRowDto[];
   t: (key: MessageKey) => string;
+  locale: "fi" | "sv";
 }) {
   return (
     <div className="overflow-x-auto">
@@ -100,7 +99,9 @@ function SiblingsDesktopTable({
                 </Link>
               </td>
               <td className="px-2 py-2">{mapSexLabel(sibling.sex, t)}</td>
-              <td className="px-2 py-2">{formatColorPlaceholder(t)}</td>
+              <td className="px-2 py-2">
+                {formatDogColor(sibling.color, locale) ?? FALLBACK_VALUE}
+              </td>
               <td className="px-2 py-2">{sibling.trialCount}</td>
               <td className="px-2 py-2">{sibling.showCount}</td>
               <td className="px-2 py-2">{sibling.litterCount}</td>
@@ -116,9 +117,11 @@ function SiblingsDesktopTable({
 function SiblingsMobileCards({
   siblings,
   t,
+  locale,
 }: {
   siblings: BeagleDogProfileSiblingRowDto[];
   t: (key: MessageKey) => string;
+  locale: "fi" | "sv";
 }) {
   return (
     <div className="space-y-2">
@@ -188,7 +191,9 @@ function SiblingsMobileCards({
               <span className={beagleTheme.mutedText}>
                 {t("dog.profile.litters.col.color")}:{" "}
               </span>
-              <span>{formatColorPlaceholder(t)}</span>
+              <span>
+                {formatDogColor(sibling.color, locale) ?? FALLBACK_VALUE}
+              </span>
             </p>
           </div>
         </article>
@@ -202,7 +207,7 @@ export function DogProfileSiblingsCard({
 }: {
   profile: BeagleDogProfileDto;
 }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   return (
     <ListingSectionShell
@@ -221,8 +226,20 @@ export function DogProfileSiblingsCard({
         </div>
       ) : (
         <ListingResponsiveResults
-          desktop={<SiblingsDesktopTable siblings={profile.siblings} t={t} />}
-          mobile={<SiblingsMobileCards siblings={profile.siblings} t={t} />}
+          desktop={
+            <SiblingsDesktopTable
+              siblings={profile.siblings}
+              t={t}
+              locale={locale}
+            />
+          }
+          mobile={
+            <SiblingsMobileCards
+              siblings={profile.siblings}
+              t={t}
+              locale={locale}
+            />
+          }
         />
       )}
     </ListingSectionShell>

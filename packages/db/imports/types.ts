@@ -6,6 +6,7 @@ export type LegacyDogRow = {
   sireRegistrationNo: string | null;
   damRegistrationNo: string | null;
   breederName: string | null;
+  colorCode: number | string | null;
 };
 
 export type LegacyBreederRow = {

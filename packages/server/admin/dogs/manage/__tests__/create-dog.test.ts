@@ -7,12 +7,14 @@ const {
   findDogByRegistrationNoDbMock,
   loadDogPedigreeAncestryForParentsDbMock,
   linkHistoricalEntriesOnDogCreateMock,
+  findAdminDogColorOptionDbMock,
 } = vi.hoisted(() => ({
   createAdminDogWriteDbMock: vi.fn(),
   runAdminDogWriteTransactionDbMock: vi.fn(),
   findDogByRegistrationNoDbMock: vi.fn(),
   loadDogPedigreeAncestryForParentsDbMock: vi.fn(),
   linkHistoricalEntriesOnDogCreateMock: vi.fn(),
+  findAdminDogColorOptionDbMock: vi.fn(),
 }));
 
 vi.mock("@beagle/db", () => ({
@@ -20,6 +22,7 @@ vi.mock("@beagle/db", () => ({
   runAdminDogWriteTransactionDb: runAdminDogWriteTransactionDbMock,
   findDogByRegistrationNoDb: findDogByRegistrationNoDbMock,
   loadDogPedigreeAncestryForParentsDb: loadDogPedigreeAncestryForParentsDbMock,
+  findAdminDogColorOptionDb: findAdminDogColorOptionDbMock,
 }));
 
 vi.mock("../link-historical-entries-on-dog-create", () => ({
@@ -64,6 +67,7 @@ describe("createAdminDog", () => {
     findDogByRegistrationNoDbMock.mockReset();
     loadDogPedigreeAncestryForParentsDbMock.mockReset();
     linkHistoricalEntriesOnDogCreateMock.mockReset();
+    findAdminDogColorOptionDbMock.mockReset();
     linkHistoricalEntriesOnDogCreateMock.mockResolvedValue({
       showLinkedCount: 0,
       trialLinkedCount: 0,
@@ -241,6 +245,7 @@ describe("createAdminDog", () => {
         damId: "dam_1",
         ownerNames: ["Tiina Virtanen"],
         ekNo: 5588,
+        colorCode: null,
         note: "Important",
         registrationNo: "FI12345/21",
         secondaryRegistrationNos: [],
@@ -262,6 +267,87 @@ describe("createAdminDog", () => {
       },
       {},
     );
+  });
+
+  it("rejects a missing color code for a new dog", async () => {
+    mockRequiredParentResolution();
+    findAdminDogColorOptionDbMock.mockResolvedValue(null);
+
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        colorCode: 999,
+        sireRegistrationNo: "FI11111/11",
+        damRegistrationNo: "FI22222/22",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Color code was not found.",
+        code: "COLOR_CODE_NOT_FOUND",
+      },
+    });
+
+    expect(createAdminDogWriteDbMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects a hidden color for a new dog", async () => {
+    mockRequiredParentResolution();
+    findAdminDogColorOptionDbMock.mockResolvedValue({
+      code: 112,
+      status: "HIDDEN",
+    });
+
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        colorCode: 112,
+        sireRegistrationNo: "FI11111/11",
+        damRegistrationNo: "FI22222/22",
+      }),
+    ).resolves.toMatchObject({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Color code is hidden and cannot be selected.",
+        code: "COLOR_CODE_HIDDEN",
+      },
+    });
+
+    expect(createAdminDogWriteDbMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects a legacy unknown color for a new dog", async () => {
+    mockRequiredParentResolution();
+    findAdminDogColorOptionDbMock.mockResolvedValue({
+      code: 493,
+      status: "LEGACY_UNKNOWN",
+    });
+
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        colorCode: 493,
+        sireRegistrationNo: "FI11111/11",
+        damRegistrationNo: "FI22222/22",
+      }),
+    ).resolves.toMatchObject({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Color code is a legacy unknown value and cannot be selected.",
+        code: "COLOR_CODE_LEGACY_UNKNOWN",
+      },
+    });
+
+    expect(createAdminDogWriteDbMock).not.toHaveBeenCalled();
   });
 
   it("returns an internal error if historical linking fails after dog creation", async () => {

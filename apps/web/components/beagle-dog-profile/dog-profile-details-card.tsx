@@ -9,6 +9,7 @@ import {
 } from "@/lib/public/beagle/dogs/profile";
 import type { MessageKey } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { formatDogColor } from "@/lib/dogs/color";
 import type {
   BeagleDogProfileDto,
   BeagleDogProfileParentDto,
@@ -184,10 +185,7 @@ export function DogProfileDetailsCard({
         />
         <DetailRow
           label={t("dog.profile.field.color")}
-          value={
-            profile.color ??
-            `${FALLBACK_VALUE} ${t("dog.profile.field.comingSoon")}`
-          }
+          value={formatDogColor(profile.color, locale) ?? FALLBACK_VALUE}
         />
         {profile.ekNo != null && (
           <DetailRow

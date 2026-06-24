@@ -71,7 +71,7 @@ export async function getBeagleDogProfileDb(
     ),
     birthDate: dog.birthDate,
     sex,
-    color: null,
+    color: dog.color,
     ekNo: dog.ekNo,
     sire: mapParent(dog.sire),
     dam: mapParent(dog.dam),

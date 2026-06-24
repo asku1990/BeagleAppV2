@@ -32,7 +32,7 @@ export function mapAdminDogProfileDbRow(
       registrationNos: dog.registrations,
       birthDate: dog.birthDate,
       sex: dog.sex,
-      color: null,
+      color: dog.color,
       ekNo: dog.ekNo,
       sire: dog.sire
         ? {

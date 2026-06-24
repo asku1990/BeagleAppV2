@@ -14,9 +14,13 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+- Koirien viralliset ja historialliset värikoodit säilyvät tuonnissa, näkyvät suomeksi ja ruotsiksi koiraprofiileissa ja ovat hallittavissa ylläpidon koiralomakkeella.
+
 ### Changed
 
 ### Fixed
+
+- Uudelle koiralle voi valita vain tällä hetkellä käytössä olevan värin, mutta vanha piilotettu värikoodi säilyy koiraa muokattaessa.
 
 ### Removed
 
