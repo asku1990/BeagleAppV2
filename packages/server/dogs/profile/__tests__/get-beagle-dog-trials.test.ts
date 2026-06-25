@@ -1,11 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { getBeagleDogProfileDbMock, getBeagleTrialsForDogDbMock } = vi.hoisted(
-  () => ({
-    getBeagleDogProfileDbMock: vi.fn(),
+const { getBeagleDogProfileIdentityDbMock, getBeagleTrialsForDogDbMock } =
+  vi.hoisted(() => ({
+    getBeagleDogProfileIdentityDbMock: vi.fn(),
     getBeagleTrialsForDogDbMock: vi.fn(),
-  }),
-);
+  }));
 
 const { formatTrialAwardMock, toBusinessDateOnlyMock } = vi.hoisted(() => ({
   formatTrialAwardMock: vi.fn(),
@@ -13,7 +12,7 @@ const { formatTrialAwardMock, toBusinessDateOnlyMock } = vi.hoisted(() => ({
 }));
 
 vi.mock("@beagle/db", () => ({
-  getBeagleDogProfileDb: getBeagleDogProfileDbMock,
+  getBeagleDogProfileIdentityDb: getBeagleDogProfileIdentityDbMock,
   getBeagleTrialsForDogDb: getBeagleTrialsForDogDbMock,
 }));
 
@@ -29,7 +28,7 @@ import { getBeagleDogTrialsService } from "../get-beagle-dog-trials";
 
 describe("getBeagleDogTrialsService", () => {
   beforeEach(() => {
-    getBeagleDogProfileDbMock.mockReset();
+    getBeagleDogProfileIdentityDbMock.mockReset();
     getBeagleTrialsForDogDbMock.mockReset();
     formatTrialAwardMock.mockReset();
     toBusinessDateOnlyMock.mockReset();
@@ -42,12 +41,12 @@ describe("getBeagleDogTrialsService", () => {
       status: 400,
       body: { ok: false, error: "Dog ID is required." },
     });
-    expect(getBeagleDogProfileDbMock).not.toHaveBeenCalled();
+    expect(getBeagleDogProfileIdentityDbMock).not.toHaveBeenCalled();
     expect(getBeagleTrialsForDogDbMock).not.toHaveBeenCalled();
   });
 
   it("returns 404 when dog is missing", async () => {
-    getBeagleDogProfileDbMock.mockResolvedValue(null);
+    getBeagleDogProfileIdentityDbMock.mockResolvedValue(null);
     getBeagleTrialsForDogDbMock.mockResolvedValue([]);
 
     const result = await getBeagleDogTrialsService("dog_1");
@@ -59,7 +58,7 @@ describe("getBeagleDogTrialsService", () => {
   });
 
   it("returns mapped trials payload", async () => {
-    getBeagleDogProfileDbMock.mockResolvedValue({
+    getBeagleDogProfileIdentityDbMock.mockResolvedValue({
       id: "dog_1",
       name: "Ajometsan Aada",
       registrationNo: "FI-11/24",
@@ -92,7 +91,7 @@ describe("getBeagleDogTrialsService", () => {
 
     const result = await getBeagleDogTrialsService(" dog_1 ");
 
-    expect(getBeagleDogProfileDbMock).toHaveBeenCalledWith("dog_1");
+    expect(getBeagleDogProfileIdentityDbMock).toHaveBeenCalledWith("dog_1");
     expect(getBeagleTrialsForDogDbMock).toHaveBeenCalledWith("dog_1");
     expect(toBusinessDateOnlyMock).toHaveBeenCalledWith(
       new Date("2024-02-01T00:00:00.000Z"),
@@ -134,7 +133,7 @@ describe("getBeagleDogTrialsService", () => {
   });
 
   it("returns 500 when db fails", async () => {
-    getBeagleDogProfileDbMock.mockRejectedValue(new Error("boom"));
+    getBeagleDogProfileIdentityDbMock.mockRejectedValue(new Error("boom"));
     getBeagleTrialsForDogDbMock.mockResolvedValue([]);
 
     const result = await getBeagleDogTrialsService("dog_1");

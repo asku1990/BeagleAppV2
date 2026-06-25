@@ -1,6 +1,9 @@
 // Builds the public dog trials DTO without loading the full profile graph.
 import type { BeagleDogTrialsDto } from "@beagle/contracts";
-import { getBeagleDogProfileDb, getBeagleTrialsForDogDb } from "@beagle/db";
+import {
+  getBeagleDogProfileIdentityDb,
+  getBeagleTrialsForDogDb,
+} from "@beagle/db";
 import { toBusinessDateOnly } from "@server/core/date-only";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
@@ -36,12 +39,12 @@ export async function getBeagleDogTrialsService(
   }
 
   try {
-    const [profile, trials] = await Promise.all([
-      getBeagleDogProfileDb(parsedDogId),
+    const [identity, trials] = await Promise.all([
+      getBeagleDogProfileIdentityDb(parsedDogId),
       getBeagleTrialsForDogDb(parsedDogId),
     ]);
 
-    if (!profile) {
+    if (!identity) {
       log.info(
         {
           event: "not_found",
@@ -71,9 +74,9 @@ export async function getBeagleDogTrialsService(
       body: {
         ok: true,
         data: {
-          id: profile.id,
-          name: profile.name,
-          registrationNo: profile.registrationNo,
+          id: identity.id,
+          name: identity.name,
+          registrationNo: identity.registrationNo,
           trials: trials.map((trial) => ({
             id: trial.id,
             trialId: trial.trialEventId,
