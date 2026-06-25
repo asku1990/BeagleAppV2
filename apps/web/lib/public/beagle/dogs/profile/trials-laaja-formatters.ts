@@ -1,3 +1,5 @@
+// Formats dog-profile trial values consistently for the wide trials view.
+// Shared by the table and clipboard output so both stay aligned.
 import { parseLocalIsoDate } from "@/lib/public/beagle/dogs/profile";
 import type { BeagleDogProfileTrialRowDto } from "@beagle/contracts";
 
@@ -34,5 +36,5 @@ export function formatPlacement(row: BeagleDogProfileTrialRowDto): string {
     return `${rank} / ${classCount}`;
   }
 
-  return rank ?? FALLBACK_VALUE;
+  return rank || FALLBACK_VALUE;
 }

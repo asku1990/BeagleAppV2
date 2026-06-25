@@ -5,15 +5,15 @@ import { useMemo } from "react";
 import { ListingResponsiveResults } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
-import { getBeagleTrialHref } from "@/lib/public/beagle/trials";
-import { cn } from "@/lib/utils";
-import type { BeagleDogProfileTrialRowDto } from "@beagle/contracts";
 import {
   FALLBACK_VALUE,
   formatDate,
   formatNumber,
   formatPlacement,
-} from "./dog-profile-trials-laaja-formatters";
+} from "@/lib/public/beagle/dogs/profile/trials-laaja-formatters";
+import { getBeagleTrialHref } from "@/lib/public/beagle/trials";
+import { cn } from "@/lib/utils";
+import type { BeagleDogProfileTrialRowDto } from "@beagle/contracts";
 
 function DogProfileTrialsLaajaMobileList({
   rows,

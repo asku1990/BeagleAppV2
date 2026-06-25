@@ -1,45 +1,11 @@
 // Builds the public dog trials DTO without loading the full profile graph.
-import { getBeagleDogTrialsDb } from "@beagle/db";
 import type { BeagleDogTrialsDto } from "@beagle/contracts";
+import { getBeagleDogProfileDb, getBeagleTrialsForDogDb } from "@beagle/db";
 import { toBusinessDateOnly } from "@server/core/date-only";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
 import { parseDogId } from "@server/dogs/core";
 import { formatTrialAward } from "@server/trials/core";
-
-function toNumberOrNull(value: { toNumber(): number } | null): number | null {
-  return value === null ? null : value.toNumber();
-}
-
-function mapTrials(
-  result: NonNullable<Awaited<ReturnType<typeof getBeagleDogTrialsDb>>>,
-): BeagleDogTrialsDto {
-  return {
-    id: result.id,
-    name: result.name,
-    registrationNo: result.registrationNo,
-    trials: result.trials.map((trial) => ({
-      id: trial.id,
-      trialId: trial.trialId,
-      place: trial.place,
-      date: toBusinessDateOnly(trial.date),
-      weather: trial.weather,
-      koetyyppi: trial.koetyyppi,
-      koiriaLuokassa: trial.koiriaLuokassa,
-      rank: trial.rank,
-      points: toNumberOrNull(trial.points),
-      award: formatTrialAward(trial.pa, trial.lk),
-      judge: trial.tuom1?.trim() || trial.ylituomariNimi || null,
-      haku: toNumberOrNull(trial.haku),
-      hauk: toNumberOrNull(trial.hauk),
-      yva: toNumberOrNull(trial.yva),
-      hlo: toNumberOrNull(trial.hlo),
-      alo: toNumberOrNull(trial.alo),
-      tja: toNumberOrNull(trial.tja),
-      pin: toNumberOrNull(trial.pin),
-    })),
-  };
-}
 
 export async function getBeagleDogTrialsService(
   dogId: string,
@@ -70,8 +36,12 @@ export async function getBeagleDogTrialsService(
   }
 
   try {
-    const result = await getBeagleDogTrialsDb(parsedDogId);
-    if (!result) {
+    const [profile, trials] = await Promise.all([
+      getBeagleDogProfileDb(parsedDogId),
+      getBeagleTrialsForDogDb(parsedDogId),
+    ]);
+
+    if (!profile) {
       log.info(
         {
           event: "not_found",
@@ -90,18 +60,41 @@ export async function getBeagleDogTrialsService(
       {
         event: "success",
         dogId: parsedDogId,
-        trialCount: result.trials.length,
+        trialCount: trials.length,
         durationMs: Date.now() - startedAt,
       },
       "dog trials fetch succeeded",
     );
 
-    const data = mapTrials(result);
     return {
       status: 200,
       body: {
         ok: true,
-        data,
+        data: {
+          id: profile.id,
+          name: profile.name,
+          registrationNo: profile.registrationNo,
+          trials: trials.map((trial) => ({
+            id: trial.id,
+            trialId: trial.trialEventId,
+            place: trial.place,
+            date: toBusinessDateOnly(trial.date),
+            weather: trial.weather,
+            koetyyppi: trial.koetyyppi,
+            koiriaLuokassa: trial.koiriaLuokassa,
+            rank: trial.rank,
+            points: trial.points,
+            award: formatTrialAward(trial.award, trial.classCode),
+            judge: trial.judge,
+            haku: trial.haku,
+            hauk: trial.hauk,
+            yva: trial.yva,
+            hlo: trial.hlo,
+            alo: trial.alo,
+            tja: trial.tja,
+            pin: trial.pin,
+          })),
+        },
       },
     };
   } catch (error) {

@@ -5,6 +5,7 @@ import type {
   BeagleTrialDetailsRow,
   BeagleTrialSearchRow,
 } from "@beagle/contracts";
+import { formatPlacement } from "@/lib/public/beagle/dogs/profile/trials-laaja-formatters";
 
 type TrialClipboardLabels = {
   no: string;
@@ -99,22 +100,7 @@ function formatDogProfilePoints(value: number | null): string {
 }
 
 function formatDogProfilePlacement(row: BeagleDogProfileTrialRowDto): string {
-  const rank = row.rank?.trim();
-  const classCount = row.koiriaLuokassa;
-
-  if (row.koetyyppi === "KOKOKAUDENKOE") {
-    return rank && classCount != null ? `${rank} / ${classCount} KK` : "KK";
-  }
-
-  if (row.koetyyppi === "PITKAKOE") {
-    return rank && classCount != null ? `${rank} / ${classCount} PK` : "PK";
-  }
-
-  if (rank && classCount != null) {
-    return `${rank} / ${classCount}`;
-  }
-
-  return rank || "-";
+  return formatPlacement(row);
 }
 
 function formatAwardForClipboard(

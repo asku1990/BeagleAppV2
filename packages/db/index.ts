@@ -73,7 +73,6 @@ export { getHomeStatisticsSnapshot, type HomeStatisticsSnapshot } from "./home";
 
 export {
   getBeagleDogProfileDb,
-  getBeagleDogTrialsDb,
   seedDogColorsDb,
   getNewestBeagleDogsDb,
   loadDogPedigreeAncestryDb,
