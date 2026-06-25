@@ -22,12 +22,14 @@ export function BeagleDogProfilePage({ profile }: BeagleDogProfilePageProps) {
   return (
     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
       <header className={cn(beagleTheme.panel, "px-5 py-5 md:px-6 md:py-6")}>
-        <h1 className={cn(beagleTheme.headingLg, beagleTheme.inkStrongText)}>
-          {t("dog.profile.page.title")}
-        </h1>
-        <p className={cn("mt-2 text-sm md:text-base", beagleTheme.mutedText)}>
-          {profile.name} - {profile.registrationNo}
-        </p>
+        <div>
+          <h1 className={cn(beagleTheme.headingLg, beagleTheme.inkStrongText)}>
+            {t("dog.profile.page.title")}
+          </h1>
+          <p className={cn("mt-2 text-sm md:text-base", beagleTheme.mutedText)}>
+            {profile.name} - {profile.registrationNo}
+          </p>
+        </div>
       </header>
 
       <DogProfileDetailsCard profile={profile} />
@@ -45,7 +47,7 @@ export function BeagleDogProfilePage({ profile }: BeagleDogProfilePageProps) {
         <DogProfileShowsCard rows={profile.shows} />
       ) : null}
       {profile.trials.length > 0 ? (
-        <DogProfileTrialsCard rows={profile.trials} />
+        <DogProfileTrialsCard dogId={profile.id} rows={profile.trials} />
       ) : null}
     </div>
   );

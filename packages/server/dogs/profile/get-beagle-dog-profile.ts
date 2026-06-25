@@ -85,6 +85,8 @@ function mapDogProfileFromDb(
       place: trial.place,
       date: toBusinessDateOnly(trial.date),
       weather: trial.weather,
+      koetyyppi: trial.koetyyppi,
+      koiriaLuokassa: trial.koiriaLuokassa,
       rank: trial.rank,
       points: trial.points,
       award: formatTrialAward(trial.award, trial.classCode),

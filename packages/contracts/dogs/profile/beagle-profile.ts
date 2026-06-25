@@ -27,6 +27,8 @@ export type BeagleDogProfileTrialRowDto = {
   place: string;
   date: string;
   weather: string | null;
+  koetyyppi: "NORMAL" | "KOKOKAUDENKOE" | "PITKAKOE";
+  koiriaLuokassa: number | null;
   rank: string | null;
   points: number | null;
   award: string | null;
