@@ -27,6 +27,8 @@ export type BeagleDogProfileTrialRowDto = {
   place: string;
   date: string;
   weather: string | null;
+  koetyyppi: "NORMAL" | "KOKOKAUDENKOE" | "PITKAKOE";
+  koiriaLuokassa: number | null;
   rank: string | null;
   points: number | null;
   award: string | null;
@@ -119,5 +121,12 @@ export type BeagleDogProfileDto = {
   siblings: BeagleDogProfileSiblingRowDto[];
   titles: BeagleDogProfileTitleRowDto[];
   shows: BeagleDogProfileShowRowDto[];
+  trials: BeagleDogProfileTrialRowDto[];
+};
+
+export type BeagleDogTrialsDto = {
+  id: string;
+  name: string;
+  registrationNo: string;
   trials: BeagleDogProfileTrialRowDto[];
 };

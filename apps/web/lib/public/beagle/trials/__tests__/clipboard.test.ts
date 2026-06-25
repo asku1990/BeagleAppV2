@@ -224,6 +224,8 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
           place: "Helsinki",
           date: "2025-06-01",
           weather: "L",
+          koetyyppi: "NORMAL",
+          koiriaLuokassa: 12,
           rank: "1",
           points: 88.2,
           award: "Voi 1",
@@ -242,6 +244,8 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
           place: "Turku",
           date: "2025-06-02",
           weather: null,
+          koetyyppi: "NORMAL",
+          koiriaLuokassa: null,
           rank: null,
           points: null,
           award: null,
@@ -293,7 +297,7 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
       "N:o\tPaikka\tPäivä\tKeli\tPalkinto\tSija\tPisteet\tTuomari\tHaku\tHaukku\tYVA\tHLO\tALO\tTJA\tPIN",
     );
     expect(lines[1]).toBe(
-      "1\tHelsinki\t2025-06-01\tL\tVoi 1\t1\t88.20\tJudge A\t4\t5\t6\t1\t2\t3\t9",
+      "1\tHelsinki\t2025-06-01\tL\tVoi 1\t1 / 12\t88.20\tJudge A\t4.00\t5.00\t6.00\t1.00\t2.00\t3.00\t9.00",
     );
     expect(lines[2]).toBe(
       "2\tTurku\t2025-06-02\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-",
@@ -309,6 +313,8 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
           place: "Tam\tpe\nre",
           date: "2025-06-03",
           weather: null,
+          koetyyppi: "NORMAL",
+          koiriaLuokassa: null,
           rank: "  ",
           points: 75,
           award: "Avo 2",

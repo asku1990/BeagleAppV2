@@ -93,7 +93,8 @@ Rule of thumb:
 
 - If the primary query key is a dog (`dogId`, reg no, dog name), start in `dogs/*`.
 - If the primary query key is an event (`date`, `place`, `event id`), use `shows/*` or `trials/*`.
-- Keep each feature in one domain root across contracts, db, server, and web transport/query layers.
+- Keep each feature rooted in one primary domain for contracts, server, and web transport/query layers.
+- In `packages/db`, reuse the canonical repository for the data shape instead of duplicating identical Prisma queries just to match the caller's domain folder.
 
 ## Current Canonical Examples
 
@@ -215,7 +216,7 @@ Dog profile remains a `dogs/*` use-case, but it may orchestrate `shows/*` and
 Constraints:
 
 - Composition happens in `packages/server` service layer only.
-- `packages/db` repositories stay domain-local and do not cross-import.
+- `packages/db` repositories stay domain-local and do not cross-import, but server use-cases may compose canonical repositories from other domains when they are the right source of truth.
 - Reuse show/trial domain helpers instead of duplicating event mapping logic in
   dog profile modules.
 

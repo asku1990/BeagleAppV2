@@ -6,6 +6,7 @@ export {
   getBeagleDogProfileService,
   type DogsServiceLogContext,
 } from "./profile/get-beagle-dog-profile";
+export { getBeagleDogTrialsService } from "./profile/get-beagle-dog-trials";
 export { parseDogId } from "./core";
 export {
   calculateInbreedingCoefficientForParentsPct,
