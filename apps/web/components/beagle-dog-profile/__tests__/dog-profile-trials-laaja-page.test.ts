@@ -72,7 +72,7 @@ describe("DogProfileTrialsLaajaPage", () => {
     expect(html).toContain("trials.details.copy.col.searchWork");
     expect(html).toContain("trials.details.copy.col.obstacleWork");
     expect(html).toContain('href="/beagle/trials/trial-route-1"');
-    expect(html).toContain("1/12");
+    expect(html).toContain("1 / 12");
     expect(html).toContain("85.50");
     expect(html).toContain("4.00");
     expect(html).toContain("Judge A");
