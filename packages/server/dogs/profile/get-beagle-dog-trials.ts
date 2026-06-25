@@ -13,7 +13,7 @@ function toNumberOrNull(value: { toNumber(): number } | null): number | null {
 
 function mapTrials(
   result: NonNullable<Awaited<ReturnType<typeof getBeagleDogTrialsDb>>>,
-) {
+): BeagleDogTrialsDto {
   return {
     id: result.id,
     name: result.name,
@@ -38,7 +38,7 @@ function mapTrials(
       tja: toNumberOrNull(trial.tja),
       pin: toNumberOrNull(trial.pin),
     })),
-  } satisfies BeagleDogTrialsDto;
+  };
 }
 
 export async function getBeagleDogTrialsService(
