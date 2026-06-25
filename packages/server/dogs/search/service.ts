@@ -5,6 +5,7 @@ import type {
   BeagleSearchRequest,
   BeagleSearchResponse,
   BeagleDogProfileDto,
+  BeagleDogTrialsDto,
 } from "@beagle/contracts";
 import { toBusinessDateOnly } from "../../core/date-only";
 import type { ServiceResult } from "../../core/result";
@@ -13,6 +14,7 @@ import {
   getBeagleDogProfileService,
   type DogsServiceLogContext,
 } from "../profile/get-beagle-dog-profile";
+import { getBeagleDogTrialsService } from "../profile/get-beagle-dog-trials";
 import { getNewestBeagleDogsService } from "../newest";
 
 const ALLOWED_SORTS: ReadonlySet<BeagleSearchSortDb> = new Set([
@@ -170,6 +172,13 @@ export function createDogsService() {
       context?: DogsServiceLogContext,
     ): Promise<ServiceResult<BeagleDogProfileDto>> {
       return getBeagleDogProfileService(dogId, context);
+    },
+
+    async getBeagleDogTrials(
+      dogId: string,
+      context?: DogsServiceLogContext,
+    ): Promise<ServiceResult<BeagleDogTrialsDto>> {
+      return getBeagleDogTrialsService(dogId, context);
     },
   };
 }

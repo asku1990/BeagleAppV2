@@ -123,3 +123,10 @@ export type BeagleDogProfileDto = {
   shows: BeagleDogProfileShowRowDto[];
   trials: BeagleDogProfileTrialRowDto[];
 };
+
+export type BeagleDogTrialsDto = {
+  id: string;
+  name: string;
+  registrationNo: string;
+  trials: BeagleDogProfileTrialRowDto[];
+};

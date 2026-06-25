@@ -6,13 +6,13 @@ import { cn } from "@/lib/utils";
 import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { copyDogProfileTrialRowsToClipboard } from "@/lib/public/beagle/trials";
-import type { BeagleDogProfileDto } from "@beagle/contracts";
+import type { BeagleDogTrialsDto } from "@beagle/contracts";
 import { DogProfileTrialsLaajaTable } from "./dog-profile-trials-laaja-table";
 
 export function DogProfileTrialsLaajaPage({
   profile,
 }: {
-  profile: BeagleDogProfileDto;
+  profile: BeagleDogTrialsDto;
 }) {
   const { t } = useI18n();
   const handleCopyRows = async () => {

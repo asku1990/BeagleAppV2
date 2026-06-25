@@ -41,4 +41,5 @@ export type {
   BeagleDogProfileSiblingsSummaryDto,
   BeagleDogProfileTitleRowDto,
   BeagleDogProfileTrialRowDto,
+  BeagleDogTrialsDto,
 } from "./profile/beagle-profile";

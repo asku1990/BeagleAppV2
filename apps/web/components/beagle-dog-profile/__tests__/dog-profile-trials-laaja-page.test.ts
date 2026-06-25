@@ -22,23 +22,7 @@ describe("DogProfileTrialsLaajaPage", () => {
         profile: {
           id: "dog_1",
           name: "Ajometsan Aada",
-          title: null,
           registrationNo: "FI-11/24",
-          registrationNos: ["FI-11/24"],
-          birthDate: null,
-          sex: "N",
-          color: null,
-          ekNo: null,
-          inbreedingCoefficientPct: null,
-          sire: null,
-          dam: null,
-          pedigree: [],
-          offspringSummary: { litterCount: 0, puppyCount: 0 },
-          siblingsSummary: { siblingCount: 0 },
-          siblings: [],
-          titles: [],
-          litters: [],
-          shows: [],
           trials: [
             {
               id: "trial1",

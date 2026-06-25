@@ -3,7 +3,7 @@
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { useBeagleDogProfileQuery } from "@/queries/public/beagle/dogs/profile/use-beagle-dog-profile-query";
+import { useBeagleDogTrialsQuery } from "@/queries/public/beagle/dogs/profile/use-beagle-dog-trials-query";
 import { DogProfileNotFoundState } from "./dog-profile-not-found-state";
 import { DogProfileTrialsLaajaPage } from "./dog-profile-trials-laaja-page";
 
@@ -19,7 +19,7 @@ export function DogProfileTrialsLaajaPageContainer({
     isLoading,
     isError,
     error,
-  } = useBeagleDogProfileQuery(dogId);
+  } = useBeagleDogTrialsQuery(dogId);
 
   if (isLoading) {
     return (
@@ -52,7 +52,7 @@ export function DogProfileTrialsLaajaPageContainer({
         <p className={cn(beagleTheme.inkText, "text-lg")}>
           {error instanceof Error
             ? error.message
-            : "Failed to load dog profile."}
+            : "Failed to load dog trials."}
         </p>
       </div>
     );

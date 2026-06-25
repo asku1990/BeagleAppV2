@@ -10,6 +10,7 @@ export {
   type BeagleDogProfileSexDb,
   type BeagleDogProfileTitleDb,
 } from "./profile/get-beagle-dog-profile";
+export { getBeagleDogTrialsDb } from "./profile/get-beagle-dog-trials";
 export {
   getAdminDogProfileDb,
   type AdminDogProfileDb,
