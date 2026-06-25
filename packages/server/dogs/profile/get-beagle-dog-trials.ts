@@ -39,11 +39,7 @@ export async function getBeagleDogTrialsService(
   }
 
   try {
-    const [identity, trials] = await Promise.all([
-      getBeagleDogProfileIdentityDb(parsedDogId),
-      getBeagleTrialsForDogDb(parsedDogId),
-    ]);
-
+    const identity = await getBeagleDogProfileIdentityDb(parsedDogId);
     if (!identity) {
       log.info(
         {
@@ -58,6 +54,8 @@ export async function getBeagleDogTrialsService(
         body: { ok: false, error: "Dog profile not found." },
       };
     }
+
+    const trials = await getBeagleTrialsForDogDb(parsedDogId);
 
     log.info(
       {
