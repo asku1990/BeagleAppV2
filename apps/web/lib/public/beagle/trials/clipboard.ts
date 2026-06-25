@@ -86,7 +86,8 @@ function sanitizeCell(value: string): string {
 }
 
 function formatMaybeString(value: string | null): string {
-  return value?.trim() ? value : "-";
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : "-";
 }
 
 function formatMaybeNumber(value: number | null): string {
@@ -95,6 +96,25 @@ function formatMaybeNumber(value: number | null): string {
 
 function formatDogProfilePoints(value: number | null): string {
   return value == null ? "-" : value.toFixed(2);
+}
+
+function formatDogProfilePlacement(row: BeagleDogProfileTrialRowDto): string {
+  const rank = row.rank?.trim();
+  const classCount = row.koiriaLuokassa;
+
+  if (row.koetyyppi === "KOKOKAUDENKOE") {
+    return rank && classCount != null ? `${rank} / ${classCount} KK` : "KK";
+  }
+
+  if (row.koetyyppi === "PITKAKOE") {
+    return rank && classCount != null ? `${rank} / ${classCount} PK` : "PK";
+  }
+
+  if (rank && classCount != null) {
+    return `${rank} / ${classCount}`;
+  }
+
+  return rank || "-";
 }
 
 function formatAwardForClipboard(
@@ -267,21 +287,22 @@ export function formatDogProfileTrialRowsForClipboard(
     if (columns.includeAward) {
       cells.push(formatMaybeString(row.award));
     }
-    if (columns.includeRank) cells.push(formatMaybeString(row.rank));
+    if (columns.includeRank) cells.push(formatDogProfilePlacement(row));
     if (columns.includePoints) cells.push(formatDogProfilePoints(row.points));
     if (columns.includeJudge) cells.push(formatMaybeString(row.judge));
-    if (columns.includeSearchWork) cells.push(formatMaybeNumber(row.haku));
-    if (columns.includeBarking) cells.push(formatMaybeNumber(row.hauk));
+    if (columns.includeSearchWork) cells.push(formatDogProfilePoints(row.haku));
+    if (columns.includeBarking) cells.push(formatDogProfilePoints(row.hauk));
     if (columns.includeGeneralImpression)
-      cells.push(formatMaybeNumber(row.yva));
+      cells.push(formatDogProfilePoints(row.yva));
     if (columns.includeSearchLoosenessPenalty) {
-      cells.push(formatMaybeNumber(row.hlo));
+      cells.push(formatDogProfilePoints(row.hlo));
     }
     if (columns.includeChaseLoosenessPenalty) {
-      cells.push(formatMaybeNumber(row.alo));
+      cells.push(formatDogProfilePoints(row.alo));
     }
-    if (columns.includeObstacleWork) cells.push(formatMaybeNumber(row.tja));
-    if (columns.includeTotalPoints) cells.push(formatMaybeNumber(row.pin));
+    if (columns.includeObstacleWork)
+      cells.push(formatDogProfilePoints(row.tja));
+    if (columns.includeTotalPoints) cells.push(formatDogProfilePoints(row.pin));
     return cells;
   });
 
