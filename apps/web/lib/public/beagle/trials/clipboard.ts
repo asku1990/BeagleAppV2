@@ -5,7 +5,7 @@ import type {
   BeagleTrialDetailsRow,
   BeagleTrialSearchRow,
 } from "@beagle/contracts";
-import { formatPlacement } from "@/lib/public/beagle/dogs/profile/trials-laaja-formatters";
+import { formatPlacement } from "@/lib/public/beagle/trials/display-formatters";
 
 type TrialClipboardLabels = {
   no: string;

@@ -1,5 +1,4 @@
-// Formats dog-profile trial values consistently for the wide trials view.
-// Shared by the table and clipboard output so both stay aligned.
+// Formats public trial values consistently for wide views and clipboard output.
 import { parseLocalIsoDate } from "@/lib/public/beagle/dogs/profile";
 import type { BeagleDogProfileTrialRowDto } from "@beagle/contracts";
 
