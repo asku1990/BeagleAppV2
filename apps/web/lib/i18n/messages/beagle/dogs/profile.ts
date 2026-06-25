@@ -83,7 +83,6 @@ export const fiBeagleDogProfileMessages = {
   "dog.profile.trials.openLaaja": "Kokeet laaja",
   "dog.profile.trials.laaja.title": "Kokeet laaja",
   "dog.profile.trials.laaja.section.title": "Kaikki koetulokset",
-  "dog.profile.trials.laaja.backToProfile": "Takaisin profiiliin",
   "dog.profile.trials.copy.success": "Koemerkinnät kopioitu leikepöydälle.",
   "dog.profile.trials.copy.error": "Koemerkintöjen kopiointi epäonnistui.",
   "dog.profile.trials.copy.unsupported":
@@ -182,10 +181,9 @@ export const svBeagleDogProfileMessages = {
   "dog.profile.trials.col.points": "Poäng",
   "trials.details.copy.col.ajotaito": "Jaktförmåga",
   "dog.profile.trials.copy.button": "Kopiera alla",
-  "dog.profile.trials.openLaaja": "Kokeet laaja",
-  "dog.profile.trials.laaja.title": "Kokeet laaja",
-  "dog.profile.trials.laaja.section.title": "Kaikki koetulokset",
-  "dog.profile.trials.laaja.backToProfile": "Tillbaka till profilen",
+  "dog.profile.trials.openLaaja": "Jaktprovsresultater - vid",
+  "dog.profile.trials.laaja.title": "Jaktprovsresultater - vid",
+  "dog.profile.trials.laaja.section.title": "Alla jaktprov",
   "dog.profile.trials.copy.success":
     "Jaktprovsposterna kopierades till urklipp.",
   "dog.profile.trials.copy.error": "Kopiering av jaktprovsposter misslyckades.",
