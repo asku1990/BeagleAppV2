@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@db/core/prisma";
 
 export type BeagleDogTrialsDbRow = {
@@ -8,27 +9,25 @@ export type BeagleDogTrialsDbRow = {
     id: string;
     trialId: string;
     place: string;
-    date: string;
+    date: Date;
     weather: string | null;
     koetyyppi: "NORMAL" | "KOKOKAUDENKOE" | "PITKAKOE";
     koiriaLuokassa: number | null;
     rank: string | null;
-    points: number | null;
-    award: string | null;
-    judge: string | null;
-    haku: number | null;
-    hauk: number | null;
-    yva: number | null;
-    hlo: number | null;
-    alo: number | null;
-    tja: number | null;
-    pin: number | null;
+    pa: string | null;
+    lk: string | null;
+    tuom1: string | null;
+    ylituomariNimi: string | null;
+    points: Prisma.Decimal | null;
+    haku: Prisma.Decimal | null;
+    hauk: Prisma.Decimal | null;
+    yva: Prisma.Decimal | null;
+    hlo: Prisma.Decimal | null;
+    alo: Prisma.Decimal | null;
+    tja: Prisma.Decimal | null;
+    pin: Prisma.Decimal | null;
   }[];
 };
-
-function toNumberOrNull(value: { toNumber(): number } | null): number | null {
-  return value === null ? null : value.toNumber();
-}
 
 export async function getBeagleDogTrialsDb(
   dogId: string,
@@ -93,21 +92,23 @@ export async function getBeagleDogTrialsDb(
       id: trial.id,
       trialId: trial.trialEvent.id,
       place: trial.trialEvent.koekunta,
-      date: trial.trialEvent.koepaiva.toISOString().slice(0, 10),
+      date: trial.trialEvent.koepaiva,
       weather: trial.ke,
       koetyyppi: trial.koetyyppi,
       koiriaLuokassa: trial.koiriaLuokassa,
       rank: trial.sija,
-      points: toNumberOrNull(trial.piste),
-      award: trial.pa,
-      judge: trial.tuom1?.trim() || trial.trialEvent.ylituomariNimi || null,
-      haku: toNumberOrNull(trial.haku),
-      hauk: toNumberOrNull(trial.hauk),
-      yva: toNumberOrNull(trial.yva),
-      hlo: toNumberOrNull(trial.hlo),
-      alo: toNumberOrNull(trial.alo),
-      tja: toNumberOrNull(trial.tja),
-      pin: toNumberOrNull(trial.pin),
+      pa: trial.pa,
+      lk: trial.lk,
+      tuom1: trial.tuom1,
+      ylituomariNimi: trial.trialEvent.ylituomariNimi,
+      points: trial.piste,
+      haku: trial.haku,
+      hauk: trial.hauk,
+      yva: trial.yva,
+      hlo: trial.hlo,
+      alo: trial.alo,
+      tja: trial.tja,
+      pin: trial.pin,
     })),
   };
 }

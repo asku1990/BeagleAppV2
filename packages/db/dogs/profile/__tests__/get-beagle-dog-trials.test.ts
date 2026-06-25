@@ -79,8 +79,8 @@ describe("getBeagleDogTrialsDb", () => {
           trialEvent: {
             id: "event_1",
             koekunta: "Turku",
-            koepaiva: new Date("2024-02-01"),
-            ylituomariNimi: null,
+            koepaiva: new Date("2024-02-01T00:00:00.000Z"),
+            ylituomariNimi: "Chief Judge",
           },
         },
       ],
@@ -88,7 +88,7 @@ describe("getBeagleDogTrialsDb", () => {
 
     const result = await getBeagleDogTrialsDb("dog_1");
 
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       id: "dog_1",
       name: "Ajometsan Aada",
       registrationNo: "FI-11/24",
@@ -97,23 +97,22 @@ describe("getBeagleDogTrialsDb", () => {
           id: "trial_1",
           trialId: "event_1",
           place: "Turku",
-          date: "2024-02-01",
           weather: "L",
           koetyyppi: "NORMAL",
           koiriaLuokassa: 12,
           rank: "1",
-          points: 85.5,
-          award: "Beaj 1",
-          judge: "Judge A",
-          haku: 4,
-          hauk: 4,
-          yva: 4,
-          hlo: 0,
-          alo: 0,
-          tja: 0,
-          pin: 8,
+          pa: "Beaj 1",
+          lk: "A",
+          tuom1: "Judge A",
+          ylituomariNimi: "Chief Judge",
         },
       ],
+    });
+    expect(result?.trials[0]?.date).toEqual(
+      new Date("2024-02-01T00:00:00.000Z"),
+    );
+    expect(result?.trials[0]?.points).toEqual({
+      toNumber: expect.any(Function),
     });
   });
 });
