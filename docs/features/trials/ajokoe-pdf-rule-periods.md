@@ -3,6 +3,11 @@
 This document tracks AJOK PDF availability by rule period. It intentionally
 does not define field mapping for any single pöytäkirja renderer.
 
+The web app exposes the PDFs through two entrypoints:
+
+- Public stacked view: `/beagle/trials/pdf?trialEntryId=...`
+- PDF bytes API: `/api/trials/[trialEntryId]/pdf`
+
 ## Rule-period availability
 
 - `trw_pre_20020801`: not implemented.
@@ -21,6 +26,10 @@ does not define field mapping for any single pöytäkirja renderer.
 
 ## Runtime behavior
 
+- The public stacked view loads the requested trial entry ids and renders each
+  supported PDF in one scrollable page.
+- Unsupported, unknown, or null rule periods are skipped in the stack instead
+  of blocking the rest of the PDFs.
 - The API route serves PDF bytes for rule sets with a configured template.
 - Rule sets without a configured template, unknown periods, or null rule
   periods return `TRIAL_PDF_NOT_AVAILABLE`.

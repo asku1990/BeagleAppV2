@@ -12,6 +12,10 @@ Keep it under `apps/web/public/templates/` while the web app serves it as a
 public template asset. Move it to a project-global docs/assets folder only if it
 stops being a runtime-served file and becomes documentation-only source material.
 
+The web app opens these PDFs through the stacked public page
+`/beagle/trials/pdf?trialEntryId=...`, while the PDF bytes still come from the
+API route `/api/trials/[trialEntryId]/pdf`.
+
 ## Tietoryhmät
 
 Alla oleva ryhmittely on suunniteltu AJOK-koirakohtaisen pöytäkirjan näkymän perusteella.
