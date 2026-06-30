@@ -5,6 +5,12 @@ import { getSharedPageWidth } from "../beagle-trial-pdf-canvas-stack";
 import { BeagleTrialPdfShell } from "../beagle-trial-pdf-shell";
 
 describe("BeagleTrialPdfShell", () => {
+  function createPdfItems(count: number) {
+    return Array.from({ length: count }, (_, index) => ({
+      trialEntryId: `trial-${index + 1}`,
+    }));
+  }
+
   it("renders one pdf item with the shared canvas stack", () => {
     const html = renderToStaticMarkup(
       React.createElement(BeagleTrialPdfShell, {
@@ -33,6 +39,31 @@ describe("BeagleTrialPdfShell", () => {
     expect(html).toContain("<canvas");
     expect(html).toContain('data-trial-entry-id="trial-1"');
     expect(html).toContain('data-trial-entry-id="trial-2"');
+  });
+
+  it("renders the first 10 pdf items and shows the reveal control for larger stacks", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(BeagleTrialPdfShell, {
+        items: createPdfItems(20),
+      }),
+    );
+
+    expect(html).toContain('data-trial-entry-id="trial-1"');
+    expect(html).toContain('data-trial-entry-id="trial-10"');
+    expect(html).not.toContain('data-trial-entry-id="trial-11"');
+    expect(html).toContain("Näytetään 10 / 20 pöytäkirjaa.");
+    expect(html).toContain("Näytä lisää pöytäkirjoja");
+  });
+
+  it("renders all pdf items without reveal control when the stack fits the initial batch", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(BeagleTrialPdfShell, {
+        items: createPdfItems(10),
+      }),
+    );
+
+    expect(html).toContain('data-trial-entry-id="trial-10"');
+    expect(html).not.toContain("Näytä lisää pöytäkirjoja");
   });
 
   it("uses the widest loaded PDF after every requested item settles", () => {

@@ -27,6 +27,9 @@ type LoadedPdfPage = {
   pageWidth: number;
 };
 
+const INITIAL_VISIBLE_PDF_COUNT = 10;
+const PDF_REVEAL_BATCH_SIZE = 10;
+
 export function getSharedPageWidth({
   items,
   pageWidths,
@@ -233,15 +236,24 @@ export function BeagleTrialPdfCanvasStack({
   items,
 }: BeagleTrialPdfCanvasStackProps) {
   const { ref, width } = useElementWidth<HTMLDivElement>();
+  const [visibleItemCount, setVisibleItemCount] = useState(
+    INITIAL_VISIBLE_PDF_COUNT,
+  );
   const [pageWidths, setPageWidths] = useState<Record<string, number>>({});
   const [failedTrialEntryIds, setFailedTrialEntryIds] = useState<
     Record<string, boolean>
   >({});
+  const visibleItems = items.slice(0, visibleItemCount);
+  const visibleCount = visibleItems.length;
+  const hasMoreItems = visibleCount < items.length;
   const sharedPageWidth = getSharedPageWidth({
-    items,
+    items: visibleItems,
     pageWidths,
     failedTrialEntryIds,
   });
+  const handleShowMore = useCallback(() => {
+    setVisibleItemCount((current) => current + PDF_REVEAL_BATCH_SIZE);
+  }, []);
   const handlePageWidth = useCallback(
     (trialEntryId: string, pageWidth: number) => {
       setPageWidths((current) => ({
@@ -260,7 +272,7 @@ export function BeagleTrialPdfCanvasStack({
 
   return (
     <div ref={ref} className="fixed inset-0 z-50 overflow-y-auto bg-background">
-      {items.map((item) => (
+      {visibleItems.map((item) => (
         <BeagleTrialPdfCanvas
           key={item.trialEntryId}
           trialEntryId={item.trialEntryId}
@@ -270,6 +282,22 @@ export function BeagleTrialPdfCanvasStack({
           onPageLoadFailed={handlePageLoadFailed}
         />
       ))}
+      {hasMoreItems ? (
+        <div className="flex justify-center bg-background px-4 py-6">
+          <div className="flex flex-col items-center gap-3">
+            <p className="text-sm text-muted-foreground">
+              Näytetään {visibleCount} / {items.length} pöytäkirjaa.
+            </p>
+            <button
+              type="button"
+              className="rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm transition hover:bg-accent hover:text-accent-foreground"
+              onClick={handleShowMore}
+            >
+              Näytä lisää pöytäkirjoja
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
