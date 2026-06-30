@@ -81,6 +81,7 @@ export const fiBeagleDogProfileMessages = {
   "trials.details.copy.col.ajotaito": "Ajotaito",
   "dog.profile.trials.copy.button": "Kopioi kaikki",
   "dog.profile.trials.openLaaja": "Kokeet laaja",
+  "dog.profile.trials.openPdfStack": "Koirakohtaiset pdf pöytäkirjat",
   "dog.profile.trials.laaja.title": "Kokeet laaja",
   "dog.profile.trials.laaja.section.title": "Kaikki koetulokset",
   "dog.profile.trials.copy.success": "Koemerkinnät kopioitu leikepöydälle.",
@@ -182,6 +183,7 @@ export const svBeagleDogProfileMessages = {
   "trials.details.copy.col.ajotaito": "Jaktförmåga",
   "dog.profile.trials.copy.button": "Kopiera alla",
   "dog.profile.trials.openLaaja": "Jaktprovsresultater - vid",
+  "dog.profile.trials.openPdfStack": "Hundens pdf-protokoll",
   "dog.profile.trials.laaja.title": "Jaktprovsresultater - vid",
   "dog.profile.trials.laaja.section.title": "Alla jaktprov",
   "dog.profile.trials.copy.success":

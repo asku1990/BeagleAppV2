@@ -85,6 +85,9 @@ importers:
       pdf-lib:
         specifier: ^1.17.1
         version: 1.17.1
+      pdfjs-dist:
+        specifier: ^6.1.200
+        version: 6.1.200
       radix-ui:
         specifier: ^1.4.3
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -1268,6 +1271,117 @@ packages:
         integrity: sha512-7G0Uf0yK3f2bjElBLGHIQzgRgMESczOMyYVasq1XK8P5HaXtlW4eQhz9MBL+TQILZLaruq+ClGId+hH0w4jvWw==,
       }
     engines: { node: ">=18" }
+
+  "@napi-rs/canvas-android-arm64@1.0.2":
+    resolution:
+      {
+        integrity: sha512-IMXKVQod0ol4vt3gmClUfXz4JAgHYESGPCUqmH3lQxBoL0K/2greJaQE1HVBVxWWFKfLc4OLZVdxg7kXVyXv+g==,
+      }
+    engines: { node: ">= 10" }
+    cpu: [arm64]
+    os: [android]
+
+  "@napi-rs/canvas-darwin-arm64@1.0.2":
+    resolution:
+      {
+        integrity: sha512-Sc8tPi6cF+5lqOzCCKFALJHhDiRwyMzTPYm3bbhdXsOunU0lQO5f05ucyOzN2r55I23Hg5bsjH63uSCvWp3EgQ==,
+      }
+    engines: { node: ">= 10" }
+    cpu: [arm64]
+    os: [darwin]
+
+  "@napi-rs/canvas-darwin-x64@1.0.2":
+    resolution:
+      {
+        integrity: sha512-niDXZ9LhKB1zLrUdYB64RHQFDGz9rr0eGx061qtJJU3U20EMMIx28ADF5fVYbhtOgkWQrBjFicfaye1yM0U62A==,
+      }
+    engines: { node: ">= 10" }
+    cpu: [x64]
+    os: [darwin]
+
+  "@napi-rs/canvas-linux-arm-gnueabihf@1.0.2":
+    resolution:
+      {
+        integrity: sha512-sgatQL9JxGRH/Amzcvu0P3t8Am3duou74CisfuJ41Dwt8cWy723z/9KZ8LlgmxfypEwEZxSTNFJtU8d281lmhQ==,
+      }
+    engines: { node: ">= 10" }
+    cpu: [arm]
+    os: [linux]
+
+  "@napi-rs/canvas-linux-arm64-gnu@1.0.2":
+    resolution:
+      {
+        integrity: sha512-dgKuX0peF3xwY6ZF5QxGS4wbfDqpoFAJYXiLSp+guZKARQUKMkRqZSDrXKj7nfrec3UCMzC0PFCPte0ES98AiA==,
+      }
+    engines: { node: ">= 10" }
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  "@napi-rs/canvas-linux-arm64-musl@1.0.2":
+    resolution:
+      {
+        integrity: sha512-qwROoDIC9upfvDoRLuPn2aNg9CGW1x0Ygr4k2Or+8paA9d0qBLwk87U+g8KQpoOviKoPoiwl97kvBYuYD7qZoA==,
+      }
+    engines: { node: ">= 10" }
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
+  "@napi-rs/canvas-linux-riscv64-gnu@1.0.2":
+    resolution:
+      {
+        integrity: sha512-fXRjnPihdnbO6qy1QQOgxAonb68A0TCEG7rj1x7v7rxNElsE8EVIKIEUTvyDtU+sthYSbX+8e7g3oZiLGnOmxw==,
+      }
+    engines: { node: ">= 10" }
+    cpu: [riscv64]
+    os: [linux]
+    libc: [glibc]
+
+  "@napi-rs/canvas-linux-x64-gnu@1.0.2":
+    resolution:
+      {
+        integrity: sha512-nPR97DXhbWIAy7yazF3jc06kEPMqYMLmPzFOVNlwKPfIoSChnI+x7dc0hTLaihz3jxrjL6j4BbA7earxfx4X3g==,
+      }
+    engines: { node: ">= 10" }
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  "@napi-rs/canvas-linux-x64-musl@1.0.2":
+    resolution:
+      {
+        integrity: sha512-l7zZY5+jL5qnBZtDz7CoBtY6p7EkHu422g/0zWwrOrzIwWyWxZFRfZZORY1UG7YApymPLx+UbOkN206xXn/c1Q==,
+      }
+    engines: { node: ">= 10" }
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
+  "@napi-rs/canvas-win32-arm64-msvc@1.0.2":
+    resolution:
+      {
+        integrity: sha512-yE0koHCFF4PIbMc2o2SEALhnipz7WBISh5glLvQiomtIoCcW0np3H4Lw93ceJAfJttTTeIIWFbwH84F7EVzjMQ==,
+      }
+    engines: { node: ">= 10" }
+    cpu: [arm64]
+    os: [win32]
+
+  "@napi-rs/canvas-win32-x64-msvc@1.0.2":
+    resolution:
+      {
+        integrity: sha512-okU8/t2foV6C31n0GtvEMbfD5rOFc70+/6xUNME9Guld29sgSOIGUEDScAWFlcP3k5TYQRl9TNkwJEEjh15w8A==,
+      }
+    engines: { node: ">= 10" }
+    cpu: [x64]
+    os: [win32]
+
+  "@napi-rs/canvas@1.0.2":
+    resolution:
+      {
+        integrity: sha512-EYEqlMYaCbpZDz+IgDH5xp9MTd3ui4dmGqbQYryhMLnSRxrhHKq5KQWHHKxFUcEP4Hp8/BWgvqXocX4j7iSbOQ==,
+      }
+    engines: { node: ">= 10" }
 
   "@napi-rs/wasm-runtime@0.2.12":
     resolution:
@@ -6637,6 +6751,13 @@ packages:
         integrity: sha512-V/mpyJAoTsN4cnP31vc0wfNA1+p20evqqnap0KLoRUN0Yk/p3wN52DOEsL4oBFcLdb76hlpKPtzJIgo67j/XLw==,
       }
 
+  pdfjs-dist@6.1.200:
+    resolution:
+      {
+        integrity: sha512-o8MolyzirkkLrcdsae/HEOiIcXWI7DS5zGpvqW8xTC2YUsW30rltFw2bDGvw/fskUdEMrQm2br68jzDS5BH2vw==,
+      }
+    engines: { node: ">=22.13.0 || >=24" }
+
   perfect-debounce@1.0.0:
     resolution:
       {
@@ -8645,7 +8766,7 @@ snapshots:
 
   "@bcoe/v8-coverage@1.0.2": {}
 
-  "@better-auth/core@1.4.18(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.8(zod@3.25.76))(jose@6.1.3)(kysely@0.28.11)(nanostores@1.1.0)":
+  "@better-auth/core@1.4.18(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.8(zod@4.3.6))(jose@6.1.3)(kysely@0.28.11)(nanostores@1.1.0)":
     dependencies:
       "@better-auth/utils": 0.3.0
       "@better-fetch/fetch": 1.1.21
@@ -8656,9 +8777,9 @@ snapshots:
       nanostores: 1.1.0
       zod: 4.3.6
 
-  "@better-auth/telemetry@1.4.18(@better-auth/core@1.4.18(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.8(zod@3.25.76))(jose@6.1.3)(kysely@0.28.11)(nanostores@1.1.0))":
+  "@better-auth/telemetry@1.4.18(@better-auth/core@1.4.18(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.8(zod@4.3.6))(jose@6.1.3)(kysely@0.28.11)(nanostores@1.1.0))":
     dependencies:
-      "@better-auth/core": 1.4.18(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.8(zod@3.25.76))(jose@6.1.3)(kysely@0.28.11)(nanostores@1.1.0)
+      "@better-auth/core": 1.4.18(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.8(zod@4.3.6))(jose@6.1.3)(kysely@0.28.11)(nanostores@1.1.0)
       "@better-auth/utils": 0.3.0
       "@better-fetch/fetch": 1.1.21
 
@@ -9102,6 +9223,54 @@ snapshots:
       is-node-process: 1.2.0
       outvariant: 1.4.3
       strict-event-emitter: 0.5.1
+
+  "@napi-rs/canvas-android-arm64@1.0.2":
+    optional: true
+
+  "@napi-rs/canvas-darwin-arm64@1.0.2":
+    optional: true
+
+  "@napi-rs/canvas-darwin-x64@1.0.2":
+    optional: true
+
+  "@napi-rs/canvas-linux-arm-gnueabihf@1.0.2":
+    optional: true
+
+  "@napi-rs/canvas-linux-arm64-gnu@1.0.2":
+    optional: true
+
+  "@napi-rs/canvas-linux-arm64-musl@1.0.2":
+    optional: true
+
+  "@napi-rs/canvas-linux-riscv64-gnu@1.0.2":
+    optional: true
+
+  "@napi-rs/canvas-linux-x64-gnu@1.0.2":
+    optional: true
+
+  "@napi-rs/canvas-linux-x64-musl@1.0.2":
+    optional: true
+
+  "@napi-rs/canvas-win32-arm64-msvc@1.0.2":
+    optional: true
+
+  "@napi-rs/canvas-win32-x64-msvc@1.0.2":
+    optional: true
+
+  "@napi-rs/canvas@1.0.2":
+    optionalDependencies:
+      "@napi-rs/canvas-android-arm64": 1.0.2
+      "@napi-rs/canvas-darwin-arm64": 1.0.2
+      "@napi-rs/canvas-darwin-x64": 1.0.2
+      "@napi-rs/canvas-linux-arm-gnueabihf": 1.0.2
+      "@napi-rs/canvas-linux-arm64-gnu": 1.0.2
+      "@napi-rs/canvas-linux-arm64-musl": 1.0.2
+      "@napi-rs/canvas-linux-riscv64-gnu": 1.0.2
+      "@napi-rs/canvas-linux-x64-gnu": 1.0.2
+      "@napi-rs/canvas-linux-x64-musl": 1.0.2
+      "@napi-rs/canvas-win32-arm64-msvc": 1.0.2
+      "@napi-rs/canvas-win32-x64-msvc": 1.0.2
+    optional: true
 
   "@napi-rs/wasm-runtime@0.2.12":
     dependencies:
@@ -10636,8 +10805,8 @@ snapshots:
 
   better-auth@1.4.18(@prisma/client@7.3.0(prisma@7.3.0(@types/react@19.2.13)(magicast@0.3.5)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3))(mysql2@3.15.3)(next@16.1.6(@playwright/test@1.58.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(pg@8.18.0)(prisma@7.3.0(@types/react@19.2.13)(magicast@0.3.5)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(vitest@3.2.4(@types/node@24.10.11)(jiti@2.6.1)(lightningcss@1.30.2)(msw@2.12.10(@types/node@24.10.11)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.2)):
     dependencies:
-      "@better-auth/core": 1.4.18(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.8(zod@3.25.76))(jose@6.1.3)(kysely@0.28.11)(nanostores@1.1.0)
-      "@better-auth/telemetry": 1.4.18(@better-auth/core@1.4.18(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.8(zod@3.25.76))(jose@6.1.3)(kysely@0.28.11)(nanostores@1.1.0))
+      "@better-auth/core": 1.4.18(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.8(zod@4.3.6))(jose@6.1.3)(kysely@0.28.11)(nanostores@1.1.0)
+      "@better-auth/telemetry": 1.4.18(@better-auth/core@1.4.18(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.8(zod@4.3.6))(jose@6.1.3)(kysely@0.28.11)(nanostores@1.1.0))
       "@better-auth/utils": 0.3.0
       "@better-fetch/fetch": 1.1.21
       "@noble/ciphers": 2.1.1
@@ -12533,6 +12702,10 @@ snapshots:
       "@pdf-lib/upng": 1.0.1
       pako: 1.0.11
       tslib: 1.14.1
+
+  pdfjs-dist@6.1.200:
+    optionalDependencies:
+      "@napi-rs/canvas": 1.0.2
 
   perfect-debounce@1.0.0: {}
 

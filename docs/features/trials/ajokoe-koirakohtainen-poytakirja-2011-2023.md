@@ -41,7 +41,7 @@ re-exported as public APIs.
 
 The PDF data path is:
 
-1. `apps/web/app/api/trials/[trialId]/pdf/route.ts`
+1. `apps/web/app/api/trials/[trialEntryId]/pdf/route.ts`
 2. `packages/server/trials/pdf/get-trial-dog-pdf-data.ts`
 3. `packages/db/trials/pdf/get-trial-dog-pdf-data.ts`
 4. `apps/web/lib/public/beagle/trials/pdf/trial-dog-pdf.ts`

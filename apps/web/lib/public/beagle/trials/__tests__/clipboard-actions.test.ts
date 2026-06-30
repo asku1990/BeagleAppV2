@@ -116,7 +116,10 @@ describe("trial clipboard actions", () => {
       rows: [
         {
           id: "d1",
+          trialEntryId: "trial-entry-1",
           trialId: "trial-1",
+          trialRuleWindowId: null,
+          hasDogTrialPdf: false,
           place: "Turku",
           date: "2025-06-01",
           weather: "P",

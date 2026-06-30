@@ -15,6 +15,7 @@ This project uses a user-facing changelog format.
 ### Added
 
 - Lisätty koirakohtainen `Kokeet laaja` -sivu, joka näyttää kaikki koiran koetulokset omalla sivullaan.
+- Lisätty koirakohtaisen `Kokeet laaja` -sivulle linkki kaikkien koiran koetulosten pdf näkymään.
 
 ### Changed
 

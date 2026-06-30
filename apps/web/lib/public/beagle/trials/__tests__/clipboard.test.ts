@@ -220,7 +220,10 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
       [
         {
           id: "t1",
+          trialEntryId: "trial-entry-1",
           trialId: "trial-1",
+          trialRuleWindowId: null,
+          hasDogTrialPdf: false,
           place: "Helsinki",
           date: "2025-06-01",
           weather: "L",
@@ -240,7 +243,10 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
         },
         {
           id: "t2",
+          trialEntryId: "trial-entry-2",
           trialId: "trial-2",
+          trialRuleWindowId: null,
+          hasDogTrialPdf: false,
           place: "Turku",
           date: "2025-06-02",
           weather: null,
@@ -309,7 +315,10 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
       [
         {
           id: "t3",
+          trialEntryId: "trial-entry-3",
           trialId: "trial-3",
+          trialRuleWindowId: null,
+          hasDogTrialPdf: false,
           place: "Tam\tpe\nre",
           date: "2025-06-03",
           weather: null,

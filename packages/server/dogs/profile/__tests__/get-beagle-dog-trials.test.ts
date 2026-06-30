@@ -67,6 +67,7 @@ describe("getBeagleDogTrialsService", () => {
       {
         id: "trial_1",
         trialEventId: "event_1",
+        trialRuleWindowId: "trw_post_20230801",
         place: "Turku",
         date: new Date("2024-02-01T00:00:00.000Z"),
         weather: "L",
@@ -108,7 +109,10 @@ describe("getBeagleDogTrialsService", () => {
           trials: [
             {
               id: "trial_1",
+              trialEntryId: "trial_1",
               trialId: "event_1",
+              trialRuleWindowId: "trw_post_20230801",
+              hasDogTrialPdf: true,
               place: "Turku",
               date: "2024-02-01",
               weather: "L",

@@ -152,6 +152,9 @@ describe("BeagleDogProfilePage", () => {
             {
               id: "trial1",
               trialId: "trial-route-1",
+              trialEntryId: "trial-entry-1",
+              trialRuleWindowId: "trw_post_20230801",
+              hasDogTrialPdf: true,
               place: "Turku",
               date: "2024-02-01",
               weather: "P",

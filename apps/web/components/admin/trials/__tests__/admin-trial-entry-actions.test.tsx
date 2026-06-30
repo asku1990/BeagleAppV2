@@ -76,7 +76,6 @@ describe("AdminTrialEntryActions", () => {
       React.createElement(AdminTrialEntryActions, {
         trialEventId: "event-1",
         trialEntryId: "entry-1",
-        trialId: "trial-1",
         dogName: "Rex",
         registrationNo: "FI123",
         eventDate: "2026-04-14",
@@ -89,7 +88,7 @@ describe("AdminTrialEntryActions", () => {
 
     expect(html).toContain("admin.trials.manage.selected.actions.openPdf");
     expect(html).toContain("menu-admin.trials.manage.selected.actions.more");
-    expect(html).toContain('href="/api/trials/trial-1/pdf"');
+    expect(html).toContain('href="/api/trials/entry-1/pdf"');
   });
 
   it("calls delete mutation with correct ids", async () => {
@@ -108,7 +107,6 @@ describe("AdminTrialEntryActions", () => {
       React.createElement(AdminTrialEntryActions, {
         trialEventId: "event-1",
         trialEntryId: "entry-1",
-        trialId: "trial-1",
         dogName: "Rex",
         registrationNo: "FI123",
         eventDate: "2026-04-14",
@@ -145,7 +143,6 @@ describe("AdminTrialEntryActions", () => {
       React.createElement(AdminTrialEntryActions, {
         trialEventId: "event-1",
         trialEntryId: "entry-1",
-        trialId: "trial-1",
         dogName: "Rex",
         registrationNo: "FI123",
         eventDate: "2026-04-14",

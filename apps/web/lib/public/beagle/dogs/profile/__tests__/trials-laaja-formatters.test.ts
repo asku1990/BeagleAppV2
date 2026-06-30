@@ -11,7 +11,10 @@ describe("trials-laaja-formatters", () => {
     expect(
       formatPlacement({
         id: "trial-1",
+        trialEntryId: "trial-entry-1",
         trialId: "event-1",
+        trialRuleWindowId: null,
+        hasDogTrialPdf: false,
         place: "Turku",
         date: "2025-06-01",
         weather: null,
@@ -36,7 +39,10 @@ describe("trials-laaja-formatters", () => {
     expect(
       formatPlacement({
         id: "trial-2",
+        trialEntryId: "trial-entry-2",
         trialId: "event-2",
+        trialRuleWindowId: null,
+        hasDogTrialPdf: false,
         place: "Turku",
         date: "2025-06-01",
         weather: null,
@@ -61,7 +67,10 @@ describe("trials-laaja-formatters", () => {
     expect(
       formatPlacement({
         id: "trial-3",
+        trialEntryId: "trial-entry-3",
         trialId: "event-3",
+        trialRuleWindowId: null,
+        hasDogTrialPdf: false,
         place: "Turku",
         date: "2025-06-01",
         weather: null,
@@ -86,7 +95,10 @@ describe("trials-laaja-formatters", () => {
     expect(
       formatPlacement({
         id: "trial-4",
+        trialEntryId: "trial-entry-4",
         trialId: "event-4",
+        trialRuleWindowId: null,
+        hasDogTrialPdf: false,
         place: "Turku",
         date: "2025-06-01",
         weather: null,

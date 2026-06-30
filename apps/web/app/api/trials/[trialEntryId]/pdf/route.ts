@@ -17,7 +17,7 @@ const METHODS = "GET,OPTIONS";
 
 export const runtime = "nodejs";
 
-function normalizeTrialId(value: string): string {
+function normalizeTrialEntryId(value: string): string {
   return value.trim();
 }
 
@@ -33,7 +33,7 @@ export async function OPTIONS(request: NextRequest) {
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ trialId: string }> },
+  context: { params: Promise<{ trialEntryId: string }> },
 ) {
   const startedAt = Date.now();
   const requestId = createRequestId(request);
@@ -44,9 +44,9 @@ export async function GET(
   });
 
   try {
-    const { trialId } = await context.params;
-    const normalizedTrialId = normalizeTrialId(trialId);
-    const result = await getTrialDogPdfDataService(normalizedTrialId, {
+    const { trialEntryId } = await context.params;
+    const normalizedTrialEntryId = normalizeTrialEntryId(trialEntryId);
+    const result = await getTrialDogPdfDataService(normalizedTrialEntryId, {
       requestId,
     });
 
@@ -68,7 +68,7 @@ export async function GET(
       log.warn(
         {
           event: "unsupported_rule_window",
-          trialId: normalizedTrialId,
+          trialEntryId: normalizedTrialEntryId,
           trialRuleWindowId,
           ruleSetId,
           durationMs: Date.now() - startedAt,
@@ -116,7 +116,7 @@ export async function GET(
     log.info(
       {
         event: "success",
-        trialId: normalizedTrialId,
+        trialEntryId: normalizedTrialEntryId,
         registrationNo: payload.registrationNo,
         dogName: payload.dogName,
         kennelpiiri: payload.kennelpiiri,

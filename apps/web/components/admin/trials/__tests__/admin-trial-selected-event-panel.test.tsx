@@ -58,8 +58,8 @@ vi.mock("next/link", () => ({
 }));
 
 vi.mock("../admin-trial-entry-actions", () => ({
-  AdminTrialEntryActions: ({ trialId }: { trialId: string }) =>
-    React.createElement("div", null, `actions-${trialId}`),
+  AdminTrialEntryActions: ({ trialEntryId }: { trialEntryId: string }) =>
+    React.createElement("div", null, `actions-${trialEntryId}`),
 }));
 
 vi.mock("../admin-trial-event-edit-dialog", () => ({

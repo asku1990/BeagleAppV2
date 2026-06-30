@@ -477,6 +477,7 @@ describe("getBeagleTrialsForDogDb", () => {
             id: true,
             koekunta: true,
             koepaiva: true,
+            trialRuleWindowId: true,
             ylituomariNimi: true,
           },
         },
