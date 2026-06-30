@@ -23,7 +23,10 @@ export type BeagleDogProfilePedigreeGenerationDto = {
 
 export type BeagleDogProfileTrialRowDto = {
   id: string;
+  trialEntryId: string;
   trialId: string;
+  trialRuleWindowId: string | null;
+  hasDogTrialPdf: boolean;
   place: string;
   date: string;
   weather: string | null;

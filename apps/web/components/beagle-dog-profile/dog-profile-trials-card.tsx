@@ -76,7 +76,6 @@ export function DogProfileTrialsCard({
   const hasChaseLoosenessPenalty = rows.some((r) => r.alo != null);
   const hasObstacleWork = rows.some((r) => r.tja != null);
   const hasTotalPoints = rows.some((r) => r.pin != null);
-
   const handleCopyRows = async () => {
     await copyDogProfileTrialRowsToClipboard({
       rows,

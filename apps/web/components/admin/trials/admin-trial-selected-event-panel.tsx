@@ -294,7 +294,6 @@ function SelectedEventEntries({
                   <AdminTrialEntryActions
                     trialEventId={trialEventId}
                     trialEntryId={entry.trialId}
-                    trialId={entry.trialId}
                     dogName={entry.dogName}
                     registrationNo={entry.registrationNo}
                     eventDate={eventDate}
@@ -346,7 +345,6 @@ function SelectedEventEntries({
             <AdminTrialEntryActions
               trialEventId={trialEventId}
               trialEntryId={entry.trialId}
-              trialId={entry.trialId}
               dogName={entry.dogName}
               registrationNo={entry.registrationNo}
               eventDate={eventDate}

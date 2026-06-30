@@ -22,6 +22,8 @@ This project uses a user-facing changelog format.
 
 ### Fixed
 
+- Korjattu bugi, jossa yksittäinen vanhentunut ajokoepöytäkirjan PDF-linkki esti koko PDF-pinon näyttämisen.
+
 ### Removed
 
 ## [0.14.0] - 2026-06-24

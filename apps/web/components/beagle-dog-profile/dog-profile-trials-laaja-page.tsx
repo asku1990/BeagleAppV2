@@ -5,7 +5,12 @@ import { toast } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import { ListingSectionShell } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
-import { copyDogProfileTrialRowsToClipboard } from "@/lib/public/beagle/trials";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import {
+  copyDogProfileTrialRowsToClipboard,
+  getTrialPdfPageHref,
+} from "@/lib/public/beagle/trials";
 import type { BeagleDogTrialsDto } from "@beagle/contracts";
 import { DogProfileTrialsLaajaTable } from "./dog-profile-trials-laaja-table";
 
@@ -15,6 +20,9 @@ export function DogProfileTrialsLaajaPage({
   profile: BeagleDogTrialsDto;
 }) {
   const { t } = useI18n();
+  const supportedTrialEntryIds = profile.trials
+    .filter((trial) => trial.hasDogTrialPdf)
+    .map((trial) => trial.trialEntryId);
   const handleCopyRows = async () => {
     await copyDogProfileTrialRowsToClipboard({
       rows: profile.trials,
@@ -84,15 +92,28 @@ export function DogProfileTrialsLaajaPage({
               {t("dog.profile.count.entries")}: {profile.trials.length}
             </span>
             {profile.trials.length > 0 ? (
-              <button
-                type="button"
-                onClick={() => {
-                  void handleCopyRows();
-                }}
-                className={cn("text-xs", beagleTheme.actionLink)}
-              >
-                {t("dog.profile.trials.copy.button")}
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    void handleCopyRows();
+                  }}
+                  className={cn("text-xs", beagleTheme.actionLink)}
+                >
+                  {t("dog.profile.trials.copy.button")}
+                </button>
+                {supportedTrialEntryIds.length > 0 ? (
+                  <Button asChild variant="outline" size="xs">
+                    <Link
+                      href={getTrialPdfPageHref(supportedTrialEntryIds)}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {t("dog.profile.trials.openPdfStack")}
+                    </Link>
+                  </Button>
+                ) : null}
+              </>
             ) : null}
           </span>
         }

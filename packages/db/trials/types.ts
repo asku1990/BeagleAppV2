@@ -62,6 +62,7 @@ export type BeagleTrialDetailsResponseDb = {
 export type BeagleTrialDogRowDb = {
   id: string;
   trialEventId: string;
+  trialRuleWindowId: string | null;
   place: string;
   date: Date;
   weather: string | null;

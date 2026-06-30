@@ -9,6 +9,7 @@ import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
 import { parseDogId } from "@server/dogs/core";
 import { formatTrialAward } from "@server/trials/core";
+import { canRenderTrialDogPdf } from "@server/trials/pdf";
 
 export async function getBeagleDogTrialsService(
   dogId: string,
@@ -77,7 +78,10 @@ export async function getBeagleDogTrialsService(
           registrationNo: identity.registrationNo,
           trials: trials.map((trial) => ({
             id: trial.id,
+            trialEntryId: trial.id,
             trialId: trial.trialEventId,
+            trialRuleWindowId: trial.trialRuleWindowId,
+            hasDogTrialPdf: canRenderTrialDogPdf(trial.trialRuleWindowId),
             place: trial.place,
             date: toBusinessDateOnly(trial.date),
             weather: trial.weather,
