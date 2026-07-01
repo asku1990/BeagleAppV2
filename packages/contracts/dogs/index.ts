@@ -40,6 +40,7 @@ export type {
   BeagleDogProfileSiblingRowDto,
   BeagleDogProfileSiblingsSummaryDto,
   BeagleDogProfileTitleRowDto,
+  BeagleDogProfileTrialEraDto,
   BeagleDogProfileTrialRowDto,
   BeagleDogTrialsDto,
 } from "./profile/beagle-profile";

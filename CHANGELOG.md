@@ -14,6 +14,8 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+- Lisätty koirakohtaiselle `Kokeet laaja` -sivulle avattavat eräkohtaiset yhteenvedot.
+
 ### Changed
 
 ### Fixed

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 import { ListingResponsiveResults } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
@@ -14,163 +14,16 @@ import {
 } from "@/lib/public/beagle/trials/display-formatters";
 import { cn } from "@/lib/utils";
 import type { BeagleDogProfileTrialRowDto } from "@beagle/contracts";
-
-function DogProfileTrialsLaajaMobileList({
-  rows,
-  headers,
-  locale,
-}: {
-  rows: BeagleDogProfileTrialRowDto[];
-  headers: {
-    no: string;
-    place: string;
-    date: string;
-    weather: string;
-    award: string;
-    rank: string;
-    points: string;
-    judge: string;
-    haku: string;
-    hauk: string;
-    ajotaito: string;
-    hlo: string;
-    alo: string;
-    tja: string;
-    pin: string;
-  };
-  locale: "fi" | "sv";
-}) {
-  const hasWeather = rows.some((row) => row.weather != null);
-  const hasAward = rows.some((row) => row.award != null);
-  const hasRank = rows.some(
-    (row) => row.rank != null || row.koetyyppi !== "NORMAL",
-  );
-  const hasPoints = rows.some((row) => row.points != null);
-  const hasHaku = rows.some((row) => row.haku != null);
-  const hasHauk = rows.some((row) => row.hauk != null);
-  const hasAjotaito = rows.some((row) => row.yva != null);
-  const hasHlo = rows.some((row) => row.hlo != null);
-  const hasAlo = rows.some((row) => row.alo != null);
-  const hasJudge = rows.some((row) => row.judge != null);
-  const hasTja = rows.some((row) => row.tja != null);
-  const hasPin = rows.some((row) => row.pin != null);
-
-  return (
-    <div className="space-y-2">
-      {rows.map((row, index) => (
-        <article
-          key={row.id}
-          className={cn(
-            "rounded-lg border p-3",
-            beagleTheme.border,
-            beagleTheme.surface,
-          )}
-        >
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <p>
-              <span className={beagleTheme.mutedText}>{headers.no}:</span>{" "}
-              <span>{index + 1}</span>
-            </p>
-            <p>
-              <span className={beagleTheme.mutedText}>{headers.date}:</span>{" "}
-              <span>{formatDate(row.date, locale)}</span>
-            </p>
-            <p className="col-span-2">
-              <span className={beagleTheme.mutedText}>{headers.place}:</span>{" "}
-              <Link
-                href={getBeagleTrialHref(row.trialId)}
-                className={beagleTheme.entityLink}
-              >
-                {row.place}
-              </Link>
-            </p>
-            {hasWeather ? (
-              <p>
-                <span className={beagleTheme.mutedText}>
-                  {headers.weather}:
-                </span>{" "}
-                <span>{row.weather ?? FALLBACK_VALUE}</span>
-              </p>
-            ) : null}
-            {hasAward ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.award}:</span>{" "}
-                <span>{row.award ?? FALLBACK_VALUE}</span>
-              </p>
-            ) : null}
-            {hasRank ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.rank}:</span>{" "}
-                <span>{formatPlacement(row)}</span>
-              </p>
-            ) : null}
-            {hasPoints ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.points}:</span>{" "}
-                <span>{formatNumber(row.points)}</span>
-              </p>
-            ) : null}
-            {hasHaku ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.haku}:</span>{" "}
-                <span>{formatNumber(row.haku)}</span>
-              </p>
-            ) : null}
-            {hasHauk ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.hauk}:</span>{" "}
-                <span>{formatNumber(row.hauk)}</span>
-              </p>
-            ) : null}
-            {hasAjotaito ? (
-              <p>
-                <span className={beagleTheme.mutedText}>
-                  {headers.ajotaito}:
-                </span>{" "}
-                <span>{formatNumber(row.yva)}</span>
-              </p>
-            ) : null}
-            {hasHlo ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.hlo}:</span>{" "}
-                <span>{formatNumber(row.hlo)}</span>
-              </p>
-            ) : null}
-            {hasAlo ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.alo}:</span>{" "}
-                <span>{formatNumber(row.alo)}</span>
-              </p>
-            ) : null}
-            {hasJudge ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.judge}:</span>{" "}
-                <span>{row.judge ?? FALLBACK_VALUE}</span>
-              </p>
-            ) : null}
-            {hasTja ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.tja}:</span>{" "}
-                <span>{formatNumber(row.tja)}</span>
-              </p>
-            ) : null}
-            {hasPin ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.pin}:</span>{" "}
-                <span>{formatNumber(row.pin)}</span>
-              </p>
-            ) : null}
-          </div>
-        </article>
-      ))}
-    </div>
-  );
-}
+import { DogProfileTrialsEraRecap } from "./dog-profile-trials-era-recap";
+import { DogProfileTrialsLaajaMobileList } from "./dog-profile-trials-laaja-mobile-list";
+import type { DogProfileTrialsLaajaHeaders } from "./dog-profile-trials-laaja-types";
 
 export function DogProfileTrialsLaajaTable({
   rows,
+  showEraRecaps,
 }: {
   rows: BeagleDogProfileTrialRowDto[];
+  showEraRecaps: boolean;
 }) {
   const { t, locale } = useI18n();
   const hasWeather = rows.some((row) => row.weather != null);
@@ -187,7 +40,24 @@ export function DogProfileTrialsLaajaTable({
   const hasJudge = rows.some((row) => row.judge != null);
   const hasTja = rows.some((row) => row.tja != null);
   const hasPin = rows.some((row) => row.pin != null);
-  const headers = useMemo(
+  const visibleColumnCount = [
+    true,
+    true,
+    true,
+    hasWeather,
+    hasAward,
+    hasRank,
+    hasPoints,
+    hasHaku,
+    hasHauk,
+    hasAjotaito,
+    hasHlo,
+    hasAlo,
+    hasJudge,
+    hasTja,
+    hasPin,
+  ].filter(Boolean).length;
+  const headers = useMemo<DogProfileTrialsLaajaHeaders>(
     () => ({
       no: t("dog.profile.trials.col.no"),
       place: t("dog.profile.trials.col.place"),
@@ -204,6 +74,11 @@ export function DogProfileTrialsLaajaTable({
       alo: t("trials.details.copy.col.chaseLoosenessPenalty"),
       tja: t("trials.details.copy.col.obstacleWork"),
       pin: t("trials.details.copy.col.mi"),
+      era: t("dog.profile.trials.eras.col.era"),
+      alkoi: t("dog.profile.trials.eras.col.alkoi"),
+      hakumin: t("dog.profile.trials.eras.col.hakumin"),
+      ajomin: t("dog.profile.trials.eras.col.ajomin"),
+      huomautus: t("dog.profile.trials.eras.col.huomautus"),
     }),
     [t],
   );
@@ -260,59 +135,71 @@ export function DogProfileTrialsLaajaTable({
             </thead>
             <tbody>
               {rows.map((row, index) => (
-                <tr
-                  key={row.id}
-                  className={cn("border-b align-top", beagleTheme.border)}
-                >
-                  <td className="px-2 py-2">{index + 1}</td>
-                  <td className="px-2 py-2">
-                    <Link
-                      href={getBeagleTrialHref(row.trialId)}
-                      className={beagleTheme.entityLink}
-                    >
-                      {row.place}
-                    </Link>
-                  </td>
-                  <td className="px-2 py-2">{formatDate(row.date, locale)}</td>
-                  {hasWeather ? (
+                <Fragment key={row.id}>
+                  <tr className={cn("border-b align-top", beagleTheme.border)}>
+                    <td className="px-2 py-2">{index + 1}</td>
                     <td className="px-2 py-2">
-                      {row.weather ?? FALLBACK_VALUE}
+                      <Link
+                        href={getBeagleTrialHref(row.trialId)}
+                        className={beagleTheme.entityLink}
+                      >
+                        {row.place}
+                      </Link>
                     </td>
+                    <td className="px-2 py-2">
+                      {formatDate(row.date, locale)}
+                    </td>
+                    {hasWeather ? (
+                      <td className="px-2 py-2">
+                        {row.weather ?? FALLBACK_VALUE}
+                      </td>
+                    ) : null}
+                    {hasAward ? (
+                      <td className="px-2 py-2">
+                        {row.award ?? FALLBACK_VALUE}
+                      </td>
+                    ) : null}
+                    {hasRank ? (
+                      <td className="px-2 py-2">{formatPlacement(row)}</td>
+                    ) : null}
+                    {hasPoints ? (
+                      <td className="px-2 py-2">{formatNumber(row.points)}</td>
+                    ) : null}
+                    {hasHaku ? (
+                      <td className="px-2 py-2">{formatNumber(row.haku)}</td>
+                    ) : null}
+                    {hasHauk ? (
+                      <td className="px-2 py-2">{formatNumber(row.hauk)}</td>
+                    ) : null}
+                    {hasAjotaito ? (
+                      <td className="px-2 py-2">{formatNumber(row.yva)}</td>
+                    ) : null}
+                    {hasHlo ? (
+                      <td className="px-2 py-2">{formatNumber(row.hlo)}</td>
+                    ) : null}
+                    {hasAlo ? (
+                      <td className="px-2 py-2">{formatNumber(row.alo)}</td>
+                    ) : null}
+                    {hasJudge ? (
+                      <td className="px-2 py-2">
+                        {row.judge ?? FALLBACK_VALUE}
+                      </td>
+                    ) : null}
+                    {hasTja ? (
+                      <td className="px-2 py-2">{formatNumber(row.tja)}</td>
+                    ) : null}
+                    {hasPin ? (
+                      <td className="px-2 py-2">{formatNumber(row.pin)}</td>
+                    ) : null}
+                  </tr>
+                  {showEraRecaps && row.eras && row.eras.length > 0 ? (
+                    <tr className={cn("border-b", beagleTheme.border)}>
+                      <td className="px-2 py-3" colSpan={visibleColumnCount}>
+                        <DogProfileTrialsEraRecap row={row} headers={headers} />
+                      </td>
+                    </tr>
                   ) : null}
-                  {hasAward ? (
-                    <td className="px-2 py-2">{row.award ?? FALLBACK_VALUE}</td>
-                  ) : null}
-                  {hasRank ? (
-                    <td className="px-2 py-2">{formatPlacement(row)}</td>
-                  ) : null}
-                  {hasPoints ? (
-                    <td className="px-2 py-2">{formatNumber(row.points)}</td>
-                  ) : null}
-                  {hasHaku ? (
-                    <td className="px-2 py-2">{formatNumber(row.haku)}</td>
-                  ) : null}
-                  {hasHauk ? (
-                    <td className="px-2 py-2">{formatNumber(row.hauk)}</td>
-                  ) : null}
-                  {hasAjotaito ? (
-                    <td className="px-2 py-2">{formatNumber(row.yva)}</td>
-                  ) : null}
-                  {hasHlo ? (
-                    <td className="px-2 py-2">{formatNumber(row.hlo)}</td>
-                  ) : null}
-                  {hasAlo ? (
-                    <td className="px-2 py-2">{formatNumber(row.alo)}</td>
-                  ) : null}
-                  {hasJudge ? (
-                    <td className="px-2 py-2">{row.judge ?? FALLBACK_VALUE}</td>
-                  ) : null}
-                  {hasTja ? (
-                    <td className="px-2 py-2">{formatNumber(row.tja)}</td>
-                  ) : null}
-                  {hasPin ? (
-                    <td className="px-2 py-2">{formatNumber(row.pin)}</td>
-                  ) : null}
-                </tr>
+                </Fragment>
               ))}
             </tbody>
           </table>
@@ -322,6 +209,7 @@ export function DogProfileTrialsLaajaTable({
         <DogProfileTrialsLaajaMobileList
           rows={rows}
           headers={headers}
+          showEraRecaps={showEraRecaps}
           locale={locale}
         />
       }

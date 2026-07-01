@@ -114,6 +114,7 @@ export type {
   BeagleDogProfileSiblingRowDto,
   BeagleDogProfileSiblingsSummaryDto,
   BeagleDogProfileTitleRowDto,
+  BeagleDogProfileTrialEraDto,
   BeagleDogProfileTrialRowDto,
   BeagleDogTrialsDto,
   CalculatePublicVirtualPairingRequest,
