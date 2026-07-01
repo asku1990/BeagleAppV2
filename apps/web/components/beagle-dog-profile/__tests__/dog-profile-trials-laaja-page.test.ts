@@ -46,6 +46,22 @@ describe("DogProfileTrialsLaajaPage", () => {
               alo: 0,
               tja: 0,
               pin: 8,
+              eras: [
+                {
+                  era: 1,
+                  alkoi: "08:15",
+                  hakumin: 35,
+                  ajomin: 120,
+                  haku: 4,
+                  hauk: 4.5,
+                  yva: 4.25,
+                  hlo: 0,
+                  alo: 0,
+                  tja: 0.5,
+                  pin: 8,
+                  huomautusTeksti: "Hyvä erä",
+                },
+              ],
             },
             {
               id: "trial2",
@@ -82,6 +98,10 @@ describe("DogProfileTrialsLaajaPage", () => {
     expect(html).toContain("dog.profile.trials.col.place");
     expect(html).toContain("trials.details.copy.col.searchWork");
     expect(html).toContain("trials.details.copy.col.obstacleWork");
+    expect(html).toContain("dog.profile.trials.eras.show");
+    expect(html.match(/dog\.profile\.trials\.eras\.show/g)).toHaveLength(1);
+    expect(html).not.toContain("dog.profile.trials.eras.hide");
+    expect(html).not.toContain("Hyvä erä");
     expect(html).toContain('href="/beagle/trials/trial-route-1"');
     expect(html).toContain(
       'href="/beagle/trials/pdf?trialEntryId=trial-entry-1"',

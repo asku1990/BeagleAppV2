@@ -103,6 +103,9 @@ Ordering:
 - render siblings/litters/shows/trials only when the corresponding arrays contain rows
 - render the laaja trial page from the same dog-scoped trial rows as the compact card
 - keep `Kokeet laaja` reachable from the profile as the expanded trial view
+- on `Kokeet laaja`, keep eräkohtaiset tiedot hidden by default and reveal only
+  compact `TrialEra` recap rows from a section-level toggle; do not render dense
+  `TrialEraLisatieto` values in the default laaja view
 - keep unknown/missing data visible as explicit fallback values instead of collapsing the row unpredictably
 - parent links should remain the primary navigation path inside pedigree/profile content
 - render siblings as one flat list card (same columns as litter puppy rows)

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useI18n } from "@/hooks/i18n";
 import { toast } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
@@ -20,9 +21,13 @@ export function DogProfileTrialsLaajaPage({
   profile: BeagleDogTrialsDto;
 }) {
   const { t } = useI18n();
+  const [showEraRecaps, setShowEraRecaps] = useState(false);
   const supportedTrialEntryIds = profile.trials
     .filter((trial) => trial.hasDogTrialPdf)
     .map((trial) => trial.trialEntryId);
+  const hasEraRecaps = profile.trials.some(
+    (trial) => trial.eras && trial.eras.length > 0,
+  );
   const handleCopyRows = async () => {
     await copyDogProfileTrialRowsToClipboard({
       rows: profile.trials,
@@ -102,6 +107,18 @@ export function DogProfileTrialsLaajaPage({
                 >
                   {t("dog.profile.trials.copy.button")}
                 </button>
+                {hasEraRecaps ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="xs"
+                    onClick={() => setShowEraRecaps((current) => !current)}
+                  >
+                    {showEraRecaps
+                      ? t("dog.profile.trials.eras.hide")
+                      : t("dog.profile.trials.eras.show")}
+                  </Button>
+                ) : null}
                 {supportedTrialEntryIds.length > 0 ? (
                   <Button asChild variant="outline" size="xs">
                     <Link
@@ -129,7 +146,10 @@ export function DogProfileTrialsLaajaPage({
             {t("dog.profile.empty.trials")}
           </div>
         ) : (
-          <DogProfileTrialsLaajaTable rows={profile.trials} />
+          <DogProfileTrialsLaajaTable
+            rows={profile.trials}
+            showEraRecaps={showEraRecaps}
+          />
         )}
       </ListingSectionShell>
     </div>
