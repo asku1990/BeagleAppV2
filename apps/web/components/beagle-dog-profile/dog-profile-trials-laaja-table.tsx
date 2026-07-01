@@ -14,9 +14,9 @@ import {
 } from "@/lib/public/beagle/trials/display-formatters";
 import { cn } from "@/lib/utils";
 import type { BeagleDogProfileTrialRowDto } from "@beagle/contracts";
-import { DogProfileTrialsEraRecap } from "./dog-profile-trials-era-recap";
-import { DogProfileTrialsLaajaMobileList } from "./dog-profile-trials-laaja-mobile-list";
-import type { DogProfileTrialsLaajaHeaders } from "./dog-profile-trials-laaja-types";
+import { DogProfileTrialsEraRecap } from "./internal/trials-laaja/dog-profile-trials-era-recap";
+import { DogProfileTrialsLaajaMobileList } from "./internal/trials-laaja/dog-profile-trials-laaja-mobile-list";
+import type { DogProfileTrialsLaajaHeaders } from "./internal/trials-laaja/dog-profile-trials-laaja-types";
 
 export function DogProfileTrialsLaajaTable({
   rows,
