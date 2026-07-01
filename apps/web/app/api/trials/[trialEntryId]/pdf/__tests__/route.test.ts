@@ -90,7 +90,7 @@ describe("trial pdf api route", () => {
 
     const { GET } = await import("../route");
     const response = await GET(request(), {
-      params: Promise.resolve({ trialId: "entry-1" }),
+      params: Promise.resolve({ trialEntryId: "entry-1" }),
     });
 
     expect(response.status).toBe(200);
@@ -136,7 +136,7 @@ describe("trial pdf api route", () => {
 
     const { GET } = await import("../route");
     const response = await GET(request(), {
-      params: Promise.resolve({ trialId: "entry-1" }),
+      params: Promise.resolve({ trialEntryId: "entry-1" }),
     });
     const rawPdf = Buffer.from(await response.arrayBuffer()).toString("latin1");
 
@@ -157,7 +157,7 @@ describe("trial pdf api route", () => {
 
     const { GET } = await import("../route");
     const response = await GET(request(), {
-      params: Promise.resolve({ trialId: "entry-missing" }),
+      params: Promise.resolve({ trialEntryId: "entry-missing" }),
     });
 
     expect(response.status).toBe(404);
@@ -201,7 +201,7 @@ describe("trial pdf api route", () => {
 
     const { GET } = await import("../route");
     const response = await GET(request(), {
-      params: Promise.resolve({ trialId: "entry-1" }),
+      params: Promise.resolve({ trialEntryId: "entry-1" }),
     });
     const rawPdf = Buffer.from(await response.arrayBuffer()).toString("latin1");
 
@@ -244,7 +244,7 @@ describe("trial pdf api route", () => {
 
       const { GET } = await import("../route");
       const response = await GET(request(), {
-        params: Promise.resolve({ trialId: "entry-1" }),
+        params: Promise.resolve({ trialEntryId: "entry-1" }),
       });
 
       expect(response.status).toBe(404);

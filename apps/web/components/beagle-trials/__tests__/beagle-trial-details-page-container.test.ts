@@ -137,8 +137,8 @@ describe("BeagleTrialDetailsPageContainer", () => {
     expect(html).toContain("trials.details.col.actions");
     expect(html).toContain('aria-label="trials.details.actions.copy"');
     expect(html).toContain('aria-label="trials.details.actions.pdf"');
-    expect(html).toContain('href="/beagle/trials/r_1/pdf"');
-    expect(html).not.toContain('href="/beagle/trials/r_2/pdf"');
+    expect(html).toContain('href="/beagle/trials/pdf?trialEntryId=r_1"');
+    expect(html).not.toContain('href="/beagle/trials/pdf?trialEntryId=r_2"');
     expect(html).toContain("trials.details.copy.all");
     expect(html).toContain('href="/beagle/dogs/dog_1"');
   });

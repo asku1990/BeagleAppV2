@@ -17,6 +17,7 @@ Routes:
 - `/beagle/trials` (trial search page)
 - `/beagle/trials/[trialId]` (trial detail page)
 - `/beagle/dogs/[dogId]` (dog profile page)
+- `/beagle/dogs/[dogId]/kokeet-laaja` (dog-specific full trial results page)
 - `/privacy`
 - `/whats-new`
 
@@ -27,9 +28,10 @@ Can do:
 3. Search shows on `/beagle/shows` and open show detail pages.
 4. Search trials on `/beagle/trials` and open trial detail pages.
 5. Open dog profile `/beagle/dogs/[dogId]`.
-6. Use available copy-to-clipboard exports on public result views.
-7. Read privacy information on `/privacy`.
-8. Read release notes on `/whats-new`.
+6. Open the dog-specific `Kokeet laaja` page from a dog profile when a full trial row list is needed.
+7. Use available copy-to-clipboard exports on public result views.
+8. Read privacy information on `/privacy`.
+9. Read release notes on `/whats-new`.
 
 Feature-level behavior is documented in:
 

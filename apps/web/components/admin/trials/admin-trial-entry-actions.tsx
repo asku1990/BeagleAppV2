@@ -6,13 +6,12 @@ import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
 import { useI18n } from "@/hooks/i18n";
 import { formatDateForFinland } from "@/lib/admin/core/date";
-import { getTrialPdfHref } from "@/lib/public/beagle/trials";
+import { getTrialPdfApiHref } from "@/lib/public/beagle/trials";
 import { useDeleteAdminTrialEntryMutation } from "@/queries/admin/trials";
 
 type AdminTrialEntryActionsProps = {
   trialEventId: string;
   trialEntryId: string;
-  trialId: string;
   dogName: string;
   registrationNo: string | null;
   eventDate: string;
@@ -25,7 +24,6 @@ type AdminTrialEntryActionsProps = {
 export function AdminTrialEntryActions({
   trialEventId,
   trialEntryId,
-  trialId,
   dogName,
   registrationNo,
   eventDate,
@@ -74,7 +72,11 @@ export function AdminTrialEntryActions({
   return (
     <div className="flex items-center gap-1">
       <Button asChild variant="ghost" size="icon-xs">
-        <Link href={getTrialPdfHref(trialId)} target="_blank" rel="noreferrer">
+        <Link
+          href={getTrialPdfApiHref(trialEntryId)}
+          target="_blank"
+          rel="noreferrer"
+        >
           <FileText className="size-3.5" aria-hidden="true" />
           <span className="sr-only">
             {t("admin.trials.manage.selected.actions.openPdf")}

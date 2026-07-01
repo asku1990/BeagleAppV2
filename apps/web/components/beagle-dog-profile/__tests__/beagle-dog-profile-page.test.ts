@@ -152,9 +152,14 @@ describe("BeagleDogProfilePage", () => {
             {
               id: "trial1",
               trialId: "trial-route-1",
+              trialEntryId: "trial-entry-1",
+              trialRuleWindowId: "trw_post_20230801",
+              hasDogTrialPdf: true,
               place: "Turku",
               date: "2024-02-01",
               weather: "P",
+              koetyyppi: "NORMAL",
+              koiriaLuokassa: null,
               rank: "1",
               points: 85.5,
               award: "BEAJ-1",
@@ -212,6 +217,8 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain("301");
     expect(html).toContain("dog.profile.shows.copy.button");
     expect(html).toContain("dog.profile.trials.copy.button");
+    expect(html).toContain("dog.profile.trials.openLaaja");
+    expect(html).toContain('href="/beagle/dogs/dog_1/kokeet-laaja"');
     expect(html).toContain('href="/beagle/shows/show-route-1"');
     expect(html).toContain('href="/beagle/trials/trial-route-1"');
     expect(html).toContain('href="/beagle/dogs/sire_1"');

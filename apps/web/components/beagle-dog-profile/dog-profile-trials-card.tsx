@@ -5,9 +5,13 @@ import {
   ListingSectionShell,
 } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
+import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/sonner";
 import { useI18n } from "@/hooks/i18n";
-import { parseLocalIsoDate } from "@/lib/public/beagle/dogs/profile";
+import {
+  getDogTrialsLaajaHref,
+  parseLocalIsoDate,
+} from "@/lib/public/beagle/dogs/profile";
 import {
   copyDogProfileTrialRowsToClipboard,
   getBeagleTrialHref,
@@ -49,8 +53,10 @@ function formatRank(rank: string | null): string {
 }
 
 export function DogProfileTrialsCard({
+  dogId,
   rows,
 }: {
+  dogId: string;
   rows: BeagleDogProfileTrialRowDto[];
 }) {
   const { t, locale } = useI18n();
@@ -70,7 +76,6 @@ export function DogProfileTrialsCard({
   const hasChaseLoosenessPenalty = rows.some((r) => r.alo != null);
   const hasObstacleWork = rows.some((r) => r.tja != null);
   const hasTotalPoints = rows.some((r) => r.pin != null);
-
   const handleCopyRows = async () => {
     await copyDogProfileTrialRowsToClipboard({
       rows,
@@ -128,15 +133,22 @@ export function DogProfileTrialsCard({
             {t("dog.profile.count.entries")}: {rows.length}
           </span>
           {rows.length > 0 ? (
-            <button
-              type="button"
-              onClick={() => {
-                void handleCopyRows();
-              }}
-              className={cn("text-xs", beagleTheme.actionLink)}
-            >
-              {t("dog.profile.trials.copy.button")}
-            </button>
+            <span className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  void handleCopyRows();
+                }}
+                className={cn("text-xs", beagleTheme.actionLink)}
+              >
+                {t("dog.profile.trials.copy.button")}
+              </button>
+              <Button asChild variant="outline" size="xs">
+                <Link href={getDogTrialsLaajaHref(dogId)}>
+                  {t("dog.profile.trials.openLaaja")}
+                </Link>
+              </Button>
+            </span>
           ) : null}
         </span>
       }

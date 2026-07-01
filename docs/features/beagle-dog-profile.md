@@ -15,7 +15,8 @@ Developer notes for the public beagle dog profile feature.
 - `apps/web/components/beagle-dog-profile/dog-profile-titles-card.tsx`: dog title rows
 - `apps/web/components/beagle-dog-profile/dog-profile-lineage-card.tsx`: parent links and pedigree tree
 - `apps/web/components/beagle-dog-profile/dog-profile-shows-card.tsx`: show results
-- `apps/web/components/beagle-dog-profile/dog-profile-trials-card.tsx`: trial results
+- `apps/web/components/beagle-dog-profile/dog-profile-trials-card.tsx`: compact trial preview
+- `apps/web/components/beagle-dog-profile/dog-profile-trials-laaja-page.tsx`: dedicated dog trial results page
 - `apps/web/components/beagle-dog-profile/dog-profile-siblings-card.tsx`: sibling list from one birth litter
 - `apps/web/app/actions/public/beagle/dogs/profile/get-dog-profile.ts`: public profile action
 - `packages/server/dogs/profile/get-beagle-dog-profile.ts`: service-level profile mapping
@@ -29,9 +30,10 @@ Developer notes for the public beagle dog profile feature.
    - show rows from the shows domain
    - trial rows from the trials domain
 3. The web page renders details and lineage always, renders titles when title rows exist, and renders secondary cards conditionally by data (siblings, litters, shows, trials).
-4. Siblings are resolved in DB from one reliable birth litter and rendered after lineage.
-5. Litters are rendered between siblings and result sections.
-6. Public inbreeding is calculated at read time from current pedigree data rather than from any stored legacy percentage.
+4. The compact trial card stays as the preview, and `Kokeet laaja` shows the full dog-scoped trial rows on a dedicated page.
+5. Siblings are resolved in DB from one reliable birth litter and rendered after lineage.
+6. Litters are rendered between siblings and result sections.
+7. Public inbreeding is calculated at read time from current pedigree data rather than from any stored legacy percentage.
 
 ## Current contract rules
 
@@ -99,6 +101,8 @@ Ordering:
 - keep details and lineage always visible as separate cards
 - render titles as a separate card after details when `titles.length > 0`
 - render siblings/litters/shows/trials only when the corresponding arrays contain rows
+- render the laaja trial page from the same dog-scoped trial rows as the compact card
+- keep `Kokeet laaja` reachable from the profile as the expanded trial view
 - keep unknown/missing data visible as explicit fallback values instead of collapsing the row unpredictably
 - parent links should remain the primary navigation path inside pedigree/profile content
 - render siblings as one flat list card (same columns as litter puppy rows)

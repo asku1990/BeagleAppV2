@@ -116,10 +116,15 @@ describe("trial clipboard actions", () => {
       rows: [
         {
           id: "d1",
+          trialEntryId: "trial-entry-1",
           trialId: "trial-1",
+          trialRuleWindowId: null,
+          hasDogTrialPdf: false,
           place: "Turku",
           date: "2025-06-01",
           weather: "P",
+          koetyyppi: "NORMAL",
+          koiriaLuokassa: null,
           rank: "1",
           points: 85.5,
           award: "Voi 1",
@@ -171,7 +176,7 @@ describe("trial clipboard actions", () => {
 
     expect(result).toBe(false);
     expect(writeText).toHaveBeenCalledWith(
-      "N:o\tPaikka\tPäivä\tKeli\tPalkinto\tSija\tPisteet\tTuomari\tHaku\tHaukku\tYVA\tHLO\tALO\tTJA\tPIN\n1\tTurku\t2025-06-01\tP\tVoi 1\t1\t85.50\tJudge A\t4\t5\t6\t1\t2\t3\t9",
+      "N:o\tPaikka\tPäivä\tKeli\tPalkinto\tSija\tPisteet\tTuomari\tHaku\tHaukku\tYVA\tHLO\tALO\tTJA\tPIN\n1\tTurku\t2025-06-01\tP\tVoi 1\t1\t85.50\tJudge A\t4.00\t5.00\t6.00\t1.00\t2.00\t3.00\t9.00",
     );
     expect(toast.error).toHaveBeenCalledWith("copy.error");
   });

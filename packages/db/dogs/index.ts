@@ -11,6 +11,10 @@ export {
   type BeagleDogProfileTitleDb,
 } from "./profile/get-beagle-dog-profile";
 export {
+  getBeagleDogProfileIdentityDb,
+  type BeagleDogProfileIdentityDb,
+} from "./profile/get-beagle-dog-profile-identity";
+export {
   getAdminDogProfileDb,
   type AdminDogProfileDb,
 } from "../admin/dogs/profile";

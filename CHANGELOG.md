@@ -20,6 +20,21 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.15.0] - 2026-07-01
+
+### Added
+
+- Lisätty koirakohtainen `Kokeet laaja` -sivu, joka näyttää kaikki koiran koetulokset omalla sivullaan.
+- Lisätty koirakohtaisen `Kokeet laaja` -sivulle linkki kaikkien koiran koetulosten pdf näkymään.
+
+### Changed
+
+- Koiraprofiiliin lisättiin linkki koirakohtaiseen `Kokeet laaja` -näkymään.
+
+### Fixed
+
+### Removed
+
 ## [0.14.0] - 2026-06-24
 
 ### Added

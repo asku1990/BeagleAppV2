@@ -20,6 +20,7 @@ import {
 } from "@server/dogs/core";
 import { encodeShowId } from "@server/shows/internal/show-id";
 import { formatTrialAward } from "@server/trials/core";
+import { canRenderTrialDogPdf } from "@server/trials/pdf";
 
 export type DogsServiceLogContext = {
   requestId?: string;
@@ -81,10 +82,15 @@ function mapDogProfileFromDb(
     }),
     trials: trials.map((trial) => ({
       id: trial.id,
+      trialEntryId: trial.id,
       trialId: trial.trialEventId,
+      trialRuleWindowId: trial.trialRuleWindowId,
+      hasDogTrialPdf: canRenderTrialDogPdf(trial.trialRuleWindowId),
       place: trial.place,
       date: toBusinessDateOnly(trial.date),
       weather: trial.weather,
+      koetyyppi: trial.koetyyppi,
+      koiriaLuokassa: trial.koiriaLuokassa,
       rank: trial.rank,
       points: trial.points,
       award: formatTrialAward(trial.award, trial.classCode),

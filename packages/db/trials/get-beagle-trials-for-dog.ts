@@ -13,8 +13,10 @@ export async function getBeagleTrialsForDogDb(
     select: {
       id: true,
       ke: true,
+      koetyyppi: true,
       lk: true,
       sija: true,
+      koiriaLuokassa: true,
       piste: true,
       pa: true,
       tuom1: true,
@@ -28,6 +30,7 @@ export async function getBeagleTrialsForDogDb(
       trialEvent: {
         select: {
           id: true,
+          trialRuleWindowId: true,
           koekunta: true,
           koepaiva: true,
           ylituomariNimi: true,
@@ -44,11 +47,14 @@ export async function getBeagleTrialsForDogDb(
   return rows.map((row) => ({
     id: row.id,
     trialEventId: row.trialEvent.id,
+    trialRuleWindowId: row.trialEvent.trialRuleWindowId,
     place: row.trialEvent.koekunta,
     date: row.trialEvent.koepaiva,
     weather: row.ke,
+    koetyyppi: row.koetyyppi,
     classCode: row.lk,
     rank: row.sija,
+    koiriaLuokassa: row.koiriaLuokassa,
     points: toNumberOrNull(row.piste),
     award: row.pa,
     judge: row.tuom1?.trim() || row.trialEvent.ylituomariNimi || null,

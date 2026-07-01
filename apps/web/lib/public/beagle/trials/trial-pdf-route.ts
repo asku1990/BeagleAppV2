@@ -1,14 +1,17 @@
 const TRIALS_API_ROUTE_ROOT = "/api/trials";
 const TRIALS_PUBLIC_ROUTE_ROOT = "/beagle/trials";
 
-export function getTrialPdfHref(trialId: string): string {
-  return getTrialPdfApiHref(trialId);
+export function getTrialPdfApiHref(trialEntryId: string): string {
+  return `${TRIALS_API_ROUTE_ROOT}/${encodeURIComponent(trialEntryId)}/pdf`;
 }
 
-export function getTrialPdfApiHref(trialId: string): string {
-  return `${TRIALS_API_ROUTE_ROOT}/${encodeURIComponent(trialId)}/pdf`;
-}
+export function getTrialPdfPageHref(trialEntryIds: string | string[]): string {
+  const ids = Array.isArray(trialEntryIds) ? trialEntryIds : [trialEntryIds];
+  const params = new URLSearchParams();
 
-export function getTrialPdfPageHref(trialId: string): string {
-  return `${TRIALS_PUBLIC_ROUTE_ROOT}/${encodeURIComponent(trialId)}/pdf`;
+  for (const trialEntryId of ids) {
+    params.append("trialEntryId", trialEntryId);
+  }
+
+  return `${TRIALS_PUBLIC_ROUTE_ROOT}/pdf?${params.toString()}`;
 }

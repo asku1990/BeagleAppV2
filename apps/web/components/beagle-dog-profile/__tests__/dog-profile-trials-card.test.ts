@@ -19,6 +19,7 @@ describe("DogProfileTrialsCard", () => {
   it("keeps source rank code unchanged", () => {
     const html = renderToStaticMarkup(
       React.createElement(DogProfileTrialsCard, {
+        dogId: "dog_1",
         rows: [
           {
             id: "trial1",
@@ -26,10 +27,15 @@ describe("DogProfileTrialsCard", () => {
             place: "Turku",
             date: "2024-02-01",
             weather: "P",
+            koetyyppi: "NORMAL",
+            koiriaLuokassa: null,
             rank: "S1",
             points: 85.5,
             award: null,
             judge: null,
+            hasDogTrialPdf: true,
+            trialEntryId: "trial-entry-1",
+            trialRuleWindowId: "trw_post_20230801",
             haku: null,
             hauk: null,
             yva: null,
@@ -50,6 +56,7 @@ describe("DogProfileTrialsCard", () => {
   it("keeps pair rank separator as pipe", () => {
     const html = renderToStaticMarkup(
       React.createElement(DogProfileTrialsCard, {
+        dogId: "dog_1",
         rows: [
           {
             id: "trial2",
@@ -57,10 +64,15 @@ describe("DogProfileTrialsCard", () => {
             place: "Rovaniemi",
             date: "2024-02-01",
             weather: "P",
+            koetyyppi: "NORMAL",
+            koiriaLuokassa: null,
             rank: "8|12",
             points: 74.2,
             award: null,
             judge: null,
+            hasDogTrialPdf: false,
+            trialEntryId: "trial-entry-2",
+            trialRuleWindowId: "trw_pre_20020801",
             haku: null,
             hauk: null,
             yva: null,
