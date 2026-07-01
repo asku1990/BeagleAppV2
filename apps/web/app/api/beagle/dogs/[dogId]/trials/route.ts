@@ -15,11 +15,26 @@ export async function OPTIONS(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
-  const { dogId } = await params;
-  const result = await dogsService.getBeagleDogTrials(dogId);
-  return jsonResponse(result.body, {
-    status: result.status,
-    methods: "GET,OPTIONS",
-    origin: request.headers.get("origin"),
-  });
+  try {
+    const { dogId } = await params;
+    const result = await dogsService.getBeagleDogTrials(dogId);
+    return jsonResponse(result.body, {
+      status: result.status,
+      methods: "GET,OPTIONS",
+      origin: request.headers.get("origin"),
+    });
+  } catch {
+    return jsonResponse(
+      {
+        ok: false,
+        error: "Failed to load dog trials.",
+        code: "INTERNAL_ERROR",
+      },
+      {
+        status: 500,
+        methods: "GET,OPTIONS",
+        origin: request.headers.get("origin"),
+      },
+    );
+  }
 }

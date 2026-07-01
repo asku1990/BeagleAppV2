@@ -71,4 +71,26 @@ describe("public dog trials api route", () => {
       error: "Dog profile not found.",
     });
   });
+
+  it("returns structured errors when the service throws", async () => {
+    getBeagleDogTrialsMock.mockRejectedValue(new Error("boom"));
+
+    const { GET } = await import("../route");
+    const request = new NextRequest(
+      "http://localhost/api/beagle/dogs/dog_1/trials",
+      {
+        headers: { origin: "http://localhost:3000" },
+      },
+    );
+    const response = await GET(request, {
+      params: Promise.resolve({ dogId: "dog_1" }),
+    });
+
+    expect(response.status).toBe(500);
+    await expect(response.json()).resolves.toEqual({
+      ok: false,
+      error: "Failed to load dog trials.",
+      code: "INTERNAL_ERROR",
+    });
+  });
 });
