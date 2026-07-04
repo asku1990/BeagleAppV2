@@ -13,16 +13,6 @@ type DogProfileTrialsEraDesktopRowProps = {
   era: BeagleDogProfileTrialEraDto;
   headers: DogProfileTrialsLaajaHeaders;
   columns: {
-    hasWeather: boolean;
-    hasAward: boolean;
-    hasRank: boolean;
-    hasPoints: boolean;
-    hasHaku: boolean;
-    hasHauk: boolean;
-    hasAjotaito: boolean;
-    hasHlo: boolean;
-    hasAlo: boolean;
-    hasJudge: boolean;
     hasEraHuomautus: boolean;
     hasTja: boolean;
     hasPin: boolean;
@@ -37,15 +27,6 @@ export function DogProfileTrialsEraDesktopRow({
   rowId,
 }: DogProfileTrialsEraDesktopRowProps) {
   const ajominText = `${headers.ajomin}: ${era.ajomin ?? FALLBACK_VALUE}`;
-  const ajominColumn = columns.hasWeather
-    ? "weather"
-    : columns.hasAward
-      ? "award"
-      : columns.hasRank
-        ? "rank"
-        : columns.hasPoints
-          ? "points"
-          : null;
 
   return (
     <tr
@@ -68,42 +49,17 @@ export function DogProfileTrialsEraDesktopRow({
       <td className="px-2 py-2 text-right">
         {headers.hakumin}: {era.hakumin ?? FALLBACK_VALUE}
       </td>
-      {columns.hasWeather ? (
-        <td className="px-2 py-2 text-right">
-          {ajominColumn === "weather" ? ajominText : ""}
-        </td>
-      ) : null}
-      {columns.hasAward ? (
-        <td className="px-2 py-2 text-right">
-          {ajominColumn === "award" ? ajominText : ""}
-        </td>
-      ) : null}
-      {columns.hasRank ? (
-        <td className="px-2 py-2 text-right">
-          {ajominColumn === "rank" ? ajominText : ""}
-        </td>
-      ) : null}
-      {columns.hasPoints ? (
-        <td className="px-2 py-2 text-right">
-          {ajominColumn === "points" ? ajominText : ""}
-        </td>
-      ) : null}
-      {columns.hasHaku ? (
-        <td className="px-2 py-2">{formatNumber(era.haku)}</td>
-      ) : null}
-      {columns.hasHauk ? (
-        <td className="px-2 py-2">{formatNumber(era.hauk)}</td>
-      ) : null}
-      {columns.hasAjotaito ? (
-        <td className="px-2 py-2">{formatNumber(era.yva)}</td>
-      ) : null}
-      {columns.hasHlo ? (
-        <td className="px-2 py-2">{formatNumber(era.hlo)}</td>
-      ) : null}
-      {columns.hasAlo ? (
-        <td className="px-2 py-2">{formatNumber(era.alo)}</td>
-      ) : null}
-      {columns.hasJudge ? <td className="px-2 py-2" /> : null}
+      <td className="px-2 py-2 text-right">{ajominText}</td>
+      <td className="px-2 py-2" />
+      <td className="px-2 py-2" />
+      <td className="px-2 py-2" />
+      <td className="px-2 py-2" />
+      <td className="px-2 py-2">{formatNumber(era.haku)}</td>
+      <td className="px-2 py-2">{formatNumber(era.hauk)}</td>
+      <td className="px-2 py-2">{formatNumber(era.yva)}</td>
+      <td className="px-2 py-2">{formatNumber(era.hlo)}</td>
+      <td className="px-2 py-2">{formatNumber(era.alo)}</td>
+      <td className="px-2 py-2" />
       {columns.hasEraHuomautus ? (
         <td className="px-2 py-2">{era.huomautusTeksti ?? FALLBACK_VALUE}</td>
       ) : null}

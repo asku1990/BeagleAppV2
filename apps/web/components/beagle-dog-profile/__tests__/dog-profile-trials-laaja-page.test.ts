@@ -160,6 +160,45 @@ describe("DogProfileTrialsLaajaPage", () => {
               },
             ],
           },
+          {
+            id: "trial2",
+            trialId: "trial-route-2",
+            trialEntryId: "trial-entry-2",
+            trialRuleWindowId: "trw_post_20230801",
+            hasDogTrialPdf: false,
+            place: "Tampere",
+            date: "2024-02-02",
+            weather: null,
+            koetyyppi: "NORMAL",
+            koiriaLuokassa: null,
+            rank: null,
+            points: null,
+            award: null,
+            judge: null,
+            haku: null,
+            hauk: null,
+            yva: null,
+            hlo: null,
+            alo: null,
+            tja: null,
+            pin: null,
+            eras: [
+              {
+                era: 1,
+                alkoi: null,
+                hakumin: 25,
+                ajomin: 95,
+                haku: null,
+                hauk: null,
+                yva: null,
+                hlo: null,
+                alo: null,
+                tja: null,
+                pin: null,
+                huomautusTeksti: null,
+              },
+            ],
+          },
         ],
       }),
     );
@@ -171,6 +210,12 @@ describe("DogProfileTrialsLaajaPage", () => {
     expect(desktopHtml).toContain("dog.profile.trials.eras.col.alkoi: 08:15");
     expect(desktopHtml).toContain("dog.profile.trials.eras.col.hakumin: 35");
     expect(desktopHtml).toContain("dog.profile.trials.eras.col.ajomin: 120");
+    expect(desktopHtml).toContain("dog.profile.trials.col.weather");
+    expect(desktopHtml).toContain("dog.profile.trials.col.class");
+    expect(desktopHtml).toContain("dog.profile.trials.col.rank");
+    expect(desktopHtml).toContain("dog.profile.trials.col.points");
+    expect(desktopHtml).toContain("dog.profile.trials.eras.col.hakumin: 25");
+    expect(desktopHtml).toContain("dog.profile.trials.eras.col.ajomin: 95");
     expect(desktopHtml).toContain("dog.profile.trials.eras.col.huomautus");
     expect(desktopHtml).toContain("Hyvä erä");
     expect(desktopHtml).toContain("4.50");

@@ -26,18 +26,6 @@ export function DogProfileTrialsLaajaTable({
   showEraDetails: boolean;
 }) {
   const { t, locale } = useI18n();
-  const hasWeather = rows.some((row) => row.weather != null);
-  const hasAward = rows.some((row) => row.award != null);
-  const hasRank = rows.some(
-    (row) => row.rank != null || row.koetyyppi !== "NORMAL",
-  );
-  const hasPoints = rows.some((row) => row.points != null);
-  const hasHaku = rows.some((row) => row.haku != null);
-  const hasHauk = rows.some((row) => row.hauk != null);
-  const hasAjotaito = rows.some((row) => row.yva != null);
-  const hasHlo = rows.some((row) => row.hlo != null);
-  const hasAlo = rows.some((row) => row.alo != null);
-  const hasJudge = rows.some((row) => row.judge != null);
   const hasTja = rows.some((row) => row.tja != null);
   const hasPin = rows.some((row) => row.pin != null);
   const hasVisibleEras =
@@ -46,16 +34,6 @@ export function DogProfileTrialsLaajaTable({
     hasVisibleEras &&
     rows.some((row) => row.eras?.some((era) => era.huomautusTeksti != null));
   const visibleColumns = {
-    hasWeather,
-    hasAward,
-    hasRank,
-    hasPoints,
-    hasHaku,
-    hasHauk,
-    hasAjotaito,
-    hasHlo,
-    hasAlo,
-    hasJudge,
     hasEraHuomautus,
     hasTja,
     hasPin,
@@ -96,38 +74,16 @@ export function DogProfileTrialsLaajaTable({
                 <th className="px-2 py-2 font-semibold">{headers.no}</th>
                 <th className="px-2 py-2 font-semibold">{headers.place}</th>
                 <th className="px-2 py-2 font-semibold">{headers.date}</th>
-                {hasWeather ? (
-                  <th className="px-2 py-2 font-semibold">{headers.weather}</th>
-                ) : null}
-                {hasAward ? (
-                  <th className="px-2 py-2 font-semibold">{headers.award}</th>
-                ) : null}
-                {hasRank ? (
-                  <th className="px-2 py-2 font-semibold">{headers.rank}</th>
-                ) : null}
-                {hasPoints ? (
-                  <th className="px-2 py-2 font-semibold">{headers.points}</th>
-                ) : null}
-                {hasHaku ? (
-                  <th className="px-2 py-2 font-semibold">{headers.haku}</th>
-                ) : null}
-                {hasHauk ? (
-                  <th className="px-2 py-2 font-semibold">{headers.hauk}</th>
-                ) : null}
-                {hasAjotaito ? (
-                  <th className="px-2 py-2 font-semibold">
-                    {headers.ajotaito}
-                  </th>
-                ) : null}
-                {hasHlo ? (
-                  <th className="px-2 py-2 font-semibold">{headers.hlo}</th>
-                ) : null}
-                {hasAlo ? (
-                  <th className="px-2 py-2 font-semibold">{headers.alo}</th>
-                ) : null}
-                {hasJudge ? (
-                  <th className="px-2 py-2 font-semibold">{headers.judge}</th>
-                ) : null}
+                <th className="px-2 py-2 font-semibold">{headers.weather}</th>
+                <th className="px-2 py-2 font-semibold">{headers.award}</th>
+                <th className="px-2 py-2 font-semibold">{headers.rank}</th>
+                <th className="px-2 py-2 font-semibold">{headers.points}</th>
+                <th className="px-2 py-2 font-semibold">{headers.haku}</th>
+                <th className="px-2 py-2 font-semibold">{headers.hauk}</th>
+                <th className="px-2 py-2 font-semibold">{headers.ajotaito}</th>
+                <th className="px-2 py-2 font-semibold">{headers.hlo}</th>
+                <th className="px-2 py-2 font-semibold">{headers.alo}</th>
+                <th className="px-2 py-2 font-semibold">{headers.judge}</th>
                 {hasEraHuomautus ? (
                   <th className="px-2 py-2 font-semibold">
                     {headers.huomautus}
@@ -163,42 +119,18 @@ export function DogProfileTrialsLaajaTable({
                     <td className="px-2 py-2">
                       {formatDate(row.date, locale)}
                     </td>
-                    {hasWeather ? (
-                      <td className="px-2 py-2">
-                        {row.weather ?? FALLBACK_VALUE}
-                      </td>
-                    ) : null}
-                    {hasAward ? (
-                      <td className="px-2 py-2">
-                        {row.award ?? FALLBACK_VALUE}
-                      </td>
-                    ) : null}
-                    {hasRank ? (
-                      <td className="px-2 py-2">{formatPlacement(row)}</td>
-                    ) : null}
-                    {hasPoints ? (
-                      <td className="px-2 py-2">{formatNumber(row.points)}</td>
-                    ) : null}
-                    {hasHaku ? (
-                      <td className="px-2 py-2">{formatNumber(row.haku)}</td>
-                    ) : null}
-                    {hasHauk ? (
-                      <td className="px-2 py-2">{formatNumber(row.hauk)}</td>
-                    ) : null}
-                    {hasAjotaito ? (
-                      <td className="px-2 py-2">{formatNumber(row.yva)}</td>
-                    ) : null}
-                    {hasHlo ? (
-                      <td className="px-2 py-2">{formatNumber(row.hlo)}</td>
-                    ) : null}
-                    {hasAlo ? (
-                      <td className="px-2 py-2">{formatNumber(row.alo)}</td>
-                    ) : null}
-                    {hasJudge ? (
-                      <td className="px-2 py-2">
-                        {row.judge ?? FALLBACK_VALUE}
-                      </td>
-                    ) : null}
+                    <td className="px-2 py-2">
+                      {row.weather ?? FALLBACK_VALUE}
+                    </td>
+                    <td className="px-2 py-2">{row.award ?? FALLBACK_VALUE}</td>
+                    <td className="px-2 py-2">{formatPlacement(row)}</td>
+                    <td className="px-2 py-2">{formatNumber(row.points)}</td>
+                    <td className="px-2 py-2">{formatNumber(row.haku)}</td>
+                    <td className="px-2 py-2">{formatNumber(row.hauk)}</td>
+                    <td className="px-2 py-2">{formatNumber(row.yva)}</td>
+                    <td className="px-2 py-2">{formatNumber(row.hlo)}</td>
+                    <td className="px-2 py-2">{formatNumber(row.alo)}</td>
+                    <td className="px-2 py-2">{row.judge ?? FALLBACK_VALUE}</td>
                     {hasEraHuomautus ? <td className="px-2 py-2" /> : null}
                     {hasTja ? (
                       <td className="px-2 py-2">{formatNumber(row.tja)}</td>
