@@ -80,4 +80,20 @@ export type BeagleTrialDogRowDb = {
   alo: number | null;
   tja: number | null;
   pin: number | null;
+  eras?: BeagleTrialDogEraRowDb[];
+};
+
+export type BeagleTrialDogEraRowDb = {
+  era: number;
+  alkoi: string | null;
+  hakumin: number | null;
+  ajomin: number | null;
+  haku: number | null;
+  hauk: number | null;
+  yva: number | null;
+  hlo: number | null;
+  alo: number | null;
+  tja: number | null;
+  pin: number | null;
+  huomautusTeksti: string | null;
 };

@@ -7,6 +7,7 @@ function toNumberOrNull(value: { toNumber(): number } | null): number | null {
 
 export async function getBeagleTrialsForDogDb(
   dogId: string,
+  options?: { includeEras?: boolean },
 ): Promise<BeagleTrialDogRowDb[]> {
   const rows = await prisma.trialEntry.findMany({
     where: { dogId },
@@ -27,6 +28,27 @@ export async function getBeagleTrialsForDogDb(
       alo: true,
       tja: true,
       pin: true,
+      ...(options?.includeEras
+        ? {
+            eras: {
+              orderBy: { era: "asc" },
+              select: {
+                era: true,
+                alkoi: true,
+                hakumin: true,
+                ajomin: true,
+                haku: true,
+                hauk: true,
+                yva: true,
+                hlo: true,
+                alo: true,
+                tja: true,
+                pin: true,
+                huomautusTeksti: true,
+              },
+            },
+          }
+        : {}),
       trialEvent: {
         select: {
           id: true,
@@ -65,5 +87,22 @@ export async function getBeagleTrialsForDogDb(
     alo: toNumberOrNull(row.alo),
     tja: toNumberOrNull(row.tja),
     pin: toNumberOrNull(row.pin),
+    eras:
+      "eras" in row && Array.isArray(row.eras)
+        ? row.eras.map((era) => ({
+            era: era.era,
+            alkoi: era.alkoi,
+            hakumin: era.hakumin,
+            ajomin: era.ajomin,
+            haku: toNumberOrNull(era.haku),
+            hauk: toNumberOrNull(era.hauk),
+            yva: toNumberOrNull(era.yva),
+            hlo: toNumberOrNull(era.hlo),
+            alo: toNumberOrNull(era.alo),
+            tja: toNumberOrNull(era.tja),
+            pin: toNumberOrNull(era.pin),
+            huomautusTeksti: era.huomautusTeksti,
+          }))
+        : undefined,
   }));
 }

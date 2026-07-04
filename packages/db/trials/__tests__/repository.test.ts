@@ -420,6 +420,7 @@ describe("getBeagleTrialsForDogDb", () => {
         pin: { toNumber: () => 5.6 },
         trialEvent: {
           id: "event-2",
+          trialRuleWindowId: "trw_post_20230801",
           koekunta: "Lahti",
           koepaiva: new Date("2025-06-02T00:00:00.000Z"),
           ylituomariNimi: "Chief Judge",
@@ -444,6 +445,7 @@ describe("getBeagleTrialsForDogDb", () => {
         pin: null,
         trialEvent: {
           id: "event-1",
+          trialRuleWindowId: "trw_pre_20020801",
           koekunta: "Helsinki",
           koepaiva: new Date("2025-06-01T00:00:00.000Z"),
           ylituomariNimi: null,
@@ -493,6 +495,7 @@ describe("getBeagleTrialsForDogDb", () => {
       {
         id: "t2",
         trialEventId: "event-2",
+        trialRuleWindowId: "trw_post_20230801",
         place: "Lahti",
         date: new Date("2025-06-02T00:00:00.000Z"),
         weather: "L",
@@ -514,6 +517,7 @@ describe("getBeagleTrialsForDogDb", () => {
       {
         id: "t1",
         trialEventId: "event-1",
+        trialRuleWindowId: "trw_pre_20020801",
         place: "Helsinki",
         date: new Date("2025-06-01T00:00:00.000Z"),
         weather: null,
@@ -587,5 +591,91 @@ describe("getBeagleTrialsForDogDb", () => {
 
     expect(result[0]?.judge).toBe("Chief");
     expect(result[1]?.judge).toBe("Entry Chief");
+  });
+
+  it("loads compact era recap rows only when requested", async () => {
+    trialEntryFindManyMock.mockResolvedValue([
+      {
+        id: "t1",
+        ke: null,
+        koetyyppi: "NORMAL",
+        lk: null,
+        sija: null,
+        koiriaLuokassa: null,
+        piste: null,
+        pa: null,
+        tuom1: null,
+        haku: null,
+        hauk: null,
+        yva: null,
+        hlo: null,
+        alo: null,
+        tja: null,
+        pin: null,
+        eras: [
+          {
+            era: 1,
+            alkoi: "08:15",
+            hakumin: 35,
+            ajomin: 120,
+            haku: { toNumber: () => 4.1 },
+            hauk: { toNumber: () => 4.2 },
+            yva: { toNumber: () => 4.3 },
+            hlo: { toNumber: () => 0.1 },
+            alo: { toNumber: () => 0.2 },
+            tja: { toNumber: () => 0.3 },
+            pin: { toNumber: () => 5.6 },
+            huomautusTeksti: "Ensimmäisen erän huomautus",
+          },
+        ],
+        trialEvent: {
+          id: "event-1",
+          trialRuleWindowId: "trw_post_20230801",
+          koekunta: "Helsinki",
+          koepaiva: new Date("2025-06-01T00:00:00.000Z"),
+          ylituomariNimi: "Chief",
+        },
+      },
+    ]);
+
+    const result = await getBeagleTrialsForDogDb("dog-1", {
+      includeEras: true,
+    });
+
+    const select = trialEntryFindManyMock.mock.calls[0]?.[0].select;
+    expect(select.eras).toEqual({
+      orderBy: { era: "asc" },
+      select: {
+        era: true,
+        alkoi: true,
+        hakumin: true,
+        ajomin: true,
+        haku: true,
+        hauk: true,
+        yva: true,
+        hlo: true,
+        alo: true,
+        tja: true,
+        pin: true,
+        huomautusTeksti: true,
+      },
+    });
+    expect(select.eras.select.lisatiedot).toBeUndefined();
+    expect(result[0]?.eras).toEqual([
+      {
+        era: 1,
+        alkoi: "08:15",
+        hakumin: 35,
+        ajomin: 120,
+        haku: 4.1,
+        hauk: 4.2,
+        yva: 4.3,
+        hlo: 0.1,
+        alo: 0.2,
+        tja: 0.3,
+        pin: 5.6,
+        huomautusTeksti: "Ensimmäisen erän huomautus",
+      },
+    ]);
   });
 });

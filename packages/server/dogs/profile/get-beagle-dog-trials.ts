@@ -56,7 +56,9 @@ export async function getBeagleDogTrialsService(
       };
     }
 
-    const trials = await getBeagleTrialsForDogDb(parsedDogId);
+    const trials = await getBeagleTrialsForDogDb(parsedDogId, {
+      includeEras: true,
+    });
 
     log.info(
       {
@@ -98,6 +100,20 @@ export async function getBeagleDogTrialsService(
             alo: trial.alo,
             tja: trial.tja,
             pin: trial.pin,
+            eras: trial.eras?.map((era) => ({
+              era: era.era,
+              alkoi: era.alkoi,
+              hakumin: era.hakumin,
+              ajomin: era.ajomin,
+              haku: era.haku,
+              hauk: era.hauk,
+              yva: era.yva,
+              hlo: era.hlo,
+              alo: era.alo,
+              tja: era.tja,
+              pin: era.pin,
+              huomautusTeksti: era.huomautusTeksti,
+            })),
           })),
         },
       },

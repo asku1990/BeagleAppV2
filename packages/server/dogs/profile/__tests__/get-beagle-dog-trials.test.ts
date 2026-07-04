@@ -85,6 +85,22 @@ describe("getBeagleDogTrialsService", () => {
         alo: 0,
         tja: 0,
         pin: 8,
+        eras: [
+          {
+            era: 1,
+            alkoi: "08:15",
+            hakumin: 35,
+            ajomin: 120,
+            haku: 4,
+            hauk: 4.5,
+            yva: 4.25,
+            hlo: 0,
+            alo: 0,
+            tja: 0.5,
+            pin: 8,
+            huomautusTeksti: "Hyvä erä",
+          },
+        ],
       },
     ]);
     formatTrialAwardMock.mockReturnValue("Avo 1");
@@ -93,7 +109,9 @@ describe("getBeagleDogTrialsService", () => {
     const result = await getBeagleDogTrialsService(" dog_1 ");
 
     expect(getBeagleDogProfileIdentityDbMock).toHaveBeenCalledWith("dog_1");
-    expect(getBeagleTrialsForDogDbMock).toHaveBeenCalledWith("dog_1");
+    expect(getBeagleTrialsForDogDbMock).toHaveBeenCalledWith("dog_1", {
+      includeEras: true,
+    });
     expect(toBusinessDateOnlyMock).toHaveBeenCalledWith(
       new Date("2024-02-01T00:00:00.000Z"),
     );
@@ -129,6 +147,22 @@ describe("getBeagleDogTrialsService", () => {
               alo: 0,
               tja: 0,
               pin: 8,
+              eras: [
+                {
+                  era: 1,
+                  alkoi: "08:15",
+                  hakumin: 35,
+                  ajomin: 120,
+                  haku: 4,
+                  hauk: 4.5,
+                  yva: 4.25,
+                  hlo: 0,
+                  alo: 0,
+                  tja: 0.5,
+                  pin: 8,
+                  huomautusTeksti: "Hyvä erä",
+                },
+              ],
             },
           ],
         },
