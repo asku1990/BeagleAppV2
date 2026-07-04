@@ -204,6 +204,7 @@ describe("DogProfileTrialsLaajaPage", () => {
     );
 
     const desktopHtml = html.split('<div class="md:hidden">')[0];
+    const mobileHtml = html.split('<div class="md:hidden">')[1] ?? "";
 
     expect(desktopHtml).not.toContain("dog.profile.trials.eras.total");
     expect(desktopHtml).toContain("dog.profile.trials.eras.col.era: 1.");
@@ -221,5 +222,22 @@ describe("DogProfileTrialsLaajaPage", () => {
     expect(desktopHtml).toContain("4.50");
     expect(desktopHtml).toContain("4.25");
     expect(desktopHtml).toContain("0.50");
+    expect(mobileHtml).toContain("dog.profile.trials.col.weather");
+    expect(mobileHtml).toContain("dog.profile.trials.col.class");
+    expect(mobileHtml).toContain("dog.profile.trials.col.rank");
+    expect(mobileHtml).toContain("dog.profile.trials.col.points");
+    expect(mobileHtml).toContain("trials.details.copy.col.searchWork");
+    expect(mobileHtml).toContain("trials.details.copy.col.barking");
+    expect(mobileHtml).toContain("trials.details.copy.col.ajotaito");
+    expect(mobileHtml).toContain(
+      "trials.details.copy.col.searchLoosenessPenalty",
+    );
+    expect(mobileHtml).toContain(
+      "trials.details.copy.col.chaseLoosenessPenalty",
+    );
+    expect(mobileHtml).toContain("trials.details.col.judge");
+    expect(mobileHtml).toContain("dog.profile.trials.eras.col.alkoi");
+    expect(mobileHtml).toContain("dog.profile.trials.eras.col.hakumin");
+    expect(mobileHtml).toContain("dog.profile.trials.eras.col.ajomin");
   });
 });
