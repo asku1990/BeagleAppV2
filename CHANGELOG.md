@@ -18,6 +18,8 @@ This project uses a user-facing changelog format.
 
 ### Changed
 
+- Koirakohtaisen `Kokeet laaja` -sivun eräkohtaiset tiedot näytetään nyt v1-tyylisinä tiiviinä alariveinä, jolloin alkuperäiset tulossarakkeet säilyvät ennallaan.
+
 ### Fixed
 
 ### Removed

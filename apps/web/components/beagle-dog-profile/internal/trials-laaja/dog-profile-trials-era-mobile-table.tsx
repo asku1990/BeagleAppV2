@@ -10,21 +10,7 @@ import type {
   BeagleDogProfileTrialEraDto,
   BeagleDogProfileTrialRowDto,
 } from "@beagle/contracts";
-
-export type DogProfileTrialsEraRecapHeaders = {
-  era: string;
-  alkoi: string;
-  hakumin: string;
-  ajomin: string;
-  haku: string;
-  hauk: string;
-  ajotaito: string;
-  hlo: string;
-  alo: string;
-  tja: string;
-  pin: string;
-  huomautus: string;
-};
+import type { DogProfileTrialsEraHeaders } from "./dog-profile-trials-laaja-types";
 
 function hasEraValue(
   era: BeagleDogProfileTrialEraDto,
@@ -33,12 +19,12 @@ function hasEraValue(
   return era[field] != null && era[field] !== "";
 }
 
-export function DogProfileTrialsEraRecap({
+export function DogProfileTrialsEraMobileTable({
   row,
   headers,
 }: {
   row: BeagleDogProfileTrialRowDto;
-  headers: DogProfileTrialsEraRecapHeaders;
+  headers: DogProfileTrialsEraHeaders;
 }) {
   const eras = row.eras ?? [];
   const hasAlkoi = eras.some((era) => hasEraValue(era, "alkoi"));
@@ -54,15 +40,9 @@ export function DogProfileTrialsEraRecap({
   const hasHuomautus = eras.some((era) => hasEraValue(era, "huomautusTeksti"));
 
   return (
-    <div
-      className={cn(
-        "rounded-lg border p-3",
-        beagleTheme.border,
-        beagleTheme.softAccent,
-      )}
-    >
+    <div className={cn("border-t pt-3", beagleTheme.border)}>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[720px] border-collapse text-xs">
+        <table className="w-full min-w-[640px] border-collapse text-xs">
           <thead>
             <tr className={cn("border-b text-left", beagleTheme.border)}>
               <th className="px-2 py-2 font-semibold">{headers.era}</th>

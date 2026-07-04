@@ -11,18 +11,18 @@ import {
 } from "@/lib/public/beagle/trials/display-formatters";
 import { cn } from "@/lib/utils";
 import type { BeagleDogProfileTrialRowDto } from "@beagle/contracts";
-import { DogProfileTrialsEraRecap } from "./dog-profile-trials-era-recap";
+import { DogProfileTrialsEraMobileTable } from "./dog-profile-trials-era-mobile-table";
 import type { DogProfileTrialsLaajaHeaders } from "./dog-profile-trials-laaja-types";
 
 export function DogProfileTrialsLaajaMobileList({
   rows,
   headers,
-  showEraRecaps,
+  showEraDetails,
   locale,
 }: {
   rows: BeagleDogProfileTrialRowDto[];
   headers: DogProfileTrialsLaajaHeaders;
-  showEraRecaps: boolean;
+  showEraDetails: boolean;
   locale: "fi" | "sv";
 }) {
   const hasWeather = rows.some((row) => row.weather != null);
@@ -146,9 +146,9 @@ export function DogProfileTrialsLaajaMobileList({
               </p>
             ) : null}
           </div>
-          {showEraRecaps && row.eras && row.eras.length > 0 ? (
+          {showEraDetails && row.eras && row.eras.length > 0 ? (
             <div className="mt-3">
-              <DogProfileTrialsEraRecap row={row} headers={headers} />
+              <DogProfileTrialsEraMobileTable row={row} headers={headers} />
             </div>
           ) : null}
         </article>

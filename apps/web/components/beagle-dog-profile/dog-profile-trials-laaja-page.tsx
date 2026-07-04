@@ -21,11 +21,11 @@ export function DogProfileTrialsLaajaPage({
   profile: BeagleDogTrialsDto;
 }) {
   const { t } = useI18n();
-  const [showEraRecaps, setShowEraRecaps] = useState(false);
+  const [showEraDetails, setShowEraDetails] = useState(false);
   const supportedTrialEntryIds = profile.trials
     .filter((trial) => trial.hasDogTrialPdf)
     .map((trial) => trial.trialEntryId);
-  const hasEraRecaps = profile.trials.some(
+  const hasEraDetails = profile.trials.some(
     (trial) => trial.eras && trial.eras.length > 0,
   );
   const handleCopyRows = async () => {
@@ -107,14 +107,14 @@ export function DogProfileTrialsLaajaPage({
                 >
                   {t("dog.profile.trials.copy.button")}
                 </button>
-                {hasEraRecaps ? (
+                {hasEraDetails ? (
                   <Button
                     type="button"
                     variant="outline"
                     size="xs"
-                    onClick={() => setShowEraRecaps((current) => !current)}
+                    onClick={() => setShowEraDetails((current) => !current)}
                   >
-                    {showEraRecaps
+                    {showEraDetails
                       ? t("dog.profile.trials.eras.hide")
                       : t("dog.profile.trials.eras.show")}
                   </Button>
@@ -148,7 +148,7 @@ export function DogProfileTrialsLaajaPage({
         ) : (
           <DogProfileTrialsLaajaTable
             rows={profile.trials}
-            showEraRecaps={showEraRecaps}
+            showEraDetails={showEraDetails}
           />
         )}
       </ListingSectionShell>

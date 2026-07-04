@@ -1,6 +1,19 @@
-import type { DogProfileTrialsEraRecapHeaders } from "./dog-profile-trials-era-recap";
+export type DogProfileTrialsEraHeaders = {
+  era: string;
+  alkoi: string;
+  hakumin: string;
+  ajomin: string;
+  haku: string;
+  hauk: string;
+  ajotaito: string;
+  hlo: string;
+  alo: string;
+  tja: string;
+  pin: string;
+  huomautus: string;
+};
 
-export type DogProfileTrialsLaajaHeaders = DogProfileTrialsEraRecapHeaders & {
+export type DogProfileTrialsLaajaHeaders = DogProfileTrialsEraHeaders & {
   no: string;
   place: string;
   date: string;

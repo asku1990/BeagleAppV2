@@ -14,16 +14,16 @@ import {
 } from "@/lib/public/beagle/trials/display-formatters";
 import { cn } from "@/lib/utils";
 import type { BeagleDogProfileTrialRowDto } from "@beagle/contracts";
-import { DogProfileTrialsEraRecap } from "./internal/trials-laaja/dog-profile-trials-era-recap";
+import { DogProfileTrialsEraDesktopRow } from "./internal/trials-laaja/dog-profile-trials-era-desktop-row";
 import { DogProfileTrialsLaajaMobileList } from "./internal/trials-laaja/dog-profile-trials-laaja-mobile-list";
 import type { DogProfileTrialsLaajaHeaders } from "./internal/trials-laaja/dog-profile-trials-laaja-types";
 
 export function DogProfileTrialsLaajaTable({
   rows,
-  showEraRecaps,
+  showEraDetails,
 }: {
   rows: BeagleDogProfileTrialRowDto[];
-  showEraRecaps: boolean;
+  showEraDetails: boolean;
 }) {
   const { t, locale } = useI18n();
   const hasWeather = rows.some((row) => row.weather != null);
@@ -40,10 +40,9 @@ export function DogProfileTrialsLaajaTable({
   const hasJudge = rows.some((row) => row.judge != null);
   const hasTja = rows.some((row) => row.tja != null);
   const hasPin = rows.some((row) => row.pin != null);
-  const visibleColumnCount = [
-    true,
-    true,
-    true,
+  const hasVisibleEras =
+    showEraDetails && rows.some((row) => row.eras && row.eras.length > 0);
+  const visibleColumns = {
     hasWeather,
     hasAward,
     hasRank,
@@ -56,7 +55,7 @@ export function DogProfileTrialsLaajaTable({
     hasJudge,
     hasTja,
     hasPin,
-  ].filter(Boolean).length;
+  };
   const headers = useMemo<DogProfileTrialsLaajaHeaders>(
     () => ({
       no: t("dog.profile.trials.col.no"),
@@ -136,7 +135,13 @@ export function DogProfileTrialsLaajaTable({
             <tbody>
               {rows.map((row, index) => (
                 <Fragment key={row.id}>
-                  <tr className={cn("border-b align-top", beagleTheme.border)}>
+                  <tr
+                    className={cn(
+                      "border-b align-top text-sm font-medium",
+                      beagleTheme.border,
+                      beagleTheme.inkStrongText,
+                    )}
+                  >
                     <td className="px-2 py-2">{index + 1}</td>
                     <td className="px-2 py-2">
                       <Link
@@ -192,13 +197,17 @@ export function DogProfileTrialsLaajaTable({
                       <td className="px-2 py-2">{formatNumber(row.pin)}</td>
                     ) : null}
                   </tr>
-                  {showEraRecaps && row.eras && row.eras.length > 0 ? (
-                    <tr className={cn("border-b", beagleTheme.border)}>
-                      <td className="px-2 py-3" colSpan={visibleColumnCount}>
-                        <DogProfileTrialsEraRecap row={row} headers={headers} />
-                      </td>
-                    </tr>
-                  ) : null}
+                  {hasVisibleEras && row.eras && row.eras.length > 0
+                    ? row.eras.map((era) => (
+                        <DogProfileTrialsEraDesktopRow
+                          key={`${row.id}-era-${era.era}`}
+                          rowId={row.id}
+                          era={era}
+                          headers={headers}
+                          columns={visibleColumns}
+                        />
+                      ))
+                    : null}
                 </Fragment>
               ))}
             </tbody>
@@ -209,7 +218,7 @@ export function DogProfileTrialsLaajaTable({
         <DogProfileTrialsLaajaMobileList
           rows={rows}
           headers={headers}
-          showEraRecaps={showEraRecaps}
+          showEraDetails={showEraDetails}
           locale={locale}
         />
       }
