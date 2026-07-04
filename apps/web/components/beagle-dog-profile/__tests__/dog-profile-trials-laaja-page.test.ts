@@ -239,5 +239,16 @@ describe("DogProfileTrialsLaajaPage", () => {
     expect(mobileHtml).toContain("dog.profile.trials.eras.col.alkoi");
     expect(mobileHtml).toContain("dog.profile.trials.eras.col.hakumin");
     expect(mobileHtml).toContain("dog.profile.trials.eras.col.ajomin");
+
+    const firstEraRowHtml =
+      [...desktopHtml.matchAll(/<tr[^>]*>[\s\S]*?<\/tr>/g)]
+        .map((match) => match[0])
+        .find((rowHtml) => rowHtml.includes("Hyvä erä")) ?? "";
+    const firstEraCells = [...firstEraRowHtml.matchAll(/<td/g)];
+
+    expect(firstEraCells).toHaveLength(16);
+    expect(firstEraRowHtml).toMatch(
+      /0\.00<\/td><td class="px-2 py-2"><\/td><td class="px-2 py-2">Hyvä erä<\/td><td class="px-2 py-2">0\.50<\/td><td class="px-2 py-2">8\.00<\/td>/,
+    );
   });
 });

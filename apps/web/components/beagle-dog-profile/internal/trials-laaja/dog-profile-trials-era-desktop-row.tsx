@@ -53,7 +53,6 @@ export function DogProfileTrialsEraDesktopRow({
       <td className="px-2 py-2" />
       <td className="px-2 py-2" />
       <td className="px-2 py-2" />
-      <td className="px-2 py-2" />
       <td className="px-2 py-2">{formatNumber(era.haku)}</td>
       <td className="px-2 py-2">{formatNumber(era.hauk)}</td>
       <td className="px-2 py-2">{formatNumber(era.yva)}</td>
