@@ -171,6 +171,8 @@ describe("DogProfileTrialsLaajaPage", () => {
     expect(desktopHtml).toContain("dog.profile.trials.eras.col.alkoi: 08:15");
     expect(desktopHtml).toContain("dog.profile.trials.eras.col.hakumin: 35");
     expect(desktopHtml).toContain("dog.profile.trials.eras.col.ajomin: 120");
+    expect(desktopHtml).toContain("dog.profile.trials.eras.col.huomautus");
+    expect(desktopHtml).toContain("Hyvä erä");
     expect(desktopHtml).toContain("4.50");
     expect(desktopHtml).toContain("4.25");
     expect(desktopHtml).toContain("0.50");

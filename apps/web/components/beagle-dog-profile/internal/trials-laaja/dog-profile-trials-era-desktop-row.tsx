@@ -23,6 +23,7 @@ type DogProfileTrialsEraDesktopRowProps = {
     hasHlo: boolean;
     hasAlo: boolean;
     hasJudge: boolean;
+    hasEraHuomautus: boolean;
     hasTja: boolean;
     hasPin: boolean;
   };
@@ -56,7 +57,7 @@ export function DogProfileTrialsEraDesktopRow({
       )}
     >
       <td className="px-2 py-2" />
-      <td className="px-2 py-2 text-right font-medium">
+      <td className="px-2 py-2 font-medium">
         {headers.era}: {era.era}.
         {era.alkoi ? (
           <span className="ml-2 font-normal">
@@ -103,6 +104,9 @@ export function DogProfileTrialsEraDesktopRow({
         <td className="px-2 py-2">{formatNumber(era.alo)}</td>
       ) : null}
       {columns.hasJudge ? <td className="px-2 py-2" /> : null}
+      {columns.hasEraHuomautus ? (
+        <td className="px-2 py-2">{era.huomautusTeksti ?? FALLBACK_VALUE}</td>
+      ) : null}
       {columns.hasTja ? (
         <td className="px-2 py-2">{formatNumber(era.tja)}</td>
       ) : null}

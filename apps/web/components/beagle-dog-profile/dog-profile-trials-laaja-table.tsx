@@ -42,6 +42,9 @@ export function DogProfileTrialsLaajaTable({
   const hasPin = rows.some((row) => row.pin != null);
   const hasVisibleEras =
     showEraDetails && rows.some((row) => row.eras && row.eras.length > 0);
+  const hasEraHuomautus =
+    hasVisibleEras &&
+    rows.some((row) => row.eras?.some((era) => era.huomautusTeksti != null));
   const visibleColumns = {
     hasWeather,
     hasAward,
@@ -53,6 +56,7 @@ export function DogProfileTrialsLaajaTable({
     hasHlo,
     hasAlo,
     hasJudge,
+    hasEraHuomautus,
     hasTja,
     hasPin,
   };
@@ -124,6 +128,11 @@ export function DogProfileTrialsLaajaTable({
                 {hasJudge ? (
                   <th className="px-2 py-2 font-semibold">{headers.judge}</th>
                 ) : null}
+                {hasEraHuomautus ? (
+                  <th className="px-2 py-2 font-semibold">
+                    {headers.huomautus}
+                  </th>
+                ) : null}
                 {hasTja ? (
                   <th className="px-2 py-2 font-semibold">{headers.tja}</th>
                 ) : null}
@@ -190,6 +199,7 @@ export function DogProfileTrialsLaajaTable({
                         {row.judge ?? FALLBACK_VALUE}
                       </td>
                     ) : null}
+                    {hasEraHuomautus ? <td className="px-2 py-2" /> : null}
                     {hasTja ? (
                       <td className="px-2 py-2">{formatNumber(row.tja)}</td>
                     ) : null}
