@@ -234,6 +234,35 @@ describe("getBeagleDogTrialsService", () => {
     });
   });
 
+  it("skips summary source loading when dog has no trials", async () => {
+    getBeagleDogProfileIdentityDbMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Ajometsan Aada",
+      registrationNo: "FI-11/24",
+    });
+    getBeagleTrialsForDogDbMock.mockResolvedValue([]);
+
+    const result = await getBeagleDogTrialsService("dog_1");
+
+    expect(getBeagleTrialsForDogDbMock).toHaveBeenCalledWith("dog_1", {
+      includeEras: true,
+    });
+    expect(getBeagleTrialSummarySourceForDogDbMock).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          id: "dog_1",
+          name: "Ajometsan Aada",
+          registrationNo: "FI-11/24",
+          trials: [],
+          summary: { allTrials: [] },
+        },
+      },
+    });
+  });
+
   it("returns 500 when db fails", async () => {
     getBeagleDogProfileIdentityDbMock.mockRejectedValue(new Error("boom"));
     getBeagleTrialsForDogDbMock.mockResolvedValue([]);

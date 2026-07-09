@@ -61,13 +61,13 @@ export async function getBeagleDogTrialsService(
     const trials = await getBeagleTrialsForDogDb(parsedDogId, {
       includeEras: true,
     });
-    const summarySource =
-      await getBeagleTrialSummarySourceForDogDb(parsedDogId);
-    const summary = buildBeagleDogTrialsSummary({
-      dogName: identity.name,
-      dogRows: summarySource.dogRows,
-      breedSummary: summarySource.breedSummary,
-    });
+    const summary =
+      trials.length === 0
+        ? { allTrials: [] }
+        : buildBeagleDogTrialsSummary({
+            dogName: identity.name,
+            ...(await getBeagleTrialSummarySourceForDogDb(parsedDogId)),
+          });
 
     log.info(
       {
