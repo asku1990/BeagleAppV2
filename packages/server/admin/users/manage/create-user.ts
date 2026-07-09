@@ -12,7 +12,7 @@ import {
   type CreateAdminUserRequest,
   type CreateAdminUserResponse,
 } from "@beagle/contracts";
-import type { ServiceResult } from "../../../core/result";
+import type { ServiceResult } from "@server/core/result";
 
 function normalizeEmail(email: string): string | null {
   return normalizeAndValidateEmailAddress(email);

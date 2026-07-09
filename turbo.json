@@ -54,6 +54,10 @@
       "dependsOn": ["^lint"],
       "outputs": []
     },
+    "lint:cycles": {
+      "dependsOn": ["^lint:cycles"],
+      "outputs": []
+    },
     "typecheck": {
       "dependsOn": ["^typecheck"],
       "outputs": []

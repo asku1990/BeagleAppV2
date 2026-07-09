@@ -1,11 +1,11 @@
 import { prisma } from "@beagle/db";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { runLegacyTrialMirrorValidation } from "../../../imports/trial-mirror-validation";
+import { runLegacyTrialMirrorValidation } from "@server/imports/trial-mirror-validation";
 import type {
   TrialMirrorValidationIssue,
   TrialMirrorValidationSeverity,
-} from "../../../imports/trial-mirror-validation";
+} from "@server/imports/trial-mirror-validation";
 
 type ParsedArgs = {
   code: string | undefined;

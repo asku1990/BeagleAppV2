@@ -1,4 +1,4 @@
-import type { RawDogRow } from "../../core/dog-row-loader";
+import type { RawDogRow } from "@db/dogs/core/dog-row-loader";
 import { matchesLike } from "./wildcard";
 import type { SearchField } from "./types";
 

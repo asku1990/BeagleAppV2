@@ -7,7 +7,7 @@ import {
   runAdminUserWriteTransactionDb,
 } from "@beagle/db";
 import type { DeleteAdminUserResponse } from "@beagle/contracts";
-import type { ServiceResult } from "../../../core/result";
+import type { ServiceResult } from "@server/core/result";
 
 type DeleteAdminUserInput = {
   userId: string;

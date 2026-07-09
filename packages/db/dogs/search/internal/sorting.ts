@@ -1,5 +1,5 @@
-import type { RawDogRow } from "../../core/dog-row-loader";
-import { compareByRegistrationDesc } from "../../core/registration";
+import type { RawDogRow } from "@db/dogs/core/dog-row-loader";
+import { compareByRegistrationDesc } from "@db/dogs/core/registration";
 import type { BeagleSearchSortDb } from "../repository";
 
 function compareRowsByRegistrationDesc(

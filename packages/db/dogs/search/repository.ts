@@ -1,5 +1,5 @@
 import type { Prisma } from "@prisma/client";
-import { prisma } from "../../core/prisma";
+import { prisma } from "@db/core/prisma";
 import { loadDogs } from "../core/dog-row-loader";
 import { compareByRegistrationDesc } from "../core/registration";
 import { toSearchRow } from "../core/search-row-mapper";

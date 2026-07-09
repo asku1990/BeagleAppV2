@@ -9,7 +9,7 @@ import type {
   ImportRunIssuesResponse,
   ImportRunResponse,
 } from "@beagle/contracts";
-import type { ServiceResult } from "../../core/result";
+import type { ServiceResult } from "@server/core/result";
 import { runLegacyPhase1 } from "../phase1";
 import { runLegacyPhase1_25 } from "../phase1_25";
 import { runLegacyPhase1_5 } from "../phase1_5";

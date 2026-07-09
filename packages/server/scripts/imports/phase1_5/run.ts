@@ -1,4 +1,4 @@
-import { importsService } from "../../../imports";
+import { importsService } from "@server/imports";
 import { disconnectImportScriptPrisma, runImportPhase } from "../internal";
 
 async function main() {
