@@ -1,5 +1,8 @@
 // Builds the public dog trials DTO without loading the full profile graph.
-import type { BeagleDogTrialsDto } from "@beagle/contracts";
+import type {
+  BeagleDogTrialsDto,
+  BeagleDogTrialsSummaryDto,
+} from "@beagle/contracts";
 import {
   getBeagleDogProfileIdentityDb,
   getBeagleTrialSummarySourceForDogDb,
@@ -12,6 +15,16 @@ import { parseDogId } from "@server/dogs/core";
 import { formatTrialAward } from "@server/trials/core";
 import { canRenderTrialDogPdf } from "@server/trials/pdf";
 import { buildBeagleDogTrialsSummary } from "./internal/beagle-dog-trials-summary";
+
+function emptyTrialsSummary(): BeagleDogTrialsSummaryDto {
+  return {
+    allTrials: [],
+    drivenTrials: [],
+    noPrize: [],
+    prizePlacements: [],
+    interrupted: [],
+  };
+}
 
 export async function getBeagleDogTrialsService(
   dogId: string,
@@ -63,7 +76,7 @@ export async function getBeagleDogTrialsService(
     });
     const summary =
       trials.length === 0
-        ? { allTrials: [] }
+        ? emptyTrialsSummary()
         : buildBeagleDogTrialsSummary({
             dogName: identity.name,
             ...(await getBeagleTrialSummarySourceForDogDb(parsedDogId)),

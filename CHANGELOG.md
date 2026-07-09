@@ -15,7 +15,7 @@ This project uses a user-facing changelog format.
 ### Added
 
 - Lisätty koirakohtaiselle `Kokeet laaja` -sivulle avattavat eräkohtaiset yhteenvedot.
-- Lisätty koirakohtaisen `Kokeet laaja` -sivun `YHTEENVETO`-osioon ensimmäinen v1-tyylinen `Kaikki kokeet` -yhteenveto.
+- Lisätty koirakohtaisen `Kokeet laaja` -sivun `YHTEENVETO`-osioon v1-tyyliset ryhmät: kaikki kokeet, ajoon johtaneet, ei palkintosijaa, palkintosijoille ja keskeytyneet.
 
 ### Changed
 

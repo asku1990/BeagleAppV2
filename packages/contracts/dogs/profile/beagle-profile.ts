@@ -77,6 +77,10 @@ export type BeagleDogTrialsSummaryRowDto = {
 
 export type BeagleDogTrialsSummaryDto = {
   allTrials: BeagleDogTrialsSummaryRowDto[];
+  drivenTrials: BeagleDogTrialsSummaryRowDto[];
+  noPrize: BeagleDogTrialsSummaryRowDto[];
+  prizePlacements: BeagleDogTrialsSummaryRowDto[];
+  interrupted: BeagleDogTrialsSummaryRowDto[];
 };
 
 export type BeagleDogProfileShowRowDto = BeagleShowStructuredResultDto & {

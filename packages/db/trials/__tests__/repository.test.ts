@@ -5,27 +5,27 @@ const {
   trialEventFindManyMock,
   trialEventFindUniqueMock,
   trialEntryFindManyMock,
-  trialEntryAggregateMock,
+  queryRawMock,
   prismaMock,
 } = vi.hoisted(() => {
   const trialEventFindMany = vi.fn();
   const trialEventFindUnique = vi.fn();
   const trialEntryFindMany = vi.fn();
-  const trialEntryAggregate = vi.fn();
+  const queryRaw = vi.fn();
 
   return {
     trialEventFindManyMock: trialEventFindMany,
     trialEventFindUniqueMock: trialEventFindUnique,
     trialEntryFindManyMock: trialEntryFindMany,
-    trialEntryAggregateMock: trialEntryAggregate,
+    queryRawMock: queryRaw,
     prismaMock: {
+      $queryRaw: queryRaw,
       trialEvent: {
         findMany: trialEventFindMany,
         findUnique: trialEventFindUnique,
       },
       trialEntry: {
         findMany: trialEntryFindMany,
-        aggregate: trialEntryAggregate,
       },
     },
   };
@@ -692,14 +692,15 @@ describe("getBeagleTrialsForDogDb", () => {
 describe("getBeagleTrialSummarySourceForDogDb", () => {
   beforeEach(() => {
     trialEntryFindManyMock.mockReset();
-    trialEntryAggregateMock.mockReset();
+    queryRawMock.mockReset();
   });
 
-  it("loads dog source rows and aggregates the whole-breed summary in the database", async () => {
+  it("loads dog source rows and aggregates grouped whole-breed summaries in the database", async () => {
     const decimal = (value: number) => ({ toNumber: () => value });
 
     trialEntryFindManyMock.mockResolvedValueOnce([
       {
+        pa: "1",
         piste: decimal(80),
         haku: decimal(8),
         hauk: decimal(6),
@@ -712,62 +713,83 @@ describe("getBeagleTrialSummarySourceForDogDb", () => {
         },
       },
     ]);
-    trialEntryAggregateMock
-      .mockResolvedValueOnce({
-        _count: { _all: 2 },
-        _sum: { piste: decimal(70) },
-      })
-      .mockResolvedValueOnce({
-        _avg: {
-          haku: decimal(5),
-          hlo: decimal(2),
-          alo: decimal(1),
-        },
-      })
-      .mockResolvedValueOnce({ _avg: { hauk: decimal(6) } })
-      .mockResolvedValueOnce({ _avg: { yva: decimal(4) } })
-      .mockResolvedValueOnce({ _avg: { pin: decimal(5) } })
-      .mockResolvedValueOnce({ _avg: { pin: decimal(3) } });
+    queryRawMock.mockResolvedValueOnce([
+      {
+        groupKey: "allTrials",
+        count: 2,
+        points: decimal(35),
+        haku: decimal(5),
+        hauk: decimal(6),
+        yva: decimal(4),
+        hlo: decimal(2),
+        alo: decimal(1),
+        mi: decimal(5),
+        pmi: decimal(3),
+      },
+      {
+        groupKey: "drivenTrials",
+        count: 1,
+        points: decimal(80),
+        haku: decimal(8),
+        hauk: decimal(6),
+        yva: decimal(5),
+        hlo: decimal(0),
+        alo: decimal(0),
+        mi: decimal(5),
+        pmi: null,
+      },
+      {
+        groupKey: "noPrize",
+        count: 0,
+        points: null,
+        haku: null,
+        hauk: null,
+        yva: null,
+        hlo: null,
+        alo: null,
+        mi: null,
+        pmi: null,
+      },
+      {
+        groupKey: "prizePlacements",
+        count: 1,
+        points: decimal(80),
+        haku: decimal(8),
+        hauk: decimal(6),
+        yva: decimal(5),
+        hlo: decimal(0),
+        alo: decimal(0),
+        mi: decimal(5),
+        pmi: null,
+      },
+      {
+        groupKey: "interrupted",
+        count: 0,
+        points: null,
+        haku: null,
+        hauk: null,
+        yva: null,
+        hlo: null,
+        alo: null,
+        mi: null,
+        pmi: null,
+      },
+    ]);
 
     const result = await getBeagleTrialSummarySourceForDogDb("dog-1");
 
-    expect(trialEntryFindManyMock).toHaveBeenNthCalledWith(
-      1,
-      expect.objectContaining({ where: { dogId: "dog-1" } }),
+    expect(trialEntryFindManyMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { dogId: "dog-1" },
+        select: expect.objectContaining({ pa: true }),
+      }),
     );
     expect(trialEntryFindManyMock).toHaveBeenCalledTimes(1);
-    expect(trialEntryAggregateMock).toHaveBeenCalledTimes(6);
-    expect(trialEntryAggregateMock).toHaveBeenNthCalledWith(
-      3,
-      expect.objectContaining({ where: { hauk: { not: 0 } } }),
-    );
-    expect(trialEntryAggregateMock).toHaveBeenNthCalledWith(
-      4,
-      expect.objectContaining({ where: { yva: { not: 0 } } }),
-    );
-    expect(trialEntryAggregateMock).toHaveBeenNthCalledWith(
-      5,
-      expect.objectContaining({
-        where: {
-          trialEvent: { trialRuleWindowId: "trw_range_2005_2011" },
-        },
-      }),
-    );
-    expect(trialEntryAggregateMock).toHaveBeenNthCalledWith(
-      6,
-      expect.objectContaining({
-        where: {
-          trialEvent: {
-            trialRuleWindowId: {
-              in: ["trw_pre_20020801", "trw_range_2002_2005"],
-            },
-          },
-        },
-      }),
-    );
+    expect(queryRawMock).toHaveBeenCalledTimes(1);
     expect(result).toEqual({
       dogRows: [
         {
+          pa: "1",
           piste: 80,
           haku: 8,
           hauk: 6,
@@ -778,17 +800,68 @@ describe("getBeagleTrialSummarySourceForDogDb", () => {
           trialRuleWindowId: "trw_range_2005_2011",
         },
       ],
-      breedSummary: {
-        count: 2,
-        points: 35,
-        haku: 5,
-        hauk: 6,
-        yva: 4,
-        hlo: 2,
-        alo: 1,
-        mi: 5,
-        pmi: 3,
-      },
+      breedSummaries: [
+        {
+          groupKey: "allTrials",
+          count: 2,
+          points: 35,
+          haku: 5,
+          hauk: 6,
+          yva: 4,
+          hlo: 2,
+          alo: 1,
+          mi: 5,
+          pmi: 3,
+        },
+        {
+          groupKey: "drivenTrials",
+          count: 1,
+          points: 80,
+          haku: 8,
+          hauk: 6,
+          yva: 5,
+          hlo: 0,
+          alo: 0,
+          mi: 5,
+          pmi: null,
+        },
+        {
+          groupKey: "noPrize",
+          count: 0,
+          points: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          mi: null,
+          pmi: null,
+        },
+        {
+          groupKey: "prizePlacements",
+          count: 1,
+          points: 80,
+          haku: 8,
+          hauk: 6,
+          yva: 5,
+          hlo: 0,
+          alo: 0,
+          mi: 5,
+          pmi: null,
+        },
+        {
+          groupKey: "interrupted",
+          count: 0,
+          points: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          mi: null,
+          pmi: null,
+        },
+      ],
     });
   });
 });

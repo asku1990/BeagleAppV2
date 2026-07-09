@@ -4,6 +4,40 @@ import type {
   BeagleTrialDogSummarySourceRowDb,
 } from "@beagle/db";
 
+type SummaryGroupKey = keyof BeagleDogTrialsSummaryDto;
+
+const SUMMARY_GROUPS = [
+  {
+    key: "allTrials",
+    dogRows: (rows: BeagleTrialDogSummarySourceRowDb[]) => rows,
+  },
+  {
+    key: "drivenTrials",
+    dogRows: (rows: BeagleTrialDogSummarySourceRowDb[]) =>
+      rows.filter((row) => row.yva != null && row.yva > 0),
+  },
+  {
+    key: "noPrize",
+    dogRows: (rows: BeagleTrialDogSummarySourceRowDb[]) =>
+      rows.filter((row) => row.pa === "0"),
+  },
+  {
+    key: "prizePlacements",
+    dogRows: (rows: BeagleTrialDogSummarySourceRowDb[]) =>
+      rows.filter((row) => row.pa === "1" || row.pa === "2" || row.pa === "3"),
+  },
+  {
+    key: "interrupted",
+    dogRows: (rows: BeagleTrialDogSummarySourceRowDb[]) =>
+      rows.filter((row) => row.pa === "L" || row.pa === "S"),
+  },
+] as const satisfies ReadonlyArray<{
+  key: SummaryGroupKey;
+  dogRows: (
+    rows: BeagleTrialDogSummarySourceRowDb[],
+  ) => BeagleTrialDogSummarySourceRowDb[];
+}>;
+
 function roundAverage(value: number): number {
   return Math.round(value * 100) / 100;
 }
@@ -107,12 +141,26 @@ function buildAggregateSummaryRow(
 export function buildBeagleDogTrialsSummary(input: {
   dogName: string;
   dogRows: BeagleTrialDogSummarySourceRowDb[];
-  breedSummary: BeagleTrialDogSummaryAggregateDb;
+  breedSummaries: BeagleTrialDogSummaryAggregateDb[];
 }): BeagleDogTrialsSummaryDto {
-  return {
-    allTrials: [
-      buildSummaryRow("dog", input.dogName, input.dogRows),
-      buildAggregateSummaryRow("breed", "KOKO ROTU", input.breedSummary),
-    ],
-  };
+  const breedSummariesByGroup = new Map(
+    input.breedSummaries.map((row) => [row.groupKey, row]),
+  );
+
+  return Object.fromEntries(
+    SUMMARY_GROUPS.map((group) => {
+      const dogRows = group.dogRows(input.dogRows);
+      const rows: BeagleDogTrialsSummaryDto[SummaryGroupKey] = [];
+      const breedSummary = breedSummariesByGroup.get(group.key);
+
+      if (dogRows.length > 0) {
+        rows.push(buildSummaryRow("dog", input.dogName, dogRows));
+      }
+      if (breedSummary) {
+        rows.push(buildAggregateSummaryRow("breed", "KOKO ROTU", breedSummary));
+      }
+
+      return [group.key, rows];
+    }),
+  ) as BeagleDogTrialsSummaryDto;
 }

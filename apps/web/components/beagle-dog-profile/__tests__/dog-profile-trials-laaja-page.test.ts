@@ -117,6 +117,66 @@ describe("DogProfileTrialsLaajaPage", () => {
                 pmi: 0.1,
               },
             ],
+            drivenTrials: [
+              {
+                label: "breed",
+                name: "KOKO ROTU",
+                count: 8,
+                points: 44.42,
+                haku: 7.19,
+                hauk: 6.54,
+                yva: 4.27,
+                hlo: 0.42,
+                alo: 0.16,
+                mi: 3.78,
+                pmi: 0.1,
+              },
+            ],
+            noPrize: [
+              {
+                label: "breed",
+                name: "KOKO ROTU",
+                count: 4,
+                points: 19.01,
+                haku: 5.13,
+                hauk: 6.2,
+                yva: 2.73,
+                hlo: 0.35,
+                alo: 0.11,
+                mi: 3.37,
+                pmi: 0.07,
+              },
+            ],
+            prizePlacements: [
+              {
+                label: "breed",
+                name: "KOKO ROTU",
+                count: 6,
+                points: 60.49,
+                haku: 8.01,
+                hauk: 6.8,
+                yva: 5.33,
+                hlo: 0.39,
+                alo: 0.1,
+                mi: 4.14,
+                pmi: 0.03,
+              },
+            ],
+            interrupted: [
+              {
+                label: "breed",
+                name: "KOKO ROTU",
+                count: 1,
+                points: 0.01,
+                haku: 4.88,
+                hauk: 6.06,
+                yva: 2.97,
+                hlo: 1.6,
+                alo: 0.73,
+                mi: 2.73,
+                pmi: 0.6,
+              },
+            ],
           },
         },
       }),
@@ -146,6 +206,10 @@ describe("DogProfileTrialsLaajaPage", () => {
     expect(html).toContain("Judge A");
     expect(html).toContain("dog.profile.trials.summary.title");
     expect(html).toContain("dog.profile.trials.summary.group.allTrials");
+    expect(html).toContain("dog.profile.trials.summary.group.drivenTrials");
+    expect(html).toContain("dog.profile.trials.summary.group.noPrize");
+    expect(html).toContain("dog.profile.trials.summary.group.prizePlacements");
+    expect(html).toContain("dog.profile.trials.summary.group.interrupted");
     expect(html).toContain("dog.profile.trials.summary.col.target");
     expect(html).toContain("Ajometsan Aada");
     expect(html).toContain("KOKO ROTU");

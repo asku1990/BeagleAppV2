@@ -30,7 +30,7 @@ Developer notes for the public beagle dog profile feature.
    - show rows from the shows domain
    - trial rows from the trials domain
 3. The web page renders details and lineage always, renders titles when title rows exist, and renders secondary cards conditionally by data (siblings, litters, shows, trials).
-4. The compact trial card stays as the preview, and `Kokeet laaja` shows the full dog-scoped trial rows on a dedicated page.
+4. The compact trial card stays as the preview, and `Kokeet laaja` shows the full dog-scoped trial rows on a dedicated page. Detailed `Kokeet laaja` behavior is documented in `docs/features/trials/ajokokeet-laaja.md`.
 5. Siblings are resolved in DB from one reliable birth litter and rendered after lineage.
 6. Litters are rendered between siblings and result sections.
 7. Public inbreeding is calculated at read time from current pedigree data rather than from any stored legacy percentage.
@@ -103,9 +103,7 @@ Ordering:
 - render siblings/litters/shows/trials only when the corresponding arrays contain rows
 - render the laaja trial page from the same dog-scoped trial rows as the compact card
 - keep `Kokeet laaja` reachable from the profile as the expanded trial view
-- render the `Kokeet laaja` `YHTEENVETO` below the trial rows; the first
-  summary slice shows only the v1 `Kaikki kokeet` averages for the dog and
-  `KOKO ROTU`
+- keep `Kokeet laaja` trial-row, era-row, PDF-link, and `YHTEENVETO` rules in `docs/features/trials/ajokokeet-laaja.md`
 - on `Kokeet laaja`, keep eräkohtaiset tiedot hidden by default and reveal only
   compact `TrialEra` recap rows from a section-level toggle; do not render dense
   `TrialEraLisatieto` values in the default laaja view
