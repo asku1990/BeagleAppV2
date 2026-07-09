@@ -147,15 +147,15 @@ export function DogProfileTrialsLaajaPage({
             {t("dog.profile.empty.trials")}
           </div>
         ) : (
-          <>
-            <DogProfileTrialsLaajaTable
-              rows={profile.trials}
-              showEraDetails={showEraDetails}
-            />
-            <DogProfileTrialsLaajaSummary summary={profile.summary} />
-          </>
+          <DogProfileTrialsLaajaTable
+            rows={profile.trials}
+            showEraDetails={showEraDetails}
+          />
         )}
       </ListingSectionShell>
+      {profile.trials.length > 0 ? (
+        <DogProfileTrialsLaajaSummary summary={profile.summary} />
+      ) : null}
     </div>
   );
 }
