@@ -1,6 +1,6 @@
 import type { CurrentUserDto } from "@beagle/contracts";
-import type { ServiceResult } from "../../core/result";
-import { hasAdminRole } from "../../core/types";
+import type { ServiceResult } from "@server/core/result";
+import { hasAdminRole } from "@server/core/types";
 
 export function requireAdmin(
   user: CurrentUserDto | null,

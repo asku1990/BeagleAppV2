@@ -11,7 +11,7 @@ import {
   prisma,
 } from "@beagle/db";
 import type { ImportRunResponse } from "@beagle/contracts";
-import type { ServiceResult } from "../../core/result";
+import type { ServiceResult } from "@server/core/result";
 import { upsertShowRows } from "../internal";
 import { formatLegacyImportSummary } from "../runs/phase-summary";
 import { toImportRunResponse } from "../runs/transform";

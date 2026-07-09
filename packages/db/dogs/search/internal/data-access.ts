@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
-import { prisma } from "../../../core/prisma";
-import { sortRegistrationsByInsertedAsc } from "../../core/registration";
+import { prisma } from "@db/core/prisma";
+import { sortRegistrationsByInsertedAsc } from "@db/dogs/core/registration";
 import type { RegistrationOrderKeyRow } from "./types";
 
 export async function loadRegistrationOrderKeys(

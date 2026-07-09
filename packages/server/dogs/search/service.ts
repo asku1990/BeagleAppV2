@@ -7,9 +7,9 @@ import type {
   BeagleDogProfileDto,
   BeagleDogTrialsDto,
 } from "@beagle/contracts";
-import { toBusinessDateOnly } from "../../core/date-only";
-import type { ServiceResult } from "../../core/result";
-import { toErrorLog, withLogContext } from "../../core/logger";
+import { toBusinessDateOnly } from "@server/core/date-only";
+import type { ServiceResult } from "@server/core/result";
+import { toErrorLog, withLogContext } from "@server/core/logger";
 import {
   getBeagleDogProfileService,
   type DogsServiceLogContext,

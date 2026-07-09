@@ -11,7 +11,7 @@ import {
   prisma,
 } from "@beagle/db";
 import type { ImportRunResponse } from "@beagle/contracts";
-import type { ServiceResult } from "../../core/result";
+import type { ServiceResult } from "@server/core/result";
 import {
   isValidRegistrationNo,
   normalizeNullable,

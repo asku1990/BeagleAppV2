@@ -4,7 +4,7 @@ import {
   formatDate,
   formatNumber,
   formatPlacement,
-} from "../../../trials/display-formatters";
+} from "@web/lib/public/beagle/trials/display-formatters";
 
 describe("trials-laaja-formatters", () => {
   it("formats normal placements as rank / class count", () => {
