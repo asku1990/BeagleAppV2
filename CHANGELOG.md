@@ -14,11 +14,23 @@ This project uses a user-facing changelog format.
 
 ### Added
 
-- Lisätty koirakohtaiselle `Kokeet laaja` -sivulle avattavat eräkohtaiset yhteenvedot.
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.16.0] - 2026-07-09
+
+### Added
+
+- Lisätty koirakohtaiselle `Kokeet laaja` -sivulle v1-tyylinen `YHTEENVETO`-osio.
+- `YHTEENVETO` näyttää koiran ja `KOKO ROTU` -vertailun ryhmissä: kaikki kokeet, ajoon johtaneet, ei palkintosijaa, palkintosijoille ja keskeytyneet.
+- Lisätty `Kokeet laaja` -sivulle LT/erätilastot: koekäynnit, lisätietoerien määrä, ajoon johtaneet erät ja ajominuuttien keskiarvo.
 
 ### Changed
 
-- Koirakohtaisen `Kokeet laaja` -sivun eräkohtaiset tiedot näytetään nyt v1-tyylisinä tiiviinä alariveinä, jolloin alkuperäiset tulossarakkeet säilyvät ennallaan.
+- Koirakohtaisen `Kokeet laaja` -sivun eräkohtaiset tiedot näytetään nyt tiiviimmin v1-tyylisinä alariveinä.
 
 ### Fixed
 

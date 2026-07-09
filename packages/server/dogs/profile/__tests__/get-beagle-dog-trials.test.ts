@@ -1,10 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { getBeagleDogProfileIdentityDbMock, getBeagleTrialsForDogDbMock } =
-  vi.hoisted(() => ({
-    getBeagleDogProfileIdentityDbMock: vi.fn(),
-    getBeagleTrialsForDogDbMock: vi.fn(),
-  }));
+const {
+  getBeagleDogProfileIdentityDbMock,
+  getBeagleTrialsForDogDbMock,
+  getBeagleTrialSummarySourceForDogDbMock,
+} = vi.hoisted(() => ({
+  getBeagleDogProfileIdentityDbMock: vi.fn(),
+  getBeagleTrialsForDogDbMock: vi.fn(),
+  getBeagleTrialSummarySourceForDogDbMock: vi.fn(),
+}));
 
 const { formatTrialAwardMock, toBusinessDateOnlyMock } = vi.hoisted(() => ({
   formatTrialAwardMock: vi.fn(),
@@ -14,6 +18,7 @@ const { formatTrialAwardMock, toBusinessDateOnlyMock } = vi.hoisted(() => ({
 vi.mock("@beagle/db", () => ({
   getBeagleDogProfileIdentityDb: getBeagleDogProfileIdentityDbMock,
   getBeagleTrialsForDogDb: getBeagleTrialsForDogDbMock,
+  getBeagleTrialSummarySourceForDogDb: getBeagleTrialSummarySourceForDogDbMock,
 }));
 
 vi.mock("@server/core/date-only", () => ({
@@ -30,6 +35,7 @@ describe("getBeagleDogTrialsService", () => {
   beforeEach(() => {
     getBeagleDogProfileIdentityDbMock.mockReset();
     getBeagleTrialsForDogDbMock.mockReset();
+    getBeagleTrialSummarySourceForDogDbMock.mockReset();
     formatTrialAwardMock.mockReset();
     toBusinessDateOnlyMock.mockReset();
   });
@@ -100,9 +106,100 @@ describe("getBeagleDogTrialsService", () => {
             pin: 8,
             huomautusTeksti: "Hyvä erä",
           },
+          {
+            era: 2,
+            alkoi: "11:15",
+            hakumin: 20,
+            ajomin: null,
+            haku: 3,
+            hauk: null,
+            yva: null,
+            hlo: 0,
+            alo: 0,
+            tja: null,
+            pin: null,
+            huomautusTeksti: null,
+          },
         ],
       },
     ]);
+    getBeagleTrialSummarySourceForDogDbMock.mockResolvedValue({
+      dogRows: [
+        {
+          piste: 85.5,
+          haku: 4,
+          hauk: 4,
+          yva: 4,
+          hlo: 0,
+          alo: 0,
+          pin: 8,
+          pa: "1",
+          trialRuleWindowId: "trw_range_2005_2011",
+        },
+      ],
+      breedSummaries: [
+        {
+          groupKey: "allTrials",
+          count: 2,
+          points: 80,
+          haku: 3.75,
+          hauk: 4,
+          yva: 4,
+          hlo: 0,
+          alo: 0,
+          mi: 7,
+          pmi: null,
+        },
+        {
+          groupKey: "drivenTrials",
+          count: 1,
+          points: 85.5,
+          haku: 4,
+          hauk: 4,
+          yva: 4,
+          hlo: 0,
+          alo: 0,
+          mi: 7,
+          pmi: null,
+        },
+        {
+          groupKey: "noPrize",
+          count: 0,
+          points: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          mi: null,
+          pmi: null,
+        },
+        {
+          groupKey: "prizePlacements",
+          count: 1,
+          points: 85.5,
+          haku: 4,
+          hauk: 4,
+          yva: 4,
+          hlo: 0,
+          alo: 0,
+          mi: 7,
+          pmi: null,
+        },
+        {
+          groupKey: "interrupted",
+          count: 0,
+          points: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          mi: null,
+          pmi: null,
+        },
+      ],
+    });
     formatTrialAwardMock.mockReturnValue("Avo 1");
     toBusinessDateOnlyMock.mockReturnValue("2024-02-01");
 
@@ -112,6 +209,9 @@ describe("getBeagleDogTrialsService", () => {
     expect(getBeagleTrialsForDogDbMock).toHaveBeenCalledWith("dog_1", {
       includeEras: true,
     });
+    expect(getBeagleTrialSummarySourceForDogDbMock).toHaveBeenCalledWith(
+      "dog_1",
+    );
     expect(toBusinessDateOnlyMock).toHaveBeenCalledWith(
       new Date("2024-02-01T00:00:00.000Z"),
     );
@@ -162,9 +262,183 @@ describe("getBeagleDogTrialsService", () => {
                   pin: 8,
                   huomautusTeksti: "Hyvä erä",
                 },
+                {
+                  era: 2,
+                  alkoi: "11:15",
+                  hakumin: 20,
+                  ajomin: null,
+                  haku: 3,
+                  hauk: null,
+                  yva: null,
+                  hlo: 0,
+                  alo: 0,
+                  tja: null,
+                  pin: null,
+                  huomautusTeksti: null,
+                },
               ],
             },
           ],
+          summary: {
+            allTrials: [
+              {
+                label: "dog",
+                name: "Ajometsan Aada",
+                count: 1,
+                points: 85.5,
+                haku: 4,
+                hauk: 4,
+                yva: 4,
+                hlo: 0,
+                alo: 0,
+                mi: 8,
+                pmi: null,
+              },
+              {
+                label: "breed",
+                name: "KOKO ROTU",
+                count: 2,
+                points: 80,
+                haku: 3.75,
+                hauk: 4,
+                yva: 4,
+                hlo: 0,
+                alo: 0,
+                mi: 7,
+                pmi: null,
+              },
+            ],
+            drivenTrials: [
+              {
+                label: "dog",
+                name: "Ajometsan Aada",
+                count: 1,
+                points: 85.5,
+                haku: 4,
+                hauk: 4,
+                yva: 4,
+                hlo: 0,
+                alo: 0,
+                mi: 8,
+                pmi: null,
+              },
+              {
+                label: "breed",
+                name: "KOKO ROTU",
+                count: 1,
+                points: 85.5,
+                haku: 4,
+                hauk: 4,
+                yva: 4,
+                hlo: 0,
+                alo: 0,
+                mi: 7,
+                pmi: null,
+              },
+            ],
+            noPrize: [
+              {
+                label: "breed",
+                name: "KOKO ROTU",
+                count: 0,
+                points: null,
+                haku: null,
+                hauk: null,
+                yva: null,
+                hlo: null,
+                alo: null,
+                mi: null,
+                pmi: null,
+              },
+            ],
+            prizePlacements: [
+              {
+                label: "dog",
+                name: "Ajometsan Aada",
+                count: 1,
+                points: 85.5,
+                haku: 4,
+                hauk: 4,
+                yva: 4,
+                hlo: 0,
+                alo: 0,
+                mi: 8,
+                pmi: null,
+              },
+              {
+                label: "breed",
+                name: "KOKO ROTU",
+                count: 1,
+                points: 85.5,
+                haku: 4,
+                hauk: 4,
+                yva: 4,
+                hlo: 0,
+                alo: 0,
+                mi: 7,
+                pmi: null,
+              },
+            ],
+            interrupted: [
+              {
+                label: "breed",
+                name: "KOKO ROTU",
+                count: 0,
+                points: null,
+                haku: null,
+                hauk: null,
+                yva: null,
+                hlo: null,
+                alo: null,
+                mi: null,
+                pmi: null,
+              },
+            ],
+          },
+          eraStats: {
+            trialCount: 1,
+            trialCountWithEras: 1,
+            eraCount: 2,
+            drivenEraCount: 1,
+            drivenEraPercentage: 50,
+            averageDriveMinutes: 120,
+          },
+        },
+      },
+    });
+  });
+
+  it("skips summary source loading when dog has no trials", async () => {
+    getBeagleDogProfileIdentityDbMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Ajometsan Aada",
+      registrationNo: "FI-11/24",
+    });
+    getBeagleTrialsForDogDbMock.mockResolvedValue([]);
+
+    const result = await getBeagleDogTrialsService("dog_1");
+
+    expect(getBeagleTrialsForDogDbMock).toHaveBeenCalledWith("dog_1", {
+      includeEras: true,
+    });
+    expect(getBeagleTrialSummarySourceForDogDbMock).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          id: "dog_1",
+          name: "Ajometsan Aada",
+          registrationNo: "FI-11/24",
+          trials: [],
+          summary: {
+            allTrials: [],
+            drivenTrials: [],
+            noPrize: [],
+            prizePlacements: [],
+            interrupted: [],
+          },
+          eraStats: null,
         },
       },
     });

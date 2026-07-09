@@ -42,6 +42,14 @@ describe("useBeagleDogTrialsQuery", () => {
           name: "Ajometsan Aada",
           registrationNo: "FI-11/24",
           trials: [],
+          summary: {
+            allTrials: [],
+            drivenTrials: [],
+            noPrize: [],
+            prizePlacements: [],
+            interrupted: [],
+          },
+          eraStats: null,
         },
       }),
     });
@@ -57,6 +65,14 @@ describe("useBeagleDogTrialsQuery", () => {
       name: "Ajometsan Aada",
       registrationNo: "FI-11/24",
       trials: [],
+      summary: {
+        allTrials: [],
+        drivenTrials: [],
+        noPrize: [],
+        prizePlacements: [],
+        interrupted: [],
+      },
+      eraStats: null,
     });
 
     expect(fetchMock).toHaveBeenCalledWith(

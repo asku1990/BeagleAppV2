@@ -97,3 +97,40 @@ export type BeagleTrialDogEraRowDb = {
   pin: number | null;
   huomautusTeksti: string | null;
 };
+
+export type BeagleTrialDogSummarySourceRowDb = {
+  pa: string | null;
+  piste: number | null;
+  haku: number | null;
+  hauk: number | null;
+  yva: number | null;
+  hlo: number | null;
+  alo: number | null;
+  pin: number | null;
+  trialRuleWindowId: string | null;
+};
+
+export type BeagleTrialDogSummaryGroupKeyDb =
+  | "allTrials"
+  | "drivenTrials"
+  | "noPrize"
+  | "prizePlacements"
+  | "interrupted";
+
+export type BeagleTrialDogSummaryAggregateDb = {
+  groupKey: BeagleTrialDogSummaryGroupKeyDb;
+  count: number;
+  points: number | null;
+  haku: number | null;
+  hauk: number | null;
+  yva: number | null;
+  hlo: number | null;
+  alo: number | null;
+  mi: number | null;
+  pmi: number | null;
+};
+
+export type BeagleTrialDogSummarySourceDb = {
+  dogRows: BeagleTrialDogSummarySourceRowDb[];
+  breedSummaries: BeagleTrialDogSummaryAggregateDb[];
+};

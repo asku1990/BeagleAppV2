@@ -61,6 +61,37 @@ export type BeagleDogProfileTrialEraDto = {
   huomautusTeksti: string | null;
 };
 
+export type BeagleDogTrialsSummaryRowDto = {
+  label: "dog" | "breed";
+  name: string;
+  count: number;
+  points: number | null;
+  haku: number | null;
+  hauk: number | null;
+  yva: number | null;
+  hlo: number | null;
+  alo: number | null;
+  mi: number | null;
+  pmi: number | null;
+};
+
+export type BeagleDogTrialsSummaryDto = {
+  allTrials: BeagleDogTrialsSummaryRowDto[];
+  drivenTrials: BeagleDogTrialsSummaryRowDto[];
+  noPrize: BeagleDogTrialsSummaryRowDto[];
+  prizePlacements: BeagleDogTrialsSummaryRowDto[];
+  interrupted: BeagleDogTrialsSummaryRowDto[];
+};
+
+export type BeagleDogTrialsEraStatsDto = {
+  trialCount: number;
+  trialCountWithEras: number;
+  eraCount: number;
+  drivenEraCount: number;
+  drivenEraPercentage: number;
+  averageDriveMinutes: number;
+};
+
 export type BeagleDogProfileShowRowDto = BeagleShowStructuredResultDto & {
   id: string;
   showId: string;
@@ -148,4 +179,6 @@ export type BeagleDogTrialsDto = {
   name: string;
   registrationNo: string;
   trials: BeagleDogProfileTrialRowDto[];
+  summary: BeagleDogTrialsSummaryDto;
+  eraStats: BeagleDogTrialsEraStatsDto | null;
 };

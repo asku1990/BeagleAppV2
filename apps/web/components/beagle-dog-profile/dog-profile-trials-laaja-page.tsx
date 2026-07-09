@@ -14,6 +14,7 @@ import {
 } from "@/lib/public/beagle/trials";
 import type { BeagleDogTrialsDto } from "@beagle/contracts";
 import { DogProfileTrialsLaajaTable } from "./dog-profile-trials-laaja-table";
+import { DogProfileTrialsLaajaSummary } from "./internal/trials-laaja/dog-profile-trials-laaja-summary";
 
 export function DogProfileTrialsLaajaPage({
   profile,
@@ -152,6 +153,12 @@ export function DogProfileTrialsLaajaPage({
           />
         )}
       </ListingSectionShell>
+      {profile.trials.length > 0 ? (
+        <DogProfileTrialsLaajaSummary
+          summary={profile.summary}
+          eraStats={profile.eraStats}
+        />
+      ) : null}
     </div>
   );
 }

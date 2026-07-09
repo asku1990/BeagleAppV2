@@ -88,6 +88,104 @@ describe("DogProfileTrialsLaajaPage", () => {
               pin: null,
             },
           ],
+          summary: {
+            allTrials: [
+              {
+                label: "dog",
+                name: "Ajometsan Aada",
+                count: 2,
+                points: 42.75,
+                haku: 4,
+                hauk: 4,
+                yva: 4,
+                hlo: 0,
+                alo: 0,
+                mi: 8,
+                pmi: null,
+              },
+              {
+                label: "breed",
+                name: "KOKO ROTU",
+                count: 10,
+                points: 37.91,
+                haku: 6.55,
+                hauk: 6.54,
+                yva: 4.27,
+                hlo: 0.47,
+                alo: 0.15,
+                mi: 3.74,
+                pmi: 0.1,
+              },
+            ],
+            drivenTrials: [
+              {
+                label: "breed",
+                name: "KOKO ROTU",
+                count: 8,
+                points: 44.42,
+                haku: 7.19,
+                hauk: 6.54,
+                yva: 4.27,
+                hlo: 0.42,
+                alo: 0.16,
+                mi: 3.78,
+                pmi: 0.1,
+              },
+            ],
+            noPrize: [
+              {
+                label: "breed",
+                name: "KOKO ROTU",
+                count: 4,
+                points: 19.01,
+                haku: 5.13,
+                hauk: 6.2,
+                yva: 2.73,
+                hlo: 0.35,
+                alo: 0.11,
+                mi: 3.37,
+                pmi: 0.07,
+              },
+            ],
+            prizePlacements: [
+              {
+                label: "breed",
+                name: "KOKO ROTU",
+                count: 6,
+                points: 60.49,
+                haku: 8.01,
+                hauk: 6.8,
+                yva: 5.33,
+                hlo: 0.39,
+                alo: 0.1,
+                mi: 4.14,
+                pmi: 0.03,
+              },
+            ],
+            interrupted: [
+              {
+                label: "breed",
+                name: "KOKO ROTU",
+                count: 1,
+                points: 0.01,
+                haku: 4.88,
+                hauk: 6.06,
+                yva: 2.97,
+                hlo: 1.6,
+                alo: 0.73,
+                mi: 2.73,
+                pmi: 0.6,
+              },
+            ],
+          },
+          eraStats: {
+            trialCount: 2,
+            trialCountWithEras: 1,
+            eraCount: 1,
+            drivenEraCount: 1,
+            drivenEraPercentage: 100,
+            averageDriveMinutes: 120,
+          },
         },
       }),
     );
@@ -114,6 +212,25 @@ describe("DogProfileTrialsLaajaPage", () => {
     expect(html).toContain("85.50");
     expect(html).toContain("4.00");
     expect(html).toContain("Judge A");
+    expect(html).toContain("dog.profile.trials.summary.title");
+    expect(html).toContain("dog.profile.trials.summary.group.allTrials");
+    expect(html).toContain("dog.profile.trials.summary.group.drivenTrials");
+    expect(html).toContain("dog.profile.trials.summary.group.noPrize");
+    expect(html).toContain("dog.profile.trials.summary.group.prizePlacements");
+    expect(html).toContain("dog.profile.trials.summary.group.interrupted");
+    expect(html).toContain("dog.profile.trials.summary.col.target");
+    expect(html).toContain("dog.profile.trials.summary.eraStats.trialVisits");
+    expect(html).toContain("2(1)");
+    expect(html).toContain("dog.profile.trials.summary.eraStats.eras");
+    expect(html).toContain("dog.profile.trials.summary.eraStats.drivenEras");
+    expect(html).toContain(
+      "dog.profile.trials.summary.eraStats.averageDriveMinutes",
+    );
+    expect(html).toContain("120.00");
+    expect(html).toContain("Ajometsan Aada");
+    expect(html).toContain("KOKO ROTU");
+    expect(html).toContain("42.75");
+    expect(html).toContain("37.91");
   });
 
   it("renders expanded era rows as compact v1-style child rows", () => {
