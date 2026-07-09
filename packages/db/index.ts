@@ -157,6 +157,7 @@ export {
   type BeagleTrialDetailsRequestDb,
   type BeagleTrialDetailsResponseDb,
   type BeagleTrialDetailsRowDb,
+  type BeagleTrialDogSummaryAggregateDb,
   type BeagleTrialDogSummarySourceDb,
   type BeagleTrialDogSummarySourceRowDb,
   type BeagleTrialDogRowDb,

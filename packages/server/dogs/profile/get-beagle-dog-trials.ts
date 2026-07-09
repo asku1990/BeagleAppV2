@@ -66,7 +66,7 @@ export async function getBeagleDogTrialsService(
     const summary = buildBeagleDogTrialsSummary({
       dogName: identity.name,
       dogRows: summarySource.dogRows,
-      breedRows: summarySource.breedRows,
+      breedSummary: summarySource.breedSummary,
     });
 
     log.info(

@@ -109,7 +109,19 @@ export type BeagleTrialDogSummarySourceRowDb = {
   trialRuleWindowId: string | null;
 };
 
+export type BeagleTrialDogSummaryAggregateDb = {
+  count: number;
+  points: number | null;
+  haku: number | null;
+  hauk: number | null;
+  yva: number | null;
+  hlo: number | null;
+  alo: number | null;
+  mi: number | null;
+  pmi: number | null;
+};
+
 export type BeagleTrialDogSummarySourceDb = {
   dogRows: BeagleTrialDogSummarySourceRowDb[];
-  breedRows: BeagleTrialDogSummarySourceRowDb[];
+  breedSummary: BeagleTrialDogSummaryAggregateDb;
 };

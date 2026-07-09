@@ -6,6 +6,7 @@ export type {
   BeagleTrialDetailsRequestDb,
   BeagleTrialDetailsResponseDb,
   BeagleTrialDetailsRowDb,
+  BeagleTrialDogSummaryAggregateDb,
   BeagleTrialDogSummarySourceDb,
   BeagleTrialDogSummarySourceRowDb,
   BeagleTrialDogEraRowDb,

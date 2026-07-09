@@ -1,5 +1,8 @@
 import type { BeagleDogTrialsSummaryDto } from "@beagle/contracts";
-import type { BeagleTrialDogSummarySourceRowDb } from "@beagle/db";
+import type {
+  BeagleTrialDogSummaryAggregateDb,
+  BeagleTrialDogSummarySourceRowDb,
+} from "@beagle/db";
 
 function roundAverage(value: number): number {
   return Math.round(value * 100) / 100;
@@ -81,15 +84,35 @@ function buildSummaryRow(
   };
 }
 
+function buildAggregateSummaryRow(
+  label: "dog" | "breed",
+  name: string,
+  row: BeagleTrialDogSummaryAggregateDb,
+): BeagleDogTrialsSummaryDto["allTrials"][number] {
+  return {
+    label,
+    name,
+    count: row.count,
+    points: row.points == null ? null : roundAverage(row.points),
+    haku: row.haku == null ? null : roundAverage(row.haku),
+    hauk: row.hauk == null ? null : roundAverage(row.hauk),
+    yva: row.yva == null ? null : roundAverage(row.yva),
+    hlo: row.hlo == null ? null : roundAverage(row.hlo),
+    alo: row.alo == null ? null : roundAverage(row.alo),
+    mi: row.mi == null ? null : roundAverage(row.mi),
+    pmi: row.pmi == null ? null : roundAverage(row.pmi),
+  };
+}
+
 export function buildBeagleDogTrialsSummary(input: {
   dogName: string;
   dogRows: BeagleTrialDogSummarySourceRowDb[];
-  breedRows: BeagleTrialDogSummarySourceRowDb[];
+  breedSummary: BeagleTrialDogSummaryAggregateDb;
 }): BeagleDogTrialsSummaryDto {
   return {
     allTrials: [
       buildSummaryRow("dog", input.dogName, input.dogRows),
-      buildSummaryRow("breed", "KOKO ROTU", input.breedRows),
+      buildAggregateSummaryRow("breed", "KOKO ROTU", input.breedSummary),
     ],
   };
 }

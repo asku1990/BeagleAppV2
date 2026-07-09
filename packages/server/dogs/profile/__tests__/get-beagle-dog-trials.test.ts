@@ -122,28 +122,17 @@ describe("getBeagleDogTrialsService", () => {
           trialRuleWindowId: "trw_range_2005_2011",
         },
       ],
-      breedRows: [
-        {
-          piste: 90,
-          haku: 4,
-          hauk: 4,
-          yva: 4,
-          hlo: 0,
-          alo: 0,
-          pin: 7,
-          trialRuleWindowId: "trw_range_2005_2011",
-        },
-        {
-          piste: 70,
-          haku: 3.5,
-          hauk: 4,
-          yva: 4,
-          hlo: 0,
-          alo: 0,
-          pin: null,
-          trialRuleWindowId: "trw_range_2002_2005",
-        },
-      ],
+      breedSummary: {
+        count: 2,
+        points: 80,
+        haku: 3.75,
+        hauk: 4,
+        yva: 4,
+        hlo: 0,
+        alo: 0,
+        mi: 7,
+        pmi: null,
+      },
     });
     formatTrialAwardMock.mockReturnValue("Avo 1");
     toBusinessDateOnlyMock.mockReturnValue("2024-02-01");

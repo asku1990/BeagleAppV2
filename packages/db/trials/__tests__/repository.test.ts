@@ -5,16 +5,19 @@ const {
   trialEventFindManyMock,
   trialEventFindUniqueMock,
   trialEntryFindManyMock,
+  trialEntryAggregateMock,
   prismaMock,
 } = vi.hoisted(() => {
   const trialEventFindMany = vi.fn();
   const trialEventFindUnique = vi.fn();
   const trialEntryFindMany = vi.fn();
+  const trialEntryAggregate = vi.fn();
 
   return {
     trialEventFindManyMock: trialEventFindMany,
     trialEventFindUniqueMock: trialEventFindUnique,
     trialEntryFindManyMock: trialEntryFindMany,
+    trialEntryAggregateMock: trialEntryAggregate,
     prismaMock: {
       trialEvent: {
         findMany: trialEventFindMany,
@@ -22,6 +25,7 @@ const {
       },
       trialEntry: {
         findMany: trialEntryFindMany,
+        aggregate: trialEntryAggregate,
       },
     },
   };
@@ -688,40 +692,42 @@ describe("getBeagleTrialsForDogDb", () => {
 describe("getBeagleTrialSummarySourceForDogDb", () => {
   beforeEach(() => {
     trialEntryFindManyMock.mockReset();
+    trialEntryAggregateMock.mockReset();
   });
 
-  it("loads raw summary source rows for the dog and whole breed", async () => {
+  it("loads dog source rows and aggregates the whole-breed summary in the database", async () => {
     const decimal = (value: number) => ({ toNumber: () => value });
 
-    trialEntryFindManyMock
-      .mockResolvedValueOnce([
-        {
-          piste: decimal(80),
-          haku: decimal(8),
-          hauk: decimal(6),
-          yva: decimal(5),
-          hlo: decimal(0),
-          alo: decimal(0),
-          pin: decimal(4),
-          trialEvent: {
-            trialRuleWindowId: "trw_range_2005_2011",
-          },
+    trialEntryFindManyMock.mockResolvedValueOnce([
+      {
+        piste: decimal(80),
+        haku: decimal(8),
+        hauk: decimal(6),
+        yva: decimal(5),
+        hlo: decimal(0),
+        alo: decimal(0),
+        pin: decimal(4),
+        trialEvent: {
+          trialRuleWindowId: "trw_range_2005_2011",
         },
-      ])
-      .mockResolvedValueOnce([
-        {
-          piste: decimal(70),
+      },
+    ]);
+    trialEntryAggregateMock
+      .mockResolvedValueOnce({
+        _count: { _all: 2 },
+        _sum: { piste: decimal(70) },
+      })
+      .mockResolvedValueOnce({
+        _avg: {
           haku: decimal(5),
-          hauk: decimal(0),
-          yva: decimal(4),
           hlo: decimal(2),
           alo: decimal(1),
-          pin: decimal(3),
-          trialEvent: {
-            trialRuleWindowId: "trw_pre_20020801",
-          },
         },
-      ]);
+      })
+      .mockResolvedValueOnce({ _avg: { hauk: decimal(6) } })
+      .mockResolvedValueOnce({ _avg: { yva: decimal(4) } })
+      .mockResolvedValueOnce({ _avg: { pin: decimal(5) } })
+      .mockResolvedValueOnce({ _avg: { pin: decimal(3) } });
 
     const result = await getBeagleTrialSummarySourceForDogDb("dog-1");
 
@@ -729,9 +735,35 @@ describe("getBeagleTrialSummarySourceForDogDb", () => {
       1,
       expect.objectContaining({ where: { dogId: "dog-1" } }),
     );
-    expect(trialEntryFindManyMock).toHaveBeenNthCalledWith(
-      2,
-      expect.not.objectContaining({ where: expect.anything() }),
+    expect(trialEntryFindManyMock).toHaveBeenCalledTimes(1);
+    expect(trialEntryAggregateMock).toHaveBeenCalledTimes(6);
+    expect(trialEntryAggregateMock).toHaveBeenNthCalledWith(
+      3,
+      expect.objectContaining({ where: { hauk: { not: 0 } } }),
+    );
+    expect(trialEntryAggregateMock).toHaveBeenNthCalledWith(
+      4,
+      expect.objectContaining({ where: { yva: { not: 0 } } }),
+    );
+    expect(trialEntryAggregateMock).toHaveBeenNthCalledWith(
+      5,
+      expect.objectContaining({
+        where: {
+          trialEvent: { trialRuleWindowId: "trw_range_2005_2011" },
+        },
+      }),
+    );
+    expect(trialEntryAggregateMock).toHaveBeenNthCalledWith(
+      6,
+      expect.objectContaining({
+        where: {
+          trialEvent: {
+            trialRuleWindowId: {
+              in: ["trw_pre_20020801", "trw_range_2002_2005"],
+            },
+          },
+        },
+      }),
     );
     expect(result).toEqual({
       dogRows: [
@@ -746,18 +778,17 @@ describe("getBeagleTrialSummarySourceForDogDb", () => {
           trialRuleWindowId: "trw_range_2005_2011",
         },
       ],
-      breedRows: [
-        {
-          piste: 70,
-          haku: 5,
-          hauk: 0,
-          yva: 4,
-          hlo: 2,
-          alo: 1,
-          pin: 3,
-          trialRuleWindowId: "trw_pre_20020801",
-        },
-      ],
+      breedSummary: {
+        count: 2,
+        points: 35,
+        haku: 5,
+        hauk: 6,
+        yva: 4,
+        hlo: 2,
+        alo: 1,
+        mi: 5,
+        pmi: 3,
+      },
     });
   });
 });

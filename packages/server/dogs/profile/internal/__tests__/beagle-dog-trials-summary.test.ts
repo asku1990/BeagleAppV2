@@ -44,28 +44,17 @@ describe("buildBeagleDogTrialsSummary", () => {
           trialRuleWindowId: "trw_range_2002_2005",
         }),
       ],
-      breedRows: [
-        row({
-          piste: 90,
-          haku: 9,
-          hauk: 7,
-          yva: 5,
-          hlo: 0,
-          alo: 0,
-          pin: 5,
-          trialRuleWindowId: "trw_range_2005_2011",
-        }),
-        row({
-          piste: 70,
-          haku: 5,
-          hauk: 0,
-          yva: 4,
-          hlo: 2,
-          alo: 1,
-          pin: 3,
-          trialRuleWindowId: "trw_pre_20020801",
-        }),
-      ],
+      breedSummary: {
+        count: 2,
+        points: 80,
+        haku: 7,
+        hauk: 7,
+        yva: 4.5,
+        hlo: 1,
+        alo: 0.5,
+        mi: 5,
+        pmi: 3,
+      },
     });
 
     expect(result).toEqual({
@@ -129,7 +118,17 @@ describe("buildBeagleDogTrialsSummary", () => {
           trialRuleWindowId: "unknown-window",
         }),
       ],
-      breedRows: [],
+      breedSummary: {
+        count: 0,
+        points: null,
+        haku: null,
+        hauk: null,
+        yva: null,
+        hlo: null,
+        alo: null,
+        mi: null,
+        pmi: null,
+      },
     });
 
     expect(result.allTrials[0]).toMatchObject({
