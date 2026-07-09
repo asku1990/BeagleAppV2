@@ -26,6 +26,7 @@ describe("public dog trials api route", () => {
           name: "Ajometsan Aada",
           registrationNo: "FI-11/24",
           trials: [],
+          summary: { allTrials: [] },
         },
       },
     });

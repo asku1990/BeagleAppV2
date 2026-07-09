@@ -53,15 +53,6 @@ Use this format for new entries:
 - Trigger to revisit: Next compliance/legal pass or before broad production launch.
 - Ticket: BEJ-30 follow-up.
 
-## 2026-03-07 - Split trials DB repository by use-case
-
-- Area: `packages/db/trials/repository.ts`
-- Issue: The repository still combines search, event detail, and dog-profile queries in one large file.
-- Impact: Harder to navigate and review; mapping and date/filter helper changes have wider blast radius.
-- Suggested fix: Split into `trials/search/*`, `trials/details/*`, and `trials/dog/*` repositories and move shared helpers to `trials/core/*`.
-- Trigger to revisit: Next BEJ trial-domain task that touches query/filter/date logic in this file.
-- Ticket: BEJ-29 follow-up (create dedicated split task key).
-
 ## 2026-03-18 - Expand canonical show presentation beyond single judge
 
 - Area: Public show detail and dog-profile show presentation.

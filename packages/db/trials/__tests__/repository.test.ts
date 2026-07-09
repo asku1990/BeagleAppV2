@@ -33,9 +33,10 @@ vi.mock("../../core/prisma", () => ({
 
 import {
   getBeagleTrialDetailsDb,
+  getBeagleTrialSummarySourceForDogDb,
   getBeagleTrialsForDogDb,
   searchBeagleTrialsDb,
-} from "../repository";
+} from "../index";
 
 // ---------------------------------------------------------------------------
 // searchBeagleTrialsDb
@@ -677,5 +678,92 @@ describe("getBeagleTrialsForDogDb", () => {
         huomautusTeksti: "Ensimmäisen erän huomautus",
       },
     ]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getBeagleTrialSummarySourceForDogDb
+// ---------------------------------------------------------------------------
+
+describe("getBeagleTrialSummarySourceForDogDb", () => {
+  beforeEach(() => {
+    trialEntryFindManyMock.mockReset();
+  });
+
+  it("loads raw summary source rows for the dog and whole breed", async () => {
+    const decimal = (value: number) => ({ toNumber: () => value });
+    const dogDate = new Date("2005-08-20T00:00:00.000Z");
+    const breedDate = new Date("2001-09-01T00:00:00.000Z");
+
+    trialEntryFindManyMock
+      .mockResolvedValueOnce([
+        {
+          piste: decimal(80),
+          haku: decimal(8),
+          hauk: decimal(6),
+          yva: decimal(5),
+          hlo: decimal(0),
+          alo: decimal(0),
+          pin: decimal(4),
+          trialEvent: {
+            koepaiva: dogDate,
+            trialRuleWindowId: "trw_range_2005_2011",
+          },
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          piste: decimal(70),
+          haku: decimal(5),
+          hauk: decimal(0),
+          yva: decimal(4),
+          hlo: decimal(2),
+          alo: decimal(1),
+          pin: decimal(3),
+          trialEvent: {
+            koepaiva: breedDate,
+            trialRuleWindowId: "trw_pre_20020801",
+          },
+        },
+      ]);
+
+    const result = await getBeagleTrialSummarySourceForDogDb("dog-1");
+
+    expect(trialEntryFindManyMock).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ where: { dogId: "dog-1" } }),
+    );
+    expect(trialEntryFindManyMock).toHaveBeenNthCalledWith(
+      2,
+      expect.not.objectContaining({ where: expect.anything() }),
+    );
+    expect(result).toEqual({
+      dogRows: [
+        {
+          piste: 80,
+          haku: 8,
+          hauk: 6,
+          yva: 5,
+          hlo: 0,
+          alo: 0,
+          pin: 4,
+          koepaiva: dogDate,
+          trialRuleWindowId: "trw_range_2005_2011",
+        },
+      ],
+      breedRows: [
+        {
+          piste: 70,
+          haku: 5,
+          hauk: 0,
+          yva: 4,
+          hlo: 2,
+          alo: 1,
+          pin: 3,
+          koepaiva: breedDate,
+          trialRuleWindowId: "trw_pre_20020801",
+        },
+      ],
+    });
   });
 });

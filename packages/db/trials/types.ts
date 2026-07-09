@@ -97,3 +97,20 @@ export type BeagleTrialDogEraRowDb = {
   pin: number | null;
   huomautusTeksti: string | null;
 };
+
+export type BeagleTrialDogSummarySourceRowDb = {
+  piste: number | null;
+  haku: number | null;
+  hauk: number | null;
+  yva: number | null;
+  hlo: number | null;
+  alo: number | null;
+  pin: number | null;
+  koepaiva: Date;
+  trialRuleWindowId: string | null;
+};
+
+export type BeagleTrialDogSummarySourceDb = {
+  dogRows: BeagleTrialDogSummarySourceRowDb[];
+  breedRows: BeagleTrialDogSummarySourceRowDb[];
+};

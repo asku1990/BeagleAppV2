@@ -1,10 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { getBeagleDogProfileIdentityDbMock, getBeagleTrialsForDogDbMock } =
-  vi.hoisted(() => ({
-    getBeagleDogProfileIdentityDbMock: vi.fn(),
-    getBeagleTrialsForDogDbMock: vi.fn(),
-  }));
+const {
+  getBeagleDogProfileIdentityDbMock,
+  getBeagleTrialsForDogDbMock,
+  getBeagleTrialSummarySourceForDogDbMock,
+} = vi.hoisted(() => ({
+  getBeagleDogProfileIdentityDbMock: vi.fn(),
+  getBeagleTrialsForDogDbMock: vi.fn(),
+  getBeagleTrialSummarySourceForDogDbMock: vi.fn(),
+}));
 
 const { formatTrialAwardMock, toBusinessDateOnlyMock } = vi.hoisted(() => ({
   formatTrialAwardMock: vi.fn(),
@@ -14,6 +18,7 @@ const { formatTrialAwardMock, toBusinessDateOnlyMock } = vi.hoisted(() => ({
 vi.mock("@beagle/db", () => ({
   getBeagleDogProfileIdentityDb: getBeagleDogProfileIdentityDbMock,
   getBeagleTrialsForDogDb: getBeagleTrialsForDogDbMock,
+  getBeagleTrialSummarySourceForDogDb: getBeagleTrialSummarySourceForDogDbMock,
 }));
 
 vi.mock("@server/core/date-only", () => ({
@@ -22,6 +27,8 @@ vi.mock("@server/core/date-only", () => ({
 
 vi.mock("@server/trials/core", () => ({
   formatTrialAward: formatTrialAwardMock,
+  getTrialBusinessDateStartUtc: (value: string) =>
+    new Date(`${value}T00:00:00.000Z`),
 }));
 
 import { getBeagleDogTrialsService } from "../get-beagle-dog-trials";
@@ -30,6 +37,7 @@ describe("getBeagleDogTrialsService", () => {
   beforeEach(() => {
     getBeagleDogProfileIdentityDbMock.mockReset();
     getBeagleTrialsForDogDbMock.mockReset();
+    getBeagleTrialSummarySourceForDogDbMock.mockReset();
     formatTrialAwardMock.mockReset();
     toBusinessDateOnlyMock.mockReset();
   });
@@ -103,6 +111,45 @@ describe("getBeagleDogTrialsService", () => {
         ],
       },
     ]);
+    getBeagleTrialSummarySourceForDogDbMock.mockResolvedValue({
+      dogRows: [
+        {
+          piste: 85.5,
+          haku: 4,
+          hauk: 4,
+          yva: 4,
+          hlo: 0,
+          alo: 0,
+          pin: 8,
+          koepaiva: new Date("2006-02-01T00:00:00.000Z"),
+          trialRuleWindowId: "trw_range_2005_2011",
+        },
+      ],
+      breedRows: [
+        {
+          piste: 90,
+          haku: 4,
+          hauk: 4,
+          yva: 4,
+          hlo: 0,
+          alo: 0,
+          pin: 7,
+          koepaiva: new Date("2006-02-01T00:00:00.000Z"),
+          trialRuleWindowId: "trw_range_2005_2011",
+        },
+        {
+          piste: 70,
+          haku: 3.5,
+          hauk: 4,
+          yva: 4,
+          hlo: 0,
+          alo: 0,
+          pin: null,
+          koepaiva: new Date("2004-02-01T00:00:00.000Z"),
+          trialRuleWindowId: "trw_range_2002_2005",
+        },
+      ],
+    });
     formatTrialAwardMock.mockReturnValue("Avo 1");
     toBusinessDateOnlyMock.mockReturnValue("2024-02-01");
 
@@ -112,6 +159,9 @@ describe("getBeagleDogTrialsService", () => {
     expect(getBeagleTrialsForDogDbMock).toHaveBeenCalledWith("dog_1", {
       includeEras: true,
     });
+    expect(getBeagleTrialSummarySourceForDogDbMock).toHaveBeenCalledWith(
+      "dog_1",
+    );
     expect(toBusinessDateOnlyMock).toHaveBeenCalledWith(
       new Date("2024-02-01T00:00:00.000Z"),
     );
@@ -165,6 +215,36 @@ describe("getBeagleDogTrialsService", () => {
               ],
             },
           ],
+          summary: {
+            allTrials: [
+              {
+                label: "dog",
+                name: "Ajometsan Aada",
+                count: 1,
+                points: 85.5,
+                haku: 4,
+                hauk: 4,
+                yva: 4,
+                hlo: 0,
+                alo: 0,
+                mi: 8,
+                pmi: null,
+              },
+              {
+                label: "breed",
+                name: "KOKO ROTU",
+                count: 2,
+                points: 80,
+                haku: 3.75,
+                hauk: 4,
+                yva: 4,
+                hlo: 0,
+                alo: 0,
+                mi: 7,
+                pmi: null,
+              },
+            ],
+          },
         },
       },
     });

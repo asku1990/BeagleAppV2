@@ -2,6 +2,7 @@
 import type { BeagleDogTrialsDto } from "@beagle/contracts";
 import {
   getBeagleDogProfileIdentityDb,
+  getBeagleTrialSummarySourceForDogDb,
   getBeagleTrialsForDogDb,
 } from "@beagle/db";
 import { toBusinessDateOnly } from "@server/core/date-only";
@@ -10,6 +11,7 @@ import type { ServiceResult } from "@server/core/result";
 import { parseDogId } from "@server/dogs/core";
 import { formatTrialAward } from "@server/trials/core";
 import { canRenderTrialDogPdf } from "@server/trials/pdf";
+import { buildBeagleDogTrialsSummary } from "./internal/beagle-dog-trials-summary";
 
 export async function getBeagleDogTrialsService(
   dogId: string,
@@ -58,6 +60,13 @@ export async function getBeagleDogTrialsService(
 
     const trials = await getBeagleTrialsForDogDb(parsedDogId, {
       includeEras: true,
+    });
+    const summarySource =
+      await getBeagleTrialSummarySourceForDogDb(parsedDogId);
+    const summary = buildBeagleDogTrialsSummary({
+      dogName: identity.name,
+      dogRows: summarySource.dogRows,
+      breedRows: summarySource.breedRows,
     });
 
     log.info(
@@ -115,6 +124,7 @@ export async function getBeagleDogTrialsService(
               huomautusTeksti: era.huomautusTeksti,
             })),
           })),
+          summary,
         },
       },
     };

@@ -103,6 +103,9 @@ Ordering:
 - render siblings/litters/shows/trials only when the corresponding arrays contain rows
 - render the laaja trial page from the same dog-scoped trial rows as the compact card
 - keep `Kokeet laaja` reachable from the profile as the expanded trial view
+- render the `Kokeet laaja` `YHTEENVETO` below the trial rows; the first
+  summary slice shows only the v1 `Kaikki kokeet` averages for the dog and
+  `KOKO ROTU`
 - on `Kokeet laaja`, keep eräkohtaiset tiedot hidden by default and reveal only
   compact `TrialEra` recap rows from a section-level toggle; do not render dense
   `TrialEraLisatieto` values in the default laaja view

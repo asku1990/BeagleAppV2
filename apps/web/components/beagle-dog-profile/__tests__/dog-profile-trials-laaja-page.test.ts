@@ -88,6 +88,36 @@ describe("DogProfileTrialsLaajaPage", () => {
               pin: null,
             },
           ],
+          summary: {
+            allTrials: [
+              {
+                label: "dog",
+                name: "Ajometsan Aada",
+                count: 2,
+                points: 42.75,
+                haku: 4,
+                hauk: 4,
+                yva: 4,
+                hlo: 0,
+                alo: 0,
+                mi: 8,
+                pmi: null,
+              },
+              {
+                label: "breed",
+                name: "KOKO ROTU",
+                count: 10,
+                points: 37.91,
+                haku: 6.55,
+                hauk: 6.54,
+                yva: 4.27,
+                hlo: 0.47,
+                alo: 0.15,
+                mi: 3.74,
+                pmi: 0.1,
+              },
+            ],
+          },
         },
       }),
     );
@@ -114,6 +144,13 @@ describe("DogProfileTrialsLaajaPage", () => {
     expect(html).toContain("85.50");
     expect(html).toContain("4.00");
     expect(html).toContain("Judge A");
+    expect(html).toContain("dog.profile.trials.summary.title");
+    expect(html).toContain("dog.profile.trials.summary.group.allTrials");
+    expect(html).toContain("dog.profile.trials.summary.col.target");
+    expect(html).toContain("Ajometsan Aada");
+    expect(html).toContain("KOKO ROTU");
+    expect(html).toContain("42.75");
+    expect(html).toContain("37.91");
   });
 
   it("renders expanded era rows as compact v1-style child rows", () => {

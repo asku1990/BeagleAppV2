@@ -1,10 +1,13 @@
 export { getBeagleTrialDetailsDb } from "./get-beagle-trial-details";
 export { getBeagleTrialsForDogDb } from "./get-beagle-trials-for-dog";
+export { getBeagleTrialSummarySourceForDogDb } from "./get-beagle-trials-summary-for-dog";
 export { searchBeagleTrialsDb } from "./search-beagle-trials";
 export type {
   BeagleTrialDetailsRequestDb,
   BeagleTrialDetailsResponseDb,
   BeagleTrialDetailsRowDb,
+  BeagleTrialDogSummarySourceDb,
+  BeagleTrialDogSummarySourceRowDb,
   BeagleTrialDogEraRowDb,
   BeagleTrialDogRowDb,
   BeagleTrialSearchRequestDb,
