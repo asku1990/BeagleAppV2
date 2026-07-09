@@ -1,7 +1,13 @@
 // Builds the public dog trials DTO without loading the full profile graph.
-import type { BeagleDogTrialsDto } from "@beagle/contracts";
+import type {
+  BeagleDogProfileTrialRowDto,
+  BeagleDogTrialsEraStatsDto,
+  BeagleDogTrialsDto,
+  BeagleDogTrialsSummaryDto,
+} from "@beagle/contracts";
 import {
   getBeagleDogProfileIdentityDb,
+  getBeagleTrialSummarySourceForDogDb,
   getBeagleTrialsForDogDb,
 } from "@beagle/db";
 import { toBusinessDateOnly } from "@server/core/date-only";
@@ -10,6 +16,49 @@ import type { ServiceResult } from "@server/core/result";
 import { parseDogId } from "@server/dogs/core";
 import { formatTrialAward } from "@server/trials/core";
 import { canRenderTrialDogPdf } from "@server/trials/pdf";
+import { buildBeagleDogTrialsSummary } from "./internal/beagle-dog-trials-summary";
+
+function emptyTrialsSummary(): BeagleDogTrialsSummaryDto {
+  return {
+    allTrials: [],
+    drivenTrials: [],
+    noPrize: [],
+    prizePlacements: [],
+    interrupted: [],
+  };
+}
+
+function roundTo(value: number, decimals: number): number {
+  const multiplier = 10 ** decimals;
+  return Math.round(value * multiplier) / multiplier;
+}
+
+function buildEraStats(
+  trials: Array<Pick<BeagleDogProfileTrialRowDto, "eras">>,
+): BeagleDogTrialsEraStatsDto | null {
+  const eras = trials.flatMap((trial) => trial.eras ?? []);
+  if (eras.length === 0) {
+    return null;
+  }
+
+  const drivenEras = eras.filter((era) => era.ajomin != null);
+  const drivenEraCount = drivenEras.length;
+  const driveMinuteSum = drivenEras.reduce(
+    (sum, era) => sum + (era.ajomin ?? 0),
+    0,
+  );
+
+  return {
+    trialCount: trials.length,
+    trialCountWithEras: trials.filter((trial) => (trial.eras?.length ?? 0) > 0)
+      .length,
+    eraCount: eras.length,
+    drivenEraCount,
+    drivenEraPercentage: roundTo((drivenEraCount / eras.length) * 100, 1),
+    averageDriveMinutes:
+      drivenEraCount === 0 ? 0 : roundTo(driveMinuteSum / drivenEraCount, 2),
+  };
+}
 
 export async function getBeagleDogTrialsService(
   dogId: string,
@@ -56,7 +105,16 @@ export async function getBeagleDogTrialsService(
       };
     }
 
-    const trials = await getBeagleTrialsForDogDb(parsedDogId);
+    const trials = await getBeagleTrialsForDogDb(parsedDogId, {
+      includeEras: true,
+    });
+    const summary =
+      trials.length === 0
+        ? emptyTrialsSummary()
+        : buildBeagleDogTrialsSummary({
+            dogName: identity.name,
+            ...(await getBeagleTrialSummarySourceForDogDb(parsedDogId)),
+          });
 
     log.info(
       {
@@ -68,6 +126,44 @@ export async function getBeagleDogTrialsService(
       "dog trials fetch succeeded",
     );
 
+    const trialDtos: BeagleDogProfileTrialRowDto[] = trials.map((trial) => ({
+      id: trial.id,
+      trialEntryId: trial.id,
+      trialId: trial.trialEventId,
+      trialRuleWindowId: trial.trialRuleWindowId,
+      hasDogTrialPdf: canRenderTrialDogPdf(trial.trialRuleWindowId),
+      place: trial.place,
+      date: toBusinessDateOnly(trial.date),
+      weather: trial.weather,
+      koetyyppi: trial.koetyyppi,
+      koiriaLuokassa: trial.koiriaLuokassa,
+      rank: trial.rank,
+      points: trial.points,
+      award: formatTrialAward(trial.award, trial.classCode),
+      judge: trial.judge,
+      haku: trial.haku,
+      hauk: trial.hauk,
+      yva: trial.yva,
+      hlo: trial.hlo,
+      alo: trial.alo,
+      tja: trial.tja,
+      pin: trial.pin,
+      eras: trial.eras?.map((era) => ({
+        era: era.era,
+        alkoi: era.alkoi,
+        hakumin: era.hakumin,
+        ajomin: era.ajomin,
+        haku: era.haku,
+        hauk: era.hauk,
+        yva: era.yva,
+        hlo: era.hlo,
+        alo: era.alo,
+        tja: era.tja,
+        pin: era.pin,
+        huomautusTeksti: era.huomautusTeksti,
+      })),
+    }));
+
     return {
       status: 200,
       body: {
@@ -76,29 +172,9 @@ export async function getBeagleDogTrialsService(
           id: identity.id,
           name: identity.name,
           registrationNo: identity.registrationNo,
-          trials: trials.map((trial) => ({
-            id: trial.id,
-            trialEntryId: trial.id,
-            trialId: trial.trialEventId,
-            trialRuleWindowId: trial.trialRuleWindowId,
-            hasDogTrialPdf: canRenderTrialDogPdf(trial.trialRuleWindowId),
-            place: trial.place,
-            date: toBusinessDateOnly(trial.date),
-            weather: trial.weather,
-            koetyyppi: trial.koetyyppi,
-            koiriaLuokassa: trial.koiriaLuokassa,
-            rank: trial.rank,
-            points: trial.points,
-            award: formatTrialAward(trial.award, trial.classCode),
-            judge: trial.judge,
-            haku: trial.haku,
-            hauk: trial.hauk,
-            yva: trial.yva,
-            hlo: trial.hlo,
-            alo: trial.alo,
-            tja: trial.tja,
-            pin: trial.pin,
-          })),
+          trials: trialDtos,
+          summary,
+          eraStats: buildEraStats(trialDtos),
         },
       },
     };

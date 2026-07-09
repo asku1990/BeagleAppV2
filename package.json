@@ -1,6 +1,6 @@
 {
   "name": "beagle-app-v2",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "private": true,
   "packageManager": "pnpm@10.33.0",
   "scripts": {
@@ -9,6 +9,7 @@
     "vercel:build": "bash ./scripts/vercel-build.sh",
     "vercel:ignored-build": "bash ./scripts/vercel-ignored-build.sh",
     "lint": "turbo lint",
+    "lint:cycles": "turbo lint:cycles",
     "format": "prettier . --write",
     "typecheck": "turbo typecheck",
     "test": "pnpm test:coverage && pnpm test:coverage:global-check",

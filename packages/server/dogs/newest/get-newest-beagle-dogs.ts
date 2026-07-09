@@ -3,9 +3,9 @@ import type {
   BeagleNewestRequest,
   BeagleNewestResponse,
 } from "@beagle/contracts";
-import { toBusinessDateOnly } from "../../core/date-only";
-import type { ServiceResult } from "../../core/result";
-import { toErrorLog, withLogContext } from "../../core/logger";
+import { toBusinessDateOnly } from "@server/core/date-only";
+import type { ServiceResult } from "@server/core/result";
+import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { DogsServiceLogContext } from "../profile/get-beagle-dog-profile";
 
 function parseNewestLimit(value: number | undefined): number {

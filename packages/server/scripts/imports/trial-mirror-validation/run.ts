@@ -2,7 +2,7 @@ import { prisma } from "@beagle/db";
 import {
   formatTrialMirrorValidationReport,
   runLegacyTrialMirrorValidation,
-} from "../../../imports/trial-mirror-validation";
+} from "@server/imports/trial-mirror-validation";
 
 async function main() {
   const startedAt = Date.now();

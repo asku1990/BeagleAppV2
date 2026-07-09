@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 import { ListingResponsiveResults } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
@@ -14,180 +14,31 @@ import {
 } from "@/lib/public/beagle/trials/display-formatters";
 import { cn } from "@/lib/utils";
 import type { BeagleDogProfileTrialRowDto } from "@beagle/contracts";
-
-function DogProfileTrialsLaajaMobileList({
-  rows,
-  headers,
-  locale,
-}: {
-  rows: BeagleDogProfileTrialRowDto[];
-  headers: {
-    no: string;
-    place: string;
-    date: string;
-    weather: string;
-    award: string;
-    rank: string;
-    points: string;
-    judge: string;
-    haku: string;
-    hauk: string;
-    ajotaito: string;
-    hlo: string;
-    alo: string;
-    tja: string;
-    pin: string;
-  };
-  locale: "fi" | "sv";
-}) {
-  const hasWeather = rows.some((row) => row.weather != null);
-  const hasAward = rows.some((row) => row.award != null);
-  const hasRank = rows.some(
-    (row) => row.rank != null || row.koetyyppi !== "NORMAL",
-  );
-  const hasPoints = rows.some((row) => row.points != null);
-  const hasHaku = rows.some((row) => row.haku != null);
-  const hasHauk = rows.some((row) => row.hauk != null);
-  const hasAjotaito = rows.some((row) => row.yva != null);
-  const hasHlo = rows.some((row) => row.hlo != null);
-  const hasAlo = rows.some((row) => row.alo != null);
-  const hasJudge = rows.some((row) => row.judge != null);
-  const hasTja = rows.some((row) => row.tja != null);
-  const hasPin = rows.some((row) => row.pin != null);
-
-  return (
-    <div className="space-y-2">
-      {rows.map((row, index) => (
-        <article
-          key={row.id}
-          className={cn(
-            "rounded-lg border p-3",
-            beagleTheme.border,
-            beagleTheme.surface,
-          )}
-        >
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <p>
-              <span className={beagleTheme.mutedText}>{headers.no}:</span>{" "}
-              <span>{index + 1}</span>
-            </p>
-            <p>
-              <span className={beagleTheme.mutedText}>{headers.date}:</span>{" "}
-              <span>{formatDate(row.date, locale)}</span>
-            </p>
-            <p className="col-span-2">
-              <span className={beagleTheme.mutedText}>{headers.place}:</span>{" "}
-              <Link
-                href={getBeagleTrialHref(row.trialId)}
-                className={beagleTheme.entityLink}
-              >
-                {row.place}
-              </Link>
-            </p>
-            {hasWeather ? (
-              <p>
-                <span className={beagleTheme.mutedText}>
-                  {headers.weather}:
-                </span>{" "}
-                <span>{row.weather ?? FALLBACK_VALUE}</span>
-              </p>
-            ) : null}
-            {hasAward ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.award}:</span>{" "}
-                <span>{row.award ?? FALLBACK_VALUE}</span>
-              </p>
-            ) : null}
-            {hasRank ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.rank}:</span>{" "}
-                <span>{formatPlacement(row)}</span>
-              </p>
-            ) : null}
-            {hasPoints ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.points}:</span>{" "}
-                <span>{formatNumber(row.points)}</span>
-              </p>
-            ) : null}
-            {hasHaku ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.haku}:</span>{" "}
-                <span>{formatNumber(row.haku)}</span>
-              </p>
-            ) : null}
-            {hasHauk ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.hauk}:</span>{" "}
-                <span>{formatNumber(row.hauk)}</span>
-              </p>
-            ) : null}
-            {hasAjotaito ? (
-              <p>
-                <span className={beagleTheme.mutedText}>
-                  {headers.ajotaito}:
-                </span>{" "}
-                <span>{formatNumber(row.yva)}</span>
-              </p>
-            ) : null}
-            {hasHlo ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.hlo}:</span>{" "}
-                <span>{formatNumber(row.hlo)}</span>
-              </p>
-            ) : null}
-            {hasAlo ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.alo}:</span>{" "}
-                <span>{formatNumber(row.alo)}</span>
-              </p>
-            ) : null}
-            {hasJudge ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.judge}:</span>{" "}
-                <span>{row.judge ?? FALLBACK_VALUE}</span>
-              </p>
-            ) : null}
-            {hasTja ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.tja}:</span>{" "}
-                <span>{formatNumber(row.tja)}</span>
-              </p>
-            ) : null}
-            {hasPin ? (
-              <p>
-                <span className={beagleTheme.mutedText}>{headers.pin}:</span>{" "}
-                <span>{formatNumber(row.pin)}</span>
-              </p>
-            ) : null}
-          </div>
-        </article>
-      ))}
-    </div>
-  );
-}
+import { DogProfileTrialsEraDesktopRow } from "./internal/trials-laaja/dog-profile-trials-era-desktop-row";
+import { DogProfileTrialsLaajaMobileList } from "./internal/trials-laaja/dog-profile-trials-laaja-mobile-list";
+import type { DogProfileTrialsLaajaHeaders } from "./internal/trials-laaja/dog-profile-trials-laaja-types";
 
 export function DogProfileTrialsLaajaTable({
   rows,
+  showEraDetails,
 }: {
   rows: BeagleDogProfileTrialRowDto[];
+  showEraDetails: boolean;
 }) {
   const { t, locale } = useI18n();
-  const hasWeather = rows.some((row) => row.weather != null);
-  const hasAward = rows.some((row) => row.award != null);
-  const hasRank = rows.some(
-    (row) => row.rank != null || row.koetyyppi !== "NORMAL",
-  );
-  const hasPoints = rows.some((row) => row.points != null);
-  const hasHaku = rows.some((row) => row.haku != null);
-  const hasHauk = rows.some((row) => row.hauk != null);
-  const hasAjotaito = rows.some((row) => row.yva != null);
-  const hasHlo = rows.some((row) => row.hlo != null);
-  const hasAlo = rows.some((row) => row.alo != null);
-  const hasJudge = rows.some((row) => row.judge != null);
   const hasTja = rows.some((row) => row.tja != null);
   const hasPin = rows.some((row) => row.pin != null);
-  const headers = useMemo(
+  const hasVisibleEras =
+    showEraDetails && rows.some((row) => row.eras && row.eras.length > 0);
+  const hasEraHuomautus =
+    hasVisibleEras &&
+    rows.some((row) => row.eras?.some((era) => era.huomautusTeksti != null));
+  const visibleColumns = {
+    hasEraHuomautus,
+    hasTja,
+    hasPin,
+  };
+  const headers = useMemo<DogProfileTrialsLaajaHeaders>(
     () => ({
       no: t("dog.profile.trials.col.no"),
       place: t("dog.profile.trials.col.place"),
@@ -204,6 +55,11 @@ export function DogProfileTrialsLaajaTable({
       alo: t("trials.details.copy.col.chaseLoosenessPenalty"),
       tja: t("trials.details.copy.col.obstacleWork"),
       pin: t("trials.details.copy.col.mi"),
+      era: t("dog.profile.trials.eras.col.era"),
+      alkoi: t("dog.profile.trials.eras.col.alkoi"),
+      hakumin: t("dog.profile.trials.eras.col.hakumin"),
+      ajomin: t("dog.profile.trials.eras.col.ajomin"),
+      huomautus: t("dog.profile.trials.eras.col.huomautus"),
     }),
     [t],
   );
@@ -218,37 +74,20 @@ export function DogProfileTrialsLaajaTable({
                 <th className="px-2 py-2 font-semibold">{headers.no}</th>
                 <th className="px-2 py-2 font-semibold">{headers.place}</th>
                 <th className="px-2 py-2 font-semibold">{headers.date}</th>
-                {hasWeather ? (
-                  <th className="px-2 py-2 font-semibold">{headers.weather}</th>
-                ) : null}
-                {hasAward ? (
-                  <th className="px-2 py-2 font-semibold">{headers.award}</th>
-                ) : null}
-                {hasRank ? (
-                  <th className="px-2 py-2 font-semibold">{headers.rank}</th>
-                ) : null}
-                {hasPoints ? (
-                  <th className="px-2 py-2 font-semibold">{headers.points}</th>
-                ) : null}
-                {hasHaku ? (
-                  <th className="px-2 py-2 font-semibold">{headers.haku}</th>
-                ) : null}
-                {hasHauk ? (
-                  <th className="px-2 py-2 font-semibold">{headers.hauk}</th>
-                ) : null}
-                {hasAjotaito ? (
+                <th className="px-2 py-2 font-semibold">{headers.weather}</th>
+                <th className="px-2 py-2 font-semibold">{headers.award}</th>
+                <th className="px-2 py-2 font-semibold">{headers.rank}</th>
+                <th className="px-2 py-2 font-semibold">{headers.points}</th>
+                <th className="px-2 py-2 font-semibold">{headers.haku}</th>
+                <th className="px-2 py-2 font-semibold">{headers.hauk}</th>
+                <th className="px-2 py-2 font-semibold">{headers.ajotaito}</th>
+                <th className="px-2 py-2 font-semibold">{headers.hlo}</th>
+                <th className="px-2 py-2 font-semibold">{headers.alo}</th>
+                <th className="px-2 py-2 font-semibold">{headers.judge}</th>
+                {hasEraHuomautus ? (
                   <th className="px-2 py-2 font-semibold">
-                    {headers.ajotaito}
+                    {headers.huomautus}
                   </th>
-                ) : null}
-                {hasHlo ? (
-                  <th className="px-2 py-2 font-semibold">{headers.hlo}</th>
-                ) : null}
-                {hasAlo ? (
-                  <th className="px-2 py-2 font-semibold">{headers.alo}</th>
-                ) : null}
-                {hasJudge ? (
-                  <th className="px-2 py-2 font-semibold">{headers.judge}</th>
                 ) : null}
                 {hasTja ? (
                   <th className="px-2 py-2 font-semibold">{headers.tja}</th>
@@ -260,59 +99,58 @@ export function DogProfileTrialsLaajaTable({
             </thead>
             <tbody>
               {rows.map((row, index) => (
-                <tr
-                  key={row.id}
-                  className={cn("border-b align-top", beagleTheme.border)}
-                >
-                  <td className="px-2 py-2">{index + 1}</td>
-                  <td className="px-2 py-2">
-                    <Link
-                      href={getBeagleTrialHref(row.trialId)}
-                      className={beagleTheme.entityLink}
-                    >
-                      {row.place}
-                    </Link>
-                  </td>
-                  <td className="px-2 py-2">{formatDate(row.date, locale)}</td>
-                  {hasWeather ? (
+                <Fragment key={row.id}>
+                  <tr
+                    className={cn(
+                      "border-b align-top text-sm font-medium",
+                      beagleTheme.border,
+                      beagleTheme.inkStrongText,
+                    )}
+                  >
+                    <td className="px-2 py-2">{index + 1}</td>
+                    <td className="px-2 py-2">
+                      <Link
+                        href={getBeagleTrialHref(row.trialId)}
+                        className={beagleTheme.entityLink}
+                      >
+                        {row.place}
+                      </Link>
+                    </td>
+                    <td className="px-2 py-2">
+                      {formatDate(row.date, locale)}
+                    </td>
                     <td className="px-2 py-2">
                       {row.weather ?? FALLBACK_VALUE}
                     </td>
-                  ) : null}
-                  {hasAward ? (
                     <td className="px-2 py-2">{row.award ?? FALLBACK_VALUE}</td>
-                  ) : null}
-                  {hasRank ? (
                     <td className="px-2 py-2">{formatPlacement(row)}</td>
-                  ) : null}
-                  {hasPoints ? (
                     <td className="px-2 py-2">{formatNumber(row.points)}</td>
-                  ) : null}
-                  {hasHaku ? (
                     <td className="px-2 py-2">{formatNumber(row.haku)}</td>
-                  ) : null}
-                  {hasHauk ? (
                     <td className="px-2 py-2">{formatNumber(row.hauk)}</td>
-                  ) : null}
-                  {hasAjotaito ? (
                     <td className="px-2 py-2">{formatNumber(row.yva)}</td>
-                  ) : null}
-                  {hasHlo ? (
                     <td className="px-2 py-2">{formatNumber(row.hlo)}</td>
-                  ) : null}
-                  {hasAlo ? (
                     <td className="px-2 py-2">{formatNumber(row.alo)}</td>
-                  ) : null}
-                  {hasJudge ? (
                     <td className="px-2 py-2">{row.judge ?? FALLBACK_VALUE}</td>
-                  ) : null}
-                  {hasTja ? (
-                    <td className="px-2 py-2">{formatNumber(row.tja)}</td>
-                  ) : null}
-                  {hasPin ? (
-                    <td className="px-2 py-2">{formatNumber(row.pin)}</td>
-                  ) : null}
-                </tr>
+                    {hasEraHuomautus ? <td className="px-2 py-2" /> : null}
+                    {hasTja ? (
+                      <td className="px-2 py-2">{formatNumber(row.tja)}</td>
+                    ) : null}
+                    {hasPin ? (
+                      <td className="px-2 py-2">{formatNumber(row.pin)}</td>
+                    ) : null}
+                  </tr>
+                  {hasVisibleEras && row.eras && row.eras.length > 0
+                    ? row.eras.map((era) => (
+                        <DogProfileTrialsEraDesktopRow
+                          key={`${row.id}-era-${era.era}`}
+                          rowId={row.id}
+                          era={era}
+                          headers={headers}
+                          columns={visibleColumns}
+                        />
+                      ))
+                    : null}
+                </Fragment>
               ))}
             </tbody>
           </table>
@@ -322,6 +160,7 @@ export function DogProfileTrialsLaajaTable({
         <DogProfileTrialsLaajaMobileList
           rows={rows}
           headers={headers}
+          showEraDetails={showEraDetails}
           locale={locale}
         />
       }

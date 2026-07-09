@@ -58,11 +58,8 @@ export async function GET(
       });
     }
 
-    const {
-      trialId: _trialId,
-      trialRuleWindowId,
-      ...restData
-    } = result.body.data;
+    const { trialId, trialRuleWindowId, ...restData } = result.body.data;
+    void trialId;
     if (!canRenderTrialDogPdf(trialRuleWindowId)) {
       const ruleSetId = getTrialDogPdfRuleSetId(trialRuleWindowId);
       log.warn(

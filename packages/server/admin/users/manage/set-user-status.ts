@@ -10,7 +10,7 @@ import type {
   SetAdminUserStatusRequest,
   SetAdminUserStatusResponse,
 } from "@beagle/contracts";
-import type { ServiceResult } from "../../../core/result";
+import type { ServiceResult } from "@server/core/result";
 
 type SetAdminUserStatusInput = SetAdminUserStatusRequest & {
   currentUserId: string;

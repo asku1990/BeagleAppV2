@@ -1,7 +1,7 @@
 import type { HomeStatisticsResponse } from "@beagle/contracts";
 import { getHomeStatisticsSnapshot } from "@beagle/db";
-import type { ServiceResult } from "../../core/result";
-import { toErrorLog, withLogContext } from "../../core/logger";
+import type { ServiceResult } from "@server/core/result";
+import { toErrorLog, withLogContext } from "@server/core/logger";
 import { toHomeStatisticsResponse } from "./to-home-statistics-response";
 
 type ServiceLogContext = {

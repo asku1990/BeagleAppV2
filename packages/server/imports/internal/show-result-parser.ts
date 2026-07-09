@@ -1,4 +1,4 @@
-import { normalizeShowResult } from "../../shows/core";
+import { normalizeShowResult } from "@server/shows/core";
 import {
   CLASS_ALIASES,
   CLASS_CODES,

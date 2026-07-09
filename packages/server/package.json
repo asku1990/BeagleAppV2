@@ -1,13 +1,14 @@
 {
   "name": "@beagle/server",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "private": true,
   "type": "module",
   "main": "./index.ts",
   "types": "./index.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
+    "lint:cycles": "eslint . --rule '{\"import/no-cycle\":[\"warn\",{\"ignoreExternal\":true}]}'",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node ../../node_modules/vitest/vitest.mjs run",
     "test:unit": "node ../../node_modules/vitest/vitest.mjs run",

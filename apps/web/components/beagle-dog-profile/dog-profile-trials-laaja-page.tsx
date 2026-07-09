@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useI18n } from "@/hooks/i18n";
 import { toast } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
@@ -13,6 +14,7 @@ import {
 } from "@/lib/public/beagle/trials";
 import type { BeagleDogTrialsDto } from "@beagle/contracts";
 import { DogProfileTrialsLaajaTable } from "./dog-profile-trials-laaja-table";
+import { DogProfileTrialsLaajaSummary } from "./internal/trials-laaja/dog-profile-trials-laaja-summary";
 
 export function DogProfileTrialsLaajaPage({
   profile,
@@ -20,9 +22,13 @@ export function DogProfileTrialsLaajaPage({
   profile: BeagleDogTrialsDto;
 }) {
   const { t } = useI18n();
+  const [showEraDetails, setShowEraDetails] = useState(false);
   const supportedTrialEntryIds = profile.trials
     .filter((trial) => trial.hasDogTrialPdf)
     .map((trial) => trial.trialEntryId);
+  const hasEraDetails = profile.trials.some(
+    (trial) => trial.eras && trial.eras.length > 0,
+  );
   const handleCopyRows = async () => {
     await copyDogProfileTrialRowsToClipboard({
       rows: profile.trials,
@@ -102,6 +108,18 @@ export function DogProfileTrialsLaajaPage({
                 >
                   {t("dog.profile.trials.copy.button")}
                 </button>
+                {hasEraDetails ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="xs"
+                    onClick={() => setShowEraDetails((current) => !current)}
+                  >
+                    {showEraDetails
+                      ? t("dog.profile.trials.eras.hide")
+                      : t("dog.profile.trials.eras.show")}
+                  </Button>
+                ) : null}
                 {supportedTrialEntryIds.length > 0 ? (
                   <Button asChild variant="outline" size="xs">
                     <Link
@@ -129,9 +147,18 @@ export function DogProfileTrialsLaajaPage({
             {t("dog.profile.empty.trials")}
           </div>
         ) : (
-          <DogProfileTrialsLaajaTable rows={profile.trials} />
+          <DogProfileTrialsLaajaTable
+            rows={profile.trials}
+            showEraDetails={showEraDetails}
+          />
         )}
       </ListingSectionShell>
+      {profile.trials.length > 0 ? (
+        <DogProfileTrialsLaajaSummary
+          summary={profile.summary}
+          eraStats={profile.eraStats}
+        />
+      ) : null}
     </div>
   );
 }
