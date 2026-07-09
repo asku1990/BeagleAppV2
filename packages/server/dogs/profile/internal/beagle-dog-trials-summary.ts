@@ -1,28 +1,5 @@
 import type { BeagleDogTrialsSummaryDto } from "@beagle/contracts";
 import type { BeagleTrialDogSummarySourceRowDb } from "@beagle/db";
-import { getTrialBusinessDateStartUtc } from "@server/trials/core";
-
-const MI_FALLBACK_START_DATE = getRequiredBusinessDateStartUtc("2005-08-01");
-const MI_FALLBACK_END_EXCLUSIVE_DATE =
-  getRequiredBusinessDateStartUtc("2011-08-01");
-
-const PMI_RULE_WINDOW_IDS = new Set([
-  "trw_pre_20020801",
-  "trw_range_2002_2005",
-]);
-const MI_RULE_WINDOW_IDS = new Set(["trw_range_2005_2011"]);
-const PIN_SUMMARY_IGNORED_RULE_WINDOW_IDS = new Set([
-  "trw_post_20110801",
-  "trw_post_20230801",
-]);
-
-function getRequiredBusinessDateStartUtc(isoDate: string): Date {
-  const value = getTrialBusinessDateStartUtc(isoDate);
-  if (!value) {
-    throw new Error(`Failed to resolve business date: ${isoDate}`);
-  }
-  return value;
-}
 
 function roundAverage(value: number): number {
   return Math.round(value * 100) / 100;
@@ -50,33 +27,18 @@ function averageNullable(
   );
 }
 
-function classifyPinSummaryColumn(
-  row: BeagleTrialDogSummarySourceRowDb,
+function resolveMetsastysintoSummaryColumn(
+  trialRuleWindowId: string | null,
 ): "mi" | "pmi" | null {
-  const { trialRuleWindowId } = row;
-
-  if (trialRuleWindowId && PMI_RULE_WINDOW_IDS.has(trialRuleWindowId)) {
-    return "pmi";
+  switch (trialRuleWindowId) {
+    case "trw_pre_20020801":
+    case "trw_range_2002_2005":
+      return "pmi";
+    case "trw_range_2005_2011":
+      return "mi";
+    default:
+      return null;
   }
-  if (trialRuleWindowId && MI_RULE_WINDOW_IDS.has(trialRuleWindowId)) {
-    return "mi";
-  }
-  if (
-    trialRuleWindowId &&
-    PIN_SUMMARY_IGNORED_RULE_WINDOW_IDS.has(trialRuleWindowId)
-  ) {
-    return null;
-  }
-
-  // Fallback only for missing/unknown windows: old PIN is PMi, 2005-2011 PIN is
-  // Mi, and post-2011 metsästysinto is not included in these summary columns.
-  if (row.koepaiva < MI_FALLBACK_START_DATE) {
-    return "pmi";
-  }
-  if (row.koepaiva < MI_FALLBACK_END_EXCLUSIVE_DATE) {
-    return "mi";
-  }
-  return null;
 }
 
 function buildSummaryRow(
@@ -96,7 +58,10 @@ function buildSummaryRow(
     alo: averageNullable(rows, "alo"),
     mi: average(
       rows.flatMap((row) => {
-        if (row.pin == null || classifyPinSummaryColumn(row) !== "mi") {
+        if (
+          row.pin == null ||
+          resolveMetsastysintoSummaryColumn(row.trialRuleWindowId) !== "mi"
+        ) {
           return [];
         }
         return [row.pin];
@@ -104,7 +69,10 @@ function buildSummaryRow(
     ),
     pmi: average(
       rows.flatMap((row) => {
-        if (row.pin == null || classifyPinSummaryColumn(row) !== "pmi") {
+        if (
+          row.pin == null ||
+          resolveMetsastysintoSummaryColumn(row.trialRuleWindowId) !== "pmi"
+        ) {
           return [];
         }
         return [row.pin];

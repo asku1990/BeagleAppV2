@@ -16,7 +16,6 @@ type SummarySourceRow = {
   alo: DecimalLike | null;
   pin: DecimalLike | null;
   trialEvent: {
-    koepaiva: Date;
     trialRuleWindowId: string | null;
   };
 };
@@ -36,7 +35,6 @@ function mapSummarySourceRow(
     hlo: toNumber(row.hlo),
     alo: toNumber(row.alo),
     pin: toNumber(row.pin),
-    koepaiva: row.trialEvent.koepaiva,
     trialRuleWindowId: row.trialEvent.trialRuleWindowId,
   }));
 }
@@ -54,7 +52,6 @@ export async function getBeagleTrialSummarySourceForDogDb(
     pin: true,
     trialEvent: {
       select: {
-        koepaiva: true,
         trialRuleWindowId: true,
       },
     },

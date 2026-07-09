@@ -27,8 +27,6 @@ vi.mock("@server/core/date-only", () => ({
 
 vi.mock("@server/trials/core", () => ({
   formatTrialAward: formatTrialAwardMock,
-  getTrialBusinessDateStartUtc: (value: string) =>
-    new Date(`${value}T00:00:00.000Z`),
 }));
 
 import { getBeagleDogTrialsService } from "../get-beagle-dog-trials";
@@ -121,7 +119,6 @@ describe("getBeagleDogTrialsService", () => {
           hlo: 0,
           alo: 0,
           pin: 8,
-          koepaiva: new Date("2006-02-01T00:00:00.000Z"),
           trialRuleWindowId: "trw_range_2005_2011",
         },
       ],
@@ -134,7 +131,6 @@ describe("getBeagleDogTrialsService", () => {
           hlo: 0,
           alo: 0,
           pin: 7,
-          koepaiva: new Date("2006-02-01T00:00:00.000Z"),
           trialRuleWindowId: "trw_range_2005_2011",
         },
         {
@@ -145,7 +141,6 @@ describe("getBeagleDogTrialsService", () => {
           hlo: 0,
           alo: 0,
           pin: null,
-          koepaiva: new Date("2004-02-01T00:00:00.000Z"),
           trialRuleWindowId: "trw_range_2002_2005",
         },
       ],

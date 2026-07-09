@@ -106,7 +106,6 @@ export type BeagleTrialDogSummarySourceRowDb = {
   hlo: number | null;
   alo: number | null;
   pin: number | null;
-  koepaiva: Date;
   trialRuleWindowId: string | null;
 };
 

@@ -1,15 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { BeagleTrialDogSummarySourceRowDb } from "@beagle/db";
-import { getTrialBusinessDateStartUtc } from "@server/trials/core";
 import { buildBeagleDogTrialsSummary } from "../beagle-dog-trials-summary";
-
-function date(value: string): Date {
-  const parsed = getTrialBusinessDateStartUtc(value);
-  if (!parsed) {
-    throw new Error(`Invalid test date: ${value}`);
-  }
-  return parsed;
-}
 
 function row(
   input: Partial<BeagleTrialDogSummarySourceRowDb>,
@@ -22,7 +13,6 @@ function row(
     hlo: null,
     alo: null,
     pin: null,
-    koepaiva: date("2006-09-01"),
     trialRuleWindowId: "trw_range_2005_2011",
     ...input,
   };
@@ -51,7 +41,6 @@ describe("buildBeagleDogTrialsSummary", () => {
           hlo: 1,
           alo: 2,
           pin: 1,
-          koepaiva: date("2004-09-01"),
           trialRuleWindowId: "trw_range_2002_2005",
         }),
       ],
@@ -74,7 +63,6 @@ describe("buildBeagleDogTrialsSummary", () => {
           hlo: 2,
           alo: 1,
           pin: 3,
-          koepaiva: date("2001-09-01"),
           trialRuleWindowId: "trw_pre_20020801",
         }),
       ],
@@ -112,18 +100,16 @@ describe("buildBeagleDogTrialsSummary", () => {
     });
   });
 
-  it("uses rule windows for Mi/PMi and falls back to dates only for missing windows", () => {
+  it("uses rule windows for Mi/PMi and ignores missing or unknown windows", () => {
     const result = buildBeagleDogTrialsSummary({
       dogName: "Ajometsan Aada",
       dogRows: [
         row({
           pin: 1,
-          koepaiva: date("2006-09-01"),
           trialRuleWindowId: "trw_range_2002_2005",
         }),
         row({
           pin: 4,
-          koepaiva: date("2004-09-01"),
           trialRuleWindowId: "trw_range_2005_2011",
         }),
         row({
@@ -136,32 +122,10 @@ describe("buildBeagleDogTrialsSummary", () => {
         }),
         row({
           pin: 2,
-          koepaiva: date("2004-09-01"),
-          trialRuleWindowId: null,
-        }),
-        row({
-          pin: 5,
-          koepaiva: date("2006-09-01"),
-          trialRuleWindowId: null,
-        }),
-        row({
-          pin: 200,
-          koepaiva: date("2012-09-01"),
           trialRuleWindowId: null,
         }),
         row({
           pin: 3,
-          koepaiva: date("2004-09-01"),
-          trialRuleWindowId: "unknown-window",
-        }),
-        row({
-          pin: 6,
-          koepaiva: date("2006-09-01"),
-          trialRuleWindowId: "unknown-window",
-        }),
-        row({
-          pin: 300,
-          koepaiva: date("2012-09-01"),
           trialRuleWindowId: "unknown-window",
         }),
       ],
@@ -170,9 +134,9 @@ describe("buildBeagleDogTrialsSummary", () => {
 
     expect(result.allTrials[0]).toMatchObject({
       label: "dog",
-      count: 10,
-      mi: 5,
-      pmi: 2,
+      count: 6,
+      mi: 4,
+      pmi: 1,
     });
     expect(result.allTrials[1]).toMatchObject({
       label: "breed",

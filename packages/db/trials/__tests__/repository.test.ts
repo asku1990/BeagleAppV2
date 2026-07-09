@@ -692,8 +692,6 @@ describe("getBeagleTrialSummarySourceForDogDb", () => {
 
   it("loads raw summary source rows for the dog and whole breed", async () => {
     const decimal = (value: number) => ({ toNumber: () => value });
-    const dogDate = new Date("2005-08-20T00:00:00.000Z");
-    const breedDate = new Date("2001-09-01T00:00:00.000Z");
 
     trialEntryFindManyMock
       .mockResolvedValueOnce([
@@ -706,7 +704,6 @@ describe("getBeagleTrialSummarySourceForDogDb", () => {
           alo: decimal(0),
           pin: decimal(4),
           trialEvent: {
-            koepaiva: dogDate,
             trialRuleWindowId: "trw_range_2005_2011",
           },
         },
@@ -721,7 +718,6 @@ describe("getBeagleTrialSummarySourceForDogDb", () => {
           alo: decimal(1),
           pin: decimal(3),
           trialEvent: {
-            koepaiva: breedDate,
             trialRuleWindowId: "trw_pre_20020801",
           },
         },
@@ -747,7 +743,6 @@ describe("getBeagleTrialSummarySourceForDogDb", () => {
           hlo: 0,
           alo: 0,
           pin: 4,
-          koepaiva: dogDate,
           trialRuleWindowId: "trw_range_2005_2011",
         },
       ],
@@ -760,7 +755,6 @@ describe("getBeagleTrialSummarySourceForDogDb", () => {
           hlo: 2,
           alo: 1,
           pin: 3,
-          koepaiva: breedDate,
           trialRuleWindowId: "trw_pre_20020801",
         },
       ],
