@@ -49,6 +49,7 @@ describe("useBeagleDogTrialsQuery", () => {
             prizePlacements: [],
             interrupted: [],
           },
+          eraStats: null,
         },
       }),
     });
@@ -71,6 +72,7 @@ describe("useBeagleDogTrialsQuery", () => {
         prizePlacements: [],
         interrupted: [],
       },
+      eraStats: null,
     });
 
     expect(fetchMock).toHaveBeenCalledWith(

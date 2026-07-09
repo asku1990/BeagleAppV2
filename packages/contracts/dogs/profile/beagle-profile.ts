@@ -83,6 +83,15 @@ export type BeagleDogTrialsSummaryDto = {
   interrupted: BeagleDogTrialsSummaryRowDto[];
 };
 
+export type BeagleDogTrialsEraStatsDto = {
+  trialCount: number;
+  trialCountWithEras: number;
+  eraCount: number;
+  drivenEraCount: number;
+  drivenEraPercentage: number;
+  averageDriveMinutes: number;
+};
+
 export type BeagleDogProfileShowRowDto = BeagleShowStructuredResultDto & {
   id: string;
   showId: string;
@@ -171,4 +180,5 @@ export type BeagleDogTrialsDto = {
   registrationNo: string;
   trials: BeagleDogProfileTrialRowDto[];
   summary: BeagleDogTrialsSummaryDto;
+  eraStats: BeagleDogTrialsEraStatsDto | null;
 };

@@ -154,7 +154,10 @@ export function DogProfileTrialsLaajaPage({
         )}
       </ListingSectionShell>
       {profile.trials.length > 0 ? (
-        <DogProfileTrialsLaajaSummary summary={profile.summary} />
+        <DogProfileTrialsLaajaSummary
+          summary={profile.summary}
+          eraStats={profile.eraStats}
+        />
       ) : null}
     </div>
   );

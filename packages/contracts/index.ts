@@ -116,6 +116,7 @@ export type {
   BeagleDogProfileTitleRowDto,
   BeagleDogProfileTrialEraDto,
   BeagleDogProfileTrialRowDto,
+  BeagleDogTrialsEraStatsDto,
   BeagleDogTrialsSummaryDto,
   BeagleDogTrialsSummaryRowDto,
   BeagleDogTrialsDto,

@@ -100,7 +100,12 @@ export const fiBeagleDogProfileMessages = {
   "dog.profile.trials.summary.group.interrupted": "Keskeytyneet",
   "dog.profile.trials.summary.col.mi": "Mi",
   "dog.profile.trials.summary.col.pmi": "Pmi",
+  "dog.profile.trials.summary.eraStats.trialVisits": "Koekäyntejä(LT)",
+  "dog.profile.trials.summary.eraStats.eras": "Koe-eriä",
+  "dog.profile.trials.summary.eraStats.drivenEras": "Ajoonjohtaneita eriä",
+  "dog.profile.trials.summary.eraStats.averageDriveMinutes": "Ajominuuttien ka",
   "dog.profile.trials.summary.unit.count": "kpl",
+  "dog.profile.trials.summary.unit.minutes": "min.",
   "dog.profile.trials.copy.success": "Koemerkinnät kopioitu leikepöydälle.",
   "dog.profile.trials.copy.error": "Koemerkintöjen kopiointi epäonnistui.",
   "dog.profile.trials.copy.unsupported":
@@ -219,7 +224,14 @@ export const svBeagleDogProfileMessages = {
   "dog.profile.trials.summary.group.interrupted": "Avbrutit",
   "dog.profile.trials.summary.col.mi": "Jl",
   "dog.profile.trials.summary.col.pmi": "Bjl",
+  "dog.profile.trials.summary.eraStats.trialVisits": "Jaktprovsvisit(TI)",
+  "dog.profile.trials.summary.eraStats.eras": "Provomgångar",
+  "dog.profile.trials.summary.eraStats.drivenEras":
+    "Provomgångar som lett till drev",
+  "dog.profile.trials.summary.eraStats.averageDriveMinutes":
+    "Drevminuternas med.",
   "dog.profile.trials.summary.unit.count": "st.",
+  "dog.profile.trials.summary.unit.minutes": "min.",
   "dog.profile.trials.copy.success":
     "Jaktprovsposterna kopierades till urklipp.",
   "dog.profile.trials.copy.error": "Kopiering av jaktprovsposter misslyckades.",

@@ -1,7 +1,10 @@
 "use client";
 
 import { Fragment } from "react";
-import type { BeagleDogTrialsSummaryDto } from "@beagle/contracts";
+import type {
+  BeagleDogTrialsEraStatsDto,
+  BeagleDogTrialsSummaryDto,
+} from "@beagle/contracts";
 import {
   ListingResponsiveResults,
   ListingSectionShell,
@@ -74,6 +77,42 @@ type Translate = ReturnType<typeof useI18n>["t"];
 
 function formatSummaryNumber(value: number | null): string {
   return value == null ? "-" : value.toFixed(2);
+}
+
+function formatEraStatsNumber(value: number, decimals: number): string {
+  return value.toFixed(decimals);
+}
+
+function SummaryEraStats({
+  eraStats,
+  t,
+}: {
+  eraStats: BeagleDogTrialsEraStatsDto;
+  t: Translate;
+}) {
+  return (
+    <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      <span>
+        {t("dog.profile.trials.summary.eraStats.trialVisits")}:{" "}
+        {eraStats.trialCount}({eraStats.trialCountWithEras}){" "}
+        {t("dog.profile.trials.summary.unit.count")}
+      </span>
+      <span>
+        {t("dog.profile.trials.summary.eraStats.eras")}: {eraStats.eraCount}{" "}
+        {t("dog.profile.trials.summary.unit.count")}
+      </span>
+      <span>
+        {t("dog.profile.trials.summary.eraStats.drivenEras")}:{" "}
+        {eraStats.drivenEraCount} {t("dog.profile.trials.summary.unit.count")} (
+        {formatEraStatsNumber(eraStats.drivenEraPercentage, 1)}%)
+      </span>
+      <span>
+        {t("dog.profile.trials.summary.eraStats.averageDriveMinutes")}:{" "}
+        {formatEraStatsNumber(eraStats.averageDriveMinutes, 2)}{" "}
+        {t("dog.profile.trials.summary.unit.minutes")}
+      </span>
+    </span>
+  );
 }
 
 function SummaryDesktopTable({
@@ -204,8 +243,10 @@ function SummaryMobileList({
 
 export function DogProfileTrialsLaajaSummary({
   summary,
+  eraStats,
 }: {
   summary: BeagleDogTrialsSummaryDto;
+  eraStats: BeagleDogTrialsEraStatsDto | null;
 }) {
   const { t } = useI18n();
   const visibleGroups = SUMMARY_GROUPS.filter(
@@ -217,7 +258,10 @@ export function DogProfileTrialsLaajaSummary({
   }
 
   return (
-    <ListingSectionShell title={t("dog.profile.trials.summary.title")}>
+    <ListingSectionShell
+      title={t("dog.profile.trials.summary.title")}
+      count={eraStats ? <SummaryEraStats eraStats={eraStats} t={t} /> : null}
+    >
       <ListingResponsiveResults
         desktop={
           <SummaryDesktopTable

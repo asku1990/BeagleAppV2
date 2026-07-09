@@ -178,6 +178,14 @@ describe("DogProfileTrialsLaajaPage", () => {
               },
             ],
           },
+          eraStats: {
+            trialCount: 2,
+            trialCountWithEras: 1,
+            eraCount: 1,
+            drivenEraCount: 1,
+            drivenEraPercentage: 100,
+            averageDriveMinutes: 120,
+          },
         },
       }),
     );
@@ -211,6 +219,14 @@ describe("DogProfileTrialsLaajaPage", () => {
     expect(html).toContain("dog.profile.trials.summary.group.prizePlacements");
     expect(html).toContain("dog.profile.trials.summary.group.interrupted");
     expect(html).toContain("dog.profile.trials.summary.col.target");
+    expect(html).toContain("dog.profile.trials.summary.eraStats.trialVisits");
+    expect(html).toContain("2(1)");
+    expect(html).toContain("dog.profile.trials.summary.eraStats.eras");
+    expect(html).toContain("dog.profile.trials.summary.eraStats.drivenEras");
+    expect(html).toContain(
+      "dog.profile.trials.summary.eraStats.averageDriveMinutes",
+    );
+    expect(html).toContain("120.00");
     expect(html).toContain("Ajometsan Aada");
     expect(html).toContain("KOKO ROTU");
     expect(html).toContain("42.75");

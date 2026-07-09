@@ -14,13 +14,30 @@ Developer notes for the public dog-specific `Kokeet laaja` page.
 2. `packages/server` resolves the dog identity and dog-scoped trial rows.
 3. `packages/db` loads summary source rows for the selected dog and grouped `KOKO ROTU` aggregates.
 4. `packages/server` builds the `BeagleDogTrialsSummaryDto`.
-5. `apps/web` renders the trial rows, optional era rows, PDF stack link, and `YHTEENVETO`.
+5. `apps/web` renders the trial rows, optional era rows, PDF stack link, era stats, and `YHTEENVETO`.
 
 The dog profile only links to `Kokeet laaja` when trial rows exist. The direct page/API path still returns a valid empty summary for dogs with no trials.
 
+## LT/Era Stats
+
+The stats line mirrors the v1 line before `YHTEENVETO`:
+
+`Koekäyntejä(LT): 17(15) kpl, Koe-eriä: 29 kpl, Ajoonjohtaneita eriä: 23 kpl (79.3%), Ajominuuttien ka: 69.09 min.`
+
+Rules:
+
+- `Koekäyntejä`: selected dog's total trial row count.
+- `(LT)`: selected dog's trial rows with at least one era row.
+- `Koe-eriä`: total era row count across the selected dog's trials.
+- `Ajoonjohtaneita eriä`: era rows where `ajomin` is present.
+- `Ajoonjohtaneita eriä (%)`: driven era count divided by total era count, rounded to one decimal.
+- `Ajominuuttien ka`: average `ajomin` over driven eras, rounded to two decimals.
+
+The server calculates these stats from already loaded dog trial era rows. The stats line is omitted when the dog has no era rows.
+
 ## YHTEENVETO groups
 
-The summary is rendered below the trial rows. Each group uses the same filter for the selected dog row and the `KOKO ROTU` row.
+The summary is rendered below the trial rows. The `YHTEENVETO` card header can show the v1-style LT/era stats line before the grouped averages. Each group uses the same filter for the selected dog row and the `KOKO ROTU` row.
 
 | DTO field         | V1 heading       | Filter                  |
 | ----------------- | ---------------- | ----------------------- |

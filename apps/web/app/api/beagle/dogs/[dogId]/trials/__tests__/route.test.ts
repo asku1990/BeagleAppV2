@@ -33,6 +33,7 @@ describe("public dog trials api route", () => {
             prizePlacements: [],
             interrupted: [],
           },
+          eraStats: null,
         },
       },
     });
