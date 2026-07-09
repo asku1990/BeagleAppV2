@@ -9,6 +9,7 @@
     "vercel:ignored-build": "bash ../../scripts/vercel-ignored-build.sh",
     "start": "next start",
     "lint": "eslint .",
+    "lint:cycles": "eslint . --rule '{\"import/no-cycle\":[\"warn\",{\"ignoreExternal\":true}]}'",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "pnpm test:unit && pnpm test:e2e",
     "test:unit": "node ../../node_modules/vitest/vitest.mjs run",
