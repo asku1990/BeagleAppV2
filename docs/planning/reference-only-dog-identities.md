@@ -5,38 +5,37 @@
 Preserve known ancestor identities when only a registration number is available,
 without presenting those records as normal dog profiles.
 
-This applies to legacy import, admin-created dogs, future imports, and external
-registration sources. The status names must describe data completeness, not the
-source that created the row.
+This applies to admin dog creation/editing and the one-time legacy phase1 import.
+The status names must describe data completeness, not the source that created the
+row.
 
 ## Decisions
 
 - Add a source-agnostic dog identity state:
-  - `NORMAL`: complete enough to behave as a normal dog record.
-  - `REFERENCE_ONLY`: hidden dog identity created from a known registration
-    reference, with no trusted profile data yet.
-- `REFERENCE_ONLY` dogs may have only:
+  - `NORMAL`: normal dog record.
+  - `REFERENCE_ONLY`: hidden identity known only from a valid registration
+    reference.
+- `REFERENCE_ONLY` dogs may contain only minimal domain data:
   - registration number
   - known or inferred sex
-  - source metadata on the registration row
   - optional internal note/audit context
-- `DogRegistration.source` records where the registration came from. Dog status
-  records how complete the dog identity is.
-- `DogRegistration.registrationNo` remains the globally unique identity key. No
-  flow may create a second registration row with the same registration number.
-- Valid missing sire/dam registrations may create `REFERENCE_ONLY` dogs and link
-  the child to them.
-- A later trusted import with real dog data for the same registration must
-  promote/update the existing `REFERENCE_ONLY` dog that owns that registration.
-- Interactive admin create flows must confirm before promoting an existing
-  `REFERENCE_ONLY` dog into a normal dog.
-- `REFERENCE_ONLY` dogs count as known pedigree slots and participate in
-  inbreeding as identity nodes.
+- `DogRegistration.registrationNo` remains globally unique, and all create,
+  link, and promotion flows must reuse the dog that already owns that
+  registration.
+- Valid sire or dam registrations not already owned by an existing dog may create
+  `REFERENCE_ONLY` dogs and link the child to them.
+- `REFERENCE_ONLY -> NORMAL` is allowed only through explicit admin
+  confirmation.
+- `NORMAL -> REFERENCE_ONLY` is not an automatic or supported normal workflow.
+- `REFERENCE_ONLY` dogs represent known ancestor identities and participate in
+  pedigree and inbreeding calculations.
 - `REFERENCE_ONLY` dogs are hidden from public views and default admin lists,
   but admin tooling should provide an explicit filter for finding them.
 
 ## Guardrails
 
+- A valid registration is one that passes normal registration validation and is
+  not a placeholder or ambiguous value.
 - Do not create reference-only rows for invalid registration numbers.
 - Do not create reference-only rows for placeholder registrations such as legacy
   unknown placeholders.
@@ -51,12 +50,6 @@ source that created the row.
 
 ### Admin dog creation and update
 
-- When an admin enters a missing valid sire or dam registration, create a hidden
-  `REFERENCE_ONLY` parent and link the dog to it.
-- Infer sex from the parent role when creating the reference:
-  - sire -> `MALE`
-  - dam -> `FEMALE`
-- If a matching `REFERENCE_ONLY` row already exists, reuse it.
 - If an admin creates a normal dog and the primary registration already belongs
   to a `REFERENCE_ONLY` dog, prompt before completing/promoting that existing
   dog row. If confirmed, update the existing dog that owns the registration.
@@ -67,27 +60,29 @@ source that created the row.
   create a new `NORMAL` dog.
 - If an admin enters a parent registration already owned by any existing dog,
   link to the dog that owns that registration.
-- If an admin enters a missing valid parent registration, create one
-  `REFERENCE_ONLY` parent for that registration and link to it.
+- Otherwise, if the parent registration is valid, create one hidden
+  `REFERENCE_ONLY` parent and link to it.
+- Infer sex from the parent role when creating the reference:
+  - sire -> `MALE`
+  - dam -> `FEMALE`
 - Updating a dog may keep its own existing registration.
 - Updating a dog to a registration owned by another `NORMAL` dog must be blocked
   as an existing dog.
 - Updating a dog to a registration owned by another `REFERENCE_ONLY` dog must
-  not silently steal or merge the reference row. That requires a separate
-  explicit merge/promote flow if needed later.
+  be blocked. Completing or merging that reference identity requires a separate
+  explicit merge or promotion flow.
 - If the entered registration is invalid, placeholder-like, or ambiguous, reject
   or flag it using normal validation instead of creating a row.
 
 ### Import relation resolution
 
-- During relation linking, resolve parent registrations against all dog
-  registrations.
-- For valid missing parent registrations, create one `REFERENCE_ONLY` dog per
-  unique registration and link all children to it.
-- If imported real dog data matches an existing `REFERENCE_ONLY` registration,
-  update/promote that existing dog row.
-- If imported real dog data matches an existing `NORMAL` registration, update
-  that existing dog row according to normal import rules.
+- Legacy phase1 runs as a one-time migration against an empty database.
+- During real dog import, phase1 creates `NORMAL` dog rows according to existing
+  phase1 rules.
+- During legacy phase1 relation linking, resolve parent registrations against all
+  dog registrations.
+- For valid parent registrations not already owned by an existing dog, create
+  one `REFERENCE_ONLY` dog per unique registration and link all children to it.
 - Existing import diagnostics for missing parent refs should shrink to only
   genuinely unresolved cases.
 - Placeholder, invalid, and ambiguous references remain diagnostics and are not
@@ -95,16 +90,11 @@ source that created the row.
 
 ### Promotion to normal dog
 
-- When real dog data arrives for a registration already attached to a
-  `REFERENCE_ONLY` dog, update that same dog row.
-- Promotion should change status to `NORMAL` only when trusted profile data is
-  present.
-- Promotion must preserve existing child links and any existing registration
-  aliases.
-- Promotion must not insert a duplicate registration. It updates the dog that
-  already owns the registration number.
-- Admin promotion requires an explicit confirmation prompt. Import promotion is
-  non-interactive and may happen automatically for trusted source data.
+- Admin promotion requires explicit confirmation.
+- Promotion preserves the existing dog ID, parent/child links, registrations,
+  and aliases.
+- Promotion updates the existing dog rather than creating a duplicate dog or
+  registration.
 
 ## Visibility And Calculations
 
@@ -119,14 +109,15 @@ source that created the row.
 
 ## Implementation Areas
 
-- Prisma/schema: add a source-agnostic dog status or data-quality field.
-- Admin dog create/update: allow missing parent registrations to create or reuse
-  reference-only parents.
+- Prisma/schema: add a source-agnostic dog status with `NORMAL` and
+  `REFERENCE_ONLY`.
+- Admin dog create/update: resolve parent registrations to existing dogs or
+  create `REFERENCE_ONLY` parents when the registration is valid and not found.
 - Legacy phase1 import: create/link valid missing parent references during
   relation resolution.
 - Public/admin queries: exclude reference-only rows by default and add explicit
   admin filtering.
-- Promotion path: update existing reference-only rows when real dog data arrives.
+- Promotion path: support explicit admin promotion.
 - Documentation: after implementation, promote durable behavior into
   `docs/features/admin-dog-management.md` and
   `docs/legacy-import/phase1.md`.
@@ -141,12 +132,14 @@ source that created the row.
   confirmation promotes that existing row and preserves pedigree links.
 - Admin creates a dog whose primary registration exists as `NORMAL`; save is
   blocked before any duplicate insert.
+- Admin enters a parent registration owned by an existing `NORMAL` dog; the
+  child links to that existing dog and no new row is created.
 - Admin update cannot silently change a dog to a registration owned by another
   `REFERENCE_ONLY` dog.
-- Import creates one reference-only parent per valid missing parent registration
+- Import creates one `REFERENCE_ONLY` parent per valid missing parent registration
   and links all referenced children.
-- A later trusted import with real dog data promotes an existing reference-only
-  row without creating another registration row.
+- Admin enters a parent registration owned by an existing `REFERENCE_ONLY` dog;
+  the child links to that existing dog and no new row is created.
 - Multiple children referencing the same missing parent registration all link to
   the same `REFERENCE_ONLY` dog.
 - Invalid, placeholder, and ambiguous parent references do not create dog rows.
