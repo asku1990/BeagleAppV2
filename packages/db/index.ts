@@ -1,5 +1,6 @@
 export {
   DogSex,
+  DogStatus,
   DogColorStatus,
   ImportKind,
   ImportStatus,

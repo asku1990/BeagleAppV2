@@ -17,6 +17,11 @@ enum DogSex {
   UNKNOWN
 }
 
+enum DogStatus {
+  NORMAL
+  REFERENCE_ONLY
+}
+
 enum DogColorStatus {
   SELECTABLE
   HIDDEN
@@ -206,6 +211,7 @@ model Dog {
   id              String            @id @default(cuid())
   name            String
   sex             DogSex            @default(UNKNOWN)
+  status          DogStatus         @default(NORMAL)
   birthDate       DateTime?
   breederNameText String?
   sireId          String?
@@ -232,6 +238,7 @@ model Dog {
 
   @@index([name])
   @@index([sex])
+  @@index([status])
   @@index([birthDate])
   @@index([sireId])
   @@index([damId])

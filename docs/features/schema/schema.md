@@ -10,6 +10,7 @@ For show-domain deep details, see:
 
 - `Role`: `USER`, `ADMIN`
 - `DogSex`: `MALE`, `FEMALE`, `UNKNOWN`
+- `DogStatus`: `NORMAL`, `REFERENCE_ONLY`
 - `ImportKind`: `LEGACY_PHASE1`, `LEGACY_PHASE1_5`, `LEGACY_PHASE3`, `LEGACY_TRIAL_MIRROR`, `LEGACY_PHASE5`
 - `ImportStatus`: `PENDING`, `RUNNING`, `SUCCEEDED`, `FAILED`
 - `ImportIssueSeverity`: `INFO`, `WARNING`, `ERROR`
@@ -65,7 +66,10 @@ erDiagram
 
 ### Core dog data
 
-- `Dog`: central dog entity (pedigree links, breeder link, color code, timestamps).
+- `Dog`: central dog entity (pedigree links, breeder link, color code, identity
+  status, and timestamps). `REFERENCE_ONLY` identifies a registration-backed
+  pedigree node whose real dog details are not known; its required `name` is
+  storage-only.
 - `DogColor`: multilingual dog color lookup referenced by `Dog.colorCode`; status distinguishes selectable, hidden, and unnamed legacy colors.
 - `DogRegistration`: unique registration numbers per dog.
 - `Breeder`: breeder registry and metadata.
@@ -162,7 +166,7 @@ Clarification:
 
 ## Index strategy (high level)
 
-- Dog/search indexes: name, sex, birth date, pedigree links.
+- Dog/search indexes: name, sex, status, birth date, pedigree links.
 - Ownership indexes: by dog, owner, ownershipDate.
 - Results indexes: by event date and dog-date combinations.
 - Import indexes: by run kind/status and issue severity/code.
