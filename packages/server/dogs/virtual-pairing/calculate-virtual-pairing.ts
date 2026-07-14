@@ -178,22 +178,18 @@ export async function calculateVirtualPairing(
 
   try {
     const sireRow = allowedStatuses
-      ? await findVirtualPairingDogByRegistrationNoDb(
-          sireRegistrationNo,
-          undefined,
+      ? await findVirtualPairingDogByRegistrationNoDb(sireRegistrationNo, {
           allowedStatuses,
-        )
+        })
       : await findVirtualPairingDogByRegistrationNoDb(sireRegistrationNo);
     if (!sireRow) {
       return invalidSireRegistrationResponse();
     }
 
     const damRow = allowedStatuses
-      ? await findVirtualPairingDogByRegistrationNoDb(
-          damRegistrationNo,
-          undefined,
+      ? await findVirtualPairingDogByRegistrationNoDb(damRegistrationNo, {
           allowedStatuses,
-        )
+        })
       : await findVirtualPairingDogByRegistrationNoDb(damRegistrationNo);
     if (!damRow) {
       return invalidDamRegistrationResponse();

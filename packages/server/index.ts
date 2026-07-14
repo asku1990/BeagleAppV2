@@ -30,7 +30,11 @@ export {
 export { betterAuth } from "./auth";
 export { createDogsService, dogsService } from "./dogs";
 export { parseDogId } from "./dogs";
-export { searchVirtualPairingDogs } from "./dogs";
+export {
+  searchPublicVirtualPairingDogs,
+  searchVirtualPairingDogs,
+  type SearchVirtualPairingDogsOptions,
+} from "./dogs";
 export { calculateVirtualPairing } from "./dogs";
 export { calculatePublicVirtualPairing } from "./dogs";
 export { createShowsService, showsService } from "./shows";

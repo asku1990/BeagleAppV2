@@ -3,6 +3,11 @@ import { prisma } from "@db/core/prisma";
 
 type VirtualPairingDbClient = Prisma.TransactionClient | typeof prisma;
 
+type FindVirtualPairingDogByRegistrationOptions = {
+  dbClient?: VirtualPairingDbClient;
+  allowedStatuses?: readonly DogStatus[];
+};
+
 function resolveDbClient(
   dbClient?: VirtualPairingDbClient,
 ): VirtualPairingDbClient {
@@ -24,12 +29,12 @@ export type VirtualPairingDogByRegistrationLookupDb = {
 
 export async function findVirtualPairingDogByRegistrationNoDb(
   registrationNo: string,
-  dbClient?: VirtualPairingDbClient,
-  allowedStatuses: readonly DogStatus[] = [
-    DogStatus.NORMAL,
-    DogStatus.REFERENCE_ONLY,
-  ],
+  options: FindVirtualPairingDogByRegistrationOptions = {},
 ): Promise<VirtualPairingDogByRegistrationLookupDb | null> {
+  const {
+    dbClient,
+    allowedStatuses = [DogStatus.NORMAL, DogStatus.REFERENCE_ONLY],
+  } = options;
   const normalizedRegistrationNo = normalizeRegistrationNo(registrationNo);
   if (!normalizedRegistrationNo) {
     return null;

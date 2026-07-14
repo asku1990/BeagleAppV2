@@ -30,6 +30,7 @@ vi.mock("../../core/logger", () => ({
 }));
 
 const { searchVirtualPairingDogs } = await import("../search");
+const { searchPublicVirtualPairingDogs } = await import("../search-public");
 
 describe("searchVirtualPairingDogs", () => {
   beforeEach(() => {
@@ -120,8 +121,10 @@ describe("searchVirtualPairingDogs", () => {
           query: "FI12345/21",
         },
         {
-          requestId: "req_1",
-          actorUserId: "user_1",
+          context: {
+            requestId: "req_1",
+            actorUserId: "user_1",
+          },
         },
       ),
     ).resolves.toMatchObject({
@@ -145,6 +148,32 @@ describe("searchVirtualPairingDogs", () => {
       page: 1,
       pageSize: 10,
     });
+  });
+
+  it("limits public searches to normal dogs", async () => {
+    searchVirtualPairingDogsDbMock.mockResolvedValue({
+      field: "name",
+      query: "Kide",
+      total: 0,
+      totalPages: 0,
+      page: 1,
+      items: [],
+    });
+
+    await searchPublicVirtualPairingDogs({
+      field: "name",
+      query: "Kide",
+    });
+
+    expect(searchVirtualPairingDogsDbMock).toHaveBeenCalledWith(
+      {
+        field: "name",
+        query: "Kide",
+        page: 1,
+        pageSize: 10,
+      },
+      ["NORMAL"],
+    );
   });
 
   it("returns an internal error when the db layer fails", async () => {

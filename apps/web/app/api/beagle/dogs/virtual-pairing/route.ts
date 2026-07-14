@@ -1,5 +1,5 @@
 import { type NextRequest } from "next/server";
-import { searchVirtualPairingDogs } from "@beagle/server";
+import { searchPublicVirtualPairingDogs } from "@beagle/server";
 import { jsonResponse, optionsResponse } from "@/lib/server/cors";
 
 function parseOptionalNumber(value: string | null): number | undefined {
@@ -19,21 +19,15 @@ export async function GET(request: NextRequest) {
     const field = request.nextUrl.searchParams.get("field");
     const query = request.nextUrl.searchParams.get("query") ?? "";
 
-    const result = await searchVirtualPairingDogs(
-      {
-        field:
-          field === "ek" || field === "reg" || field === "name"
-            ? field
-            : "name",
-        query,
-        page: parseOptionalNumber(request.nextUrl.searchParams.get("page")),
-        pageSize: parseOptionalNumber(
-          request.nextUrl.searchParams.get("pageSize"),
-        ),
-      },
-      undefined,
-      ["NORMAL"],
-    );
+    const result = await searchPublicVirtualPairingDogs({
+      field:
+        field === "ek" || field === "reg" || field === "name" ? field : "name",
+      query,
+      page: parseOptionalNumber(request.nextUrl.searchParams.get("page")),
+      pageSize: parseOptionalNumber(
+        request.nextUrl.searchParams.get("pageSize"),
+      ),
+    });
 
     return jsonResponse(result.body, {
       status: result.status,

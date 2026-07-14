@@ -1,5 +1,6 @@
-import { searchVirtualPairingDogsDb, type DogStatus } from "@beagle/db";
+import { searchVirtualPairingDogsDb } from "@beagle/db";
 import type {
+  DogStatus,
   VirtualPairingSearchRequest,
   VirtualPairingSearchResponse,
 } from "@beagle/contracts";
@@ -17,11 +18,16 @@ function parsePageSize(value: number | undefined): number {
   return Math.min(50, Math.max(1, Math.floor(value ?? 10)));
 }
 
+export type SearchVirtualPairingDogsOptions = {
+  context?: DogsServiceLogContext;
+  allowedStatuses?: readonly DogStatus[];
+};
+
 export async function searchVirtualPairingDogs(
   input: VirtualPairingSearchRequest,
-  context?: DogsServiceLogContext,
-  allowedStatuses?: readonly DogStatus[],
+  options: SearchVirtualPairingDogsOptions = {},
 ): Promise<ServiceResult<VirtualPairingSearchResponse>> {
+  const { context, allowedStatuses } = options;
   const startedAt = Date.now();
   const log = withLogContext({
     layer: "service",

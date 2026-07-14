@@ -103,10 +103,9 @@ describe("findVirtualPairingDogByRegistrationNoDb", () => {
   it("allows admin callers to include both statuses", async () => {
     dogRegistrationFindManyMock.mockResolvedValue([]);
 
-    await findVirtualPairingDogByRegistrationNoDb("FI54321/20", undefined, [
-      DogStatus.NORMAL,
-      DogStatus.REFERENCE_ONLY,
-    ]);
+    await findVirtualPairingDogByRegistrationNoDb("FI54321/20", {
+      allowedStatuses: [DogStatus.NORMAL, DogStatus.REFERENCE_ONLY],
+    });
 
     expect(dogRegistrationFindManyMock).toHaveBeenCalledWith(
       expect.objectContaining({

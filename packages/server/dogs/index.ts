@@ -1,5 +1,9 @@
 export { createDogsService, dogsService } from "./search";
-export { searchVirtualPairingDogs } from "./virtual-pairing";
+export {
+  searchPublicVirtualPairingDogs,
+  searchVirtualPairingDogs,
+  type SearchVirtualPairingDogsOptions,
+} from "./virtual-pairing";
 export { calculateVirtualPairing } from "./virtual-pairing/calculate-virtual-pairing";
 export { calculatePublicVirtualPairing } from "./virtual-pairing/calculate-public-virtual-pairing";
 export {

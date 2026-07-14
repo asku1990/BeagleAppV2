@@ -67,9 +67,10 @@ erDiagram
 ### Core dog data
 
 - `Dog`: central dog entity (pedigree links, breeder link, color code, identity
-  status, and timestamps). `REFERENCE_ONLY` identifies a registration-backed
-  pedigree node whose real dog details are not known; its required `name` is
-  storage-only.
+  status, and timestamps). `REFERENCE_ONLY` identifies a registration-backed dog
+  identity retained for references but not exposed as a standalone public dog.
+  It may store every known dog detail. When its name is unknown, the normalized
+  primary registration is stored as the required internal name fallback.
 - `DogColor`: multilingual dog color lookup referenced by `Dog.colorCode`; status distinguishes selectable, hidden, and unnamed legacy colors.
 - `DogRegistration`: unique registration numbers per dog.
 - `Breeder`: breeder registry and metadata.
