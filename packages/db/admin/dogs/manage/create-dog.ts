@@ -6,6 +6,7 @@ import {
 import { uniqueNonEmptyNames } from "./normalization";
 
 export type CreateAdminDogDbInput = {
+  status: "NORMAL" | "REFERENCE_ONLY";
   name: string;
   sex: "MALE" | "FEMALE" | "UNKNOWN";
   birthDate: Date | null;
@@ -116,6 +117,7 @@ async function createAdminDogDb(
 
   const createdDog = await tx.dog.create({
     data: {
+      status: input.status,
       name: input.name,
       sex: input.sex,
       birthDate: input.birthDate,

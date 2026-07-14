@@ -53,6 +53,7 @@ describe("createAdminDogWriteDb", () => {
     await expect(
       createAdminDogWriteDb(
         {
+          status: "NORMAL",
           name: "Kide",
           sex: "FEMALE",
           birthDate: null,
@@ -93,6 +94,11 @@ describe("createAdminDogWriteDb", () => {
         },
       ],
     });
+    expect(dogCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: "NORMAL" }),
+      }),
+    );
   });
 
   it("skips title persistence when titles are omitted", async () => {
@@ -105,6 +111,7 @@ describe("createAdminDogWriteDb", () => {
 
     await createAdminDogWriteDb(
       {
+        status: "REFERENCE_ONLY",
         name: "Kide",
         sex: "FEMALE",
         birthDate: null,
@@ -121,5 +128,10 @@ describe("createAdminDogWriteDb", () => {
     );
 
     expect(dogTitleCreateManyMock).not.toHaveBeenCalled();
+    expect(dogCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: "REFERENCE_ONLY" }),
+      }),
+    );
   });
 });

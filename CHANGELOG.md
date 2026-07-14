@@ -14,6 +14,9 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+- Ylläpitäjä voi luoda sukutauluviitteiksi tarkoitettuja viitekoiria. Viitekoiralle
+  riittää rekisterinumero, mutta kaikki tunnetut tiedot voidaan tallentaa.
+
 ### Changed
 
 - Viitekoirat eivät näy julkisissa koirahauissa, uusimmissa koirissa,

@@ -3,6 +3,14 @@ export const fiAdminDogsFormMessages = {
   "admin.dogs.form.editModalAria": "Muokkaa koiraa",
   "admin.dogs.form.createTitle": "Luo koira",
   "admin.dogs.form.editTitle": "Muokkaa koiraa",
+  "admin.dogs.form.statusLabel": "Koiran tyyppi",
+  "admin.dogs.form.statusAria": "Valitse koiran tyyppi",
+  "admin.dogs.form.statusNormal": "Normaali koira",
+  "admin.dogs.form.statusReferenceOnly": "Viitekoira",
+  "admin.dogs.form.statusNormalHelp":
+    "Normaali koira näkyy itsenäisesti julkisissa koiranäkymissä.",
+  "admin.dogs.form.statusReferenceOnlyHelp":
+    "Viitekoira säilyttää sukutauluissa ja laskennoissa tarvittavan koiran identiteetin. Se voi sisältää kaikki tunnetut tiedot, mutta ei näy omana koiranaan julkisissa hauissa tai profiileissa.",
   "admin.dogs.form.registrationNoPlaceholder": "Rekisterinumero",
   "admin.dogs.form.secondaryRegistrationLabel": "Toissijaiset rekisterinumerot",
   "admin.dogs.form.secondaryRegistrationAdd": "+ Lisää toissijainen",
@@ -64,6 +72,14 @@ export const svAdminDogsFormMessages = {
   "admin.dogs.form.editModalAria": "Redigera hund",
   "admin.dogs.form.createTitle": "Skapa hund",
   "admin.dogs.form.editTitle": "Redigera hund",
+  "admin.dogs.form.statusLabel": "Hundtyp",
+  "admin.dogs.form.statusAria": "Valj hundtyp",
+  "admin.dogs.form.statusNormal": "Normal hund",
+  "admin.dogs.form.statusReferenceOnly": "Referenshund",
+  "admin.dogs.form.statusNormalHelp":
+    "En normal hund visas självständigt i de offentliga hundvyerna.",
+  "admin.dogs.form.statusReferenceOnlyHelp":
+    "En referenshund bevarar den hundidentitet som behövs i stamtavlor och beräkningar. Den kan innehålla alla kända uppgifter men visas inte som en egen hund i offentliga sökningar eller profiler.",
   "admin.dogs.form.registrationNoPlaceholder": "Registreringsnummer",
   "admin.dogs.form.secondaryRegistrationLabel": "Sekundara registreringsnummer",
   "admin.dogs.form.secondaryRegistrationAdd": "+ Lagg till sekundar",

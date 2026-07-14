@@ -1,5 +1,6 @@
 import type {
   CreateAdminDogRequest,
+  DogStatus,
   UpdateAdminDogRequest,
 } from "@beagle/contracts";
 import { AdminMutationError } from "@/queries/admin/mutation-error";
@@ -76,8 +77,10 @@ function normalizeTitlesForMutation(
 
 export function toCreateAdminDogRequest(
   values: AdminDogFormValues,
+  status: DogStatus = "NORMAL",
 ): CreateAdminDogRequest {
   return {
+    status,
     name: values.name,
     sex: values.sex,
     birthDate: normalizeOptionalText(values.birthDate) ?? undefined,
@@ -155,6 +158,8 @@ export function getAdminDogMutationErrorMessageKey(
       return "admin.dogs.mutation.errorNameTooLong";
     case "INVALID_SEX":
       return "admin.dogs.mutation.errorInvalidSex";
+    case "INVALID_DOG_STATUS":
+      return "admin.dogs.mutation.errorInvalidDogStatus";
     case "INVALID_BIRTH_DATE":
       return "admin.dogs.mutation.errorInvalidBirthDate";
     case "INVALID_EK_NO":

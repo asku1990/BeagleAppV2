@@ -85,7 +85,10 @@ export async function createAdminDog(
       return inTryValidation.response;
     }
 
-    const parentValidation = await resolveAndValidateCreateParents(input);
+    const parentValidation = await resolveAndValidateCreateParents({
+      ...input,
+      status: preflight.data.status,
+    });
     if (!parentValidation.ok) {
       return parentValidation.response;
     }
@@ -115,6 +118,7 @@ export async function createAdminDog(
       async (tx) => {
         const created = await createAdminDogWriteDb(
           {
+            status: preflight.data.status,
             name: preflight.data.name,
             sex: preflight.data.sex,
             birthDate: preflight.data.birthDate,

@@ -9,8 +9,9 @@ in [reference-only-dog-identities.md](./reference-only-dog-identities.md).
 After the schema foundation, the first versions are:
 
 1. public visibility,
-2. status-aware admin dog creation and editing, and
-3. phase-one import creation and linking of missing parents.
+2. reference-only admin dog creation,
+3. status-aware admin dog editing, and
+4. phase-one import creation and linking of missing parents.
 
 Admin filters, list badges, profile-fact guards, and other admin polish are not
 prerequisites for these versions.
@@ -66,25 +67,21 @@ Acceptance:
 Review gate: stop after targeted tests, typecheck, and lint. Continue only after
 explicit approval.
 
-## Version 2: status-aware admin create and edit
+## Version 2A: status-aware admin create
 
-- Add a `NORMAL` / `REFERENCE_ONLY` status section to the existing admin dog
-  create and edit modal. New dogs default to `NORMAL`.
+- Add a create-only `NORMAL` / `REFERENCE_ONLY` status section to the existing
+  admin dog modal. New dogs default to `NORMAL`.
 - Keep every existing dog form section available for both statuses. A
   reference-only dog may store every known field, including name, birth date,
   breeder, owners, parents, metadata, titles, and notes.
-- Carry status through the admin create, update, and dog-list contracts only as
-  needed to write the value and populate edit mode. Do not add list filters or
-  list badges in this version.
+- Carry status through the admin create contract and persistence path. Callers
+  that omit status continue to create normal dogs.
 - Preserve the current required-field and parent rules for normal dogs.
 - For reference-only dogs, require a valid primary registration, allow unknown
   fields and missing parents, and validate and persist every supplied value
   normally.
 - If the name is unknown, use the normalized primary registration as the
-  database-required internal fallback. Replace that fallback when a known name
-  is later entered.
-- Allow status to be changed in edit mode without deleting stored details.
-  Changing to `NORMAL` must satisfy the normal-dog validation rules.
+  database-required internal fallback.
 - Keep parent selection explicit: the parent lookup includes both statuses, and
   selecting an existing reference-only dog links that row as sire or dam.
 - Do not create a missing parent automatically from the child form. The admin
@@ -93,13 +90,36 @@ explicit approval.
 
 Acceptance:
 
-- Admin can create and edit reference-only dogs using the existing modal and
-  may record every known detail.
+- Admin can create reference-only dogs using the existing modal and may record
+  every known detail.
 - Admin can select and link an existing reference-only sire or dam when creating
-  or editing another dog.
+  another dog.
 - Missing parents still fail resolution instead of being silently created.
-- Changing a reference-only dog to normal reuses the same dog and registration;
-  it does not create a duplicate identity.
+- Existing normal-dog creation behavior remains unchanged.
+
+Review gate: stop after targeted tests, typecheck, and lint. Continue only after
+explicit approval.
+
+## Version 2B: status-aware admin edit
+
+- Carry status through the admin dog-list and update contracts so edit mode is
+  populated with the stored value.
+- Show the `NORMAL` / `REFERENCE_ONLY` status section in edit mode.
+- Preserve every stored detail when editing either status.
+- Apply optional name and parent rules when the stored or requested status is
+  reference-only. Replace the internal registration fallback when a known name
+  is entered.
+- Allow status changes without creating a new identity. Changing to `NORMAL`
+  must satisfy the normal-dog required-field and parent rules.
+- Keep parent selection explicit and never create a missing parent from the
+  child form.
+
+Acceptance:
+
+- Admin can edit reference-only dogs using the existing modal.
+- Reference-only dogs may retain missing details or one/both missing parents.
+- Changing a reference-only dog to normal reuses the same dog and registration.
+- Existing normal-dog editing behavior remains unchanged.
 
 Review gate: stop after targeted tests, typecheck, and lint. Continue only after
 explicit approval.
@@ -139,8 +159,8 @@ For each version:
 - Run typecheck and lint for touched packages.
 - Run the full `pnpm test`, `pnpm typecheck`, and `pnpm lint` before the version
   is considered complete.
-- Run cycle lint only when import or barrel restructuring changes the import
-  graph.
+- Do not run cycle lint in agent workflows; it is too slow for routine agent
+  validation.
 - Never report a check as passing unless it was run.
 
 ## Deferred work

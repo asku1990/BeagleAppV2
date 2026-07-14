@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import type { DogStatus } from "@beagle/contracts";
 import { AdminFormModalShell } from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import { type ComboboxOption } from "@/components/ui/combobox";
@@ -9,6 +10,7 @@ import {
   DogFormMetadataSection,
   DogFormParentsSection,
   DogFormRegistrationSection,
+  DogFormStatusSection,
   DogFormTitlesSection,
 } from "./internal";
 import type { AdminDogFormValues, AdminDogRecord } from "./types";
@@ -18,6 +20,7 @@ type DogFormModalProps = {
   mode: "create" | "edit";
   dog: AdminDogRecord | null;
   values: AdminDogFormValues;
+  createStatus: DogStatus;
   colorOptions: ComboboxOption[];
   ownerOptions: NamedEntityOption[];
   parentOptions: DogParentOption[];
@@ -28,6 +31,7 @@ type DogFormModalProps = {
   isCalculatingInbreeding?: boolean;
   onClose: () => void;
   onValuesChange: (values: AdminDogFormValues) => void;
+  onCreateStatusChange: (status: DogStatus) => void;
   onSubmit: (values: AdminDogFormValues) => void | Promise<void>;
   onCalculateInbreeding?: () => void | Promise<void>;
 };
@@ -36,6 +40,7 @@ export function DogFormModal({
   mode,
   dog,
   values,
+  createStatus,
   colorOptions,
   ownerOptions,
   parentOptions,
@@ -46,6 +51,7 @@ export function DogFormModal({
   isCalculatingInbreeding = false,
   onClose,
   onValuesChange,
+  onCreateStatusChange,
   onSubmit,
   onCalculateInbreeding,
 }: DogFormModalProps) {
@@ -54,17 +60,20 @@ export function DogFormModal({
     () => new Date().toISOString().slice(0, 10),
     [],
   );
+  const normalRulesApply = mode === "edit" || createStatus === "NORMAL";
 
   const isSubmitDisabled = useMemo(() => {
     return (
       isSubmitting ||
-      values.name.trim().length === 0 ||
       values.registrationNo.trim().length === 0 ||
-      values.sirePreviewRegistrationNo.trim().length === 0 ||
-      values.damPreviewRegistrationNo.trim().length === 0
+      (normalRulesApply &&
+        (values.name.trim().length === 0 ||
+          values.sirePreviewRegistrationNo.trim().length === 0 ||
+          values.damPreviewRegistrationNo.trim().length === 0))
     );
   }, [
     isSubmitting,
+    normalRulesApply,
     values.name,
     values.registrationNo,
     values.sirePreviewRegistrationNo,
@@ -132,6 +141,14 @@ export function DogFormModal({
       }
     >
       <div className="space-y-3">
+        {mode === "create" ? (
+          <DogFormStatusSection
+            status={createStatus}
+            onStatusChange={onCreateStatusChange}
+            t={t}
+          />
+        ) : null}
+
         <DogFormRegistrationSection
           values={values}
           onValuesChange={onValuesChange}
@@ -142,6 +159,7 @@ export function DogFormModal({
           values={values}
           todayDateInputValue={todayDateInputValue}
           isSubmitting={isSubmitting}
+          nameRequired={normalRulesApply}
           onValuesChange={onValuesChange}
           t={t}
         />
@@ -163,6 +181,7 @@ export function DogFormModal({
           onValuesChange={onValuesChange}
           onCalculateInbreeding={onCalculateInbreeding}
           isCalculatingInbreeding={isCalculatingInbreeding}
+          parentsRequired={normalRulesApply}
           t={t}
         />
 

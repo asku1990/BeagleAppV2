@@ -128,6 +128,7 @@ describe("DogFormModal", () => {
         mode: "edit",
         dog: buildDog(values),
         values,
+        createStatus: "NORMAL",
         colorOptions: [{ value: "121", label: "121 - Kolmivärinen" }],
         ownerOptions: [
           { id: "o_1", name: "Tiina Virtanen" },
@@ -142,6 +143,7 @@ describe("DogFormModal", () => {
         open: true,
         onClose: vi.fn(),
         onValuesChange: vi.fn(),
+        onCreateStatusChange: vi.fn(),
         onSubmit: vi.fn(),
         onCalculateInbreeding: vi.fn(),
       }),
@@ -174,6 +176,7 @@ describe("DogFormModal", () => {
         mode: "edit",
         dog: buildDog(values),
         values,
+        createStatus: "NORMAL",
         colorOptions: [{ value: "121", label: "121 - Kolmivärinen" }],
         ownerOptions: [
           { id: "o_1", name: "Tiina Virtanen" },
@@ -188,6 +191,7 @@ describe("DogFormModal", () => {
         open: true,
         onClose: vi.fn(),
         onValuesChange: vi.fn(),
+        onCreateStatusChange: vi.fn(),
         onSubmit: vi.fn(),
         onCalculateInbreeding: vi.fn(),
       }),
@@ -203,6 +207,7 @@ describe("DogFormModal", () => {
         mode: "create",
         dog: null,
         values,
+        createStatus: "NORMAL",
         colorOptions: [],
         ownerOptions: [],
         parentOptions: [],
@@ -211,6 +216,7 @@ describe("DogFormModal", () => {
         open: true,
         onClose: vi.fn(),
         onValuesChange: vi.fn(),
+        onCreateStatusChange: vi.fn(),
         onSubmit: vi.fn(),
         onCalculateInbreeding: vi.fn(),
       }),
@@ -221,5 +227,41 @@ describe("DogFormModal", () => {
     expect(html).not.toContain("admin.dogs.form.birthDateClear");
     expect(html).toContain("admin.dogs.form.inbreedingCalculate");
     expect(html).toContain("disabled");
+  });
+
+  it("shows create-only reference status and makes name and parents optional", () => {
+    const values = buildCreateValues();
+    values.registrationNo = "FI12345/21";
+
+    const html = renderToStaticMarkup(
+      React.createElement(DogFormModal, {
+        mode: "create",
+        dog: null,
+        values,
+        createStatus: "REFERENCE_ONLY",
+        colorOptions: [],
+        ownerOptions: [],
+        parentOptions: [],
+        onOwnerSearchChange: vi.fn(),
+        onParentSearchChange: vi.fn(),
+        open: true,
+        onClose: vi.fn(),
+        onValuesChange: vi.fn(),
+        onCreateStatusChange: vi.fn(),
+        onSubmit: vi.fn(),
+        onCalculateInbreeding: vi.fn(),
+      }),
+    );
+
+    expect(html).toContain("admin.dogs.form.statusReferenceOnly");
+    expect(html).toContain("admin.dogs.form.statusReferenceOnlyHelp");
+    expect(html).not.toContain("admin.dogs.form.namePlaceholder *");
+    expect(html).not.toContain("admin.dogs.form.sireSelectLabel *");
+    expect(html).not.toContain("admin.dogs.form.damSelectLabel *");
+    const submitButton = html.match(
+      /<button[^>]*>admin\.dogs\.form\.createSubmit<\/button>/,
+    )?.[0];
+    expect(submitButton).toBeDefined();
+    expect(submitButton).not.toContain(' disabled=""');
   });
 });

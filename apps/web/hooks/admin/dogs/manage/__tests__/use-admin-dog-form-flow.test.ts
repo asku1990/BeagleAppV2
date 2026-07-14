@@ -112,6 +112,7 @@ describe("useAdminDogFormFlow", () => {
     await hook.handleSubmit(buildFormValues());
 
     expect(createMutateAsync).toHaveBeenCalledWith({
+      status: "NORMAL",
       name: "Metsapolun Kide",
       sex: "FEMALE",
       birthDate: "2021-04-09",
@@ -137,6 +138,7 @@ describe("useAdminDogFormFlow", () => {
       open: false,
       mode: "create",
       target: null,
+      createStatus: "NORMAL",
     });
   });
 
@@ -345,15 +347,17 @@ describe("useAdminDogFormFlow", () => {
       open: true,
       mode: "edit",
       target,
+      createStatus: "NORMAL",
     });
   });
 
   it("keeps create modal birth date empty by default", () => {
     const setFormValues = vi.fn();
+    const setFormState = vi.fn();
 
     useStateMock
       .mockImplementationOnce((initial) => [initial, vi.fn()])
-      .mockImplementationOnce((initial) => [initial, vi.fn()])
+      .mockImplementationOnce((initial) => [initial, setFormState])
       .mockImplementationOnce((initial) => [initial, setFormValues])
       .mockImplementationOnce((initial) => [initial, vi.fn()])
       .mockImplementationOnce((initial) => [initial, vi.fn()])
@@ -376,5 +380,11 @@ describe("useAdminDogFormFlow", () => {
         birthDate: "",
       }),
     );
+    expect(setFormState).toHaveBeenCalledWith({
+      open: true,
+      mode: "create",
+      target: null,
+      createStatus: "NORMAL",
+    });
   });
 });

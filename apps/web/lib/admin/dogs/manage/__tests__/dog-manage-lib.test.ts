@@ -43,27 +43,35 @@ describe("admin dog manage lib", () => {
 
   it("normalizes create payload fields for mutation requests", () => {
     expect(
-      toCreateAdminDogRequest({
-        name: "Metsapolun Kide",
-        sex: "FEMALE",
-        birthDate: " 2021-04-09 ",
-        breederNameText: " Metsapolun ",
-        ownershipNames: ["Tiina Virtanen"],
-        ekNo: " 5588 ",
-        inbreedingCoefficientPct: 12.5,
-        colorCode: "121",
-        note: " Important note ",
-        registrationNo: "FI12345/21 ",
-        secondaryRegistrationNos: [" fi54321/21 ", "", " FI77777/18 "],
-        sirePreviewName: "Korven Aatos",
-        sirePreviewRegistrationNo: " FI54321/20 ",
-        damPreviewName: "Havupolun Helmi",
-        damPreviewRegistrationNo: "",
-        titles: [
-          { awardedOn: " 2022-01-10 ", titleCode: " FI JVA ", titleName: " " },
-        ],
-      }),
+      toCreateAdminDogRequest(
+        {
+          name: "Metsapolun Kide",
+          sex: "FEMALE",
+          birthDate: " 2021-04-09 ",
+          breederNameText: " Metsapolun ",
+          ownershipNames: ["Tiina Virtanen"],
+          ekNo: " 5588 ",
+          inbreedingCoefficientPct: 12.5,
+          colorCode: "121",
+          note: " Important note ",
+          registrationNo: "FI12345/21 ",
+          secondaryRegistrationNos: [" fi54321/21 ", "", " FI77777/18 "],
+          sirePreviewName: "Korven Aatos",
+          sirePreviewRegistrationNo: " FI54321/20 ",
+          damPreviewName: "Havupolun Helmi",
+          damPreviewRegistrationNo: "",
+          titles: [
+            {
+              awardedOn: " 2022-01-10 ",
+              titleCode: " FI JVA ",
+              titleName: " ",
+            },
+          ],
+        },
+        "REFERENCE_ONLY",
+      ),
     ).toEqual({
+      status: "REFERENCE_ONLY",
       name: "Metsapolun Kide",
       sex: "FEMALE",
       birthDate: "2021-04-09",
