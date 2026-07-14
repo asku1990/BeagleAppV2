@@ -4,7 +4,10 @@ export {
   searchVirtualPairingDogs,
   type SearchVirtualPairingDogsOptions,
 } from "./virtual-pairing";
-export { calculateVirtualPairing } from "./virtual-pairing/calculate-virtual-pairing";
+export {
+  calculateVirtualPairing,
+  type CalculateVirtualPairingOptions,
+} from "./virtual-pairing/calculate-virtual-pairing";
 export { calculatePublicVirtualPairing } from "./virtual-pairing/calculate-public-virtual-pairing";
 export {
   getBeagleDogProfileService,

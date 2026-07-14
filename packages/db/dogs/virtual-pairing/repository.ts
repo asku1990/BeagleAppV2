@@ -42,11 +42,10 @@ function toRow(row: RawVirtualPairingDogRow): VirtualPairingSearchDogRowDb {
 
 export async function searchVirtualPairingDogsDb(
   input: VirtualPairingSearchRequestDb,
-  allowedStatuses: readonly DogStatus[] = [
-    DogStatus.NORMAL,
-    DogStatus.REFERENCE_ONLY,
-  ],
+  options: { allowedStatuses?: readonly DogStatus[] } = {},
 ): Promise<VirtualPairingSearchResponseDb> {
+  const { allowedStatuses = [DogStatus.NORMAL, DogStatus.REFERENCE_ONLY] } =
+    options;
   const query = normalizeQuery(input.query);
   const page = parsePage(input.page);
   const pageSize = parsePageSize(input.pageSize);

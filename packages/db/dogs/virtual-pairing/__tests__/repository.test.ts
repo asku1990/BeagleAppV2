@@ -425,7 +425,9 @@ describe("searchVirtualPairingDogsDb", () => {
         page: 1,
         pageSize: 10,
       },
-      [DogStatus.NORMAL, DogStatus.REFERENCE_ONLY],
+      {
+        allowedStatuses: [DogStatus.NORMAL, DogStatus.REFERENCE_ONLY],
+      },
     );
 
     expect(dogCountMock).toHaveBeenCalledWith({

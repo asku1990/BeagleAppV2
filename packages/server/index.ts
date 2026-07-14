@@ -35,7 +35,10 @@ export {
   searchVirtualPairingDogs,
   type SearchVirtualPairingDogsOptions,
 } from "./dogs";
-export { calculateVirtualPairing } from "./dogs";
+export {
+  calculateVirtualPairing,
+  type CalculateVirtualPairingOptions,
+} from "./dogs";
 export { calculatePublicVirtualPairing } from "./dogs";
 export { createShowsService, showsService } from "./shows";
 export { createTrialsService, trialsService } from "./trials";

@@ -9,5 +9,8 @@ export {
   type SearchVirtualPairingDogsOptions,
 } from "./search";
 export { searchPublicVirtualPairingDogs } from "./search-public";
-export { calculateVirtualPairing } from "./calculate-virtual-pairing";
+export {
+  calculateVirtualPairing,
+  type CalculateVirtualPairingOptions,
+} from "./calculate-virtual-pairing";
 export { calculatePublicVirtualPairing } from "./calculate-public-virtual-pairing";

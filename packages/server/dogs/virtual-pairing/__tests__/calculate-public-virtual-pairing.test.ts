@@ -155,7 +155,7 @@ describe("calculatePublicVirtualPairing", () => {
         damRegistrationNo: " fi54321/21 ",
         generationDepth: 9,
       },
-      ["NORMAL"],
+      { allowedStatuses: ["NORMAL"] },
     );
   });
 

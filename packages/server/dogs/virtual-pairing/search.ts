@@ -55,7 +55,7 @@ export async function searchVirtualPairingDogs(
       pageSize: parsePageSize(input.pageSize),
     };
     const result = allowedStatuses
-      ? await searchVirtualPairingDogsDb(dbInput, allowedStatuses)
+      ? await searchVirtualPairingDogsDb(dbInput, { allowedStatuses })
       : await searchVirtualPairingDogsDb(dbInput);
 
     log.info(

@@ -172,7 +172,7 @@ describe("searchVirtualPairingDogs", () => {
         page: 1,
         pageSize: 10,
       },
-      ["NORMAL"],
+      { allowedStatuses: ["NORMAL"] },
     );
   });
 

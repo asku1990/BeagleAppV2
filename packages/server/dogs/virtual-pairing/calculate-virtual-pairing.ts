@@ -37,6 +37,10 @@ export type VirtualPairingCalculationCoreResult = {
   ancestorDetailsById: Map<string, VirtualPairingAncestorDetailsDb>;
 };
 
+export type CalculateVirtualPairingOptions = {
+  allowedStatuses?: readonly DogStatus[];
+};
+
 type CalculationResult = ServiceResult<VirtualPairingCalculationCoreResult>;
 
 function normalizeRegistrationNo(value: string): string {
@@ -145,8 +149,9 @@ function buildVirtualRootAncestry(
 
 export async function calculateVirtualPairing(
   input: VirtualPairingCalculationRequest,
-  allowedStatuses?: readonly DogStatus[],
+  options: CalculateVirtualPairingOptions = {},
 ): Promise<CalculationResult> {
+  const { allowedStatuses } = options;
   const startedAt = Date.now();
   const sireRegistrationNo = normalizeRegistrationNo(input.sireRegistrationNo);
   const damRegistrationNo = normalizeRegistrationNo(input.damRegistrationNo);
