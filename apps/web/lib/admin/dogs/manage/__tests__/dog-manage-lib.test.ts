@@ -5,6 +5,7 @@ import {
   toAdminDogBreederOptions,
   toAdminDogParentOptions,
   toCreateAdminDogRequest,
+  toUpdateAdminDogRequest,
 } from "..";
 
 describe("admin dog manage lib", () => {
@@ -99,6 +100,7 @@ describe("admin dog manage lib", () => {
   it("maps list query titlesText for compact list rendering", () => {
     const mapped = mapAdminDogFromQuery({
       id: "dog_1",
+      status: "REFERENCE_ONLY",
       registrationNo: "FI12345/21",
       secondaryRegistrationNos: [],
       name: "Metsapolun Kide",
@@ -117,7 +119,56 @@ describe("admin dog manage lib", () => {
       titles: [],
     });
 
+    expect(mapped.status).toBe("REFERENCE_ONLY");
     expect(mapped.titlesText).toBe("FI JVA, SE JCH");
     expect(mapped).not.toHaveProperty("inbreedingCoefficientPct");
+  });
+
+  it("includes selected status in update mutation requests", () => {
+    const target = mapAdminDogFromQuery({
+      id: "dog_1",
+      status: "REFERENCE_ONLY",
+      registrationNo: "FI12345/21",
+      secondaryRegistrationNos: [],
+      name: "Known Reference",
+      sex: "FEMALE",
+      birthDate: null,
+      breederName: null,
+      ownerNames: [],
+      sire: null,
+      dam: null,
+      trialCount: 0,
+      showCount: 0,
+      titlesText: null,
+      ekNo: null,
+      colorCode: null,
+      note: null,
+      titles: [],
+    });
+
+    expect(
+      toUpdateAdminDogRequest(
+        {
+          name: "Known Reference",
+          sex: "FEMALE",
+          birthDate: "",
+          breederNameText: "",
+          ownershipNames: [],
+          ekNo: "",
+          inbreedingCoefficientPct: null,
+          colorCode: "",
+          note: "",
+          registrationNo: "FI12345/21",
+          secondaryRegistrationNos: [],
+          sirePreviewName: "",
+          sirePreviewRegistrationNo: "",
+          damPreviewName: "",
+          damPreviewRegistrationNo: "",
+          titles: [],
+        },
+        target,
+        "NORMAL",
+      ),
+    ).toEqual(expect.objectContaining({ id: "dog_1", status: "NORMAL" }));
   });
 });

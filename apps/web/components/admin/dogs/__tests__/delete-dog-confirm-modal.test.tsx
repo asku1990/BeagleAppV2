@@ -13,6 +13,7 @@ vi.mock("@/hooks/i18n", () => ({
 function buildDog(): AdminDogRecord {
   return {
     id: "dog_1",
+    status: "NORMAL",
     registrationNo: "FI12345/21",
     secondaryRegistrationNos: [],
     name: "Metsapolun Kide",

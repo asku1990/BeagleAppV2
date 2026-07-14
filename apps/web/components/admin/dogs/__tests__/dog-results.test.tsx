@@ -40,6 +40,7 @@ vi.mock("@/components/ui/card", () => ({
 function buildDog(overrides: Partial<AdminDogRecord> = {}): AdminDogRecord {
   return {
     id: "dog_1",
+    status: "NORMAL",
     registrationNo: "FI12345/21",
     secondaryRegistrationNos: [],
     name: "Metsapolun Kide",

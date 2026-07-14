@@ -57,6 +57,7 @@ function buildFormValues(): AdminDogFormValues {
 function buildTargetDog(): AdminDogRecord {
   return {
     id: "dog_1",
+    status: "NORMAL",
     name: "Metsapolun Kide",
     sex: "FEMALE",
     birthDate: "2021-04-09",
@@ -93,7 +94,7 @@ describe("useAdminDogFormFlow", () => {
     useStateMock
       .mockImplementationOnce((initial) => [initial, setDeleteTarget])
       .mockImplementationOnce(() => [
-        { open: true, mode: "create", target: null },
+        { open: true, mode: "create", target: null, formStatus: "NORMAL" },
         setFormState,
       ])
       .mockImplementationOnce((initial) => [initial, setFormValues])
@@ -138,7 +139,7 @@ describe("useAdminDogFormFlow", () => {
       open: false,
       mode: "create",
       target: null,
-      createStatus: "NORMAL",
+      formStatus: "NORMAL",
     });
   });
 
@@ -148,7 +149,7 @@ describe("useAdminDogFormFlow", () => {
     useStateMock
       .mockImplementationOnce((initial) => [initial, vi.fn()])
       .mockImplementationOnce(() => [
-        { open: true, mode: "edit", target },
+        { open: true, mode: "edit", target, formStatus: "REFERENCE_ONLY" },
         vi.fn(),
       ])
       .mockImplementationOnce((initial) => [initial, vi.fn()])
@@ -172,6 +173,7 @@ describe("useAdminDogFormFlow", () => {
     expect(updateMutateAsync).toHaveBeenCalledWith(
       expect.objectContaining({
         id: "dog_1",
+        status: "REFERENCE_ONLY",
         name: "Metsapolun Kide",
         registrationNo: "fi12345/21",
       }),
@@ -212,7 +214,7 @@ describe("useAdminDogFormFlow", () => {
     useStateMock
       .mockImplementationOnce((initial) => [initial, vi.fn()])
       .mockImplementationOnce(() => [
-        { open: true, mode: "create", target: null },
+        { open: true, mode: "create", target: null, formStatus: "NORMAL" },
         vi.fn(),
       ])
       .mockImplementationOnce((initial) => [initial, vi.fn()])
@@ -314,6 +316,7 @@ describe("useAdminDogFormFlow", () => {
 
   it("starts edit modal inbreeding preview empty until recalculated", () => {
     const target = buildTargetDog();
+    target.status = "REFERENCE_ONLY";
     const setFormValues = vi.fn();
     const setFormState = vi.fn();
 
@@ -347,7 +350,7 @@ describe("useAdminDogFormFlow", () => {
       open: true,
       mode: "edit",
       target,
-      createStatus: "NORMAL",
+      formStatus: "REFERENCE_ONLY",
     });
   });
 
@@ -384,7 +387,7 @@ describe("useAdminDogFormFlow", () => {
       open: true,
       mode: "create",
       target: null,
-      createStatus: "NORMAL",
+      formStatus: "NORMAL",
     });
   });
 });

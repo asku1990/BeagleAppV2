@@ -20,7 +20,7 @@ type DogFormModalProps = {
   mode: "create" | "edit";
   dog: AdminDogRecord | null;
   values: AdminDogFormValues;
-  createStatus: DogStatus;
+  formStatus: DogStatus;
   colorOptions: ComboboxOption[];
   ownerOptions: NamedEntityOption[];
   parentOptions: DogParentOption[];
@@ -31,7 +31,7 @@ type DogFormModalProps = {
   isCalculatingInbreeding?: boolean;
   onClose: () => void;
   onValuesChange: (values: AdminDogFormValues) => void;
-  onCreateStatusChange: (status: DogStatus) => void;
+  onFormStatusChange: (status: DogStatus) => void;
   onSubmit: (values: AdminDogFormValues) => void | Promise<void>;
   onCalculateInbreeding?: () => void | Promise<void>;
 };
@@ -40,7 +40,7 @@ export function DogFormModal({
   mode,
   dog,
   values,
-  createStatus,
+  formStatus,
   colorOptions,
   ownerOptions,
   parentOptions,
@@ -51,7 +51,7 @@ export function DogFormModal({
   isCalculatingInbreeding = false,
   onClose,
   onValuesChange,
-  onCreateStatusChange,
+  onFormStatusChange,
   onSubmit,
   onCalculateInbreeding,
 }: DogFormModalProps) {
@@ -60,7 +60,7 @@ export function DogFormModal({
     () => new Date().toISOString().slice(0, 10),
     [],
   );
-  const normalRulesApply = mode === "edit" || createStatus === "NORMAL";
+  const normalRulesApply = formStatus === "NORMAL";
 
   const isSubmitDisabled = useMemo(() => {
     return (
@@ -141,13 +141,11 @@ export function DogFormModal({
       }
     >
       <div className="space-y-3">
-        {mode === "create" ? (
-          <DogFormStatusSection
-            status={createStatus}
-            onStatusChange={onCreateStatusChange}
-            t={t}
-          />
-        ) : null}
+        <DogFormStatusSection
+          status={formStatus}
+          onStatusChange={onFormStatusChange}
+          t={t}
+        />
 
         <DogFormRegistrationSection
           values={values}

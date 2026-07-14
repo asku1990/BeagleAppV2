@@ -36,6 +36,7 @@ describe("updateAdminDogAction", () => {
     await expect(
       updateAdminDogAction({
         id: "dog_1",
+        status: "NORMAL",
         name: "Kide",
         sex: "FEMALE",
         registrationNo: "FI12345/21",
@@ -70,6 +71,7 @@ describe("updateAdminDogAction", () => {
     await expect(
       updateAdminDogAction({
         id: "dog_1",
+        status: "NORMAL",
         name: "Kide",
         sex: "FEMALE",
         registrationNo: "FI12345/21",
@@ -108,6 +110,7 @@ describe("updateAdminDogAction", () => {
     await expect(
       updateAdminDogAction({
         id: "dog_1",
+        status: "REFERENCE_ONLY",
         name: "Kide",
         sex: "FEMALE",
         registrationNo: "FI12345/21",
@@ -148,6 +151,7 @@ describe("updateAdminDogAction", () => {
 
     const payload = {
       id: "dog_1",
+      status: "REFERENCE_ONLY" as const,
       name: "Metsapolun Kide",
       sex: "FEMALE" as const,
       birthDate: "2021-04-09",

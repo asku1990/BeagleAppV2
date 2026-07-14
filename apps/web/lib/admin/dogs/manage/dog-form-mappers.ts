@@ -72,6 +72,7 @@ export function mapAdminDogToFormValues(
 export function mapAdminDogFromQuery(item: AdminDogListItem): AdminDogRecord {
   return {
     id: item.id,
+    status: item.status,
     registrationNo: item.registrationNo,
     secondaryRegistrationNos: item.secondaryRegistrationNos,
     name: item.name,

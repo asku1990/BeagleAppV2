@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { updateAdminDog } from "../update-dog";
+import type { UpdateAdminDogRequest } from "@beagle/contracts";
+import { updateAdminDog as updateAdminDogService } from "../update-dog";
 
 const {
   updateAdminDogWriteDbMock,
@@ -25,6 +26,14 @@ vi.mock("@beagle/db", () => ({
   loadDogPedigreeAncestryForParentsDb: loadDogPedigreeAncestryForParentsDbMock,
   findAdminDogColorOptionDb: findAdminDogColorOptionDbMock,
 }));
+
+function updateAdminDog(
+  input: Omit<UpdateAdminDogRequest, "status"> & {
+    status?: UpdateAdminDogRequest["status"];
+  },
+) {
+  return updateAdminDogService({ status: "NORMAL", ...input });
+}
 
 describe("updateAdminDog", () => {
   beforeEach(() => {
@@ -64,8 +73,8 @@ describe("updateAdminDog", () => {
     findDogByIdDbMock.mockResolvedValue({
       id: "dog_1",
       colorCode: 112,
-      sire: null,
-      dam: null,
+      sire: { id: "sire_1", sex: "MALE" },
+      dam: { id: "dam_1", sex: "FEMALE" },
     });
     findAdminDogColorOptionDbMock.mockResolvedValue({
       code: 112,
@@ -93,8 +102,8 @@ describe("updateAdminDog", () => {
     findDogByIdDbMock.mockResolvedValue({
       id: "dog_1",
       colorCode: 493,
-      sire: null,
-      dam: null,
+      sire: { id: "sire_1", sex: "MALE" },
+      dam: { id: "dam_1", sex: "FEMALE" },
     });
     findAdminDogColorOptionDbMock.mockResolvedValue({
       code: 493,
@@ -145,8 +154,8 @@ describe("updateAdminDog", () => {
     findDogByIdDbMock.mockResolvedValue({
       id: "dog_1",
       colorCode: 121,
-      sire: null,
-      dam: null,
+      sire: { id: "sire_1", sex: "MALE" },
+      dam: { id: "dam_1", sex: "FEMALE" },
     });
     findAdminDogColorOptionDbMock.mockResolvedValue({
       code: 112,
@@ -177,8 +186,8 @@ describe("updateAdminDog", () => {
     findDogByIdDbMock.mockResolvedValue({
       id: "dog_1",
       colorCode: 121,
-      sire: null,
-      dam: null,
+      sire: { id: "sire_1", sex: "MALE" },
+      dam: { id: "dam_1", sex: "FEMALE" },
     });
     findAdminDogColorOptionDbMock.mockResolvedValue({
       code: 493,
@@ -338,6 +347,176 @@ describe("updateAdminDog", () => {
     });
   });
 
+  it("returns 400 for an invalid dog status", async () => {
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        status: "ARCHIVED" as never,
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Invalid dog status value.",
+        code: "INVALID_DOG_STATUS",
+      },
+    });
+  });
+
+  it("requires a name when changing a dog to normal", async () => {
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        status: "NORMAL",
+        name: " ",
+        sex: "UNKNOWN",
+        registrationNo: "FI12345/21",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Name is required.",
+        code: "INVALID_NAME",
+      },
+    });
+  });
+
+  it("updates a reference-only dog with registration fallback name and missing parents", async () => {
+    findDogByIdDbMock.mockResolvedValue({
+      id: "dog_1",
+      colorCode: null,
+      sire: null,
+      dam: null,
+    });
+    updateAdminDogWriteDbMock.mockResolvedValue({
+      id: "dog_1",
+      name: "FI12345/21",
+      sex: "UNKNOWN",
+      registrationNo: "FI12345/21",
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        status: "REFERENCE_ONLY",
+        name: " ",
+        sex: "UNKNOWN",
+        registrationNo: " fi12345/21 ",
+      }),
+    ).resolves.toMatchObject({ status: 200 });
+
+    expect(updateAdminDogWriteDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "dog_1",
+        status: "REFERENCE_ONLY",
+        name: "FI12345/21",
+        registrationNo: "FI12345/21",
+        sireId: undefined,
+        damId: undefined,
+      }),
+      {},
+    );
+  });
+
+  it("allows a reference-only dog to clear both parents", async () => {
+    updateAdminDogWriteDbMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Known Reference",
+      sex: "FEMALE",
+      registrationNo: "FI12345/21",
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        status: "REFERENCE_ONLY",
+        name: "Known Reference",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        sireRegistrationNo: null,
+        damRegistrationNo: null,
+      }),
+    ).resolves.toMatchObject({ status: 200 });
+
+    expect(updateAdminDogWriteDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: "REFERENCE_ONLY",
+        sireId: null,
+        damId: null,
+      }),
+      {},
+    );
+  });
+
+  it("rejects changing a reference-only dog to normal when an effective parent is missing", async () => {
+    findDogByIdDbMock.mockResolvedValue({
+      id: "dog_1",
+      colorCode: null,
+      sire: null,
+      dam: { id: "dam_1", sex: "FEMALE" },
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        status: "NORMAL",
+        name: "Known Reference",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Sire registration number is required.",
+        code: "REQUIRED_SIRE_REGISTRATION",
+      },
+    });
+
+    expect(updateAdminDogWriteDbMock).not.toHaveBeenCalled();
+  });
+
+  it("changes a reference-only dog to normal using the same identity", async () => {
+    updateAdminDogWriteDbMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Known Reference",
+      sex: "FEMALE",
+      registrationNo: "FI12345/21",
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        status: "NORMAL",
+        name: "Known Reference",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
+    ).resolves.toMatchObject({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          id: "dog_1",
+          registrationNo: "FI12345/21",
+        },
+      },
+    });
+
+    expect(updateAdminDogWriteDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "dog_1",
+        status: "NORMAL",
+        registrationNo: "FI12345/21",
+      }),
+      {},
+    );
+  });
+
   it("updates dog and returns 200", async () => {
     findDogByRegistrationNoDbMock.mockResolvedValue(null);
     updateAdminDogWriteDbMock.mockResolvedValue({
@@ -375,6 +554,7 @@ describe("updateAdminDog", () => {
     expect(updateAdminDogWriteDbMock).toHaveBeenCalledWith(
       {
         id: "dog_1",
+        status: "NORMAL",
         name: "Metsapolun Kide",
         sex: "FEMALE",
         birthDate: new Date("2021-04-09T00:00:00.000Z"),

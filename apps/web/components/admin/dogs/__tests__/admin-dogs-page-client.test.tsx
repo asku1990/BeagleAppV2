@@ -134,6 +134,8 @@ function buildFormFlow(overrides: Record<string, unknown> = {}) {
     setDeleteTarget: vi.fn(),
     formState: { open: true, mode: "create", target: null },
     formValues: buildFormValues(),
+    formStatus: "NORMAL",
+    setFormStatus: vi.fn(),
     setFormValues: vi.fn(),
     ownerLookupQuery: "",
     setOwnerLookupQuery: vi.fn(),
@@ -193,6 +195,7 @@ describe("AdminDogsPageClient", () => {
         items: [
           {
             id: "dog_1",
+            status: "REFERENCE_ONLY",
             registrationNo: "FI12345/21",
             secondaryRegistrationNos: [],
             name: "Metsapolun Kide",
@@ -264,6 +267,8 @@ describe("AdminDogsPageClient", () => {
     expect(dogResultsProps.onEdit).toBe(formFlow.openEditModal);
     expect(dogResultsProps.onDelete).toBe(formFlow.setDeleteTarget);
     expect(dogFormProps.onSubmit).toBe(formFlow.handleSubmit);
+    expect(dogFormProps.formStatus).toBe("NORMAL");
+    expect(dogFormProps.onFormStatusChange).toBe(formFlow.setFormStatus);
     expect(dogFormProps.onCalculateInbreeding).toBe(
       formFlow.handleCalculateInbreeding,
     );
@@ -295,6 +300,7 @@ describe("AdminDogsPageClient", () => {
     const formFlow = buildFormFlow({
       deleteTarget: {
         id: "dog_1",
+        status: "NORMAL",
         registrationNo: "FI12345/21",
         secondaryRegistrationNos: [],
         name: "Metsapolun Kide",

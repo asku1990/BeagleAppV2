@@ -16,6 +16,8 @@ This project uses a user-facing changelog format.
 
 - Ylläpitäjä voi luoda sukutauluviitteiksi tarkoitettuja viitekoiria. Viitekoiralle
   riittää rekisterinumero, mutta kaikki tunnetut tiedot voidaan tallentaa.
+- Ylläpitäjä voi muokata viitekoiria ja vaihtaa koiran tyypin normaalin koiran
+  ja viitekoiran välillä samoja koira- ja rekisteritietoja käyttäen.
 
 ### Changed
 

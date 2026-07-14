@@ -104,9 +104,11 @@ export function toCreateAdminDogRequest(
 export function toUpdateAdminDogRequest(
   values: AdminDogFormValues,
   target: AdminDogRecord,
+  status: DogStatus,
 ): UpdateAdminDogRequest {
   return {
     id: target.id,
+    status,
     name: values.name,
     sex: values.sex,
     birthDate: normalizeOptionalText(values.birthDate),

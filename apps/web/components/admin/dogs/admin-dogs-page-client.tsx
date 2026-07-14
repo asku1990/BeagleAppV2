@@ -184,7 +184,7 @@ export function AdminDogsPageClient() {
         mode={dogFormFlow.formState.mode}
         dog={dogFormFlow.formState.target}
         values={dogFormFlow.formValues}
-        createStatus={dogFormFlow.createStatus}
+        formStatus={dogFormFlow.formStatus}
         colorOptions={colorOptions}
         ownerOptions={ownerOptions}
         parentOptions={parentOptions}
@@ -192,7 +192,7 @@ export function AdminDogsPageClient() {
         onParentSearchChange={dogFormFlow.setParentLookupQuery}
         onClose={dogFormFlow.closeFormModal}
         onValuesChange={dogFormFlow.setFormValues}
-        onCreateStatusChange={dogFormFlow.setCreateStatus}
+        onFormStatusChange={dogFormFlow.setFormStatus}
         onSubmit={dogFormFlow.handleSubmit}
         onCalculateInbreeding={dogFormFlow.handleCalculateInbreeding}
         isCalculatingInbreeding={dogFormFlow.isCalculatingInbreeding}

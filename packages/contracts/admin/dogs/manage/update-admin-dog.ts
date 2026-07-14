@@ -1,7 +1,9 @@
+import type { DogStatus } from "@contracts/dogs/status";
 import type { AdminDogListSex, AdminDogTitleInput } from "./admin-dogs-list";
 
 export type UpdateAdminDogRequest = {
   id: string;
+  status: DogStatus;
   name: string;
   sex: AdminDogListSex;
   birthDate?: string | null;

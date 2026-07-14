@@ -44,7 +44,7 @@ type DogFormState = {
   open: boolean;
   mode: "create" | "edit";
   target: AdminDogRecord | null;
-  createStatus: DogStatus;
+  formStatus: DogStatus;
 };
 
 // Owns admin dog modal/form state and mutation orchestration without UI concerns.
@@ -60,7 +60,7 @@ export function useAdminDogFormFlow({
     open: false,
     mode: "create",
     target: null,
-    createStatus: "NORMAL",
+    formStatus: "NORMAL",
   });
   const [formValues, setFormValues] = useState<AdminDogFormValues>(
     createEmptyAdminDogFormValues,
@@ -80,7 +80,7 @@ export function useAdminDogFormFlow({
       open: true,
       mode: "create",
       target: null,
-      createStatus: "NORMAL",
+      formStatus: "NORMAL",
     });
   }
 
@@ -91,7 +91,7 @@ export function useAdminDogFormFlow({
       open: true,
       mode: "edit",
       target: dog,
-      createStatus: "NORMAL",
+      formStatus: dog.status,
     });
   }
 
@@ -137,14 +137,14 @@ export function useAdminDogFormFlow({
     if (formState.mode === "create") {
       try {
         await createDogMutation.mutateAsync(
-          toCreateAdminDogRequest(values, formState.createStatus),
+          toCreateAdminDogRequest(values, formState.formStatus),
         );
         toast.success(t("admin.dogs.create.success"));
         setFormState({
           open: false,
           mode: "create",
           target: null,
-          createStatus: "NORMAL",
+          formStatus: "NORMAL",
         });
       } catch (error) {
         toast.error(
@@ -164,14 +164,14 @@ export function useAdminDogFormFlow({
 
     try {
       await updateDogMutation.mutateAsync(
-        toUpdateAdminDogRequest(values, formState.target),
+        toUpdateAdminDogRequest(values, formState.target, formState.formStatus),
       );
       toast.success(t("admin.dogs.edit.success"));
       setFormState({
         open: false,
         mode: "create",
         target: null,
-        createStatus: "NORMAL",
+        formStatus: "NORMAL",
       });
     } catch (error) {
       toast.error(
@@ -209,9 +209,9 @@ export function useAdminDogFormFlow({
     setDeleteTarget,
     formState,
     formValues,
-    createStatus: formState.createStatus,
-    setCreateStatus: (createStatus: DogStatus) =>
-      setFormState((current) => ({ ...current, createStatus })),
+    formStatus: formState.formStatus,
+    setFormStatus: (formStatus: DogStatus) =>
+      setFormState((current) => ({ ...current, formStatus })),
     setFormValues: handleValuesChange,
     ownerLookupQuery,
     setOwnerLookupQuery,
