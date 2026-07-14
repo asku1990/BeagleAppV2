@@ -16,6 +16,11 @@ This project uses a user-facing changelog format.
 
 ### Changed
 
+- Viitekoirat eivät näy julkisissa koirahauissa, uusimmissa koirissa,
+  koiraprofiileissa tai virtuaaliparituksen valinnoissa. Sukutauluissa niiden
+  tunnetut tiedot säilyvät ilman linkkiä erilliseen julkiseen profiiliin, eikä
+  profiililinkkejä näytetä näyttely- tai koetuloksissa.
+
 ### Fixed
 
 ### Removed

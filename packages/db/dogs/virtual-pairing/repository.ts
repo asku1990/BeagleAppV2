@@ -1,4 +1,5 @@
 import { prisma } from "@db/core/prisma";
+import { DogStatus } from "@prisma/client";
 import {
   VIRTUAL_PAIRING_BROAD_CANDIDATE_LIMIT,
   normalizeQuery,
@@ -41,6 +42,10 @@ function toRow(row: RawVirtualPairingDogRow): VirtualPairingSearchDogRowDb {
 
 export async function searchVirtualPairingDogsDb(
   input: VirtualPairingSearchRequestDb,
+  allowedStatuses: readonly DogStatus[] = [
+    DogStatus.NORMAL,
+    DogStatus.REFERENCE_ONLY,
+  ],
 ): Promise<VirtualPairingSearchResponseDb> {
   const query = normalizeQuery(input.query);
   const page = parsePage(input.page);
@@ -64,14 +69,17 @@ export async function searchVirtualPairingDogsDb(
     query,
   });
   if (boundedWhere) {
-    const total = await prisma.dog.count({ where: boundedWhere });
+    const where = {
+      AND: [{ status: { in: [...allowedStatuses] } }, boundedWhere],
+    };
+    const total = await prisma.dog.count({ where });
     const totalPages = Math.ceil(total / pageSize);
     const resolvedPage =
       totalPages === 0 ? 1 : Math.min(Math.max(1, page), totalPages);
     const start = (resolvedPage - 1) * pageSize;
 
     const rows = await loadVirtualPairingDogs({
-      where: boundedWhere,
+      where,
       orderBy: resolveBoundedOrderBy(input.field),
       skip: start,
       take: pageSize,
@@ -125,7 +133,9 @@ export async function searchVirtualPairingDogsDb(
   }
 
   const rows = await loadVirtualPairingDogs({
-    where: broadWhere,
+    where: {
+      AND: [{ status: { in: [...allowedStatuses] } }, broadWhere],
+    },
     orderBy: resolveBroadOrderBy(input.field),
     take: VIRTUAL_PAIRING_BROAD_CANDIDATE_LIMIT + 1,
     select: {

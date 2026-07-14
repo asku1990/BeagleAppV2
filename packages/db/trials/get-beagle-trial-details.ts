@@ -1,7 +1,7 @@
 // Reads a public beagle trial detail from a single canonical TrialEvent row.
 // Entries are loaded only through TrialEntry.trialEventId so the response maps
 // exactly to one event, even when other events share the same date/place.
-import { DogSex, type Prisma } from "@prisma/client";
+import { DogSex, DogStatus, type Prisma } from "@prisma/client";
 import { prisma } from "../core/prisma";
 import type {
   BeagleTrialDetailsRequestDb,
@@ -92,6 +92,7 @@ export async function getBeagleTrialDetailsDb(
             select: {
               name: true,
               sex: true,
+              status: true,
             },
           },
         },
@@ -108,7 +109,7 @@ export async function getBeagleTrialDetailsDb(
     .map((entry) => ({
       id: entry.id,
       trialRuleWindowId: trialEvent.trialRuleWindowId,
-      dogId: entry.dogId,
+      dogId: entry.dog?.status === DogStatus.NORMAL ? entry.dogId : null,
       registrationNo: entry.rekisterinumeroSnapshot,
       // Prefer the linked dog name; fall back to registration snapshot so
       // entries without a dogId always render something meaningful.

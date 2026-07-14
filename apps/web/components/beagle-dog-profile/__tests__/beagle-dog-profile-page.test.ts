@@ -35,12 +35,14 @@ describe("BeagleDogProfilePage", () => {
             name: "Sire",
             registrationNo: "SIRE-1",
             ekNo: 101,
+            status: "NORMAL",
           },
           dam: {
             id: "dam_1",
             name: "Dam",
             registrationNo: "DAM-1",
             ekNo: null,
+            status: "REFERENCE_ONLY",
           },
           pedigree: [
             {
@@ -53,12 +55,14 @@ describe("BeagleDogProfilePage", () => {
                     name: "Sire",
                     registrationNo: "SIRE-1",
                     ekNo: 101,
+                    status: "NORMAL",
                   },
                   dam: {
                     id: "dam_1",
                     name: "Dam",
                     registrationNo: "DAM-1",
                     ekNo: null,
+                    status: "REFERENCE_ONLY",
                   },
                 },
               ],
@@ -101,6 +105,7 @@ describe("BeagleDogProfilePage", () => {
                 name: "Co Parent",
                 registrationNo: "CO-1",
                 ekNo: null,
+                status: "REFERENCE_ONLY",
               },
               puppyCount: 2,
               puppies: [
@@ -222,8 +227,8 @@ describe("BeagleDogProfilePage", () => {
     expect(html).toContain('href="/beagle/shows/show-route-1"');
     expect(html).toContain('href="/beagle/trials/trial-route-1"');
     expect(html).toContain('href="/beagle/dogs/sire_1"');
-    expect(html).toContain('href="/beagle/dogs/dam_1"');
-    expect(html).toContain('href="/beagle/dogs/co_parent_1"');
+    expect(html).not.toContain('href="/beagle/dogs/dam_1"');
+    expect(html).not.toContain('href="/beagle/dogs/co_parent_1"');
     expect(html).toContain('href="/beagle/dogs/sibling_1"');
     expect(html).toContain('href="/beagle/dogs/puppy_1"');
     expect(html).toContain('href="/beagle/dogs/puppy_2"');

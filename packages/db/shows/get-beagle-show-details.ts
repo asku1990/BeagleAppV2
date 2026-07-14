@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import { DogStatus, type Prisma } from "@prisma/client";
 import {
   addBusinessIsoDateDays,
   getBusinessDateStartUtc,
@@ -68,6 +68,7 @@ export async function getBeagleShowDetailsDb(
             id: true,
             name: true,
             sex: true,
+            status: true,
             registrations: {
               select: {
                 registrationNo: true,
@@ -124,7 +125,7 @@ export async function getBeagleShowDetailsDb(
   const items: BeagleShowDetailsRowDb[] = event.entries
     .map((row) => ({
       id: row.id,
-      dogId: row.dog?.id ?? null,
+      dogId: row.dog?.status === DogStatus.NORMAL ? row.dog.id : null,
       registrationNo:
         row.dog?.registrations[0]?.registrationNo ?? row.registrationNoSnapshot,
       name: row.dog?.name ?? row.dogNameSnapshot,

@@ -1,4 +1,4 @@
-import { DogSex } from "@prisma/client";
+import { DogSex, DogStatus } from "@prisma/client";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { findVirtualPairingDogByRegistrationNoDb } from "../find-dog-by-registration";
 
@@ -80,6 +80,9 @@ describe("findVirtualPairingDogByRegistrationNoDb", () => {
           equals: "FI54321/20",
           mode: "insensitive",
         },
+        dog: {
+          status: { in: [DogStatus.NORMAL, DogStatus.REFERENCE_ONLY] },
+        },
       },
       take: 2,
       orderBy: [{ registrationNo: "asc" }, { id: "asc" }],
@@ -95,6 +98,27 @@ describe("findVirtualPairingDogByRegistrationNoDb", () => {
         },
       },
     });
+  });
+
+  it("allows admin callers to include both statuses", async () => {
+    dogRegistrationFindManyMock.mockResolvedValue([]);
+
+    await findVirtualPairingDogByRegistrationNoDb("FI54321/20", undefined, [
+      DogStatus.NORMAL,
+      DogStatus.REFERENCE_ONLY,
+    ]);
+
+    expect(dogRegistrationFindManyMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          dog: {
+            status: {
+              in: [DogStatus.NORMAL, DogStatus.REFERENCE_ONLY],
+            },
+          },
+        }),
+      }),
+    );
   });
 
   it("returns null for unknown or blank registration numbers", async () => {

@@ -94,10 +94,23 @@ describe("getHomeStatisticsSnapshot", () => {
       new Date("2025-06-01T00:00:00.000Z"),
     );
 
-    // performedByDogs uses the canonical trialEntries relation
-    expect(dogCountMock).toHaveBeenCalledWith({
-      where: { trialEntries: { some: {} } },
+    expect(dogCountMock).toHaveBeenNthCalledWith(1, {
+      where: { status: "NORMAL", registrations: { some: {} } },
     });
+    expect(dogAggregateMock).toHaveBeenCalledWith({
+      where: { status: "NORMAL", registrations: { some: {} } },
+      _max: { birthDate: true },
+    });
+
+    // performedByDogs uses the canonical trialEntries relation
+    expect(dogCountMock).toHaveBeenNthCalledWith(2, {
+      where: { status: "NORMAL", trialEntries: { some: {} } },
+    });
+    expect(dogCountMock).toHaveBeenNthCalledWith(3, {
+      where: { status: "NORMAL", showEntries: { some: {} } },
+    });
+    expect(trialEntryCountMock).toHaveBeenCalledWith();
+    expect(showEntryCountMock).toHaveBeenCalledWith();
 
     // date range excludes TrialEvent rows with no entries
     expect(trialEventAggregateMock).toHaveBeenCalledWith({

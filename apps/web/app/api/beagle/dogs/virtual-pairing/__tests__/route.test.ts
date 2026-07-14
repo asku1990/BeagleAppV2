@@ -42,12 +42,16 @@ describe("public virtual pairing api route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(200);
-    expect(searchVirtualPairingDogsMock).toHaveBeenCalledWith({
-      field: "name",
-      query: "Kide",
-      page: 2,
-      pageSize: 10,
-    });
+    expect(searchVirtualPairingDogsMock).toHaveBeenCalledWith(
+      {
+        field: "name",
+        query: "Kide",
+        page: 2,
+        pageSize: 10,
+      },
+      undefined,
+      ["NORMAL"],
+    );
   });
 
   it("returns structured errors when the service throws", async () => {

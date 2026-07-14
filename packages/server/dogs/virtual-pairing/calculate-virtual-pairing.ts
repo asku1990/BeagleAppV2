@@ -2,6 +2,7 @@ import {
   findVirtualPairingAncestorDetailsDb,
   findVirtualPairingDogByRegistrationNoDb,
   loadDogPedigreeAncestryForParentsDb,
+  type DogStatus,
   type VirtualPairingAncestorDetailsDb,
 } from "@beagle/db";
 import { loadDogDiseaseFactsDb } from "@beagle/db/dogs/core/epi-disease-facts";
@@ -144,6 +145,7 @@ function buildVirtualRootAncestry(
 
 export async function calculateVirtualPairing(
   input: VirtualPairingCalculationRequest,
+  allowedStatuses?: readonly DogStatus[],
 ): Promise<CalculationResult> {
   const startedAt = Date.now();
   const sireRegistrationNo = normalizeRegistrationNo(input.sireRegistrationNo);
@@ -175,14 +177,24 @@ export async function calculateVirtualPairing(
   }
 
   try {
-    const sireRow =
-      await findVirtualPairingDogByRegistrationNoDb(sireRegistrationNo);
+    const sireRow = allowedStatuses
+      ? await findVirtualPairingDogByRegistrationNoDb(
+          sireRegistrationNo,
+          undefined,
+          allowedStatuses,
+        )
+      : await findVirtualPairingDogByRegistrationNoDb(sireRegistrationNo);
     if (!sireRow) {
       return invalidSireRegistrationResponse();
     }
 
-    const damRow =
-      await findVirtualPairingDogByRegistrationNoDb(damRegistrationNo);
+    const damRow = allowedStatuses
+      ? await findVirtualPairingDogByRegistrationNoDb(
+          damRegistrationNo,
+          undefined,
+          allowedStatuses,
+        )
+      : await findVirtualPairingDogByRegistrationNoDb(damRegistrationNo);
     if (!damRow) {
       return invalidDamRegistrationResponse();
     }

@@ -1,4 +1,4 @@
-import { searchVirtualPairingDogsDb } from "@beagle/db";
+import { searchVirtualPairingDogsDb, type DogStatus } from "@beagle/db";
 import type {
   VirtualPairingSearchRequest,
   VirtualPairingSearchResponse,
@@ -20,6 +20,7 @@ function parsePageSize(value: number | undefined): number {
 export async function searchVirtualPairingDogs(
   input: VirtualPairingSearchRequest,
   context?: DogsServiceLogContext,
+  allowedStatuses?: readonly DogStatus[],
 ): Promise<ServiceResult<VirtualPairingSearchResponse>> {
   const startedAt = Date.now();
   const log = withLogContext({
@@ -41,12 +42,15 @@ export async function searchVirtualPairingDogs(
   );
 
   try {
-    const result = await searchVirtualPairingDogsDb({
+    const dbInput = {
       field: input.field,
       query: input.query,
       page: parsePage(input.page),
       pageSize: parsePageSize(input.pageSize),
-    });
+    };
+    const result = allowedStatuses
+      ? await searchVirtualPairingDogsDb(dbInput, allowedStatuses)
+      : await searchVirtualPairingDogsDb(dbInput);
 
     log.info(
       {

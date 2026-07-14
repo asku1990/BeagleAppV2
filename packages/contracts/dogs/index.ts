@@ -1,4 +1,5 @@
 export type { DogColorDto, DogColorStatus } from "./colors";
+export type { DogStatus } from "./status";
 export type {
   BeagleSearchMode,
   BeagleSearchRequest,

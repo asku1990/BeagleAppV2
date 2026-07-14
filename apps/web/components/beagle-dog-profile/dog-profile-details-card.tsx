@@ -99,7 +99,7 @@ function renderParentValue(
     missingRegistrationPrefix: "",
   });
 
-  if (!parent?.id) {
+  if (!parent?.id || parent.status === "REFERENCE_ONLY") {
     return label;
   }
 

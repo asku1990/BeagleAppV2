@@ -353,7 +353,7 @@ describe("getNewestBeagleDogsDb", () => {
     const result = await getNewestBeagleDogsDb();
 
     expect(dogFindManyMock).toHaveBeenCalledWith({
-      where: {},
+      where: { status: "NORMAL" },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: 5,
       skip: undefined,

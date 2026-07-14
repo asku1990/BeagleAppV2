@@ -19,15 +19,21 @@ export async function GET(request: NextRequest) {
     const field = request.nextUrl.searchParams.get("field");
     const query = request.nextUrl.searchParams.get("query") ?? "";
 
-    const result = await searchVirtualPairingDogs({
-      field:
-        field === "ek" || field === "reg" || field === "name" ? field : "name",
-      query,
-      page: parseOptionalNumber(request.nextUrl.searchParams.get("page")),
-      pageSize: parseOptionalNumber(
-        request.nextUrl.searchParams.get("pageSize"),
-      ),
-    });
+    const result = await searchVirtualPairingDogs(
+      {
+        field:
+          field === "ek" || field === "reg" || field === "name"
+            ? field
+            : "name",
+        query,
+        page: parseOptionalNumber(request.nextUrl.searchParams.get("page")),
+        pageSize: parseOptionalNumber(
+          request.nextUrl.searchParams.get("pageSize"),
+        ),
+      },
+      undefined,
+      ["NORMAL"],
+    );
 
     return jsonResponse(result.body, {
       status: result.status,

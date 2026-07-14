@@ -76,9 +76,10 @@ describe("calculatePublicVirtualPairing", () => {
               "anc-1",
               {
                 id: "anc-1",
-                name: "Ancestor One",
+                name: "FI00001/20",
                 registrationNo: "FI00001/20",
                 ekNo: 99,
+                status: "REFERENCE_ONLY",
               },
             ],
           ]),
@@ -129,7 +130,7 @@ describe("calculatePublicVirtualPairing", () => {
             contributions: [
               {
                 ancestorId: "anc-1",
-                label: "Ancestor One EK:99 FI00001/20",
+                label: "FI00001/20 EK:99 FI00001/20",
                 contributionPct: 0.75,
                 rawContributionPct: 1,
                 occurrenceCount: 2,
@@ -148,11 +149,14 @@ describe("calculatePublicVirtualPairing", () => {
       },
     });
 
-    expect(calculateVirtualPairingMock).toHaveBeenCalledWith({
-      sireRegistrationNo: " fi12345/21 ",
-      damRegistrationNo: " fi54321/21 ",
-      generationDepth: 9,
-    });
+    expect(calculateVirtualPairingMock).toHaveBeenCalledWith(
+      {
+        sireRegistrationNo: " fi12345/21 ",
+        damRegistrationNo: " fi54321/21 ",
+        generationDepth: 9,
+      },
+      ["NORMAL"],
+    );
   });
 
   it("passes through a failing service result", async () => {
