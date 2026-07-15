@@ -1,3 +1,5 @@
+import type { DogStatus } from "@contracts/dogs/status";
+
 export type AdminDogListSex = "MALE" | "FEMALE" | "UNKNOWN";
 
 export type AdminDogParentPreview = {
@@ -23,6 +25,7 @@ export type AdminDogTitleItem = {
 
 export type AdminDogListItem = {
   id: string;
+  status: DogStatus;
   registrationNo: string | null;
   secondaryRegistrationNos: string[];
   name: string;

@@ -1,4 +1,5 @@
 import { prisma } from "@db/core/prisma";
+import { DogStatus } from "@prisma/client";
 
 export type HomeStatisticsSnapshot = {
   registrations: {
@@ -33,6 +34,7 @@ export async function getHomeStatisticsSnapshot(): Promise<HomeStatisticsSnapsho
   ] = await Promise.all([
     prisma.dog.count({
       where: {
+        status: DogStatus.NORMAL,
         registrations: {
           some: {},
         },
@@ -40,6 +42,7 @@ export async function getHomeStatisticsSnapshot(): Promise<HomeStatisticsSnapsho
     }),
     prisma.dog.aggregate({
       where: {
+        status: DogStatus.NORMAL,
         registrations: {
           some: {},
         },
@@ -49,6 +52,7 @@ export async function getHomeStatisticsSnapshot(): Promise<HomeStatisticsSnapsho
     prisma.trialEntry.count(),
     prisma.dog.count({
       where: {
+        status: DogStatus.NORMAL,
         trialEntries: {
           some: {},
         },
@@ -66,6 +70,7 @@ export async function getHomeStatisticsSnapshot(): Promise<HomeStatisticsSnapsho
     prisma.showEntry.count(),
     prisma.dog.count({
       where: {
+        status: DogStatus.NORMAL,
         showEntries: {
           some: {},
         },

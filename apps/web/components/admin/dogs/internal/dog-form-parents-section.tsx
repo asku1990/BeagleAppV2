@@ -13,6 +13,7 @@ type DogFormParentsSectionProps = {
   onValuesChange: (values: AdminDogFormValues) => void;
   onCalculateInbreeding?: () => void | Promise<void>;
   isCalculatingInbreeding: boolean;
+  parentsRequired: boolean;
   t: (key: MessageKey) => string;
 };
 
@@ -32,6 +33,7 @@ export function DogFormParentsSection({
   onValuesChange,
   onCalculateInbreeding,
   isCalculatingInbreeding,
+  parentsRequired,
   t,
 }: DogFormParentsSectionProps) {
   const canCalculateInbreeding =
@@ -44,7 +46,8 @@ export function DogFormParentsSection({
       <div className="grid gap-3 md:grid-cols-2">
         <div className="space-y-1">
           <p className="text-sm text-muted-foreground">
-            {t("admin.dogs.form.sireSelectLabel")} *
+            {t("admin.dogs.form.sireSelectLabel")}
+            {parentsRequired ? " *" : ""}
           </p>
           <Combobox
             value={values.sirePreviewRegistrationNo}
@@ -69,7 +72,8 @@ export function DogFormParentsSection({
         </div>
         <div className="space-y-1">
           <p className="text-sm text-muted-foreground">
-            {t("admin.dogs.form.damSelectLabel")} *
+            {t("admin.dogs.form.damSelectLabel")}
+            {parentsRequired ? " *" : ""}
           </p>
           <Combobox
             value={values.damPreviewRegistrationNo}

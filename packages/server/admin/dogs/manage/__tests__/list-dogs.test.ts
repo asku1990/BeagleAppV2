@@ -89,6 +89,7 @@ describe("listAdminDogs", () => {
       items: [
         {
           id: "dog_1",
+          status: "REFERENCE_ONLY",
           registrationNo: "FI12345/21",
           secondaryRegistrationNos: ["FI54321/21"],
           name: "Metsapolun Kide",
@@ -151,6 +152,7 @@ describe("listAdminDogs", () => {
           items: [
             {
               id: "dog_1",
+              status: "REFERENCE_ONLY",
               registrationNo: "FI12345/21",
               secondaryRegistrationNos: ["FI54321/21"],
               name: "Metsapolun Kide",

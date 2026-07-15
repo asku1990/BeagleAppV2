@@ -94,6 +94,99 @@ describe("createAdminDog", () => {
     });
   });
 
+  it("returns 400 for an invalid dog status", async () => {
+    await expect(
+      createAdminDog({
+        status: "ARCHIVED" as never,
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Invalid dog status value.",
+        code: "INVALID_DOG_STATUS",
+      },
+    });
+  });
+
+  it("creates a reference-only dog with registration fallback name and no parents", async () => {
+    createAdminDogWriteDbMock.mockResolvedValue({
+      id: "dog_ref_1",
+      name: "FI12345/21",
+      sex: "UNKNOWN",
+      registrationNo: "FI12345/21",
+    });
+
+    await expect(
+      createAdminDog({
+        status: "REFERENCE_ONLY",
+        name: " ",
+        sex: "UNKNOWN",
+        registrationNo: " fi12345/21 ",
+      }),
+    ).resolves.toEqual({
+      status: 201,
+      body: {
+        ok: true,
+        data: {
+          id: "dog_ref_1",
+          name: "FI12345/21",
+          sex: "UNKNOWN",
+          registrationNo: "FI12345/21",
+        },
+      },
+    });
+
+    expect(findDogByRegistrationNoDbMock).not.toHaveBeenCalled();
+    expect(createAdminDogWriteDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: "REFERENCE_ONLY",
+        name: "FI12345/21",
+        registrationNo: "FI12345/21",
+        sireId: null,
+        damId: null,
+      }),
+      {},
+    );
+  });
+
+  it("creates a reference-only dog with an explicitly resolved sire and no dam", async () => {
+    findDogByRegistrationNoDbMock.mockResolvedValue({
+      id: "sire_1",
+      sex: "MALE",
+    });
+    createAdminDogWriteDbMock.mockResolvedValue({
+      id: "dog_ref_1",
+      name: "Known Parent Reference",
+      sex: "FEMALE",
+      registrationNo: "FI12345/21",
+    });
+
+    await expect(
+      createAdminDog({
+        status: "REFERENCE_ONLY",
+        name: "Known Parent Reference",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        sireRegistrationNo: "FI11111/11",
+      }),
+    ).resolves.toMatchObject({ status: 201 });
+
+    expect(findDogByRegistrationNoDbMock).toHaveBeenCalledWith("FI11111/11");
+    expect(createAdminDogWriteDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: "REFERENCE_ONLY",
+        name: "Known Parent Reference",
+        sireId: "sire_1",
+        damId: null,
+      }),
+      {},
+    );
+  });
+
   it("returns 400 for empty registration number", async () => {
     await expect(
       createAdminDog({
@@ -237,6 +330,7 @@ describe("createAdminDog", () => {
 
     expect(createAdminDogWriteDbMock).toHaveBeenCalledWith(
       {
+        status: "NORMAL",
         name: "Metsapolun Kide",
         sex: "FEMALE",
         birthDate: new Date("2021-04-09T00:00:00.000Z"),

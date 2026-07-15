@@ -1,4 +1,4 @@
-import { DogSex } from "@prisma/client";
+import { DogSex, DogStatus } from "@prisma/client";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { searchVirtualPairingDogsDb } from "../repository";
 
@@ -107,18 +107,22 @@ describe("searchVirtualPairingDogsDb", () => {
 
     expect(dogCountMock).toHaveBeenCalledWith({
       where: {
-        name: {
-          contains: "kide",
-          mode: "insensitive",
-        },
+        AND: [
+          {
+            status: { in: [DogStatus.NORMAL, DogStatus.REFERENCE_ONLY] },
+          },
+          { name: { contains: "kide", mode: "insensitive" } },
+        ],
       },
     });
     expect(dogFindManyMock).toHaveBeenCalledWith({
       where: {
-        name: {
-          contains: "kide",
-          mode: "insensitive",
-        },
+        AND: [
+          {
+            status: { in: [DogStatus.NORMAL, DogStatus.REFERENCE_ONLY] },
+          },
+          { name: { contains: "kide", mode: "insensitive" } },
+        ],
       },
       orderBy: [{ name: "asc" }, { id: "asc" }],
       skip: 5,
@@ -171,26 +175,40 @@ describe("searchVirtualPairingDogsDb", () => {
 
     expect(dogCountMock).toHaveBeenCalledWith({
       where: {
-        registrations: {
-          some: {
-            registrationNo: {
-              equals: "FI12345/21",
-              mode: "insensitive",
+        AND: [
+          {
+            status: { in: [DogStatus.NORMAL, DogStatus.REFERENCE_ONLY] },
+          },
+          {
+            registrations: {
+              some: {
+                registrationNo: {
+                  equals: "FI12345/21",
+                  mode: "insensitive",
+                },
+              },
             },
           },
-        },
+        ],
       },
     });
     expect(dogFindManyMock).toHaveBeenCalledWith({
       where: {
-        registrations: {
-          some: {
-            registrationNo: {
-              equals: "FI12345/21",
-              mode: "insensitive",
+        AND: [
+          {
+            status: { in: [DogStatus.NORMAL, DogStatus.REFERENCE_ONLY] },
+          },
+          {
+            registrations: {
+              some: {
+                registrationNo: {
+                  equals: "FI12345/21",
+                  mode: "insensitive",
+                },
+              },
             },
           },
-        },
+        ],
       },
       orderBy: [{ name: "asc" }, { id: "asc" }],
       skip: 0,
@@ -258,12 +276,22 @@ describe("searchVirtualPairingDogsDb", () => {
 
     expect(dogCountMock).toHaveBeenCalledWith({
       where: {
-        ekNo: 5588,
+        AND: [
+          {
+            status: { in: [DogStatus.NORMAL, DogStatus.REFERENCE_ONLY] },
+          },
+          { ekNo: 5588 },
+        ],
       },
     });
     expect(dogFindManyMock).toHaveBeenCalledWith({
       where: {
-        ekNo: 5588,
+        AND: [
+          {
+            status: { in: [DogStatus.NORMAL, DogStatus.REFERENCE_ONLY] },
+          },
+          { ekNo: 5588 },
+        ],
       },
       orderBy: [{ ekNo: "asc" }, { name: "asc" }, { id: "asc" }],
       skip: 0,
@@ -346,10 +374,12 @@ describe("searchVirtualPairingDogsDb", () => {
     expect(dogCountMock).not.toHaveBeenCalled();
     expect(dogFindManyMock).toHaveBeenCalledWith({
       where: {
-        name: {
-          contains: "sentinel",
-          mode: "insensitive",
-        },
+        AND: [
+          {
+            status: { in: [DogStatus.NORMAL, DogStatus.REFERENCE_ONLY] },
+          },
+          { name: { contains: "sentinel", mode: "insensitive" } },
+        ],
       },
       orderBy: [{ name: "asc" }, { id: "asc" }],
       take: 501,
@@ -381,6 +411,36 @@ describe("searchVirtualPairingDogsDb", () => {
       isLimited: true,
       candidateLimit: 500,
       items: [],
+    });
+  });
+
+  it("allows callers to include both statuses", async () => {
+    dogCountMock.mockResolvedValue(0);
+    dogFindManyMock.mockResolvedValue([]);
+
+    await searchVirtualPairingDogsDb(
+      {
+        field: "name",
+        query: "kide",
+        page: 1,
+        pageSize: 10,
+      },
+      {
+        allowedStatuses: [DogStatus.NORMAL, DogStatus.REFERENCE_ONLY],
+      },
+    );
+
+    expect(dogCountMock).toHaveBeenCalledWith({
+      where: {
+        AND: [
+          {
+            status: {
+              in: [DogStatus.NORMAL, DogStatus.REFERENCE_ONLY],
+            },
+          },
+          { name: { contains: "kide", mode: "insensitive" } },
+        ],
+      },
     });
   });
 

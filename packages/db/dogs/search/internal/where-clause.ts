@@ -1,4 +1,4 @@
-import { DogSex, type Prisma } from "@prisma/client";
+import { DogSex, DogStatus, type Prisma } from "@prisma/client";
 import { getWildcardProbe, hasWildcard } from "./wildcard";
 
 function toYearStartDateUtc(year: number): Date {
@@ -18,7 +18,7 @@ export function buildWhere(input: {
   birthYearTo?: number;
   ekOnly?: boolean;
 }): Prisma.DogWhereInput {
-  const and: Prisma.DogWhereInput[] = [];
+  const and: Prisma.DogWhereInput[] = [{ status: DogStatus.NORMAL }];
 
   if (input.ek) {
     if (!hasWildcard(input.ek)) {

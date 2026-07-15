@@ -52,7 +52,7 @@ function renderParentLabel(
 function renderParentLink(parent: BeagleDogProfileParentDto | null) {
   const label = renderParentLabel(parent);
 
-  if (!parent?.id) {
+  if (!parent?.id || parent.status === "REFERENCE_ONLY") {
     return <span>{label}</span>;
   }
 

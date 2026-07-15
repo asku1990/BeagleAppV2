@@ -1,6 +1,7 @@
 // Encapsulates sibling candidate query shape so the profile DB use-case remains
 // focused on orchestration instead of Prisma include/where details.
 import { prisma } from "@db/core/prisma";
+import { DogStatus } from "@prisma/client";
 import {
   buildSiblingWhere,
   type SiblingProfileContext,
@@ -12,6 +13,7 @@ const siblingCandidateInclude = {
   sire: { include: { registrations: true } },
   dam: { include: { registrations: true } },
   whelpedPuppies: {
+    where: { status: DogStatus.NORMAL },
     select: {
       id: true,
       birthDate: true,
@@ -30,6 +32,7 @@ const siblingCandidateInclude = {
     },
   },
   siredPuppies: {
+    where: { status: DogStatus.NORMAL },
     select: {
       id: true,
       birthDate: true,

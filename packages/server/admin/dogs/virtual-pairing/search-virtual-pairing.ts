@@ -51,7 +51,9 @@ export async function searchAdminVirtualPairing(
 
   try {
     const result = await searchVirtualPairingDogs(input, {
-      actorUserId: currentUser?.id ?? undefined,
+      context: {
+        actorUserId: currentUser?.id ?? undefined,
+      },
     });
 
     if (!result.body.ok) {

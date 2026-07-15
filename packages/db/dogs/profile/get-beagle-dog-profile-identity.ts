@@ -1,5 +1,6 @@
 // Loads only the dog identity needed by lightweight dog-centric views.
 import { prisma } from "@db/core/prisma";
+import { DogStatus } from "@prisma/client";
 import { getPrimaryRegistrationNo } from "./internal/profile-mappers";
 
 export type BeagleDogProfileIdentityDb = {
@@ -11,8 +12,8 @@ export type BeagleDogProfileIdentityDb = {
 export async function getBeagleDogProfileIdentityDb(
   dogId: string,
 ): Promise<BeagleDogProfileIdentityDb | null> {
-  const dog = await prisma.dog.findUnique({
-    where: { id: dogId },
+  const dog = await prisma.dog.findFirst({
+    where: { id: dogId, status: DogStatus.NORMAL },
     select: {
       id: true,
       name: true,

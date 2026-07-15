@@ -4,6 +4,7 @@ import {
   getBusinessDateUtcRange,
   toBusinessDateOnly,
 } from "@db/core/date-only";
+import { DogStatus } from "@prisma/client";
 import { getPrimaryRegistrationNo, toSexCode } from "./profile-mappers";
 import type {
   BeagleDogProfileSiblingRowDb,
@@ -77,6 +78,7 @@ export function buildSiblingWhere(
 
   return {
     id: { not: context.id },
+    status: DogStatus.NORMAL,
     // Match by Helsinki calendar day to avoid missing siblings with different
     // legacy timestamp times on the same birth date.
     birthDate: {

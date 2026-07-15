@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DogStatus } from "@prisma/client";
 
 const { dogFindUniqueMock, prismaMock } = vi.hoisted(() => {
   const dogFindUnique = vi.fn();
@@ -7,7 +8,7 @@ const { dogFindUniqueMock, prismaMock } = vi.hoisted(() => {
     dogFindUniqueMock: dogFindUnique,
     prismaMock: {
       dog: {
-        findUnique: dogFindUnique,
+        findFirst: dogFindUnique,
       },
     },
   };
@@ -32,7 +33,7 @@ describe("getBeagleDogProfileIdentityDb", () => {
     expect(result).toBeNull();
     expect(dogFindUniqueMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { id: "missing-id" },
+        where: { id: "missing-id", status: DogStatus.NORMAL },
       }),
     );
   });

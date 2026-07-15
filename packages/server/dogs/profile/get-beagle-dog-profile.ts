@@ -9,7 +9,10 @@ import {
   type BeagleShowDogRowDb,
   type BeagleTrialDogRowDb,
 } from "@beagle/db";
-import type { BeagleDogProfileDto } from "@beagle/contracts";
+import type {
+  BeagleDogProfileDto,
+  BeagleDogProfileParentDto,
+} from "@beagle/contracts";
 import { toBusinessDateOnly } from "@server/core/date-only";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
@@ -26,6 +29,16 @@ export type DogsServiceLogContext = {
   requestId?: string;
   actorUserId?: string;
 };
+
+function toPublicParent(
+  parent: BeagleDogProfileDb["sire"],
+): BeagleDogProfileParentDto | null {
+  if (!parent) {
+    return null;
+  }
+
+  return { ...parent, status: parent.status ?? "NORMAL" };
+}
 
 function mapDogProfileFromDb(
   profile: BeagleDogProfileDb,
@@ -44,14 +57,21 @@ function mapDogProfileFromDb(
     color: profile.color,
     ekNo: profile.ekNo,
     inbreedingCoefficientPct,
-    sire: profile.sire,
-    dam: profile.dam,
-    pedigree: profile.pedigree,
+    sire: toPublicParent(profile.sire),
+    dam: toPublicParent(profile.dam),
+    pedigree: profile.pedigree.map((generation) => ({
+      ...generation,
+      cards: generation.cards.map((card) => ({
+        ...card,
+        sire: toPublicParent(card.sire),
+        dam: toPublicParent(card.dam),
+      })),
+    })),
     offspringSummary: profile.offspringSummary,
     litters: profile.litters.map((litter) => ({
       id: litter.id,
       birthDate: litter.birthDate ? toBusinessDateOnly(litter.birthDate) : null,
-      otherParent: litter.otherParent,
+      otherParent: toPublicParent(litter.otherParent),
       puppyCount: litter.puppyCount,
       puppies: litter.puppies,
     })),

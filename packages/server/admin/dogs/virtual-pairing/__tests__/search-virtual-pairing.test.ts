@@ -83,5 +83,19 @@ describe("searchAdminVirtualPairing", () => {
         },
       },
     });
+
+    expect(searchVirtualPairingDogsMock).toHaveBeenCalledWith(
+      {
+        field: "name",
+        query: "Kide",
+        page: 2,
+        pageSize: 5,
+      },
+      {
+        context: {
+          actorUserId: "admin_1",
+        },
+      },
+    );
   });
 });

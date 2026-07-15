@@ -45,7 +45,9 @@ function mapContribution(
 export async function calculatePublicVirtualPairing(
   input: CalculatePublicVirtualPairingRequest,
 ): Promise<CalculateResult> {
-  const result = await calculateVirtualPairing(input);
+  const result = await calculateVirtualPairing(input, {
+    allowedStatuses: ["NORMAL"],
+  });
   if (!result.body.ok) {
     return {
       status: result.status,

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DogSex } from "@prisma/client";
+import { DogSex, DogStatus } from "@prisma/client";
 
 const {
   showEventFindManyMock,
@@ -502,7 +502,7 @@ describe("getBeagleShowDetailsDb", () => {
     });
   });
 
-  it("keeps unlinked canonical entries visible with snapshot identity", async () => {
+  it("keeps entries visible while linking only normal dogs", async () => {
     showEventFindManyMock.mockResolvedValue([
       {
         eventLookupKey: "show-event-2",
@@ -518,7 +518,22 @@ describe("getBeagleShowDetailsDb", () => {
               id: "dog-1",
               name: "Linked Dog",
               sex: DogSex.MALE,
+              status: DogStatus.NORMAL,
               registrations: [{ registrationNo: "FI-111/25" }],
+            },
+            resultItems: [],
+          },
+          {
+            id: "reference-only",
+            judge: "Judge Main",
+            heightText: "42",
+            registrationNoSnapshot: "FI-333/25",
+            dog: {
+              id: "dog-reference",
+              name: "FI-333/25",
+              sex: DogSex.FEMALE,
+              status: DogStatus.REFERENCE_ONLY,
+              registrations: [{ registrationNo: "FI-333/25" }],
             },
             resultItems: [],
           },
@@ -540,12 +555,18 @@ describe("getBeagleShowDetailsDb", () => {
       eventPlace: "Helsinki",
     });
 
-    expect(result?.dogCount).toBe(2);
+    expect(result?.dogCount).toBe(3);
     expect(result?.items).toEqual([
       expect.objectContaining({
         id: "linked",
         dogId: "dog-1",
         registrationNo: "FI-111/25",
+      }),
+      expect.objectContaining({
+        id: "reference-only",
+        dogId: null,
+        registrationNo: "FI-333/25",
+        name: "FI-333/25",
       }),
       expect.objectContaining({
         id: "unlinked",

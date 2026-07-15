@@ -42,6 +42,7 @@ export function mapParent(
     name: dog.name,
     registrationNo: getParentRegistrationNo(dog.registrations),
     ekNo: dog.ekNo ?? null,
+    ...(dog.status ? { status: dog.status } : {}),
   };
 }
 

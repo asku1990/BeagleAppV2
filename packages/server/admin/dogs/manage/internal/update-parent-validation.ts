@@ -87,6 +87,7 @@ export function validateUpdateParentGuards(
   existingDog: ExistingDogParentState,
   sire: ParentRef | null | undefined,
   dam: ParentRef | null | undefined,
+  parentsRequired: boolean,
 ): UpdateParentGuardResult {
   const effectiveSire: ParentRef | null =
     sire === undefined ? existingDog.sire : sire;
@@ -114,14 +115,14 @@ export function validateUpdateParentGuards(
     };
   }
 
-  if (!effectiveSire) {
+  if (!effectiveSire && parentsRequired) {
     return {
       ok: false,
       response: requiredSireRegistrationResponse(),
     };
   }
 
-  if (!effectiveDam) {
+  if (!effectiveDam && parentsRequired) {
     return {
       ok: false,
       response: requiredDamRegistrationResponse(),

@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import type { DogStatus, Prisma } from "@prisma/client";
 import { prisma } from "@db/core/prisma";
 import { getFirstInsertedRegistrationNo } from "../core/registration";
 
@@ -15,6 +15,7 @@ export type VirtualPairingAncestorDetailsDb = {
   name: string;
   ekNo: number | null;
   registrationNo: string;
+  status: DogStatus;
 };
 
 export async function findVirtualPairingAncestorDetailsDb(
@@ -29,6 +30,7 @@ export async function findVirtualPairingAncestorDetailsDb(
       id: true,
       name: true,
       ekNo: true,
+      status: true,
       registrations: {
         select: {
           registrationNo: true,
@@ -47,6 +49,7 @@ export async function findVirtualPairingAncestorDetailsDb(
             id: row.id,
             name: row.name,
             ekNo: row.ekNo,
+            status: row.status,
             registrationNo:
               getFirstInsertedRegistrationNo(row.registrations) ?? "-",
           },

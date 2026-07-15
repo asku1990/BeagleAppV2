@@ -1,10 +1,11 @@
 // Fetches the base dog profile row shape (dog + pedigree + offspring relations)
 // used by the profile DB orchestrator.
 import { prisma } from "@db/core/prisma";
+import { DogStatus } from "@prisma/client";
 
 export async function getDogProfileBaseRow(dogId: string) {
-  return prisma.dog.findUnique({
-    where: { id: dogId },
+  return prisma.dog.findFirst({
+    where: { id: dogId, status: DogStatus.NORMAL },
     include: {
       registrations: true,
       sire: {
@@ -46,12 +47,14 @@ export async function getDogProfileBaseRow(dogId: string) {
         },
       },
       whelpedPuppies: {
+        where: { status: DogStatus.NORMAL },
         include: {
           color: true,
           registrations: true,
           sire: { include: { registrations: true } },
           dam: { include: { registrations: true } },
           whelpedPuppies: {
+            where: { status: DogStatus.NORMAL },
             select: {
               id: true,
               birthDate: true,
@@ -70,6 +73,7 @@ export async function getDogProfileBaseRow(dogId: string) {
             },
           },
           siredPuppies: {
+            where: { status: DogStatus.NORMAL },
             select: {
               id: true,
               birthDate: true,
@@ -96,12 +100,14 @@ export async function getDogProfileBaseRow(dogId: string) {
         },
       },
       siredPuppies: {
+        where: { status: DogStatus.NORMAL },
         include: {
           color: true,
           registrations: true,
           sire: { include: { registrations: true } },
           dam: { include: { registrations: true } },
           whelpedPuppies: {
+            where: { status: DogStatus.NORMAL },
             select: {
               id: true,
               birthDate: true,
@@ -120,6 +126,7 @@ export async function getDogProfileBaseRow(dogId: string) {
             },
           },
           siredPuppies: {
+            where: { status: DogStatus.NORMAL },
             select: {
               id: true,
               birthDate: true,

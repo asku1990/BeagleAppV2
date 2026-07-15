@@ -40,6 +40,14 @@ describe("loadDogPedigreeAncestryDb", () => {
     const result = await loadDogPedigreeAncestryDb("root", 10);
 
     expect(dogFindManyMock).toHaveBeenCalledTimes(3);
+    expect(dogFindManyMock).toHaveBeenNthCalledWith(1, {
+      where: { id: { in: ["root"] } },
+      select: { id: true, sireId: true, damId: true },
+    });
+    expect(dogFindManyMock).toHaveBeenNthCalledWith(2, {
+      where: { id: { in: ["sire", "dam"] } },
+      select: { id: true, sireId: true, damId: true },
+    });
     expect(result).toEqual({
       rootId: "root",
       nodes: {
