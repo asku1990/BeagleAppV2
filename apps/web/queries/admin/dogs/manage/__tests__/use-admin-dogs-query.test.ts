@@ -24,12 +24,13 @@ describe("useAdminDogsQuery", () => {
   it("uses expected query key and options", () => {
     useQueryMock.mockImplementation((options) => options);
 
-    useAdminDogsQuery({ query: "kide", sex: "FEMALE" });
+    useAdminDogsQuery({ query: "kide", sex: "FEMALE" }, { enabled: false });
 
     const options = useQueryMock.mock.calls[0]?.[0] as {
       queryKey: readonly unknown[];
       staleTime: number;
       refetchOnWindowFocus: boolean;
+      enabled: boolean;
     };
 
     expect(options.queryKey).toEqual(
@@ -37,6 +38,7 @@ describe("useAdminDogsQuery", () => {
     );
     expect(options.staleTime).toBe(30_000);
     expect(options.refetchOnWindowFocus).toBe(true);
+    expect(options.enabled).toBe(false);
   });
 
   it("returns items and pagination when action succeeds", async () => {

@@ -5,7 +5,14 @@ import { useQuery } from "@tanstack/react-query";
 import { getAdminDogsAction } from "@/app/actions/admin/dogs/manage/get-admin-dogs";
 import { adminDogsQueryKey } from "./query-keys";
 
-export function useAdminDogsQuery(filters: AdminDogListRequest) {
+type UseAdminDogsQueryOptions = {
+  enabled?: boolean;
+};
+
+export function useAdminDogsQuery(
+  filters: AdminDogListRequest,
+  options: UseAdminDogsQueryOptions = {},
+) {
   return useQuery<{
     items: AdminDogListItem[];
     total: number;
@@ -28,5 +35,6 @@ export function useAdminDogsQuery(filters: AdminDogListRequest) {
     },
     staleTime: 30_000,
     refetchOnWindowFocus: true,
+    enabled: options.enabled ?? true,
   });
 }

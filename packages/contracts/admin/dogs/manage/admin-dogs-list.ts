@@ -49,6 +49,7 @@ export type AdminDogListSort = "name-asc" | "birth-desc" | "created-desc";
 export type AdminDogListRequest = {
   query?: string;
   sex?: AdminDogListSex;
+  status?: DogStatus;
   page?: number;
   pageSize?: number;
   sort?: AdminDogListSort;

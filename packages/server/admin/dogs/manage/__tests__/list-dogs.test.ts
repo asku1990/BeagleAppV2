@@ -79,6 +79,17 @@ describe("listAdminDogs", () => {
         code: "INVALID_SEX",
       },
     });
+
+    await expect(
+      listAdminDogs({ status: "INVALID" as "NORMAL" }, adminUser),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Invalid status value.",
+        code: "INVALID_STATUS",
+      },
+    });
   });
 
   it("returns mapped dog rows when db succeeds", async () => {
@@ -130,6 +141,7 @@ describe("listAdminDogs", () => {
         {
           query: "kide",
           sex: "FEMALE",
+          status: "REFERENCE_ONLY",
           page: 1,
           pageSize: 20,
           sort: "name-asc",
@@ -193,6 +205,7 @@ describe("listAdminDogs", () => {
     expect(listAdminDogsDbMock).toHaveBeenCalledWith({
       query: "kide",
       sex: "FEMALE",
+      status: "REFERENCE_ONLY",
       page: 1,
       pageSize: 20,
       sort: "name-asc",
