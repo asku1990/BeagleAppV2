@@ -31,6 +31,9 @@ describe("DogFilters", () => {
     expect(html).toContain("admin.dogs.filters.advanced.open");
     expect(html).toContain('aria-expanded="false"');
     expect(html).not.toContain("admin.dogs.filters.statusLabel");
+    expect(html.indexOf('value="kide"')).toBeLessThan(
+      html.indexOf("admin.dogs.filters.submit"),
+    );
   });
 
   it("disables request actions while a search is pending", () => {

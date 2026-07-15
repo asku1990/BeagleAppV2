@@ -1,4 +1,5 @@
 import type { AdminDogListRequest } from "@beagle/contracts";
+import { adminDogListRequestKeyParts } from "@/lib/admin/dogs/manage/dog-search-request";
 
 export const adminDogsQueryKeyRoot = ["admin-dogs"] as const;
 export const adminDogBreederOptionsQueryKeyRoot = [
@@ -25,12 +26,7 @@ export const adminDogDeleteImpactQueryKeyRoot = [
 export function adminDogsQueryKey(filters: AdminDogListRequest) {
   return [
     ...adminDogsQueryKeyRoot,
-    filters.query ?? "",
-    filters.sex ?? null,
-    filters.status ?? null,
-    filters.page ?? 1,
-    filters.pageSize ?? 20,
-    filters.sort ?? "name-asc",
+    ...adminDogListRequestKeyParts(filters),
   ] as const;
 }
 

@@ -49,12 +49,18 @@ export function DogFilters({
 
   return (
     <form className="space-y-3" onSubmit={handleSubmit}>
-      <Input
-        value={query}
-        onChange={(event) => onQueryChange(event.target.value)}
-        placeholder={t("admin.dogs.filters.searchPlaceholder")}
-        aria-label={t("admin.dogs.filters.searchAria")}
-      />
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Input
+          value={query}
+          onChange={(event) => onQueryChange(event.target.value)}
+          placeholder={t("admin.dogs.filters.searchPlaceholder")}
+          aria-label={t("admin.dogs.filters.searchAria")}
+          className="min-w-0 flex-1"
+        />
+        <Button type="submit" className="sm:shrink-0" disabled={isPending}>
+          {t("admin.dogs.filters.submit")}
+        </Button>
+      </div>
       <div
         className="flex flex-wrap gap-2"
         role="group"
@@ -94,9 +100,6 @@ export function DogFilters({
         </Button>
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button type="submit" disabled={isPending}>
-          {t("admin.dogs.filters.submit")}
-        </Button>
         <Button
           type="button"
           variant="outline"

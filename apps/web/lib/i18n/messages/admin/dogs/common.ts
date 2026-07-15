@@ -7,9 +7,14 @@ export const fiAdminDogsCommonMessages = {
   "admin.dogs.management.countPrefix": "Hakutulokset",
   "admin.dogs.loading": "Ladataan koiria...",
   "admin.dogs.error": "Koirien lataaminen epäonnistui.",
+  "admin.dogs.pagination.previous": "Edellinen",
+  "admin.dogs.pagination.page": "Sivu",
+  "admin.dogs.pagination.next": "Seuraava",
   "admin.dogs.filters.searchPlaceholder":
     "Hae nimellä, rekisterinumerolla, tittelikoodilla, tittelin nimellä, omistajalla tai muistiinpanosta",
   "admin.dogs.filters.searchAria": "Hae koiria",
+  "admin.dogs.filters.initialPrompt":
+    "Valitse hakuehdot ja paina Hae. Tyhjä haku näyttää kaikki koirat.",
   "admin.dogs.filters.submit": "Hae",
   "admin.dogs.filters.reset": "Tyhjennä",
   "admin.dogs.filters.advanced.open": "Näytä tarkennetut suodattimet",
@@ -81,9 +86,14 @@ export const svAdminDogsCommonMessages = {
   "admin.dogs.management.countPrefix": "Sokresultat",
   "admin.dogs.loading": "Laddar hundar...",
   "admin.dogs.error": "Kunde inte ladda hundar.",
+  "admin.dogs.pagination.previous": "Föregående",
+  "admin.dogs.pagination.page": "Sida",
+  "admin.dogs.pagination.next": "Nästa",
   "admin.dogs.filters.searchPlaceholder":
     "Sök på namn, registreringsnummer, titelkod, titelnamn, ägare eller anteckning",
   "admin.dogs.filters.searchAria": "Sok hundar",
+  "admin.dogs.filters.initialPrompt":
+    "Välj sökvillkor och tryck på Sök. En tom sökning visar alla hundar.",
   "admin.dogs.filters.submit": "Sök",
   "admin.dogs.filters.reset": "Rensa",
   "admin.dogs.filters.advanced.open": "Visa avancerade filter",
