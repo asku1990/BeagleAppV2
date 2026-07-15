@@ -17,6 +17,7 @@ import {
   invalidBirthDateResponse,
   invalidColorCodeResponse,
   invalidDogIdResponse,
+  invalidDogStatusResponse,
   invalidEkNoResponse,
   invalidNameResponse,
   invalidRegistrationNoFormatResponse,
@@ -47,6 +48,7 @@ type UpdateValidationSuccess<T> = {
 export type UpdatePreflightValidationResult =
   | UpdateValidationSuccess<{
       id: string;
+      status: "NORMAL" | "REFERENCE_ONLY";
       name: string;
       sex: "MALE" | "FEMALE" | "UNKNOWN";
       birthDate: Date | null | undefined;
@@ -84,8 +86,18 @@ export function validateUpdatePreflight(
     };
   }
 
+  const status = input.status;
+  if (status !== "NORMAL" && status !== "REFERENCE_ONLY") {
+    return {
+      ok: false,
+      logContext: { event: "invalid_dog_status", dogId: id, status },
+      logMessage: "admin dog update rejected because dog status is invalid",
+      response: invalidDogStatusResponse(),
+    };
+  }
+
   const name = normalizeRequiredText(input.name);
-  if (!name) {
+  if (!name && status === "NORMAL") {
     return {
       ok: false,
       logContext: { event: "invalid_name", dogId: id },
@@ -94,7 +106,7 @@ export function validateUpdatePreflight(
     };
   }
 
-  if (name.length > maxNameLength) {
+  if (name && name.length > maxNameLength) {
     return {
       ok: false,
       logContext: { event: "name_too_long", dogId: id },
@@ -217,7 +229,8 @@ export function validateUpdatePreflight(
     ok: true,
     data: {
       id,
-      name,
+      status,
+      name: name ?? registration.primaryRegistrationNo,
       sex,
       birthDate,
       ekNo,

@@ -117,14 +117,16 @@ export async function updateAdminDog(
       return dogNotFoundResponse();
     }
 
-    const parentGuardResult = parentFieldsWereEdited
-      ? validateUpdateParentGuards(
-          preflight.data.id,
-          existingDog,
-          resolvedParents.data.sire,
-          resolvedParents.data.dam,
-        )
-      : undefined;
+    const parentGuardResult =
+      parentFieldsWereEdited || preflight.data.status === "NORMAL"
+        ? validateUpdateParentGuards(
+            preflight.data.id,
+            existingDog,
+            resolvedParents.data.sire,
+            resolvedParents.data.dam,
+            preflight.data.status === "NORMAL",
+          )
+        : undefined;
     if (parentGuardResult && !parentGuardResult.ok) {
       return parentGuardResult.response;
     }
@@ -157,6 +159,7 @@ export async function updateAdminDog(
         updateAdminDogWriteDb(
           {
             id: preflight.data.id,
+            status: preflight.data.status,
             name: preflight.data.name,
             sex: preflight.data.sex,
             birthDate: preflight.data.birthDate,

@@ -70,6 +70,9 @@ Issue tooling:
   - per-code files: `<ISSUE_CODE>.csv`
   - index file: `index.csv`
   - grouped stage summary: `stage-reasons.csv`
+  - per-code files place `message` first, followed by `registrationNo`,
+    `sourceTable`, `stage`, `severity`, and `payloadJson`, so the review note is
+    immediately visible in Excel
 
 ## Phase responsibilities
 

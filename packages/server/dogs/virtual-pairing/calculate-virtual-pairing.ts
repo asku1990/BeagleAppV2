@@ -2,6 +2,7 @@ import {
   findVirtualPairingAncestorDetailsDb,
   findVirtualPairingDogByRegistrationNoDb,
   loadDogPedigreeAncestryForParentsDb,
+  type DogStatus,
   type VirtualPairingAncestorDetailsDb,
 } from "@beagle/db";
 import { loadDogDiseaseFactsDb } from "@beagle/db/dogs/core/epi-disease-facts";
@@ -34,6 +35,10 @@ export type VirtualPairingCalculationCoreResult = {
   health: DogHealthSummary;
   diagnostics: InbreedingCoefficientBreakdownPct;
   ancestorDetailsById: Map<string, VirtualPairingAncestorDetailsDb>;
+};
+
+export type CalculateVirtualPairingOptions = {
+  allowedStatuses?: readonly DogStatus[];
 };
 
 type CalculationResult = ServiceResult<VirtualPairingCalculationCoreResult>;
@@ -144,7 +149,9 @@ function buildVirtualRootAncestry(
 
 export async function calculateVirtualPairing(
   input: VirtualPairingCalculationRequest,
+  options: CalculateVirtualPairingOptions = {},
 ): Promise<CalculationResult> {
+  const { allowedStatuses } = options;
   const startedAt = Date.now();
   const sireRegistrationNo = normalizeRegistrationNo(input.sireRegistrationNo);
   const damRegistrationNo = normalizeRegistrationNo(input.damRegistrationNo);
@@ -175,14 +182,20 @@ export async function calculateVirtualPairing(
   }
 
   try {
-    const sireRow =
-      await findVirtualPairingDogByRegistrationNoDb(sireRegistrationNo);
+    const sireRow = allowedStatuses
+      ? await findVirtualPairingDogByRegistrationNoDb(sireRegistrationNo, {
+          allowedStatuses,
+        })
+      : await findVirtualPairingDogByRegistrationNoDb(sireRegistrationNo);
     if (!sireRow) {
       return invalidSireRegistrationResponse();
     }
 
-    const damRow =
-      await findVirtualPairingDogByRegistrationNoDb(damRegistrationNo);
+    const damRow = allowedStatuses
+      ? await findVirtualPairingDogByRegistrationNoDb(damRegistrationNo, {
+          allowedStatuses,
+        })
+      : await findVirtualPairingDogByRegistrationNoDb(damRegistrationNo);
     if (!damRow) {
       return invalidDamRegistrationResponse();
     }

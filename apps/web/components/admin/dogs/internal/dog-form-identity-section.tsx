@@ -7,6 +7,7 @@ type DogFormIdentitySectionProps = {
   values: AdminDogFormValues;
   todayDateInputValue: string;
   isSubmitting: boolean;
+  nameRequired: boolean;
   onValuesChange: (values: AdminDogFormValues) => void;
   t: (key: MessageKey) => string;
 };
@@ -15,13 +16,15 @@ export function DogFormIdentitySection({
   values,
   todayDateInputValue,
   isSubmitting,
+  nameRequired,
   onValuesChange,
   t,
 }: DogFormIdentitySectionProps) {
   return (
     <>
       <p className="text-sm text-muted-foreground">
-        {t("admin.dogs.form.namePlaceholder")} *
+        {t("admin.dogs.form.namePlaceholder")}
+        {nameRequired ? " *" : ""}
       </p>
       <Input
         value={values.name}
@@ -30,7 +33,7 @@ export function DogFormIdentitySection({
         }
         placeholder={t("admin.dogs.form.namePlaceholder")}
         maxLength={120}
-        required
+        required={nameRequired}
       />
       <div className="space-y-2">
         <p className="text-sm text-muted-foreground">

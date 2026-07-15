@@ -96,6 +96,7 @@ export type {
   BeagleNewestResponse,
   DogColorDto,
   DogColorStatus,
+  DogStatus,
   BeagleSearchMode,
   BeagleSearchRequest,
   BeagleSearchResponse,

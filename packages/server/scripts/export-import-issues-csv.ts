@@ -5,16 +5,11 @@ import {
 } from "@beagle/db";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-
-type CsvIssueRow = {
-  stage: string;
-  severity: ImportIssueSeverity;
-  code: string;
-  message: string;
-  registrationNo: string | null;
-  sourceTable: string | null;
-  payloadJson: string | null;
-};
+import {
+  formatPerCodeIssueCsv,
+  toCsvLine,
+  type CsvIssueRow,
+} from "./imports/internal/issue-csv";
 
 type StageReasonSummary = {
   stage: string;
@@ -125,18 +120,6 @@ function sanitizeCodeForFilename(code: string): string {
   return sanitized.length > 0 ? sanitized : "UNKNOWN_CODE";
 }
 
-function toCsvCell(value: string | null | undefined): string {
-  const next = value ?? "";
-  if (!/[",\n\r]/.test(next)) {
-    return next;
-  }
-  return `"${next.replace(/"/g, '""')}"`;
-}
-
-function toCsvLine(values: Array<string | null | undefined>): string {
-  return values.map(toCsvCell).join(",");
-}
-
 async function main() {
   const { runId, stage, code, severity, outDir, limit, wantsHelp, error } =
     parseArgs(process.argv);
@@ -214,27 +197,7 @@ async function main() {
   for (const [issueCode, rows] of codeEntries) {
     const filename = `${sanitizeCodeForFilename(issueCode)}.csv`;
     const filePath = path.join(outputDir, filename);
-    const lines = [
-      toCsvLine([
-        "registrationNo",
-        "sourceTable",
-        "stage",
-        "severity",
-        "message",
-        "payloadJson",
-      ]),
-      ...rows.map((row) =>
-        toCsvLine([
-          row.registrationNo,
-          row.sourceTable,
-          row.stage,
-          row.severity,
-          row.message,
-          row.payloadJson,
-        ]),
-      ),
-    ];
-    await writeFile(filePath, `${lines.join("\n")}\n`, "utf8");
+    await writeFile(filePath, formatPerCodeIssueCsv(rows), "utf8");
     indexLines.push(toCsvLine([issueCode, String(rows.length), filename]));
   }
 

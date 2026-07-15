@@ -47,6 +47,7 @@ describe("listAdminDogsDb", () => {
     dogFindManyMock.mockResolvedValue([
       {
         id: "dog_1",
+        status: "REFERENCE_ONLY",
         name: "Metsapolun Kide",
         sex: DogSex.FEMALE,
         birthDate: new Date("2021-04-09T00:00:00.000Z"),
@@ -100,6 +101,7 @@ describe("listAdminDogsDb", () => {
       items: [
         {
           id: "dog_1",
+          status: "REFERENCE_ONLY",
           registrationNo: "FI12345/21",
           secondaryRegistrationNos: [],
           name: "Metsapolun Kide",
@@ -178,6 +180,7 @@ describe("listAdminDogsDb", () => {
     dogFindManyMock.mockResolvedValue([
       {
         id: "dog_1",
+        status: "NORMAL",
         name: "Metsapolun Kide",
         sex: DogSex.FEMALE,
         birthDate: null,

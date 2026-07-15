@@ -15,6 +15,7 @@ import {
   duplicateRegistrationNoResponse,
   invalidBirthDateResponse,
   invalidColorCodeResponse,
+  invalidDogStatusResponse,
   invalidEkNoResponse,
   invalidNameResponse,
   invalidRegistrationNoFormatResponse,
@@ -44,6 +45,7 @@ type CreateValidationSuccess<T> = {
 
 export type CreatePreflightValidationResult =
   | CreateValidationSuccess<{
+      status: "NORMAL" | "REFERENCE_ONLY";
       name: string;
       sex: "MALE" | "FEMALE" | "UNKNOWN";
       birthDate: Date | null;
@@ -69,8 +71,18 @@ export function validateCreatePreflight(
   maxNameLength: number,
   maxRegistrationNoLength: number,
 ): CreatePreflightValidationResult {
+  const status = input.status ?? "NORMAL";
+  if (status !== "NORMAL" && status !== "REFERENCE_ONLY") {
+    return {
+      ok: false,
+      logContext: { event: "invalid_dog_status", status: input.status },
+      logMessage: "admin dog create rejected because dog status is invalid",
+      response: invalidDogStatusResponse(),
+    };
+  }
+
   const name = normalizeRequiredText(input.name);
-  if (!name) {
+  if (!name && status === "NORMAL") {
     return {
       ok: false,
       logContext: { event: "invalid_name" },
@@ -79,7 +91,7 @@ export function validateCreatePreflight(
     };
   }
 
-  if (name.length > maxNameLength) {
+  if (name && name.length > maxNameLength) {
     return {
       ok: false,
       logContext: { event: "name_too_long" },
@@ -185,7 +197,8 @@ export function validateCreatePreflight(
   return {
     ok: true,
     data: {
-      name,
+      status,
+      name: name ?? registration.primaryRegistrationNo,
       sex,
       birthDate,
       ekNo,

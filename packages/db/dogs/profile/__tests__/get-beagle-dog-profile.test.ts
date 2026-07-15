@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DogSex } from "@prisma/client";
+import { DogSex, DogStatus } from "@prisma/client";
 
 const { dogFindUniqueMock, dogFindManyMock, prismaMock } = vi.hoisted(() => {
   const dogFindUnique = vi.fn();
@@ -10,7 +10,7 @@ const { dogFindUniqueMock, dogFindManyMock, prismaMock } = vi.hoisted(() => {
     dogFindManyMock: dogFindMany,
     prismaMock: {
       dog: {
-        findUnique: dogFindUnique,
+        findFirst: dogFindUnique,
         findMany: dogFindMany,
       },
     },
@@ -36,6 +36,7 @@ function makeParent(
   return {
     id,
     name,
+    status: DogStatus.NORMAL,
     ekNo,
     registrations: [makeRegistration(registrationNo, "2018-01-01")],
   };
@@ -96,7 +97,7 @@ describe("getBeagleDogProfileDb", () => {
     expect(result).toBeNull();
     expect(dogFindUniqueMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { id: "missing-id" },
+        where: { id: "missing-id", status: DogStatus.NORMAL },
       }),
     );
   });
@@ -115,6 +116,7 @@ describe("getBeagleDogProfileDb", () => {
       sire: {
         id: "sire1",
         name: "Sire Dog",
+        status: DogStatus.REFERENCE_ONLY,
         ekNo: 501,
         registrations: [makeRegistration("SIRE-REG", "2018-01-01")],
         sire: null,
@@ -123,6 +125,7 @@ describe("getBeagleDogProfileDb", () => {
       dam: {
         id: "dam1",
         name: "Dam Dog",
+        status: DogStatus.NORMAL,
         ekNo: 777,
         registrations: [makeRegistration("DAM-REG", "2018-01-01")],
         sire: null,
@@ -150,12 +153,14 @@ describe("getBeagleDogProfileDb", () => {
         name: "Sire Dog",
         registrationNo: "SIRE-REG",
         ekNo: 501,
+        status: DogStatus.REFERENCE_ONLY,
       },
       dam: {
         id: "dam1",
         name: "Dam Dog",
         registrationNo: "DAM-REG",
         ekNo: 777,
+        status: DogStatus.NORMAL,
       },
     });
     expect(result?.birthDate).toEqual(new Date("2020-01-01"));
@@ -171,6 +176,12 @@ describe("getBeagleDogProfileDb", () => {
     expect(queryArgs.include).toHaveProperty("whelpedPuppies");
     expect(queryArgs.include).toHaveProperty("siredPuppies");
     expect(queryArgs.include).toHaveProperty("titles");
+    expect(queryArgs.include.whelpedPuppies).toMatchObject({
+      where: { status: DogStatus.NORMAL },
+    });
+    expect(queryArgs.include.siredPuppies).toMatchObject({
+      where: { status: DogStatus.NORMAL },
+    });
   });
 
   it("maps title rows in stored row order", async () => {
@@ -263,6 +274,7 @@ describe("getBeagleDogProfileDb", () => {
       sire: {
         id: "sire-no-reg",
         name: "Sire Without Reg",
+        status: DogStatus.REFERENCE_ONLY,
         registrations: [],
         sire: null,
         dam: null,
@@ -279,6 +291,7 @@ describe("getBeagleDogProfileDb", () => {
       name: "Sire Without Reg",
       registrationNo: null,
       ekNo: null,
+      status: DogStatus.REFERENCE_ONLY,
     });
   });
 
@@ -789,6 +802,7 @@ describe("getBeagleDogProfileDb", () => {
       sire: {
         id: "",
         name: "Sire Missing Id",
+        status: DogStatus.NORMAL,
         ekNo: null,
         registrations: [makeRegistration("SIRE-REG", "2018-01-01")],
       },

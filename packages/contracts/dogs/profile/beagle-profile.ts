@@ -1,13 +1,15 @@
 import type { BeagleShowStructuredResultDto } from "@contracts/shows/beagle-shows";
 import type { DogColorDto } from "../colors";
+import type { DogStatus } from "../status";
 
 export type BeagleDogProfileSex = "U" | "N" | "-";
 
 export type BeagleDogProfileParentDto = {
   id?: string;
-  name: string;
+  name: string | null;
   registrationNo: string | null;
   ekNo?: number | null;
+  status: DogStatus;
 };
 
 export type BeagleDogProfilePedigreeCardDto = {

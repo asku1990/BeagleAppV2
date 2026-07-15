@@ -25,6 +25,7 @@ export const fiAdminDogsCommonMessages = {
   "admin.dogs.mutation.errorNameTooLong":
     "Koiran nimi on liian pitkä (max 120 merkkiä).",
   "admin.dogs.mutation.errorInvalidSex": "Virheellinen sukupuoli.",
+  "admin.dogs.mutation.errorInvalidDogStatus": "Virheellinen koiran tyyppi.",
   "admin.dogs.mutation.errorInvalidBirthDate":
     "Syntymäajan muoto on virheellinen.",
   "admin.dogs.mutation.errorInvalidEkNo":
@@ -89,6 +90,7 @@ export const svAdminDogsCommonMessages = {
   "admin.dogs.mutation.errorNameTooLong":
     "Hundens namn ar for langt (max 120 tecken).",
   "admin.dogs.mutation.errorInvalidSex": "Ogiltigt kon.",
+  "admin.dogs.mutation.errorInvalidDogStatus": "Ogiltig hundtyp.",
   "admin.dogs.mutation.errorInvalidBirthDate":
     "Fodelsedatum har ogiltigt format.",
   "admin.dogs.mutation.errorInvalidEkNo":

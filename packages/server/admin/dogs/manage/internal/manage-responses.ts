@@ -76,6 +76,17 @@ export function invalidSexResponse<
   } as ServiceResult<T>;
 }
 
+export function invalidDogStatusResponse(): CreateResult {
+  return {
+    status: 400,
+    body: {
+      ok: false,
+      error: "Invalid dog status value.",
+      code: "INVALID_DOG_STATUS",
+    },
+  };
+}
+
 export function invalidBirthDateResponse<
   T extends ManageErrorTarget,
 >(): ServiceResult<T> {

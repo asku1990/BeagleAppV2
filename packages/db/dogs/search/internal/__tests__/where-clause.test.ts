@@ -1,10 +1,12 @@
-import { DogSex } from "@prisma/client";
+import { DogSex, DogStatus } from "@prisma/client";
 import { describe, expect, it } from "vitest";
 import { buildWhere } from "../where-clause";
 
 describe("dogs/search/internal/where-clause", () => {
-  it("returns empty object when no filters are present", () => {
-    expect(buildWhere({ ek: "", reg: "", name: "" })).toEqual({});
+  it("requires normal status when no filters are present", () => {
+    expect(buildWhere({ ek: "", reg: "", name: "" })).toEqual({
+      AND: [{ status: DogStatus.NORMAL }],
+    });
   });
 
   it("builds exact ek filter for numeric ek and no wildcard", () => {
@@ -32,7 +34,7 @@ describe("dogs/search/internal/where-clause", () => {
 
   it("skips wildcard probe filters when probe is empty", () => {
     const where = buildWhere({ ek: "", reg: "%%", name: "__" });
-    expect(where).toEqual({});
+    expect(where).toEqual({ AND: [{ status: DogStatus.NORMAL }] });
   });
 
   it("adds sex, year range and ekOnly constraints", () => {

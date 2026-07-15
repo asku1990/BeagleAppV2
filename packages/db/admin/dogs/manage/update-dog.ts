@@ -3,6 +3,7 @@ import { uniqueNonEmptyNames } from "./normalization";
 
 export type UpdateAdminDogDbInput = {
   id: string;
+  status: "NORMAL" | "REFERENCE_ONLY";
   name: string;
   sex: "MALE" | "FEMALE" | "UNKNOWN";
   birthDate?: Date | null;
@@ -303,6 +304,7 @@ export async function updateAdminDogWriteDb(
   const updatedDog = await tx.dog.update({
     where: { id: input.id },
     data: {
+      status: input.status,
       name: input.name,
       sex: input.sex,
       ...(input.birthDate === undefined ? {} : { birthDate: input.birthDate }),

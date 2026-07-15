@@ -33,6 +33,7 @@ describe("findVirtualPairingAncestorDetailsDb", () => {
         id: "ancestor-2",
         name: "Korpelan Aatos",
         ekNo: 2002,
+        status: "REFERENCE_ONLY",
         registrations: [
           {
             registrationNo: "FI22222/21",
@@ -44,6 +45,7 @@ describe("findVirtualPairingAncestorDetailsDb", () => {
         id: "ancestor-1",
         name: "Metsapolun Kide",
         ekNo: null,
+        status: "NORMAL",
         registrations: [
           {
             registrationNo: "FI11111/20",
@@ -69,12 +71,14 @@ describe("findVirtualPairingAncestorDetailsDb", () => {
         name: "Metsapolun Kide",
         ekNo: null,
         registrationNo: "FI11111/20",
+        status: "NORMAL",
       },
       {
         id: "ancestor-2",
         name: "Korpelan Aatos",
         ekNo: 2002,
         registrationNo: "FI22222/21",
+        status: "REFERENCE_ONLY",
       },
     ]);
   });

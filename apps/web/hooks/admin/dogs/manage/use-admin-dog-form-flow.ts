@@ -6,6 +6,7 @@ import type {
   CalculateAdminDogInbreedingResponse,
   CreateAdminDogRequest,
   DeleteAdminDogRequest,
+  DogStatus,
   UpdateAdminDogRequest,
 } from "@beagle/contracts";
 import { toast } from "@/components/ui/sonner";
@@ -43,6 +44,7 @@ type DogFormState = {
   open: boolean;
   mode: "create" | "edit";
   target: AdminDogRecord | null;
+  formStatus: DogStatus;
 };
 
 // Owns admin dog modal/form state and mutation orchestration without UI concerns.
@@ -58,6 +60,7 @@ export function useAdminDogFormFlow({
     open: false,
     mode: "create",
     target: null,
+    formStatus: "NORMAL",
   });
   const [formValues, setFormValues] = useState<AdminDogFormValues>(
     createEmptyAdminDogFormValues,
@@ -73,13 +76,23 @@ export function useAdminDogFormFlow({
   function openCreateModal() {
     resetLookups();
     setFormValues(createEmptyAdminDogFormValues());
-    setFormState({ open: true, mode: "create", target: null });
+    setFormState({
+      open: true,
+      mode: "create",
+      target: null,
+      formStatus: "NORMAL",
+    });
   }
 
   function openEditModal(dog: AdminDogRecord) {
     resetLookups();
     setFormValues(mapAdminDogToFormValues(dog));
-    setFormState({ open: true, mode: "edit", target: dog });
+    setFormState({
+      open: true,
+      mode: "edit",
+      target: dog,
+      formStatus: dog.status,
+    });
   }
 
   function closeFormModal() {
@@ -123,9 +136,16 @@ export function useAdminDogFormFlow({
   async function handleSubmit(values: AdminDogFormValues) {
     if (formState.mode === "create") {
       try {
-        await createDogMutation.mutateAsync(toCreateAdminDogRequest(values));
+        await createDogMutation.mutateAsync(
+          toCreateAdminDogRequest(values, formState.formStatus),
+        );
         toast.success(t("admin.dogs.create.success"));
-        setFormState({ open: false, mode: "create", target: null });
+        setFormState({
+          open: false,
+          mode: "create",
+          target: null,
+          formStatus: "NORMAL",
+        });
       } catch (error) {
         toast.error(
           t(
@@ -144,10 +164,15 @@ export function useAdminDogFormFlow({
 
     try {
       await updateDogMutation.mutateAsync(
-        toUpdateAdminDogRequest(values, formState.target),
+        toUpdateAdminDogRequest(values, formState.target, formState.formStatus),
       );
       toast.success(t("admin.dogs.edit.success"));
-      setFormState({ open: false, mode: "create", target: null });
+      setFormState({
+        open: false,
+        mode: "create",
+        target: null,
+        formStatus: "NORMAL",
+      });
     } catch (error) {
       toast.error(
         t(
@@ -184,6 +209,9 @@ export function useAdminDogFormFlow({
     setDeleteTarget,
     formState,
     formValues,
+    formStatus: formState.formStatus,
+    setFormStatus: (formStatus: DogStatus) =>
+      setFormState((current) => ({ ...current, formStatus })),
     setFormValues: handleValuesChange,
     ownerLookupQuery,
     setOwnerLookupQuery,

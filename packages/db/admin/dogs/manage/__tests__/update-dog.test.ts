@@ -1,5 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { updateAdminDogWriteDb } from "../update-dog";
+import {
+  updateAdminDogWriteDb as updateAdminDogWriteDbService,
+  type UpdateAdminDogDbInput,
+} from "../update-dog";
+
+function updateAdminDogWriteDb(
+  input: Omit<UpdateAdminDogDbInput, "status"> & {
+    status?: UpdateAdminDogDbInput["status"];
+  },
+  tx: Parameters<typeof updateAdminDogWriteDbService>[1],
+) {
+  return updateAdminDogWriteDbService({ status: "NORMAL", ...input }, tx);
+}
 
 describe("updateAdminDogWriteDb", () => {
   const dogFindUniqueMock = vi.fn();
@@ -148,6 +160,38 @@ describe("updateAdminDogWriteDb", () => {
           sireId: expect.anything(),
           damId: expect.anything(),
         }),
+      }),
+    );
+  });
+
+  it("persists reference-only status without changing other update behavior", async () => {
+    dogFindUniqueMock.mockResolvedValue({ id: "dog_1" });
+    dogUpdateMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Known Reference",
+      sex: "FEMALE",
+    });
+    dogRegistrationFindManyMock.mockResolvedValue([
+      { id: "reg_primary", registrationNo: "FI11111/21" },
+    ]);
+
+    await updateAdminDogWriteDb(
+      {
+        id: "dog_1",
+        status: "REFERENCE_ONLY",
+        name: "Known Reference",
+        sex: "FEMALE",
+        sireId: undefined,
+        damId: undefined,
+        registrationNo: "FI11111/21",
+      },
+      tx as never,
+    );
+
+    expect(dogUpdateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "dog_1" },
+        data: expect.objectContaining({ status: "REFERENCE_ONLY" }),
       }),
     );
   });

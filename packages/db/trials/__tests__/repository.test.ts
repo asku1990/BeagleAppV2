@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DogSex } from "@prisma/client";
+import { DogSex, DogStatus } from "@prisma/client";
 
 const {
   trialEventFindManyMock,
@@ -289,7 +289,11 @@ describe("getBeagleTrialDetailsDb", () => {
           alo: { toNumber: () => 4.5 },
           tja: { toNumber: () => 4.6 },
           pin: { toNumber: () => 4.7 },
-          dog: { name: "Bella", sex: DogSex.FEMALE },
+          dog: {
+            name: "Bella",
+            sex: DogSex.FEMALE,
+            status: DogStatus.NORMAL,
+          },
         },
         {
           id: "r1",
@@ -308,7 +312,11 @@ describe("getBeagleTrialDetailsDb", () => {
           alo: { toNumber: () => 5.5 },
           tja: { toNumber: () => 5.6 },
           pin: { toNumber: () => 5.7 },
-          dog: { name: "Aatu", sex: DogSex.MALE },
+          dog: {
+            name: "Aatu",
+            sex: DogSex.MALE,
+            status: DogStatus.NORMAL,
+          },
         },
       ],
     });
@@ -352,6 +360,53 @@ describe("getBeagleTrialDetailsDb", () => {
       weather: null,
       points: null,
       judge: "Judge Main",
+    });
+  });
+
+  it("keeps reference-only entries visible without a profile link id", async () => {
+    trialEventFindUniqueMock.mockResolvedValue({
+      id: "event-reference",
+      koepaiva: new Date("2025-06-01T12:34:00.000Z"),
+      koekunta: "Helsinki",
+      ylituomariNimi: "Judge Main",
+      trialRuleWindowId: "trw1",
+      entries: [
+        {
+          id: "reference-entry",
+          dogId: "reference-dog",
+          rekisterinumeroSnapshot: "FI-400/25",
+          ke: null,
+          pa: null,
+          lk: null,
+          sija: null,
+          piste: null,
+          tuom1: null,
+          haku: null,
+          hauk: null,
+          yva: null,
+          hlo: null,
+          alo: null,
+          tja: null,
+          pin: null,
+          dog: {
+            name: "FI-400/25",
+            sex: DogSex.MALE,
+            status: DogStatus.REFERENCE_ONLY,
+          },
+        },
+      ],
+    });
+
+    const result = await getBeagleTrialDetailsDb({
+      trialEventId: "event-reference",
+    });
+
+    expect(result?.dogCount).toBe(1);
+    expect(result?.items[0]).toMatchObject({
+      id: "reference-entry",
+      dogId: null,
+      registrationNo: "FI-400/25",
+      name: "FI-400/25",
     });
   });
 

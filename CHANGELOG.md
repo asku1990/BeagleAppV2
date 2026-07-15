@@ -20,6 +20,23 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.17.0] - 2026-07-15
+
+### Added
+
+- Ylläpitäjä voi lisätä sukutaulukoiria. Sukutaulukoirasta tarvitaan vain rekisterinumero, mutta myös muut tiedossa olevat tiedot voidaan tallentaa.
+- Ylläpitäjä voi muokata sukutaulukoiran tietoja ja vaihtaa sukutaulukoiran tavalliseksi koiraksi tai tavallisen koiran sukutaulukoiraksi.
+- Tuonnin ensimmäinen vaihe luo sukutaulukoirat puuttuville isille ja emille sekä yhdistää ne jälkeläisiin. Luodut sukutaulukoirat merkitään varoituksina tarkistettavaan Excel-tiedostoon.
+- Sukutaulukoirat näkyvät sukutauluissa niillä tiedoilla, jotka niistä tunnetaan.
+- Sukutaulukoirat eivät näy julkisissa koirapalveluissa, kuten koirahaussa, uusimpien koirien listalla, koiraprofiileissa tai virtuaaliparituksen valinnoissa.
+- Sukutaulukoirilla ei ole linkkiä julkiseen koiraprofiiliin. Profiililinkkiä ei näytetä myöskään näyttely- tai koetuloksissa.
+
+### Changed
+
+### Fixed
+
+### Removed
+
 ## [0.16.0] - 2026-07-09
 
 ### Added

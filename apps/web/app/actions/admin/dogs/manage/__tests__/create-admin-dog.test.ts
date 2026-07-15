@@ -35,6 +35,7 @@ describe("createAdminDogAction", () => {
 
     await expect(
       createAdminDogAction({
+        status: "REFERENCE_ONLY",
         name: "Metsapolun Kide",
         sex: "FEMALE",
         registrationNo: "FI12345/21",
@@ -68,6 +69,7 @@ describe("createAdminDogAction", () => {
 
     await expect(
       createAdminDogAction({
+        status: "REFERENCE_ONLY",
         name: "Metsapolun Kide",
         sex: "FEMALE",
         registrationNo: "FI12345/21",
@@ -105,6 +107,7 @@ describe("createAdminDogAction", () => {
 
     await expect(
       createAdminDogAction({
+        status: "REFERENCE_ONLY",
         name: "Metsapolun Kide",
         sex: "FEMALE",
         registrationNo: "FI12345/21",
@@ -121,6 +124,7 @@ describe("createAdminDogAction", () => {
 
     expect(createAdminDogMock).toHaveBeenCalledWith(
       {
+        status: "REFERENCE_ONLY",
         name: "Metsapolun Kide",
         sex: "FEMALE",
         registrationNo: "FI12345/21",

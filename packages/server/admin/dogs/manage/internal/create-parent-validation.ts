@@ -33,6 +33,7 @@ export type CreateParentValidationResult =
   | CreateParentValidationFailure;
 
 export async function resolveAndValidateCreateParents(input: {
+  status?: "NORMAL" | "REFERENCE_ONLY";
   sireRegistrationNo?: string | null;
   damRegistrationNo?: string | null;
 }): Promise<CreateParentValidationResult> {
@@ -43,14 +44,16 @@ export async function resolveAndValidateCreateParents(input: {
     input.damRegistrationNo ?? undefined,
   );
 
-  if (!sireRegistrationNo) {
+  const parentsRequired = (input.status ?? "NORMAL") === "NORMAL";
+
+  if (!sireRegistrationNo && parentsRequired) {
     return {
       ok: false,
       response: requiredSireRegistrationResponse(),
     };
   }
 
-  if (!damRegistrationNo) {
+  if (!damRegistrationNo && parentsRequired) {
     return {
       ok: false,
       response: requiredDamRegistrationResponse(),

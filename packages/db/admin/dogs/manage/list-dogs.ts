@@ -28,6 +28,7 @@ export type AdminDogTitleItemDb = {
 
 export type AdminDogListRowDb = {
   id: string;
+  status: "NORMAL" | "REFERENCE_ONLY";
   registrationNo: string | null;
   secondaryRegistrationNos: string[];
   name: string;
@@ -213,6 +214,7 @@ export async function listAdminDogsDb(
     where,
     select: {
       id: true,
+      status: true,
       name: true,
       sex: true,
       birthDate: true,
@@ -308,6 +310,7 @@ export async function listAdminDogsDb(
 
       return {
         id: row.id,
+        status: row.status,
         registrationNo: row.registrations[0]?.registrationNo ?? null,
         secondaryRegistrationNos: row.registrations
           .slice(1)

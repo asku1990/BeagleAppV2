@@ -309,15 +309,30 @@ describe("dogs service", () => {
       sex: "U",
       color: null,
       ekNo: 42,
-      sire: { name: "Sire", registrationNo: "FI-2/18" },
-      dam: { name: "Dam", registrationNo: "FI-3/18" },
+      sire: {
+        id: "sire-1",
+        name: "FI-2/18",
+        registrationNo: "FI-2/18",
+        status: "REFERENCE_ONLY",
+      },
+      dam: {
+        id: "dam-1",
+        name: "Dam",
+        registrationNo: "FI-3/18",
+        status: "NORMAL",
+      },
       pedigree: [],
       offspringSummary: { litterCount: 1, puppyCount: 2 },
       litters: [
         {
           id: "litter-1",
           birthDate: new Date("2024-05-01T00:00:00.000Z"),
-          otherParent: { name: "Dam", registrationNo: "FI-3/18" },
+          otherParent: {
+            id: "dam-1",
+            name: "Dam",
+            registrationNo: "FI-3/18",
+            status: "NORMAL",
+          },
           puppyCount: 2,
           puppies: [
             {
@@ -508,8 +523,16 @@ describe("dogs service", () => {
       sex: "N",
       color: null,
       ekNo: null,
-      sire: { name: "Sire", registrationNo: "FI-2/18" },
-      dam: { name: "Dam", registrationNo: "FI-3/18" },
+      sire: {
+        name: "Sire",
+        registrationNo: "FI-2/18",
+        status: "NORMAL",
+      },
+      dam: {
+        name: "Dam",
+        registrationNo: "FI-3/18",
+        status: "NORMAL",
+      },
       pedigree: [],
       offspringSummary: { litterCount: 0, puppyCount: 0 },
       litters: [],

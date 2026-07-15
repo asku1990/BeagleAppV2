@@ -48,7 +48,7 @@ Agent operating rules for this repository.
 - Run targeted checks for touched code.
 - Prefer targeted checks for regular local validation and agent workflows.
 - Full lint is okay when relevant.
-- Run cycle lint only for import graph, barrel, package boundary, shared utility, or import restructuring risk.
+- Do not run cycle lint in agent workflows; it is too slow for routine agent validation.
 - If checks are not run, state that explicitly.
 - CI note: if Turbo task chains include `build` (for example via `test:e2e`), required env vars must be present in CI and forwarded via `turbo.json` `globalEnv`.
 

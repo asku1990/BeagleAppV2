@@ -53,7 +53,22 @@ Phase 1 imports foundation entities and link structures. It does not import tria
   - ambiguous breeder keys are not auto-linked (`BREEDER_NAME_KEY_AMBIGUOUS`)
 - Parent links (`sireId`, `damId`):
   - resolved after dog/registration indexing
-  - missing/invalid/placeholder parent refs are reported as issues
+  - missing-parent discovery counts references only from rows whose normalized,
+    valid child registration exists in the relation index; skipped child rows
+    cannot create orphan identities or contribute false parent-role ambiguity
+  - a valid missing registration used only as a sire or only as a dam creates one
+    `REFERENCE_ONLY` dog before relations are written
+  - sire-only references infer `MALE`; dam-only references infer `FEMALE`
+  - the normalized registration is used as the required internal name fallback
+  - every created reference-only parent produces a
+    `RELATION_REFERENCE_ONLY_PARENT_CREATED` review warning after child links are
+    written; this warning confirms a successful import and does not increase the
+    run error count
+  - registrations already owned by normal or reference-only dogs are reused
+  - registrations used as both sire and dam create no dog and produce
+    `RELATION_PARENT_ROLE_AMBIGUOUS` errors
+  - invalid parent registrations are errors, while placeholder registrations
+    remain informational and are not created
   - when the dog itself never imported, `RELATION_DOG_NOT_FOUND` now clarifies whether the row was skipped earlier because `KNIMI` was blank or whether the dog was absent from the imported dogs index in the new database
 - Owner links:
   - owner row requires a resolved dog by registration
@@ -88,6 +103,8 @@ Typical issue groups:
 - invalid registration format
 - missing dog relation targets
 - placeholder/invalid relation registrations
+- successfully created reference-only parents requiring review
+- parent registrations used ambiguously as both sire and dam
 - alias/canonical conflicts
 
 Issue rows are written to `ImportRunIssue` with `kind=LEGACY_PHASE1`.
@@ -98,6 +115,12 @@ Issue rows are written to `ImportRunIssue` with `kind=LEGACY_PHASE1`.
 - Missing relation targets are reported and row-specific link/write is skipped.
 - Import continues and run finishes `SUCCEEDED` with warnings when issues exist.
 - Unexpected exceptions mark run as `FAILED` with `UNEXPECTED_EXCEPTION`.
+
+## Issue CSV review
+
+Per-code issue CSV files place `message` first so the review note is visible
+immediately when the file is opened in Excel. The remaining columns are
+`registrationNo`, `sourceTable`, `stage`, `severity`, and `payloadJson`.
 
 ## Implementation references
 

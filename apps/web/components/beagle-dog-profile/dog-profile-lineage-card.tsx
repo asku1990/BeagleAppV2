@@ -17,6 +17,7 @@ import { PedigreeTree } from "./pedigree-tree";
 
 type PedigreeLine = {
   id: string | null;
+  status: BeagleDogProfileParentDto["status"] | null;
   ekNo: number | null;
   sexSymbol: "♂" | "♀";
   registrationNo: string | null;
@@ -32,6 +33,7 @@ function formatPedigreeLine(
   if (!parent) {
     return {
       id: null,
+      status: null,
       ekNo: null,
       sexSymbol,
       registrationNo: null,
@@ -42,6 +44,7 @@ function formatPedigreeLine(
 
   return {
     id: parent.id ?? null,
+    status: parent.status,
     ekNo: parent.ekNo ?? null,
     sexSymbol,
     registrationNo: parent.registrationNo ?? null,
@@ -72,7 +75,7 @@ function renderPedigreeLine(
   const ekSuffix =
     line.ekNo == null ? "" : ` (${line.shortEkLabel}: ${String(line.ekNo)})`;
 
-  if (!line.id) {
+  if (!line.id || line.status === "REFERENCE_ONLY") {
     return (
       <>
         {lineText}

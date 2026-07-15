@@ -1,3 +1,5 @@
+import type { DogStatus } from "@beagle/contracts";
+
 export type AdminDogSex = "MALE" | "FEMALE" | "UNKNOWN";
 
 export type AdminDogParentPreview = {
@@ -15,6 +17,7 @@ export type AdminDogTitleRecord = {
 
 export type AdminDogRecord = {
   id: string;
+  status: DogStatus;
   name: string;
   sex: AdminDogSex;
   birthDate: string | null;

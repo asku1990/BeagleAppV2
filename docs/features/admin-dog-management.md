@@ -31,6 +31,24 @@ Developer notes for the admin dog management flow.
 6. `DogFormModal` delegates large form areas to private `internal/*` sections while keeping controlled form values in the parent flow.
 7. Create/update/delete actions call admin dog mutation hooks, then rely on existing query invalidation behavior from those hooks.
 
+## Status-aware create and edit
+
+- The existing form supports `NORMAL` and `REFERENCE_ONLY` identities in create
+  and edit modes. New dogs default to `NORMAL`.
+- Reference-only dogs require a valid primary registration but may omit a known
+  name and one or both parents. When the name is unknown, the normalized primary
+  registration is stored as the database-required internal fallback.
+- All supplied fields remain available and are persisted for either status;
+  reference-only status does not imply that other known details are discarded.
+- Every save as `NORMAL` applies the normal-dog required-field and parent rules.
+  Incomplete legacy normal dogs must be completed before unrelated edits can be
+  saved.
+- Status changes update the existing dog identity and registration. Changing a
+  reference-only dog to normal requires the complete normal-dog validation.
+- Parent lookup includes both statuses. Creating or editing a child links only
+  explicitly selected existing parents and never creates a missing parent
+  identity implicitly.
+
 ## Refactor boundary (BEJ-73)
 
 - `AdminDogsPageClient` stays a composition shell.
@@ -45,6 +63,7 @@ Developer notes for the admin dog management flow.
 - Page-client wiring and option shaping: `apps/web/components/admin/dogs/__tests__/admin-dogs-page-client.test.tsx`
 - Form-flow hook behavior: `apps/web/hooks/admin/dogs/manage/__tests__/use-admin-dog-form-flow.test.ts`
 - Pure helper behavior: `apps/web/lib/admin/dogs/manage/__tests__/dog-manage-lib.test.ts`
+- Server create/update validation: `packages/server/admin/dogs/manage/__tests__/*-dog.test.ts`
 
 ## When to update this doc
 

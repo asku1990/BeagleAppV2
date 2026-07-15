@@ -69,6 +69,7 @@ describe("useUpdateAdminDogMutation", () => {
 
     const input = {
       id: "dog_1",
+      status: "NORMAL" as const,
       name: "Kide",
       sex: "FEMALE",
       registrationNo: "FI12345/21",
@@ -99,6 +100,7 @@ describe("useUpdateAdminDogMutation", () => {
     await expect(
       options.mutationFn({
         id: "dog_1",
+        status: "NORMAL",
         name: "Kide",
         sex: "FEMALE",
         registrationNo: "FI12345/21",

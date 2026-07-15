@@ -1,21 +1,21 @@
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { searchVirtualPairingDogsMock } = vi.hoisted(() => ({
-  searchVirtualPairingDogsMock: vi.fn(),
+const { searchPublicVirtualPairingDogsMock } = vi.hoisted(() => ({
+  searchPublicVirtualPairingDogsMock: vi.fn(),
 }));
 
 vi.mock("@beagle/server", () => ({
-  searchVirtualPairingDogs: searchVirtualPairingDogsMock,
+  searchPublicVirtualPairingDogs: searchPublicVirtualPairingDogsMock,
 }));
 
 describe("public virtual pairing api route", () => {
   beforeEach(() => {
-    searchVirtualPairingDogsMock.mockReset();
+    searchPublicVirtualPairingDogsMock.mockReset();
   });
 
   it("returns search results for public clients", async () => {
-    searchVirtualPairingDogsMock.mockResolvedValue({
+    searchPublicVirtualPairingDogsMock.mockResolvedValue({
       status: 200,
       body: {
         ok: true,
@@ -42,7 +42,7 @@ describe("public virtual pairing api route", () => {
     const response = await GET(request);
 
     expect(response.status).toBe(200);
-    expect(searchVirtualPairingDogsMock).toHaveBeenCalledWith({
+    expect(searchPublicVirtualPairingDogsMock).toHaveBeenCalledWith({
       field: "name",
       query: "Kide",
       page: 2,
@@ -51,7 +51,7 @@ describe("public virtual pairing api route", () => {
   });
 
   it("returns structured errors when the service throws", async () => {
-    searchVirtualPairingDogsMock.mockRejectedValue(new Error("boom"));
+    searchPublicVirtualPairingDogsMock.mockRejectedValue(new Error("boom"));
 
     const { GET } = await import("../route");
     const request = new NextRequest(
