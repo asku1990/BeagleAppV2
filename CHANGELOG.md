@@ -14,20 +14,24 @@ This project uses a user-facing changelog format.
 
 ### Added
 
-- Ylläpitäjä voi luoda sukutauluviitteiksi tarkoitettuja viitekoiria. Viitekoiralle
-  riittää rekisterinumero, mutta kaikki tunnetut tiedot voidaan tallentaa.
-- Ylläpitäjä voi muokata viitekoiria ja vaihtaa koiran tyypin normaalin koiran
-  ja viitekoiran välillä samoja koira- ja rekisteritietoja käyttäen.
-- Vaiheen 1 tuonti luo puuttuvista isä- ja emäviittauksista viitekoirat,
-  linkittää ne jälkeläisiin ja kirjaa jokaisesta luodusta viitekoirasta
-  Excelissä tarkistettavan varoituksen.
-
 ### Changed
 
-- Viitekoirat eivät näy julkisissa koirahauissa, uusimmissa koirissa,
-  koiraprofiileissa tai virtuaaliparituksen valinnoissa. Sukutauluissa niiden
-  tunnetut tiedot säilyvät ilman linkkiä erilliseen julkiseen profiiliin, eikä
-  profiililinkkejä näytetä näyttely- tai koetuloksissa.
+### Fixed
+
+### Removed
+
+## [0.17.0] - 2026-07-15
+
+### Added
+
+- Ylläpitäjä voi lisätä sukutaulukoiria. Sukutaulukoirasta tarvitaan vain rekisterinumero, mutta myös muut tiedossa olevat tiedot voidaan tallentaa.
+- Ylläpitäjä voi muokata sukutaulukoiran tietoja ja vaihtaa sukutaulukoiran tavalliseksi koiraksi tai tavallisen koiran sukutaulukoiraksi.
+- Tuonnin ensimmäinen vaihe luo sukutaulukoirat puuttuville isille ja emille sekä yhdistää ne jälkeläisiin. Luodut sukutaulukoirat merkitään varoituksina tarkistettavaan Excel-tiedostoon.
+- Sukutaulukoirat näkyvät sukutauluissa niillä tiedoilla, jotka niistä tunnetaan.
+- Sukutaulukoirat eivät näy julkisissa koirapalveluissa, kuten koirahaussa, uusimpien koirien listalla, koiraprofiileissa tai virtuaaliparituksen valinnoissa.
+- Sukutaulukoirilla ei ole linkkiä julkiseen koiraprofiiliin. Profiililinkkiä ei näytetä myöskään näyttely- tai koetuloksissa.
+
+### Changed
 
 ### Fixed
 

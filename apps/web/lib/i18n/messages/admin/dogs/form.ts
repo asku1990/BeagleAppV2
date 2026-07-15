@@ -6,11 +6,11 @@ export const fiAdminDogsFormMessages = {
   "admin.dogs.form.statusLabel": "Koiran tyyppi",
   "admin.dogs.form.statusAria": "Valitse koiran tyyppi",
   "admin.dogs.form.statusNormal": "Normaali koira",
-  "admin.dogs.form.statusReferenceOnly": "Viitekoira",
+  "admin.dogs.form.statusReferenceOnly": "Sukutaulukoira",
   "admin.dogs.form.statusNormalHelp":
     "Normaali koira näkyy itsenäisesti julkisissa koiranäkymissä.",
   "admin.dogs.form.statusReferenceOnlyHelp":
-    "Viitekoira säilyttää sukutauluissa ja laskennoissa tarvittavan koiran identiteetin. Se voi sisältää kaikki tunnetut tiedot, mutta ei näy omana koiranaan julkisissa hauissa tai profiileissa.",
+    "Sukutaulukoira säilyttää sukutauluissa ja laskennoissa tarvittavat koiran tiedot. Sille voi tallentaa kaikki tunnetut tiedot, mutta se ei näy omana koiranaan julkisissa hauissa tai profiileissa.",
   "admin.dogs.form.registrationNoPlaceholder": "Rekisterinumero",
   "admin.dogs.form.secondaryRegistrationLabel": "Toissijaiset rekisterinumerot",
   "admin.dogs.form.secondaryRegistrationAdd": "+ Lisää toissijainen",
