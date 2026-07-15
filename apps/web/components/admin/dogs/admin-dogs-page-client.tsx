@@ -22,6 +22,7 @@ import {
   useCalculateAdminDogInbreedingMutation,
   useCreateAdminDogMutation,
   useUpdateAdminDogMutation,
+  adminDogsQueryKey,
 } from "@/queries/admin/dogs";
 import { DeleteDogConfirmModal } from "./delete-dog-confirm-modal";
 import { DogFilters } from "./dog-filters";
@@ -35,6 +36,19 @@ const DEFAULT_DOG_FILTERS = {
   sort: "name-asc",
 } satisfies AdminDogListRequest;
 
+function haveSameAdminDogsQueryKey(
+  left: AdminDogListRequest,
+  right: AdminDogListRequest,
+): boolean {
+  const leftKey = adminDogsQueryKey(left);
+  const rightKey = adminDogsQueryKey(right);
+
+  return (
+    leftKey.length === rightKey.length &&
+    leftKey.every((value, index) => Object.is(value, rightKey[index]))
+  );
+}
+
 export function AdminDogsPageClient() {
   const { t, locale } = useI18n();
   const [query, setQuery] = useState("");
@@ -43,14 +57,22 @@ export function AdminDogsPageClient() {
   const [filters, setFilters] = useState<AdminDogListRequest>(() => ({
     ...DEFAULT_DOG_FILTERS,
   }));
+  const dogsQuery = useAdminDogsQuery(filters);
 
   function handleSearch() {
-    setFilters({
+    const nextFilters = {
       query: query.trim().length > 0 ? query.trim() : undefined,
       sex: sex === "all" ? undefined : sex,
       status: status === "all" ? undefined : status,
       ...DEFAULT_DOG_FILTERS,
-    });
+    } satisfies AdminDogListRequest;
+
+    if (haveSameAdminDogsQueryKey(filters, nextFilters)) {
+      void dogsQuery.refetch();
+      return;
+    }
+
+    setFilters(nextFilters);
   }
 
   function handleResetSearch() {
@@ -60,7 +82,6 @@ export function AdminDogsPageClient() {
     setFilters({ ...DEFAULT_DOG_FILTERS });
   }
 
-  const dogsQuery = useAdminDogsQuery(filters);
   const calculateInbreedingMutation = useCalculateAdminDogInbreedingMutation();
   const createDogMutation = useCreateAdminDogMutation();
   const updateDogMutation = useUpdateAdminDogMutation();

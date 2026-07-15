@@ -47,18 +47,24 @@ vi.mock("@/hooks/admin/dogs/manage", () => ({
   useAdminDogFormFlow: useAdminDogFormFlowMock,
 }));
 
-vi.mock("@/queries/admin/dogs", () => ({
-  useAdminDogsQuery: useAdminDogsQueryMock,
-  useAdminDogColorOptionsQuery: useAdminDogColorOptionsQueryMock,
-  useAdminDogOwnerOptionsQuery: useAdminDogOwnerOptionsQueryMock,
-  useAdminDogParentOptionsQuery: useAdminDogParentOptionsQueryMock,
-  useAdminDogDeleteImpactQuery: useAdminDogDeleteImpactQueryMock,
-  useCalculateAdminDogInbreedingMutation:
-    useCalculateAdminDogInbreedingMutationMock,
-  useCreateAdminDogMutation: useCreateAdminDogMutationMock,
-  useUpdateAdminDogMutation: useUpdateAdminDogMutationMock,
-  useDeleteAdminDogMutation: useDeleteAdminDogMutationMock,
-}));
+vi.mock("@/queries/admin/dogs", async () => {
+  const { adminDogsQueryKey } =
+    await import("@/queries/admin/dogs/manage/query-keys");
+
+  return {
+    adminDogsQueryKey,
+    useAdminDogsQuery: useAdminDogsQueryMock,
+    useAdminDogColorOptionsQuery: useAdminDogColorOptionsQueryMock,
+    useAdminDogOwnerOptionsQuery: useAdminDogOwnerOptionsQueryMock,
+    useAdminDogParentOptionsQuery: useAdminDogParentOptionsQueryMock,
+    useAdminDogDeleteImpactQuery: useAdminDogDeleteImpactQueryMock,
+    useCalculateAdminDogInbreedingMutation:
+      useCalculateAdminDogInbreedingMutationMock,
+    useCreateAdminDogMutation: useCreateAdminDogMutationMock,
+    useUpdateAdminDogMutation: useUpdateAdminDogMutationMock,
+    useDeleteAdminDogMutation: useDeleteAdminDogMutationMock,
+  };
+});
 
 vi.mock("@/components/listing", () => ({
   ListingSectionShell: ({ children }: { children: React.ReactNode }) =>
@@ -224,6 +230,7 @@ describe("AdminDogsPageClient", () => {
       isLoading: false,
       isError: false,
       isFetching: false,
+      refetch: vi.fn(),
     });
     useAdminDogColorOptionsQueryMock.mockReturnValue({
       data: [
@@ -304,6 +311,24 @@ describe("AdminDogsPageClient", () => {
         onReset: expect.any(Function),
       }),
     );
+  });
+
+  it("refetches an errored request when submitted filters are unchanged", () => {
+    const refetch = vi.fn();
+    useAdminDogsQueryMock.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      isFetching: false,
+      refetch,
+    });
+
+    renderToStaticMarkup(React.createElement(AdminDogsPageClient));
+
+    const filtersProps = dogFiltersPropsMock.mock.calls[0][0];
+    filtersProps.onSubmit();
+
+    expect(refetch).toHaveBeenCalledTimes(1);
   });
 
   it("passes delete impact state into confirm modal", () => {
