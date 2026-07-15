@@ -27,6 +27,7 @@ export function adminDogsQueryKey(filters: AdminDogListRequest) {
     ...adminDogsQueryKeyRoot,
     filters.query ?? "",
     filters.sex ?? null,
+    filters.status ?? null,
     filters.page ?? 1,
     filters.pageSize ?? 20,
     filters.sort ?? "name-asc",

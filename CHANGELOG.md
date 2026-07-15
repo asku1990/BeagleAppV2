@@ -14,7 +14,13 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+- Ylläpidon koirahakuun lisättiin koiran tyypin tarkennettu suodatin, jolla
+  voidaan hakea normaaleja koiria tai sukutaulukoiria.
+
 ### Changed
+
+- Ylläpidon koirahaku suoritetaan nyt Hae-painikkeella, joten hakutekstin tai
+  suodattimien muuttaminen ei tee automaattisesti uusia hakupyyntöjä.
 
 ### Fixed
 

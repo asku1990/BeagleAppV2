@@ -61,6 +61,22 @@ function parseSex(
   return { ok: false };
 }
 
+function parseStatus(
+  value: string | undefined,
+):
+  | { ok: true; value: "NORMAL" | "REFERENCE_ONLY" | undefined }
+  | { ok: false } {
+  if (!value) {
+    return { ok: true, value: undefined };
+  }
+
+  if (value === "NORMAL" || value === "REFERENCE_ONLY") {
+    return { ok: true, value };
+  }
+
+  return { ok: false };
+}
+
 export async function listAdminDogs(
   input: AdminDogListRequest,
   currentUser: CurrentUserDto | null,
@@ -73,18 +89,7 @@ export async function listAdminDogs(
     ...(context?.requestId ? { requestId: context.requestId } : {}),
     ...(context?.actorUserId ? { actorUserId: context.actorUserId } : {}),
   });
-
-  log.info(
-    {
-      event: "start",
-      query: normalizeQuery(input.query),
-      sex: input.sex ?? null,
-      page: input.page ?? 1,
-      pageSize: input.pageSize ?? 20,
-      sort: input.sort ?? "name-asc",
-    },
-    "admin dogs list started",
-  );
+  const normalizedQuery = normalizeQuery(input.query);
 
   const authResult = requireAdmin(currentUser);
   if (!authResult.body.ok) {
@@ -145,10 +150,45 @@ export async function listAdminDogs(
     };
   }
 
+  const parsedStatus = parseStatus(input.status);
+  if (!parsedStatus.ok) {
+    log.warn(
+      {
+        event: "invalid_status",
+        status: input.status,
+        durationMs: Date.now() - startedAt,
+      },
+      "admin dogs list rejected because status is invalid",
+    );
+
+    return {
+      status: 400,
+      body: {
+        ok: false,
+        error: "Invalid status value.",
+        code: "INVALID_STATUS",
+      },
+    };
+  }
+
+  log.info(
+    {
+      event: "start",
+      query: normalizedQuery,
+      sex: parsedSex.value ?? null,
+      status: parsedStatus.value ?? null,
+      page: input.page ?? 1,
+      pageSize: input.pageSize ?? 20,
+      sort: parsedSort.value,
+    },
+    "admin dogs list started",
+  );
+
   try {
     const result = await listAdminDogsDb({
-      query: normalizeQuery(input.query),
+      query: normalizedQuery,
       sex: parsedSex.value,
+      status: parsedStatus.value,
       page: parsePage(input.page),
       pageSize: parsePageSize(input.pageSize),
       sort: parsedSort.value,

@@ -72,6 +72,9 @@ describe("DogResults", () => {
     );
 
     expect(html).toContain("admin.dogs.columns.titles");
+    expect(html).toContain("admin.dogs.columns.status");
+    expect(html).toContain("admin.dogs.status.normal");
+    expect(html).toContain("admin.dogs.mobile.statusLabel");
     expect(html).not.toContain("admin.dogs.columns.breeder");
     expect(html).not.toContain("admin.dogs.mobile.breederLabel");
     expect(html).not.toContain("Hidden Breeder");
@@ -90,5 +93,17 @@ describe("DogResults", () => {
     );
 
     expect(html).toContain("admin.dogs.mobile.titlesLabel: -");
+  });
+
+  it("shows the reference-only status label", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(DogResults, {
+        dogs: [buildDog({ status: "REFERENCE_ONLY" })],
+        onEdit: vi.fn(),
+        onDelete: vi.fn(),
+      }),
+    );
+
+    expect(html).toContain("admin.dogs.status.referenceOnly");
   });
 });

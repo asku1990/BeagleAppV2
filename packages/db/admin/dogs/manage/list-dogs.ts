@@ -1,4 +1,4 @@
-import { DogSex, type Prisma } from "@prisma/client";
+import { DogSex, DogStatus, type Prisma } from "@prisma/client";
 import { prisma } from "@db/core/prisma";
 import { normalizeQuery, uniqueNonEmptyNames } from "./normalization";
 
@@ -7,6 +7,7 @@ export type AdminDogListSortDb = "name-asc" | "birth-desc" | "created-desc";
 export type AdminDogListRequestDb = {
   query?: string;
   sex?: "MALE" | "FEMALE" | "UNKNOWN";
+  status?: "NORMAL" | "REFERENCE_ONLY";
   page?: number;
   pageSize?: number;
   sort?: AdminDogListSortDb;
@@ -103,6 +104,18 @@ function parseSex(sex: string | undefined): DogSex | undefined {
   return undefined;
 }
 
+function parseStatus(status: string | undefined): DogStatus | undefined {
+  if (status === "NORMAL") {
+    return DogStatus.NORMAL;
+  }
+
+  if (status === "REFERENCE_ONLY") {
+    return DogStatus.REFERENCE_ONLY;
+  }
+
+  return undefined;
+}
+
 function resolveOrderBy(
   sort: AdminDogListSortDb,
 ): Prisma.DogOrderByWithRelationInput[] {
@@ -140,6 +153,7 @@ export async function listAdminDogsDb(
 ): Promise<AdminDogListResponseDb> {
   const query = normalizeQuery(input.query);
   const parsedSex = parseSex(input.sex);
+  const parsedStatus = parseStatus(input.status);
   const page = parsePage(input.page);
   const pageSize = parsePageSize(input.pageSize);
   const sort = parseSort(input.sort);
@@ -147,6 +161,9 @@ export async function listAdminDogsDb(
   const andFilters: Prisma.DogWhereInput[] = [];
   if (parsedSex) {
     andFilters.push({ sex: parsedSex });
+  }
+  if (parsedStatus) {
+    andFilters.push({ status: parsedStatus });
   }
 
   if (query.length > 0) {

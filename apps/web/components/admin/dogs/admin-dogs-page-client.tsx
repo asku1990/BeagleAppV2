@@ -1,5 +1,6 @@
 "use client";
 
+import type { AdminDogListRequest, DogStatus } from "@beagle/contracts";
 import { useMemo, useState } from "react";
 import { ListingSectionShell } from "@/components/listing";
 import { Button } from "@/components/ui/button";
@@ -28,21 +29,36 @@ import { DogFormModal } from "./dog-form-modal";
 import { DogResults } from "./dog-results";
 import type { AdminDogSex } from "./types";
 
+const DEFAULT_DOG_FILTERS = {
+  page: 1,
+  pageSize: 50,
+  sort: "name-asc",
+} satisfies AdminDogListRequest;
+
 export function AdminDogsPageClient() {
   const { t, locale } = useI18n();
   const [query, setQuery] = useState("");
   const [sex, setSex] = useState<"all" | AdminDogSex>("all");
+  const [status, setStatus] = useState<"all" | DogStatus>("all");
+  const [filters, setFilters] = useState<AdminDogListRequest>(() => ({
+    ...DEFAULT_DOG_FILTERS,
+  }));
 
-  const filters = useMemo(
-    () => ({
+  function handleSearch() {
+    setFilters({
       query: query.trim().length > 0 ? query.trim() : undefined,
       sex: sex === "all" ? undefined : sex,
-      page: 1,
-      pageSize: 50,
-      sort: "name-asc" as const,
-    }),
-    [query, sex],
-  );
+      status: status === "all" ? undefined : status,
+      ...DEFAULT_DOG_FILTERS,
+    });
+  }
+
+  function handleResetSearch() {
+    setQuery("");
+    setSex("all");
+    setStatus("all");
+    setFilters({ ...DEFAULT_DOG_FILTERS });
+  }
 
   const dogsQuery = useAdminDogsQuery(filters);
   const calculateInbreedingMutation = useCalculateAdminDogInbreedingMutation();
@@ -155,8 +171,13 @@ export function AdminDogsPageClient() {
           <DogFilters
             query={query}
             sex={sex}
+            status={status}
+            isPending={dogsQuery.isFetching}
             onQueryChange={setQuery}
             onSexChange={setSex}
+            onStatusChange={setStatus}
+            onSubmit={handleSearch}
+            onReset={handleResetSearch}
           />
           <p className="text-sm text-muted-foreground">
             {t("admin.dogs.management.countPrefix")} {resultCount}

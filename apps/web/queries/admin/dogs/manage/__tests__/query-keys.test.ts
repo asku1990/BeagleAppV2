@@ -16,11 +16,20 @@ describe("admin dogs query keys", () => {
       adminDogsQueryKey({
         query: "kide",
         sex: "FEMALE",
+        status: "REFERENCE_ONLY",
         page: 2,
         pageSize: 50,
         sort: "name-asc",
       }),
-    ).toEqual([...adminDogsQueryKeyRoot, "kide", "FEMALE", 2, 50, "name-asc"]);
+    ).toEqual([
+      ...adminDogsQueryKeyRoot,
+      "kide",
+      "FEMALE",
+      "REFERENCE_ONLY",
+      2,
+      50,
+      "name-asc",
+    ]);
   });
 
   it("builds breeder options key", () => {

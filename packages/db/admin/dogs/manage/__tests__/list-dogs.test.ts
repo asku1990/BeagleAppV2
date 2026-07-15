@@ -152,6 +152,7 @@ describe("listAdminDogsDb", () => {
     await listAdminDogsDb({
       query: "5588",
       sex: "FEMALE",
+      status: "REFERENCE_ONLY",
       page: 99,
       pageSize: 10,
       sort: "birth-desc",
@@ -160,6 +161,7 @@ describe("listAdminDogsDb", () => {
     const countArgs = dogCountMock.mock.calls[0]?.[0] as { where: unknown };
     const whereJson = JSON.stringify(countArgs.where);
     expect(whereJson).toContain("FEMALE");
+    expect(whereJson).toContain("REFERENCE_ONLY");
     expect(whereJson).toContain("5588");
 
     const findManyArgs = dogFindManyMock.mock.calls[0]?.[0] as {

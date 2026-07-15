@@ -18,6 +18,7 @@ const {
   dogFormModalPropsMock,
   deleteModalPropsMock,
   dogResultsPropsMock,
+  dogFiltersPropsMock,
 } = vi.hoisted(() => ({
   useAdminDogsQueryMock: vi.fn(),
   useAdminDogColorOptionsQueryMock: vi.fn(),
@@ -33,6 +34,7 @@ const {
   dogFormModalPropsMock: vi.fn(),
   deleteModalPropsMock: vi.fn(),
   dogResultsPropsMock: vi.fn(),
+  dogFiltersPropsMock: vi.fn(),
 }));
 
 vi.mock("@/hooks/i18n", () => ({
@@ -81,7 +83,10 @@ vi.mock("@/components/ui/button", () => ({
 }));
 
 vi.mock("../dog-filters", () => ({
-  DogFilters: () => React.createElement("div", null, "filters"),
+  DogFilters: (props: Record<string, unknown>) => {
+    dogFiltersPropsMock(props);
+    return React.createElement("div", null, "filters");
+  },
 }));
 
 vi.mock("../dog-results", () => ({
@@ -172,6 +177,7 @@ describe("AdminDogsPageClient", () => {
     dogFormModalPropsMock.mockReset();
     deleteModalPropsMock.mockReset();
     dogResultsPropsMock.mockReset();
+    dogFiltersPropsMock.mockReset();
 
     useCalculateAdminDogInbreedingMutationMock.mockReturnValue({
       isPending: false,
@@ -217,6 +223,7 @@ describe("AdminDogsPageClient", () => {
       },
       isLoading: false,
       isError: false,
+      isFetching: false,
     });
     useAdminDogColorOptionsQueryMock.mockReturnValue({
       data: [
@@ -277,6 +284,26 @@ describe("AdminDogsPageClient", () => {
       dogId: null,
       enabled: false,
     });
+  });
+
+  it("keeps draft filters separate from the initial applied request", () => {
+    renderToStaticMarkup(React.createElement(AdminDogsPageClient));
+
+    expect(useAdminDogsQueryMock).toHaveBeenCalledWith({
+      page: 1,
+      pageSize: 50,
+      sort: "name-asc",
+    });
+    expect(dogFiltersPropsMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        query: "",
+        sex: "all",
+        status: "all",
+        isPending: false,
+        onSubmit: expect.any(Function),
+        onReset: expect.any(Function),
+      }),
+    );
   });
 
   it("passes delete impact state into confirm modal", () => {

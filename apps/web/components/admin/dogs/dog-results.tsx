@@ -25,6 +25,14 @@ function DogSexLabel({ sex }: { sex: AdminDogRecord["sex"] }) {
   return t("admin.dogs.sex.unknown");
 }
 
+function DogStatusLabel({ status }: { status: AdminDogRecord["status"] }) {
+  const { t } = useI18n();
+
+  return status === "REFERENCE_ONLY"
+    ? t("admin.dogs.status.referenceOnly")
+    : t("admin.dogs.status.normal");
+}
+
 function showDash(value: string | number | null): string {
   if (value === null) {
     return "-";
@@ -130,6 +138,7 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
               </th>
               <th className="px-2 py-2">{t("admin.dogs.columns.name")}</th>
               <th className="px-2 py-2">{t("admin.dogs.columns.sex")}</th>
+              <th className="px-2 py-2">{t("admin.dogs.columns.status")}</th>
               <th className="px-2 py-2">{t("admin.dogs.columns.birthDate")}</th>
               <th className="px-2 py-2">{t("admin.dogs.columns.owners")}</th>
               <th className="px-2 py-2">{t("admin.dogs.columns.sire")}</th>
@@ -173,6 +182,9 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
                 </td>
                 <td className="px-2 py-2">
                   <DogSexLabel sex={dog.sex} />
+                </td>
+                <td className="px-2 py-2">
+                  <DogStatusLabel status={dog.status} />
                 </td>
                 <td className="px-2 py-2">
                   {showDash(formatBirthDate(dog.birthDate, locale))}
@@ -237,6 +249,10 @@ export function DogResults({ dogs, onEdit, onDelete }: DogResultsProps) {
             <div className="text-sm space-y-1">
               <p>
                 {t("admin.dogs.mobile.sexLabel")}: <DogSexLabel sex={dog.sex} />
+              </p>
+              <p>
+                {t("admin.dogs.mobile.statusLabel")}:{" "}
+                <DogStatusLabel status={dog.status} />
               </p>
               <p>
                 {t("admin.dogs.mobile.birthDateLabel")}:{" "}
