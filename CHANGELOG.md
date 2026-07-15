@@ -14,6 +14,16 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.18.0] - 2026-07-15
+
+### Added
+
 - Ylläpidon koirahakuun lisättiin koiran tyypin tarkennettu suodatin, jolla
   voidaan hakea normaaleja koiria tai sukutaulukoiria.
 - Ylläpidon koirahaun tulokset jaetaan 50 koiran sivuihin, ja hakutulosten välillä voi siirtyä sivu kerrallaan.
