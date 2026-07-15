@@ -39,7 +39,9 @@ Implementation order and review gates are defined in
   status.
 - Every existing form field remains available for both statuses, and every
   supplied value is retained.
-- Normal dogs keep the existing required-field and parent rules.
+- Every save as `NORMAL` applies the normal-dog required-field and parent rules.
+  Incomplete legacy normal dogs must be completed before other edits can be
+  saved.
 - Reference-only dogs require a valid primary registration but may have unknown
   details or missing parents.
 - Because `Dog.name` remains database-required, an unknown reference-only name
@@ -56,6 +58,8 @@ Implementation order and review gates are defined in
 
 - The one-shot phase-one bootstrap may create missing reference-only sire and
   dam identities automatically before writing relations.
+- Only references from rows whose child registration exists in the relation
+  index participate in missing-parent discovery and role classification.
 - A valid missing registration used only as a sire implies `MALE`; one used only
   as a dam implies `FEMALE`.
 - Matching source details are retained when available. If no name is known, the
@@ -64,6 +68,8 @@ Implementation order and review gates are defined in
 - Invalid registrations, placeholders, and registrations used ambiguously in
   both parent roles do not create reference-only identities and remain import
   diagnostics.
+- Successfully created reference identities produce review warnings without
+  increasing the import run error count.
 
 ## Domain guardrails
 

@@ -18,6 +18,9 @@ This project uses a user-facing changelog format.
   riittää rekisterinumero, mutta kaikki tunnetut tiedot voidaan tallentaa.
 - Ylläpitäjä voi muokata viitekoiria ja vaihtaa koiran tyypin normaalin koiran
   ja viitekoiran välillä samoja koira- ja rekisteritietoja käyttäen.
+- Vaiheen 1 tuonti luo puuttuvista isä- ja emäviittauksista viitekoirat,
+  linkittää ne jälkeläisiin ja kirjaa jokaisesta luodusta viitekoirasta
+  Excelissä tarkistettavan varoituksen.
 
 ### Changed
 

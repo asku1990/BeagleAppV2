@@ -119,7 +119,9 @@ Acceptance:
 - Admin can edit reference-only dogs using the existing modal.
 - Reference-only dogs may retain missing details or one/both missing parents.
 - Changing a reference-only dog to normal reuses the same dog and registration.
-- Existing normal-dog editing behavior remains unchanged.
+- Every save as `NORMAL` revalidates the normal-dog required fields and parent
+  rules. Incomplete legacy normal dogs must be completed before other edits can
+  be saved.
 
 Review gate: stop after targeted tests, typecheck, and lint. Continue only after
 explicit approval.
@@ -127,7 +129,8 @@ explicit approval.
 ## Version 3: phase-one missing-parent import
 
 - During the phase-one relation stage, collect valid sire and dam registrations
-  that do not already own a dog identity.
+  that do not already own a dog identity. Count references only from rows whose
+  normalized child registration exists in the relation index.
 - Create one `REFERENCE_ONLY` dog per unique missing registration and add it to
   the relation index before child relations are written.
 - Infer `MALE` when the registration appears unambiguously as a sire and
@@ -138,6 +141,13 @@ explicit approval.
 - Do not create identities for invalid registrations, placeholders, or a
   registration used ambiguously as both sire and dam. Preserve diagnostics for
   those cases.
+- Record one `RELATION_REFERENCE_ONLY_PARENT_CREATED` review warning per created
+  identity after relations are linked. Successful creation warnings do not
+  increase the run error count.
+- Report invalid registrations and ambiguous parent roles as errors; keep
+  placeholder registrations informational.
+- Place `message` first in per-code issue CSV files so review notes are visible
+  immediately in Excel.
 - Keep the existing one-shot bootstrap assumptions; replay and partially
   imported environment compatibility remain out of scope.
 
@@ -150,6 +160,8 @@ Acceptance:
   import diagnostics.
 - Ordinary imported dog rows remain normal unless explicitly created by the
   missing-parent reference flow.
+- Rows that cannot write relations do not create orphan reference identities or
+  contribute to parent-role ambiguity.
 
 ## Validation
 

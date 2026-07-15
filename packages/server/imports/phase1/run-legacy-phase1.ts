@@ -25,6 +25,7 @@ import {
 import { toOwnershipDateKey, upsertOwner } from "../internal";
 import { toImportRunResponse } from "../runs/transform";
 import { formatLegacyImportSummary } from "../runs/phase-summary";
+import { createReferenceOnlyParents } from "./internal/create-reference-only-parents";
 
 const FINNISH_REGISTRATION_PREFIXES = new Set(["FI", "SF"]);
 
@@ -472,6 +473,7 @@ export async function runLegacyPhase1(
         errorsCount += 1;
         await recordIssue({
           stage: "dogs",
+          severity: "ERROR",
           code: "REGISTRATION_INVALID_FORMAT",
           message: "Dog row has invalid registration format.",
           registrationNo,
@@ -640,6 +642,7 @@ export async function runLegacyPhase1(
         errorsCount += 1;
         await recordIssue({
           stage: "ek",
+          severity: "ERROR",
           code: "REGISTRATION_INVALID_FORMAT",
           message: "EK row has invalid registration format.",
           registrationNo,
@@ -795,6 +798,7 @@ export async function runLegacyPhase1(
           errorsCount += 1;
           await recordIssue({
             stage: "samakoira",
+            severity: "ERROR",
             code: "REGISTRATION_INVALID_FORMAT",
             message: `Samakoira alias ${alias.key} has invalid registration format.`,
             registrationNo: parsedAlias.registrationNo,
@@ -926,6 +930,7 @@ export async function runLegacyPhase1(
         errorsCount += 1;
         await recordIssue({
           stage: "samakoira",
+          severity: "ERROR",
           code: "REGISTRATION_INVALID_FORMAT",
           message: "Samakoira REK_MUU has invalid registration format.",
           registrationNo: rekMuu.registrationNo,
@@ -967,6 +972,16 @@ export async function runLegacyPhase1(
     finishStage("index");
 
     startStage("relations");
+    const { createdByRegistration, ambiguousRegistrations } =
+      await createReferenceOnlyParents({
+        rows: legacy.dogs,
+        dogIdByRegistration,
+        breederIdByNameKey,
+        importedDogColorCodes,
+        recordIssue,
+      });
+    dogsUpserted += createdByRegistration.size;
+    errorsCount += ambiguousRegistrations.size;
     const totalRelations = legacy.dogs.length;
     let relationsProcessed = 0;
     let relationsUpdated = 0;
@@ -1003,6 +1018,7 @@ export async function runLegacyPhase1(
         errorsCount += 1;
         await recordIssue({
           stage: "relations",
+          severity: "ERROR",
           code: "REGISTRATION_INVALID_FORMAT",
           message: "Dog row has invalid registration format.",
           registrationNo: registration.registrationNo,
@@ -1095,6 +1111,7 @@ export async function runLegacyPhase1(
         errorsCount += 1;
         await recordIssue({
           stage: "relations",
+          severity: "ERROR",
           code: "REGISTRATION_INVALID_FORMAT",
           message: "Sire registration has invalid format.",
           registrationNo: sireRegistrationForLookup,
@@ -1111,6 +1128,7 @@ export async function runLegacyPhase1(
         errorsCount += 1;
         await recordIssue({
           stage: "relations",
+          severity: "ERROR",
           code: "REGISTRATION_INVALID_FORMAT",
           message: "Dam registration has invalid format.",
           registrationNo: damRegistrationForLookup,
@@ -1130,7 +1148,11 @@ export async function runLegacyPhase1(
         ? dogIdByRegistration.get(damRegistrationForLookup)
         : undefined;
 
-      if (sireRegistrationForLookup && !sireId) {
+      if (
+        sireRegistrationForLookup &&
+        !sireId &&
+        !ambiguousRegistrations.has(sireRegistrationForLookup)
+      ) {
         missingSireRefs += 1;
         errorsCount += 1;
         await recordIssue({
@@ -1147,7 +1169,11 @@ export async function runLegacyPhase1(
         });
       }
 
-      if (damRegistrationForLookup && !damId) {
+      if (
+        damRegistrationForLookup &&
+        !damId &&
+        !ambiguousRegistrations.has(damRegistrationForLookup)
+      ) {
         missingDamRefs += 1;
         errorsCount += 1;
         await recordIssue({
@@ -1173,14 +1199,51 @@ export async function runLegacyPhase1(
       });
       relationsUpdated += 1;
 
+      if (sireRegistrationForLookup && sireId) {
+        const createdSire = createdByRegistration.get(
+          sireRegistrationForLookup,
+        );
+        if (createdSire) {
+          createdSire.linkedChildrenCount += 1;
+        }
+      }
+      if (damRegistrationForLookup && damId) {
+        const createdDam = createdByRegistration.get(damRegistrationForLookup);
+        if (createdDam) {
+          createdDam.linkedChildrenCount += 1;
+        }
+      }
+
       if (relationsProcessed % 1000 === 0) {
         logProgress("relations", relationsProcessed, totalRelations);
       }
     }
     logProgress("relations", relationsProcessed, totalRelations);
+    for (const createdParent of createdByRegistration.values()) {
+      await recordIssue({
+        stage: "relations",
+        severity: "WARNING",
+        code: "RELATION_REFERENCE_ONLY_PARENT_CREATED",
+        message:
+          "Imported as a reference-only parent and linked successfully. Review warning only: bearek_id did not contain an importable dog row for this registration.",
+        registrationNo: createdParent.registrationNo,
+        sourceTable: "bearek_id",
+        payloadJson: JSON.stringify({
+          dogId: createdParent.dogId,
+          status: "REFERENCE_ONLY",
+          parentRole: createdParent.role,
+          inferredSex: createdParent.sex,
+          referenceCount: createdParent.referenceCount,
+          linkedChildrenCount: createdParent.linkedChildrenCount,
+          sourceDetailsMatched: createdParent.sourceDetailsMatched,
+          usedRegistrationNameFallback:
+            createdParent.usedRegistrationNameFallback,
+        }),
+      });
+    }
     finishStage(
       "relations",
-      `updated=${relationsUpdated}, skippedNoRegistration=${relationsSkippedNoRegistration}, skippedDogNotFound=${relationsSkippedDogNotFound}, missingSireRefs=${missingSireRefs}, missingDamRefs=${missingDamRefs}, skippedPlaceholderSireRefs=${skippedPlaceholderSireRefs}, skippedPlaceholderDamRefs=${skippedPlaceholderDamRefs}`,
+      `updated=${relationsUpdated}, referenceOnlyCreated=${createdByRegistration.size}, referenceOnlyLinked=${[...createdByRegistration.values()].reduce((total, parent) => total + parent.linkedChildrenCount, 0)}, ambiguousParentRegistrations=${ambiguousRegistrations.size}, skippedNoRegistration=${relationsSkippedNoRegistration}, skippedDogNotFound=${relationsSkippedDogNotFound}, missingSireRefs=${missingSireRefs}, missingDamRefs=${missingDamRefs}, skippedPlaceholderSireRefs=${skippedPlaceholderSireRefs}, skippedPlaceholderDamRefs=${skippedPlaceholderDamRefs}`,
     );
 
     startStage("owners");
@@ -1193,6 +1256,7 @@ export async function runLegacyPhase1(
         errorsCount += 1;
         await recordIssue({
           stage: "owners",
+          severity: "ERROR",
           code: "REGISTRATION_INVALID_FORMAT",
           message: "Owner row has invalid registration format.",
           registrationNo: registration.registrationNo,

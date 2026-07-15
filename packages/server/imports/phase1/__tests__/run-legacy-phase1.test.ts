@@ -45,6 +45,10 @@ vi.mock("@beagle/db", () => ({
     FEMALE: "FEMALE",
     UNKNOWN: "UNKNOWN",
   },
+  DogStatus: {
+    NORMAL: "NORMAL",
+    REFERENCE_ONLY: "REFERENCE_ONLY",
+  },
   ImportKind: {
     LEGACY_PHASE1: "LEGACY_PHASE1",
   },
@@ -480,6 +484,177 @@ describe("runLegacyPhase1", () => {
         errorsCount: 0,
         errorSummary: expect.stringContaining("Phase 1:"),
       }),
+      expect.any(Object),
+    );
+  });
+
+  it("creates one reference-only sire, links every child, and records one review warning", async () => {
+    fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogs: [
+        {
+          registrationNo: "FI12345/21",
+          name: "Aino",
+          sex: "N",
+          birthDateRaw: "20240101",
+          sireRegistrationNo: "FI99999/19",
+          damRegistrationNo: null,
+          breederName: null,
+          colorCode: null,
+        },
+        {
+          registrationNo: "FI54321/21",
+          name: "Bella",
+          sex: "N",
+          birthDateRaw: "20240202",
+          sireRegistrationNo: "FI99999/19",
+          damRegistrationNo: null,
+          breederName: null,
+          colorCode: null,
+        },
+      ],
+      breeders: [],
+      eks: [],
+      owners: [],
+      samakoira: [],
+    });
+    dogRegistrationFindManyMock.mockResolvedValue([
+      { registrationNo: "FI12345/21", dogId: "dog-1" },
+      { registrationNo: "FI54321/21", dogId: "dog-2" },
+    ]);
+    dogCreateMock.mockImplementation(({ data }) =>
+      Promise.resolve({
+        id:
+          data.status === "REFERENCE_ONLY"
+            ? "reference-sire"
+            : data.name === "Bella"
+              ? "dog-2"
+              : "dog-1",
+      }),
+    );
+
+    await runLegacyPhase1("user-1");
+
+    expect(
+      dogCreateMock.mock.calls.filter(
+        ([call]) => call.data.status === "REFERENCE_ONLY",
+      ),
+    ).toEqual([
+      [
+        expect.objectContaining({
+          data: expect.objectContaining({
+            name: "FI99999/19",
+            sex: "MALE",
+            status: "REFERENCE_ONLY",
+            registrations: {
+              create: {
+                registrationNo: "FI99999/19",
+                source: "CANONICAL",
+              },
+            },
+          }),
+        }),
+      ],
+    ]);
+    expect(dogUpdateMock).toHaveBeenCalledWith({
+      where: { id: "dog-1" },
+      data: { sireId: "reference-sire", damId: null },
+    });
+    expect(dogUpdateMock).toHaveBeenCalledWith({
+      where: { id: "dog-2" },
+      data: { sireId: "reference-sire", damId: null },
+    });
+
+    const issues = createImportRunIssuesBulkMock.mock.calls.flatMap(
+      ([, nextIssues]) => nextIssues,
+    );
+    const createdIssue = issues.find(
+      (issue) => issue.code === "RELATION_REFERENCE_ONLY_PARENT_CREATED",
+    );
+    expect(createdIssue).toEqual(
+      expect.objectContaining({
+        severity: "WARNING",
+        registrationNo: "FI99999/19",
+      }),
+    );
+    expect(JSON.parse(createdIssue?.payloadJson ?? "{}")).toEqual(
+      expect.objectContaining({
+        dogId: "reference-sire",
+        parentRole: "sire",
+        inferredSex: "MALE",
+        referenceCount: 2,
+        linkedChildrenCount: 2,
+        usedRegistrationNameFallback: true,
+      }),
+    );
+    expect(markImportRunFinishedMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.objectContaining({ dogsUpserted: 3, errorsCount: 0 }),
+      expect.any(Object),
+    );
+  });
+
+  it("reports an ambiguous missing parent once without creating or linking it", async () => {
+    fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogs: [
+        {
+          registrationNo: "FI12345/21",
+          name: "Aino",
+          sex: "N",
+          birthDateRaw: null,
+          sireRegistrationNo: "FI99999/19",
+          damRegistrationNo: null,
+          breederName: null,
+          colorCode: null,
+        },
+        {
+          registrationNo: "FI54321/21",
+          name: "Bella",
+          sex: "N",
+          birthDateRaw: null,
+          sireRegistrationNo: null,
+          damRegistrationNo: "FI99999/19",
+          breederName: null,
+          colorCode: null,
+        },
+      ],
+      breeders: [],
+      eks: [],
+      owners: [],
+      samakoira: [],
+    });
+    dogRegistrationFindManyMock.mockResolvedValue([
+      { registrationNo: "FI12345/21", dogId: "dog-1" },
+      { registrationNo: "FI54321/21", dogId: "dog-2" },
+    ]);
+
+    await runLegacyPhase1("user-1");
+
+    expect(
+      dogCreateMock.mock.calls.some(
+        ([call]) => call.data.status === "REFERENCE_ONLY",
+      ),
+    ).toBe(false);
+    const issues = createImportRunIssuesBulkMock.mock.calls.flatMap(
+      ([, nextIssues]) => nextIssues,
+    );
+    expect(
+      issues.filter((issue) => issue.code === "RELATION_PARENT_ROLE_AMBIGUOUS"),
+    ).toEqual([
+      expect.objectContaining({
+        severity: "ERROR",
+        registrationNo: "FI99999/19",
+      }),
+    ]);
+    expect(
+      issues.some(
+        (issue) =>
+          issue.code === "RELATION_SIRE_NOT_FOUND" ||
+          issue.code === "RELATION_DAM_NOT_FOUND",
+      ),
+    ).toBe(false);
+    expect(markImportRunFinishedMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.objectContaining({ dogsUpserted: 2, errorsCount: 1 }),
       expect.any(Object),
     );
   });
