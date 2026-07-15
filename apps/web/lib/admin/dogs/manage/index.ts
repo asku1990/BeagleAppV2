@@ -14,3 +14,7 @@ export {
   toCreateAdminDogRequest,
   toUpdateAdminDogRequest,
 } from "./dog-mutation-flow";
+export {
+  adminDogListRequestKeyParts,
+  shouldRefetchAdminDogSearch,
+} from "./dog-search-request";

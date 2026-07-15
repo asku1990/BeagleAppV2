@@ -1,5 +1,6 @@
 "use client";
 
+import type { AdminDogListRequest, DogStatus } from "@beagle/contracts";
 import { useMemo, useState } from "react";
 import { ListingSectionShell } from "@/components/listing";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { useI18n } from "@/hooks/i18n";
 import { useAdminDogFormFlow } from "@/hooks/admin/dogs/manage";
 import {
   mapAdminDogFromQuery,
+  shouldRefetchAdminDogSearch,
   toAdminDogOwnerOptions,
   toAdminDogParentOptions,
 } from "@/lib/admin/dogs/manage";
@@ -25,26 +27,54 @@ import {
 import { DeleteDogConfirmModal } from "./delete-dog-confirm-modal";
 import { DogFilters } from "./dog-filters";
 import { DogFormModal } from "./dog-form-modal";
+import { DogPagination } from "./dog-pagination";
 import { DogResults } from "./dog-results";
 import type { AdminDogSex } from "./types";
+
+const DEFAULT_DOG_FILTERS = {
+  page: 1,
+  pageSize: 50,
+  sort: "name-asc",
+} satisfies AdminDogListRequest;
 
 export function AdminDogsPageClient() {
   const { t, locale } = useI18n();
   const [query, setQuery] = useState("");
   const [sex, setSex] = useState<"all" | AdminDogSex>("all");
+  const [status, setStatus] = useState<"all" | DogStatus>("all");
+  const [filters, setFilters] = useState<AdminDogListRequest | null>(null);
+  const hasSearched = filters !== null;
+  const dogsQuery = useAdminDogsQuery(filters ?? DEFAULT_DOG_FILTERS, {
+    enabled: hasSearched,
+  });
 
-  const filters = useMemo(
-    () => ({
+  function handleSearch() {
+    const nextFilters = {
       query: query.trim().length > 0 ? query.trim() : undefined,
       sex: sex === "all" ? undefined : sex,
-      page: 1,
-      pageSize: 50,
-      sort: "name-asc" as const,
-    }),
-    [query, sex],
-  );
+      status: status === "all" ? undefined : status,
+      ...DEFAULT_DOG_FILTERS,
+    } satisfies AdminDogListRequest;
 
-  const dogsQuery = useAdminDogsQuery(filters);
+    if (shouldRefetchAdminDogSearch(filters, nextFilters)) {
+      void dogsQuery.refetch();
+      return;
+    }
+
+    setFilters(nextFilters);
+  }
+
+  function handleResetSearch() {
+    setQuery("");
+    setSex("all");
+    setStatus("all");
+    setFilters(null);
+  }
+
+  function handlePageChange(page: number) {
+    setFilters((current) => (current ? { ...current, page } : current));
+  }
+
   const calculateInbreedingMutation = useCalculateAdminDogInbreedingMutation();
   const createDogMutation = useCreateAdminDogMutation();
   const updateDogMutation = useUpdateAdminDogMutation();
@@ -137,7 +167,9 @@ export function AdminDogsPageClient() {
     [colorOptionsQuery.data, dogFormFlow.formValues.colorCode, locale],
   );
 
-  const resultCount = dogs.length;
+  const resultCount = dogsQuery.data?.total ?? 0;
+  const currentPage = dogsQuery.data?.page ?? filters?.page ?? 1;
+  const totalPages = dogsQuery.data?.totalPages ?? 0;
 
   return (
     <div className="space-y-4" suppressHydrationWarning>
@@ -155,25 +187,45 @@ export function AdminDogsPageClient() {
           <DogFilters
             query={query}
             sex={sex}
+            status={status}
+            isPending={hasSearched && dogsQuery.isFetching}
             onQueryChange={setQuery}
             onSexChange={setSex}
+            onStatusChange={setStatus}
+            onSubmit={handleSearch}
+            onReset={handleResetSearch}
           />
-          <p className="text-sm text-muted-foreground">
-            {t("admin.dogs.management.countPrefix")} {resultCount}
-          </p>
-          {dogsQuery.isLoading ? (
+          {!hasSearched ? (
+            <p className="text-sm text-muted-foreground">
+              {t("admin.dogs.filters.initialPrompt")}
+            </p>
+          ) : null}
+          {hasSearched ? (
+            <p className="text-sm text-muted-foreground">
+              {t("admin.dogs.management.countPrefix")} {resultCount}
+            </p>
+          ) : null}
+          {hasSearched && dogsQuery.isLoading ? (
             <p className="text-sm text-muted-foreground">
               {t("admin.dogs.loading")}
             </p>
           ) : null}
-          {dogsQuery.isError ? (
+          {hasSearched && dogsQuery.isError ? (
             <p className="text-sm text-destructive">{t("admin.dogs.error")}</p>
           ) : null}
-          {!dogsQuery.isLoading ? (
+          {hasSearched && !dogsQuery.isLoading ? (
             <DogResults
               dogs={dogs}
               onEdit={dogFormFlow.openEditModal}
               onDelete={dogFormFlow.setDeleteTarget}
+            />
+          ) : null}
+          {hasSearched && !dogsQuery.isLoading && !dogsQuery.isError ? (
+            <DogPagination
+              page={currentPage}
+              totalPages={totalPages}
+              isPending={dogsQuery.isFetching}
+              onPageChange={handlePageChange}
             />
           ) : null}
         </div>

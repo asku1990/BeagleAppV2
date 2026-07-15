@@ -18,6 +18,8 @@ const {
   dogFormModalPropsMock,
   deleteModalPropsMock,
   dogResultsPropsMock,
+  dogFiltersPropsMock,
+  dogPaginationPropsMock,
 } = vi.hoisted(() => ({
   useAdminDogsQueryMock: vi.fn(),
   useAdminDogColorOptionsQueryMock: vi.fn(),
@@ -33,6 +35,8 @@ const {
   dogFormModalPropsMock: vi.fn(),
   deleteModalPropsMock: vi.fn(),
   dogResultsPropsMock: vi.fn(),
+  dogFiltersPropsMock: vi.fn(),
+  dogPaginationPropsMock: vi.fn(),
 }));
 
 vi.mock("@/hooks/i18n", () => ({
@@ -81,13 +85,23 @@ vi.mock("@/components/ui/button", () => ({
 }));
 
 vi.mock("../dog-filters", () => ({
-  DogFilters: () => React.createElement("div", null, "filters"),
+  DogFilters: (props: Record<string, unknown>) => {
+    dogFiltersPropsMock(props);
+    return React.createElement("div", null, "filters");
+  },
 }));
 
 vi.mock("../dog-results", () => ({
   DogResults: (props: Record<string, unknown>) => {
     dogResultsPropsMock(props);
     return React.createElement("div", null, "results");
+  },
+}));
+
+vi.mock("../dog-pagination", () => ({
+  DogPagination: (props: Record<string, unknown>) => {
+    dogPaginationPropsMock(props);
+    return React.createElement("div", null, "pagination");
   },
 }));
 
@@ -172,6 +186,8 @@ describe("AdminDogsPageClient", () => {
     dogFormModalPropsMock.mockReset();
     deleteModalPropsMock.mockReset();
     dogResultsPropsMock.mockReset();
+    dogFiltersPropsMock.mockReset();
+    dogPaginationPropsMock.mockReset();
 
     useCalculateAdminDogInbreedingMutationMock.mockReturnValue({
       isPending: false,
@@ -192,6 +208,9 @@ describe("AdminDogsPageClient", () => {
 
     useAdminDogsQueryMock.mockReturnValue({
       data: {
+        total: 73,
+        totalPages: 2,
+        page: 1,
         items: [
           {
             id: "dog_1",
@@ -217,6 +236,8 @@ describe("AdminDogsPageClient", () => {
       },
       isLoading: false,
       isError: false,
+      isFetching: false,
+      refetch: vi.fn(),
     });
     useAdminDogColorOptionsQueryMock.mockReturnValue({
       data: [
@@ -255,7 +276,6 @@ describe("AdminDogsPageClient", () => {
 
     const formFlow = useAdminDogFormFlowMock.mock.results[0].value;
     const firstButtonProps = buttonPropsMock.mock.calls[0][0];
-    const dogResultsProps = dogResultsPropsMock.mock.calls[0][0];
     const dogFormProps = dogFormModalPropsMock.mock.calls[0][0];
     const deleteProps = deleteModalPropsMock.mock.calls[0][0];
 
@@ -264,8 +284,6 @@ describe("AdminDogsPageClient", () => {
 
     expect(formFlow.openCreateModal).toHaveBeenCalledTimes(1);
     expect(formFlow.setDeleteTarget).toHaveBeenCalledWith(null);
-    expect(dogResultsProps.onEdit).toBe(formFlow.openEditModal);
-    expect(dogResultsProps.onDelete).toBe(formFlow.setDeleteTarget);
     expect(dogFormProps.onSubmit).toBe(formFlow.handleSubmit);
     expect(dogFormProps.formStatus).toBe("NORMAL");
     expect(dogFormProps.onFormStatusChange).toBe(formFlow.setFormStatus);
@@ -277,6 +295,33 @@ describe("AdminDogsPageClient", () => {
       dogId: null,
       enabled: false,
     });
+  });
+
+  it("does not query or show results before the first submission", () => {
+    const html = renderToStaticMarkup(React.createElement(AdminDogsPageClient));
+
+    expect(useAdminDogsQueryMock).toHaveBeenCalledWith(
+      {
+        page: 1,
+        pageSize: 50,
+        sort: "name-asc",
+      },
+      { enabled: false },
+    );
+    expect(dogFiltersPropsMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        query: "",
+        sex: "all",
+        status: "all",
+        isPending: false,
+        onSubmit: expect.any(Function),
+        onReset: expect.any(Function),
+      }),
+    );
+    expect(html).toContain("admin.dogs.filters.initialPrompt");
+    expect(html).not.toContain("admin.dogs.management.countPrefix");
+    expect(dogResultsPropsMock).not.toHaveBeenCalled();
+    expect(dogPaginationPropsMock).not.toHaveBeenCalled();
   });
 
   it("passes delete impact state into confirm modal", () => {
@@ -343,7 +388,6 @@ describe("AdminDogsPageClient", () => {
     renderToStaticMarkup(React.createElement(AdminDogsPageClient));
 
     const dogFormProps = dogFormModalPropsMock.mock.calls[0][0];
-    const dogResultsProps = dogResultsPropsMock.mock.calls[0][0];
 
     expect(dogFormProps.breederOptions).toBeUndefined();
     expect(dogFormProps.onBreederSearchChange).toBeUndefined();
@@ -366,6 +410,5 @@ describe("AdminDogsPageClient", () => {
         keywords: ["121", "Kolmivärinen", "Trefärgad", ""],
       },
     ]);
-    expect(dogResultsProps.dogs[0]?.titlesText).toBeNull();
   });
 });
