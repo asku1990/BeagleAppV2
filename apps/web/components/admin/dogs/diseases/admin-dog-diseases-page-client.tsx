@@ -11,6 +11,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { toast } from "@/components/ui/sonner";
 import { useAdminDogDiseasesUiState } from "@/hooks/admin/dogs/diseases";
+import { useI18n } from "@/hooks/i18n";
+import { getAdminDogDiseaseCreateErrorMessageKey } from "@/lib/admin/dogs/diseases";
 import {
   useAdminDogDiseasesQuery,
   useCreateAdminDogDiseaseMutation,
@@ -28,6 +30,7 @@ type Props = {
 };
 
 export function AdminDogDiseasesPageClient({ initialData }: Props) {
+  const { t } = useI18n();
   const labels = useDiseasePageLabels();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] =
@@ -194,8 +197,13 @@ export function AdminDogDiseasesPageClient({ initialData }: Props) {
               toast.success(labels.create.success);
               setIsCreateOpen(false);
             } catch (error) {
+              const messageKey = getAdminDogDiseaseCreateErrorMessageKey(error);
               toast.error(
-                error instanceof Error ? error.message : labels.create.error,
+                messageKey
+                  ? t(messageKey)
+                  : error instanceof Error
+                    ? error.message
+                    : labels.create.error,
               );
             }
           }}

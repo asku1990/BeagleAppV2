@@ -31,10 +31,17 @@ and registrations, and before phase1.5 imports titles.
 - Synthetic or missing `beasairaat.REKNO` values are preserved with a null
   `dogId` only when both source parent registrations resolve, so anonymous
   affected puppy/litter evidence can be used by EPI/PUR calculations.
-- Valid `REKNO` values that do not resolve are not stored in
-  `KoiranSairaus`; they are recorded as import issues only for manual cleanup.
+- Valid `REKNO` values that do not resolve are normally not stored in
+  `KoiranSairaus`; they are recorded as skipped import issues for manual
+  cleanup.
+- The known legacy row `ID=270 / FIN001/07` is an explicit exception: it is
+  imported with its original registration as `LITTER` evidence when both
+  source parents resolve.
 - Rows that cannot become `DOG` or `LITTER` do not fail the import, but they are
   skipped from `KoiranSairaus` and recorded as issues.
+- Disease registration issues state whether the row was imported as `LITTER`
+  evidence or skipped. Import summary counters include only rows that reached
+  the corresponding outcome.
 
 ## Data rules
 

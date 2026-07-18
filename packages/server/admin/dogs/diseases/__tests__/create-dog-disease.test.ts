@@ -3,13 +3,13 @@ import { createAdminDogDisease } from "../create-dog-disease";
 
 const {
   createAdminDogDiseaseDbMock,
-  findAdminDiseaseDogByRegistrationNoDbMock,
+  findDogByRegistrationNoDbMock,
   findAdminDogDiseaseDefinitionByCodeDbMock,
   findAdminDogDiseaseDuplicateDbMock,
   runAdminDogDiseaseWriteTransactionDbMock,
 } = vi.hoisted(() => ({
   createAdminDogDiseaseDbMock: vi.fn(),
-  findAdminDiseaseDogByRegistrationNoDbMock: vi.fn(),
+  findDogByRegistrationNoDbMock: vi.fn(),
   findAdminDogDiseaseDefinitionByCodeDbMock: vi.fn(),
   findAdminDogDiseaseDuplicateDbMock: vi.fn(),
   runAdminDogDiseaseWriteTransactionDbMock: vi.fn(),
@@ -17,8 +17,7 @@ const {
 
 vi.mock("@beagle/db", () => ({
   createAdminDogDiseaseDb: createAdminDogDiseaseDbMock,
-  findAdminDiseaseDogByRegistrationNoDb:
-    findAdminDiseaseDogByRegistrationNoDbMock,
+  findDogByRegistrationNoDb: findDogByRegistrationNoDbMock,
   findAdminDogDiseaseDefinitionByCodeDb:
     findAdminDogDiseaseDefinitionByCodeDbMock,
   findAdminDogDiseaseDuplicateDb: findAdminDogDiseaseDuplicateDbMock,
@@ -36,7 +35,7 @@ const adminUser = {
 describe("createAdminDogDisease", () => {
   beforeEach(() => {
     createAdminDogDiseaseDbMock.mockReset();
-    findAdminDiseaseDogByRegistrationNoDbMock.mockReset();
+    findDogByRegistrationNoDbMock.mockReset();
     findAdminDogDiseaseDefinitionByCodeDbMock.mockReset();
     findAdminDogDiseaseDuplicateDbMock.mockReset();
     runAdminDogDiseaseWriteTransactionDbMock.mockReset();
@@ -51,7 +50,7 @@ describe("createAdminDogDisease", () => {
       id: "sairaus-epi",
       koodi: "epi",
     });
-    findAdminDiseaseDogByRegistrationNoDbMock.mockResolvedValueOnce({
+    findDogByRegistrationNoDbMock.mockResolvedValueOnce({
       id: "dog-1",
     });
     createAdminDogDiseaseDbMock.mockResolvedValue({ id: "row-1" });
@@ -141,7 +140,7 @@ describe("createAdminDogDisease", () => {
 
     expect(runAdminDogDiseaseWriteTransactionDbMock).not.toHaveBeenCalled();
     expect(findAdminDogDiseaseDefinitionByCodeDbMock).not.toHaveBeenCalled();
-    expect(findAdminDiseaseDogByRegistrationNoDbMock).not.toHaveBeenCalled();
+    expect(findDogByRegistrationNoDbMock).not.toHaveBeenCalled();
     expect(createAdminDogDiseaseDbMock).not.toHaveBeenCalled();
   });
 
@@ -150,10 +149,10 @@ describe("createAdminDogDisease", () => {
       id: "sairaus-epi",
       koodi: "epi",
     });
-    findAdminDiseaseDogByRegistrationNoDbMock
+    findDogByRegistrationNoDbMock
       .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce({ id: "sire-1" })
-      .mockResolvedValueOnce({ id: "dam-1" });
+      .mockResolvedValueOnce({ id: "sire-1", sex: "MALE" })
+      .mockResolvedValueOnce({ id: "dam-1", sex: "FEMALE" });
     createAdminDogDiseaseDbMock.mockResolvedValue({ id: "row-litter" });
 
     await expect(
@@ -197,6 +196,16 @@ describe("createAdminDogDisease", () => {
       },
       { tx: true },
     );
+    expect(findDogByRegistrationNoDbMock).toHaveBeenNthCalledWith(
+      2,
+      "SF14404/90",
+      { tx: true },
+    );
+    expect(findDogByRegistrationNoDbMock).toHaveBeenNthCalledWith(
+      3,
+      "SF19531/89",
+      { tx: true },
+    );
   });
 
   it("allows compact legacy EPI litter registrations", async () => {
@@ -204,10 +213,10 @@ describe("createAdminDogDisease", () => {
       id: "sairaus-epi",
       koodi: "epi",
     });
-    findAdminDiseaseDogByRegistrationNoDbMock
+    findDogByRegistrationNoDbMock
       .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce({ id: "sire-1" })
-      .mockResolvedValueOnce({ id: "dam-1" });
+      .mockResolvedValueOnce({ id: "sire-1", sex: "MALE" })
+      .mockResolvedValueOnce({ id: "dam-1", sex: "FEMALE" });
     createAdminDogDiseaseDbMock.mockResolvedValue({ id: "row-litter" });
 
     await expect(
@@ -236,10 +245,10 @@ describe("createAdminDogDisease", () => {
       id: "sairaus-pur",
       koodi: "pur",
     });
-    findAdminDiseaseDogByRegistrationNoDbMock
+    findDogByRegistrationNoDbMock
       .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce({ id: "sire-1" })
-      .mockResolvedValueOnce({ id: "dam-1" });
+      .mockResolvedValueOnce({ id: "sire-1", sex: "MALE" })
+      .mockResolvedValueOnce({ id: "dam-1", sex: "FEMALE" });
     createAdminDogDiseaseDbMock.mockResolvedValue({ id: "row-litter" });
 
     await expect(
@@ -263,12 +272,55 @@ describe("createAdminDogDisease", () => {
     });
   });
 
-  it("rejects valid unresolved real registrations as litter evidence", async () => {
+  it("allows an arbitrary litter identity when it does not resolve to a dog", async () => {
     findAdminDogDiseaseDefinitionByCodeDbMock.mockResolvedValue({
       id: "sairaus-epi",
       koodi: "epi",
     });
-    findAdminDiseaseDogByRegistrationNoDbMock.mockResolvedValueOnce(null);
+    findDogByRegistrationNoDbMock
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ id: "sire-1", sex: "MALE" })
+      .mockResolvedValueOnce({ id: "dam-1", sex: "FEMALE" });
+    createAdminDogDiseaseDbMock.mockResolvedValue({ id: "row-litter" });
+
+    await expect(
+      createAdminDogDisease(
+        {
+          evidenceKind: "LITTER",
+          diseaseCode: "epi",
+          registrationNo: "FI12345/21",
+          sireRegistrationNo: "SF14404/90",
+          damRegistrationNo: "SF19531/89",
+          public: false,
+        },
+        adminUser,
+      ),
+    ).resolves.toEqual({
+      status: 201,
+      body: {
+        ok: true,
+        data: { id: "row-litter" },
+      },
+    });
+
+    expect(createAdminDogDiseaseDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        evidenceKind: "LITTER",
+        dogId: null,
+        rekisterinumero: "FI12345/21",
+      }),
+      { tx: true },
+    );
+  });
+
+  it("rejects a litter identity that resolves to an existing dog", async () => {
+    findAdminDogDiseaseDefinitionByCodeDbMock.mockResolvedValue({
+      id: "sairaus-epi",
+      koodi: "epi",
+    });
+    findDogByRegistrationNoDbMock.mockResolvedValueOnce({
+      id: "dog-1",
+    });
 
     await expect(
       createAdminDogDisease(
@@ -286,9 +338,146 @@ describe("createAdminDogDisease", () => {
       status: 400,
       body: {
         ok: false,
-        code: "INVALID_LITTER_REGISTRATION_NO",
+        code: "LITTER_REGISTRATION_MATCHES_DOG",
         error:
-          "Litter evidence requires an anonymous or synthetic registration number.",
+          "A dog exists with this registration number. Add the disease evidence as DOG evidence.",
+      },
+    });
+
+    expect(createAdminDogDiseaseDbMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects litter evidence when the selected sire is not male", async () => {
+    findAdminDogDiseaseDefinitionByCodeDbMock.mockResolvedValue({
+      id: "sairaus-epi",
+      koodi: "epi",
+    });
+    findDogByRegistrationNoDbMock
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ id: "sire-1", sex: "FEMALE" })
+      .mockResolvedValueOnce({ id: "dam-1", sex: "MALE" });
+
+    await expect(
+      createAdminDogDisease(
+        {
+          evidenceKind: "LITTER",
+          diseaseCode: "epi",
+          registrationNo: "TESTI2",
+          sireRegistrationNo: "SE52916/2023",
+          damRegistrationNo: "SE50296/2021",
+          public: false,
+        },
+        adminUser,
+      ),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        code: "INVALID_SIRE_SEX",
+        error: "Selected litter sire must be a male dog.",
+      },
+    });
+
+    expect(findAdminDogDiseaseDuplicateDbMock).not.toHaveBeenCalled();
+    expect(createAdminDogDiseaseDbMock).not.toHaveBeenCalled();
+  });
+
+  it("keeps the existing error when a litter parent does not resolve", async () => {
+    findAdminDogDiseaseDefinitionByCodeDbMock.mockResolvedValue({
+      id: "sairaus-epi",
+      koodi: "epi",
+    });
+    findDogByRegistrationNoDbMock
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ id: "dam-1", sex: "FEMALE" });
+
+    await expect(
+      createAdminDogDisease(
+        {
+          evidenceKind: "LITTER",
+          diseaseCode: "epi",
+          registrationNo: "TESTI-PUUTTUVA",
+          sireRegistrationNo: "SE00000/2021",
+          damRegistrationNo: "SE52916/2023",
+          public: false,
+        },
+        adminUser,
+      ),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        code: "LITTER_PARENT_NOT_FOUND",
+        error: "Litter sire and dam must both resolve to dogs.",
+      },
+    });
+
+    expect(createAdminDogDiseaseDbMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects litter evidence when the selected dam is not female", async () => {
+    findAdminDogDiseaseDefinitionByCodeDbMock.mockResolvedValue({
+      id: "sairaus-epi",
+      koodi: "epi",
+    });
+    findDogByRegistrationNoDbMock
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ id: "sire-1", sex: "MALE" })
+      .mockResolvedValueOnce({ id: "dam-1", sex: "UNKNOWN" });
+
+    await expect(
+      createAdminDogDisease(
+        {
+          evidenceKind: "LITTER",
+          diseaseCode: "epi",
+          registrationNo: "TESTI3",
+          sireRegistrationNo: "SE50296/2021",
+          damRegistrationNo: "SE52916/2023",
+          public: false,
+        },
+        adminUser,
+      ),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        code: "INVALID_DAM_SEX",
+        error: "Selected litter dam must be a female dog.",
+      },
+    });
+
+    expect(createAdminDogDiseaseDbMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects the same dog as both litter parents", async () => {
+    findAdminDogDiseaseDefinitionByCodeDbMock.mockResolvedValue({
+      id: "sairaus-epi",
+      koodi: "epi",
+    });
+    findDogByRegistrationNoDbMock
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ id: "parent-1", sex: "MALE" })
+      .mockResolvedValueOnce({ id: "parent-1", sex: "MALE" });
+
+    await expect(
+      createAdminDogDisease(
+        {
+          evidenceKind: "LITTER",
+          diseaseCode: "epi",
+          registrationNo: "TESTI4",
+          sireRegistrationNo: "SE50296/2021",
+          damRegistrationNo: "SE50296/2021",
+          public: false,
+        },
+        adminUser,
+      ),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        code: "INVALID_PARENT_COMBINATION",
+        error: "Litter sire and dam must be different dogs.",
       },
     });
 
@@ -300,7 +489,7 @@ describe("createAdminDogDisease", () => {
       id: "sairaus-epi",
       koodi: "epi",
     });
-    findAdminDiseaseDogByRegistrationNoDbMock.mockResolvedValueOnce({
+    findDogByRegistrationNoDbMock.mockResolvedValueOnce({
       id: "dog-1",
     });
     findAdminDogDiseaseDuplicateDbMock.mockResolvedValueOnce({
@@ -345,10 +534,10 @@ describe("createAdminDogDisease", () => {
       id: "sairaus-epi",
       koodi: "epi",
     });
-    findAdminDiseaseDogByRegistrationNoDbMock
+    findDogByRegistrationNoDbMock
       .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce({ id: "sire-1" })
-      .mockResolvedValueOnce({ id: "dam-1" });
+      .mockResolvedValueOnce({ id: "sire-1", sex: "MALE" })
+      .mockResolvedValueOnce({ id: "dam-1", sex: "FEMALE" });
     findAdminDogDiseaseDuplicateDbMock.mockResolvedValueOnce({
       id: "existing-row",
     });
@@ -393,7 +582,7 @@ describe("createAdminDogDisease", () => {
       id: "sairaus-epi",
       koodi: "epi",
     });
-    findAdminDiseaseDogByRegistrationNoDbMock.mockResolvedValueOnce(null);
+    findDogByRegistrationNoDbMock.mockResolvedValueOnce(null);
 
     await expect(
       createAdminDogDisease(

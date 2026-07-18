@@ -57,7 +57,9 @@ For `LITTER` evidence:
 - Real `REKNO` resolving to dog -> `DOG`.
 - Invalid/synthetic/missing `REKNO` with both parents resolved -> `LITTER`.
 - Valid unresolved `REKNO`, or no resolved complete parent pair -> import issue
-  only; do not insert a `KoiranSairaus` row.
+  only; do not insert a `KoiranSairaus` row, except for the known anonymous
+  legacy row `ID=270 / FIN001/07`, which becomes `LITTER` evidence when both
+  parents resolve.
 - Always preserve raw source registration strings.
 
 ## Parent Registration Storage
@@ -84,6 +86,8 @@ Desired behavior after that migration:
 - `FI15813/15` should be `DOG` evidence because the dog exists.
 - `PKR.VI-15268` vs `PKRVI-15268` is an alias/import cleanup issue, not a reason to lose dog evidence.
 - `EPI_1/94` with resolved sire/dam should be `LITTER` evidence.
+- `FIN001/07` on legacy row `ID=270` should preserve its registration and become
+  `LITTER` evidence when both parents resolve.
 - Missing `REKNO` with unresolved parents should be an import issue only.
 
 ## Out Of Scope

@@ -30,10 +30,6 @@ export type AdminDogDiseaseDefinitionDb = {
   koodi: string;
 };
 
-export type AdminDogDiseaseDogLookupDb = {
-  id: string;
-};
-
 export type AdminDogDiseaseDuplicateLookupDb = {
   id: string;
 };
@@ -58,24 +54,6 @@ export async function findAdminDogDiseaseDefinitionByCodeDb(
       koodi: true,
     },
   });
-}
-
-export async function findAdminDiseaseDogByRegistrationNoDb(
-  registrationNo: string,
-  dbClient: AdminDogDiseaseDbClient = prisma,
-): Promise<AdminDogDiseaseDogLookupDb | null> {
-  const row = await dbClient.dogRegistration.findUnique({
-    where: { registrationNo },
-    select: {
-      dog: {
-        select: {
-          id: true,
-        },
-      },
-    },
-  });
-
-  return row?.dog ?? null;
 }
 
 export async function findAdminDogDiseaseDuplicateDb(
