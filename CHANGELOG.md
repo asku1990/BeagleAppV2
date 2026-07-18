@@ -16,11 +16,14 @@ This project uses a user-facing changelog format.
 
 ### Changed
 
-- Ylläpitäjä voi käyttää koiran sairauden pentuetodisteelle vapaavalintaistatunnistetta. Jos
+- Ylläpitäjä voi käyttää koiran sairauden pentuetodisteelle vapaavalintaista tunnistetta. Jos
   tunniste kuuluu olemassa olevalle koiralle, sairaustieto ohjataan lisäämään
   koirakohtaisena tietona.
 
 ### Fixed
+
+- Sairauden pentuetodisteelle ei voi tallentaa samaa koiraa molemmiksi
+  vanhemmiksi eikä väärää sukupuolta isän tai emän rooliin.
 
 ### Removed
 

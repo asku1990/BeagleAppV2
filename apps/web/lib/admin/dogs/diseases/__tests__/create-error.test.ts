@@ -26,6 +26,21 @@ describe("getAdminDogDiseaseCreateErrorMessageKey", () => {
     );
   });
 
+  it.each([
+    [
+      "INVALID_PARENT_COMBINATION",
+      "admin.dogs.mutation.errorInvalidParentCombination",
+    ],
+    ["INVALID_SIRE_SEX", "admin.dogs.mutation.errorInvalidSireSex"],
+    ["INVALID_DAM_SEX", "admin.dogs.mutation.errorInvalidDamSex"],
+  ] as const)("maps %s to the existing parent message", (code, key) => {
+    expect(
+      getAdminDogDiseaseCreateErrorMessageKey(
+        new AdminMutationError("Invalid litter parents.", code),
+      ),
+    ).toBe(key);
+  });
+
   it("provides Finnish and Swedish guidance for the existing dog match", () => {
     const key = "admin.dogs.diseases.create.errorLitterRegistrationMatchesDog";
 

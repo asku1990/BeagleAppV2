@@ -21,7 +21,8 @@ Admin-facing disease evidence browsing, creation, and deletion for `KoiranSairau
   option to show every disease row.
 - Disease creation supports two evidence kinds:
   - `DOG`: links the row to a resolved real dog.
-  - `LITTER`: stores anonymous litter evidence with resolved sire and dam registration numbers.
+  - `LITTER`: stores anonymous litter evidence with a male sire and female dam
+    identified by their registration numbers.
 - The browse list now surfaces the persisted create-modal metadata directly in each row/card:
   - evidence kind
   - `pentue`
@@ -35,6 +36,8 @@ Admin-facing disease evidence browsing, creation, and deletion for `KoiranSairau
 - Disease code is required.
 - Registration number is required.
 - Litter evidence requires both sire and dam registration numbers.
+- Litter parents must resolve to different dogs. The sire must be male and the
+  dam female; dogs with an unknown sex are rejected in either role.
 - Dog evidence requires the registration number to resolve to a real dog.
 - Litter evidence accepts any non-empty identity up to 40 characters when the
   identity does not resolve to a real dog.

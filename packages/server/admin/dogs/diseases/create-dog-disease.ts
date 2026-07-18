@@ -1,6 +1,6 @@
 import {
   createAdminDogDiseaseDb,
-  findAdminDiseaseDogByRegistrationNoDb,
+  findDogByRegistrationNoDb,
   findAdminDogDiseaseDefinitionByCodeDb,
   findAdminDogDiseaseDuplicateDb,
   runAdminDogDiseaseWriteTransactionDb,
@@ -18,6 +18,7 @@ import {
   validateCreateDogDiseaseInput,
   type CreateDogDiseaseValidationResult,
 } from "./internal/create-disease-validation";
+import { validateLitterParents } from "./internal/litter-parent-validation";
 
 function validationResponse(
   validation: Extract<CreateDogDiseaseValidationResult, { ok: false }>,
@@ -108,7 +109,7 @@ export async function createAdminDogDisease(
           throw new Error("DISEASE_NOT_FOUND");
         }
 
-        const dog = await findAdminDiseaseDogByRegistrationNoDb(
+        const dog = await findDogByRegistrationNoDb(
           validation.data.registrationNo,
           tx,
         );
@@ -156,13 +157,13 @@ export async function createAdminDogDisease(
         }
 
         const sire = validation.data.sireRegistrationNo
-          ? await findAdminDiseaseDogByRegistrationNoDb(
+          ? await findDogByRegistrationNoDb(
               validation.data.sireRegistrationNo,
               tx,
             )
           : null;
         const dam = validation.data.damRegistrationNo
-          ? await findAdminDiseaseDogByRegistrationNoDb(
+          ? await findDogByRegistrationNoDb(
               validation.data.damRegistrationNo,
               tx,
             )
@@ -170,6 +171,11 @@ export async function createAdminDogDisease(
 
         if (!sire || !dam) {
           throw new Error("LITTER_PARENT_NOT_FOUND");
+        }
+
+        const parentValidationError = validateLitterParents(sire, dam);
+        if (parentValidationError) {
+          throw new Error(parentValidationError);
         }
 
         const existing = await findAdminDogDiseaseDuplicateDb(
@@ -246,6 +252,18 @@ export async function createAdminDogDisease(
       LITTER_PARENT_NOT_FOUND: {
         code: "LITTER_PARENT_NOT_FOUND",
         error: "Litter sire and dam must both resolve to dogs.",
+      },
+      INVALID_PARENT_COMBINATION: {
+        code: "INVALID_PARENT_COMBINATION",
+        error: "Litter sire and dam must be different dogs.",
+      },
+      INVALID_SIRE_SEX: {
+        code: "INVALID_SIRE_SEX",
+        error: "Selected litter sire must be a male dog.",
+      },
+      INVALID_DAM_SEX: {
+        code: "INVALID_DAM_SEX",
+        error: "Selected litter dam must be a female dog.",
       },
     };
     const mappedError = errorMap[message];
