@@ -16,6 +16,10 @@ This project uses a user-facing changelog format.
 
 ### Changed
 
+- Ylläpitäjä voi käyttää koiran sairauden pentuetodisteelle vapaavalintaistatunnistetta. Jos
+  tunniste kuuluu olemassa olevalle koiralle, sairaustieto ohjataan lisäämään
+  koirakohtaisena tietona.
+
 ### Fixed
 
 ### Removed

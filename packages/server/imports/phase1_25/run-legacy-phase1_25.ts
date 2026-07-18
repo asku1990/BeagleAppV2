@@ -36,17 +36,28 @@ type RegistrationIndex = {
 
 type KoiranSairausEvidenceKind = "DOG" | "LITTER";
 
+type KoiranSairausIdentityKind =
+  | "RESOLVED_DOG"
+  | "GENERATED"
+  | "SYNTHETIC"
+  | "UNRESOLVED";
+
 type KoiranSairausIdentityResolution = {
   registrationNo: string;
   dogId: string | null;
-  issue: {
-    code:
-      | "KOIRAN_SAIRAUS_REGISTRATION_SYNTHETIC_IMPORTED"
-      | "KOIRAN_SAIRAUS_REGISTRATION_GENERATED_IMPORTED"
-      | "KOIRAN_SAIRAUS_REGISTRATION_UNRESOLVED";
-    message: string;
-    counter: "fallback" | "unresolved";
-  } | null;
+  kind: KoiranSairausIdentityKind;
+};
+
+type KoiranSairausIdentityIssue = {
+  code:
+    | "KOIRAN_SAIRAUS_REGISTRATION_SYNTHETIC_IMPORTED"
+    | "KOIRAN_SAIRAUS_REGISTRATION_SYNTHETIC_SKIPPED"
+    | "KOIRAN_SAIRAUS_REGISTRATION_GENERATED_IMPORTED"
+    | "KOIRAN_SAIRAUS_REGISTRATION_GENERATED_SKIPPED"
+    | "KOIRAN_SAIRAUS_REGISTRATION_UNRESOLVED_IMPORTED_AS_LITTER"
+    | "KOIRAN_SAIRAUS_REGISTRATION_UNRESOLVED_SKIPPED";
+  message: string;
+  counter: "fallback" | "unresolved" | null;
 };
 
 type SairausDelegate = {
@@ -186,12 +197,7 @@ function resolveKoiranSairausIdentity(
     return {
       registrationNo: `LEGACY_BEASAIRAAT_${row.legacyId}`,
       dogId: null,
-      issue: {
-        code: "KOIRAN_SAIRAUS_REGISTRATION_GENERATED_IMPORTED",
-        message:
-          "beasairaat row is missing REKNO, so a legacy fallback registration number was generated.",
-        counter: "fallback",
-      },
+      kind: "GENERATED",
     };
   }
 
@@ -199,12 +205,7 @@ function resolveKoiranSairausIdentity(
     return {
       registrationNo: normalizedRegistrationNo,
       dogId: null,
-      issue: {
-        code: "KOIRAN_SAIRAUS_REGISTRATION_SYNTHETIC_IMPORTED",
-        message:
-          "beasairaat row has a synthetic or invalid REKNO that was preserved as imported identity.",
-        counter: "fallback",
-      },
+      kind: "SYNTHETIC",
     };
   }
 
@@ -213,20 +214,78 @@ function resolveKoiranSairausIdentity(
     return {
       registrationNo: normalizedRegistrationNo,
       dogId: null,
-      issue: {
-        code: "KOIRAN_SAIRAUS_REGISTRATION_UNRESOLVED",
-        message:
-          "beasairaat row has a valid REKNO that did not resolve to DogRegistration.",
-        counter: "unresolved",
-      },
+      kind: "UNRESOLVED",
     };
   }
 
   return {
     registrationNo: normalizedRegistrationNo,
     dogId,
-    issue: null,
+    kind: "RESOLVED_DOG",
   };
+}
+
+function isKnownLegacyLitterEvidence(
+  row: { legacyId: number },
+  registrationNo: string,
+): boolean {
+  return row.legacyId === 270 && registrationNo === "FIN001/07";
+}
+
+function resolveKoiranSairausIdentityIssue(input: {
+  dog: KoiranSairausIdentityResolution;
+  evidenceKind: KoiranSairausEvidenceKind | null;
+  knownLegacyLitterEvidence: boolean;
+}): KoiranSairausIdentityIssue | null {
+  const importedAsLitter = input.evidenceKind === "LITTER";
+
+  switch (input.dog.kind) {
+    case "RESOLVED_DOG":
+      return null;
+    case "GENERATED":
+      return importedAsLitter
+        ? {
+            code: "KOIRAN_SAIRAUS_REGISTRATION_GENERATED_IMPORTED",
+            message:
+              "beasairaat row is missing REKNO; a fallback identity was generated and the row was imported as LITTER evidence.",
+            counter: "fallback",
+          }
+        : {
+            code: "KOIRAN_SAIRAUS_REGISTRATION_GENERATED_SKIPPED",
+            message:
+              "beasairaat row is missing REKNO and was skipped because it could not form usable DOG or LITTER evidence.",
+            counter: null,
+          };
+    case "SYNTHETIC":
+      return importedAsLitter
+        ? {
+            code: "KOIRAN_SAIRAUS_REGISTRATION_SYNTHETIC_IMPORTED",
+            message:
+              "beasairaat row has a synthetic or invalid REKNO; the identity was preserved and the row was imported as LITTER evidence.",
+            counter: "fallback",
+          }
+        : {
+            code: "KOIRAN_SAIRAUS_REGISTRATION_SYNTHETIC_SKIPPED",
+            message:
+              "beasairaat row has a synthetic or invalid REKNO and was skipped because it could not form usable LITTER evidence.",
+            counter: null,
+          };
+    case "UNRESOLVED":
+      return importedAsLitter
+        ? {
+            code: "KOIRAN_SAIRAUS_REGISTRATION_UNRESOLVED_IMPORTED_AS_LITTER",
+            message:
+              "beasairaat REKNO did not resolve to a dog, but the known legacy row was imported as LITTER evidence with its original identity.",
+            counter: null,
+          }
+        : {
+            code: "KOIRAN_SAIRAUS_REGISTRATION_UNRESOLVED_SKIPPED",
+            message: input.knownLegacyLitterEvidence
+              ? "Known legacy LITTER evidence was skipped because both source parents did not resolve to dogs."
+              : "beasairaat row has a valid REKNO that did not resolve to a dog, so the row was skipped.",
+            counter: "unresolved",
+          };
+  }
 }
 
 function isUnknownLegacyParentRegistration(value: string): boolean {
@@ -237,12 +296,15 @@ function classifyKoiranSairausEvidence(input: {
   dog: KoiranSairausIdentityResolution;
   isaDogId: string | null;
   emaDogId: string | null;
+  knownLegacyLitterEvidence: boolean;
 }): KoiranSairausEvidenceKind | null {
   if (input.dog.dogId) {
     return "DOG";
   }
   if (
-    input.dog.issue?.counter === "fallback" &&
+    (input.dog.kind === "GENERATED" ||
+      input.dog.kind === "SYNTHETIC" ||
+      input.knownLegacyLitterEvidence) &&
     input.isaDogId &&
     input.emaDogId
   ) {
@@ -478,28 +540,17 @@ export async function runLegacyPhase1_25(
         row.sireRegistrationNo,
       );
       const ema = resolveRegistration(registrationIndex, row.damRegistrationNo);
+      const knownLegacyLitterEvidence = isKnownLegacyLitterEvidence(
+        row,
+        dog.registrationNo,
+      );
       const evidenceKind = classifyKoiranSairausEvidence({
         dog,
         isaDogId: isa.dogId,
         emaDogId: ema.dogId,
+        knownLegacyLitterEvidence,
       });
       const sairausKoodi = normalizeDiseaseCode(row.diseaseCode);
-      if (dog.issue) {
-        if (dog.issue.counter === "fallback") {
-          koiranSairaudetFallbackIdentityIssues += 1;
-        } else {
-          koiranSairaudetUnresolvedDogSkipped += 1;
-        }
-        await recordIssue({
-          stage: "koiran-sairaudet",
-          code: dog.issue.code,
-          message: dog.issue.message,
-          registrationNo: dog.registrationNo,
-          sourceRowId: row.legacyId,
-          sourceTable: "beasairaat",
-          payloadJson: JSON.stringify(row),
-        });
-      }
       if (evidenceKind !== "DOG") {
         for (const [role, parent] of [
           ["sire", isa],
@@ -564,6 +615,25 @@ export async function runLegacyPhase1_25(
       }
       if (!evidenceKind) {
         koiranSairaudetSkipped += 1;
+        const identityIssue = resolveKoiranSairausIdentityIssue({
+          dog,
+          evidenceKind,
+          knownLegacyLitterEvidence,
+        });
+        if (identityIssue) {
+          if (identityIssue.counter === "unresolved") {
+            koiranSairaudetUnresolvedDogSkipped += 1;
+          }
+          await recordIssue({
+            stage: "koiran-sairaudet",
+            code: identityIssue.code,
+            message: identityIssue.message,
+            registrationNo: dog.registrationNo,
+            sourceRowId: row.legacyId,
+            sourceTable: "beasairaat",
+            payloadJson: JSON.stringify(row),
+          });
+        }
         if (koiranSairaudetProcessed % 1000 === 0) {
           logProgress(
             "koiran-sairaudet",
@@ -588,6 +658,25 @@ export async function runLegacyPhase1_25(
         tietolahde: normalizeNullable(row.source),
         muokattuLahteessa: parseLegacyTimestamp(row.modifiedRaw),
       });
+      const identityIssue = resolveKoiranSairausIdentityIssue({
+        dog,
+        evidenceKind,
+        knownLegacyLitterEvidence,
+      });
+      if (identityIssue) {
+        if (identityIssue.counter === "fallback") {
+          koiranSairaudetFallbackIdentityIssues += 1;
+        }
+        await recordIssue({
+          stage: "koiran-sairaudet",
+          code: identityIssue.code,
+          message: identityIssue.message,
+          registrationNo: dog.registrationNo,
+          sourceRowId: row.legacyId,
+          sourceTable: "beasairaat",
+          payloadJson: JSON.stringify(row),
+        });
+      }
       if (koiranSairaudetProcessed % 1000 === 0) {
         logProgress(
           "koiran-sairaudet",

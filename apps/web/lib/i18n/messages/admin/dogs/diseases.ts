@@ -57,6 +57,8 @@ export const fiAdminDogsDiseasesMessages = {
   "admin.dogs.diseases.create.cancel": "Peruuta",
   "admin.dogs.diseases.create.success": "Sairaustieto tallennettu.",
   "admin.dogs.diseases.create.error": "Sairaustiedon tallennus epäonnistui.",
+  "admin.dogs.diseases.create.errorLitterRegistrationMatchesDog":
+    "Rekisterinumerolla löytyi olemassa oleva koira. Lisää sairaustieto Koira-tyyppisenä.",
   "admin.dogs.diseases.delete.title": "Poista sairaustieto",
   "admin.dogs.diseases.delete.descriptionPrefix": "Poistetaanko sairaustieto",
   "admin.dogs.diseases.delete.registrationLabel": "Rekisterinumero",
@@ -130,6 +132,8 @@ export const svAdminDogsDiseasesMessages = {
   "admin.dogs.diseases.create.success": "Sjukdomsuppgiften sparades.",
   "admin.dogs.diseases.create.error":
     "Det gick inte att spara sjukdomsuppgiften.",
+  "admin.dogs.diseases.create.errorLitterRegistrationMatchesDog":
+    "En befintlig hund hittades med registreringsnumret. Lägg till sjukdomsuppgiften med typen Hund.",
   "admin.dogs.diseases.delete.title": "Ta bort sjukdomsuppgift",
   "admin.dogs.diseases.delete.descriptionPrefix": "Ta bort sjukdomsuppgiften",
   "admin.dogs.diseases.delete.registrationLabel": "Registreringsnummer",

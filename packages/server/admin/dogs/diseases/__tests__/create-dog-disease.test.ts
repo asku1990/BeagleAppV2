@@ -263,12 +263,55 @@ describe("createAdminDogDisease", () => {
     });
   });
 
-  it("rejects valid unresolved real registrations as litter evidence", async () => {
+  it("allows an arbitrary litter identity when it does not resolve to a dog", async () => {
     findAdminDogDiseaseDefinitionByCodeDbMock.mockResolvedValue({
       id: "sairaus-epi",
       koodi: "epi",
     });
-    findAdminDiseaseDogByRegistrationNoDbMock.mockResolvedValueOnce(null);
+    findAdminDiseaseDogByRegistrationNoDbMock
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ id: "sire-1" })
+      .mockResolvedValueOnce({ id: "dam-1" });
+    createAdminDogDiseaseDbMock.mockResolvedValue({ id: "row-litter" });
+
+    await expect(
+      createAdminDogDisease(
+        {
+          evidenceKind: "LITTER",
+          diseaseCode: "epi",
+          registrationNo: "FI12345/21",
+          sireRegistrationNo: "SF14404/90",
+          damRegistrationNo: "SF19531/89",
+          public: false,
+        },
+        adminUser,
+      ),
+    ).resolves.toEqual({
+      status: 201,
+      body: {
+        ok: true,
+        data: { id: "row-litter" },
+      },
+    });
+
+    expect(createAdminDogDiseaseDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        evidenceKind: "LITTER",
+        dogId: null,
+        rekisterinumero: "FI12345/21",
+      }),
+      { tx: true },
+    );
+  });
+
+  it("rejects a litter identity that resolves to an existing dog", async () => {
+    findAdminDogDiseaseDefinitionByCodeDbMock.mockResolvedValue({
+      id: "sairaus-epi",
+      koodi: "epi",
+    });
+    findAdminDiseaseDogByRegistrationNoDbMock.mockResolvedValueOnce({
+      id: "dog-1",
+    });
 
     await expect(
       createAdminDogDisease(
@@ -286,9 +329,9 @@ describe("createAdminDogDisease", () => {
       status: 400,
       body: {
         ok: false,
-        code: "INVALID_LITTER_REGISTRATION_NO",
+        code: "LITTER_REGISTRATION_MATCHES_DOG",
         error:
-          "Litter evidence requires an anonymous or synthetic registration number.",
+          "A dog exists with this registration number. Add the disease evidence as DOG evidence.",
       },
     });
 

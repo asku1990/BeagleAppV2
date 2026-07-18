@@ -14,12 +14,10 @@ import type {
 import { requireAdmin } from "@server/admin/core/service";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
-import { isValidRegistrationNo } from "@server/admin/dogs/manage/normalization";
 import {
   validateCreateDogDiseaseInput,
   type CreateDogDiseaseValidationResult,
 } from "./internal/create-disease-validation";
-import { isLegacySyntheticDiseaseRegistration } from "./internal/synthetic-registration";
 
 function validationResponse(
   validation: Extract<CreateDogDiseaseValidationResult, { ok: false }>,
@@ -153,15 +151,8 @@ export async function createAdminDogDisease(
           );
         }
 
-        if (
-          dog ||
-          (isValidRegistrationNo(validation.data.registrationNo) &&
-            !isLegacySyntheticDiseaseRegistration(
-              validation.data.registrationNo,
-              disease.koodi,
-            ))
-        ) {
-          throw new Error("INVALID_LITTER_REGISTRATION_NO");
+        if (dog) {
+          throw new Error("LITTER_REGISTRATION_MATCHES_DOG");
         }
 
         const sire = validation.data.sireRegistrationNo
@@ -247,10 +238,10 @@ export async function createAdminDogDisease(
         code: "DOG_NOT_FOUND",
         error: "Dog was not found.",
       },
-      INVALID_LITTER_REGISTRATION_NO: {
-        code: "INVALID_LITTER_REGISTRATION_NO",
+      LITTER_REGISTRATION_MATCHES_DOG: {
+        code: "LITTER_REGISTRATION_MATCHES_DOG",
         error:
-          "Litter evidence requires an anonymous or synthetic registration number.",
+          "A dog exists with this registration number. Add the disease evidence as DOG evidence.",
       },
       LITTER_PARENT_NOT_FOUND: {
         code: "LITTER_PARENT_NOT_FOUND",

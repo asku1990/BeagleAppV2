@@ -36,12 +36,17 @@ Admin-facing disease evidence browsing, creation, and deletion for `KoiranSairau
 - Registration number is required.
 - Litter evidence requires both sire and dam registration numbers.
 - Dog evidence requires the registration number to resolve to a real dog.
-- Litter evidence rejects valid real dog registrations unless the registration is a supported synthetic/anonymous format.
+- Litter evidence accepts any non-empty identity up to 40 characters when the
+  identity does not resolve to a real dog.
+- If a litter identity resolves to a real dog, creation is rejected and the
+  admin is instructed to add the disease as `DOG` evidence instead.
 
-## Synthetic registrations
+## Litter identities
 
-- Accepted formats are the legacy anonymous patterns used by imported disease evidence, including underscore-based forms like `EPI_1/94` and compact code-prefixed forms like `EPI1/26` or `PUR1/06`.
-- These formats exist so anonymous litter evidence can be recorded without creating placeholder dogs.
+- Legacy anonymous patterns such as `EPI_1/94`, `EPI1/26`, and `PUR1/06`
+  remain valid, but new litter identities are not restricted to those formats.
+- The explicit `LITTER` evidence kind and resolved source parents distinguish
+  anonymous litter evidence without creating placeholder dogs.
 
 ## Duplicate prevention
 
