@@ -41,6 +41,12 @@ This project uses a user-facing changelog format.
 
 ### Fixed
 
+- Vanhan tietokannan tuonti varoittaa nyt, jos isäksi tai emäksi yhdistetyn
+  koiran sukupuoli on tuntematon tai vanhempainroolin vastainen. Sukulaisuussuhde
+  säilytetään varoituksesta huolimatta.
+- Vanhan tietokannan tuonti varoittaa myös virheellisistä koiran
+  sukupuoliarvoista ja tallentaa ne edelleen tuntemattomana sukupuolena.
+
 ### Removed
 
 ## [0.17.0] - 2026-07-15
