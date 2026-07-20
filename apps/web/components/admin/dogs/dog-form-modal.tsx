@@ -59,7 +59,7 @@ export function DogFormModal({
   const { t } = useI18n();
   const todayDateInputValue = useMemo(
     () => toBusinessDateInputValue(new Date()),
-    [],
+    [open],
   );
   const normalRulesApply = formStatus === "NORMAL";
   const hasEkAssignmentWithoutNumber =
