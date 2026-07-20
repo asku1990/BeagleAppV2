@@ -2,6 +2,10 @@ import type {
   CreateAdminDogRequest,
   CreateAdminDogResponse,
 } from "@beagle/contracts";
+import {
+  isFutureBusinessDate,
+  toBusinessDateOnly,
+} from "@server/core/date-only";
 import type { ServiceResult } from "@server/core/result";
 import {
   normalizeDistinctNames,
@@ -13,6 +17,7 @@ import {
 } from "../normalization";
 import {
   duplicateRegistrationNoResponse,
+  ekNoRequiredForAssignmentDateResponse,
   invalidBirthDateResponse,
   invalidColorCodeResponse,
   invalidDogStatusResponse,
@@ -26,6 +31,7 @@ import {
   noteTooLongResponse,
   registrationNoTooLongResponse,
 } from "./manage-responses";
+import { isValidEkAssignment } from "./ek-assignment-validation";
 import { validateRegistrationInput } from "./registration-validation";
 import {
   validateDogTitles,
@@ -143,6 +149,27 @@ export function validateCreatePreflight(
       logMessage:
         "admin dog create rejected because EK number assignment date is invalid",
       response: invalidEkNoAssignedOnResponse(),
+    };
+  }
+  if (ekNoAssignedOn && isFutureBusinessDate(ekNoAssignedOn)) {
+    return {
+      ok: false,
+      logContext: {
+        event: "future_ek_no_assigned_on",
+        ekNoAssignedOn: toBusinessDateOnly(ekNoAssignedOn),
+      },
+      logMessage:
+        "admin dog create rejected because EK number assignment date is in the future",
+      response: invalidEkNoAssignedOnResponse(),
+    };
+  }
+  if (!isValidEkAssignment(ekNo, ekNoAssignedOn)) {
+    return {
+      ok: false,
+      logContext: { event: "ek_no_required_for_assignment_date" },
+      logMessage:
+        "admin dog create rejected because EK assignment date has no EK number",
+      response: ekNoRequiredForAssignmentDateResponse(),
     };
   }
 

@@ -54,7 +54,7 @@ Developer notes for the admin dog management flow.
 - `AdminDogsPageClient` stays a composition shell.
 - Non-UI form flow logic stays in feature-local hook/lib modules.
 - `DogFormModal` remains presentational and receives prepared options/handlers as props.
-- EK number and its optional assignment date are maintained as dog-level fields in the metadata section; they are not repeatable title rows.
+- EK number and its optional assignment date are maintained as dog-level fields in the metadata section; they are not repeatable title rows. Create and update require an EK number when an assignment date is present and reject assignment dates after the current Helsinki business date.
 - Admin create/update payloads include optional `colorCode`; the form lists only `SELECTABLE` `DogColor` rows in the active UI language.
 - Existing hidden or legacy-unknown colors remain visible on edit and may be preserved, but cannot be newly assigned.
 

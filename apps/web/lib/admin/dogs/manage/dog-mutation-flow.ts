@@ -170,6 +170,8 @@ export function getAdminDogMutationErrorMessageKey(
       return "admin.dogs.mutation.errorInvalidEkNo";
     case "INVALID_EK_NO_ASSIGNED_ON":
       return "admin.dogs.mutation.errorInvalidEkNoAssignedOn";
+    case "EK_NO_REQUIRED_FOR_ASSIGNMENT_DATE":
+      return "admin.dogs.mutation.errorEkNoRequiredForAssignmentDate";
     case "INVALID_COLOR_CODE":
       return "admin.dogs.mutation.errorInvalidColorCode";
     case "REGISTRATION_NO_TOO_LONG":

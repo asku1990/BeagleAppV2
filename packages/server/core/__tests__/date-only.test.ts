@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { BUSINESS_TIME_ZONE, toBusinessDateOnly } from "../date-only";
+import {
+  BUSINESS_TIME_ZONE,
+  isFutureBusinessDate,
+  toBusinessDateOnly,
+} from "../date-only";
 
 describe("toBusinessDateOnly", () => {
   it("uses configured business timezone", () => {
@@ -25,5 +29,33 @@ describe("toBusinessDateOnly", () => {
     expect(toBusinessDateOnly(new Date("2022-10-29T22:30:00.000Z"))).toBe(
       "2022-10-30",
     );
+  });
+});
+
+describe("isFutureBusinessDate", () => {
+  const helsinkiAfterMidnight = new Date("2026-07-19T21:30:00.000Z");
+
+  it("accepts past and current Helsinki business dates", () => {
+    expect(
+      isFutureBusinessDate(
+        new Date("2026-07-19T00:00:00.000Z"),
+        helsinkiAfterMidnight,
+      ),
+    ).toBe(false);
+    expect(
+      isFutureBusinessDate(
+        new Date("2026-07-20T00:00:00.000Z"),
+        helsinkiAfterMidnight,
+      ),
+    ).toBe(false);
+  });
+
+  it("rejects a date after the current Helsinki business date", () => {
+    expect(
+      isFutureBusinessDate(
+        new Date("2026-07-21T00:00:00.000Z"),
+        helsinkiAfterMidnight,
+      ),
+    ).toBe(true);
   });
 });

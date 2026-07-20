@@ -21,6 +21,10 @@ export function DogFormMetadataSection({
   onValuesChange,
   t,
 }: DogFormMetadataSectionProps) {
+  const hasEkNo = values.ekNo.trim().length > 0;
+  const hasEkAssignmentWithoutNumber =
+    !hasEkNo && values.ekNoAssignedOn.trim().length > 0;
+
   return (
     <>
       <div className="grid gap-2 md:grid-cols-2">
@@ -42,6 +46,11 @@ export function DogFormMetadataSection({
             placeholder={t("admin.dogs.form.ekNoPlaceholder")}
             maxLength={10}
           />
+          {hasEkAssignmentWithoutNumber ? (
+            <p className="text-xs text-destructive">
+              {t("admin.dogs.form.ekNoRequiredForAssignmentDate")}
+            </p>
+          ) : null}
         </div>
         <div className="space-y-1">
           <p className="text-sm text-muted-foreground">
@@ -90,7 +99,7 @@ export function DogFormMetadataSection({
                     ekNoAssignedOn: todayDateInputValue,
                   })
                 }
-                disabled={isSubmitting}
+                disabled={isSubmitting || !hasEkNo}
               >
                 {t("admin.dogs.form.ekNoAssignedOnSet")}
               </Button>

@@ -99,6 +99,12 @@ describe("admin dog manage lib", () => {
     );
   });
 
+  it("maps the missing EK number invariant error", () => {
+    expect(
+      getAdminDogMutationErrorMessageKey("EK_NO_REQUIRED_FOR_ASSIGNMENT_DATE"),
+    ).toBe("admin.dogs.mutation.errorEkNoRequiredForAssignmentDate");
+  });
+
   it("maps list query titlesText for compact list rendering", () => {
     const mapped = mapAdminDogFromQuery({
       id: "dog_1",

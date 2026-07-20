@@ -19,3 +19,10 @@ export function toBusinessDateOnly(value: Date): string {
 
   return `${year}-${month}-${day}`;
 }
+
+export function isFutureBusinessDate(
+  value: Date,
+  now: Date = new Date(),
+): boolean {
+  return toBusinessDateOnly(value) > toBusinessDateOnly(now);
+}

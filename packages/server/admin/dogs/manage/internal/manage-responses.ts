@@ -120,8 +120,22 @@ export function invalidEkNoAssignedOnResponse<
     status: 400,
     body: {
       ok: false,
-      error: "EK number assignment date must use YYYY-MM-DD format.",
+      error:
+        "EK number assignment date must use YYYY-MM-DD format and must not be in the future.",
       code: "INVALID_EK_NO_ASSIGNED_ON",
+    },
+  } as ServiceResult<T>;
+}
+
+export function ekNoRequiredForAssignmentDateResponse<
+  T extends ManageErrorTarget,
+>(): ServiceResult<T> {
+  return {
+    status: 400,
+    body: {
+      ok: false,
+      error: "EK number is required when an assignment date is provided.",
+      code: "EK_NO_REQUIRED_FOR_ASSIGNMENT_DATE",
     },
   } as ServiceResult<T>;
 }

@@ -51,6 +51,8 @@ export const fiAdminDogsFormMessages = {
     "EK-numeron myöntämispäivä ei tiedossa.",
   "admin.dogs.form.ekNoAssignedOnSet": "Aseta päivämäärä",
   "admin.dogs.form.ekNoAssignedOnClear": "Poista päivämäärä",
+  "admin.dogs.form.ekNoRequiredForAssignmentDate":
+    "EK-numero tarvitaan, kun myöntämispäivä on asetettu.",
   "admin.dogs.form.colorSelectLabel": "Väri",
   "admin.dogs.form.notePlaceholder": "Muistiinpano",
   "admin.dogs.form.titlesLabel": "Tittelit",
@@ -126,6 +128,8 @@ export const svAdminDogsFormMessages = {
     "Datumet då EK-numret tilldelades är okänt.",
   "admin.dogs.form.ekNoAssignedOnSet": "Ange datum",
   "admin.dogs.form.ekNoAssignedOnClear": "Ta bort datum",
+  "admin.dogs.form.ekNoRequiredForAssignmentDate":
+    "EK-nummer krävs när ett tilldelningsdatum har angetts.",
   "admin.dogs.form.colorSelectLabel": "Farg",
   "admin.dogs.form.notePlaceholder": "Anteckning",
   "admin.dogs.form.titlesLabel": "Titlar",

@@ -62,10 +62,13 @@ export function DogFormModal({
     [],
   );
   const normalRulesApply = formStatus === "NORMAL";
+  const hasEkAssignmentWithoutNumber =
+    values.ekNo.trim().length === 0 && values.ekNoAssignedOn.trim().length > 0;
 
   const isSubmitDisabled = useMemo(() => {
     return (
       isSubmitting ||
+      hasEkAssignmentWithoutNumber ||
       values.registrationNo.trim().length === 0 ||
       (normalRulesApply &&
         (values.name.trim().length === 0 ||
@@ -74,6 +77,7 @@ export function DogFormModal({
     );
   }, [
     isSubmitting,
+    hasEkAssignmentWithoutNumber,
     normalRulesApply,
     values.name,
     values.registrationNo,

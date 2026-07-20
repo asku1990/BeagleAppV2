@@ -16,9 +16,11 @@ import { isPrismaUniqueConstraintError } from "./internal/prisma-errors";
 import {
   dogNotFoundResponse,
   duplicateDogResponse,
+  ekNoRequiredForAssignmentDateResponse,
   updateInternalErrorResponse,
   updateSuccessResponse,
 } from "./internal/manage-responses";
+import { isValidEkAssignment } from "./internal/ek-assignment-validation";
 import { validateAdminDogColorSelection } from "./internal/color-validation";
 import {
   validateUpdateInTry,
@@ -115,6 +117,26 @@ export async function updateAdminDog(
     const existingDog = await findDogByIdDb(preflight.data.id);
     if (!existingDog) {
       return dogNotFoundResponse();
+    }
+
+    const effectiveEkNo =
+      preflight.data.ekNo === undefined
+        ? existingDog.ekNo
+        : preflight.data.ekNo;
+    const effectiveEkNoAssignedOn =
+      preflight.data.ekNoAssignedOn === undefined
+        ? existingDog.ekNoAssignedOn
+        : preflight.data.ekNoAssignedOn;
+    if (!isValidEkAssignment(effectiveEkNo, effectiveEkNoAssignedOn)) {
+      log.warn(
+        {
+          event: "ek_no_required_for_assignment_date",
+          dogId: preflight.data.id,
+          durationMs: Date.now() - startedAt,
+        },
+        "admin dog update rejected because EK assignment date has no EK number",
+      );
+      return ekNoRequiredForAssignmentDateResponse();
     }
 
     const parentGuardResult =

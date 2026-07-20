@@ -269,6 +269,34 @@ describe("DogFormModal", () => {
     expect(html).not.toContain(
       'aria-label="admin.dogs.form.ekNoAssignedOnLabel"',
     );
+    expect(html).toMatch(/admin\.dogs\.form\.ekNoAssignedOnSet<\/button>/);
+    expect(html).toContain("disabled");
+  });
+
+  it("blocks saving an EK assignment date without an EK number", () => {
+    const values = buildEditValues();
+    values.ekNo = "";
+    const html = renderToStaticMarkup(
+      React.createElement(DogFormModal, {
+        mode: "edit",
+        dog: buildDog(values),
+        values,
+        formStatus: "NORMAL",
+        colorOptions: [],
+        ownerOptions: [],
+        parentOptions: [],
+        onOwnerSearchChange: vi.fn(),
+        onParentSearchChange: vi.fn(),
+        open: true,
+        onClose: vi.fn(),
+        onValuesChange: vi.fn(),
+        onFormStatusChange: vi.fn(),
+        onSubmit: vi.fn(),
+      }),
+    );
+
+    expect(html).toContain("admin.dogs.form.ekNoRequiredForAssignmentDate");
+    expect(html).toContain("disabled");
   });
 
   it("shows reference status and makes name and parents optional", () => {
