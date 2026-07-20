@@ -14,18 +14,25 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.19.0] - 2026-07-20
+
+### Added
+
 - Ylläpitäjä voi tallentaa koiralle EK-numeron myöntämispäivän, kun koiralla on EK-numero. Tulevaisuuteen sijoittuvia päivämääriä ei hyväksytä, ja tieto tuodaan myös vanhasta tietokannasta.
 
 ### Changed
 
-- Ylläpitäjä voi käyttää koiran sairauden pentuetodisteelle vapaavalintaista tunnistetta. Jos
-  tunniste kuuluu olemassa olevalle koiralle, sairaustieto ohjataan lisäämään
-  koirakohtaisena tietona.
+- Ylläpitäjä voi käyttää koiran sairauden pentuetodisteelle vapaavalintaista tunnistetta. Jos tunniste kuuluu olemassa olevalle koiralle, sairaustieto ohjataan lisäämään koirakohtaisena tietona.
 
 ### Fixed
 
-- Sairauden pentuetodisteelle ei voi tallentaa samaa koiraa molemmiksi
-  vanhemmiksi eikä väärää sukupuolta isän tai emän rooliin.
+- Sairauden pentuetodisteelle ei voi tallentaa samaa koiraa molemmiksi vanhemmiksi eikä väärää sukupuolta isän tai emän rooliin.
 
 ### Removed
 
