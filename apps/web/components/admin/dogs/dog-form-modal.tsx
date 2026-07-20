@@ -57,10 +57,7 @@ export function DogFormModal({
   onCalculateInbreeding,
 }: DogFormModalProps) {
   const { t } = useI18n();
-  const todayDateInputValue = useMemo(
-    () => toBusinessDateInputValue(new Date()),
-    [open],
-  );
+  const todayDateInputValue = toBusinessDateInputValue(new Date());
   const normalRulesApply = formStatus === "NORMAL";
   const hasEkAssignmentWithoutNumber =
     values.ekNo.trim().length === 0 && values.ekNoAssignedOn.trim().length > 0;
