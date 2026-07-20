@@ -231,6 +231,9 @@ export async function listAdminDogs(
             showCount: item.showCount,
             titlesText: item.titlesText,
             ekNo: item.ekNo,
+            ekNoAssignedOn: item.ekNoAssignedOn
+              ? toBusinessDateOnly(item.ekNoAssignedOn)
+              : null,
             colorCode: item.colorCode,
             note: item.note,
             titles: item.titles.map((title) => ({

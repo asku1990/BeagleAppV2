@@ -9,6 +9,7 @@ export type CreateAdminDogRequest = {
   breederNameText?: string;
   ownerNames?: string[];
   ekNo?: number;
+  ekNoAssignedOn?: string | null;
   colorCode?: number | null;
   note?: string;
   registrationNo: string;

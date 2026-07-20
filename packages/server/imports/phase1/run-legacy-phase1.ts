@@ -319,8 +319,11 @@ export async function runLegacyPhase1(
     const beaApuRowsWithEkNo = legacy.eks.filter(
       (row) => row.ekNo != null,
     ).length;
+    const beaApuRowsWithAssignedOn = legacy.eks.filter(
+      (row) => row.ekNoAssignedOnRaw?.trim().length,
+    ).length;
     log(
-      `Loaded legacy source rows: dogs=${legacy.dogs.length}, breeders=${legacy.breeders.length}, bea_apuRows=${beaApuRows}, bea_apuRowsWithEkNo=${beaApuRowsWithEkNo}, owners=${legacy.owners.length}, samakoira=${legacy.samakoira.length}`,
+      `Loaded legacy source rows: dogs=${legacy.dogs.length}, breeders=${legacy.breeders.length}, bea_apuRows=${beaApuRows}, beaApuRowsWithEkNo=${beaApuRowsWithEkNo}, beaApuRowsWithAssignedOn=${beaApuRowsWithAssignedOn}, owners=${legacy.owners.length}, samakoira=${legacy.samakoira.length}`,
     );
     finishStage("load");
 
@@ -662,6 +665,7 @@ export async function runLegacyPhase1(
           payloadJson: JSON.stringify({
             registrationNo: row.registrationNo,
             ekNo: row.ekNo,
+            ekNoAssignedOnRaw: row.ekNoAssignedOnRaw,
           }),
         });
         if (eksProcessed % 1000 === 0) {
@@ -683,6 +687,7 @@ export async function runLegacyPhase1(
           payloadJson: JSON.stringify({
             registrationNo: row.registrationNo,
             ekNo: row.ekNo,
+            ekNoAssignedOnRaw: row.ekNoAssignedOnRaw,
           }),
         });
         if (eksProcessed % 1000 === 0) {
@@ -697,6 +702,24 @@ export async function runLegacyPhase1(
           logProgress("ek", eksProcessed, totalEks);
         }
         continue;
+      }
+
+      const assignedOnRaw = normalizeNullable(row.ekNoAssignedOnRaw);
+      const ekNoAssignedOn = parseLegacyDate(assignedOnRaw);
+      if (assignedOnRaw && !ekNoAssignedOn) {
+        errorsCount += 1;
+        await recordIssue({
+          stage: "ek",
+          code: "EK_ASSIGNED_ON_INVALID",
+          message: "EK row has an invalid EK_PVM assignment date.",
+          registrationNo,
+          sourceTable: "bea_apu",
+          payloadJson: JSON.stringify({
+            registrationNo: row.registrationNo,
+            ekNo: row.ekNo,
+            ekNoAssignedOnRaw: row.ekNoAssignedOnRaw,
+          }),
+        });
       }
 
       const registration = await prisma.dogRegistration.findUnique({
@@ -715,6 +738,7 @@ export async function runLegacyPhase1(
           payloadJson: JSON.stringify({
             registrationNo: row.registrationNo,
             ekNo: row.ekNo,
+            ekNoAssignedOnRaw: row.ekNoAssignedOnRaw,
           }),
         });
         if (eksProcessed % 1000 === 0) {
@@ -725,7 +749,10 @@ export async function runLegacyPhase1(
 
       await prisma.dog.update({
         where: { id: registration.dogId },
-        data: { ekNo: Number(row.ekNo) },
+        data: {
+          ekNo: Number(row.ekNo),
+          ekNoAssignedOn,
+        },
       });
       eksApplied += 1;
 

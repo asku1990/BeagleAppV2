@@ -174,6 +174,7 @@ export async function updateAdminDog(
                 : (resolvedParents.data.dam?.id ?? null),
             ownerNames: inTryValidation.data.ownerNames,
             ekNo: preflight.data.ekNo,
+            ekNoAssignedOn: preflight.data.ekNoAssignedOn,
             colorCode: preflight.data.colorCode,
             note: inTryValidation.data.note,
             registrationNo: preflight.data.primaryRegistrationNo,

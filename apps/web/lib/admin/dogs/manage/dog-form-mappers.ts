@@ -29,6 +29,7 @@ export function createEmptyAdminDogFormValues(): AdminDogFormValues {
     breederNameText: "",
     ownershipNames: [],
     ekNo: "",
+    ekNoAssignedOn: "",
     inbreedingCoefficientPct: null,
     colorCode: "",
     note: "",
@@ -52,6 +53,7 @@ export function mapAdminDogToFormValues(
     breederNameText: dog.breederNameText ?? "",
     ownershipNames: dog.ownershipPreview,
     ekNo: dog.ekNo === null ? "" : String(dog.ekNo),
+    ekNoAssignedOn: dog.ekNoAssignedOn ?? "",
     inbreedingCoefficientPct: null,
     colorCode: dog.colorCode === null ? "" : String(dog.colorCode),
     note: dog.note ?? "",
@@ -96,6 +98,7 @@ export function mapAdminDogFromQuery(item: AdminDogListItem): AdminDogRecord {
     showCount: item.showCount,
     titlesText: item.titlesText,
     ekNo: item.ekNo,
+    ekNoAssignedOn: normalizeDateForInput(item.ekNoAssignedOn),
     colorCode: item.colorCode,
     note: item.note,
     titles: (item.titles ?? []).map((title) => ({

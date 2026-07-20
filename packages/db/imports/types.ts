@@ -21,6 +21,7 @@ export type LegacyBreederRow = {
 export type LegacyEkRow = {
   registrationNo: string;
   ekNo: number | null;
+  ekNoAssignedOnRaw: string | null;
 };
 
 export type LegacyDogTitleRow = {

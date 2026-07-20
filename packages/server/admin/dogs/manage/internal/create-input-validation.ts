@@ -17,6 +17,7 @@ import {
   invalidColorCodeResponse,
   invalidDogStatusResponse,
   invalidEkNoResponse,
+  invalidEkNoAssignedOnResponse,
   invalidNameResponse,
   invalidRegistrationNoFormatResponse,
   invalidRegistrationNoResponse,
@@ -50,6 +51,7 @@ export type CreatePreflightValidationResult =
       sex: "MALE" | "FEMALE" | "UNKNOWN";
       birthDate: Date | null;
       ekNo: number | null;
+      ekNoAssignedOn: Date | null;
       colorCode: number | null;
       primaryRegistrationNo: string;
       secondaryRegistrationNos: string[];
@@ -130,6 +132,20 @@ export function validateCreatePreflight(
     };
   }
 
+  const ekNoAssignedOn = parseBirthDate(input.ekNoAssignedOn);
+  if (ekNoAssignedOn === "INVALID") {
+    return {
+      ok: false,
+      logContext: {
+        event: "invalid_ek_no_assigned_on",
+        ekNoAssignedOn: input.ekNoAssignedOn,
+      },
+      logMessage:
+        "admin dog create rejected because EK number assignment date is invalid",
+      response: invalidEkNoAssignedOnResponse(),
+    };
+  }
+
   const colorCode = parsePositiveInteger(input.colorCode);
   if (colorCode === "INVALID") {
     return {
@@ -202,6 +218,7 @@ export function validateCreatePreflight(
       sex,
       birthDate,
       ekNo,
+      ekNoAssignedOn,
       colorCode,
       primaryRegistrationNo: registration.primaryRegistrationNo,
       secondaryRegistrationNos: registration.secondaryRegistrationNos,

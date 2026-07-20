@@ -66,7 +66,8 @@ erDiagram
 
 ### Core dog data
 
-- `Dog`: central dog entity (pedigree links, breeder link, color code, identity
+- `Dog`: central dog entity (pedigree links, breeder link, EK number and its
+  optional assignment date, color code, identity
   status, and timestamps). `REFERENCE_ONLY` identifies a registration-backed dog
   identity retained for references but not exposed as a standalone public dog.
   It may store every known dog detail. When its name is unknown, the normalized
@@ -135,6 +136,7 @@ erDiagram
 ## Identity and unique constraints (key ones)
 
 - `Dog.ekNo` unique
+- `Dog.ekNoAssignedOn` nullable dog-level date; no separate EK history relation
 - `DogColor.code` primary key
 - `DogRegistration.registrationNo` unique
 - `TrialResult.sourceKey` unique

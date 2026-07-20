@@ -329,6 +329,25 @@ describe("updateAdminDog", () => {
     });
   });
 
+  it("returns 400 for an invalid EK assignment date", async () => {
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        ekNoAssignedOn: "2026/01/01",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "EK number assignment date must use YYYY-MM-DD format.",
+        code: "INVALID_EK_NO_ASSIGNED_ON",
+      },
+    });
+  });
+
   it("returns 400 when name is too long", async () => {
     await expect(
       updateAdminDog({
@@ -535,6 +554,7 @@ describe("updateAdminDog", () => {
         breederNameText: " Metsapolun ",
         ownerNames: [" Tiina Virtanen "],
         ekNo: 5588,
+        ekNoAssignedOn: "2024-01-15",
         note: " Important ",
         registrationNo: " FI12345/21 ",
       }),
@@ -563,6 +583,7 @@ describe("updateAdminDog", () => {
         damId: undefined,
         ownerNames: ["Tiina Virtanen"],
         ekNo: 5588,
+        ekNoAssignedOn: new Date("2024-01-15T00:00:00.000Z"),
         note: "Important",
         registrationNo: "FI12345/21",
         secondaryRegistrationNos: undefined,

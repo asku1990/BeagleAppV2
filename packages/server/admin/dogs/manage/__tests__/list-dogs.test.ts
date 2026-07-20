@@ -122,6 +122,8 @@ describe("listAdminDogs", () => {
           showCount: 4,
           titlesText: "FI JVA",
           ekNo: 5588,
+          ekNoAssignedOn: new Date("2024-01-15T00:00:00.000Z"),
+          colorCode: 121,
           note: "Important",
           titles: [
             {
@@ -186,6 +188,8 @@ describe("listAdminDogs", () => {
               showCount: 4,
               titlesText: "FI JVA",
               ekNo: 5588,
+              ekNoAssignedOn: "2024-01-15",
+              colorCode: 121,
               note: "Important",
               titles: [
                 {

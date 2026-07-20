@@ -10,6 +10,7 @@ export type UpdateAdminDogRequest = {
   breederNameText?: string | null;
   ownerNames?: string[];
   ekNo?: number | null;
+  ekNoAssignedOn?: string | null;
   colorCode?: number | null;
   note?: string | null;
   registrationNo: string;

@@ -44,6 +44,8 @@ export const fiAdminDogsCommonMessages = {
     "Syntymäajan muoto on virheellinen.",
   "admin.dogs.mutation.errorInvalidEkNo":
     "EK-numero tulee olla positiivinen kokonaisluku.",
+  "admin.dogs.mutation.errorInvalidEkNoAssignedOn":
+    "EK-numeron myöntämispäivän muoto on virheellinen.",
   "admin.dogs.mutation.errorInvalidColorCode": "Valittua väriä ei löytynyt.",
   "admin.dogs.mutation.errorRegistrationTooLong":
     "Rekisterinumero on liian pitkä (max 40 merkkiä).",
@@ -123,6 +125,8 @@ export const svAdminDogsCommonMessages = {
     "Fodelsedatum har ogiltigt format.",
   "admin.dogs.mutation.errorInvalidEkNo":
     "EK-nummer maste vara ett positivt heltal.",
+  "admin.dogs.mutation.errorInvalidEkNoAssignedOn":
+    "Datumet då EK-numret tilldelades har ogiltigt format.",
   "admin.dogs.mutation.errorInvalidColorCode":
     "Den valda fargen hittades inte.",
   "admin.dogs.mutation.errorRegistrationTooLong":

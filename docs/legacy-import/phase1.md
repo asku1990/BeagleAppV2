@@ -30,7 +30,7 @@ Phase 1 imports foundation entities and link structures. It does not import tria
   - `COLCODE` -> `Dog.colorCode`
 - the canonical typed dog-color catalog -> `DogColor` lookup rows before dog writes
 - `kennel` -> `Breeder` details (`name`, short code, city, granted/raw fields).
-- `bea_apu` -> `Dog.ekNo` by registration lookup.
+- `bea_apu` -> `Dog.ekNo` and `Dog.ekNoAssignedOn` by registration lookup.
 - `beaom` -> `Owner` + `DogOwnership` rows by registration lookup.
 - `samakoira` -> alias registrations (`REK_2`, `REK_3`) attached to canonical `REK_1`.
 - `samakoira.VARA` -> appended into `Dog.note` for the canonical dog when non-empty.
@@ -85,6 +85,9 @@ including null, empty, and whitespace-only values, produces a
   - ownership uses `ownershipDateKey` and `createMany(skipDuplicates=true)`
 - EK rows:
   - `bea_apu` rows with a non-empty `EKNO` update `Dog.ekNo`
+  - valid `EK_PVM` values in `YYYYMMDD` format update `Dog.ekNoAssignedOn`
+  - blank `EK_PVM` values store a null assignment date
+  - invalid `EK_PVM` values record `EK_ASSIGNED_ON_INVALID`, keep the EK number, and store a null assignment date
   - rows without `EKNO` do not update `Dog.ekNo`
   - malformed `registrationNo` values are still recorded as issues before the `EKNO` check
   - the phase log reports both the raw `bea_apu` row count and the subset that has a non-empty `EKNO`

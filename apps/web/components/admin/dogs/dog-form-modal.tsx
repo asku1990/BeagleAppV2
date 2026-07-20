@@ -4,6 +4,7 @@ import { AdminFormModalShell } from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import { type ComboboxOption } from "@/components/ui/combobox";
 import { useI18n } from "@/hooks/i18n";
+import { toBusinessDateInputValue } from "@/lib/admin/core/date";
 import {
   DogFormBreederOwnersSection,
   DogFormIdentitySection,
@@ -57,7 +58,7 @@ export function DogFormModal({
 }: DogFormModalProps) {
   const { t } = useI18n();
   const todayDateInputValue = useMemo(
-    () => new Date().toISOString().slice(0, 10),
+    () => toBusinessDateInputValue(new Date()),
     [],
   );
   const normalRulesApply = formStatus === "NORMAL";
@@ -185,6 +186,8 @@ export function DogFormModal({
 
         <DogFormMetadataSection
           values={values}
+          todayDateInputValue={todayDateInputValue}
+          isSubmitting={isSubmitting}
           colorOptions={colorOptions}
           onValuesChange={onValuesChange}
           t={t}
