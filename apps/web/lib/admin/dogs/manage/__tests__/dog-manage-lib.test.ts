@@ -130,6 +130,8 @@ describe("admin dog manage lib", () => {
 
     expect(mapped.status).toBe("REFERENCE_ONLY");
     expect(mapped.titlesText).toBe("FI JVA, SE JCH");
+    expect(mapped.ekNoAssignedOn).toBe("2024-01-15");
+    expect(mapped.ekNoAssignedOn).not.toContain("T");
     expect(mapped).not.toHaveProperty("inbreedingCoefficientPct");
   });
 
@@ -155,6 +157,8 @@ describe("admin dog manage lib", () => {
       note: null,
       titles: [],
     });
+
+    expect(target.ekNoAssignedOn).toBeNull();
 
     expect(
       toUpdateAdminDogRequest(

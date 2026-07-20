@@ -218,7 +218,7 @@ model Dog {
   damId           String?
   breederId       String?
   ekNo            Int?              @unique
-  ekNoAssignedOn  DateTime?
+  ekNoAssignedOn  DateTime?         @db.Date
   colorCode       Int?
   note            String?
   sire            Dog?              @relation("SireRelation", fields: [sireId], references: [id])

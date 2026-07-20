@@ -136,7 +136,8 @@ erDiagram
 ## Identity and unique constraints (key ones)
 
 - `Dog.ekNo` unique
-- `Dog.ekNoAssignedOn` nullable dog-level date; no separate EK history relation
+- `Dog.ekNoAssignedOn` nullable dog-level calendar date backed by PostgreSQL
+  `DATE`; no separate EK history relation
 - `DogColor.code` primary key
 - `DogRegistration.registrationNo` unique
 - `TrialResult.sourceKey` unique

@@ -2,10 +2,7 @@ import type {
   UpdateAdminDogRequest,
   UpdateAdminDogResponse,
 } from "@beagle/contracts";
-import {
-  isFutureBusinessDate,
-  toBusinessDateOnly,
-} from "@server/core/date-only";
+import { isFutureBusinessDate, toDateOnly } from "@server/core/date-only";
 import type { ServiceResult } from "@server/core/result";
 import { parseDogId } from "@server/dogs/core";
 import {
@@ -237,7 +234,7 @@ export function validateUpdatePreflight(
       logContext: {
         event: "future_ek_no_assigned_on",
         dogId: id,
-        ekNoAssignedOn: toBusinessDateOnly(ekNoAssignedOn),
+        ekNoAssignedOn: toDateOnly(ekNoAssignedOn),
       },
       logMessage:
         "admin dog update rejected because EK number assignment date is in the future",

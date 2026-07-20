@@ -138,24 +138,24 @@ describe("listAdminDogs", () => {
       ],
     });
 
-    await expect(
-      listAdminDogs(
-        {
-          query: "kide",
-          sex: "FEMALE",
-          status: "REFERENCE_ONLY",
-          page: 1,
-          pageSize: 20,
-          sort: "name-asc",
-        },
-        {
-          id: "u_1",
-          email: "admin@example.com",
-          username: null,
-          role: "ADMIN",
-        },
-      ),
-    ).resolves.toEqual({
+    const result = await listAdminDogs(
+      {
+        query: "kide",
+        sex: "FEMALE",
+        status: "REFERENCE_ONLY",
+        page: 1,
+        pageSize: 20,
+        sort: "name-asc",
+      },
+      {
+        id: "u_1",
+        email: "admin@example.com",
+        username: null,
+        role: "ADMIN",
+      },
+    );
+
+    expect(result).toEqual({
       status: 200,
       body: {
         ok: true,
@@ -205,6 +205,13 @@ describe("listAdminDogs", () => {
         },
       },
     });
+
+    expect(result.body.ok && result.body.data.items[0]?.ekNoAssignedOn).toBe(
+      "2024-01-15",
+    );
+    expect(
+      result.body.ok && result.body.data.items[0]?.ekNoAssignedOn,
+    ).not.toContain("T");
 
     expect(listAdminDogsDbMock).toHaveBeenCalledWith({
       query: "kide",

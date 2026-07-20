@@ -39,6 +39,7 @@ export type AdminDogListItem = {
   showCount: number;
   titlesText: string | null;
   ekNo: number | null;
+  /** Calendar date in YYYY-MM-DD format; never a timestamp. */
   ekNoAssignedOn: string | null;
   colorCode: number | null;
   note: string | null;

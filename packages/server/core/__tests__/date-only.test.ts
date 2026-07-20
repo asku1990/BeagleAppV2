@@ -3,6 +3,7 @@ import {
   BUSINESS_TIME_ZONE,
   isFutureBusinessDate,
   toBusinessDateOnly,
+  toDateOnly,
 } from "../date-only";
 
 describe("toBusinessDateOnly", () => {
@@ -32,8 +33,29 @@ describe("toBusinessDateOnly", () => {
   });
 });
 
+describe("toDateOnly", () => {
+  it("preserves the stored UTC calendar date without Helsinki conversion", () => {
+    const value = new Date("2024-01-14T22:00:00.000Z");
+
+    expect(toDateOnly(value)).toBe("2024-01-14");
+    expect(toBusinessDateOnly(value)).toBe("2024-01-15");
+  });
+
+  it("serializes Prisma DATE values as YYYY-MM-DD", () => {
+    expect(toDateOnly(new Date("2024-01-15T00:00:00.000Z"))).toBe("2024-01-15");
+  });
+});
+
 describe("isFutureBusinessDate", () => {
+  const helsinkiBeforeMidnight = new Date("2026-07-19T20:59:59.999Z");
   const helsinkiAfterMidnight = new Date("2026-07-19T21:30:00.000Z");
+
+  it("changes business today at Helsinki midnight", () => {
+    const july20 = new Date("2026-07-20T00:00:00.000Z");
+
+    expect(isFutureBusinessDate(july20, helsinkiBeforeMidnight)).toBe(true);
+    expect(isFutureBusinessDate(july20, helsinkiAfterMidnight)).toBe(false);
+  });
 
   it("accepts past and current Helsinki business dates", () => {
     expect(

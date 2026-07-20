@@ -1,2 +1,2 @@
 ALTER TABLE "Dog"
-ADD COLUMN "ekNoAssignedOn" TIMESTAMP(3);
+ADD COLUMN "ekNoAssignedOn" DATE;

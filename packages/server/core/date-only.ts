@@ -20,9 +20,22 @@ export function toBusinessDateOnly(value: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+/** Serializes a Prisma date-only value without applying timezone conversion. */
+export function toDateOnly(value: Date): string {
+  if (Number.isNaN(value.getTime())) {
+    throw new Error("Failed to serialize date-only value.");
+  }
+
+  const year = String(value.getUTCFullYear()).padStart(4, "0");
+  const month = String(value.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(value.getUTCDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 export function isFutureBusinessDate(
   value: Date,
   now: Date = new Date(),
 ): boolean {
-  return toBusinessDateOnly(value) > toBusinessDateOnly(now);
+  return toDateOnly(value) > toBusinessDateOnly(now);
 }
