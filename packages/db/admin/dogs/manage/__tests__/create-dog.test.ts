@@ -62,6 +62,7 @@ describe("createAdminDogWriteDb", () => {
           damId: null,
           ownerNames: ["Owner One"],
           ekNo: null,
+          ekNoAssignedOn: new Date("2024-01-15T00:00:00.000Z"),
           colorCode: null,
           note: null,
           registrationNo: "FI12345/21",
@@ -96,7 +97,10 @@ describe("createAdminDogWriteDb", () => {
     });
     expect(dogCreateMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({ status: "NORMAL" }),
+        data: expect.objectContaining({
+          status: "NORMAL",
+          ekNoAssignedOn: new Date("2024-01-15T00:00:00.000Z"),
+        }),
       }),
     );
   });
@@ -120,6 +124,7 @@ describe("createAdminDogWriteDb", () => {
         damId: null,
         ownerNames: [],
         ekNo: null,
+        ekNoAssignedOn: null,
         colorCode: null,
         note: null,
         registrationNo: "FI12345/21",

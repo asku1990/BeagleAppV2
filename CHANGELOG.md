@@ -14,6 +14,8 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+- Ylläpitäjä voi tallentaa koiralle EK-numeron myöntämispäivän, kun koiralla on EK-numero. Tulevaisuuteen sijoittuvia päivämääriä ei hyväksytä, ja tieto tuodaan myös vanhasta tietokannasta.
+
 ### Changed
 
 - Ylläpitäjä voi käyttää koiran sairauden pentuetodisteelle vapaavalintaista tunnistetta. Jos

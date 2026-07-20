@@ -276,6 +276,66 @@ describe("createAdminDog", () => {
     });
   });
 
+  it("returns 400 for an invalid EK assignment date", async () => {
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        ekNoAssignedOn: "2026-02-31",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error:
+          "EK number assignment date must use YYYY-MM-DD format and must not be in the future.",
+        code: "INVALID_EK_NO_ASSIGNED_ON",
+      },
+    });
+  });
+
+  it("returns 400 for a future EK assignment date", async () => {
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        ekNoAssignedOn: "2099-01-01",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error:
+          "EK number assignment date must use YYYY-MM-DD format and must not be in the future.",
+        code: "INVALID_EK_NO_ASSIGNED_ON",
+      },
+    });
+    expect(runAdminDogWriteTransactionDbMock).not.toHaveBeenCalled();
+    expect(createAdminDogWriteDbMock).not.toHaveBeenCalled();
+  });
+
+  it("returns 400 for an EK assignment date without an EK number", async () => {
+    await expect(
+      createAdminDog({
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        ekNoAssignedOn: "2024-01-15",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "EK number is required when an assignment date is provided.",
+        code: "EK_NO_REQUIRED_FOR_ASSIGNMENT_DATE",
+      },
+    });
+    expect(runAdminDogWriteTransactionDbMock).not.toHaveBeenCalled();
+    expect(createAdminDogWriteDbMock).not.toHaveBeenCalled();
+  });
+
   it("returns 400 when name is too long", async () => {
     await expect(
       createAdminDog({
@@ -310,6 +370,7 @@ describe("createAdminDog", () => {
         breederNameText: " Metsapolun ",
         ownerNames: [" Tiina Virtanen "],
         ekNo: 5588,
+        ekNoAssignedOn: "2024-01-15",
         note: " Important ",
         registrationNo: " FI12345/21 ",
         sireRegistrationNo: "FI11111/11",
@@ -339,6 +400,7 @@ describe("createAdminDog", () => {
         damId: "dam_1",
         ownerNames: ["Tiina Virtanen"],
         ekNo: 5588,
+        ekNoAssignedOn: new Date("2024-01-15T00:00:00.000Z"),
         colorCode: null,
         note: "Important",
         registrationNo: "FI12345/21",

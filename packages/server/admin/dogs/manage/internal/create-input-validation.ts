@@ -2,6 +2,7 @@ import type {
   CreateAdminDogRequest,
   CreateAdminDogResponse,
 } from "@beagle/contracts";
+import { isFutureBusinessDate, toDateOnly } from "@server/core/date-only";
 import type { ServiceResult } from "@server/core/result";
 import {
   normalizeDistinctNames,
@@ -13,10 +14,12 @@ import {
 } from "../normalization";
 import {
   duplicateRegistrationNoResponse,
+  ekNoRequiredForAssignmentDateResponse,
   invalidBirthDateResponse,
   invalidColorCodeResponse,
   invalidDogStatusResponse,
   invalidEkNoResponse,
+  invalidEkNoAssignedOnResponse,
   invalidNameResponse,
   invalidRegistrationNoFormatResponse,
   invalidRegistrationNoResponse,
@@ -25,6 +28,7 @@ import {
   noteTooLongResponse,
   registrationNoTooLongResponse,
 } from "./manage-responses";
+import { isValidEkAssignment } from "./ek-assignment-validation";
 import { validateRegistrationInput } from "./registration-validation";
 import {
   validateDogTitles,
@@ -50,6 +54,7 @@ export type CreatePreflightValidationResult =
       sex: "MALE" | "FEMALE" | "UNKNOWN";
       birthDate: Date | null;
       ekNo: number | null;
+      ekNoAssignedOn: Date | null;
       colorCode: number | null;
       primaryRegistrationNo: string;
       secondaryRegistrationNos: string[];
@@ -130,6 +135,41 @@ export function validateCreatePreflight(
     };
   }
 
+  const ekNoAssignedOn = parseBirthDate(input.ekNoAssignedOn);
+  if (ekNoAssignedOn === "INVALID") {
+    return {
+      ok: false,
+      logContext: {
+        event: "invalid_ek_no_assigned_on",
+        ekNoAssignedOn: input.ekNoAssignedOn,
+      },
+      logMessage:
+        "admin dog create rejected because EK number assignment date is invalid",
+      response: invalidEkNoAssignedOnResponse(),
+    };
+  }
+  if (ekNoAssignedOn && isFutureBusinessDate(ekNoAssignedOn)) {
+    return {
+      ok: false,
+      logContext: {
+        event: "future_ek_no_assigned_on",
+        ekNoAssignedOn: toDateOnly(ekNoAssignedOn),
+      },
+      logMessage:
+        "admin dog create rejected because EK number assignment date is in the future",
+      response: invalidEkNoAssignedOnResponse(),
+    };
+  }
+  if (!isValidEkAssignment(ekNo, ekNoAssignedOn)) {
+    return {
+      ok: false,
+      logContext: { event: "ek_no_required_for_assignment_date" },
+      logMessage:
+        "admin dog create rejected because EK assignment date has no EK number",
+      response: ekNoRequiredForAssignmentDateResponse(),
+    };
+  }
+
   const colorCode = parsePositiveInteger(input.colorCode);
   if (colorCode === "INVALID") {
     return {
@@ -202,6 +242,7 @@ export function validateCreatePreflight(
       sex,
       birthDate,
       ekNo,
+      ekNoAssignedOn,
       colorCode,
       primaryRegistrationNo: registration.primaryRegistrationNo,
       secondaryRegistrationNos: registration.secondaryRegistrationNos,

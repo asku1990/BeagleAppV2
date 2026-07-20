@@ -139,8 +139,16 @@ describe("runLegacyPhase1", () => {
       ],
       breeders: [],
       eks: [
-        { registrationNo: "FI12345/21", ekNo: 5588 },
-        { registrationNo: "FI12345/21", ekNo: null },
+        {
+          registrationNo: "FI12345/21",
+          ekNo: 5588,
+          ekNoAssignedOnRaw: "20240115",
+        },
+        {
+          registrationNo: "FI12345/21",
+          ekNo: null,
+          ekNoAssignedOnRaw: null,
+        },
       ],
       owners: [],
       samakoira: [],
@@ -181,7 +189,10 @@ describe("runLegacyPhase1", () => {
         [
           {
             where: { id: "dog-1" },
-            data: { ekNo: 5588 },
+            data: {
+              ekNo: 5588,
+              ekNoAssignedOn: new Date("2024-01-15T00:00:00.000Z"),
+            },
           },
         ],
       ]),
@@ -200,6 +211,47 @@ describe("runLegacyPhase1", () => {
         errorsCount: 0,
         errorSummary: expect.stringContaining("Phase 1:"),
       }),
+      expect.any(Object),
+    );
+  });
+
+  it("records invalid EK assignment dates while preserving the EK number", async () => {
+    fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogs: [],
+      breeders: [],
+      eks: [
+        {
+          registrationNo: "FI12345/21",
+          ekNo: 5588,
+          ekNoAssignedOnRaw: "20240231",
+        },
+      ],
+      owners: [],
+      samakoira: [],
+    });
+
+    const result = await runLegacyPhase1("user-1");
+
+    expect(result.status).toBe(202);
+    expect(dogUpdateMock).toHaveBeenCalledWith({
+      where: { id: "dog-1" },
+      data: { ekNo: 5588, ekNoAssignedOn: null },
+    });
+    const issues = createImportRunIssuesBulkMock.mock.calls.flatMap(
+      ([, nextIssues]) => nextIssues,
+    );
+    expect(issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          severity: "WARNING",
+          code: "EK_ASSIGNED_ON_INVALID",
+          registrationNo: "FI12345/21",
+        }),
+      ]),
+    );
+    expect(markImportRunFinishedMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.objectContaining({ status: "SUCCEEDED", errorsCount: 1 }),
       expect.any(Object),
     );
   });
@@ -512,7 +564,13 @@ describe("runLegacyPhase1", () => {
         },
       ],
       breeders: [],
-      eks: [{ registrationNo: "FI12345/21", ekNo: null }],
+      eks: [
+        {
+          registrationNo: "FI12345/21",
+          ekNo: null,
+          ekNoAssignedOnRaw: null,
+        },
+      ],
       owners: [],
       samakoira: [],
     });

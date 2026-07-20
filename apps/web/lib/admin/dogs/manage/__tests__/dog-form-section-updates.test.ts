@@ -21,6 +21,7 @@ function createValues(): AdminDogFormValues {
     breederNameText: "Metsapolun",
     ownershipNames: ["Tiina Virtanen"],
     ekNo: "5588",
+    ekNoAssignedOn: "2024-01-15",
     inbreedingCoefficientPct: null,
     colorCode: "",
     note: "",

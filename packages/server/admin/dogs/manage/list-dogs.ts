@@ -4,7 +4,7 @@ import type {
   AdminDogListResponse,
   CurrentUserDto,
 } from "@beagle/contracts";
-import { toBusinessDateOnly } from "@server/core/date-only";
+import { toBusinessDateOnly, toDateOnly } from "@server/core/date-only";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
 import { requireAdmin } from "@server/admin/core/service";
@@ -231,6 +231,9 @@ export async function listAdminDogs(
             showCount: item.showCount,
             titlesText: item.titlesText,
             ekNo: item.ekNo,
+            ekNoAssignedOn: item.ekNoAssignedOn
+              ? toDateOnly(item.ekNoAssignedOn)
+              : null,
             colorCode: item.colorCode,
             note: item.note,
             titles: item.titles.map((title) => ({

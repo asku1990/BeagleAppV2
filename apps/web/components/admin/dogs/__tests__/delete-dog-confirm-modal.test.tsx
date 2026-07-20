@@ -27,6 +27,7 @@ function buildDog(): AdminDogRecord {
     showCount: 0,
     titlesText: null,
     ekNo: null,
+    ekNoAssignedOn: null,
     colorCode: null,
     note: null,
     titles: [],

@@ -49,6 +49,8 @@ describe("updateAdminDog", () => {
     findDogByIdDbMock.mockResolvedValue({
       id: "dog_1",
       colorCode: null,
+      ekNo: null,
+      ekNoAssignedOn: null,
       sire: { id: "sire_1", sex: "MALE" },
       dam: { id: "dam_1", sex: "FEMALE" },
     });
@@ -329,6 +331,137 @@ describe("updateAdminDog", () => {
     });
   });
 
+  it("returns 400 for an invalid EK assignment date", async () => {
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        ekNoAssignedOn: "2026/01/01",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error:
+          "EK number assignment date must use YYYY-MM-DD format and must not be in the future.",
+        code: "INVALID_EK_NO_ASSIGNED_ON",
+      },
+    });
+  });
+
+  it("returns 400 for a future EK assignment date", async () => {
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        ekNoAssignedOn: "2099-01-01",
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error:
+          "EK number assignment date must use YYYY-MM-DD format and must not be in the future.",
+        code: "INVALID_EK_NO_ASSIGNED_ON",
+      },
+    });
+    expect(runAdminDogWriteTransactionDbMock).not.toHaveBeenCalled();
+    expect(updateAdminDogWriteDbMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects clearing an EK number while its assignment date remains", async () => {
+    findDogByIdDbMock.mockResolvedValue({
+      id: "dog_1",
+      colorCode: null,
+      ekNo: 5588,
+      ekNoAssignedOn: new Date("2024-01-15T00:00:00.000Z"),
+      sire: { id: "sire_1", sex: "MALE" },
+      dam: { id: "dam_1", sex: "FEMALE" },
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        ekNo: null,
+      }),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "EK number is required when an assignment date is provided.",
+        code: "EK_NO_REQUIRED_FOR_ASSIGNMENT_DATE",
+      },
+    });
+    expect(runAdminDogWriteTransactionDbMock).not.toHaveBeenCalled();
+    expect(updateAdminDogWriteDbMock).not.toHaveBeenCalled();
+  });
+
+  it("allows clearing an EK number and its assignment date together", async () => {
+    findDogByIdDbMock.mockResolvedValue({
+      id: "dog_1",
+      colorCode: null,
+      ekNo: 5588,
+      ekNoAssignedOn: new Date("2024-01-15T00:00:00.000Z"),
+      sire: { id: "sire_1", sex: "MALE" },
+      dam: { id: "dam_1", sex: "FEMALE" },
+    });
+    updateAdminDogWriteDbMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Metsapolun Kide",
+      sex: "FEMALE",
+      registrationNo: "FI12345/21",
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        ekNo: null,
+        ekNoAssignedOn: null,
+      }),
+    ).resolves.toMatchObject({ status: 200 });
+    expect(updateAdminDogWriteDbMock).toHaveBeenCalledWith(
+      expect.objectContaining({ ekNo: null, ekNoAssignedOn: null }),
+      {},
+    );
+  });
+
+  it("allows assigning a date when the persisted dog has an EK number", async () => {
+    findDogByIdDbMock.mockResolvedValue({
+      id: "dog_1",
+      colorCode: null,
+      ekNo: 5588,
+      ekNoAssignedOn: null,
+      sire: { id: "sire_1", sex: "MALE" },
+      dam: { id: "dam_1", sex: "FEMALE" },
+    });
+    updateAdminDogWriteDbMock.mockResolvedValue({
+      id: "dog_1",
+      name: "Metsapolun Kide",
+      sex: "FEMALE",
+      registrationNo: "FI12345/21",
+    });
+
+    await expect(
+      updateAdminDog({
+        id: "dog_1",
+        name: "Metsapolun Kide",
+        sex: "FEMALE",
+        registrationNo: "FI12345/21",
+        ekNoAssignedOn: "2024-01-15",
+      }),
+    ).resolves.toMatchObject({ status: 200 });
+  });
+
   it("returns 400 when name is too long", async () => {
     await expect(
       updateAdminDog({
@@ -535,6 +668,7 @@ describe("updateAdminDog", () => {
         breederNameText: " Metsapolun ",
         ownerNames: [" Tiina Virtanen "],
         ekNo: 5588,
+        ekNoAssignedOn: "2024-01-15",
         note: " Important ",
         registrationNo: " FI12345/21 ",
       }),
@@ -563,6 +697,7 @@ describe("updateAdminDog", () => {
         damId: undefined,
         ownerNames: ["Tiina Virtanen"],
         ekNo: 5588,
+        ekNoAssignedOn: new Date("2024-01-15T00:00:00.000Z"),
         note: "Important",
         registrationNo: "FI12345/21",
         secondaryRegistrationNos: undefined,

@@ -26,6 +26,15 @@ Use this format for new entries:
 
 ## Entries
 
+## 2026-07-20 - Audit date and time field semantics
+
+- Area: Prisma schema, PostgreSQL storage, imports, and API contracts.
+- Issue: Existing date/time fields have not been classified consistently by domain meaning. The audit must classify every field as a date-only calendar value, an actual timestamp/instant, a local scheduled time, or an uncertain legacy value requiring investigation.
+- Impact: Without a field-by-field audit, timezone conversion and database-type changes risk shifting calendar dates or changing the meaning of stored timestamps.
+- Suggested fix: For each field, record its Prisma type and native database annotation, actual PostgreSQL column type, domain meaning, whether timezone conversion is appropriate, API/contract representation, existing stored-data assumptions, and migration risk. Propose migrations only after this inventory is reviewed.
+- Trigger to revisit: Before changing any existing date/time column or introducing shared date/time migration policy.
+- Ticket: Unassigned follow-up audit.
+
 ## 2026-04-04 - Align show-definition visibility semantics
 
 - Area: `ShowResultDefinition` reads, projections, and admin UI option building.

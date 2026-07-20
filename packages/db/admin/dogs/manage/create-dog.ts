@@ -15,6 +15,7 @@ export type CreateAdminDogDbInput = {
   damId: string | null;
   ownerNames: string[];
   ekNo: number | null;
+  ekNoAssignedOn: Date | null;
   colorCode: number | null;
   note: string | null;
   registrationNo: string;
@@ -126,6 +127,7 @@ async function createAdminDogDb(
       damId: input.damId,
       breederId,
       ekNo: input.ekNo,
+      ekNoAssignedOn: input.ekNoAssignedOn,
       colorCode: input.colorCode,
       note: input.note,
     },

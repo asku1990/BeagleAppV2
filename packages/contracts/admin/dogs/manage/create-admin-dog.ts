@@ -9,6 +9,8 @@ export type CreateAdminDogRequest = {
   breederNameText?: string;
   ownerNames?: string[];
   ekNo?: number;
+  /** Calendar date in YYYY-MM-DD format; never a timestamp. */
+  ekNoAssignedOn?: string | null;
   colorCode?: number | null;
   note?: string;
   registrationNo: string;

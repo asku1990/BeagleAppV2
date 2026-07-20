@@ -43,6 +43,7 @@ export type AdminDogListRowDb = {
   showCount: number;
   titlesText: string | null;
   ekNo: number | null;
+  ekNoAssignedOn: Date | null;
   colorCode: number | null;
   note: string | null;
   titles: AdminDogTitleItemDb[];
@@ -238,6 +239,7 @@ export async function listAdminDogsDb(
       breederNameText: true,
       note: true,
       ekNo: true,
+      ekNoAssignedOn: true,
       colorCode: true,
       breeder: {
         select: {
@@ -345,6 +347,7 @@ export async function listAdminDogsDb(
         showCount: row._count.showEntries,
         titlesText: titleCodes.length > 0 ? titleCodes.join(", ") : null,
         ekNo: row.ekNo,
+        ekNoAssignedOn: row.ekNoAssignedOn,
         colorCode: row.colorCode,
         note: row.note,
         titles: row.titles.map((title) => ({

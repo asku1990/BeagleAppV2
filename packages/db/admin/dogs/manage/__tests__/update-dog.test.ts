@@ -148,6 +148,7 @@ describe("updateAdminDogWriteDb", () => {
         damId: undefined,
         ownerNames: [],
         ekNo: null,
+        ekNoAssignedOn: new Date("2024-01-15T00:00:00.000Z"),
         note: null,
         registrationNo: "FI11111/21",
       },
@@ -159,6 +160,13 @@ describe("updateAdminDogWriteDb", () => {
         data: expect.not.objectContaining({
           sireId: expect.anything(),
           damId: expect.anything(),
+        }),
+      }),
+    );
+    expect(dogUpdateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          ekNoAssignedOn: new Date("2024-01-15T00:00:00.000Z"),
         }),
       }),
     );

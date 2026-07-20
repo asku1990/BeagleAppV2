@@ -22,8 +22,16 @@ describe("fetchLegacyPhase1Rows", () => {
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([
-          { registrationNo: "FI-1/20", ekNo: 123 },
-          { registrationNo: "FI-2/20", ekNo: null },
+          {
+            registrationNo: "FI-1/20",
+            ekNo: 123,
+            ekNoAssignedOnRaw: "20240115",
+          },
+          {
+            registrationNo: "FI-2/20",
+            ekNo: null,
+            ekNoAssignedOnRaw: null,
+          },
         ])
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([]),
@@ -34,11 +42,19 @@ describe("fetchLegacyPhase1Rows", () => {
     const result = await fetchLegacyPhase1Rows({ log });
 
     expect(result.eks).toEqual([
-      { registrationNo: "FI-1/20", ekNo: 123 },
-      { registrationNo: "FI-2/20", ekNo: null },
+      {
+        registrationNo: "FI-1/20",
+        ekNo: 123,
+        ekNoAssignedOnRaw: "20240115",
+      },
+      {
+        registrationNo: "FI-2/20",
+        ekNo: null,
+        ekNoAssignedOnRaw: null,
+      },
     ]);
     expect(log).toHaveBeenCalledWith(
-      "Fetched bea_apu source rows: total=2, withEkNo=1, elapsed=0s",
+      "Fetched bea_apu source rows: total=2, withEkNo=1, withAssignedOn=1, elapsed=0s",
     );
     expect(connection.end).toHaveBeenCalled();
   });
