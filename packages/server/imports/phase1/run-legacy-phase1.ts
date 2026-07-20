@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import {
   type AuditContextDb,
+  DogSex,
   type ImportIssueSeverity,
   ImportKind,
   createImportRunIssue,
@@ -90,16 +91,31 @@ function formatPlaceholderRelationMessage(role: "Sire" | "Dam"): string {
   return `${role} registration is a placeholder and was treated as unknown, so the placeholder reference was not written to the new database.`;
 }
 
-async function loadDogIdByRegistration(): Promise<Map<string, string>> {
+async function loadDogIndexByRegistration(): Promise<{
+  dogIdByRegistration: Map<string, string>;
+  dogSexByRegistration: Map<string, DogSex>;
+}> {
   const registrations = await prisma.dogRegistration.findMany({
-    select: { registrationNo: true, dogId: true },
+    select: {
+      registrationNo: true,
+      dogId: true,
+      dog: { select: { sex: true } },
+    },
   });
-  return new Map(
-    registrations.map((registration) => [
-      registration.registrationNo,
-      registration.dogId,
-    ]),
-  );
+  return {
+    dogIdByRegistration: new Map(
+      registrations.map((registration) => [
+        registration.registrationNo,
+        registration.dogId,
+      ]),
+    ),
+    dogSexByRegistration: new Map(
+      registrations.map((registration) => [
+        registration.registrationNo,
+        registration.dog.sex,
+      ]),
+    ),
+  };
 }
 
 function mergeNoteValue(existing: string | null, incoming: string): string {
@@ -303,8 +319,11 @@ export async function runLegacyPhase1(
     const beaApuRowsWithEkNo = legacy.eks.filter(
       (row) => row.ekNo != null,
     ).length;
+    const beaApuRowsWithAssignedOn = legacy.eks.filter(
+      (row) => row.ekNoAssignedOnRaw?.trim().length,
+    ).length;
     log(
-      `Loaded legacy source rows: dogs=${legacy.dogs.length}, breeders=${legacy.breeders.length}, bea_apuRows=${beaApuRows}, bea_apuRowsWithEkNo=${beaApuRowsWithEkNo}, owners=${legacy.owners.length}, samakoira=${legacy.samakoira.length}`,
+      `Loaded legacy source rows: dogs=${legacy.dogs.length}, breeders=${legacy.breeders.length}, bea_apuRows=${beaApuRows}, beaApuRowsWithEkNo=${beaApuRowsWithEkNo}, beaApuRowsWithAssignedOn=${beaApuRowsWithAssignedOn}, owners=${legacy.owners.length}, samakoira=${legacy.samakoira.length}`,
     );
     finishStage("load");
 
@@ -488,6 +507,23 @@ export async function runLegacyPhase1(
         continue;
       }
 
+      const sex = mapSex(row.sex);
+      if (sex === DogSex.UNKNOWN) {
+        await recordIssue({
+          stage: "dogs",
+          severity: "WARNING",
+          code: "DOG_SEX_INVALID_VALUE",
+          message:
+            "Dog row has an invalid sex value; sex was treated as unknown.",
+          registrationNo,
+          sourceTable: "bearek_id",
+          payloadJson: JSON.stringify({
+            registrationNo,
+            rawSex: row.sex,
+          }),
+        });
+      }
+
       const breederNameText = normalizeNullable(row.breederName);
       const colorCode = parseLegacyColorCode(row.colorCode);
       if (colorCode === "INVALID") {
@@ -563,7 +599,7 @@ export async function runLegacyPhase1(
           where: { id: existingRegistration.dogId },
           data: {
             name,
-            sex: mapSex(row.sex),
+            sex,
             birthDate: parseLegacyDate(row.birthDateRaw),
             breederNameText,
             breederId,
@@ -581,7 +617,7 @@ export async function runLegacyPhase1(
         await prisma.dog.create({
           data: {
             name,
-            sex: mapSex(row.sex),
+            sex,
             birthDate: parseLegacyDate(row.birthDateRaw),
             breederNameText,
             breederId,
@@ -629,6 +665,7 @@ export async function runLegacyPhase1(
           payloadJson: JSON.stringify({
             registrationNo: row.registrationNo,
             ekNo: row.ekNo,
+            ekNoAssignedOnRaw: row.ekNoAssignedOnRaw,
           }),
         });
         if (eksProcessed % 1000 === 0) {
@@ -650,6 +687,7 @@ export async function runLegacyPhase1(
           payloadJson: JSON.stringify({
             registrationNo: row.registrationNo,
             ekNo: row.ekNo,
+            ekNoAssignedOnRaw: row.ekNoAssignedOnRaw,
           }),
         });
         if (eksProcessed % 1000 === 0) {
@@ -664,6 +702,24 @@ export async function runLegacyPhase1(
           logProgress("ek", eksProcessed, totalEks);
         }
         continue;
+      }
+
+      const assignedOnRaw = normalizeNullable(row.ekNoAssignedOnRaw);
+      const ekNoAssignedOn = parseLegacyDate(assignedOnRaw);
+      if (assignedOnRaw && !ekNoAssignedOn) {
+        errorsCount += 1;
+        await recordIssue({
+          stage: "ek",
+          code: "EK_ASSIGNED_ON_INVALID",
+          message: "EK row has an invalid EK_PVM assignment date.",
+          registrationNo,
+          sourceTable: "bea_apu",
+          payloadJson: JSON.stringify({
+            registrationNo: row.registrationNo,
+            ekNo: row.ekNo,
+            ekNoAssignedOnRaw: row.ekNoAssignedOnRaw,
+          }),
+        });
       }
 
       const registration = await prisma.dogRegistration.findUnique({
@@ -682,6 +738,7 @@ export async function runLegacyPhase1(
           payloadJson: JSON.stringify({
             registrationNo: row.registrationNo,
             ekNo: row.ekNo,
+            ekNoAssignedOnRaw: row.ekNoAssignedOnRaw,
           }),
         });
         if (eksProcessed % 1000 === 0) {
@@ -692,7 +749,10 @@ export async function runLegacyPhase1(
 
       await prisma.dog.update({
         where: { id: registration.dogId },
-        data: { ekNo: Number(row.ekNo) },
+        data: {
+          ekNo: Number(row.ekNo),
+          ekNoAssignedOn,
+        },
       });
       eksApplied += 1;
 
@@ -710,7 +770,8 @@ export async function runLegacyPhase1(
     let aliasConflicts = 0;
     let finnishCanonicalPromotions = 0;
     let notesUpdated = 0;
-    const dogIdByRegistrationForSamakoira = await loadDogIdByRegistration();
+    const { dogIdByRegistration: dogIdByRegistrationForSamakoira } =
+      await loadDogIndexByRegistration();
     const noteByDogId = new Map<string, string | null>();
     const getDogNote = async (dogId: string): Promise<string | null> => {
       if (noteByDogId.has(dogId)) {
@@ -967,7 +1028,8 @@ export async function runLegacyPhase1(
     );
 
     startStage("index");
-    const dogIdByRegistration = await loadDogIdByRegistration();
+    const { dogIdByRegistration, dogSexByRegistration } =
+      await loadDogIndexByRegistration();
     log(`Indexed dogs by registration: ${dogIdByRegistration.size}`);
     finishStage("index");
 
@@ -982,6 +1044,9 @@ export async function runLegacyPhase1(
       });
     dogsUpserted += createdByRegistration.size;
     errorsCount += ambiguousRegistrations.size;
+    for (const createdParent of createdByRegistration.values()) {
+      dogSexByRegistration.set(createdParent.registrationNo, createdParent.sex);
+    }
     const totalRelations = legacy.dogs.length;
     let relationsProcessed = 0;
     let relationsUpdated = 0;
@@ -1188,6 +1253,50 @@ export async function runLegacyPhase1(
             damRegistrationNo: damRegistrationForLookup,
           }),
         });
+      }
+
+      if (sireRegistrationForLookup && sireId) {
+        const actualSex = dogSexByRegistration.get(sireRegistrationForLookup);
+        if (actualSex && actualSex !== DogSex.MALE) {
+          await recordIssue({
+            stage: "relations",
+            severity: "WARNING",
+            code: "RELATION_SIRE_SEX_MISMATCH",
+            message:
+              "Resolved sire sex does not match the expected parent role.",
+            registrationNo: registration.registrationNo,
+            sourceTable: "bearek_id",
+            payloadJson: JSON.stringify({
+              childRegistrationNo: registration.registrationNo,
+              parentRegistrationNo: sireRegistrationForLookup,
+              parentDogId: sireId,
+              actualSex,
+              expectedSex: DogSex.MALE,
+            }),
+          });
+        }
+      }
+
+      if (damRegistrationForLookup && damId) {
+        const actualSex = dogSexByRegistration.get(damRegistrationForLookup);
+        if (actualSex && actualSex !== DogSex.FEMALE) {
+          await recordIssue({
+            stage: "relations",
+            severity: "WARNING",
+            code: "RELATION_DAM_SEX_MISMATCH",
+            message:
+              "Resolved dam sex does not match the expected parent role.",
+            registrationNo: registration.registrationNo,
+            sourceTable: "bearek_id",
+            payloadJson: JSON.stringify({
+              childRegistrationNo: registration.registrationNo,
+              parentRegistrationNo: damRegistrationForLookup,
+              parentDogId: damId,
+              actualSex,
+              expectedSex: DogSex.FEMALE,
+            }),
+          });
+        }
       }
 
       await prisma.dog.update({

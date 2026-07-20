@@ -52,12 +52,16 @@ export async function fetchLegacyPhase1Rows(options?: {
     const eksStartedAt = Date.now();
     const eks = (await connection.query(
       `SELECT REKNO as registrationNo,
-              EKNO as ekNo
+              EKNO as ekNo,
+              EK_PVM as ekNoAssignedOnRaw
        FROM bea_apu`,
     )) as LegacyEkRow[];
     const eksWithEkNo = eks.filter((row) => row.ekNo != null).length;
+    const eksWithAssignedOn = eks.filter(
+      (row) => row.ekNoAssignedOnRaw?.trim().length,
+    ).length;
     log(
-      `Fetched bea_apu source rows: total=${eks.length}, withEkNo=${eksWithEkNo}, elapsed=${Math.round((Date.now() - eksStartedAt) / 1000)}s`,
+      `Fetched bea_apu source rows: total=${eks.length}, withEkNo=${eksWithEkNo}, withAssignedOn=${eksWithAssignedOn}, elapsed=${Math.round((Date.now() - eksStartedAt) / 1000)}s`,
     );
 
     const ownersStartedAt = Date.now();

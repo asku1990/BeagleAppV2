@@ -52,6 +52,7 @@ describe("admin dog manage lib", () => {
           breederNameText: " Metsapolun ",
           ownershipNames: ["Tiina Virtanen"],
           ekNo: " 5588 ",
+          ekNoAssignedOn: " 2024-01-15 ",
           inbreedingCoefficientPct: 12.5,
           colorCode: "121",
           note: " Important note ",
@@ -79,6 +80,7 @@ describe("admin dog manage lib", () => {
       breederNameText: "Metsapolun",
       ownerNames: ["Tiina Virtanen"],
       ekNo: 5588,
+      ekNoAssignedOn: "2024-01-15",
       colorCode: 121,
       note: "Important note",
       registrationNo: "FI12345/21",
@@ -95,6 +97,12 @@ describe("admin dog manage lib", () => {
     expect(getAdminDogMutationErrorMessageKey("UNKNOWN_ERROR")).toBe(
       "admin.dogs.mutation.errorDefault",
     );
+  });
+
+  it("maps the missing EK number invariant error", () => {
+    expect(
+      getAdminDogMutationErrorMessageKey("EK_NO_REQUIRED_FOR_ASSIGNMENT_DATE"),
+    ).toBe("admin.dogs.mutation.errorEkNoRequiredForAssignmentDate");
   });
 
   it("maps list query titlesText for compact list rendering", () => {
@@ -114,6 +122,7 @@ describe("admin dog manage lib", () => {
       showCount: 2,
       titlesText: "FI JVA, SE JCH",
       ekNo: 5588,
+      ekNoAssignedOn: "2024-01-15",
       colorCode: null,
       note: null,
       titles: [],
@@ -121,6 +130,8 @@ describe("admin dog manage lib", () => {
 
     expect(mapped.status).toBe("REFERENCE_ONLY");
     expect(mapped.titlesText).toBe("FI JVA, SE JCH");
+    expect(mapped.ekNoAssignedOn).toBe("2024-01-15");
+    expect(mapped.ekNoAssignedOn).not.toContain("T");
     expect(mapped).not.toHaveProperty("inbreedingCoefficientPct");
   });
 
@@ -141,10 +152,13 @@ describe("admin dog manage lib", () => {
       showCount: 0,
       titlesText: null,
       ekNo: null,
+      ekNoAssignedOn: null,
       colorCode: null,
       note: null,
       titles: [],
     });
+
+    expect(target.ekNoAssignedOn).toBeNull();
 
     expect(
       toUpdateAdminDogRequest(
@@ -155,6 +169,7 @@ describe("admin dog manage lib", () => {
           breederNameText: "",
           ownershipNames: [],
           ekNo: "",
+          ekNoAssignedOn: "",
           inbreedingCoefficientPct: null,
           colorCode: "",
           note: "",

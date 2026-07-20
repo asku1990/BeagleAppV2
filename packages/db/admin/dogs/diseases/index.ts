@@ -11,12 +11,10 @@ export {
 export { listAdminDogDiseaseDefinitionsDb } from "./list-dog-disease-definitions";
 export {
   createAdminDogDiseaseDb,
-  findAdminDiseaseDogByRegistrationNoDb,
   findAdminDogDiseaseDefinitionByCodeDb,
   findAdminDogDiseaseDuplicateDb,
   runAdminDogDiseaseWriteTransactionDb,
   type AdminDogDiseaseDefinitionDb,
-  type AdminDogDiseaseDogLookupDb,
   type AdminDogDiseaseDuplicateLookupDb,
   type CreateAdminDogDiseaseDbInput,
   type CreatedAdminDogDiseaseDb,

@@ -10,6 +10,8 @@ export type UpdateAdminDogRequest = {
   breederNameText?: string | null;
   ownerNames?: string[];
   ekNo?: number | null;
+  /** Calendar date in YYYY-MM-DD format; never a timestamp. */
+  ekNoAssignedOn?: string | null;
   colorCode?: number | null;
   note?: string | null;
   registrationNo: string;

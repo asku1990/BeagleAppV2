@@ -30,10 +30,14 @@ Phase 1 imports foundation entities and link structures. It does not import tria
   - `COLCODE` -> `Dog.colorCode`
 - the canonical typed dog-color catalog -> `DogColor` lookup rows before dog writes
 - `kennel` -> `Breeder` details (`name`, short code, city, granted/raw fields).
-- `bea_apu` -> `Dog.ekNo` by registration lookup.
+- `bea_apu` -> `Dog.ekNo` and `Dog.ekNoAssignedOn` by registration lookup.
 - `beaom` -> `Owner` + `DogOwnership` rows by registration lookup.
 - `samakoira` -> alias registrations (`REK_2`, `REK_3`) attached to canonical `REK_1`.
 - `samakoira.VARA` -> appended into `Dog.note` for the canonical dog when non-empty.
+
+Only `U` and `N` are valid `bearek_id.SUKUP` values. Every other value,
+including null, empty, and whitespace-only values, produces a
+`DOG_SEX_INVALID_VALUE` warning and is stored as `UNKNOWN`.
 
 ## Main writes
 
@@ -65,6 +69,12 @@ Phase 1 imports foundation entities and link structures. It does not import tria
     written; this warning confirms a successful import and does not increase the
     run error count
   - registrations already owned by normal or reference-only dogs are reused
+  - a resolved sire whose persisted sex is not `MALE` produces a
+    `RELATION_SIRE_SEX_MISMATCH` warning, and a resolved dam whose persisted sex
+    is not `FEMALE` produces a `RELATION_DAM_SEX_MISMATCH` warning
+  - parent-sex warning payloads include the child registration, parent
+    registration, parent dog ID, actual sex, and expected sex; the resolved
+    relationship is still written after the warning
   - registrations used as both sire and dam create no dog and produce
     `RELATION_PARENT_ROLE_AMBIGUOUS` errors
   - invalid parent registrations are errors, while placeholder registrations
@@ -75,6 +85,9 @@ Phase 1 imports foundation entities and link structures. It does not import tria
   - ownership uses `ownershipDateKey` and `createMany(skipDuplicates=true)`
 - EK rows:
   - `bea_apu` rows with a non-empty `EKNO` update `Dog.ekNo`
+  - valid `EK_PVM` values in `YYYYMMDD` format update `Dog.ekNoAssignedOn`
+  - blank `EK_PVM` values store a null assignment date
+  - invalid `EK_PVM` values record `EK_ASSIGNED_ON_INVALID`, keep the EK number, and store a null assignment date
   - rows without `EKNO` do not update `Dog.ekNo`
   - malformed `registrationNo` values are still recorded as issues before the `EKNO` check
   - the phase log reports both the raw `bea_apu` row count and the subset that has a non-empty `EKNO`
@@ -100,11 +113,13 @@ Phase 1 imports foundation entities and link structures. It does not import tria
 Typical issue groups:
 
 - missing required fields
+- invalid or missing dog sex values stored as unknown
 - invalid registration format
 - missing dog relation targets
 - placeholder/invalid relation registrations
 - successfully created reference-only parents requiring review
 - parent registrations used ambiguously as both sire and dam
+- resolved sires or dams whose persisted sex does not match the parent role
 - alias/canonical conflicts
 
 Issue rows are written to `ImportRunIssue` with `kind=LEGACY_PHASE1`.
@@ -113,6 +128,8 @@ Issue rows are written to `ImportRunIssue` with `kind=LEGACY_PHASE1`.
 
 - Invalid registration formats are reported and skipped for that row path.
 - Missing relation targets are reported and row-specific link/write is skipped.
+- Parent-sex mismatches are warnings only and do not block relation writes or
+  increase the run error count.
 - Import continues and run finishes `SUCCEEDED` with warnings when issues exist.
 - Unexpected exceptions mark run as `FAILED` with `UNEXPECTED_EXCEPTION`.
 

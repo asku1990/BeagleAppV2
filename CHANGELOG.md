@@ -20,6 +20,22 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.19.0] - 2026-07-20
+
+### Added
+
+- Ylläpitäjä voi tallentaa koiralle EK-numeron myöntämispäivän, kun koiralla on EK-numero. Tulevaisuuteen sijoittuvia päivämääriä ei hyväksytä, ja tieto tuodaan myös vanhasta tietokannasta.
+
+### Changed
+
+- Ylläpitäjä voi käyttää koiran sairauden pentuetodisteelle vapaavalintaista tunnistetta. Jos tunniste kuuluu olemassa olevalle koiralle, sairaustieto ohjataan lisäämään koirakohtaisena tietona.
+
+### Fixed
+
+- Sairauden pentuetodisteelle ei voi tallentaa samaa koiraa molemmiksi vanhemmiksi eikä väärää sukupuolta isän tai emän rooliin.
+
+### Removed
+
 ## [0.18.0] - 2026-07-15
 
 ### Added
@@ -33,6 +49,12 @@ This project uses a user-facing changelog format.
 - Ylläpidon koirahaku käynnistyy vasta Hae-painikkeella, joten sivun avaaminen, hakutekstin kirjoittaminen tai suodattimien muuttaminen ei tee hakupyyntöjä.
 
 ### Fixed
+
+- Vanhan tietokannan tuonti varoittaa nyt, jos isäksi tai emäksi yhdistetyn
+  koiran sukupuoli on tuntematon tai vanhempainroolin vastainen. Sukulaisuussuhde
+  säilytetään varoituksesta huolimatta.
+- Vanhan tietokannan tuonti varoittaa myös virheellisistä koiran
+  sukupuoliarvoista ja tallentaa ne edelleen tuntemattomana sukupuolena.
 
 ### Removed
 

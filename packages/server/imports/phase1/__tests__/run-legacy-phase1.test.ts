@@ -139,8 +139,16 @@ describe("runLegacyPhase1", () => {
       ],
       breeders: [],
       eks: [
-        { registrationNo: "FI12345/21", ekNo: 5588 },
-        { registrationNo: "FI12345/21", ekNo: null },
+        {
+          registrationNo: "FI12345/21",
+          ekNo: 5588,
+          ekNoAssignedOnRaw: "20240115",
+        },
+        {
+          registrationNo: "FI12345/21",
+          ekNo: null,
+          ekNoAssignedOnRaw: null,
+        },
       ],
       owners: [],
       samakoira: [],
@@ -155,7 +163,11 @@ describe("runLegacyPhase1", () => {
       return Promise.resolve({ dogId: "dog-1" });
     });
     dogRegistrationFindManyMock.mockResolvedValue([
-      { registrationNo: "FI12345/21", dogId: "dog-1" },
+      {
+        registrationNo: "FI12345/21",
+        dogId: "dog-1",
+        dog: { sex: "MALE" },
+      },
     ]);
     dogRegistrationCreateMock.mockResolvedValue({
       id: "registration-1",
@@ -177,7 +189,10 @@ describe("runLegacyPhase1", () => {
         [
           {
             where: { id: "dog-1" },
-            data: { ekNo: 5588 },
+            data: {
+              ekNo: 5588,
+              ekNoAssignedOn: new Date("2024-01-15T00:00:00.000Z"),
+            },
           },
         ],
       ]),
@@ -196,6 +211,202 @@ describe("runLegacyPhase1", () => {
         errorsCount: 0,
         errorSummary: expect.stringContaining("Phase 1:"),
       }),
+      expect.any(Object),
+    );
+  });
+
+  it("records invalid EK assignment dates while preserving the EK number", async () => {
+    fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogs: [],
+      breeders: [],
+      eks: [
+        {
+          registrationNo: "FI12345/21",
+          ekNo: 5588,
+          ekNoAssignedOnRaw: "20240231",
+        },
+      ],
+      owners: [],
+      samakoira: [],
+    });
+
+    const result = await runLegacyPhase1("user-1");
+
+    expect(result.status).toBe(202);
+    expect(dogUpdateMock).toHaveBeenCalledWith({
+      where: { id: "dog-1" },
+      data: { ekNo: 5588, ekNoAssignedOn: null },
+    });
+    const issues = createImportRunIssuesBulkMock.mock.calls.flatMap(
+      ([, nextIssues]) => nextIssues,
+    );
+    expect(issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          severity: "WARNING",
+          code: "EK_ASSIGNED_ON_INVALID",
+          registrationNo: "FI12345/21",
+        }),
+      ]),
+    );
+    expect(markImportRunFinishedMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.objectContaining({ status: "SUCCEEDED", errorsCount: 1 }),
+      expect.any(Object),
+    );
+  });
+
+  it("warns for every dog sex other than U and N while preserving mapped values", async () => {
+    fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogs: [
+        {
+          registrationNo: "FI12345/21",
+          name: "Invalid sex",
+          sex: "X",
+          birthDateRaw: null,
+          sireRegistrationNo: null,
+          damRegistrationNo: null,
+          breederName: null,
+          colorCode: null,
+        },
+        {
+          registrationNo: "FI54321/21",
+          name: "Blank sex",
+          sex: " ",
+          birthDateRaw: null,
+          sireRegistrationNo: null,
+          damRegistrationNo: null,
+          breederName: null,
+          colorCode: null,
+        },
+        {
+          registrationNo: "FI99999/21",
+          name: "Null sex",
+          sex: null,
+          birthDateRaw: null,
+          sireRegistrationNo: null,
+          damRegistrationNo: null,
+          breederName: null,
+          colorCode: null,
+        },
+        {
+          registrationNo: "FI11111/21",
+          name: "Male",
+          sex: "U",
+          birthDateRaw: null,
+          sireRegistrationNo: null,
+          damRegistrationNo: null,
+          breederName: null,
+          colorCode: null,
+        },
+        {
+          registrationNo: "FI22222/21",
+          name: "Female",
+          sex: "N",
+          birthDateRaw: null,
+          sireRegistrationNo: null,
+          damRegistrationNo: null,
+          breederName: null,
+          colorCode: null,
+        },
+      ],
+      breeders: [],
+      eks: [],
+      owners: [],
+      samakoira: [],
+    });
+    dogRegistrationFindManyMock.mockResolvedValue([
+      {
+        registrationNo: "FI12345/21",
+        dogId: "dog-1",
+        dog: { sex: "UNKNOWN" },
+      },
+      {
+        registrationNo: "FI54321/21",
+        dogId: "dog-2",
+        dog: { sex: "UNKNOWN" },
+      },
+      {
+        registrationNo: "FI99999/21",
+        dogId: "dog-3",
+        dog: { sex: "UNKNOWN" },
+      },
+      {
+        registrationNo: "FI11111/21",
+        dogId: "dog-4",
+        dog: { sex: "MALE" },
+      },
+      {
+        registrationNo: "FI22222/21",
+        dogId: "dog-5",
+        dog: { sex: "FEMALE" },
+      },
+    ]);
+
+    await runLegacyPhase1("user-1");
+
+    expect(dogCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ name: "Invalid sex", sex: "UNKNOWN" }),
+      }),
+    );
+    expect(dogCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ name: "Blank sex", sex: "UNKNOWN" }),
+      }),
+    );
+    expect(dogCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ name: "Null sex", sex: "UNKNOWN" }),
+      }),
+    );
+    expect(dogCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ name: "Male", sex: "MALE" }),
+      }),
+    );
+    expect(dogCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ name: "Female", sex: "FEMALE" }),
+      }),
+    );
+
+    const issues = createImportRunIssuesBulkMock.mock.calls.flatMap(
+      ([, nextIssues]) => nextIssues,
+    );
+    const sexIssues = issues.filter(
+      (issue) => issue.code === "DOG_SEX_INVALID_VALUE",
+    );
+    expect(sexIssues).toEqual([
+      expect.objectContaining({
+        stage: "dogs",
+        severity: "WARNING",
+        registrationNo: "FI12345/21",
+        sourceTable: "bearek_id",
+      }),
+      expect.objectContaining({
+        stage: "dogs",
+        severity: "WARNING",
+        registrationNo: "FI54321/21",
+        sourceTable: "bearek_id",
+      }),
+      expect.objectContaining({
+        stage: "dogs",
+        severity: "WARNING",
+        registrationNo: "FI99999/21",
+        sourceTable: "bearek_id",
+      }),
+    ]);
+    expect(
+      sexIssues.map((issue) => JSON.parse(issue.payloadJson ?? "{}")),
+    ).toEqual([
+      { registrationNo: "FI12345/21", rawSex: "X" },
+      { registrationNo: "FI54321/21", rawSex: " " },
+      { registrationNo: "FI99999/21", rawSex: null },
+    ]);
+    expect(markImportRunFinishedMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.objectContaining({ errorsCount: 0 }),
       expect.any(Object),
     );
   });
@@ -249,7 +460,11 @@ describe("runLegacyPhase1", () => {
       samakoira: [],
     });
     dogRegistrationFindManyMock.mockResolvedValue([
-      { registrationNo: "FI12345/21", dogId: "dog-1" },
+      {
+        registrationNo: "FI12345/21",
+        dogId: "dog-1",
+        dog: { sex: "FEMALE" },
+      },
     ]);
 
     const result = await runLegacyPhase1("user-1");
@@ -298,7 +513,11 @@ describe("runLegacyPhase1", () => {
       samakoira: [],
     });
     dogRegistrationFindManyMock.mockResolvedValue([
-      { registrationNo: "FI12345/21", dogId: "dog-1" },
+      {
+        registrationNo: "FI12345/21",
+        dogId: "dog-1",
+        dog: { sex: "MALE" },
+      },
     ]);
 
     const result = await runLegacyPhase1("user-1");
@@ -345,7 +564,13 @@ describe("runLegacyPhase1", () => {
         },
       ],
       breeders: [],
-      eks: [{ registrationNo: "FI12345/21", ekNo: null }],
+      eks: [
+        {
+          registrationNo: "FI12345/21",
+          ekNo: null,
+          ekNoAssignedOnRaw: null,
+        },
+      ],
       owners: [],
       samakoira: [],
     });
@@ -488,6 +713,166 @@ describe("runLegacyPhase1", () => {
     );
   });
 
+  it.each([
+    {
+      caseName: "warns for unknown sire and dam sexes",
+      sireSex: "UNKNOWN",
+      damSex: "UNKNOWN",
+      expectedCodes: [
+        "RELATION_SIRE_SEX_MISMATCH",
+        "RELATION_DAM_SEX_MISMATCH",
+      ],
+    },
+    {
+      caseName: "warns for opposite sire and dam sexes",
+      sireSex: "FEMALE",
+      damSex: "MALE",
+      expectedCodes: [
+        "RELATION_SIRE_SEX_MISMATCH",
+        "RELATION_DAM_SEX_MISMATCH",
+      ],
+    },
+    {
+      caseName: "does not warn for valid sire and dam sexes",
+      sireSex: "MALE",
+      damSex: "FEMALE",
+      expectedCodes: [],
+    },
+  ])("$caseName", async ({ sireSex, damSex, expectedCodes }) => {
+    const toLegacySex = (sex: string) => {
+      if (sex === "MALE") return "U";
+      if (sex === "FEMALE") return "N";
+      return null;
+    };
+    fetchLegacyPhase1RowsMock.mockResolvedValue({
+      dogs: [
+        {
+          registrationNo: "FI10000/21",
+          name: "Child",
+          sex: "N",
+          birthDateRaw: null,
+          sireRegistrationNo: "FI20000/19",
+          damRegistrationNo: "FI30000/19",
+          breederName: null,
+          colorCode: null,
+        },
+        {
+          registrationNo: "FI20000/19",
+          name: "Sire",
+          sex: toLegacySex(sireSex),
+          birthDateRaw: null,
+          sireRegistrationNo: null,
+          damRegistrationNo: null,
+          breederName: null,
+          colorCode: null,
+        },
+        {
+          registrationNo: "FI30000/19",
+          name: "Dam",
+          sex: toLegacySex(damSex),
+          birthDateRaw: null,
+          sireRegistrationNo: null,
+          damRegistrationNo: null,
+          breederName: null,
+          colorCode: null,
+        },
+      ],
+      breeders: [],
+      eks: [],
+      owners: [],
+      samakoira: [],
+    });
+    dogRegistrationFindManyMock.mockResolvedValue([
+      {
+        registrationNo: "FI10000/21",
+        dogId: "child",
+        dog: { sex: "FEMALE" },
+      },
+      {
+        registrationNo: "FI20000/19",
+        dogId: "sire",
+        dog: { sex: sireSex },
+      },
+      {
+        registrationNo: "FI30000/19",
+        dogId: "dam",
+        dog: { sex: damSex },
+      },
+    ]);
+    dogCreateMock.mockImplementation(({ data }) =>
+      Promise.resolve({
+        id:
+          data.name === "Child"
+            ? "child"
+            : data.name === "Sire"
+              ? "sire"
+              : "dam",
+      }),
+    );
+
+    await runLegacyPhase1("user-1");
+
+    const issues = createImportRunIssuesBulkMock.mock.calls.flatMap(
+      ([, nextIssues]) => nextIssues,
+    );
+    const sexMismatchIssues = issues.filter((issue) =>
+      issue.code.endsWith("_SEX_MISMATCH"),
+    );
+    expect(sexMismatchIssues.map((issue) => issue.code)).toEqual(expectedCodes);
+
+    const sireIssue = sexMismatchIssues.find(
+      (issue) => issue.code === "RELATION_SIRE_SEX_MISMATCH",
+    );
+    if (sireIssue) {
+      expect(sireIssue).toEqual(
+        expect.objectContaining({
+          stage: "relations",
+          severity: "WARNING",
+          registrationNo: "FI10000/21",
+          sourceTable: "bearek_id",
+        }),
+      );
+      expect(JSON.parse(sireIssue.payloadJson ?? "{}")).toEqual({
+        childRegistrationNo: "FI10000/21",
+        parentRegistrationNo: "FI20000/19",
+        parentDogId: "sire",
+        actualSex: sireSex,
+        expectedSex: "MALE",
+      });
+    }
+
+    const damIssue = sexMismatchIssues.find(
+      (issue) => issue.code === "RELATION_DAM_SEX_MISMATCH",
+    );
+    if (damIssue) {
+      expect(damIssue).toEqual(
+        expect.objectContaining({
+          stage: "relations",
+          severity: "WARNING",
+          registrationNo: "FI10000/21",
+          sourceTable: "bearek_id",
+        }),
+      );
+      expect(JSON.parse(damIssue.payloadJson ?? "{}")).toEqual({
+        childRegistrationNo: "FI10000/21",
+        parentRegistrationNo: "FI30000/19",
+        parentDogId: "dam",
+        actualSex: damSex,
+        expectedSex: "FEMALE",
+      });
+    }
+
+    expect(dogUpdateMock).toHaveBeenCalledWith({
+      where: { id: "child" },
+      data: { sireId: "sire", damId: "dam" },
+    });
+    expect(markImportRunFinishedMock).toHaveBeenCalledWith(
+      "run-1",
+      expect.objectContaining({ errorsCount: 0 }),
+      expect.any(Object),
+    );
+  });
+
   it("creates one reference-only sire, links every child, and records one review warning", async () => {
     fetchLegacyPhase1RowsMock.mockResolvedValue({
       dogs: [
@@ -518,8 +903,16 @@ describe("runLegacyPhase1", () => {
       samakoira: [],
     });
     dogRegistrationFindManyMock.mockResolvedValue([
-      { registrationNo: "FI12345/21", dogId: "dog-1" },
-      { registrationNo: "FI54321/21", dogId: "dog-2" },
+      {
+        registrationNo: "FI12345/21",
+        dogId: "dog-1",
+        dog: { sex: "FEMALE" },
+      },
+      {
+        registrationNo: "FI54321/21",
+        dogId: "dog-2",
+        dog: { sex: "FEMALE" },
+      },
     ]);
     dogCreateMock.mockImplementation(({ data }) =>
       Promise.resolve({
@@ -623,8 +1016,16 @@ describe("runLegacyPhase1", () => {
       samakoira: [],
     });
     dogRegistrationFindManyMock.mockResolvedValue([
-      { registrationNo: "FI12345/21", dogId: "dog-1" },
-      { registrationNo: "FI54321/21", dogId: "dog-2" },
+      {
+        registrationNo: "FI12345/21",
+        dogId: "dog-1",
+        dog: { sex: "FEMALE" },
+      },
+      {
+        registrationNo: "FI54321/21",
+        dogId: "dog-2",
+        dog: { sex: "FEMALE" },
+      },
     ]);
 
     await runLegacyPhase1("user-1");

@@ -52,6 +52,7 @@ function buildDog(overrides: Partial<AdminDogRecord> = {}): AdminDogRecord {
     titlesText: "FI JVA, SE JCH",
     ownershipPreview: ["Tiina Virtanen"],
     ekNo: 5588,
+    ekNoAssignedOn: null,
     colorCode: 121,
     note: "Important",
     sirePreview: { name: "Korven Aatos", registrationNo: "FI54321/20" },

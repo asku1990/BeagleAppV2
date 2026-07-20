@@ -44,6 +44,16 @@ prefer Server Actions for mutations and other write flows.
   is a stronger HTTP/API reason to expose them as route handlers.
 - Keep business logic in `packages/server` regardless of transport choice.
 
+## Date and time storage
+
+Classify fields by domain meaning rather than using one database type everywhere.
+
+- Use PostgreSQL `DATE` through Prisma `DateTime @db.Date` for calendar dates that have no meaningful time or timezone, such as birth dates, assignment dates, registration dates, and death dates.
+- Use timestamp fields for actual moments in time, such as creation, update, login, audit, import execution, and message delivery times.
+- Do not convert date-only values through timezone-aware timestamp logic.
+- Determine business “today” in the required business timezone, currently `Europe/Helsinki`, but store the resulting business date as a date-only value.
+- Existing date/time columns must not be bulk-refactored without first auditing their domain meaning, current PostgreSQL type, stored data semantics, serialization behavior, and migration risk.
+
 ## Canonical Folder Conventions
 
 Use `/<audience>/<domain>/<feature>/` for web transport/query layers.

@@ -45,6 +45,7 @@ function buildEditValues(): AdminDogFormValues {
     breederNameText: "Metsapolun",
     ownershipNames: ["Tiina Virtanen", "Antti Virtanen"],
     ekNo: "5588",
+    ekNoAssignedOn: "2024-01-15",
     inbreedingCoefficientPct: null,
     colorCode: "121",
     note: "Important note",
@@ -72,6 +73,7 @@ function buildCreateValues(): AdminDogFormValues {
     breederNameText: "",
     ownershipNames: [],
     ekNo: "",
+    ekNoAssignedOn: "",
     inbreedingCoefficientPct: null,
     colorCode: "",
     note: "",
@@ -107,6 +109,7 @@ function buildDog(values: AdminDogFormValues): AdminDogRecord {
     titlesText:
       values.titles.map((title) => title.titleCode).join(", ") || null,
     ekNo: Number(values.ekNo),
+    ekNoAssignedOn: values.ekNoAssignedOn || null,
     colorCode: values.colorCode ? Number(values.colorCode) : null,
     note: values.note,
     registrationNo: values.registrationNo,
@@ -158,6 +161,9 @@ describe("DogFormModal", () => {
     expect(html).toContain(">Tiina Virtanen<");
     expect(html).toContain(">Antti Virtanen<");
     expect(html).toContain('value="5588"');
+    expect(html).toContain('value="2024-01-15"');
+    expect(html).toContain("admin.dogs.form.ekNoAssignedOnClear");
+    expect(html).not.toContain("admin.dogs.form.ekNoAssignedOnUnknown");
     expect(html).toContain('value="Important note"');
     expect(html).toContain('value="2022-01-10"');
     expect(html).toContain('value="FI JVA"');
@@ -169,36 +175,42 @@ describe("DogFormModal", () => {
     expect(html).toContain("admin.dogs.form.recordIdPrefix dog_1");
   });
 
-  it("caps the birth date picker at today", () => {
-    const values = buildEditValues();
-    const today = new Date().toISOString().slice(0, 10);
-    const html = renderToStaticMarkup(
-      React.createElement(DogFormModal, {
-        mode: "edit",
-        dog: buildDog(values),
-        values,
-        formStatus: "NORMAL",
-        colorOptions: [{ value: "121", label: "121 - Kolmivärinen" }],
-        ownerOptions: [
-          { id: "o_1", name: "Tiina Virtanen" },
-          { id: "o_2", name: "Antti Virtanen" },
-        ],
-        parentOptions: [
-          { registrationNo: "FI54321/20", name: "Korven Aatos" },
-          { registrationNo: "FI77777/18", name: "Havupolun Helmi" },
-        ],
-        onOwnerSearchChange: vi.fn(),
-        onParentSearchChange: vi.fn(),
-        open: true,
-        onClose: vi.fn(),
-        onValuesChange: vi.fn(),
-        onFormStatusChange: vi.fn(),
-        onSubmit: vi.fn(),
-        onCalculateInbreeding: vi.fn(),
-      }),
-    );
+  it("caps date pickers at the Helsinki business date", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-19T21:30:00.000Z"));
 
-    expect(html).toContain(`max="${today}"`);
+    try {
+      const values = buildEditValues();
+      const html = renderToStaticMarkup(
+        React.createElement(DogFormModal, {
+          mode: "edit",
+          dog: buildDog(values),
+          values,
+          formStatus: "NORMAL",
+          colorOptions: [{ value: "121", label: "121 - Kolmivärinen" }],
+          ownerOptions: [
+            { id: "o_1", name: "Tiina Virtanen" },
+            { id: "o_2", name: "Antti Virtanen" },
+          ],
+          parentOptions: [
+            { registrationNo: "FI54321/20", name: "Korven Aatos" },
+            { registrationNo: "FI77777/18", name: "Havupolun Helmi" },
+          ],
+          onOwnerSearchChange: vi.fn(),
+          onParentSearchChange: vi.fn(),
+          open: true,
+          onClose: vi.fn(),
+          onValuesChange: vi.fn(),
+          onFormStatusChange: vi.fn(),
+          onSubmit: vi.fn(),
+          onCalculateInbreeding: vi.fn(),
+        }),
+      );
+
+      expect(html).toContain('max="2026-07-20"');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("shows explicit set-date control when birth date is empty", () => {
@@ -227,6 +239,63 @@ describe("DogFormModal", () => {
     expect(html).toContain("admin.dogs.form.birthDateSet");
     expect(html).not.toContain("admin.dogs.form.birthDateClear");
     expect(html).toContain("admin.dogs.form.inbreedingCalculate");
+    expect(html).toContain("disabled");
+  });
+
+  it("shows explicit set-date control when EK assignment date is empty", () => {
+    const values = buildCreateValues();
+    const html = renderToStaticMarkup(
+      React.createElement(DogFormModal, {
+        mode: "create",
+        dog: null,
+        values,
+        formStatus: "NORMAL",
+        colorOptions: [],
+        ownerOptions: [],
+        parentOptions: [],
+        onOwnerSearchChange: vi.fn(),
+        onParentSearchChange: vi.fn(),
+        open: true,
+        onClose: vi.fn(),
+        onValuesChange: vi.fn(),
+        onFormStatusChange: vi.fn(),
+        onSubmit: vi.fn(),
+      }),
+    );
+
+    expect(html).toContain("admin.dogs.form.ekNoAssignedOnUnknown");
+    expect(html).toContain("admin.dogs.form.ekNoAssignedOnSet");
+    expect(html).not.toContain("admin.dogs.form.ekNoAssignedOnClear");
+    expect(html).not.toContain(
+      'aria-label="admin.dogs.form.ekNoAssignedOnLabel"',
+    );
+    expect(html).toMatch(/admin\.dogs\.form\.ekNoAssignedOnSet<\/button>/);
+    expect(html).toContain("disabled");
+  });
+
+  it("blocks saving an EK assignment date without an EK number", () => {
+    const values = buildEditValues();
+    values.ekNo = "";
+    const html = renderToStaticMarkup(
+      React.createElement(DogFormModal, {
+        mode: "edit",
+        dog: buildDog(values),
+        values,
+        formStatus: "NORMAL",
+        colorOptions: [],
+        ownerOptions: [],
+        parentOptions: [],
+        onOwnerSearchChange: vi.fn(),
+        onParentSearchChange: vi.fn(),
+        open: true,
+        onClose: vi.fn(),
+        onValuesChange: vi.fn(),
+        onFormStatusChange: vi.fn(),
+        onSubmit: vi.fn(),
+      }),
+    );
+
+    expect(html).toContain("admin.dogs.form.ekNoRequiredForAssignmentDate");
     expect(html).toContain("disabled");
   });
 
