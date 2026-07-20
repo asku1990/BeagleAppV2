@@ -33,9 +33,14 @@ export function toDateOnly(value: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+/**
+ * Compares an already validated YYYY-MM-DD value with the current Helsinki
+ * business date. Canonical date-only strings are ordered lexicographically;
+ * this helper does not validate arbitrary strings.
+ */
 export function isFutureBusinessDate(
-  value: Date,
+  dateOnly: string,
   now: Date = new Date(),
 ): boolean {
-  return toDateOnly(value) > toBusinessDateOnly(now);
+  return dateOnly > toBusinessDateOnly(now);
 }

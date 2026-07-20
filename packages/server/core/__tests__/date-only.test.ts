@@ -51,33 +51,24 @@ describe("isFutureBusinessDate", () => {
   const helsinkiAfterMidnight = new Date("2026-07-19T21:30:00.000Z");
 
   it("changes business today at Helsinki midnight", () => {
-    const july20 = new Date("2026-07-20T00:00:00.000Z");
+    const july20 = "2026-07-20";
 
     expect(isFutureBusinessDate(july20, helsinkiBeforeMidnight)).toBe(true);
     expect(isFutureBusinessDate(july20, helsinkiAfterMidnight)).toBe(false);
   });
 
   it("accepts past and current Helsinki business dates", () => {
-    expect(
-      isFutureBusinessDate(
-        new Date("2026-07-19T00:00:00.000Z"),
-        helsinkiAfterMidnight,
-      ),
-    ).toBe(false);
-    expect(
-      isFutureBusinessDate(
-        new Date("2026-07-20T00:00:00.000Z"),
-        helsinkiAfterMidnight,
-      ),
-    ).toBe(false);
+    expect(isFutureBusinessDate("2026-07-19", helsinkiAfterMidnight)).toBe(
+      false,
+    );
+    expect(isFutureBusinessDate("2026-07-20", helsinkiAfterMidnight)).toBe(
+      false,
+    );
   });
 
   it("rejects a date after the current Helsinki business date", () => {
-    expect(
-      isFutureBusinessDate(
-        new Date("2026-07-21T00:00:00.000Z"),
-        helsinkiAfterMidnight,
-      ),
-    ).toBe(true);
+    expect(isFutureBusinessDate("2026-07-21", helsinkiAfterMidnight)).toBe(
+      true,
+    );
   });
 });

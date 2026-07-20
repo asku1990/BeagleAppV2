@@ -148,7 +148,7 @@ export function validateCreatePreflight(
       response: invalidEkNoAssignedOnResponse(),
     };
   }
-  if (ekNoAssignedOn && isFutureBusinessDate(ekNoAssignedOn)) {
+  if (ekNoAssignedOn && isFutureBusinessDate(toDateOnly(ekNoAssignedOn))) {
     return {
       ok: false,
       logContext: {
