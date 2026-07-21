@@ -38,11 +38,16 @@ vi.mock("@/components/ui/card", () => ({
 vi.mock("@/components/ui/button", () => ({
   Button: ({
     children,
+    asChild,
     ...props
   }: {
     children: React.ReactNode;
+    asChild?: boolean;
     [key: string]: unknown;
-  }) => React.createElement("button", props, children),
+  }) =>
+    asChild
+      ? React.createElement(React.Fragment, null, children)
+      : React.createElement("button", props, children),
 }));
 
 vi.mock("next/link", () => ({
@@ -123,5 +128,40 @@ describe("AdminTrialSelectedEventPanel", () => {
     expect(html).toContain("actions-trial-1");
     expect(html).toContain("admin.trials.manage.selected.actions.editEvent");
     expect(html).toContain("edit-dialog-false");
+    expect(html).not.toContain(
+      "admin.trials.manage.selected.actions.openWorkspace",
+    );
+  });
+
+  it("renders an optional event workspace link", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(AdminTrialSelectedEventPanel, {
+        selectedEvent: {
+          trialEventId: "event-1",
+          eventDate: "2026-04-14",
+          eventPlace: "Helsinki",
+          eventName: null,
+          jarjestaja: null,
+          ylituomari: null,
+          ylituomariNumero: null,
+          ytKertomus: null,
+          kennelpiiri: null,
+          kennelpiirinro: null,
+          sklKoeId: 12345,
+          dogCount: 0,
+          entries: [],
+        },
+        isLoading: false,
+        isError: false,
+        errorText: "error",
+        workspaceHref: "/admin/trials/event-1",
+        onDeletedTrialEvent: vi.fn(),
+      }),
+    );
+
+    expect(html).toContain('href="/admin/trials/event-1"');
+    expect(html).toContain(
+      "admin.trials.manage.selected.actions.openWorkspace",
+    );
   });
 });

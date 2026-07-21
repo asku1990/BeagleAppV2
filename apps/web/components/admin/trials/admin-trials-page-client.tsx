@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import type { AdminTrialEventSearchRequest } from "@beagle/contracts";
 import { useI18n } from "@/hooks/i18n";
+import { getAdminTrialEventHref } from "@/lib/admin/trials";
 import { AdminTrialEventsFilters } from "./admin-trial-events-filters";
 import { AdminTrialEventsResults } from "./admin-trial-events-results";
 import { AdminTrialSelectedEventPanel } from "./admin-trial-selected-event-panel";
@@ -190,6 +191,11 @@ export function AdminTrialsPageClient() {
         isLoading={eventQuery.isLoading}
         isError={eventQuery.isError}
         errorText={selectedErrorText}
+        workspaceHref={
+          eventQuery.data?.event
+            ? getAdminTrialEventHref(eventQuery.data.event.trialEventId)
+            : undefined
+        }
         onDeletedTrialEvent={(deletedTrialEventId) => {
           setSelectedEventIdInput("");
           setBlockedAutoSelectedEventId(deletedTrialEventId);

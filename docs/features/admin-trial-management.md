@@ -1,21 +1,24 @@
 # Admin Trial Management
 
-Developer notes for the admin trial read-only event flow (`BEJ-76`, `BEJ-81`
+Developer notes for the admin trial event flow (`BEJ-76`, `BEJ-81`, `BEJ-103`
 and follow-up admin flow redesign).
 
 ## Primary purpose
 
 - The admin list page is an event-first master-detail workflow for canonical
   AJOK `TrialEvent` + `TrialEntry` rows.
-- The main user task is to search events, select one event, then inspect its
-  dog rows without editing.
-- Per-dog inspection opens the generated trial PDF. There is no separate admin
-  trial row detail page.
+- An admin can search events, select one event, inspect and edit its metadata
+  and dog rows, delete a result, or open the event at the stable
+  `/admin/trials/[trialEventId]` workspace URL.
+- Per-dog inspection opens the generated trial PDF. Existing event and result
+  editing remains modal-based.
 
 ## Main files
 
 - `apps/web/app/(admin)/admin/trials/page.tsx`: route entrypoint for event master-detail list
+- `apps/web/app/(admin)/admin/trials/[trialEventId]/page.tsx`: stable event workspace route
 - `apps/web/components/admin/trials/admin-trials-page-client.tsx`: event filters + event list + selected-event rows
+- `apps/web/components/admin/trials/admin-trial-event-workspace-page-client.tsx`: one-event workspace states and navigation
 - `apps/web/components/admin/trials/admin-trial-selected-event-panel.tsx`: selected-event rows and row actions
 - `apps/web/components/admin/trials/admin-trial-entry-actions.tsx`: per-dog PDF action
 - `apps/web/queries/admin/trials/manage/use-admin-trial-events-query.ts`: event list query hook
@@ -32,7 +35,10 @@ and follow-up admin flow redesign).
 
 1. List page fetches event summaries through `useAdminTrialEventsQuery`.
 2. Event selection fetches selected event rows through `useAdminTrialEventQuery`.
-3. Row action opens `/api/trials/[trialId]/pdf` in a new tab.
+3. The selected-event panel links to the stable event workspace, which fetches
+   only the `trialEventId` from its route.
+4. Event and result changes use the existing admin mutations; the PDF action
+   opens `/api/trials/[trialEntryId]/pdf` in a new tab.
 
 ## Contract rules
 
@@ -48,11 +54,18 @@ and follow-up admin flow redesign).
 ## Render rules
 
 - Event rows/cards are the interaction target for choosing a selected event.
-- Selected event dog rows have one action: open the dog-specific trial PDF.
-- The admin flow has no update/remove controls and no separate row detail page.
+- The selected-event header has event edit and workspace navigation actions.
+- Selected dog rows have PDF, edit, and result-delete actions.
+- A missing workspace event is shown explicitly and never falls back to a
+  different event.
+- Until BEJ-103 Gate E2 changes the lifecycle, deleting the final result also
+  deletes its event. The workspace then returns to `/admin/trials`; non-final
+  and failed deletions remain on the workspace.
 
 ## Tests
 
+- `apps/web/app/(admin)/admin/trials/[trialEventId]/__tests__/page.test.tsx`
+- `apps/web/components/admin/trials/__tests__/admin-trial-event-workspace-page-client.test.tsx`
 - `apps/web/components/admin/trials/__tests__/admin-trials-page-client.test.tsx`
 - `apps/web/components/admin/trials/__tests__/admin-trial-entry-actions.test.tsx`
 - `apps/web/components/admin/trials/__tests__/admin-trial-selected-event-panel.test.tsx`

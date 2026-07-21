@@ -14,6 +14,8 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+- Ylläpitäjä voi avata ajokoetapahtuman omalle sivulleen tarkastelua ja nykyisiä muokkaustoimintoja varten.
+
 ### Changed
 
 ### Fixed

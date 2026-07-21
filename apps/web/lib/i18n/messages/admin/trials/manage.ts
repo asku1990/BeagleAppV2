@@ -40,6 +40,11 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.events.columns.name": "Tapahtuma",
   "admin.trials.manage.events.columns.judge": "Ylituomari",
   "admin.trials.manage.events.columns.dogs": "Koiria",
+  "admin.trials.manage.workspace.title": "Ajokoetapahtuma",
+  "admin.trials.manage.workspace.notFound": "Ajokoetapahtumaa ei löytynyt.",
+  "admin.trials.manage.workspace.error":
+    "Ajokoetapahtuman lataaminen epäonnistui.",
+  "admin.trials.manage.workspace.retry": "Yritä uudelleen",
   "admin.trials.manage.selected.title": "Valittu tapahtuma",
   "admin.trials.manage.selected.subtitle":
     "Tapahtuman koirarivit ja rivikohtaiset toiminnot.",
@@ -60,6 +65,7 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.selected.columns.actions": "Toiminnot",
   "admin.trials.manage.selected.actions.openPdf": "Avaa pöytäkirja",
   "admin.trials.manage.selected.actions.more": "Lisää toimintoja",
+  "admin.trials.manage.selected.actions.openWorkspace": "Avaa tapahtuman sivu",
   "admin.trials.manage.selected.actions.editEvent": "Muokkaa tapahtumaa",
   "admin.trials.manage.selected.actions.editEntry": "Muokkaa riviä",
   "admin.trials.manage.entryModal.header.title": "Muokattava koerivi",
@@ -167,6 +173,12 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.events.columns.name": "Evenemang",
   "admin.trials.manage.events.columns.judge": "Överdomare",
   "admin.trials.manage.events.columns.dogs": "Hundar",
+  "admin.trials.manage.workspace.title": "Jaktprovsevenemang",
+  "admin.trials.manage.workspace.notFound":
+    "Jaktprovsevenemanget hittades inte.",
+  "admin.trials.manage.workspace.error":
+    "Det gick inte att ladda jaktprovsevenemanget.",
+  "admin.trials.manage.workspace.retry": "Försök igen",
   "admin.trials.manage.selected.title": "Valt evenemang",
   "admin.trials.manage.selected.subtitle":
     "Hundrader och radåtgärder för valt evenemang.",
@@ -186,6 +198,7 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.selected.columns.actions": "Åtgärder",
   "admin.trials.manage.selected.actions.openPdf": "Öppna protokoll",
   "admin.trials.manage.selected.actions.more": "Fler åtgärder",
+  "admin.trials.manage.selected.actions.openWorkspace": "Öppna evenemangssidan",
   "admin.trials.manage.selected.actions.editEvent": "Redigera evenemang",
   "admin.trials.manage.selected.actions.editEntry": "Redigera rad",
   "admin.trials.manage.entryModal.header.title": "Redigerad provrad",

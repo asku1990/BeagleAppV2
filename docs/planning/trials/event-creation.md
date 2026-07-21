@@ -28,12 +28,16 @@ Rules:
 
 ### Scope
 
-- Add a dedicated admin event workspace route for one `trialEventId`.
+- Add a dedicated `/admin/trials/[trialEventId]` workspace route for one
+  `trialEventId`.
 - Reuse the existing admin event detail query, event summary, result list,
   event-edit action, result-edit modal, PDF action, and result-delete action
   where practical.
 - Add an explicit way to open the workspace from the current trials page.
 - Provide loading, missing-event, and read-error states on the workspace.
+- Provide retry for generic read failures.
+- Never select or display a different event when the requested event is
+  missing.
 - Keep authorization at the existing admin layout and backend boundaries.
 
 ### Exclusions
@@ -57,12 +61,17 @@ Rules:
 - Existing edit, PDF, and result-delete actions retain their current behavior.
 - Missing and inaccessible event states are handled without falling back to a
   different event.
+- Deleting a non-final result or failing to delete a result leaves the admin on
+  the workspace. If current final-result deletion also deletes the event, the
+  workspace returns to `/admin/trials`.
 - The current trials list continues to work as before.
 
 ### Targeted validation
 
 - Add focused route/component tests for loading, success, missing, and error
   states.
+- Cover retry, workspace navigation, no self-link, no missing-event fallback,
+  and all current result-deletion outcomes.
 - Run the existing selected-event component and action tests affected by reuse.
 - Run targeted web type checking and linting for touched code.
 - Manually verify the workspace at desktop and mobile widths when browser

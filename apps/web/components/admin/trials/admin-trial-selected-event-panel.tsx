@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import {
   ListingSectionShell,
   ListingResponsiveResults,
@@ -33,6 +34,7 @@ type AdminTrialSelectedEventPanelProps = {
   isError: boolean;
   errorText: string;
   onDeletedTrialEvent: (deletedTrialEventId: string) => void;
+  workspaceHref?: string;
 };
 
 const EMPTY_ENTRIES: AdminTrialEventEntry[] = [];
@@ -43,6 +45,7 @@ export function AdminTrialSelectedEventPanel({
   isError,
   errorText,
   onDeletedTrialEvent,
+  workspaceHref,
 }: AdminTrialSelectedEventPanelProps) {
   const { t } = useI18n();
   const [isEditOpen, setIsEditOpen] = React.useState(false);
@@ -163,16 +166,27 @@ export function AdminTrialSelectedEventPanel({
                     </p>
                   </div>
                 </div>
-                <Button
-                  type="button"
-                  onClick={() => {
-                    setEditError(null);
-                    setIsEditOpen(true);
-                  }}
-                  disabled={updateMutation.isPending}
-                >
-                  {t("admin.trials.manage.selected.actions.editEvent")}
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  {workspaceHref ? (
+                    <Button asChild variant="outline">
+                      <Link href={workspaceHref}>
+                        {t(
+                          "admin.trials.manage.selected.actions.openWorkspace",
+                        )}
+                      </Link>
+                    </Button>
+                  ) : null}
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setEditError(null);
+                      setIsEditOpen(true);
+                    }}
+                    disabled={updateMutation.isPending}
+                  >
+                    {t("admin.trials.manage.selected.actions.editEvent")}
+                  </Button>
+                </div>
               </div>
             </div>
             <SelectedEventEntries
