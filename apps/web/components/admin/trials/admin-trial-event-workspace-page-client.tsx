@@ -22,11 +22,9 @@ export function AdminTrialEventWorkspacePageClient({
 
   return (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {t("admin.trials.manage.workspace.title")}
-        </h1>
-      </div>
+      <h1 className="text-2xl font-semibold tracking-tight">
+        {t("admin.trials.manage.workspace.title")}
+      </h1>
 
       {eventQuery.isError ? (
         <Card>
