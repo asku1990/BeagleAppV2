@@ -88,9 +88,8 @@ separate approval.
   place. Keep the remaining existing event metadata fields optional.
 - Reject creation when the unique `TrialEvent.sklKoeId` already belongs to an
   event; do not turn a create request into an update.
-- Resolve `trialRuleWindowId` from the event date using the existing active
-  rule-window behavior. When the event date is edited later, keep its resolved
-  rule window consistent with the new date.
+- During event creation, resolve the initial `trialRuleWindowId` from the
+  entered event date using the existing active rule-window behavior.
 - Change result deletion so removing the final `TrialEntry` leaves the
   `TrialEvent` persisted and empty.
 - Add explicit event deletion that succeeds only when the event has zero
@@ -115,6 +114,9 @@ persisted event workspace.
 - No automatic cleanup or expiry for empty events.
 - No cascade deletion of a non-empty event.
 - No redesign of the trials index or existing result-edit modal.
+- No change to later event-edit behavior, including rule-window recalculation
+  when an existing event date is edited. Any such change requires its own
+  approved planning change.
 - No public UI, statistics, or import redesign.
 
 ### Dependencies
@@ -126,7 +128,8 @@ persisted event workspace.
 ### Acceptance criteria
 
 - An authorized admin can create an event with the required identity fields
-  and optional existing event metadata.
+  and optional existing event metadata, with its initial `trialRuleWindowId`
+  resolved from the entered event date.
 - Invalid required values and an already-used SKL ID return stable validation
   or conflict errors without creating an event.
 - The created event is visible to admin reads, opens in its workspace, and is
