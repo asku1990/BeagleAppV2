@@ -7,16 +7,20 @@ and follow-up admin flow redesign).
 
 - The admin list page is an event-first master-detail workflow for canonical
   AJOK `TrialEvent` + `TrialEntry` rows.
-- An admin can search events, select one event, inspect and edit its metadata
-  and dog rows, delete a result, or open the event at the stable
+- An admin can create and search events, select one event, inspect and edit its
+  metadata and dog rows, delete a result, or open the event at the stable
   `/admin/trials/[trialEventId]` workspace URL.
+- Empty events remain available to administrators. They can be deleted
+  explicitly from their workspace, but only while they have no result rows.
 - Per-dog inspection opens the generated trial PDF. Existing event and result
   editing remains modal-based.
 
 ## Main files
 
 - `apps/web/app/(admin)/admin/trials/page.tsx`: route entrypoint for event master-detail list
+- `apps/web/app/(admin)/admin/trials/new/page.tsx`: full-page event creation route
 - `apps/web/app/(admin)/admin/trials/[trialEventId]/page.tsx`: stable event workspace route
+- `apps/web/components/admin/trials/admin-trial-event-create-page-client.tsx`: event creation form and continuation
 - `apps/web/components/admin/trials/admin-trials-page-client.tsx`: event filters + event list + selected-event rows
 - `apps/web/components/admin/trials/admin-trial-event-workspace-page-client.tsx`: one-event workspace states and navigation
 - `apps/web/components/admin/trials/admin-trial-selected-event-panel.tsx`: selected-event rows and row actions
@@ -37,8 +41,9 @@ and follow-up admin flow redesign).
 2. Event selection fetches selected event rows through `useAdminTrialEventQuery`.
 3. The selected-event panel links to the stable event workspace, which fetches
    only the `trialEventId` from its route.
-4. Event and result changes use the existing admin mutations; the PDF action
+4. Event and result changes use admin Server Action mutations; the PDF action
    opens `/api/trials/[trialEntryId]/pdf` in a new tab.
+5. Successful event creation opens the persisted empty event workspace.
 
 ## Contract rules
 
@@ -46,6 +51,10 @@ and follow-up admin flow redesign).
   `page`, `filters`, `availableYears`, `items[]`).
 - Event detail response: one event (`event`) with event header fields and
   selected dog rows (`entries[]`).
+- Event creation requires a positive `sklKoeId`, an ISO date, and a non-empty
+  place. Duplicate SKL IDs return `SKL_KOE_ID_CONFLICT`.
+- Empty event deletion returns `TRIAL_EVENT_NOT_EMPTY` if result rows are
+  present and `TRIAL_EVENT_NOT_FOUND` if the event no longer exists.
 - `TRIAL_EVENT_NOT_FOUND` is returned for missing event IDs.
 - After BEJ-81 switch, event/list identifiers are:
   - `sklKoeId` (preferred when available)
@@ -58,13 +67,17 @@ and follow-up admin flow redesign).
 - Selected dog rows have PDF, edit, and result-delete actions.
 - A missing workspace event is shown explicitly and never falls back to a
   different event.
-- Until BEJ-103 Gate E2 changes the lifecycle, deleting the final result also
-  deletes its event. The workspace then returns to `/admin/trials`; non-final
-  and failed deletions remain on the workspace.
+- Deleting the final result leaves its event persisted and displays the valid
+  empty-event state in the workspace.
+- Explicit event deletion is offered only for an empty event and is enforced
+  by both the server and database write. Successful deletion returns to
+  `/admin/trials`; failed deletion remains on the workspace.
 
 ## Tests
 
+- `apps/web/app/(admin)/admin/trials/new/__tests__/page.test.tsx`
 - `apps/web/app/(admin)/admin/trials/[trialEventId]/__tests__/page.test.tsx`
+- `apps/web/components/admin/trials/__tests__/admin-trial-event-create-page-client.test.tsx`
 - `apps/web/components/admin/trials/__tests__/admin-trial-event-workspace-page-client.test.tsx`
 - `apps/web/components/admin/trials/__tests__/admin-trials-page-client.test.tsx`
 - `apps/web/components/admin/trials/__tests__/admin-trial-entry-actions.test.tsx`

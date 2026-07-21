@@ -23,6 +23,9 @@ describe("admin trial message index", () => {
         "admin.trials.manage.selected.actions.openWorkspace"
       ],
     ).toBe("Avaa tapahtuman sivu");
+    expect(fiAdminTrialsMessages["admin.trials.manage.create.action"]).toBe(
+      "Luo tapahtuma",
+    );
     expect(svAdminTrialsMessages["admin.trials.manage.events.title"]).toBe(
       "Evenemang",
     );
@@ -43,5 +46,8 @@ describe("admin trial message index", () => {
         "admin.trials.manage.selected.actions.openWorkspace"
       ],
     ).toBe("Öppna evenemangssidan");
+    expect(svAdminTrialsMessages["admin.trials.manage.create.action"]).toBe(
+      "Skapa evenemang",
+    );
   });
 });

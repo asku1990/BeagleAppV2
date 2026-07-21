@@ -72,6 +72,11 @@ vi.mock("../admin-trial-event-edit-dialog", () => ({
     React.createElement("div", null, `edit-dialog-${open}`),
 }));
 
+vi.mock("../admin-trial-event-delete-action", () => ({
+  AdminTrialEventDeleteAction: ({ trialEventId }: { trialEventId: string }) =>
+    React.createElement("div", null, `delete-event-${trialEventId}`),
+}));
+
 vi.mock("@/queries/admin/trials", () => ({
   useUpdateAdminTrialEventMutation: () => ({
     mutateAsync: vi.fn(),
@@ -163,5 +168,34 @@ describe("AdminTrialSelectedEventPanel", () => {
     expect(html).toContain(
       "admin.trials.manage.selected.actions.openWorkspace",
     );
+  });
+
+  it("shows event deletion only for an empty event when explicitly allowed", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(AdminTrialSelectedEventPanel, {
+        selectedEvent: {
+          trialEventId: "event-1",
+          eventDate: "2026-04-14",
+          eventPlace: "Helsinki",
+          eventName: null,
+          jarjestaja: null,
+          ylituomari: null,
+          ylituomariNumero: null,
+          ytKertomus: null,
+          kennelpiiri: null,
+          kennelpiirinro: null,
+          sklKoeId: 12345,
+          dogCount: 0,
+          entries: [],
+        },
+        isLoading: false,
+        isError: false,
+        errorText: "error",
+        onDeletedTrialEvent: vi.fn(),
+        allowEmptyEventDeletion: true,
+      }),
+    );
+
+    expect(html).toContain("delete-event-event-1");
   });
 });

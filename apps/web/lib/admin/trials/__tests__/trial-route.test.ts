@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { getAdminTrialEventHref, getAdminTrialsHref } from "../trial-route";
+import {
+  getAdminTrialEventCreateHref,
+  getAdminTrialEventHref,
+  getAdminTrialsHref,
+} from "../trial-route";
 
 describe("admin trial route helpers", () => {
   it("returns the admin trials root", () => {
@@ -8,6 +12,10 @@ describe("admin trial route helpers", () => {
 
   it("builds an event workspace href", () => {
     expect(getAdminTrialEventHref("event-1")).toBe("/admin/trials/event-1");
+  });
+
+  it("builds the event creation href", () => {
+    expect(getAdminTrialEventCreateHref()).toBe("/admin/trials/new");
   });
 
   it("encodes the event id as one path segment", () => {

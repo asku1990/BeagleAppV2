@@ -3,7 +3,6 @@
 import React, { useMemo, useState } from "react";
 import { AdminFormModalShell } from "@/components/admin";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useI18n } from "@/hooks/i18n";
 import type { AdminTrialEventDetails } from "@beagle/contracts";
 import {
@@ -11,6 +10,7 @@ import {
   parseSklKoeIdDraft,
   toTrialEventDraft,
 } from "./admin-trial-event-edit-dialog-helpers";
+import { AdminTrialEventFormFields } from "./admin-trial-event-form-fields";
 
 export type UpdateAdminTrialEventPayload = {
   trialEventId: string;
@@ -197,135 +197,12 @@ function AdminTrialEventEditDialogContent({
           <p className="text-sm text-destructive">{errorText}</p>
         ) : null}
       </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        <label className="space-y-1 text-sm">
-          <span>{t("admin.trials.manage.eventModal.fields.eventDate")}</span>
-          <Input
-            type="date"
-            value={draft.eventDate}
-            disabled={isPending}
-            onChange={(event) =>
-              setDraft((current) => ({
-                ...current,
-                eventDate: event.target.value,
-              }))
-            }
-          />
-        </label>
-        <label className="space-y-1 text-sm">
-          <span>{t("admin.trials.manage.eventModal.fields.eventPlace")}</span>
-          <Input
-            value={draft.eventPlace}
-            disabled={isPending}
-            onChange={(event) =>
-              setDraft((current) => ({
-                ...current,
-                eventPlace: event.target.value,
-              }))
-            }
-          />
-        </label>
-        <label className="space-y-1 text-sm">
-          <span>{t("admin.trials.manage.eventModal.fields.jarjestaja")}</span>
-          <Input
-            value={draft.jarjestaja}
-            disabled={isPending}
-            onChange={(event) =>
-              setDraft((current) => ({
-                ...current,
-                jarjestaja: event.target.value,
-              }))
-            }
-          />
-        </label>
-        <label className="space-y-1 text-sm">
-          <span>{t("admin.trials.manage.eventModal.fields.ylituomari")}</span>
-          <Input
-            value={draft.ylituomari}
-            disabled={isPending}
-            onChange={(event) =>
-              setDraft((current) => ({
-                ...current,
-                ylituomari: event.target.value,
-              }))
-            }
-          />
-          <span className="block text-xs text-muted-foreground">
-            {t("admin.trials.manage.eventModal.fields.ylituomariHelp")}
-          </span>
-        </label>
-        <label className="space-y-1 text-sm">
-          <span>
-            {t("admin.trials.manage.eventModal.fields.ylituomariNumero")}
-          </span>
-          <Input
-            value={draft.ylituomariNumero}
-            disabled={isPending}
-            onChange={(event) =>
-              setDraft((current) => ({
-                ...current,
-                ylituomariNumero: event.target.value,
-              }))
-            }
-          />
-        </label>
-        <label className="space-y-1 text-sm md:col-span-2">
-          <span>{t("admin.trials.manage.eventModal.fields.ytKertomus")}</span>
-          <textarea
-            value={draft.ytKertomus}
-            disabled={isPending}
-            onChange={(event) =>
-              setDraft((current) => ({
-                ...current,
-                ytKertomus: event.target.value,
-              }))
-            }
-            className="min-h-24 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-          />
-        </label>
-        <label className="space-y-1 text-sm">
-          <span>{t("admin.trials.manage.eventModal.fields.kennelpiiri")}</span>
-          <Input
-            value={draft.kennelpiiri}
-            disabled={isPending}
-            onChange={(event) =>
-              setDraft((current) => ({
-                ...current,
-                kennelpiiri: event.target.value,
-              }))
-            }
-          />
-        </label>
-        <label className="space-y-1 text-sm">
-          <span>
-            {t("admin.trials.manage.eventModal.fields.kennelpiirinro")}
-          </span>
-          <Input
-            value={draft.kennelpiirinro}
-            disabled={isPending}
-            onChange={(event) =>
-              setDraft((current) => ({
-                ...current,
-                kennelpiirinro: event.target.value,
-              }))
-            }
-          />
-        </label>
-        <label className="space-y-1 text-sm">
-          <span>{t("admin.trials.manage.eventModal.fields.sklKoeId")}</span>
-          <Input
-            inputMode="numeric"
-            value={draft.sklKoeId}
-            disabled={isPending}
-            onChange={(event) =>
-              setDraft((current) => ({
-                ...current,
-                sklKoeId: event.target.value,
-              }))
-            }
-          />
-        </label>
-      </div>
+      <AdminTrialEventFormFields
+        draft={draft}
+        disabled={isPending}
+        onChange={setDraft}
+        showJudgeUpdateHelp
+      />
     </AdminFormModalShell>
   );
 }

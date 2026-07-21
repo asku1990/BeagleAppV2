@@ -45,6 +45,28 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.workspace.error":
     "Ajokoetapahtuman lataaminen epäonnistui.",
   "admin.trials.manage.workspace.retry": "Yritä uudelleen",
+  "admin.trials.manage.create.action": "Luo tapahtuma",
+  "admin.trials.manage.create.title": "Luo ajokoetapahtuma",
+  "admin.trials.manage.create.description":
+    "Tallenna tapahtuman perustiedot. Koirakohtaiset tulokset lisätään myöhemmin.",
+  "admin.trials.manage.create.save": "Luo tapahtuma",
+  "admin.trials.manage.create.saving": "Luodaan...",
+  "admin.trials.manage.create.cancel": "Peruuta",
+  "admin.trials.manage.create.error": "Tapahtuman luominen epäonnistui.",
+  "admin.trials.manage.create.conflict":
+    "Annettu SKL koe ID kuuluu jo toiselle tapahtumalle.",
+  "admin.trials.manage.deleteEvent.action": "Poista tapahtuma",
+  "admin.trials.manage.deleteEvent.confirmTitle": "Poistetaanko tapahtuma?",
+  "admin.trials.manage.deleteEvent.confirmBody":
+    "Tyhjä tapahtuma poistetaan pysyvästi. Tapahtumaa, jolla on tuloksia, ei voi poistaa.",
+  "admin.trials.manage.deleteEvent.confirm": "Poista tapahtuma",
+  "admin.trials.manage.deleteEvent.deleting": "Poistetaan...",
+  "admin.trials.manage.deleteEvent.cancel": "Peruuta",
+  "admin.trials.manage.deleteEvent.success": "Tapahtuma poistettiin.",
+  "admin.trials.manage.deleteEvent.error":
+    "Tapahtuman poistaminen epäonnistui.",
+  "admin.trials.manage.deleteEvent.notEmpty":
+    "Tapahtumaa ei voi poistaa, koska sillä on koetuloksia.",
   "admin.trials.manage.selected.title": "Valittu tapahtuma",
   "admin.trials.manage.selected.subtitle":
     "Tapahtuman koirarivit ja rivikohtaiset toiminnot.",
@@ -79,7 +101,7 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.selected.actions.delete.confirmTitle":
     "Poistetaanko tämä koetulos?",
   "admin.trials.manage.selected.actions.delete.confirmBody":
-    "Tämä poistaa vain tämän koirakohtaisen koetuloksen.\nJos tämä oli tapahtuman viimeinen tulos, myös tyhjä koetapahtuma poistetaan.",
+    "Tämä poistaa vain tämän koirakohtaisen koetuloksen. Jos tämä oli tapahtuman viimeinen tulos, tyhjä koetapahtuma säilyy.",
   "admin.trials.manage.selected.actions.delete.confirmDog": "Koira",
   "admin.trials.manage.selected.actions.delete.confirmRegistration":
     "Rekisterinumero",
@@ -179,6 +201,28 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.workspace.error":
     "Det gick inte att ladda jaktprovsevenemanget.",
   "admin.trials.manage.workspace.retry": "Försök igen",
+  "admin.trials.manage.create.action": "Skapa evenemang",
+  "admin.trials.manage.create.title": "Skapa jaktprovsevenemang",
+  "admin.trials.manage.create.description":
+    "Spara evenemangets grunduppgifter. Hundspecifika resultat läggs till senare.",
+  "admin.trials.manage.create.save": "Skapa evenemang",
+  "admin.trials.manage.create.saving": "Skapar...",
+  "admin.trials.manage.create.cancel": "Avbryt",
+  "admin.trials.manage.create.error": "Det gick inte att skapa evenemanget.",
+  "admin.trials.manage.create.conflict":
+    "Det angivna SKL prov-ID:t används redan av ett annat evenemang.",
+  "admin.trials.manage.deleteEvent.action": "Ta bort evenemang",
+  "admin.trials.manage.deleteEvent.confirmTitle": "Ta bort evenemanget?",
+  "admin.trials.manage.deleteEvent.confirmBody":
+    "Det tomma evenemanget tas bort permanent. Ett evenemang med resultat kan inte tas bort.",
+  "admin.trials.manage.deleteEvent.confirm": "Ta bort evenemang",
+  "admin.trials.manage.deleteEvent.deleting": "Tar bort...",
+  "admin.trials.manage.deleteEvent.cancel": "Avbryt",
+  "admin.trials.manage.deleteEvent.success": "Evenemanget togs bort.",
+  "admin.trials.manage.deleteEvent.error":
+    "Det gick inte att ta bort evenemanget.",
+  "admin.trials.manage.deleteEvent.notEmpty":
+    "Evenemanget kan inte tas bort eftersom det har provresultat.",
   "admin.trials.manage.selected.title": "Valt evenemang",
   "admin.trials.manage.selected.subtitle":
     "Hundrader och radåtgärder för valt evenemang.",
@@ -212,7 +256,7 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.selected.actions.delete.confirmTitle":
     "Ta bort det här provresultatet?",
   "admin.trials.manage.selected.actions.delete.confirmBody":
-    "Det här tar bara bort det här hundspecifika provresultatet.\nOm detta var det sista resultatet i evenemanget tas även det tomma provevenemanget bort.",
+    "Det här tar bara bort det hundspecifika provresultatet. Om det var evenemangets sista resultat bevaras det tomma evenemanget.",
   "admin.trials.manage.selected.actions.delete.confirmDog": "Hund",
   "admin.trials.manage.selected.actions.delete.confirmRegistration":
     "Registrering",

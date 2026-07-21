@@ -60,6 +60,8 @@ export function AdminTrialEventWorkspacePageClient({
           isError={false}
           errorText={t("admin.trials.manage.workspace.error")}
           onDeletedTrialEvent={() => router.replace(getAdminTrialsHref())}
+          onTrialEventDeleteConflict={() => void eventQuery.refetch()}
+          allowEmptyEventDeletion
         />
       )}
     </div>

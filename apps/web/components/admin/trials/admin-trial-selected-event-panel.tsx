@@ -27,6 +27,7 @@ import {
   type UpdateAdminTrialEventPayload,
 } from "./admin-trial-event-edit-dialog";
 import { AdminTrialEntryEditDialog } from "./admin-trial-entry-edit-dialog";
+import { AdminTrialEventDeleteAction } from "./admin-trial-event-delete-action";
 
 type AdminTrialSelectedEventPanelProps = {
   selectedEvent: AdminTrialEventDetails | null;
@@ -34,6 +35,8 @@ type AdminTrialSelectedEventPanelProps = {
   isError: boolean;
   errorText: string;
   onDeletedTrialEvent: (deletedTrialEventId: string) => void;
+  onTrialEventDeleteConflict?: () => void;
+  allowEmptyEventDeletion?: boolean;
   workspaceHref?: string;
 };
 
@@ -45,6 +48,8 @@ export function AdminTrialSelectedEventPanel({
   isError,
   errorText,
   onDeletedTrialEvent,
+  onTrialEventDeleteConflict,
+  allowEmptyEventDeletion = false,
   workspaceHref,
 }: AdminTrialSelectedEventPanelProps) {
   const { t } = useI18n();
@@ -186,6 +191,13 @@ export function AdminTrialSelectedEventPanel({
                   >
                     {t("admin.trials.manage.selected.actions.editEvent")}
                   </Button>
+                  {allowEmptyEventDeletion && selectedEntries.length === 0 ? (
+                    <AdminTrialEventDeleteAction
+                      trialEventId={selectedEvent.trialEventId}
+                      onDeleted={onDeletedTrialEvent}
+                      onNotEmpty={() => onTrialEventDeleteConflict?.()}
+                    />
+                  ) : null}
                 </div>
               </div>
             </div>

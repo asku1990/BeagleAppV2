@@ -15,8 +15,12 @@ This project uses a user-facing changelog format.
 ### Added
 
 - Ylläpitäjä voi avata ajokoetapahtuman omalle sivulleen tarkastelua ja nykyisiä muokkaustoimintoja varten.
+- Ylläpitäjä voi luoda ajokoetapahtuman perustietoineen ja avata sen omalle sivulleen ennen koetulosten lisäämistä.
+- Ylläpitäjä voi poistaa tyhjän ajokoetapahtuman sen omalta sivulta.
 
 ### Changed
+
+- Viimeisen koetuloksen poistaminen säilyttää ajokoetapahtuman tyhjänä, kunnes ylläpitäjä poistaa tapahtuman erikseen.
 
 ### Fixed
 
