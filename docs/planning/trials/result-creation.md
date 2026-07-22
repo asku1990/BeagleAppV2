@@ -231,15 +231,15 @@ No preserved environment may consume the edited migration incrementally.
 Implementation and validation must not:
 
 - run `prisma migrate reset`;
-- run any other Prisma migration, deploy, resolve, status, `db push`, or client
-  generation command;
+- run any other Prisma migration, deploy, resolve, status, or `db push`
+  command;
 - reset, recreate, or modify any local or remote database automatically;
 - attempt to resolve migration checksum drift automatically; or
 - run a fresh bootstrap without separate explicit approval.
 
-The user owns all Prisma migration, database, bootstrap, and client-generation
-commands. If the unchanged generated client prevents a local type check, report
-that limitation instead of regenerating it.
+The user owns all Prisma migration, database, and bootstrap commands. Prisma
+client generation is allowed when required by the approved schema changes and
+must not connect to or modify a database.
 
 ## Explicit exclusions
 

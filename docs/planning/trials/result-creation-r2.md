@@ -54,9 +54,12 @@ backend message strings to determine behavior.
   action opens the first result form for the newly persisted event.
 - Define cancel and browser navigation:
   - Cancel returns to the event workspace.
-  - Dirty cancel and browser-back navigation use a localized native
-    confirmation before discarding values.
-  - Refresh and tab/window close use browser-native unsaved-change protection.
+  - Dirty cancel uses a localized application confirmation dialog before
+    discarding values.
+  - Browser-back and internal navigation use a route-blocking application
+    confirmation where technically supported.
+  - Refresh and tab/window close use browser-native unsaved-change protection
+    with browser-controlled wording.
   - Clean browser back returns to the event workspace without confirmation.
   - A failed or rejected save stays on the populated form.
 - Add Finnish and Swedish labels, helper text, validation messages, stable
