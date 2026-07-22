@@ -4,14 +4,14 @@ import type {
   BeagleTrialSearchMode,
   BeagleTrialSearchResponse,
 } from "@beagle/contracts";
-import { toBusinessDateOnly } from "../core/date-only";
 import { toErrorLog, withLogContext } from "../core/logger";
 import type { ServiceResult } from "../core/result";
 import {
-  getTrialBusinessDateUtcRange,
-  getTrialBusinessYearUtcRange,
-  toTrialBusinessYear,
-} from "./core/business-date";
+  getTrialDateOnlyUtcRange,
+  getTrialDateOnlyYearUtcRange,
+  formatTrialDateOnly,
+  toTrialDateOnlyYear,
+} from "./core/date-only";
 import { parseIsoDateOnly } from "./internal/iso-date";
 import type { TrialsServiceLogContext } from "./types";
 
@@ -49,7 +49,7 @@ function parseYear(value: number | undefined): number | null {
 
 function collectAvailableYears(availableEventDates: Date[]): number[] {
   return Array.from(
-    new Set(availableEventDates.map((value) => toTrialBusinessYear(value))),
+    new Set(availableEventDates.map((value) => toTrialDateOnlyYear(value))),
   ).sort((left, right) => right - left);
 }
 
@@ -187,11 +187,10 @@ export async function searchBeagleTrialsService(
 
   try {
     const rangeFromDate = dateFromIso
-      ? getTrialBusinessDateUtcRange(new Date(`${dateFromIso}T00:00:00.000Z`))
-          .start
+      ? getTrialDateOnlyUtcRange(new Date(`${dateFromIso}T00:00:00.000Z`)).start
       : null;
     const rangeToExclusive = dateToIso
-      ? getTrialBusinessDateUtcRange(new Date(`${dateToIso}T00:00:00.000Z`))
+      ? getTrialDateOnlyUtcRange(new Date(`${dateToIso}T00:00:00.000Z`))
           .endExclusive
       : null;
 
@@ -204,7 +203,7 @@ export async function searchBeagleTrialsService(
     let result: Awaited<ReturnType<typeof searchBeagleTrialsDb>>;
 
     if (resolvedMode === "year") {
-      const yearRange = getTrialBusinessYearUtcRange(year ?? 0);
+      const yearRange = getTrialDateOnlyYearUtcRange(year ?? 0);
       if (!yearRange) {
         throw new Error("Failed to build trial year range.");
       }
@@ -240,7 +239,7 @@ export async function searchBeagleTrialsService(
       if (!latestYear) {
         result = available;
       } else {
-        const yearRange = getTrialBusinessYearUtcRange(latestYear);
+        const yearRange = getTrialDateOnlyYearUtcRange(latestYear);
         if (!yearRange) {
           throw new Error("Failed to build trial year range.");
         }
@@ -270,7 +269,7 @@ export async function searchBeagleTrialsService(
       page: result.page,
       items: result.items.map((item) => ({
         trialId: item.trialEventId,
-        eventDate: toBusinessDateOnly(item.eventDate),
+        eventDate: formatTrialDateOnly(item.eventDate),
         eventPlace: item.eventPlace,
         judge: item.judge,
         dogCount: item.dogCount,

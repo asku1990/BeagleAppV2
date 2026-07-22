@@ -14,6 +14,8 @@ and follow-up admin flow redesign).
   explicitly from their workspace, but only while they have no result rows.
 - Per-dog inspection opens the generated trial PDF. Existing event and result
   editing remains modal-based.
+- The R1 backend contract can create one manual result at a time through an
+  admin Server Action. It is intentionally not linked to a UI until R2.
 
 ## Main files
 
@@ -44,6 +46,9 @@ and follow-up admin flow redesign).
 4. Event and result changes use admin Server Action mutations; the PDF action
    opens `/api/trials/[trialEntryId]/pdf` in a new tab.
 5. Successful event creation opens the persisted empty event workspace.
+6. Manual result creation validates and canonicalizes the typed registration,
+   then atomically creates the entry, eras, and lisätiedot. A matching local
+   `DogRegistration` links the dog; an unknown registration remains unlinked.
 
 ## Contract rules
 
@@ -53,6 +58,13 @@ and follow-up admin flow redesign).
   selected dog rows (`entries[]`).
 - Event creation requires a positive `sklKoeId`, an ISO date, and a non-empty
   place. Duplicate SKL IDs return `SKL_KOE_ID_CONFLICT`.
+- Manual result identity is `SKL:<sklKoeId>|REG:<canonicalRegistration>` and
+  uses source `MANUAL_ADMIN`. Duplicate registration within an event returns
+  `TRIAL_ENTRY_REGISTRATION_CONFLICT`.
+- Manual result writes require each normalized lisätieto `(koodi, osa)` pair
+  to occur only once across the submitted matrix rows.
+- `TrialEvent.koepaiva` is a PostgreSQL `DATE`; all trial contracts serialize
+  it as timezone-free `YYYY-MM-DD`.
 - Empty event deletion returns `TRIAL_EVENT_NOT_EMPTY` if result rows are
   present and `TRIAL_EVENT_NOT_FOUND` if the event no longer exists.
 - `TRIAL_EVENT_NOT_FOUND` is returned for missing event IDs.

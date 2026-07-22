@@ -4,7 +4,7 @@ import type {
   AdminTrialEventDetailsResponse,
   CurrentUserDto,
 } from "@beagle/contracts";
-import { toBusinessDateOnly } from "@server/core/date-only";
+import { formatTrialDateOnly } from "@server/trials/core/date-only";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
 import { requireAdmin } from "@server/admin/core/service";
@@ -74,7 +74,7 @@ export async function getAdminTrialEvent(
         data: {
           event: {
             trialEventId: result.trialEventId,
-            eventDate: toBusinessDateOnly(result.eventDate),
+            eventDate: formatTrialDateOnly(result.eventDate),
             eventPlace: result.eventPlace,
             eventName: result.eventName,
             jarjestaja: result.jarjestaja,

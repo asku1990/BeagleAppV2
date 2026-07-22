@@ -7,6 +7,8 @@ const { upsertDbMock, listActiveRuleWindowsMock } = vi.hoisted(() => ({
 }));
 
 vi.mock("@beagle/db", () => ({
+  buildTrialEntryIdentity: (sklKoeId: number, registrationNo: string) =>
+    `SKL:${sklKoeId}|REG:${registrationNo}`,
   DogSex: {
     MALE: "MALE",
     FEMALE: "FEMALE",

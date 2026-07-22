@@ -6,6 +6,11 @@ export {
   type CreateAdminTrialEventWriteResultDb,
 } from "./create-trial-event";
 export {
+  createAdminTrialEntryWriteDb,
+  type CreateAdminTrialEntryWriteRequestDb,
+  type CreateAdminTrialEntryWriteResultDb,
+} from "./create-trial-entry";
+export {
   deleteAdminTrialEventWriteDb,
   type DeleteAdminTrialEventWriteRequestDb,
   type DeleteAdminTrialEventWriteResultDb,
@@ -25,6 +30,7 @@ export {
   type UpdateAdminTrialEntryWriteRequestDb,
   type UpdateAdminTrialEntryWriteResultDb,
 } from "./update-trial-entry";
+export type { AdminTrialEntryWriteDataDb } from "./trial-entry-write";
 export type {
   AdminTrialEventDetailsDb,
   AdminTrialEventDetailsRequestDb,

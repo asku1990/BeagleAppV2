@@ -3,7 +3,7 @@ import type {
   AdminTrialEventSearchSort,
 } from "@beagle/contracts";
 import type { AdminTrialEventSearchSortDb } from "@beagle/db";
-import { getTrialBusinessDateUtcRange } from "@server/trials/core/business-date";
+import { getTrialDateOnlyUtcRange } from "@server/trials/core/date-only";
 
 export type ParsedAdminTrialEventSearchInput = {
   query: string;
@@ -201,11 +201,10 @@ export function parseAdminTrialEventSearchInput(
   const query = normalizeQuery(input.query);
   const mode = year != null ? "year" : hasRangeInput ? "range" : null;
   const rangeFromDate = dateFromIso
-    ? getTrialBusinessDateUtcRange(new Date(`${dateFromIso}T00:00:00.000Z`))
-        .start
+    ? getTrialDateOnlyUtcRange(new Date(`${dateFromIso}T00:00:00.000Z`)).start
     : null;
   const rangeToExclusive = dateToIso
-    ? getTrialBusinessDateUtcRange(new Date(`${dateToIso}T00:00:00.000Z`))
+    ? getTrialDateOnlyUtcRange(new Date(`${dateToIso}T00:00:00.000Z`))
         .endExclusive
     : null;
 

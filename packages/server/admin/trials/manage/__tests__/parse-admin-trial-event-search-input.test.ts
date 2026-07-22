@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getTrialBusinessDateStartUtc } from "@server/trials/core/business-date";
+import { getTrialDateOnlyStartUtc } from "@server/trials/core/date-only";
 import { parseAdminTrialEventSearchInput } from "../internal/parse-admin-trial-event-search-input";
 
 describe("parseAdminTrialEventSearchInput", () => {
@@ -46,8 +46,8 @@ describe("parseAdminTrialEventSearchInput", () => {
         year: null,
         dateFromIso: "2026-06-01",
         dateToIso: "2026-06-30",
-        rangeFromDate: getTrialBusinessDateStartUtc("2026-06-01"),
-        rangeToExclusive: getTrialBusinessDateStartUtc("2026-07-01"),
+        rangeFromDate: getTrialDateOnlyStartUtc("2026-06-01"),
+        rangeToExclusive: getTrialDateOnlyStartUtc("2026-07-01"),
       },
     });
   });

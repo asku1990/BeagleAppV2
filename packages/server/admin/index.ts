@@ -22,6 +22,7 @@ export { deleteAdminDogDisease } from "./dogs";
 export { listAdminTrialEvents } from "./trials";
 export { getAdminTrialEvent } from "./trials";
 export { createAdminTrialEvent } from "./trials";
+export { createAdminTrialEntry } from "./trials";
 export { deleteAdminTrialEvent } from "./trials";
 export { deleteAdminTrialEntry } from "./trials";
 export { updateAdminTrialEvent } from "./trials";

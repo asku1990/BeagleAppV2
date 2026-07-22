@@ -73,6 +73,7 @@ enum ShowSourceTag {
 
 enum TrialSourceTag {
   LEGACY_AKOEALL
+  MANUAL_ADMIN
   KOIRATIETOKANTA_API
 }
 
@@ -407,7 +408,7 @@ model TrialEvent {
   // 1) kokeen tiedot
   id             String   @id @default(cuid())
   sklKoeId       Int?     @unique
-  koepaiva       DateTime
+  koepaiva       DateTime @db.Date
   koekunta       String
   jarjestaja     String?
   kennelpiiri    String?
@@ -458,7 +459,7 @@ model TrialEntry {
   yva                        Decimal?             @db.Decimal(6, 2) // nykyinen ajotaito
   hlo                        Decimal?             @db.Decimal(6, 2)
   alo                        Decimal?             @db.Decimal(6, 2)
-  tja                        Decimal?             @db.Decimal(6, 2)
+  tja                        Decimal?             @db.Decimal(6, 2) // vanhojen kokeiden tie- ja estetyöskentely
   pin                        Decimal?             @db.Decimal(6, 2)
   ansiopisteetYhteensa       Decimal?             @db.Decimal(6, 2)
   tappiopisteetYhteensa      Decimal?             @db.Decimal(6, 2)
@@ -498,7 +499,7 @@ model TrialEra {
   yva             Decimal?            @db.Decimal(6, 2) // nykyinen ajotaito
   hlo             Decimal?            @db.Decimal(6, 2)
   alo             Decimal?            @db.Decimal(6, 2)
-  tja             Decimal?            @db.Decimal(6, 2)
+  tja             Decimal?            @db.Decimal(6, 2) // vanhojen kokeiden tie- ja estetyöskentely
   pin             Decimal?            @db.Decimal(6, 2)
   huomautusTeksti String?             @db.Text
   raakadataJson   String?             @db.Text

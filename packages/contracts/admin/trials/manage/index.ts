@@ -1,4 +1,10 @@
 export type {
+  AdminTrialEntryEraWrite,
+  AdminTrialEntryLisatietoWriteRow,
+  AdminTrialEntryWriteData,
+  AdminTrialEntryWriteFields,
+} from "./admin-trial-entry-write";
+export type {
   AdminTrialEventSearchFilters,
   AdminTrialEventSearchMode,
   AdminTrialEventSearchRequest,
@@ -16,6 +22,10 @@ export type {
   CreateAdminTrialEventRequest,
   CreateAdminTrialEventResponse,
 } from "./create-admin-trial-event";
+export type {
+  CreateAdminTrialEntryRequest,
+  CreateAdminTrialEntryResponse,
+} from "./create-admin-trial-entry";
 export type {
   DeleteAdminTrialEventRequest,
   DeleteAdminTrialEventResponse,

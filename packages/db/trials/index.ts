@@ -31,3 +31,4 @@ export {
   type KoiratietokantaAjokUpsertDbInput,
   type KoiratietokantaAjokUpsertDbResult,
 } from "./integrations/koiratietokanta";
+export { buildTrialEntryIdentity } from "./core/trial-entry-identity";

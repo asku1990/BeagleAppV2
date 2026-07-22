@@ -1,8 +1,8 @@
 import { searchAdminTrialsDb } from "@beagle/db";
 import {
-  getTrialBusinessYearUtcRange,
-  toTrialBusinessYear,
-} from "@server/trials/core/business-date";
+  getTrialDateOnlyYearUtcRange,
+  toTrialDateOnlyYear,
+} from "@server/trials/core/date-only";
 import type { ParsedAdminTrialEventSearchInput } from "./parse-admin-trial-event-search-input";
 
 export type ResolvedAdminTrialEventSearch = {
@@ -15,7 +15,7 @@ export type ResolvedAdminTrialEventSearch = {
 
 function collectAvailableYears(availableEventDates: Date[]): number[] {
   return Array.from(
-    new Set(availableEventDates.map((value) => toTrialBusinessYear(value))),
+    new Set(availableEventDates.map((value) => toTrialDateOnlyYear(value))),
   ).sort((left, right) => right - left);
 }
 
@@ -25,7 +25,7 @@ export async function resolveAdminTrialEventSearchResponseDb(
   const hasQuery = input.query.length > 0;
 
   if (input.mode === "year") {
-    const yearRange = getTrialBusinessYearUtcRange(input.year ?? 0);
+    const yearRange = getTrialDateOnlyYearUtcRange(input.year ?? 0);
     if (!yearRange) {
       throw new Error("Failed to build admin trial year range.");
     }
@@ -98,7 +98,7 @@ export async function resolveAdminTrialEventSearchResponseDb(
     };
   }
 
-  const yearRange = getTrialBusinessYearUtcRange(latestYear);
+  const yearRange = getTrialDateOnlyYearUtcRange(latestYear);
   if (!yearRange) {
     throw new Error("Failed to build admin trial year range.");
   }
