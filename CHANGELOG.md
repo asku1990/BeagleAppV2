@@ -17,12 +17,16 @@ This project uses a user-facing changelog format.
 - Ylläpitäjä voi avata ajokoetapahtuman omalle sivulleen tarkastelua ja nykyisiä muokkaustoimintoja varten.
 - Ylläpitäjä voi luoda ajokoetapahtuman perustietoineen ja avata sen omalle sivulleen ennen koetulosten lisäämistä.
 - Ylläpitäjä voi poistaa tyhjän ajokoetapahtuman sen omalta sivulta.
+- Ylläpitäjä voi lisätä ajokoetapahtumaan koirakohtaisia tuloksia yksi kerrallaan ja jatkaa seuraavaan tulokseen tai palata tapahtuman sivulle.
 
 ### Changed
 
 - Viimeisen koetuloksen poistaminen säilyttää ajokoetapahtuman tyhjänä, kunnes ylläpitäjä poistaa tapahtuman erikseen.
+- Uuden ajokoetapahtuman luomisen jälkeen siirrytään suoraan lisäämään tapahtuman ensimmäistä koetulosta.
 
 ### Fixed
+
+- Ajokoetuloksen lisätietorivit tallennetaan kelvollisessa kokonaislukujärjestyksessä, ja hylätty lisätietorivi näytetään aiempaa tarkemmin.
 
 ### Removed
 

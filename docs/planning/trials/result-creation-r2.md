@@ -28,6 +28,8 @@ R2 consumes, but does not redefine or weaken, the R1 decisions for:
 
 R2 maps stable `errorCode` values to localized presentation and never inspects
 backend message strings to determine behavior.
+When R1 supplies typed validation details, R2 uses their stable reason and safe
+field context to identify the rejected section or lisätieto row.
 
 ## Scope
 

@@ -1,4 +1,7 @@
-import type { AdminTrialEntryWriteData } from "@beagle/contracts";
+import type {
+  AdminTrialEntryValidationIssue,
+  AdminTrialEntryWriteData,
+} from "@beagle/contracts";
 import type { AdminTrialEntryWriteDataDb } from "@beagle/db";
 
 export type AdminTrialEntryWriteValidationReason =
@@ -19,11 +22,8 @@ export type AdminTrialEntryWriteValidationReason =
   | "duplicate_lisatieto_era_value"
   | "invalid_lisatieto_order";
 
-export type AdminTrialEntryWriteValidationIssue = {
-  area: "entry" | "eras" | "additional_info";
-  reason: AdminTrialEntryWriteValidationReason;
-  value?: string;
-};
+export type AdminTrialEntryWriteValidationIssue =
+  AdminTrialEntryValidationIssue;
 
 const VALID_KOETYYPIT = new Set(["NORMAL", "KOKOKAUDENKOE", "PITKAKOE"]);
 const VALID_HUOMAUTUKSET = new Set(["LUOPUI", "SULJETTU", "KESKEYTETTY"]);
@@ -101,8 +101,12 @@ function failure(
   area: AdminTrialEntryWriteValidationIssue["area"],
   reason: AdminTrialEntryWriteValidationReason,
   value?: string,
+  context?: Pick<AdminTrialEntryValidationIssue, "koodi" | "osa">,
 ): { ok: false; issue: AdminTrialEntryWriteValidationIssue } {
-  return { ok: false, issue: { area, reason, ...(value ? { value } : {}) } };
+  return {
+    ok: false,
+    issue: { area, reason, ...(value ? { value } : {}), ...context },
+  };
 }
 
 // Validates and normalizes the result shape shared by create and update writes.
@@ -193,14 +197,25 @@ export function parseAdminTrialEntryWriteInput(
     }
     lisatietoKeys.add(key);
     if (options.mode === "create" && !isNullableInteger(row.jarjestys)) {
-      return failure("additional_info", "invalid_lisatieto_order");
+      return failure("additional_info", "invalid_lisatieto_order", undefined, {
+        koodi,
+        osa,
+      });
     }
     if (row.eraValues.some((value) => !eraNumbers.includes(value.era))) {
-      return failure("additional_info", "invalid_lisatieto_era");
+      return failure("additional_info", "invalid_lisatieto_era", undefined, {
+        koodi,
+        osa,
+      });
     }
     const lisatietoEraNumbers = row.eraValues.map((value) => value.era);
     if (new Set(lisatietoEraNumbers).size !== lisatietoEraNumbers.length) {
-      return failure("additional_info", "duplicate_lisatieto_era_value");
+      return failure(
+        "additional_info",
+        "duplicate_lisatieto_era_value",
+        undefined,
+        { koodi, osa },
+      );
     }
   }
 

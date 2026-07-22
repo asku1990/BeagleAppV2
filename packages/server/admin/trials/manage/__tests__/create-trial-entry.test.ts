@@ -185,4 +185,35 @@ describe("createAdminTrialEntry", () => {
     });
     expect(writeMock).not.toHaveBeenCalled();
   });
+
+  it("returns safe row context for invalid lisatieto ordering", async () => {
+    await expect(
+      createAdminTrialEntry(
+        {
+          ...input,
+          lisatiedotRows: [
+            {
+              koodi: "25",
+              osa: "b",
+              nimi: null,
+              jarjestys: 25.1,
+              eraValues: [{ era: 1, arvo: "1" }],
+            },
+          ],
+        },
+        admin,
+      ),
+    ).resolves.toMatchObject({
+      status: 400,
+      body: {
+        code: "INVALID_TRIAL_ADDITIONAL_INFO",
+        details: {
+          area: "additional_info",
+          reason: "invalid_lisatieto_order",
+          koodi: "25",
+          osa: "b",
+        },
+      },
+    });
+  });
 });

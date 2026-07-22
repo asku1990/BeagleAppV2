@@ -33,6 +33,7 @@ export type AdminTrialLisatietoConfig = {
   label: string;
   inputKind: AdminTrialLisatietoInputKind;
   sortOrder: number;
+  persistenceOrder: number;
 };
 
 function defineLisatieto(
@@ -42,7 +43,7 @@ function defineLisatieto(
   inputKind: AdminTrialLisatietoInputKind,
   sortOrder: number,
   osa = "",
-): AdminTrialLisatietoConfig {
+): Omit<AdminTrialLisatietoConfig, "persistenceOrder"> {
   return { koodi, osa, group, label, inputKind, sortOrder };
 }
 
@@ -59,7 +60,7 @@ export const ADMIN_TRIAL_LISATIETO_GROUP_LABELS: Record<
   unknown: "Muut / tuntemattomat",
 };
 
-export const ADMIN_TRIAL_LISATIETO_CONFIG = [
+const ADMIN_TRIAL_LISATIETO_CONFIG_SOURCE = [
   defineLisatieto("10", "olosuhteet", "Vaativat olosuhteet", "marker", 10),
   defineLisatieto("11", "olosuhteet", "Paljas maa", "marker", 11),
   defineLisatieto("12", "olosuhteet", "Lumikeli", "integer", 12),
@@ -142,7 +143,16 @@ export const ADMIN_TRIAL_LISATIETO_CONFIG = [
   ),
   defineLisatieto("61", "muut_ominaisuudet", "Hallittavuus", "decimal", 61),
   defineLisatieto("62", "muut_ominaisuudet", "Matka ajoerässä", "decimal", 62),
-] as const satisfies readonly AdminTrialLisatietoConfig[];
+] as const satisfies readonly Omit<
+  AdminTrialLisatietoConfig,
+  "persistenceOrder"
+>[];
+
+export const ADMIN_TRIAL_LISATIETO_CONFIG: readonly AdminTrialLisatietoConfig[] =
+  ADMIN_TRIAL_LISATIETO_CONFIG_SOURCE.map((item, index) => ({
+    ...item,
+    persistenceOrder: index + 1,
+  }));
 
 export const ADMIN_TRIAL_LISATIETO_KOODIT = Array.from(
   new Set(ADMIN_TRIAL_LISATIETO_CONFIG.map((item) => item.koodi)),

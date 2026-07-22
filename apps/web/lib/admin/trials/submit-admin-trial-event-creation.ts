@@ -3,7 +3,7 @@ import type {
   CreateAdminTrialEventResponse,
 } from "@beagle/contracts";
 import { AdminMutationError } from "@/queries/admin/mutation-error";
-import { getAdminTrialEventHref } from "./trial-route";
+import { getAdminTrialEntryCreateHref } from "./trial-route";
 
 export type AdminTrialEventCreationDraft = {
   eventDate: string;
@@ -93,7 +93,7 @@ export async function submitAdminTrialEventCreation({
       kennelpiirinro: draft.kennelpiirinro.trim() || null,
       sklKoeId,
     });
-    replace(getAdminTrialEventHref(result.trialEventId));
+    replace(getAdminTrialEntryCreateHref(result.trialEventId));
   } catch (error) {
     setErrorText(
       error instanceof AdminMutationError

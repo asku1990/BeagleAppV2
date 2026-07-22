@@ -179,6 +179,9 @@ Existing `UNAUTHENTICATED` and `FORBIDDEN` authorization codes remain in use.
   outcomes, and owns structured success/failure logging.
 - The Server Action performs its existing admin/session guard and passes the
   service code through as `errorCode` without interpreting message text.
+- Validation failures may also include a typed, safe `details` issue with the
+  validation area/reason and affected lisätieto code/part. Raw entered values
+  are not exposed through validation details.
 
 ## Date-only invariant
 

@@ -209,6 +209,7 @@ describe("entry edit lisatiedot model", () => {
     expect(
       rows.find((row) => row.koodi === "25" && row.osa === "b"),
     ).toMatchObject({
+      jarjestys: 26,
       eraValues: { 1: "0", 2: "" },
     });
     expect(

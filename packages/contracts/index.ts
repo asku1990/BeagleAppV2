@@ -300,6 +300,7 @@ export type {
   CreateAdminTrialEventResponse,
   CreateAdminTrialEntryRequest,
   CreateAdminTrialEntryResponse,
+  AdminTrialEntryValidationIssue,
   DeleteAdminTrialEventRequest,
   DeleteAdminTrialEventResponse,
   DeleteAdminTrialEntryRequest,

@@ -38,6 +38,7 @@ type AdminTrialSelectedEventPanelProps = {
   onTrialEventDeleteConflict?: () => void;
   allowEmptyEventDeletion?: boolean;
   workspaceHref?: string;
+  createEntryHref?: string;
 };
 
 const EMPTY_ENTRIES: AdminTrialEventEntry[] = [];
@@ -51,6 +52,7 @@ export function AdminTrialSelectedEventPanel({
   onTrialEventDeleteConflict,
   allowEmptyEventDeletion = false,
   workspaceHref,
+  createEntryHref,
 }: AdminTrialSelectedEventPanelProps) {
   const { t } = useI18n();
   const [isEditOpen, setIsEditOpen] = React.useState(false);
@@ -172,6 +174,13 @@ export function AdminTrialSelectedEventPanel({
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
+                  {createEntryHref ? (
+                    <Button asChild>
+                      <Link href={createEntryHref}>
+                        {t("admin.trials.manage.resultCreate.action")}
+                      </Link>
+                    </Button>
+                  ) : null}
                   {workspaceHref ? (
                     <Button asChild variant="outline">
                       <Link href={workspaceHref}>

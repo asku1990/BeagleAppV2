@@ -180,6 +180,8 @@ describe("parseAdminTrialEntryWriteInput", () => {
       issue: {
         area: "additional_info",
         reason: "duplicate_lisatieto_era_value",
+        koodi: "11",
+        osa: "",
       },
     });
   });
@@ -193,6 +195,8 @@ describe("parseAdminTrialEntryWriteInput", () => {
       issue: {
         area: "additional_info",
         reason: "invalid_lisatieto_order",
+        koodi: "11",
+        osa: "",
       },
     });
     expect(

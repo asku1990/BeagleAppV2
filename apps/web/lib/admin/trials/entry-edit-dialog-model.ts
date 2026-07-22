@@ -199,7 +199,7 @@ export function toLisatietoRows(
       koodi: config.koodi,
       osa: config.osa,
       nimi: config.label,
-      jarjestys: config.sortOrder,
+      jarjestys: config.persistenceOrder,
     });
   }
 
@@ -211,6 +211,7 @@ export function toLisatietoRows(
         nimi: item.nimi,
         jarjestys: item.jarjestys,
       });
+      row.jarjestys = item.jarjestys;
       row.eraValues[era.era] = item.arvo;
     }
   }
