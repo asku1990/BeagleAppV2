@@ -46,6 +46,7 @@ export { upsertKoiratietokantaAjokResultService } from "./trials";
 export { listAdminTrialEvents } from "./admin";
 export { getAdminTrialEvent } from "./admin";
 export { createAdminTrialEvent } from "./admin";
+export { createAdminTrialEntry } from "./admin";
 export { deleteAdminTrialEvent } from "./admin";
 export { deleteAdminTrialEntry } from "./admin";
 export { updateAdminTrialEvent } from "./admin";

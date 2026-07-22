@@ -31,6 +31,13 @@ result upsert contract.
   - `KOEPAIKKA`
 - Unknown fields are ignored.
 - The raw payload is always preserved in `TrialEntry.raakadataJson`.
+- If the same canonical identity was first created manually, the API update is
+  authoritative: it keeps technical identity and row creation time, replaces
+  all mapped business fields and eras/lisätiedot, clears manual-only `tja`, and
+  changes the source to `KOIRATIETOKANTA_API`.
+- `tja` is the legacy-trial tie- ja estetyöskentely summary field. Current API
+  tie/obstacle values are stored as lisätiedot instead, so the API upsert does
+  not derive a new `tja` summary value.
 
 ## Main field mapping
 

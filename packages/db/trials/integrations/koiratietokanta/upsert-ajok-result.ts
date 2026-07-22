@@ -211,6 +211,9 @@ export async function upsertKoiratietokantaAjokResultDb(
       yva: input.entry.yva,
       hlo: input.entry.hlo,
       alo: input.entry.alo,
+      // Legacy trials stored tie- ja estetyöskentely in this summary field.
+      // Current API values live in lisatiedot, so authoritative upsert clears it.
+      tja: null,
       ansiopisteetYhteensa: input.entry.ansiopisteetYhteensa,
       tappiopisteetYhteensa: input.entry.tappiopisteetYhteensa,
       // Event-level chief judge is canonical for imported AJOK entries.

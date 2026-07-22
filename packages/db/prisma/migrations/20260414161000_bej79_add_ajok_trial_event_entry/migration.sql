@@ -4,14 +4,14 @@
 -- once this migration is treated as immutable in shared deployed environments.
 
 -- CreateEnum
-CREATE TYPE "TrialSourceTag" AS ENUM ('LEGACY_AKOEALL', 'KOIRATIETOKANTA_API');
+CREATE TYPE "TrialSourceTag" AS ENUM ('LEGACY_AKOEALL', 'MANUAL_ADMIN', 'KOIRATIETOKANTA_API');
 
 -- CreateTable
 CREATE TABLE "TrialEvent" (
     "id" TEXT NOT NULL,
     "sklKoeId" INTEGER,
     "legacyEventKey" TEXT,
-    "koepaiva" TIMESTAMP(3) NOT NULL,
+    "koepaiva" DATE NOT NULL,
     "koekunta" TEXT NOT NULL,
     "jarjestaja" TEXT,
     "kennelpiiri" TEXT,
