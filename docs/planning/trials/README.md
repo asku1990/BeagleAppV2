@@ -15,8 +15,10 @@ on the next gate.
 
 - [Event creation](./event-creation.md) defines the event workspace, manual
   event creation, and the persisted empty-event lifecycle.
-- [Result creation](./result-creation.md) defines the manual result write path
-  and the full-page result form.
+- [Result creation R1](./result-creation.md) defines the manual-result schema,
+  identity, transaction, error, date-only, and Server Action backend contract.
+- [Result creation R2](./result-creation-r2.md) defines the full-page result
+  form and admin UI workflow built on the approved R1 contract.
 - [Later UX](./later-ux.md) records deferred ideas only and does not authorize
   their implementation.
 
@@ -66,10 +68,20 @@ Repository guardrails and current feature documentation:
 
 Implement gates in this order:
 
+```text
+E1
+ ↓
+E2
+ ↓
+R1 (backend)
+ ↓
+R2 (UI)
+```
+
 1. `E1` - event workspace
 2. `E2` - event creation and empty-event lifecycle
-3. `R1` - manual result backend and schema foundation
-4. `R2` - full-page manual result form
+3. `R1` - manual result schema and backend
+4. `R2` - manual result UI and workflow
 
 For every gate:
 
