@@ -4,6 +4,10 @@ export function getAdminTrialsHref(): string {
   return ADMIN_TRIALS_ROUTE_ROOT;
 }
 
+export function getAdminTrialEventCreateHref(): string {
+  return `${ADMIN_TRIALS_ROUTE_ROOT}/new`;
+}
+
 export function getAdminTrialEventHref(trialEventId: string): string {
   return `${ADMIN_TRIALS_ROUTE_ROOT}/${encodeURIComponent(trialEventId)}`;
 }

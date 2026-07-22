@@ -2,7 +2,10 @@ import {
   type KoiratietokantaAjokUpsertRequest,
   type KoiratietokantaAjokUpsertResponse,
 } from "@beagle/contracts";
-import { prisma, upsertKoiratietokantaAjokResultDb } from "@beagle/db";
+import {
+  listActiveTrialRuleWindowsDb,
+  upsertKoiratietokantaAjokResultDb,
+} from "@beagle/db";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
 import { resolveTrialRuleWindowId } from "@server/trials/core";
@@ -35,10 +38,7 @@ export async function upsertKoiratietokantaAjokResultService(
   }
 
   try {
-    const activeRuleWindows = await prisma.trialRuleWindow.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
-    });
+    const activeRuleWindows = await listActiveTrialRuleWindowsDb();
     const trialRuleWindowId = resolveTrialRuleWindowId(
       activeRuleWindows,
       mapped.event.koepaiva,

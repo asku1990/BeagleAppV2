@@ -169,6 +169,8 @@ describe("AdminTrialsPageClient", () => {
 
     expect(html).toContain("admin.trials.title");
     expect(html).toContain("admin.trials.description");
+    expect(html).toContain("admin.trials.manage.create.action");
+    expect(html).toContain("/admin/trials/new");
     expect(html).toContain("year|||");
     expect(html).toContain("2|1|1|event-1|admin.trials.manage.error");
     expect(html).toContain(

@@ -1,6 +1,16 @@
 export { getAdminTrialEventDetailsDb } from "./get-trial-event-details";
 export { searchAdminTrialsDb } from "./search-trials";
 export {
+  createAdminTrialEventWriteDb,
+  type CreateAdminTrialEventWriteRequestDb,
+  type CreateAdminTrialEventWriteResultDb,
+} from "./create-trial-event";
+export {
+  deleteAdminTrialEventWriteDb,
+  type DeleteAdminTrialEventWriteRequestDb,
+  type DeleteAdminTrialEventWriteResultDb,
+} from "./delete-trial-event";
+export {
   deleteAdminTrialEntryWriteDb,
   type DeleteAdminTrialEntryWriteRequestDb,
   type DeleteAdminTrialEntryWriteResultDb,
