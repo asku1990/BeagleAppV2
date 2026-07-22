@@ -8,9 +8,9 @@ import { requireAdmin } from "@server/admin/core/service";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
 import {
-  isValidTrialRegistrationNo,
-  normalizeTrialRegistrationNo,
-} from "@server/trials/core";
+  isValidRegistrationNo,
+  normalizeRegistrationNo,
+} from "@server/dogs/core";
 import { parseAdminTrialEntryWriteInput } from "./internal/parse-admin-trial-entry-write-input";
 
 type ServiceLogContext = { requestId?: string; actorUserId?: string };
@@ -43,7 +43,8 @@ export async function createAdminTrialEntry(
     return { status: auth.status, body: auth.body };
   }
 
-  const trialEventId = input.trialEventId.trim();
+  const trialEventId =
+    typeof input?.trialEventId === "string" ? input.trialEventId.trim() : "";
   if (!trialEventId) {
     log.warn(
       { event: "invalid_trial_event_id" },
@@ -59,8 +60,8 @@ export async function createAdminTrialEntry(
     };
   }
 
-  const registrationNo = normalizeTrialRegistrationNo(input.registrationNo);
-  if (!registrationNo || !isValidTrialRegistrationNo(registrationNo)) {
+  const registrationNo = normalizeRegistrationNo(input?.registrationNo);
+  if (!registrationNo || !isValidRegistrationNo(registrationNo)) {
     log.warn(
       { event: "invalid_registration_number", trialEventId },
       "admin trial entry creation rejected before persistence",

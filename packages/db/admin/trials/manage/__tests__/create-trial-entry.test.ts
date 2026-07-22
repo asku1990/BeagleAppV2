@@ -80,6 +80,14 @@ const input = {
   ],
 };
 
+function uniqueConstraintError(target: string | string[]) {
+  return new Prisma.PrismaClientKnownRequestError("duplicate", {
+    code: "P2002",
+    clientVersion: "test",
+    meta: { target },
+  });
+}
+
 describe("createAdminTrialEntryWriteDb", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -145,16 +153,33 @@ describe("createAdminTrialEntryWriteDb", () => {
     });
   });
 
-  it("maps a database identity constraint race to registration conflict", async () => {
-    prismaTransaction.mockRejectedValueOnce(
-      new Prisma.PrismaClientKnownRequestError("duplicate", {
-        code: "P2002",
-        clientVersion: "test",
-        meta: { target: ["trialEventId", "rekisterinumeroSnapshot"] },
-      }),
-    );
-    await expect(createAdminTrialEntryWriteDb(input)).resolves.toEqual({
-      status: "registration_conflict",
-    });
-  });
+  it.each([
+    [["yksilointiAvain"]],
+    [["trialEventId", "rekisterinumeroSnapshot"]],
+    ["TrialEntry_yksilointiAvain_key"],
+    ["TrialEntry_trialEventId_rekisterinumeroSnapshot_key"],
+  ])(
+    "maps identity constraint target %j to registration conflict",
+    async (target) => {
+      prismaTransaction.mockRejectedValueOnce(uniqueConstraintError(target));
+      await expect(createAdminTrialEntryWriteDb(input)).resolves.toEqual({
+        status: "registration_conflict",
+      });
+    },
+  );
+
+  it.each([
+    [["trialEntryId", "era"]],
+    [["trialEraId", "koodi", "osa"]],
+    [["trialEventId", "futureIdentityField"]],
+    [["futureIdentityField", "rekisterinumeroSnapshot"]],
+    ["TrialEntry_trialEventId_futureIdentityField_key"],
+  ])(
+    "does not map unrelated constraint target %j to registration conflict",
+    async (target) => {
+      const error = uniqueConstraintError(target);
+      prismaTransaction.mockRejectedValueOnce(error);
+      await expect(createAdminTrialEntryWriteDb(input)).rejects.toBe(error);
+    },
+  );
 });

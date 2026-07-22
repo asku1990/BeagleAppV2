@@ -119,6 +119,22 @@ describe("createAdminTrialEntry", () => {
     });
   });
 
+  it("maps malformed runtime input to a stable validation error", async () => {
+    await expect(
+      createAdminTrialEntry(
+        {
+          ...input,
+          entry: null,
+        } as unknown as CreateAdminTrialEntryRequest,
+        admin,
+      ),
+    ).resolves.toMatchObject({
+      status: 400,
+      body: { ok: false, code: "INVALID_TRIAL_ENTRY" },
+    });
+    expect(writeMock).not.toHaveBeenCalled();
+  });
+
   it("rejects duplicate normalized lisatieto keys before persistence", async () => {
     const row = {
       koodi: "11",

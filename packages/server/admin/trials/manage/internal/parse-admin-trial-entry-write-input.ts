@@ -2,6 +2,7 @@ import type { AdminTrialEntryWriteData } from "@beagle/contracts";
 import type { AdminTrialEntryWriteDataDb } from "@beagle/db";
 
 export type AdminTrialEntryWriteValidationReason =
+  | "invalid_write_shape"
   | "invalid_koetyyppi"
   | "invalid_huomautus"
   | "invalid_entry_integer"
@@ -26,6 +27,31 @@ export type AdminTrialEntryWriteValidationIssue = {
 
 const VALID_KOETYYPIT = new Set(["NORMAL", "KOKOKAUDENKOE", "PITKAKOE"]);
 const VALID_HUOMAUTUKSET = new Set(["LUOPUI", "SULJETTU", "KESKEYTETTY"]);
+const MAX_DB_INT = 2_147_483_647;
+const MIN_DB_INT = -2_147_483_648;
+const MAX_DECIMAL_6_2 = 9_999.99;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === "object" && !Array.isArray(value));
+}
+
+function hasWriteContainerShape(input: unknown): boolean {
+  if (!isRecord(input)) return false;
+  if (!isRecord(input.entry)) return false;
+  if (!Array.isArray(input.eras) || !input.eras.every(isRecord)) return false;
+  if (
+    !Array.isArray(input.lisatiedotRows) ||
+    !input.lisatiedotRows.every(
+      (row) =>
+        isRecord(row) &&
+        Array.isArray(row.eraValues) &&
+        row.eraValues.every(isRecord),
+    )
+  ) {
+    return false;
+  }
+  return true;
+}
 
 function normalizeNullableText(
   value: string | null | undefined,
@@ -37,23 +63,38 @@ function normalizeNullableText(
 function normalizeNullableInteger(
   value: number | null | undefined,
 ): number | null {
-  return value == null || !Number.isInteger(value) ? null : value;
+  return isDbInteger(value) ? value : null;
 }
 
 function normalizeNullableNumber(
   value: number | null | undefined,
 ): number | null {
-  return value == null || !Number.isFinite(value) ? null : value;
+  return isDbDecimal(value) ? value : null;
 }
 
-function isNullableInteger(value: unknown): boolean {
+function isDbInteger(value: unknown): value is number {
   return (
-    value == null || (typeof value === "number" && Number.isSafeInteger(value))
+    typeof value === "number" &&
+    Number.isSafeInteger(value) &&
+    value >= MIN_DB_INT &&
+    value <= MAX_DB_INT
   );
 }
 
+function isDbDecimal(value: unknown): value is number {
+  return (
+    typeof value === "number" &&
+    Number.isFinite(value) &&
+    Math.abs(value) <= MAX_DECIMAL_6_2
+  );
+}
+
+function isNullableInteger(value: unknown): boolean {
+  return value == null || isDbInteger(value);
+}
+
 function isNullableNumber(value: unknown): boolean {
-  return value == null || (typeof value === "number" && Number.isFinite(value));
+  return value == null || isDbDecimal(value);
 }
 
 function failure(
@@ -71,6 +112,9 @@ export function parseAdminTrialEntryWriteInput(
 ):
   | { ok: true; data: AdminTrialEntryWriteDataDb }
   | { ok: false; issue: AdminTrialEntryWriteValidationIssue } {
+  if (!hasWriteContainerShape(input)) {
+    return failure("entry", "invalid_write_shape");
+  }
   if (!VALID_KOETYYPIT.has(input.entry.koetyyppi)) {
     return failure("entry", "invalid_koetyyppi");
   }

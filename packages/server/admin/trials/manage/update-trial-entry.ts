@@ -21,6 +21,11 @@ function validationFailure(
   issue: AdminTrialEntryWriteValidationIssue,
 ): ServiceResult<UpdateAdminTrialEntryResponse> {
   switch (issue.reason) {
+    case "invalid_write_shape":
+      return badRequest(
+        "Trial result fields are invalid.",
+        "INVALID_TRIAL_ENTRY",
+      );
     case "missing_eras":
       return badRequest("At least one era is required.", "INVALID_ERAS");
     case "invalid_era_number":
@@ -103,8 +108,10 @@ export async function updateAdminTrialEntry(
   context?: ServiceLogContext,
 ): Promise<ServiceResult<UpdateAdminTrialEntryResponse>> {
   const startedAt = Date.now();
-  const trialEventId = input.trialEventId.trim();
-  const trialEntryId = input.trialEntryId.trim();
+  const trialEventId =
+    typeof input?.trialEventId === "string" ? input.trialEventId.trim() : "";
+  const trialEntryId =
+    typeof input?.trialEntryId === "string" ? input.trialEntryId.trim() : "";
   const log = withLogContext({
     layer: "service",
     useCase: "admin-trials.updateAdminTrialEntry",

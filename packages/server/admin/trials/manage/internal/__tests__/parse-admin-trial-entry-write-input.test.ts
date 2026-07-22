@@ -63,6 +63,23 @@ function createInput(): AdminTrialEntryWriteData {
 }
 
 describe("parseAdminTrialEntryWriteInput", () => {
+  it.each([
+    null,
+    {},
+    { entry: {}, eras: null, lisatiedotRows: [] },
+    { entry: {}, eras: [], lisatiedotRows: [{}] },
+  ])("rejects malformed write container %#", (input) => {
+    expect(
+      parseAdminTrialEntryWriteInput(
+        input as unknown as AdminTrialEntryWriteData,
+        { mode: "create" },
+      ),
+    ).toEqual({
+      ok: false,
+      issue: { area: "entry", reason: "invalid_write_shape" },
+    });
+  });
+
   it("normalizes the shared write shape", () => {
     const result = parseAdminTrialEntryWriteInput(createInput(), {
       mode: "create",
@@ -100,6 +117,26 @@ describe("parseAdminTrialEntryWriteInput", () => {
     ).toEqual({
       ok: false,
       issue: { area: "eras", reason: "missing_eras" },
+    });
+  });
+
+  it("rejects integers outside the PostgreSQL Int range", () => {
+    const input = createInput();
+    input.entry.koiriaLuokassa = 2_147_483_648;
+
+    expect(parseAdminTrialEntryWriteInput(input, { mode: "create" })).toEqual({
+      ok: false,
+      issue: { area: "entry", reason: "invalid_entry_integer" },
+    });
+  });
+
+  it("rejects numbers outside the Decimal(6,2) range", () => {
+    const input = createInput();
+    input.entry.points = 10_000;
+
+    expect(parseAdminTrialEntryWriteInput(input, { mode: "create" })).toEqual({
+      ok: false,
+      issue: { area: "entry", reason: "invalid_entry_number" },
     });
   });
 
@@ -158,6 +195,20 @@ describe("parseAdminTrialEntryWriteInput", () => {
         reason: "invalid_lisatieto_order",
       },
     });
+    expect(
+      parseAdminTrialEntryWriteInput(input, { mode: "update" }),
+    ).toMatchObject({
+      ok: true,
+      data: {
+        lisatiedotByEra: [{ items: [{ jarjestys: null }] }],
+      },
+    });
+  });
+
+  it("normalizes out-of-range update ordering to null", () => {
+    const input = createInput();
+    input.lisatiedotRows[0].jarjestys = 2_147_483_648;
+
     expect(
       parseAdminTrialEntryWriteInput(input, { mode: "update" }),
     ).toMatchObject({

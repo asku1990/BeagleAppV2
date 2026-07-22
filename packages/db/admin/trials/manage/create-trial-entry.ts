@@ -27,16 +27,22 @@ function isEntryIdentityConflict(error: unknown): boolean {
     return false;
   }
   const target = error.meta?.target;
-  const fields = Array.isArray(target)
-    ? target.map(String)
-    : [String(target ?? "")];
-  return fields.some(
-    (field) =>
-      field.includes("yksilointiAvain") ||
-      field.includes("trialEventId_rekisterinumeroSnapshot") ||
-      field.includes("trialEventId") ||
-      field.includes("rekisterinumeroSnapshot"),
-  );
+  if (Array.isArray(target)) {
+    const fields = target.map(String);
+    return (
+      (fields.length === 1 && fields[0] === "yksilointiAvain") ||
+      (fields.length === 2 &&
+        fields.includes("trialEventId") &&
+        fields.includes("rekisterinumeroSnapshot"))
+    );
+  }
+
+  return [
+    "yksilointiAvain",
+    "trialEventId_rekisterinumeroSnapshot",
+    "TrialEntry_yksilointiAvain_key",
+    "TrialEntry_trialEventId_rekisterinumeroSnapshot_key",
+  ].includes(String(target ?? ""));
 }
 
 // Creates one complete manual result and all nested rows atomically.

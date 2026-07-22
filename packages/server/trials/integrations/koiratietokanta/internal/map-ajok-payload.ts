@@ -12,9 +12,9 @@ import {
   TrialEntryKoetyyppi,
 } from "@beagle/db";
 import {
-  isValidTrialRegistrationNo,
-  normalizeTrialRegistrationNo,
-} from "@server/trials/core";
+  isValidRegistrationNo,
+  normalizeRegistrationNo,
+} from "@server/dogs/core";
 import { mapKoiratietokantaAjokEraWrites } from "./map-ajok-era-writes";
 import {
   isRecord,
@@ -85,10 +85,10 @@ export function mapKoiratietokantaAjokPayload(
     });
   }
 
-  const registrationNo = normalizeTrialRegistrationNo(
+  const registrationNo = normalizeRegistrationNo(
     normalizeText(payload.REKISTERINUMERO),
   );
-  if (!registrationNo || !isValidTrialRegistrationNo(registrationNo)) {
+  if (!registrationNo || !isValidRegistrationNo(registrationNo)) {
     issues.push({
       field: "REKISTERINUMERO",
       code: registrationNo ? "INVALID" : "REQUIRED",
