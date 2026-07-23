@@ -15,6 +15,7 @@ type Props = {
     value: string,
   ) => void;
   visibleFields?: ReadonlySet<Exclude<keyof EraDraft, "era">>;
+  yvaLabel?: string;
 };
 
 export function EraSection({
@@ -24,6 +25,7 @@ export function EraSection({
   onRemoveEra,
   onChangeEraField,
   visibleFields,
+  yvaLabel,
 }: Props) {
   return (
     <>
@@ -70,8 +72,8 @@ export function EraSection({
                   visibleFields && !visibleFields.has(field) ? null : (
                     <label key={field} className="space-y-1 text-xs">
                       <span>
-                        {visibleFields && field === "yva"
-                          ? "ajotaito"
+                        {field === "yva"
+                          ? (yvaLabel ?? ADMIN_TRIAL_ERA_FIELD_LABELS[field])
                           : ADMIN_TRIAL_ERA_FIELD_LABELS[field]}
                       </span>
                       <Input

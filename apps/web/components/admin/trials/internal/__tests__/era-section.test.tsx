@@ -6,7 +6,7 @@ import { resolveResultCreateFieldSet } from "@/lib/admin/trials/result-create-fi
 import { EraSection } from "../era-section";
 
 describe("EraSection", () => {
-  it("uses the current-era Ajotaito label only in configured creation", () => {
+  it("uses the current-era Ajotaito label only in verified creation", () => {
     const props = {
       eras: [createEmptyEraDraft(1)],
       isPending: false,
@@ -14,20 +14,32 @@ describe("EraSection", () => {
       onRemoveEra: vi.fn(),
       onChangeEraField: vi.fn(),
     };
+    const verifiedFieldSet = resolveResultCreateFieldSet("trw_post_20230801");
 
     const createHtml = renderToStaticMarkup(
       React.createElement(EraSection, {
         ...props,
-        visibleFields:
-          resolveResultCreateFieldSet("trw_post_20230801").eraFields,
+        visibleFields: verifiedFieldSet.eraFields,
+        yvaLabel: verifiedFieldSet.yvaLabels?.era,
       }),
     );
     const editHtml = renderToStaticMarkup(
       React.createElement(EraSection, props),
     );
+    const fallbackFieldSet = resolveResultCreateFieldSet(null);
+    const fallbackHtml = renderToStaticMarkup(
+      React.createElement(EraSection, {
+        ...props,
+        visibleFields: fallbackFieldSet.eraFields,
+        yvaLabel: fallbackFieldSet.yvaLabels?.era,
+      }),
+    );
 
     expect(createHtml).toContain("ajotaito");
     expect(createHtml).not.toContain("ajotaito / yleisvaikutelma");
     expect(editHtml).toContain("ajotaito / yleisvaikutelma");
+    expect(fallbackHtml).toContain("ajotaito / yleisvaikutelma");
+    expect(fallbackHtml).toContain("tie ja estetyöskentely");
+    expect(fallbackHtml).toContain("metsästysinto");
   });
 });

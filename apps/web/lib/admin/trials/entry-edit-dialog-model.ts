@@ -194,12 +194,8 @@ export function toLisatietoRows(
       group: config?.group ?? "unknown",
       label: config?.label ?? input.nimi ?? "Tuntematon lisätieto",
       inputKind: config?.inputKind ?? "text",
-      valueHint:
-        config?.valueHint ??
-        (config?.inputKind === "tri-state"
-          ? "marker"
-          : (config?.inputKind ?? "text")),
-      toPersistedValue: config?.toPersistedValue ?? ((value) => value),
+      valueHint: config?.valueHint,
+      toPersistedValue: config?.toPersistedValue,
       hideOsaSuffix: config?.hideOsaSuffix,
       useSemanticControl: config?.useSemanticControl,
       sortOrder:

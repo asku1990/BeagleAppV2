@@ -14,6 +14,10 @@ describe("result create field registry", () => {
     expect(fieldSet.entryFields.has("pin")).toBe(false);
     expect(fieldSet.eraFields.has("tja")).toBe(false);
     expect(fieldSet.eraFields.has("pin")).toBe(false);
+    expect(fieldSet.yvaLabels).toEqual({
+      entry: "Ajotaito",
+      era: "ajotaito",
+    });
   });
 
   it("matches the verified 2023+ lisatieto codes, parts, order and kinds", () => {
@@ -55,11 +59,14 @@ describe("result create field registry", () => {
     const marker = resolveResultCreateFieldSet(
       "trw_post_20230801",
     ).lisatiedot.find((row) => row.koodi === "10");
+    const toPersistedValue = marker?.toPersistedValue;
 
     expect(marker?.inputKind).toBe("marker");
-    expect(marker?.toPersistedValue("1")).toBe("1");
-    expect(marker?.toPersistedValue("0")).toBe("");
-    expect(marker?.toPersistedValue("")).toBe("");
+    expect(toPersistedValue).toBeTypeOf("function");
+    if (!toPersistedValue) throw new Error("Marker persistence mapper missing");
+    expect(toPersistedValue("1")).toBe("1");
+    expect(toPersistedValue("0")).toBe("");
+    expect(toPersistedValue("")).toBe("");
   });
 
   it.each([
@@ -71,10 +78,19 @@ describe("result create field registry", () => {
 
     expect(fieldSet.id).toBe("unverified-fallback");
     expect(fieldSet.verified).toBe(false);
+    expect(fieldSet.yvaLabels).toBeUndefined();
     expect(fieldSet.entryFields.has("tja")).toBe(true);
     expect(fieldSet.eraFields.has("pin")).toBe(true);
     expect(
       fieldSet.lisatiedot.some((row) => row.koodi === "25" && row.osa === "b"),
+    ).toBe(true);
+    expect(
+      fieldSet.lisatiedot.every(
+        (row) =>
+          row.useSemanticControl === undefined &&
+          row.toPersistedValue === undefined &&
+          row.valueHint === undefined,
+      ),
     ).toBe(true);
   });
 });

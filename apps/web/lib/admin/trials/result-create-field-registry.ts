@@ -25,7 +25,11 @@ export type ResultCreateFieldSet = {
     | "admin.trials.manage.resultCreate.rulePeriod.unverified";
   entryFields: ReadonlySet<keyof EntryDraft>;
   eraFields: ReadonlySet<Exclude<keyof EraDraft, "era">>;
-  lisatiedot: readonly ResultCreateLisatietoField[];
+  yvaLabels?: {
+    entry: string;
+    era: string;
+  };
+  lisatiedot: readonly AdminTrialLisatietoConfig[];
 };
 
 export const SEEDED_TRIAL_RULE_WINDOW_IDS = [
@@ -105,9 +109,9 @@ function withSemantics(
   };
 }
 
-const FALLBACK_LISATIEDOT = ADMIN_TRIAL_LISATIETO_CONFIG.map((config) =>
-  withSemantics(config),
-);
+const FALLBACK_LISATIEDOT = ADMIN_TRIAL_LISATIETO_CONFIG.map((config) => ({
+  ...config,
+}));
 
 const POST_2023_INPUT_OVERRIDES: Readonly<
   Record<string, ResultCreateSemanticInputKind>
@@ -143,6 +147,10 @@ const POST_2023_FIELD_SET: ResultCreateFieldSet = {
   eraFields: new Set(
     [...ALL_ERA_FIELDS].filter((field) => field !== "tja" && field !== "pin"),
   ),
+  yvaLabels: {
+    entry: "Ajotaito",
+    era: "ajotaito",
+  },
   lisatiedot: POST_2023_LISATIEDOT,
 };
 

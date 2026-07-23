@@ -259,6 +259,7 @@ function ResultCreateForm({
               }))
             }
             visibleFields={fieldSet.entryFields}
+            yvaLabel={fieldSet.yvaLabels?.entry}
           />
           <EraSection
             eras={draft.eras}
@@ -274,6 +275,7 @@ function ResultCreateForm({
               }))
             }
             visibleFields={fieldSet.eraFields}
+            yvaLabel={fieldSet.yvaLabels?.era}
           />
           <LisatiedotMatrix
             eras={draft.eras}

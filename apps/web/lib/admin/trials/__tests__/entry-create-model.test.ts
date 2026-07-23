@@ -142,4 +142,26 @@ describe("manual trial entry create model", () => {
       },
     });
   });
+
+  it("preserves generic marker values in compatibility fallback", () => {
+    const fieldSet = resolveResultCreateFieldSet(null);
+    const draft = createAdminTrialEntryCreateDraft(event, fieldSet);
+    draft.registrationNo = "FI43560/18";
+    const marker = draft.lisatiedotRows.find((row) => row.koodi === "10");
+    if (marker) marker.eraValues[1] = "0";
+
+    const result = toCreateAdminTrialEntryRequest("event-1", draft);
+
+    expect(result).toMatchObject({
+      ok: true,
+      request: {
+        lisatiedotRows: [
+          expect.objectContaining({
+            koodi: "10",
+            eraValues: [{ era: 1, arvo: "0" }],
+          }),
+        ],
+      },
+    });
+  });
 });

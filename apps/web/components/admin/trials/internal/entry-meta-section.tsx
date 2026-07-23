@@ -7,6 +7,7 @@ type Props = {
   isPending: boolean;
   onChange: (updater: (current: EntryDraft) => EntryDraft) => void;
   visibleFields?: ReadonlySet<keyof EntryDraft>;
+  yvaLabel?: string;
 };
 
 export function EntryMetaSection({
@@ -14,6 +15,7 @@ export function EntryMetaSection({
   isPending,
   onChange,
   visibleFields,
+  yvaLabel,
 }: Props) {
   function updateField(field: keyof EntryDraft, value: string) {
     onChange((current) => ({
@@ -190,9 +192,7 @@ export function EntryMetaSection({
             ) : null}
             {visible("yva") ? (
               <TextField
-                label={
-                  visibleFields ? "Ajotaito" : "Ajotaito / yleisvaikutelma"
-                }
+                label={yvaLabel ?? "Ajotaito / yleisvaikutelma"}
                 value={entryDraft.yva}
                 inputMode="decimal"
                 disabled={isPending}

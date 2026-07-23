@@ -162,15 +162,23 @@ export function LisatiedotMatrix({
                           <input
                             className="h-5 w-full rounded-sm border border-input bg-background px-1 text-center text-[10px] leading-none"
                             inputMode={
-                              row.inputKind === "text"
-                                ? "text"
-                                : row.inputKind === "integer"
-                                  ? "numeric"
+                              row.useSemanticControl
+                                ? row.inputKind === "text"
+                                  ? "text"
+                                  : row.inputKind === "integer"
+                                    ? "numeric"
+                                    : "decimal"
+                                : row.inputKind === "text"
+                                  ? "text"
                                   : "decimal"
                             }
-                            title={t(
-                              `admin.trials.manage.resultCreate.valueHint.${row.valueHint ?? row.inputKind}` as never,
-                            )}
+                            title={
+                              row.useSemanticControl
+                                ? t(
+                                    `admin.trials.manage.resultCreate.valueHint.${row.valueHint ?? row.inputKind}` as never,
+                                  )
+                                : undefined
+                            }
                             value={row.eraValues[era.era] ?? ""}
                             disabled={isPending}
                             onChange={(event) =>

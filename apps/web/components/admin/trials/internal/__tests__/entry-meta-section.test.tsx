@@ -83,6 +83,8 @@ describe("EntryMetaSection", () => {
         onChange: vi.fn(),
         visibleFields:
           resolveResultCreateFieldSet("trw_post_20230801").entryFields,
+        yvaLabel:
+          resolveResultCreateFieldSet("trw_post_20230801").yvaLabels?.entry,
       }),
     );
 
@@ -96,5 +98,22 @@ describe("EntryMetaSection", () => {
     expect(html).toContain(">Muut</h5>");
     expect(html).toContain("Ajotaito");
     expect(html).toContain("Ansiopisteet yhteensä");
+  });
+
+  it("keeps the generic label and all fields in compatibility fallback", () => {
+    const fieldSet = resolveResultCreateFieldSet(null);
+    const html = renderToStaticMarkup(
+      React.createElement(EntryMetaSection, {
+        entryDraft,
+        isPending: false,
+        onChange: vi.fn(),
+        visibleFields: fieldSet.entryFields,
+        yvaLabel: fieldSet.yvaLabels?.entry,
+      }),
+    );
+
+    expect(html).toContain("Ajotaito / yleisvaikutelma");
+    expect(html).toContain("Tie ja estetyöskentely");
+    expect(html).toContain("Metsästysinto");
   });
 });
