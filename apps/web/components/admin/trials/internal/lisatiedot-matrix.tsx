@@ -1,4 +1,5 @@
 import React from "react";
+import { useI18n } from "@/hooks/i18n";
 import {
   ADMIN_TRIAL_LISATIETO_GROUP_LABELS,
   type AdminTrialLisatietoInputKind,
@@ -26,11 +27,12 @@ export function LisatiedotMatrix({
   isPending,
   onChangeCell,
 }: Props) {
+  const { t } = useI18n();
   function sanitizeValue(
     kind: AdminTrialLisatietoInputKind,
     rawValue: string,
   ): string {
-    if (kind === "marker") {
+    if (kind === "marker" || kind === "tri-state") {
       if (rawValue === "1" || rawValue === "0" || rawValue === "") {
         return rawValue;
       }
@@ -98,7 +100,9 @@ export function LisatiedotMatrix({
                     <td className="sticky left-0 z-10 w-56 min-w-56 bg-background px-2 py-1">
                       <div className="flex items-baseline gap-1.5">
                         <span className="font-semibold">
-                          {row.osa ? `${row.koodi} ${row.osa}` : row.koodi}
+                          {row.osa && !row.hideOsaSuffix
+                            ? `${row.koodi} ${row.osa}`
+                            : row.koodi}
                         </span>
                         <span className="truncate text-muted-foreground">
                           {row.label}
@@ -107,7 +111,24 @@ export function LisatiedotMatrix({
                     </td>
                     {sortedEras.map((era) => (
                       <td key={era.era} className="w-16 min-w-16 px-0.5 py-0.5">
-                        {row.inputKind === "marker" ? (
+                        {row.inputKind === "marker" &&
+                        row.useSemanticControl ? (
+                          <input
+                            type="checkbox"
+                            aria-label={`${row.koodi} ${row.label}, ${t("admin.trials.manage.resultCreate.valueHint.marker")}, erä ${era.era}`}
+                            checked={(row.eraValues[era.era] ?? "") === "1"}
+                            disabled={isPending}
+                            onChange={(event) =>
+                              onChangeCell(
+                                row.koodi,
+                                row.osa,
+                                era.era,
+                                event.target.checked ? "1" : "",
+                              )
+                            }
+                          />
+                        ) : row.inputKind === "marker" ||
+                          row.inputKind === "tri-state" ? (
                           <select
                             className="h-5 w-full rounded-sm border border-input bg-background px-0.5 text-center text-[10px] leading-none"
                             value={row.eraValues[era.era] ?? ""}
@@ -122,14 +143,41 @@ export function LisatiedotMatrix({
                             }
                           >
                             <option value="">-</option>
-                            <option value="0">0</option>
-                            <option value="1">1</option>
+                            <option value="0">
+                              {row.inputKind === "tri-state"
+                                ? t(
+                                    "admin.trials.manage.resultCreate.triState.no",
+                                  )
+                                : "0"}
+                            </option>
+                            <option value="1">
+                              {row.inputKind === "tri-state"
+                                ? t(
+                                    "admin.trials.manage.resultCreate.triState.yes",
+                                  )
+                                : "1"}
+                            </option>
                           </select>
                         ) : (
                           <input
                             className="h-5 w-full rounded-sm border border-input bg-background px-1 text-center text-[10px] leading-none"
                             inputMode={
-                              row.inputKind === "text" ? "text" : "decimal"
+                              row.useSemanticControl
+                                ? row.inputKind === "text"
+                                  ? "text"
+                                  : row.inputKind === "integer"
+                                    ? "numeric"
+                                    : "decimal"
+                                : row.inputKind === "text"
+                                  ? "text"
+                                  : "decimal"
+                            }
+                            title={
+                              row.useSemanticControl
+                                ? t(
+                                    `admin.trials.manage.resultCreate.valueHint.${row.valueHint ?? row.inputKind}` as never,
+                                  )
+                                : undefined
                             }
                             value={row.eraValues[era.era] ?? ""}
                             disabled={isPending}

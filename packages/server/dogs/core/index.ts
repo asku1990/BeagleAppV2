@@ -1,4 +1,5 @@
 export { parseDogId } from "./dog-id";
+export { isValidRegistrationNo, normalizeRegistrationNo } from "./registration";
 export {
   calculateInbreedingCoefficientBreakdownForParentsPct,
   calculateInbreedingCoefficientForParentsPct,

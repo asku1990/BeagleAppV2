@@ -94,8 +94,8 @@ describe("listAdminTrialEvents", () => {
 
     expect(searchAdminTrialsDbMock).toHaveBeenCalledWith({
       query: "helsinki",
-      dateFrom: new Date("2025-12-31T22:00:00.000Z"),
-      dateTo: new Date("2026-12-31T22:00:00.000Z"),
+      dateFrom: new Date("2026-01-01T00:00:00.000Z"),
+      dateTo: new Date("2027-01-01T00:00:00.000Z"),
       page: 2,
       pageSize: 100,
       sort: "date-asc",

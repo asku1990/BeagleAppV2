@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import {
   ListingSectionShell,
   ListingResponsiveResults,
@@ -26,6 +27,7 @@ import {
   type UpdateAdminTrialEventPayload,
 } from "./admin-trial-event-edit-dialog";
 import { AdminTrialEntryEditDialog } from "./admin-trial-entry-edit-dialog";
+import { AdminTrialEventDeleteAction } from "./admin-trial-event-delete-action";
 
 type AdminTrialSelectedEventPanelProps = {
   selectedEvent: AdminTrialEventDetails | null;
@@ -33,6 +35,10 @@ type AdminTrialSelectedEventPanelProps = {
   isError: boolean;
   errorText: string;
   onDeletedTrialEvent: (deletedTrialEventId: string) => void;
+  onTrialEventDeleteConflict?: () => void;
+  allowEmptyEventDeletion?: boolean;
+  workspaceHref?: string;
+  createEntryHref?: string;
 };
 
 const EMPTY_ENTRIES: AdminTrialEventEntry[] = [];
@@ -43,6 +49,10 @@ export function AdminTrialSelectedEventPanel({
   isError,
   errorText,
   onDeletedTrialEvent,
+  onTrialEventDeleteConflict,
+  allowEmptyEventDeletion = false,
+  workspaceHref,
+  createEntryHref,
 }: AdminTrialSelectedEventPanelProps) {
   const { t } = useI18n();
   const [isEditOpen, setIsEditOpen] = React.useState(false);
@@ -163,16 +173,41 @@ export function AdminTrialSelectedEventPanel({
                     </p>
                   </div>
                 </div>
-                <Button
-                  type="button"
-                  onClick={() => {
-                    setEditError(null);
-                    setIsEditOpen(true);
-                  }}
-                  disabled={updateMutation.isPending}
-                >
-                  {t("admin.trials.manage.selected.actions.editEvent")}
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  {createEntryHref ? (
+                    <Button asChild>
+                      <Link href={createEntryHref}>
+                        {t("admin.trials.manage.resultCreate.action")}
+                      </Link>
+                    </Button>
+                  ) : null}
+                  {workspaceHref ? (
+                    <Button asChild variant="outline">
+                      <Link href={workspaceHref}>
+                        {t(
+                          "admin.trials.manage.selected.actions.openWorkspace",
+                        )}
+                      </Link>
+                    </Button>
+                  ) : null}
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setEditError(null);
+                      setIsEditOpen(true);
+                    }}
+                    disabled={updateMutation.isPending}
+                  >
+                    {t("admin.trials.manage.selected.actions.editEvent")}
+                  </Button>
+                  {allowEmptyEventDeletion && selectedEntries.length === 0 ? (
+                    <AdminTrialEventDeleteAction
+                      trialEventId={selectedEvent.trialEventId}
+                      onDeleted={onDeletedTrialEvent}
+                      onNotEmpty={() => onTrialEventDeleteConflict?.()}
+                    />
+                  ) : null}
+                </div>
               </div>
             </div>
             <SelectedEventEntries

@@ -15,6 +15,17 @@ describe("admin trial message index", () => {
     expect(
       fiAdminTrialsMessages["admin.trials.manage.selected.actions.editEvent"],
     ).toBe("Muokkaa tapahtumaa");
+    expect(
+      fiAdminTrialsMessages["admin.trials.manage.workspace.notFound"],
+    ).toBe("Ajokoetapahtumaa ei löytynyt.");
+    expect(
+      fiAdminTrialsMessages[
+        "admin.trials.manage.selected.actions.openWorkspace"
+      ],
+    ).toBe("Avaa tapahtuman sivu");
+    expect(fiAdminTrialsMessages["admin.trials.manage.create.action"]).toBe(
+      "Luo tapahtuma",
+    );
     expect(svAdminTrialsMessages["admin.trials.manage.events.title"]).toBe(
       "Evenemang",
     );
@@ -27,5 +38,16 @@ describe("admin trial message index", () => {
     expect(
       svAdminTrialsMessages["admin.trials.manage.selected.actions.editEvent"],
     ).toBe("Redigera evenemang");
+    expect(
+      svAdminTrialsMessages["admin.trials.manage.workspace.notFound"],
+    ).toBe("Jaktprovsevenemanget hittades inte.");
+    expect(
+      svAdminTrialsMessages[
+        "admin.trials.manage.selected.actions.openWorkspace"
+      ],
+    ).toBe("Öppna evenemangssidan");
+    expect(svAdminTrialsMessages["admin.trials.manage.create.action"]).toBe(
+      "Skapa evenemang",
+    );
   });
 });

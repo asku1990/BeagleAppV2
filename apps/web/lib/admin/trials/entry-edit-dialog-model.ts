@@ -4,6 +4,7 @@ import {
   getAdminTrialLisatietoConfig,
   type AdminTrialLisatietoGroup,
   type AdminTrialLisatietoInputKind,
+  type AdminTrialLisatietoConfig,
 } from "./entry-edit-config";
 
 export type LisatietoRowDraft = {
@@ -14,6 +15,10 @@ export type LisatietoRowDraft = {
   group: AdminTrialLisatietoGroup;
   label: string;
   inputKind: AdminTrialLisatietoInputKind;
+  valueHint?: "marker" | "integer" | "decimal" | "text";
+  toPersistedValue?: (controlValue: string) => string;
+  hideOsaSuffix?: boolean;
+  useSemanticControl?: boolean;
   sortOrder: number;
   eraValues: Record<number, string>;
 };
@@ -147,6 +152,7 @@ export function toEraDrafts(entry: AdminTrialEventEntry): EraDraft[] {
 export function toLisatietoRows(
   entry: AdminTrialEventEntry,
   eras: EraDraft[],
+  configs: readonly AdminTrialLisatietoConfig[] = ADMIN_TRIAL_LISATIETO_CONFIG,
 ): LisatietoRowDraft[] {
   const eraNumbers = eras.map((era) => era.era);
   const values = new Map<string, LisatietoRowDraft>();
@@ -175,7 +181,10 @@ export function toLisatietoRows(
       return existing;
     }
 
-    const config = getAdminTrialLisatietoConfig(input.koodi, input.osa);
+    const config =
+      configs.find(
+        (item) => item.koodi === input.koodi && item.osa === input.osa,
+      ) ?? getAdminTrialLisatietoConfig(input.koodi, input.osa);
     const parsedCode = Number.parseInt(input.koodi, 10);
     const row: LisatietoRowDraft = {
       koodi: input.koodi,
@@ -185,6 +194,10 @@ export function toLisatietoRows(
       group: config?.group ?? "unknown",
       label: config?.label ?? input.nimi ?? "Tuntematon lisätieto",
       inputKind: config?.inputKind ?? "text",
+      valueHint: config?.valueHint,
+      toPersistedValue: config?.toPersistedValue,
+      hideOsaSuffix: config?.hideOsaSuffix,
+      useSemanticControl: config?.useSemanticControl,
       sortOrder:
         config?.sortOrder ??
         (Number.isInteger(parsedCode) ? parsedCode : Number.MAX_SAFE_INTEGER),
@@ -194,12 +207,12 @@ export function toLisatietoRows(
     return row;
   }
 
-  for (const config of ADMIN_TRIAL_LISATIETO_CONFIG) {
+  for (const config of configs) {
     ensureRow({
       koodi: config.koodi,
       osa: config.osa,
       nimi: config.label,
-      jarjestys: config.sortOrder,
+      jarjestys: config.persistenceOrder,
     });
   }
 
@@ -211,6 +224,7 @@ export function toLisatietoRows(
         nimi: item.nimi,
         jarjestys: item.jarjestys,
       });
+      row.jarjestys = item.jarjestys;
       row.eraValues[era.era] = item.arvo;
     }
   }
@@ -238,12 +252,19 @@ export function toLisatietoRows(
   });
 }
 
+const MIN_DB_INTEGER = -2_147_483_648;
+const MAX_DB_INTEGER = 2_147_483_647;
+
 export function parseInteger(value: string): number | null {
   const trimmed = value.trim();
   if (!trimmed) return null;
   if (!/^-?\d+$/.test(trimmed)) return null;
   const parsed = Number.parseInt(trimmed, 10);
-  return Number.isInteger(parsed) ? parsed : null;
+  return Number.isSafeInteger(parsed) &&
+    parsed >= MIN_DB_INTEGER &&
+    parsed <= MAX_DB_INTEGER
+    ? parsed
+    : null;
 }
 
 export function parseDecimal(value: string): number | null {
@@ -255,7 +276,7 @@ export function parseDecimal(value: string): number | null {
 
 export function isValidOptionalInteger(value: string): boolean {
   const trimmed = value.trim();
-  return trimmed.length === 0 || /^-?\d+$/.test(trimmed);
+  return trimmed.length === 0 || parseInteger(trimmed) !== null;
 }
 
 export function isValidOptionalDecimal(value: string): boolean {

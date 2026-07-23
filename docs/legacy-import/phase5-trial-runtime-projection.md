@@ -98,16 +98,11 @@ Keep `legacy_akoeall` summary values on `TrialEntry`:
 Trial rule timeline:
 
 - Rule windows are seeded by migration before phase 5 runs.
-- `trw_pre_20020801`: `AJOKOKEEN SÄÄNNÖT JA OHJEET (AJOK ja BEAJ), voimassa ennen 1.8.2002`
-- `trw_range_2002_2005`: `AJOKOKEEN SÄÄNNÖT JA OHJEET (AJOK ja BEAJ), voimassa 1.8.2002-31.7.2005`
-- `trw_range_2005_2011`: `AJOKOKEEN SÄÄNNÖT JA OHJEET (AJOK ja BEAJ), voimassa 1.8.2005-31.7.2011`
-- `trw_post_20110801`: `AJOKOKEEN SÄÄNNÖT JA OHJEET (AJOK ja BEAJ), voimassa 1.8.2011-31.7.2023`
-- Current rule window:
-  - `id = trw_post_20230801`
-  - `fromYmd = 20230801`
-  - `toYmd = null`
-  - `sortOrder = 50`
-  - `label = AJOKOKEEN SÄÄNNÖT JA OHJEET (AJOK ja BEAJ), voimassa 1.8.2023 alkaen`
+- Phase 5 resolves the imported event date against the active inclusive
+  windows and persists the selected ID on `TrialEvent`.
+- The canonical seeded timeline and its manual-creation verification statuses
+  are documented in
+  [Trial rule windows](../features/trials/rule-windows.md).
 
 Map selected `bealt*` era fields to `TrialEra`:
 

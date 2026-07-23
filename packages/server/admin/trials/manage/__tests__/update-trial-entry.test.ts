@@ -260,6 +260,65 @@ describe("updateAdminTrialEntry", () => {
     expect(updateAdminTrialEntryWriteDbMock).not.toHaveBeenCalled();
   });
 
+  it("rejects duplicate normalized lisatieto keys before persistence", async () => {
+    const row = {
+      koodi: "11",
+      osa: "",
+      nimi: null,
+      jarjestys: null,
+      eraValues: [{ era: 1, arvo: "1" }],
+    };
+
+    await expect(
+      updateAdminTrialEntry(
+        {
+          ...baseInput(),
+          lisatiedotRows: [row, { ...row, koodi: " 11 ", osa: " " }],
+        },
+        adminUser,
+      ),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Duplicate lisatieto rows are not allowed.",
+        code: "INVALID_TRIAL_ADDITIONAL_INFO",
+      },
+    });
+    expect(updateAdminTrialEntryWriteDbMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects duplicate lisatieto era values before persistence", async () => {
+    await expect(
+      updateAdminTrialEntry(
+        {
+          ...baseInput(),
+          lisatiedotRows: [
+            {
+              koodi: "11",
+              osa: "",
+              nimi: null,
+              jarjestys: null,
+              eraValues: [
+                { era: 1, arvo: "1" },
+                { era: 1, arvo: "2" },
+              ],
+            },
+          ],
+        },
+        adminUser,
+      ),
+    ).resolves.toEqual({
+      status: 400,
+      body: {
+        ok: false,
+        error: "Duplicate lisatieto era values are not allowed.",
+        code: "INVALID_TRIAL_ADDITIONAL_INFO",
+      },
+    });
+    expect(updateAdminTrialEntryWriteDbMock).not.toHaveBeenCalled();
+  });
+
   it("accepts canonical and existing numeric lisatieto codes by koodi and osa", async () => {
     updateAdminTrialEntryWriteDbMock.mockResolvedValue({
       status: "updated",

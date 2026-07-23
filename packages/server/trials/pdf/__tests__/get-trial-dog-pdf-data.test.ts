@@ -131,6 +131,41 @@ describe("getTrialDogPdfDataService", () => {
     expect(result.body.data.trialRuleWindowId).toBe("trw_range_2005_2011");
   });
 
+  it("pivots only PDF-consumed part a for lisatieto codes 25 and 27", async () => {
+    const base = dbRow();
+    getTrialDogPdfDataDbMock.mockResolvedValue(
+      dbRow({
+        eras: [
+          {
+            ...base.eras[0],
+            lisatiedot: [
+              { koodi: "25", osa: "a", arvo: "2.5" },
+              { koodi: "25", osa: "b", arvo: "99" },
+              { koodi: "27", osa: "a", arvo: "18" },
+              { koodi: "27", osa: "c", arvo: "88" },
+            ],
+          },
+          {
+            ...base.eras[1],
+            lisatiedot: [
+              { koodi: "25", osa: "a", arvo: "3.5" },
+              { koodi: "27", osa: "a", arvo: "20" },
+            ],
+          },
+        ],
+      }),
+    );
+
+    const result = await getTrialDogPdfDataService("entry-1");
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) throw new Error("Expected ok=true");
+    expect(result.body.data.lisatiedotRows).toEqual([
+      { koodi: "25", era1: "2.5", era2: "3.5" },
+      { koodi: "27", era1: "18", era2: "20" },
+    ]);
+  });
+
   it("derives accepted driving minutes and driving time points for legacy rows", async () => {
     getTrialDogPdfDataDbMock.mockResolvedValue(dbRow());
 

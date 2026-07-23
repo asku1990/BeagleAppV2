@@ -38,11 +38,16 @@ vi.mock("@/components/ui/card", () => ({
 vi.mock("@/components/ui/button", () => ({
   Button: ({
     children,
+    asChild,
     ...props
   }: {
     children: React.ReactNode;
+    asChild?: boolean;
     [key: string]: unknown;
-  }) => React.createElement("button", props, children),
+  }) =>
+    asChild
+      ? React.createElement(React.Fragment, null, children)
+      : React.createElement("button", props, children),
 }));
 
 vi.mock("next/link", () => ({
@@ -67,6 +72,11 @@ vi.mock("../admin-trial-event-edit-dialog", () => ({
     React.createElement("div", null, `edit-dialog-${open}`),
 }));
 
+vi.mock("../admin-trial-event-delete-action", () => ({
+  AdminTrialEventDeleteAction: ({ trialEventId }: { trialEventId: string }) =>
+    React.createElement("div", null, `delete-event-${trialEventId}`),
+}));
+
 vi.mock("@/queries/admin/trials", () => ({
   useUpdateAdminTrialEventMutation: () => ({
     mutateAsync: vi.fn(),
@@ -84,6 +94,7 @@ describe("AdminTrialSelectedEventPanel", () => {
       React.createElement(AdminTrialSelectedEventPanel, {
         selectedEvent: {
           trialEventId: "event-1",
+          trialRuleWindowId: "trw_post_20230801",
           eventDate: "2026-04-14",
           eventPlace: "Helsinki",
           eventName: "Kevatkoe",
@@ -123,5 +134,71 @@ describe("AdminTrialSelectedEventPanel", () => {
     expect(html).toContain("actions-trial-1");
     expect(html).toContain("admin.trials.manage.selected.actions.editEvent");
     expect(html).toContain("edit-dialog-false");
+    expect(html).not.toContain(
+      "admin.trials.manage.selected.actions.openWorkspace",
+    );
+  });
+
+  it("renders an optional event workspace link", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(AdminTrialSelectedEventPanel, {
+        selectedEvent: {
+          trialEventId: "event-1",
+          trialRuleWindowId: null,
+          eventDate: "2026-04-14",
+          eventPlace: "Helsinki",
+          eventName: null,
+          jarjestaja: null,
+          ylituomari: null,
+          ylituomariNumero: null,
+          ytKertomus: null,
+          kennelpiiri: null,
+          kennelpiirinro: null,
+          sklKoeId: 12345,
+          dogCount: 0,
+          entries: [],
+        },
+        isLoading: false,
+        isError: false,
+        errorText: "error",
+        workspaceHref: "/admin/trials/event-1",
+        onDeletedTrialEvent: vi.fn(),
+      }),
+    );
+
+    expect(html).toContain('href="/admin/trials/event-1"');
+    expect(html).toContain(
+      "admin.trials.manage.selected.actions.openWorkspace",
+    );
+  });
+
+  it("shows event deletion only for an empty event when explicitly allowed", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(AdminTrialSelectedEventPanel, {
+        selectedEvent: {
+          trialEventId: "event-1",
+          trialRuleWindowId: null,
+          eventDate: "2026-04-14",
+          eventPlace: "Helsinki",
+          eventName: null,
+          jarjestaja: null,
+          ylituomari: null,
+          ylituomariNumero: null,
+          ytKertomus: null,
+          kennelpiiri: null,
+          kennelpiirinro: null,
+          sklKoeId: 12345,
+          dogCount: 0,
+          entries: [],
+        },
+        isLoading: false,
+        isError: false,
+        errorText: "error",
+        onDeletedTrialEvent: vi.fn(),
+        allowEmptyEventDeletion: true,
+      }),
+    );
+
+    expect(html).toContain("delete-event-event-1");
   });
 });

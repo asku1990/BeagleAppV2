@@ -40,6 +40,91 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.events.columns.name": "Tapahtuma",
   "admin.trials.manage.events.columns.judge": "Ylituomari",
   "admin.trials.manage.events.columns.dogs": "Koiria",
+  "admin.trials.manage.workspace.title": "Ajokoetapahtuma",
+  "admin.trials.manage.workspace.notFound": "Ajokoetapahtumaa ei löytynyt.",
+  "admin.trials.manage.workspace.error":
+    "Ajokoetapahtuman lataaminen epäonnistui.",
+  "admin.trials.manage.workspace.retry": "Yritä uudelleen",
+  "admin.trials.manage.create.action": "Luo tapahtuma",
+  "admin.trials.manage.create.title": "Luo ajokoetapahtuma",
+  "admin.trials.manage.create.description":
+    "Tallenna tapahtuman perustiedot. Koirakohtaiset tulokset lisätään myöhemmin.",
+  "admin.trials.manage.create.save": "Luo tapahtuma",
+  "admin.trials.manage.create.saving": "Luodaan...",
+  "admin.trials.manage.create.cancel": "Peruuta",
+  "admin.trials.manage.create.error": "Tapahtuman luominen epäonnistui.",
+  "admin.trials.manage.create.conflict":
+    "Annettu SKL koe ID kuuluu jo toiselle tapahtumalle.",
+  "admin.trials.manage.resultCreate.action": "Lisää tulos",
+  "admin.trials.manage.resultCreate.title": "Lisää koetulos",
+  "admin.trials.manage.resultCreate.loading": "Ladataan tapahtumaa...",
+  "admin.trials.manage.resultCreate.loadError":
+    "Tapahtuman lataaminen epäonnistui.",
+  "admin.trials.manage.resultCreate.eventNotFound":
+    "Ajokoetapahtumaa ei löytynyt.",
+  "admin.trials.manage.resultCreate.missingSklId":
+    "Tulosta ei voi lisätä, koska tapahtumalta puuttuu SKL koe ID.",
+  "admin.trials.manage.resultCreate.backToList": "Takaisin tapahtumiin",
+  "admin.trials.manage.resultCreate.backToWorkspace":
+    "Takaisin tapahtuman sivulle",
+  "admin.trials.manage.resultCreate.registration": "Rekisterinumero",
+  "admin.trials.manage.resultCreate.rulePeriod.post2023": "Säännöt: 1.8.2023 →",
+  "admin.trials.manage.resultCreate.rulePeriod.unverified":
+    "Säännöt: historiallinen tai määrittämätön sääntökausi",
+  "admin.trials.manage.resultCreate.ruleWindowWarning":
+    "Tämän sääntökauden kenttiä ei ole vielä tarkistettu pöytäkirjaa vasten. Lomake näyttää yhteensopivuuden vuoksi kaikki nykyiset kentät.",
+  "admin.trials.manage.resultCreate.valueHint.marker": "Valinta",
+  "admin.trials.manage.resultCreate.valueHint.integer": "Kokonaisluku",
+  "admin.trials.manage.resultCreate.valueHint.decimal": "Desimaaliluku",
+  "admin.trials.manage.resultCreate.valueHint.text": "Teksti",
+  "admin.trials.manage.resultCreate.triState.no": "Ei",
+  "admin.trials.manage.resultCreate.triState.yes": "Kyllä",
+  "admin.trials.manage.resultCreate.saveAnother": "Tallenna ja lisää seuraava",
+  "admin.trials.manage.resultCreate.saveFinish": "Tallenna ja lopeta",
+  "admin.trials.manage.resultCreate.cancel": "Peruuta",
+  "admin.trials.manage.resultCreate.success": "Koetulos tallennettiin.",
+  "admin.trials.manage.resultCreate.validation.registration":
+    "Anna rekisterinumero.",
+  "admin.trials.manage.resultCreate.validation.entry":
+    "Tarkista tuloksen numeeriset kentät.",
+  "admin.trials.manage.resultCreate.validation.eras":
+    "Tarkista erien numerointi ja numeeriset kentät.",
+  "admin.trials.manage.resultCreate.error.registration":
+    "Rekisterinumero ei ole kelvollinen.",
+  "admin.trials.manage.resultCreate.error.conflict":
+    "Tällä rekisterinumerolla on jo tulos tapahtumassa.",
+  "admin.trials.manage.resultCreate.error.entry":
+    "Tarkista tuloksen perustiedot.",
+  "admin.trials.manage.resultCreate.error.eras": "Tarkista erien tiedot.",
+  "admin.trials.manage.resultCreate.error.additionalInfo":
+    "Tarkista lisätietojen arvot.",
+  "admin.trials.manage.resultCreate.error.additionalInfoOrder":
+    "Lomake muodosti virheellisen järjestyksen lisätiedolle",
+  "admin.trials.manage.resultCreate.error.additionalInfoRow":
+    "Palvelin hylkäsi lisätiedon",
+  "admin.trials.manage.resultCreate.error.eventNotFound":
+    "Ajokoetapahtumaa ei enää löytynyt.",
+  "admin.trials.manage.resultCreate.error.missingSklId":
+    "Tapahtumalta puuttuu SKL koe ID.",
+  "admin.trials.manage.resultCreate.error.generic":
+    "Koetuloksen tallentaminen epäonnistui.",
+  "admin.trials.manage.resultCreate.unsaved.title": "Hylätäänkö muutokset?",
+  "admin.trials.manage.resultCreate.unsaved.body":
+    "Tallentamattomat tiedot menetetään.",
+  "admin.trials.manage.resultCreate.unsaved.confirm": "Hylkää muutokset",
+  "admin.trials.manage.resultCreate.unsaved.cancel": "Jatka muokkaamista",
+  "admin.trials.manage.deleteEvent.action": "Poista tapahtuma",
+  "admin.trials.manage.deleteEvent.confirmTitle": "Poistetaanko tapahtuma?",
+  "admin.trials.manage.deleteEvent.confirmBody":
+    "Tyhjä tapahtuma poistetaan pysyvästi. Tapahtumaa, jolla on tuloksia, ei voi poistaa.",
+  "admin.trials.manage.deleteEvent.confirm": "Poista tapahtuma",
+  "admin.trials.manage.deleteEvent.deleting": "Poistetaan...",
+  "admin.trials.manage.deleteEvent.cancel": "Peruuta",
+  "admin.trials.manage.deleteEvent.success": "Tapahtuma poistettiin.",
+  "admin.trials.manage.deleteEvent.error":
+    "Tapahtuman poistaminen epäonnistui.",
+  "admin.trials.manage.deleteEvent.notEmpty":
+    "Tapahtumaa ei voi poistaa, koska sillä on koetuloksia.",
   "admin.trials.manage.selected.title": "Valittu tapahtuma",
   "admin.trials.manage.selected.subtitle":
     "Tapahtuman koirarivit ja rivikohtaiset toiminnot.",
@@ -60,6 +145,7 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.selected.columns.actions": "Toiminnot",
   "admin.trials.manage.selected.actions.openPdf": "Avaa pöytäkirja",
   "admin.trials.manage.selected.actions.more": "Lisää toimintoja",
+  "admin.trials.manage.selected.actions.openWorkspace": "Avaa tapahtuman sivu",
   "admin.trials.manage.selected.actions.editEvent": "Muokkaa tapahtumaa",
   "admin.trials.manage.selected.actions.editEntry": "Muokkaa riviä",
   "admin.trials.manage.entryModal.header.title": "Muokattava koerivi",
@@ -73,7 +159,7 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.selected.actions.delete.confirmTitle":
     "Poistetaanko tämä koetulos?",
   "admin.trials.manage.selected.actions.delete.confirmBody":
-    "Tämä poistaa vain tämän koirakohtaisen koetuloksen.\nJos tämä oli tapahtuman viimeinen tulos, myös tyhjä koetapahtuma poistetaan.",
+    "Tämä poistaa vain tämän koirakohtaisen koetuloksen. Jos tämä oli tapahtuman viimeinen tulos, tyhjä koetapahtuma säilyy.",
   "admin.trials.manage.selected.actions.delete.confirmDog": "Koira",
   "admin.trials.manage.selected.actions.delete.confirmRegistration":
     "Rekisterinumero",
@@ -167,6 +253,93 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.events.columns.name": "Evenemang",
   "admin.trials.manage.events.columns.judge": "Överdomare",
   "admin.trials.manage.events.columns.dogs": "Hundar",
+  "admin.trials.manage.workspace.title": "Jaktprovsevenemang",
+  "admin.trials.manage.workspace.notFound":
+    "Jaktprovsevenemanget hittades inte.",
+  "admin.trials.manage.workspace.error":
+    "Det gick inte att ladda jaktprovsevenemanget.",
+  "admin.trials.manage.workspace.retry": "Försök igen",
+  "admin.trials.manage.create.action": "Skapa evenemang",
+  "admin.trials.manage.create.title": "Skapa jaktprovsevenemang",
+  "admin.trials.manage.create.description":
+    "Spara evenemangets grunduppgifter. Hundspecifika resultat läggs till senare.",
+  "admin.trials.manage.create.save": "Skapa evenemang",
+  "admin.trials.manage.create.saving": "Skapar...",
+  "admin.trials.manage.create.cancel": "Avbryt",
+  "admin.trials.manage.create.error": "Det gick inte att skapa evenemanget.",
+  "admin.trials.manage.create.conflict":
+    "Det angivna SKL prov-ID:t används redan av ett annat evenemang.",
+  "admin.trials.manage.resultCreate.action": "Lägg till resultat",
+  "admin.trials.manage.resultCreate.title": "Lägg till provresultat",
+  "admin.trials.manage.resultCreate.loading": "Laddar evenemanget...",
+  "admin.trials.manage.resultCreate.loadError":
+    "Det gick inte att ladda evenemanget.",
+  "admin.trials.manage.resultCreate.eventNotFound":
+    "Jaktprovsevenemanget hittades inte.",
+  "admin.trials.manage.resultCreate.missingSklId":
+    "Resultatet kan inte läggas till eftersom evenemanget saknar SKL prov-ID.",
+  "admin.trials.manage.resultCreate.backToList": "Tillbaka till evenemangen",
+  "admin.trials.manage.resultCreate.backToWorkspace":
+    "Tillbaka till evenemangssidan",
+  "admin.trials.manage.resultCreate.registration": "Registreringsnummer",
+  "admin.trials.manage.resultCreate.rulePeriod.post2023": "Regler: 1.8.2023 →",
+  "admin.trials.manage.resultCreate.rulePeriod.unverified":
+    "Regler: historisk eller obestämd regelperiod",
+  "admin.trials.manage.resultCreate.ruleWindowWarning":
+    "Fälten för den här regelperioden har ännu inte verifierats mot protokollet. Formuläret visar därför alla nuvarande fält för kompatibilitet.",
+  "admin.trials.manage.resultCreate.valueHint.marker": "Val",
+  "admin.trials.manage.resultCreate.valueHint.integer": "Heltal",
+  "admin.trials.manage.resultCreate.valueHint.decimal": "Decimaltal",
+  "admin.trials.manage.resultCreate.valueHint.text": "Text",
+  "admin.trials.manage.resultCreate.triState.no": "Nej",
+  "admin.trials.manage.resultCreate.triState.yes": "Ja",
+  "admin.trials.manage.resultCreate.saveAnother": "Spara och lägg till nästa",
+  "admin.trials.manage.resultCreate.saveFinish": "Spara och avsluta",
+  "admin.trials.manage.resultCreate.cancel": "Avbryt",
+  "admin.trials.manage.resultCreate.success": "Provresultatet sparades.",
+  "admin.trials.manage.resultCreate.validation.registration":
+    "Ange registreringsnummer.",
+  "admin.trials.manage.resultCreate.validation.entry":
+    "Kontrollera resultatets numeriska fält.",
+  "admin.trials.manage.resultCreate.validation.eras":
+    "Kontrollera omgångarnas numrering och numeriska fält.",
+  "admin.trials.manage.resultCreate.error.registration":
+    "Registreringsnumret är ogiltigt.",
+  "admin.trials.manage.resultCreate.error.conflict":
+    "Registreringsnumret har redan ett resultat i evenemanget.",
+  "admin.trials.manage.resultCreate.error.entry":
+    "Kontrollera resultatets grunduppgifter.",
+  "admin.trials.manage.resultCreate.error.eras":
+    "Kontrollera omgångarnas uppgifter.",
+  "admin.trials.manage.resultCreate.error.additionalInfo":
+    "Kontrollera tilläggsuppgifternas värden.",
+  "admin.trials.manage.resultCreate.error.additionalInfoOrder":
+    "Formuläret skapade en ogiltig ordning för tilläggsuppgiften",
+  "admin.trials.manage.resultCreate.error.additionalInfoRow":
+    "Servern avvisade tilläggsuppgiften",
+  "admin.trials.manage.resultCreate.error.eventNotFound":
+    "Jaktprovsevenemanget finns inte längre.",
+  "admin.trials.manage.resultCreate.error.missingSklId":
+    "Evenemanget saknar SKL prov-ID.",
+  "admin.trials.manage.resultCreate.error.generic":
+    "Det gick inte att spara provresultatet.",
+  "admin.trials.manage.resultCreate.unsaved.title": "Kassera ändringarna?",
+  "admin.trials.manage.resultCreate.unsaved.body":
+    "Uppgifter som inte sparats går förlorade.",
+  "admin.trials.manage.resultCreate.unsaved.confirm": "Kassera ändringarna",
+  "admin.trials.manage.resultCreate.unsaved.cancel": "Fortsätt redigera",
+  "admin.trials.manage.deleteEvent.action": "Ta bort evenemang",
+  "admin.trials.manage.deleteEvent.confirmTitle": "Ta bort evenemanget?",
+  "admin.trials.manage.deleteEvent.confirmBody":
+    "Det tomma evenemanget tas bort permanent. Ett evenemang med resultat kan inte tas bort.",
+  "admin.trials.manage.deleteEvent.confirm": "Ta bort evenemang",
+  "admin.trials.manage.deleteEvent.deleting": "Tar bort...",
+  "admin.trials.manage.deleteEvent.cancel": "Avbryt",
+  "admin.trials.manage.deleteEvent.success": "Evenemanget togs bort.",
+  "admin.trials.manage.deleteEvent.error":
+    "Det gick inte att ta bort evenemanget.",
+  "admin.trials.manage.deleteEvent.notEmpty":
+    "Evenemanget kan inte tas bort eftersom det har provresultat.",
   "admin.trials.manage.selected.title": "Valt evenemang",
   "admin.trials.manage.selected.subtitle":
     "Hundrader och radåtgärder för valt evenemang.",
@@ -186,6 +359,7 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.selected.columns.actions": "Åtgärder",
   "admin.trials.manage.selected.actions.openPdf": "Öppna protokoll",
   "admin.trials.manage.selected.actions.more": "Fler åtgärder",
+  "admin.trials.manage.selected.actions.openWorkspace": "Öppna evenemangssidan",
   "admin.trials.manage.selected.actions.editEvent": "Redigera evenemang",
   "admin.trials.manage.selected.actions.editEntry": "Redigera rad",
   "admin.trials.manage.entryModal.header.title": "Redigerad provrad",
@@ -199,7 +373,7 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.selected.actions.delete.confirmTitle":
     "Ta bort det här provresultatet?",
   "admin.trials.manage.selected.actions.delete.confirmBody":
-    "Det här tar bara bort det här hundspecifika provresultatet.\nOm detta var det sista resultatet i evenemanget tas även det tomma provevenemanget bort.",
+    "Det här tar bara bort det hundspecifika provresultatet. Om det var evenemangets sista resultat bevaras det tomma evenemanget.",
   "admin.trials.manage.selected.actions.delete.confirmDog": "Hund",
   "admin.trials.manage.selected.actions.delete.confirmRegistration":
     "Registrering",

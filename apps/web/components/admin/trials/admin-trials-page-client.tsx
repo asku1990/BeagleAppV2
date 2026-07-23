@@ -1,8 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import type { AdminTrialEventSearchRequest } from "@beagle/contracts";
 import { useI18n } from "@/hooks/i18n";
+import { Button } from "@/components/ui/button";
+import {
+  getAdminTrialEventCreateHref,
+  getAdminTrialEventHref,
+} from "@/lib/admin/trials";
 import { AdminTrialEventsFilters } from "./admin-trial-events-filters";
 import { AdminTrialEventsResults } from "./admin-trial-events-results";
 import { AdminTrialSelectedEventPanel } from "./admin-trial-selected-event-panel";
@@ -142,13 +148,20 @@ export function AdminTrialsPageClient() {
 
   return (
     <div className="space-y-4" suppressHydrationWarning>
-      <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {t("admin.trials.title")}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {t("admin.trials.description")}
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="space-y-2">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {t("admin.trials.title")}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {t("admin.trials.description")}
+          </p>
+        </div>
+        <Button asChild>
+          <Link href={getAdminTrialEventCreateHref()}>
+            {t("admin.trials.manage.create.action")}
+          </Link>
+        </Button>
       </div>
 
       <AdminTrialEventsFilters
@@ -190,6 +203,11 @@ export function AdminTrialsPageClient() {
         isLoading={eventQuery.isLoading}
         isError={eventQuery.isError}
         errorText={selectedErrorText}
+        workspaceHref={
+          eventQuery.data?.event
+            ? getAdminTrialEventHref(eventQuery.data.event.trialEventId)
+            : undefined
+        }
         onDeletedTrialEvent={(deletedTrialEventId) => {
           setSelectedEventIdInput("");
           setBlockedAutoSelectedEventId(deletedTrialEventId);

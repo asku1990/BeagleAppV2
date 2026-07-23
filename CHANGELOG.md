@@ -14,9 +14,22 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+- Ylläpitäjä voi avata ajokoetapahtuman omalle sivulleen tarkastelua ja nykyisiä muokkaustoimintoja varten.
+- Ylläpitäjä voi luoda ajokoetapahtuman perustietoineen ja avata sen omalle sivulleen ennen koetulosten lisäämistä.
+- Ylläpitäjä voi poistaa tyhjän ajokoetapahtuman sen omalta sivulta.
+- Ylläpitäjä voi lisätä ajokoetapahtumaan koirakohtaisia tuloksia yksi kerrallaan ja jatkaa seuraavaan tulokseen tai palata tapahtuman sivulle.
+
 ### Changed
 
+- Viimeisen koetuloksen poistaminen säilyttää ajokoetapahtuman tyhjänä, kunnes ylläpitäjä poistaa tapahtuman erikseen.
+- Uuden ajokoetapahtuman luomisen jälkeen siirrytään suoraan lisäämään tapahtuman ensimmäistä koetulosta.
+- Ajokoetuloksen lisäyslomake näyttää 1.8.2023 alkaen käytössä olevan sääntökauden mukaiset kentät. Vanhemmilla tai tunnistamattomilla sääntökausilla kaikki yhteensopivuuskentät säilyvät näkyvissä varoituksen kanssa.
+
 ### Fixed
+
+- Ajokoetuloksen lisätietorivit tallennetaan kelvollisessa kokonaislukujärjestyksessä, ja hylätty lisätietorivi näytetään aiempaa tarkemmin.
+- Ajokoetuloksen lisäyslomakkeen selaimen Takaisin-toiminto ei enää yritä perua navigointia epäluotettavalla edestakaisella sivuhistorian käsittelyllä.
+- Ylisuuria kokonaislukuarvoja ei enää tallenneta tyhjinä ajokoetuloksen luonnissa tai muokkauksessa.
 
 ### Removed
 

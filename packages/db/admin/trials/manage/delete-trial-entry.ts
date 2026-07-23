@@ -15,8 +15,8 @@ export type DeleteAdminTrialEntryWriteResultDb =
       deletedTrialEvent: boolean;
     };
 
-// modification: deleting TrialEntry cascades to TrialEra and TrialEraLisatieto.
-// If this was the last entry, remove the now-empty TrialEvent as cleanup.
+// Deleting TrialEntry cascades to TrialEra and TrialEraLisatieto.
+// The parent event intentionally remains persisted when the final entry is removed.
 export async function deleteAdminTrialEntryWriteDb(
   input: DeleteAdminTrialEntryWriteRequestDb,
 ): Promise<DeleteAdminTrialEntryWriteResultDb> {
@@ -32,27 +32,11 @@ export async function deleteAdminTrialEntryWriteDb(
       return { status: "not_found" };
     }
 
-    const remainingEntries = await tx.trialEntry.count({
-      where: {
-        trialEventId: input.trialEventId,
-      },
-    });
-
-    let deletedTrialEvent = false;
-    if (remainingEntries === 0) {
-      await tx.trialEvent.delete({
-        where: {
-          id: input.trialEventId,
-        },
-      });
-      deletedTrialEvent = true;
-    }
-
     return {
       status: "deleted",
       deletedTrialEntryId: input.trialEntryId,
       trialEventId: input.trialEventId,
-      deletedTrialEvent,
+      deletedTrialEvent: false,
     };
   }, ADMIN_WRITE_TX_CONFIG);
 }
