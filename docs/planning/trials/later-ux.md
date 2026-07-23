@@ -16,6 +16,10 @@ the review rules in the [BEJ-103 planning overview](./README.md).
   index.
 - Move editing of existing results from the modal to the reusable full-page
   result form.
+- Make existing result editing rule-window-aware, including preservation of
+  stored fields hidden by a narrower verified field set.
+- Redesign result editing only after the R3A and R3B creation gates have been
+  implemented, validated, and reviewed.
 - Add searchable dog selection to manual result creation.
 - Allow inline dog creation from the result flow.
 - Add an explicit draft/publish state for trial events or results.
@@ -27,8 +31,10 @@ the review rules in the [BEJ-103 planning overview](./README.md).
 
 - E1 and E2 retain the existing trials master-detail list.
 - R1 and R2 retain the existing result-edit modal.
-- R2 uses a free-text registration field and saves one complete result at a
-  time.
+- R2, R3A, and R3B use a free-text registration field and save one complete
+  result at a time.
+- R3A and R3B do not change result editing. Older, null, and unknown rule
+  windows use the warned show-all fallback only in result creation.
 - Matching Koiratietokanta upserts are resolved by the authoritative backend
   behavior documented in [Result creation](./result-creation.md), without a
   manual reconciliation screen.
