@@ -4,9 +4,11 @@ import {
   createAdminTrialEntryCreateDraft,
   toCreateAdminTrialEntryRequest,
 } from "../entry-create-model";
+import { resolveResultCreateFieldSet } from "../result-create-field-registry";
 
 const event: AdminTrialEventDetails = {
   trialEventId: "event-1",
+  trialRuleWindowId: "trw_post_20230801",
   eventDate: "2026-07-21",
   eventPlace: "Helsinki",
   eventName: null,
@@ -119,5 +121,25 @@ describe("manual trial entry create model", () => {
         true,
       );
     }
+  });
+
+  it("serializes only the resolved 2023+ rows through registry persistence mapping", () => {
+    const fieldSet = resolveResultCreateFieldSet(event.trialRuleWindowId);
+    const draft = createAdminTrialEntryCreateDraft(event, fieldSet);
+    draft.registrationNo = "FI43560/18";
+
+    expect(
+      draft.lisatiedotRows.some((row) => row.koodi === "25" && row.osa === "b"),
+    ).toBe(false);
+    const marker = draft.lisatiedotRows.find((row) => row.koodi === "10");
+    if (marker) marker.eraValues[1] = "0";
+
+    const result = toCreateAdminTrialEntryRequest("event-1", draft);
+    expect(result).toMatchObject({
+      ok: true,
+      request: {
+        lisatiedotRows: [],
+      },
+    });
   });
 });

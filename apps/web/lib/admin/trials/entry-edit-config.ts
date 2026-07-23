@@ -24,7 +24,8 @@ export type AdminTrialLisatietoInputKind =
   | "marker"
   | "integer"
   | "decimal"
-  | "text";
+  | "text"
+  | "tri-state";
 
 export type AdminTrialLisatietoConfig = {
   koodi: string;
@@ -34,6 +35,10 @@ export type AdminTrialLisatietoConfig = {
   inputKind: AdminTrialLisatietoInputKind;
   sortOrder: number;
   persistenceOrder: number;
+  valueHint?: "marker" | "integer" | "decimal" | "text";
+  toPersistedValue?: (controlValue: string) => string;
+  hideOsaSuffix?: boolean;
+  useSemanticControl?: boolean;
 };
 
 function defineLisatieto(

@@ -2,6 +2,7 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import type { EntryDraft } from "@/lib/admin/trials/entry-edit-dialog-model";
+import { resolveResultCreateFieldSet } from "@/lib/admin/trials/result-create-field-registry";
 import { EntryMetaSection } from "../entry-meta-section";
 
 const entryDraft: EntryDraft = {
@@ -71,5 +72,24 @@ describe("EntryMetaSection", () => {
     expect(html).toContain("Ylituomarin numero");
     expect(html).toContain("Ryhmätuomari");
     expect(html).toContain("Palkintotuomari");
+  });
+
+  it("uses create-only field visibility without changing the default edit view", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(EntryMetaSection, {
+        entryDraft,
+        isPending: false,
+        onChange: vi.fn(),
+        visibleFields:
+          resolveResultCreateFieldSet("trw_post_20230801").entryFields,
+      }),
+    );
+
+    expect(html).not.toContain("Tie ja estetyöskentely");
+    expect(html).not.toContain("Metsästysinto");
+    expect(html).not.toContain("Ajotaito / yleisvaikutelma");
+    expect(html).not.toContain("<h5");
+    expect(html).toContain("Ajotaito");
+    expect(html).toContain("Ansiopisteet yhteensä");
   });
 });

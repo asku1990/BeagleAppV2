@@ -14,6 +14,7 @@ type Props = {
     field: Exclude<keyof EraDraft, "era">,
     value: string,
   ) => void;
+  visibleFields?: ReadonlySet<Exclude<keyof EraDraft, "era">>;
 };
 
 export function EraSection({
@@ -22,6 +23,7 @@ export function EraSection({
   onAddEra,
   onRemoveEra,
   onChangeEraField,
+  visibleFields,
 }: Props) {
   return (
     <>
@@ -64,32 +66,40 @@ export function EraSection({
                     "tja",
                     "pin",
                   ] as const
-                ).map((field) => (
-                  <label key={field} className="space-y-1 text-xs">
-                    <span>{ADMIN_TRIAL_ERA_FIELD_LABELS[field]}</span>
+                ).map((field) =>
+                  visibleFields && !visibleFields.has(field) ? null : (
+                    <label key={field} className="space-y-1 text-xs">
+                      <span>
+                        {visibleFields && field === "yva"
+                          ? "ajotaito"
+                          : ADMIN_TRIAL_ERA_FIELD_LABELS[field]}
+                      </span>
+                      <Input
+                        value={era[field]}
+                        disabled={isPending}
+                        onChange={(event) =>
+                          onChangeEraField(era.era, field, event.target.value)
+                        }
+                      />
+                    </label>
+                  ),
+                )}
+                {!visibleFields || visibleFields.has("huomautusTeksti") ? (
+                  <label className="space-y-1 text-xs md:col-span-4">
+                    <span>Huomautusteksti</span>
                     <Input
-                      value={era[field]}
+                      value={era.huomautusTeksti}
                       disabled={isPending}
                       onChange={(event) =>
-                        onChangeEraField(era.era, field, event.target.value)
+                        onChangeEraField(
+                          era.era,
+                          "huomautusTeksti",
+                          event.target.value,
+                        )
                       }
                     />
                   </label>
-                ))}
-                <label className="space-y-1 text-xs md:col-span-4">
-                  <span>Huomautusteksti</span>
-                  <Input
-                    value={era.huomautusTeksti}
-                    disabled={isPending}
-                    onChange={(event) =>
-                      onChangeEraField(
-                        era.era,
-                        "huomautusTeksti",
-                        event.target.value,
-                      )
-                    }
-                  />
-                </label>
+                ) : null}
               </div>
             </div>
           ))}

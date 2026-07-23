@@ -66,6 +66,7 @@ export type AdminTrialEntryEraLisatieto = {
 };
 
 export type AdminTrialEventDetails = AdminTrialEventSummary & {
+  trialRuleWindowId: string | null;
   entries: AdminTrialEventEntry[];
 };
 

@@ -74,6 +74,7 @@ export async function getAdminTrialEvent(
         data: {
           event: {
             trialEventId: result.trialEventId,
+            trialRuleWindowId: result.trialRuleWindowId,
             eventDate: formatTrialDateOnly(result.eventDate),
             eventPlace: result.eventPlace,
             eventName: result.eventName,

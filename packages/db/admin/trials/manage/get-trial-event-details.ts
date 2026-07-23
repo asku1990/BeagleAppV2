@@ -23,6 +23,7 @@ export async function getAdminTrialEventDetailsDb(
     },
     select: {
       id: true,
+      trialRuleWindowId: true,
       sklKoeId: true,
       koepaiva: true,
       koekunta: true,
@@ -117,6 +118,7 @@ export async function getAdminTrialEventDetailsDb(
 
   return {
     trialEventId: row.id,
+    trialRuleWindowId: row.trialRuleWindowId,
     eventDate: row.koepaiva,
     eventPlace: row.koekunta,
     eventName: row.jarjestaja,

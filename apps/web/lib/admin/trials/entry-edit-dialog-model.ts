@@ -4,6 +4,7 @@ import {
   getAdminTrialLisatietoConfig,
   type AdminTrialLisatietoGroup,
   type AdminTrialLisatietoInputKind,
+  type AdminTrialLisatietoConfig,
 } from "./entry-edit-config";
 
 export type LisatietoRowDraft = {
@@ -14,6 +15,10 @@ export type LisatietoRowDraft = {
   group: AdminTrialLisatietoGroup;
   label: string;
   inputKind: AdminTrialLisatietoInputKind;
+  valueHint?: "marker" | "integer" | "decimal" | "text";
+  toPersistedValue?: (controlValue: string) => string;
+  hideOsaSuffix?: boolean;
+  useSemanticControl?: boolean;
   sortOrder: number;
   eraValues: Record<number, string>;
 };
@@ -147,6 +152,7 @@ export function toEraDrafts(entry: AdminTrialEventEntry): EraDraft[] {
 export function toLisatietoRows(
   entry: AdminTrialEventEntry,
   eras: EraDraft[],
+  configs: readonly AdminTrialLisatietoConfig[] = ADMIN_TRIAL_LISATIETO_CONFIG,
 ): LisatietoRowDraft[] {
   const eraNumbers = eras.map((era) => era.era);
   const values = new Map<string, LisatietoRowDraft>();
@@ -175,7 +181,10 @@ export function toLisatietoRows(
       return existing;
     }
 
-    const config = getAdminTrialLisatietoConfig(input.koodi, input.osa);
+    const config =
+      configs.find(
+        (item) => item.koodi === input.koodi && item.osa === input.osa,
+      ) ?? getAdminTrialLisatietoConfig(input.koodi, input.osa);
     const parsedCode = Number.parseInt(input.koodi, 10);
     const row: LisatietoRowDraft = {
       koodi: input.koodi,
@@ -185,6 +194,14 @@ export function toLisatietoRows(
       group: config?.group ?? "unknown",
       label: config?.label ?? input.nimi ?? "Tuntematon lisätieto",
       inputKind: config?.inputKind ?? "text",
+      valueHint:
+        config?.valueHint ??
+        (config?.inputKind === "tri-state"
+          ? "marker"
+          : (config?.inputKind ?? "text")),
+      toPersistedValue: config?.toPersistedValue ?? ((value) => value),
+      hideOsaSuffix: config?.hideOsaSuffix,
+      useSemanticControl: config?.useSemanticControl,
       sortOrder:
         config?.sortOrder ??
         (Number.isInteger(parsedCode) ? parsedCode : Number.MAX_SAFE_INTEGER),
@@ -194,7 +211,7 @@ export function toLisatietoRows(
     return row;
   }
 
-  for (const config of ADMIN_TRIAL_LISATIETO_CONFIG) {
+  for (const config of configs) {
     ensureRow({
       koodi: config.koodi,
       osa: config.osa,

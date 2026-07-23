@@ -99,6 +99,7 @@ export type AdminTrialEntryEraLisatietoDb = {
 
 export type AdminTrialEventDetailsDb = {
   trialEventId: string;
+  trialRuleWindowId: string | null;
   eventDate: Date;
   eventPlace: string;
   eventName: string | null;
