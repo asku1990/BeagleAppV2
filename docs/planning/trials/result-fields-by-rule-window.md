@@ -2,7 +2,7 @@
 
 ## Status and sequencing
 
-R3A was implemented by PR #344. This file remains the planning and review
+R3A is implemented in PR #344. This file remains the planning and review
 record; current durable behavior is documented in
 [Trial rule windows](../../features/trials/rule-windows.md).
 
