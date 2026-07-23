@@ -22,9 +22,9 @@ creation UI.
 
 R3A owns field correctness, not layout. Its registry is the single source of
 truth for visible fields, ordering, business/PDF grouping, semantic input
-kinds, and the persistence metadata needed to serialize a selected field.
-Presentation components consume the resolved field set and must not branch on
-specific rule-window IDs.
+kinds, localized value hints, and the persistence metadata needed to serialize
+a selected field. Presentation components consume the resolved field set and
+must not branch on specific rule-window IDs.
 
 The current mismatch is structural:
 
@@ -45,7 +45,7 @@ The current mismatch is structural:
   stored value through the DB and service mappings.
 - Add a semantic result-create field-set registry covering every seeded rule
   window ID. The registry defines field visibility, ordering, grouping,
-  semantic input kinds, and persistence mapping.
+  semantic input kinds, localized value hints, and persistence mapping.
 - Define semantic input kinds independently from stored values:
   `marker`, `integer`, `decimal`, and `text`, plus `tri-state` only for a field
   whose persistence explicitly distinguishes empty, `0`, and `1`. The
@@ -106,8 +106,8 @@ The current mismatch is structural:
 - Admin event details return the event's persisted `trialRuleWindowId`.
 - Result creation resolves its field set from that stored ID.
 - The field registry is the single source of truth for create-form visibility,
-  ordering, grouping, semantic controls, and persistence mapping; UI
-  components contain no rule-window-ID branches.
+  ordering, grouping, semantic controls, localized value hints, and
+  persistence mapping; UI components contain no rule-window-ID branches.
 - Semantic control state maps to persistence values through the registry,
   including tri-state only where empty, `0`, and `1` are distinct domain
   values.
@@ -132,7 +132,8 @@ The current mismatch is structural:
 - Field-registry tests covering every seeded rule-window ID and null/unknown
   fallback behavior.
 - Registry tests for semantic input kinds and control-state-to-persistence
-  mapping, including any explicitly configured tri-state field.
+  mapping, including localized value hints and any explicitly configured
+  tri-state field.
 - 2023+ parity tests for visible entry fields, era fields, lisätieto codes,
   parts, ordering, and input kinds.
 - Create-form tests for persisted-rule selection, fallback warning, unlimited

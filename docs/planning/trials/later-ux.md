@@ -20,9 +20,6 @@ the review rules in the [BEJ-103 planning overview](./README.md).
   stored fields hidden by a narrower verified field set.
 - Redesign result editing only after the R3A and R3B creation gates have been
   implemented, validated, and reviewed.
-- If a guided or multi-step result flow is adopted later, implement it as a
-  coordinator that controls visibility of the reusable R3B cards rather than
-  rewriting their field presentation.
 - Add searchable dog selection to manual result creation.
 - Allow inline dog creation from the result flow.
 - Add an explicit draft/publish state for trial events or results.
@@ -38,8 +35,9 @@ the review rules in the [BEJ-103 planning overview](./README.md).
   result at a time.
 - R3A and R3B do not change result editing. Older, null, and unknown rule
   windows use the warned show-all fallback only in result creation.
-- R3B keeps result creation on one page; a wizard or mandatory multi-step
-  coordinator is not part of the current gates.
+- R3B does not require a wizard. If a guided presentation is adopted during
+  R3B, it must be a thin coordinator over the same reusable cards and preserve
+  the existing save and navigation behavior.
 - Matching Koiratietokanta upserts are resolved by the authoritative backend
   behavior documented in [Result creation](./result-creation.md), without a
   manual reconciliation screen.

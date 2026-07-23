@@ -30,6 +30,12 @@ by the R3A registry.
 Keep one full-page form and one in-memory draft. Do not require a wizard or
 mandatory multi-step navigation.
 
+A guided or multi-step presentation is permitted, but it is not an R3B
+requirement. If implementation review shows that guidance is useful, add it as
+a thin coordinator that controls which reusable cards are visible. It must not
+duplicate card content, create separate field models, or change the existing
+save and navigation contract.
+
 Compose the page from independently reusable cards such as:
 
 - event context;
@@ -51,7 +57,7 @@ workflow.
 Cards must not own page navigation or rule-window resolution. They receive
 draft values, callbacks, validation state, and resolved field configuration
 through their interfaces. This keeps them reusable for future editing or for
-a later optional coordinator that controls card visibility without rewriting
+an optional R3B coordinator that controls card visibility without rewriting
 the cards.
 
 ## Rule-window presentation
@@ -168,7 +174,9 @@ entry has an ID.
 
 ## Exclusions
 
-- No wizard or mandatory multi-step flow.
+- No requirement to implement a wizard or mandatory multi-step flow. Any
+  guided presentation must remain a thin coordinator over the same reusable
+  cards.
 - No result-edit UI or rule-window-aware editing.
 - No migration of the edit modal to the card-based create page.
 - No unsaved PDF generation or new PDF preview endpoint.
@@ -185,6 +193,8 @@ entry has an ID.
   only.
 - The existing result-create route remains a familiar single-page form with
   the same save and navigation behavior.
+- A guided presentation, if adopted, reuses the same cards and field model and
+  does not change persistence, save, or navigation behavior.
 - Reusable cards render from the resolved R3A field set and contain no
   rule-window-specific branching.
 - Rule windows remain mostly invisible: administrators cannot select one,
