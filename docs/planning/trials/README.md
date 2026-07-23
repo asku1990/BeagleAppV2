@@ -23,9 +23,9 @@ on the next gate.
   defines R3A: make the existing result-create form use the event's persisted
   rule window, verify the 2023+ field set, and retain a warned show-all
   fallback for other windows.
-- [Guided result-creation UX](./result-creation-guided-ux.md) defines R3B:
-  replace only the full-page result-create form with a four-step workflow
-  after R3A has been reviewed.
+- [Result-creation UX](./result-creation-ux.md) defines R3B: evolve the
+  existing full-page create form into a clearer card-based single-page
+  experience after R3A has been reviewed.
 - [Later UX](./later-ux.md) records deferred ideas only and does not authorize
   their implementation.
 
@@ -89,7 +89,7 @@ R2 (UI)
  ↓
 R3A (rule-window-aware creation)
  ↓
-R3B (guided creation UX)
+R3B (result-creation UX)
 ```
 
 1. `E1` - event workspace
@@ -97,7 +97,7 @@ R3B (guided creation UX)
 3. `R1` - manual result schema and backend
 4. `R2` - manual result UI and workflow
 5. `R3A` - rule-window-aware result creation, after R2 review
-6. `R3B` - guided result-creation UX, after R3A review
+6. `R3B` - card-based result-creation UX, after R3A review
 
 For every gate:
 

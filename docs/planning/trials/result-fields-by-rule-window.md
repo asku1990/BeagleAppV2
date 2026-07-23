@@ -20,6 +20,12 @@ lisätieto fields from the event's persisted `trialRuleWindowId`. This aligns
 new 2023+ results with the corresponding dog-trial PDF before changing the
 creation UI.
 
+R3A owns field correctness, not layout. Its registry is the single source of
+truth for visible fields, ordering, business/PDF grouping, semantic input
+kinds, and the persistence metadata needed to serialize a selected field.
+Presentation components consume the resolved field set and must not branch on
+specific rule-window IDs.
+
 The current mismatch is structural:
 
 - PDF rendering already selects a renderer by rule window, while the admin
@@ -38,7 +44,13 @@ The current mismatch is structural:
 - Add `trialRuleWindowId` to the admin event-detail contract and propagate the
   stored value through the DB and service mappings.
 - Add a semantic result-create field-set registry covering every seeded rule
-  window ID.
+  window ID. The registry defines field visibility, ordering, grouping,
+  semantic input kinds, and persistence mapping.
+- Define semantic input kinds independently from stored values:
+  `marker`, `integer`, `decimal`, and `text`, plus `tri-state` only for a field
+  whose persistence explicitly distinguishes empty, `0`, and `1`. The
+  registry owns the mapping between semantic control state and persisted
+  values.
 - Resolve the create field set from the event's persisted
   `trialRuleWindowId`, never from the browser or by recalculating from the
   event date.
@@ -60,6 +72,12 @@ The current mismatch is structural:
 - Register older known, null, and unknown rule windows through one explicitly
   unverified fallback matching the current show-all create-form behavior.
 - Show a localized warning whenever the unverified fallback is active.
+- Treat rule-window selection as event-owned context. The administrator never
+  chooses or changes it from the result-create form.
+- Show only a minimal localized read-only rule-period label, for example
+  `Säännöt: 1.8.2023 →`. The technical `trialRuleWindowId` may appear only in
+  a tooltip, expandable diagnostics, or developer output, never as a normal
+  user-facing form field.
 - Pass field-set configuration only into the result-create flow. Shared
   components must keep their current default behavior so the existing edit
   modal is unaffected.
@@ -87,6 +105,14 @@ The current mismatch is structural:
 
 - Admin event details return the event's persisted `trialRuleWindowId`.
 - Result creation resolves its field set from that stored ID.
+- The field registry is the single source of truth for create-form visibility,
+  ordering, grouping, semantic controls, and persistence mapping; UI
+  components contain no rule-window-ID branches.
+- Semantic control state maps to persistence values through the registry,
+  including tri-state only where empty, `0`, and `1` are distinct domain
+  values.
+- Administrators cannot select a rule window and normally see only its
+  localized period label.
 - A 2023+ create form displays the verified score, era, and lisätieto
   configuration.
 - Codes `25` and `27` persist with part `a`, appear as single rows, and reach
@@ -105,10 +131,15 @@ The current mismatch is structural:
   event details.
 - Field-registry tests covering every seeded rule-window ID and null/unknown
   fallback behavior.
+- Registry tests for semantic input kinds and control-state-to-persistence
+  mapping, including any explicitly configured tri-state field.
 - 2023+ parity tests for visible entry fields, era fields, lisätieto codes,
   parts, ordering, and input kinds.
 - Create-form tests for persisted-rule selection, fallback warning, unlimited
-  continuous eras, and request serialization.
+  continuous eras, minimal rule-period presentation, and request
+  serialization.
+- Presentation tests proving the resolved registry configuration drives
+  rendering without rule-window-specific component branches.
 - Regression tests proving the edit modal retains its current complete field
   set and request serialization.
 - PDF pivot regression tests for part `a` of codes `25` and `27`.
@@ -120,8 +151,8 @@ The current mismatch is structural:
 R3A can merge independently after R2. It changes only the semantic
 presentation of result creation and leaves result editing unchanged.
 
-Stop after validation and request explicit review. Do not begin the guided
-creation UX in R3B without separate approval.
+Stop after validation and request explicit review. Do not begin the
+card-based creation UX in R3B without separate approval.
 
 ## Later historical and edit work
 
