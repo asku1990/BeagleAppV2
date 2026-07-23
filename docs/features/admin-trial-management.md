@@ -85,7 +85,9 @@ and follow-up admin flow redesign).
 - Event rows/cards are the interaction target for choosing a selected event.
 - The selected-event header has event edit and workspace navigation actions.
 - The event workspace links to the full-page result form. Dirty result forms
-  confirm internal navigation and use native unload protection for refresh or close.
+  confirm internal navigation and use native unload protection for refresh or
+  close. Browser Back leaves the form without application confirmation because
+  the App Router has no reliable asynchronous route-blocking hook.
 - Selected dog rows have PDF, edit, and result-delete actions.
 - A missing workspace event is shown explicitly and never falls back to a
   different event.

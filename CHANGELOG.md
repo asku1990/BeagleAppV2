@@ -27,6 +27,7 @@ This project uses a user-facing changelog format.
 ### Fixed
 
 - Ajokoetuloksen lisätietorivit tallennetaan kelvollisessa kokonaislukujärjestyksessä, ja hylätty lisätietorivi näytetään aiempaa tarkemmin.
+- Ajokoetuloksen lisäyslomakkeen selaimen Takaisin-toiminto ei enää yritä perua navigointia epäluotettavalla edestakaisella sivuhistorian käsittelyllä.
 
 ### Removed
 

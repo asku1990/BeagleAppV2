@@ -3,19 +3,40 @@
 import { useEffect, useRef, useState } from "react";
 
 export function useUnsavedTrialEntryGuard(isDirty: boolean) {
-  const [pendingLeave, setPendingLeave] = useState<(() => void) | null>(null);
+  const [isConfirmingLeave, setIsConfirmingLeave] = useState(false);
+  const pendingLeaveRef = useRef<(() => void) | null>(null);
   const allowLeaveRef = useRef(false);
+
+  function queueLeave(action: () => void) {
+    pendingLeaveRef.current = action;
+    setIsConfirmingLeave(true);
+  }
 
   useEffect(() => {
     if (!isDirty) return;
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (!allowLeaveRef.current) event.preventDefault();
+      if (allowLeaveRef.current) return;
+      event.preventDefault();
+      event.returnValue = true;
     };
     const handleClick = (event: MouseEvent) => {
-      if (allowLeaveRef.current || event.defaultPrevented || event.button !== 0)
+      if (
+        allowLeaveRef.current ||
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      )
         return;
       const anchor = (event.target as Element | null)?.closest("a");
-      if (!anchor || anchor.target || anchor.hasAttribute("download")) return;
+      if (
+        !anchor ||
+        (anchor.target && anchor.target !== "_self") ||
+        anchor.hasAttribute("download")
+      )
+        return;
       const target = new URL(anchor.href, window.location.href);
       if (
         target.origin !== window.location.origin ||
@@ -23,37 +44,36 @@ export function useUnsavedTrialEntryGuard(isDirty: boolean) {
       )
         return;
       event.preventDefault();
-      setPendingLeave(() => () => window.location.assign(target.href));
-    };
-    const handlePopState = () => {
-      if (allowLeaveRef.current) return;
-      window.history.forward();
-      setPendingLeave(() => () => window.history.back());
+      pendingLeaveRef.current = () => window.location.assign(target.href);
+      setIsConfirmingLeave(true);
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
     document.addEventListener("click", handleClick, true);
-    window.addEventListener("popstate", handlePopState);
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       document.removeEventListener("click", handleClick, true);
-      window.removeEventListener("popstate", handlePopState);
     };
   }, [isDirty]);
 
   function requestLeave(action: () => void) {
     if (!isDirty) action();
-    else setPendingLeave(() => action);
+    else queueLeave(action);
   }
 
   return {
-    isConfirmingLeave: pendingLeave !== null,
+    isConfirmingLeave,
     requestLeave,
-    cancelLeave: () => setPendingLeave(null),
+    cancelLeave: () => {
+      pendingLeaveRef.current = null;
+      setIsConfirmingLeave(false);
+    },
     confirmLeave: () => {
-      const action = pendingLeave;
+      const action = pendingLeaveRef.current;
+      pendingLeaveRef.current = null;
+      if (!action) return;
       allowLeaveRef.current = true;
-      setPendingLeave(null);
-      action?.();
+      setIsConfirmingLeave(false);
+      action();
     },
   };
 }
