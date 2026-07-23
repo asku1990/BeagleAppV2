@@ -63,6 +63,7 @@ describe("EntryMetaSection", () => {
     expect(html).toContain("Haukku");
     expect(html).toContain("Ajotaito / yleisvaikutelma");
     expect(html).toContain("Muut");
+    expect(html.match(/<h5/g)).toHaveLength(4);
     expect(html).toContain("Ansiopisteet yhteensä");
     expect(html).toContain("Metsästysinto");
     expect(html).toContain("Tie ja estetyöskentely");
@@ -88,7 +89,11 @@ describe("EntryMetaSection", () => {
     expect(html).not.toContain("Tie ja estetyöskentely");
     expect(html).not.toContain("Metsästysinto");
     expect(html).not.toContain("Ajotaito / yleisvaikutelma");
-    expect(html).not.toContain("<h5");
+    expect(html.match(/<h5/g)).toHaveLength(4);
+    expect(html).toContain(">Ajo</h5>");
+    expect(html).toContain(">Haku</h5>");
+    expect(html).toContain(">Haukku</h5>");
+    expect(html).toContain(">Muut</h5>");
     expect(html).toContain("Ajotaito");
     expect(html).toContain("Ansiopisteet yhteensä");
   });
