@@ -239,12 +239,19 @@ export function toLisatietoRows(
   });
 }
 
+const MIN_DB_INTEGER = -2_147_483_648;
+const MAX_DB_INTEGER = 2_147_483_647;
+
 export function parseInteger(value: string): number | null {
   const trimmed = value.trim();
   if (!trimmed) return null;
   if (!/^-?\d+$/.test(trimmed)) return null;
   const parsed = Number.parseInt(trimmed, 10);
-  return Number.isInteger(parsed) ? parsed : null;
+  return Number.isSafeInteger(parsed) &&
+    parsed >= MIN_DB_INTEGER &&
+    parsed <= MAX_DB_INTEGER
+    ? parsed
+    : null;
 }
 
 export function parseDecimal(value: string): number | null {
@@ -256,7 +263,7 @@ export function parseDecimal(value: string): number | null {
 
 export function isValidOptionalInteger(value: string): boolean {
   const trimmed = value.trim();
-  return trimmed.length === 0 || /^-?\d+$/.test(trimmed);
+  return trimmed.length === 0 || parseInteger(trimmed) !== null;
 }
 
 export function isValidOptionalDecimal(value: string): boolean {

@@ -62,6 +62,34 @@ describe("manual trial entry create model", () => {
     });
   });
 
+  it.each(["koiriaLuokassa", "hyvaksytytAjominuutit"] as const)(
+    "rejects oversized entry integer input in %s",
+    (field) => {
+      const draft = createAdminTrialEntryCreateDraft(event);
+      draft.registrationNo = "FI123";
+      draft.entry[field] = "9".repeat(400);
+
+      expect(toCreateAdminTrialEntryRequest("event-1", draft)).toEqual({
+        ok: false,
+        section: "entry",
+      });
+    },
+  );
+
+  it.each(["hakumin", "ajomin"] as const)(
+    "rejects oversized era integer input in %s",
+    (field) => {
+      const draft = createAdminTrialEntryCreateDraft(event);
+      draft.registrationNo = "FI123";
+      draft.eras[0][field] = "9".repeat(400);
+
+      expect(toCreateAdminTrialEntryRequest("event-1", draft)).toEqual({
+        ok: false,
+        section: "eras",
+      });
+    },
+  );
+
   it("uses integer persistence order and omits empty lisatieto rows", () => {
     const draft = createAdminTrialEntryCreateDraft(event);
     draft.registrationNo = "FI43560/18";

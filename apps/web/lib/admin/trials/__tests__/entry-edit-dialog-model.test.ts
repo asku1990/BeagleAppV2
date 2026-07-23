@@ -54,11 +54,24 @@ describe("entry edit lisatiedot model", () => {
     expect(parseInteger(" 42 ")).toBe(42);
   });
 
+  it("parses only integers representable by PostgreSQL Int", () => {
+    expect(parseInteger("-2147483648")).toBe(-2_147_483_648);
+    expect(parseInteger("2147483647")).toBe(2_147_483_647);
+    expect(parseInteger("-2147483649")).toBeNull();
+    expect(parseInteger("2147483648")).toBeNull();
+    expect(parseInteger("9".repeat(400))).toBeNull();
+  });
+
   it("validates optional numeric input before payload conversion", () => {
     expect(isValidOptionalInteger("")).toBe(true);
     expect(isValidOptionalInteger(" 42 ")).toBe(true);
+    expect(isValidOptionalInteger("-2147483648")).toBe(true);
+    expect(isValidOptionalInteger("2147483647")).toBe(true);
     expect(isValidOptionalInteger("12abc")).toBe(false);
     expect(isValidOptionalInteger("1-2")).toBe(false);
+    expect(isValidOptionalInteger("-2147483649")).toBe(false);
+    expect(isValidOptionalInteger("2147483648")).toBe(false);
+    expect(isValidOptionalInteger("9".repeat(400))).toBe(false);
 
     expect(isValidOptionalDecimal("")).toBe(true);
     expect(isValidOptionalDecimal(" 4,25 ")).toBe(true);
