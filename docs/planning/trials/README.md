@@ -19,6 +19,9 @@ on the next gate.
   identity, transaction, error, date-only, and Server Action backend contract.
 - [Result creation R2](./result-creation-r2.md) defines the full-page result
   form and admin UI workflow built on the approved R1 contract.
+- [Rule-window-aware result fields](./result-fields-by-rule-window.md) defines
+  the second result-creation follow-up after R2: introduce field-set selection
+  for every rule window and verify the 2023+ set first.
 - [Later UX](./later-ux.md) records deferred ideas only and does not authorize
   their implementation.
 
@@ -76,12 +79,15 @@ E2
 R1 (backend)
  ↓
 R2 (UI)
+ ↓
+R3 (rule-window field sets)
 ```
 
 1. `E1` - event workspace
 2. `E2` - event creation and empty-event lifecycle
 3. `R1` - manual result schema and backend
 4. `R2` - manual result UI and workflow
+5. `R3` - rule-window-aware result fields, after R2 review
 
 For every gate:
 

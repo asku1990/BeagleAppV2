@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   getAdminTrialEventCreateHref,
+  getAdminTrialEntryCreateHref,
   getAdminTrialEventHref,
   getAdminTrialsHref,
 } from "../trial-route";
@@ -21,6 +22,12 @@ describe("admin trial route helpers", () => {
   it("encodes the event id as one path segment", () => {
     expect(getAdminTrialEventHref("event/with spaces")).toBe(
       "/admin/trials/event%2Fwith%20spaces",
+    );
+  });
+
+  it("builds a result creation href under the workspace", () => {
+    expect(getAdminTrialEntryCreateHref("event-1")).toBe(
+      "/admin/trials/event-1/results/new",
     );
   });
 });

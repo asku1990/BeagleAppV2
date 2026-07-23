@@ -88,6 +88,7 @@ export async function createAdminTrialEntry(
         ok: false,
         error: "Trial result fields are invalid.",
         code: ISSUE_CODES[parsed.issue.area],
+        details: parsed.issue,
       },
     };
   }

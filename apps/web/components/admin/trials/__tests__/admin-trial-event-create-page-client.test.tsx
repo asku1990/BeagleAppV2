@@ -143,7 +143,7 @@ describe("AdminTrialEventCreatePageClient", () => {
       sklKoeId: 456,
     });
     expect(replaceMock).toHaveBeenCalledWith(
-      "/admin/trials/event%2Fwith%20spaces",
+      "/admin/trials/event%2Fwith%20spaces/results/new",
     );
   });
 

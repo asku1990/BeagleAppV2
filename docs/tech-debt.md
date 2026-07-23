@@ -26,6 +26,15 @@ Use this format for new entries:
 
 ## Entries
 
+## 2026-07-23 - Add deterministic dirty-form browser Back interception
+
+- Area: Admin AJOK manual-result navigation guard.
+- Issue: Dirty result forms guard explicit internal navigation and full-page unloads, but browser Back intentionally remains unguarded because asynchronous `popstate` recovery can race App Router navigation.
+- Impact: Browser Back can discard an unsaved manual result without application confirmation.
+- Suggested fix: Design a deliberate history-state guard that preserves Next.js history state, handles repeated traversal, and removes its sentinel cleanly before every confirmed navigation.
+- Trigger to revisit: When browser Back confirmation becomes a required result-entry acceptance criterion and can be covered in a real browser.
+- Ticket: BEJ-103 follow-up.
+
 ## 2026-07-20 - Audit date and time field semantics
 
 - Area: Prisma schema, PostgreSQL storage, imports, and API contracts.

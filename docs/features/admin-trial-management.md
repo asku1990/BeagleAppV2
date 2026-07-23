@@ -14,14 +14,16 @@ and follow-up admin flow redesign).
   explicitly from their workspace, but only while they have no result rows.
 - Per-dog inspection opens the generated trial PDF. Existing event and result
   editing remains modal-based.
-- The R1 backend contract can create one manual result at a time through an
-  admin Server Action. It is intentionally not linked to a UI until R2.
+- An admin can create one manual result at a time from an event workspace.
+  The full-page form supports saving another result for the same event or
+  finishing back at the workspace.
 
 ## Main files
 
 - `apps/web/app/(admin)/admin/trials/page.tsx`: route entrypoint for event master-detail list
 - `apps/web/app/(admin)/admin/trials/new/page.tsx`: full-page event creation route
 - `apps/web/app/(admin)/admin/trials/[trialEventId]/page.tsx`: stable event workspace route
+- `apps/web/app/(admin)/admin/trials/[trialEventId]/results/new/page.tsx`: manual result creation route
 - `apps/web/components/admin/trials/admin-trial-event-create-page-client.tsx`: event creation form and continuation
 - `apps/web/components/admin/trials/admin-trials-page-client.tsx`: event filters + event list + selected-event rows
 - `apps/web/components/admin/trials/admin-trial-event-workspace-page-client.tsx`: one-event workspace states and navigation
@@ -45,10 +47,12 @@ and follow-up admin flow redesign).
    only the `trialEventId` from its route.
 4. Event and result changes use admin Server Action mutations; the PDF action
    opens `/api/trials/[trialEntryId]/pdf` in a new tab.
-5. Successful event creation opens the persisted empty event workspace.
+5. Successful event creation opens the first manual result form for the new event.
 6. Manual result creation validates and canonicalizes the typed registration,
    then atomically creates the entry, eras, and lisätiedot. A matching local
    `DogRegistration` links the dog; an unknown registration remains unlinked.
+7. Successful result creation refetches admin event data and affected public
+   trial, dog-profile trial, and home-statistics queries without optimistic rows.
 
 ## Contract rules
 
@@ -63,6 +67,10 @@ and follow-up admin flow redesign).
   `TRIAL_ENTRY_REGISTRATION_CONFLICT`.
 - Manual result writes require each normalized lisätieto `(koodi, osa)` pair
   to occur only once across the submitted matrix rows.
+- Lisätieto UI sorting is separate from its integer persisted `jarjestys`;
+  unused create-form rows are omitted from the write payload.
+- Manual-result validation errors may carry safe structured field context for
+  localized feedback without exposing raw user-entered values.
 - `TrialEvent.koepaiva` is a PostgreSQL `DATE`; all trial contracts serialize
   it as timezone-free `YYYY-MM-DD`.
 - Empty event deletion returns `TRIAL_EVENT_NOT_EMPTY` if result rows are
@@ -76,6 +84,10 @@ and follow-up admin flow redesign).
 
 - Event rows/cards are the interaction target for choosing a selected event.
 - The selected-event header has event edit and workspace navigation actions.
+- The event workspace links to the full-page result form. Dirty result forms
+  confirm internal navigation and use native unload protection for refresh or
+  close. Browser Back leaves the form without application confirmation because
+  the App Router has no reliable asynchronous route-blocking hook.
 - Selected dog rows have PDF, edit, and result-delete actions.
 - A missing workspace event is shown explicitly and never falls back to a
   different event.

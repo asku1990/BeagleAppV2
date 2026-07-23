@@ -25,6 +25,7 @@ export type {
 export type {
   CreateAdminTrialEntryRequest,
   CreateAdminTrialEntryResponse,
+  AdminTrialEntryValidationIssue,
 } from "./create-admin-trial-entry";
 export type {
   DeleteAdminTrialEventRequest,

@@ -99,6 +99,9 @@ describe("AdminTrialEventWorkspacePageClient", () => {
     });
     expect(panelPropsRef.current?.workspaceHref).toBeUndefined();
     expect(panelPropsRef.current?.allowEmptyEventDeletion).toBe(true);
+    expect(panelPropsRef.current?.createEntryHref).toBe(
+      "/admin/trials/event-1/results/new",
+    );
   });
 
   it("passes loading state to the reused panel", () => {

@@ -53,4 +53,30 @@ describe("createAdminTrialEntryAction", () => {
       message: "Conflict",
     });
   });
+
+  it("passes through safe validation details", async () => {
+    guard.mockResolvedValue({ ok: true });
+    user.mockResolvedValue({ id: "u1", email: "a@example.com", role: "ADMIN" });
+    create.mockResolvedValue({
+      status: 400,
+      body: {
+        ok: false,
+        code: "INVALID_TRIAL_ADDITIONAL_INFO",
+        error: "Invalid",
+        details: {
+          area: "additional_info",
+          reason: "invalid_lisatieto_order",
+          koodi: "25",
+          osa: "b",
+        },
+      },
+    });
+    await expect(createAdminTrialEntryAction(input)).resolves.toMatchObject({
+      validationIssue: {
+        reason: "invalid_lisatieto_order",
+        koodi: "25",
+        osa: "b",
+      },
+    });
+  });
 });

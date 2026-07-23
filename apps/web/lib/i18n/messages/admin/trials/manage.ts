@@ -55,6 +55,53 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.create.error": "Tapahtuman luominen epäonnistui.",
   "admin.trials.manage.create.conflict":
     "Annettu SKL koe ID kuuluu jo toiselle tapahtumalle.",
+  "admin.trials.manage.resultCreate.action": "Lisää tulos",
+  "admin.trials.manage.resultCreate.title": "Lisää koetulos",
+  "admin.trials.manage.resultCreate.loading": "Ladataan tapahtumaa...",
+  "admin.trials.manage.resultCreate.loadError":
+    "Tapahtuman lataaminen epäonnistui.",
+  "admin.trials.manage.resultCreate.eventNotFound":
+    "Ajokoetapahtumaa ei löytynyt.",
+  "admin.trials.manage.resultCreate.missingSklId":
+    "Tulosta ei voi lisätä, koska tapahtumalta puuttuu SKL koe ID.",
+  "admin.trials.manage.resultCreate.backToList": "Takaisin tapahtumiin",
+  "admin.trials.manage.resultCreate.backToWorkspace":
+    "Takaisin tapahtuman sivulle",
+  "admin.trials.manage.resultCreate.registration": "Rekisterinumero",
+  "admin.trials.manage.resultCreate.saveAnother": "Tallenna ja lisää seuraava",
+  "admin.trials.manage.resultCreate.saveFinish": "Tallenna ja lopeta",
+  "admin.trials.manage.resultCreate.cancel": "Peruuta",
+  "admin.trials.manage.resultCreate.success": "Koetulos tallennettiin.",
+  "admin.trials.manage.resultCreate.validation.registration":
+    "Anna rekisterinumero.",
+  "admin.trials.manage.resultCreate.validation.entry":
+    "Tarkista tuloksen numeeriset kentät.",
+  "admin.trials.manage.resultCreate.validation.eras":
+    "Tarkista erien numerointi ja numeeriset kentät.",
+  "admin.trials.manage.resultCreate.error.registration":
+    "Rekisterinumero ei ole kelvollinen.",
+  "admin.trials.manage.resultCreate.error.conflict":
+    "Tällä rekisterinumerolla on jo tulos tapahtumassa.",
+  "admin.trials.manage.resultCreate.error.entry":
+    "Tarkista tuloksen perustiedot.",
+  "admin.trials.manage.resultCreate.error.eras": "Tarkista erien tiedot.",
+  "admin.trials.manage.resultCreate.error.additionalInfo":
+    "Tarkista lisätietojen arvot.",
+  "admin.trials.manage.resultCreate.error.additionalInfoOrder":
+    "Lomake muodosti virheellisen järjestyksen lisätiedolle",
+  "admin.trials.manage.resultCreate.error.additionalInfoRow":
+    "Palvelin hylkäsi lisätiedon",
+  "admin.trials.manage.resultCreate.error.eventNotFound":
+    "Ajokoetapahtumaa ei enää löytynyt.",
+  "admin.trials.manage.resultCreate.error.missingSklId":
+    "Tapahtumalta puuttuu SKL koe ID.",
+  "admin.trials.manage.resultCreate.error.generic":
+    "Koetuloksen tallentaminen epäonnistui.",
+  "admin.trials.manage.resultCreate.unsaved.title": "Hylätäänkö muutokset?",
+  "admin.trials.manage.resultCreate.unsaved.body":
+    "Tallentamattomat tiedot menetetään.",
+  "admin.trials.manage.resultCreate.unsaved.confirm": "Hylkää muutokset",
+  "admin.trials.manage.resultCreate.unsaved.cancel": "Jatka muokkaamista",
   "admin.trials.manage.deleteEvent.action": "Poista tapahtuma",
   "admin.trials.manage.deleteEvent.confirmTitle": "Poistetaanko tapahtuma?",
   "admin.trials.manage.deleteEvent.confirmBody":
@@ -211,6 +258,54 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.create.error": "Det gick inte att skapa evenemanget.",
   "admin.trials.manage.create.conflict":
     "Det angivna SKL prov-ID:t används redan av ett annat evenemang.",
+  "admin.trials.manage.resultCreate.action": "Lägg till resultat",
+  "admin.trials.manage.resultCreate.title": "Lägg till provresultat",
+  "admin.trials.manage.resultCreate.loading": "Laddar evenemanget...",
+  "admin.trials.manage.resultCreate.loadError":
+    "Det gick inte att ladda evenemanget.",
+  "admin.trials.manage.resultCreate.eventNotFound":
+    "Jaktprovsevenemanget hittades inte.",
+  "admin.trials.manage.resultCreate.missingSklId":
+    "Resultatet kan inte läggas till eftersom evenemanget saknar SKL prov-ID.",
+  "admin.trials.manage.resultCreate.backToList": "Tillbaka till evenemangen",
+  "admin.trials.manage.resultCreate.backToWorkspace":
+    "Tillbaka till evenemangssidan",
+  "admin.trials.manage.resultCreate.registration": "Registreringsnummer",
+  "admin.trials.manage.resultCreate.saveAnother": "Spara och lägg till nästa",
+  "admin.trials.manage.resultCreate.saveFinish": "Spara och avsluta",
+  "admin.trials.manage.resultCreate.cancel": "Avbryt",
+  "admin.trials.manage.resultCreate.success": "Provresultatet sparades.",
+  "admin.trials.manage.resultCreate.validation.registration":
+    "Ange registreringsnummer.",
+  "admin.trials.manage.resultCreate.validation.entry":
+    "Kontrollera resultatets numeriska fält.",
+  "admin.trials.manage.resultCreate.validation.eras":
+    "Kontrollera omgångarnas numrering och numeriska fält.",
+  "admin.trials.manage.resultCreate.error.registration":
+    "Registreringsnumret är ogiltigt.",
+  "admin.trials.manage.resultCreate.error.conflict":
+    "Registreringsnumret har redan ett resultat i evenemanget.",
+  "admin.trials.manage.resultCreate.error.entry":
+    "Kontrollera resultatets grunduppgifter.",
+  "admin.trials.manage.resultCreate.error.eras":
+    "Kontrollera omgångarnas uppgifter.",
+  "admin.trials.manage.resultCreate.error.additionalInfo":
+    "Kontrollera tilläggsuppgifternas värden.",
+  "admin.trials.manage.resultCreate.error.additionalInfoOrder":
+    "Formuläret skapade en ogiltig ordning för tilläggsuppgiften",
+  "admin.trials.manage.resultCreate.error.additionalInfoRow":
+    "Servern avvisade tilläggsuppgiften",
+  "admin.trials.manage.resultCreate.error.eventNotFound":
+    "Jaktprovsevenemanget finns inte längre.",
+  "admin.trials.manage.resultCreate.error.missingSklId":
+    "Evenemanget saknar SKL prov-ID.",
+  "admin.trials.manage.resultCreate.error.generic":
+    "Det gick inte att spara provresultatet.",
+  "admin.trials.manage.resultCreate.unsaved.title": "Kassera ändringarna?",
+  "admin.trials.manage.resultCreate.unsaved.body":
+    "Uppgifter som inte sparats går förlorade.",
+  "admin.trials.manage.resultCreate.unsaved.confirm": "Kassera ändringarna",
+  "admin.trials.manage.resultCreate.unsaved.cancel": "Fortsätt redigera",
   "admin.trials.manage.deleteEvent.action": "Ta bort evenemang",
   "admin.trials.manage.deleteEvent.confirmTitle": "Ta bort evenemanget?",
   "admin.trials.manage.deleteEvent.confirmBody":

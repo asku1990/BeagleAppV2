@@ -28,6 +28,8 @@ R2 consumes, but does not redefine or weaken, the R1 decisions for:
 
 R2 maps stable `errorCode` values to localized presentation and never inspects
 backend message strings to determine behavior.
+When R1 supplies typed validation details, R2 uses their stable reason and safe
+field context to identify the rejected section or lisätieto row.
 
 ## Scope
 
@@ -56,8 +58,10 @@ backend message strings to determine behavior.
   - Cancel returns to the event workspace.
   - Dirty cancel uses a localized application confirmation dialog before
     discarding values.
-  - Browser-back and internal navigation use a route-blocking application
-    confirmation where technically supported.
+  - Internal navigation uses a route-blocking application confirmation.
+  - Browser Back leaves the form without application confirmation; robust Back
+    interception is deferred until it can use a deterministic history-state
+    design with browser-level tests.
   - Refresh and tab/window close use browser-native unsaved-change protection
     with browser-controlled wording.
   - Clean browser back returns to the event workspace without confirmation.

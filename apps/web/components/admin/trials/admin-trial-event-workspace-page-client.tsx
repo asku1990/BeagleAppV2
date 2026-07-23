@@ -4,7 +4,10 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useI18n } from "@/hooks/i18n";
-import { getAdminTrialsHref } from "@/lib/admin/trials";
+import {
+  getAdminTrialEntryCreateHref,
+  getAdminTrialsHref,
+} from "@/lib/admin/trials";
 import { useAdminTrialEventQuery } from "@/queries/admin/trials";
 import { AdminTrialSelectedEventPanel } from "./admin-trial-selected-event-panel";
 
@@ -62,6 +65,7 @@ export function AdminTrialEventWorkspacePageClient({
           onDeletedTrialEvent={() => router.replace(getAdminTrialsHref())}
           onTrialEventDeleteConflict={() => void eventQuery.refetch()}
           allowEmptyEventDeletion
+          createEntryHref={getAdminTrialEntryCreateHref(trialEventId)}
         />
       )}
     </div>
