@@ -19,6 +19,7 @@ import {
   getAdminTrialEventHref,
   getAdminTrialsHref,
   getNextEraNumber,
+  resolveResultCreateFieldSet,
   toCreateAdminTrialEntryRequest,
 } from "@/lib/admin/trials";
 import {
@@ -113,9 +114,13 @@ function ResultCreateForm({
   const { t } = useI18n();
   const router = useRouter();
   const mutation = useCreateAdminTrialEntryMutation();
+  const fieldSet = React.useMemo(
+    () => resolveResultCreateFieldSet(event.trialRuleWindowId),
+    [event.trialRuleWindowId],
+  );
   const initial = React.useMemo(
-    () => createAdminTrialEntryCreateDraft(event),
-    [event],
+    () => createAdminTrialEntryCreateDraft(event, fieldSet),
+    [event, fieldSet],
   );
   const [draft, setDraft] = React.useState(initial);
   const [errorText, setErrorText] = React.useState<string | null>(null);
@@ -164,7 +169,7 @@ function ResultCreateForm({
       await mutation.mutateAsync(parsed.request);
       toast.success(t("admin.trials.manage.resultCreate.success"));
       if (intent === "another")
-        setDraft(createAdminTrialEntryCreateDraft(event));
+        setDraft(createAdminTrialEntryCreateDraft(event, fieldSet));
       else router.replace(workspaceHref);
     } catch (error) {
       const code =
@@ -215,6 +220,14 @@ function ResultCreateForm({
           {formatDateForFinland(event.eventDate)} • {event.eventPlace} • SKL{" "}
           {event.sklKoeId}
         </p>
+        <p className="text-sm text-muted-foreground">
+          {t(fieldSet.rulePeriodMessageKey)}
+        </p>
+        {!fieldSet.verified ? (
+          <p className="text-sm text-amber-700" role="alert">
+            {t("admin.trials.manage.resultCreate.ruleWindowWarning")}
+          </p>
+        ) : null}
       </div>
       <Card>
         <CardContent className="space-y-5 p-5">
@@ -245,6 +258,8 @@ function ResultCreateForm({
                 entry: update(current.entry),
               }))
             }
+            visibleFields={fieldSet.entryFields}
+            yvaLabel={fieldSet.yvaLabels?.entry}
           />
           <EraSection
             eras={draft.eras}
@@ -259,6 +274,8 @@ function ResultCreateForm({
                 ),
               }))
             }
+            visibleFields={fieldSet.eraFields}
+            yvaLabel={fieldSet.yvaLabels?.era}
           />
           <LisatiedotMatrix
             eras={draft.eras}

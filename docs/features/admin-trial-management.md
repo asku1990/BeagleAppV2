@@ -17,6 +17,12 @@ and follow-up admin flow redesign).
 - An admin can create one manual result at a time from an event workspace.
   The full-page form supports saving another result for the same event or
   finishing back at the workspace.
+- Manual result creation resolves its visible score, era, and lisätieto fields
+  from the event's persisted `trialRuleWindowId`. The 2023+ window is verified
+  against its PDF field set; older, null, and unknown windows retain the
+  complete compatibility form with a warning. The canonical timeline, field
+  sets, and fallback semantics are documented in
+  [Trial rule windows](./trials/rule-windows.md).
 
 ## Main files
 
@@ -59,7 +65,8 @@ and follow-up admin flow redesign).
 - Event list response: paginated event summaries (`total`, `totalPages`,
   `page`, `filters`, `availableYears`, `items[]`).
 - Event detail response: one event (`event`) with event header fields and
-  selected dog rows (`entries[]`).
+  selected dog rows (`entries[]`). It includes the event-owned
+  `trialRuleWindowId`; clients must not recalculate the window from the date.
 - Event creation requires a positive `sklKoeId`, an ISO date, and a non-empty
   place. Duplicate SKL IDs return `SKL_KOE_ID_CONFLICT`.
 - Manual result identity is `SKL:<sklKoeId>|REG:<canonicalRegistration>` and
@@ -69,6 +76,10 @@ and follow-up admin flow redesign).
   to occur only once across the submitted matrix rows.
 - Lisätieto UI sorting is separate from its integer persisted `jarjestys`;
   unused create-form rows are omitted from the write payload.
+- The result-create field registry owns create-only visibility, ordering,
+  business grouping, semantic input kinds, localized value-hint categories,
+  and control-to-persistence mapping. Shared edit components use their default
+  complete field set and do not consume create-only configuration.
 - Manual-result validation errors may carry safe structured field context for
   localized feedback without exposing raw user-entered values.
 - `TrialEvent.koepaiva` is a PostgreSQL `DATE`; all trial contracts serialize
@@ -88,6 +99,13 @@ and follow-up admin flow redesign).
   confirm internal navigation and use native unload protection for refresh or
   close. Browser Back leaves the form without application confirmation because
   the App Router has no reliable asynchronous route-blocking hook.
+- The result form shows only a localized rule-period label. For
+  `trw_post_20230801`, entry- and era-level `tja`/`pin` are hidden, lisätieto
+  codes 25 and 27 expose only part `a`, and codes 19, 23, 26, and 59 use their
+  verified semantic input kinds. Other rule windows show the full compatibility
+  set and an unverified-field warning. See
+  [Trial rule windows](./trials/rule-windows.md) for the complete verified
+  configuration and compatibility boundary.
 - Selected dog rows have PDF, edit, and result-delete actions.
 - A missing workspace event is shown explicitly and never falls back to a
   different event.

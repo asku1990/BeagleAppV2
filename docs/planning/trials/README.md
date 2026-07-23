@@ -19,9 +19,13 @@ on the next gate.
   identity, transaction, error, date-only, and Server Action backend contract.
 - [Result creation R2](./result-creation-r2.md) defines the full-page result
   form and admin UI workflow built on the approved R1 contract.
-- [Rule-window-aware result fields](./result-fields-by-rule-window.md) defines
-  the second result-creation follow-up after R2: introduce field-set selection
-  for every rule window and verify the 2023+ set first.
+- [Rule-window-aware result creation](./result-fields-by-rule-window.md)
+  defines R3A: make the existing result-create form use the event's persisted
+  rule window, verify the 2023+ field set, and retain a warned show-all
+  fallback for other windows.
+- [Result-creation UX](./result-creation-ux.md) defines R3B: evolve the
+  existing full-page create form into a clearer card-based single-page
+  experience after R3A has been reviewed.
 - [Later UX](./later-ux.md) records deferred ideas only and does not authorize
   their implementation.
 
@@ -30,6 +34,7 @@ Repository guardrails and current feature documentation:
 - [Architecture guardrails](../../../ARCHITECTURE.md)
 - [Documentation rules](../../documentation-rules.md)
 - [Current admin trial management](../../features/admin-trial-management.md)
+- [Canonical trial rule windows](../../features/trials/rule-windows.md)
 - [Koiratietokanta AJOK upsert](../../features/trials/koiratietokanta-api-ajok-upsert.md)
 
 ## Grounded current state
@@ -66,6 +71,9 @@ Repository guardrails and current feature documentation:
   adding another result to the same event and finishing at the event workspace.
 - The existing trials master-detail list and existing result-edit modal remain
   in place for BEJ-103.
+- Rule-window-aware presentation is introduced for result creation before any
+  result-editing redesign. Existing result editing remains unchanged through
+  R3A and R3B.
 
 ## Implementation order and review rules
 
@@ -80,14 +88,17 @@ R1 (backend)
  ↓
 R2 (UI)
  ↓
-R3 (rule-window field sets)
+R3A (rule-window-aware creation)
+ ↓
+R3B (result-creation UX)
 ```
 
 1. `E1` - event workspace
 2. `E2` - event creation and empty-event lifecycle
 3. `R1` - manual result schema and backend
 4. `R2` - manual result UI and workflow
-5. `R3` - rule-window-aware result fields, after R2 review
+5. `R3A` - rule-window-aware result creation, after R2 review
+6. `R3B` - card-based result-creation UX, after R3A review
 
 For every gate:
 
@@ -108,6 +119,7 @@ BEJ-103 does not authorize:
 - changes to trial statistics or their calculation;
 - redesign of legacy import or Koiratietokanta ingestion;
 - redesign of existing result editing;
+- rule-window-aware result editing;
 - batch entry of several unsaved dog results;
 - a draft/publish workflow;
 - autosave;

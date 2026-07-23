@@ -22,6 +22,17 @@ describe("LisatiedotMatrix", () => {
         eraValues: { 1: "1", 2: "" },
       },
       {
+        koodi: "17",
+        osa: "",
+        nimi: "Lämpötila °C",
+        jarjestys: 17,
+        group: "olosuhteet",
+        label: "Lämpötila °C",
+        inputKind: "integer",
+        sortOrder: 17,
+        eraValues: { 1: "5", 2: "" },
+      },
+      {
         koodi: "19",
         osa: "",
         nimi: "Lumipeitteen laatu",
@@ -73,5 +84,52 @@ describe("LisatiedotMatrix", () => {
     expect(html).toContain("90 legacy");
     expect(html).toContain("Legacy field");
     expect(html).toContain('inputMode="text"');
+    expect(html).toContain("<select");
+    expect(html).not.toContain('type="checkbox"');
+    expect(html).not.toContain('inputMode="numeric"');
+  });
+
+  it("uses semantic controls only for explicitly configured rows", () => {
+    const rows: LisatietoRowDraft[] = [
+      {
+        koodi: "10",
+        osa: "",
+        nimi: "Vaativat olosuhteet",
+        jarjestys: 10,
+        group: "olosuhteet",
+        label: "Vaativat olosuhteet",
+        inputKind: "marker",
+        valueHint: "marker",
+        useSemanticControl: true,
+        sortOrder: 10,
+        eraValues: { 1: "" },
+      },
+      {
+        koodi: "17",
+        osa: "",
+        nimi: "Lämpötila °C",
+        jarjestys: 17,
+        group: "olosuhteet",
+        label: "Lämpötila °C",
+        inputKind: "integer",
+        valueHint: "integer",
+        useSemanticControl: true,
+        sortOrder: 17,
+        eraValues: { 1: "" },
+      },
+    ];
+
+    const html = renderToStaticMarkup(
+      React.createElement(LisatiedotMatrix, {
+        eras: [createEmptyEraDraft(1)],
+        rows,
+        isPending: false,
+        onChangeCell: vi.fn(),
+      }),
+    );
+
+    expect(html).toContain('type="checkbox"');
+    expect(html).not.toContain("<select");
+    expect(html).toContain('inputMode="numeric"');
   });
 });

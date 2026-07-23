@@ -68,6 +68,17 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.resultCreate.backToWorkspace":
     "Takaisin tapahtuman sivulle",
   "admin.trials.manage.resultCreate.registration": "Rekisterinumero",
+  "admin.trials.manage.resultCreate.rulePeriod.post2023": "Säännöt: 1.8.2023 →",
+  "admin.trials.manage.resultCreate.rulePeriod.unverified":
+    "Säännöt: historiallinen tai määrittämätön sääntökausi",
+  "admin.trials.manage.resultCreate.ruleWindowWarning":
+    "Tämän sääntökauden kenttiä ei ole vielä tarkistettu pöytäkirjaa vasten. Lomake näyttää yhteensopivuuden vuoksi kaikki nykyiset kentät.",
+  "admin.trials.manage.resultCreate.valueHint.marker": "Valinta",
+  "admin.trials.manage.resultCreate.valueHint.integer": "Kokonaisluku",
+  "admin.trials.manage.resultCreate.valueHint.decimal": "Desimaaliluku",
+  "admin.trials.manage.resultCreate.valueHint.text": "Teksti",
+  "admin.trials.manage.resultCreate.triState.no": "Ei",
+  "admin.trials.manage.resultCreate.triState.yes": "Kyllä",
   "admin.trials.manage.resultCreate.saveAnother": "Tallenna ja lisää seuraava",
   "admin.trials.manage.resultCreate.saveFinish": "Tallenna ja lopeta",
   "admin.trials.manage.resultCreate.cancel": "Peruuta",
@@ -271,6 +282,17 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.resultCreate.backToWorkspace":
     "Tillbaka till evenemangssidan",
   "admin.trials.manage.resultCreate.registration": "Registreringsnummer",
+  "admin.trials.manage.resultCreate.rulePeriod.post2023": "Regler: 1.8.2023 →",
+  "admin.trials.manage.resultCreate.rulePeriod.unverified":
+    "Regler: historisk eller obestämd regelperiod",
+  "admin.trials.manage.resultCreate.ruleWindowWarning":
+    "Fälten för den här regelperioden har ännu inte verifierats mot protokollet. Formuläret visar därför alla nuvarande fält för kompatibilitet.",
+  "admin.trials.manage.resultCreate.valueHint.marker": "Val",
+  "admin.trials.manage.resultCreate.valueHint.integer": "Heltal",
+  "admin.trials.manage.resultCreate.valueHint.decimal": "Decimaltal",
+  "admin.trials.manage.resultCreate.valueHint.text": "Text",
+  "admin.trials.manage.resultCreate.triState.no": "Nej",
+  "admin.trials.manage.resultCreate.triState.yes": "Ja",
   "admin.trials.manage.resultCreate.saveAnother": "Spara och lägg till nästa",
   "admin.trials.manage.resultCreate.saveFinish": "Spara och avsluta",
   "admin.trials.manage.resultCreate.cancel": "Avbryt",

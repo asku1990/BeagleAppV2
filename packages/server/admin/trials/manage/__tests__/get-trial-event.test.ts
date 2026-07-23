@@ -55,6 +55,7 @@ describe("getAdminTrialEvent", () => {
   it("maps event and entries from db", async () => {
     getAdminTrialEventDetailsDbMock.mockResolvedValue({
       trialEventId: "event-1",
+      trialRuleWindowId: "trw_post_20230801",
       eventDate: new Date("2026-04-14T00:00:00.000Z"),
       eventPlace: "Helsinki",
       eventName: "Talvikoe",
@@ -99,6 +100,7 @@ describe("getAdminTrialEvent", () => {
         data: {
           event: {
             trialEventId: "event-1",
+            trialRuleWindowId: "trw_post_20230801",
             eventDate: "2026-04-14",
             eventPlace: "Helsinki",
             eventName: "Talvikoe",

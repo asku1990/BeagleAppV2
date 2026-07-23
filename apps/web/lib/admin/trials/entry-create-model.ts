@@ -16,6 +16,7 @@ import {
   type EraDraft,
   type LisatietoRowDraft,
 } from "./entry-edit-dialog-model";
+import type { ResultCreateFieldSet } from "./result-create-field-registry";
 
 export type AdminTrialEntryCreateDraft = {
   registrationNo: string;
@@ -48,6 +49,7 @@ function emptyEntry(event: AdminTrialEventDetails): AdminTrialEventEntry {
 
 export function createAdminTrialEntryCreateDraft(
   event: AdminTrialEventDetails,
+  fieldSet?: ResultCreateFieldSet,
 ): AdminTrialEntryCreateDraft {
   const entry = emptyEntry(event);
   const eras = [createEmptyEraDraft(1)];
@@ -55,7 +57,7 @@ export function createAdminTrialEntryCreateDraft(
     registrationNo: "",
     entry: toEntryDraft(entry),
     eras,
-    lisatiedotRows: toLisatietoRows(entry, eras),
+    lisatiedotRows: toLisatietoRows(entry, eras, fieldSet?.lisatiedot),
   };
 }
 
@@ -166,7 +168,12 @@ export function toCreateAdminTrialEntryRequest(
       })),
       lisatiedotRows: draft.lisatiedotRows
         .filter((row) =>
-          eras.some((era) => (row.eraValues[era.era] ?? "").trim().length > 0),
+          eras.some((era) => {
+            const controlValue = row.eraValues[era.era] ?? "";
+            const persistedValue =
+              row.toPersistedValue?.(controlValue) ?? controlValue;
+            return persistedValue.trim().length > 0;
+          }),
         )
         .map((row) => ({
           koodi: row.koodi,
@@ -175,7 +182,11 @@ export function toCreateAdminTrialEntryRequest(
           jarjestys: row.jarjestys,
           eraValues: eras.map((era) => ({
             era: era.era,
-            arvo: parseNullableString(row.eraValues[era.era] ?? ""),
+            arvo: parseNullableString(
+              row.toPersistedValue?.(row.eraValues[era.era] ?? "") ??
+                row.eraValues[era.era] ??
+                "",
+            ),
           })),
         })),
     },

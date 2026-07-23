@@ -94,6 +94,7 @@ describe("AdminTrialSelectedEventPanel", () => {
       React.createElement(AdminTrialSelectedEventPanel, {
         selectedEvent: {
           trialEventId: "event-1",
+          trialRuleWindowId: "trw_post_20230801",
           eventDate: "2026-04-14",
           eventPlace: "Helsinki",
           eventName: "Kevatkoe",
@@ -143,6 +144,7 @@ describe("AdminTrialSelectedEventPanel", () => {
       React.createElement(AdminTrialSelectedEventPanel, {
         selectedEvent: {
           trialEventId: "event-1",
+          trialRuleWindowId: null,
           eventDate: "2026-04-14",
           eventPlace: "Helsinki",
           eventName: null,
@@ -175,6 +177,7 @@ describe("AdminTrialSelectedEventPanel", () => {
       React.createElement(AdminTrialSelectedEventPanel, {
         selectedEvent: {
           trialEventId: "event-1",
+          trialRuleWindowId: null,
           eventDate: "2026-04-14",
           eventPlace: "Helsinki",
           eventName: null,

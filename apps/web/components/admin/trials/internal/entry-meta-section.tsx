@@ -6,15 +6,25 @@ type Props = {
   entryDraft: EntryDraft;
   isPending: boolean;
   onChange: (updater: (current: EntryDraft) => EntryDraft) => void;
+  visibleFields?: ReadonlySet<keyof EntryDraft>;
+  yvaLabel?: string;
 };
 
-export function EntryMetaSection({ entryDraft, isPending, onChange }: Props) {
+export function EntryMetaSection({
+  entryDraft,
+  isPending,
+  onChange,
+  visibleFields,
+  yvaLabel,
+}: Props) {
   function updateField(field: keyof EntryDraft, value: string) {
     onChange((current) => ({
       ...current,
       [field]: value,
     }));
   }
+  const visible = (field: keyof EntryDraft) =>
+    !visibleFields || visibleFields.has(field);
 
   return (
     <div className="space-y-4">
@@ -160,68 +170,86 @@ export function EntryMetaSection({ entryDraft, isPending, onChange }: Props) {
         </h4>
         <div className="space-y-4">
           <ScoreSubsection title="Ajo">
-            <TextField
-              label="Hyväksytyt ajominuutit"
-              value={entryDraft.hyvaksytytAjominuutit}
-              inputMode="numeric"
-              disabled={isPending}
-              onChange={(value) => updateField("hyvaksytytAjominuutit", value)}
-            />
-            <TextField
-              label="Ajoajan pisteet"
-              value={entryDraft.ajoajanPisteet}
-              inputMode="decimal"
-              disabled={isPending}
-              onChange={(value) => updateField("ajoajanPisteet", value)}
-            />
-            <TextField
-              label="Ajotaito / yleisvaikutelma"
-              value={entryDraft.yva}
-              inputMode="decimal"
-              disabled={isPending}
-              onChange={(value) => updateField("yva", value)}
-            />
+            {visible("hyvaksytytAjominuutit") ? (
+              <TextField
+                label="Hyväksytyt ajominuutit"
+                value={entryDraft.hyvaksytytAjominuutit}
+                inputMode="numeric"
+                disabled={isPending}
+                onChange={(value) =>
+                  updateField("hyvaksytytAjominuutit", value)
+                }
+              />
+            ) : null}
+            {visible("ajoajanPisteet") ? (
+              <TextField
+                label="Ajoajan pisteet"
+                value={entryDraft.ajoajanPisteet}
+                inputMode="decimal"
+                disabled={isPending}
+                onChange={(value) => updateField("ajoajanPisteet", value)}
+              />
+            ) : null}
+            {visible("yva") ? (
+              <TextField
+                label={yvaLabel ?? "Ajotaito / yleisvaikutelma"}
+                value={entryDraft.yva}
+                inputMode="decimal"
+                disabled={isPending}
+                onChange={(value) => updateField("yva", value)}
+              />
+            ) : null}
           </ScoreSubsection>
           <ScoreSubsection title="Haku">
-            <TextField
-              label="Haku"
-              value={entryDraft.haku}
-              inputMode="decimal"
-              disabled={isPending}
-              onChange={(value) => updateField("haku", value)}
-            />
+            {visible("haku") ? (
+              <TextField
+                label="Haku"
+                value={entryDraft.haku}
+                inputMode="decimal"
+                disabled={isPending}
+                onChange={(value) => updateField("haku", value)}
+              />
+            ) : null}
           </ScoreSubsection>
           <ScoreSubsection title="Haukku">
-            <TextField
-              label="Haukku"
-              value={entryDraft.hauk}
-              inputMode="decimal"
-              disabled={isPending}
-              onChange={(value) => updateField("hauk", value)}
-            />
+            {visible("hauk") ? (
+              <TextField
+                label="Haukku"
+                value={entryDraft.hauk}
+                inputMode="decimal"
+                disabled={isPending}
+                onChange={(value) => updateField("hauk", value)}
+              />
+            ) : null}
           </ScoreSubsection>
           <ScoreSubsection title="Muut">
-            <TextField
-              label="Ansiopisteet yhteensä"
-              value={entryDraft.ansiopisteetYhteensa}
-              inputMode="decimal"
-              disabled={isPending}
-              onChange={(value) => updateField("ansiopisteetYhteensa", value)}
-            />
-            <TextField
-              label="Tie ja estetyöskentely"
-              value={entryDraft.tja}
-              inputMode="decimal"
-              disabled={isPending}
-              onChange={(value) => updateField("tja", value)}
-            />
-            <TextField
-              label="Metsästysinto"
-              value={entryDraft.pin}
-              inputMode="decimal"
-              disabled={isPending}
-              onChange={(value) => updateField("pin", value)}
-            />
+            {visible("ansiopisteetYhteensa") ? (
+              <TextField
+                label="Ansiopisteet yhteensä"
+                value={entryDraft.ansiopisteetYhteensa}
+                inputMode="decimal"
+                disabled={isPending}
+                onChange={(value) => updateField("ansiopisteetYhteensa", value)}
+              />
+            ) : null}
+            {visible("tja") ? (
+              <TextField
+                label="Tie ja estetyöskentely"
+                value={entryDraft.tja}
+                inputMode="decimal"
+                disabled={isPending}
+                onChange={(value) => updateField("tja", value)}
+              />
+            ) : null}
+            {visible("pin") ? (
+              <TextField
+                label="Metsästysinto"
+                value={entryDraft.pin}
+                inputMode="decimal"
+                disabled={isPending}
+                onChange={(value) => updateField("pin", value)}
+              />
+            ) : null}
           </ScoreSubsection>
         </div>
       </section>
