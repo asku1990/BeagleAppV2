@@ -20,7 +20,9 @@ and follow-up admin flow redesign).
 - Manual result creation resolves its visible score, era, and lisätieto fields
   from the event's persisted `trialRuleWindowId`. The 2023+ window is verified
   against its PDF field set; older, null, and unknown windows retain the
-  complete compatibility form with a warning.
+  complete compatibility form with a warning. The canonical timeline, field
+  sets, and fallback semantics are documented in
+  [Trial rule windows](./trials/rule-windows.md).
 
 ## Main files
 
@@ -101,7 +103,9 @@ and follow-up admin flow redesign).
   `trw_post_20230801`, entry- and era-level `tja`/`pin` are hidden, lisätieto
   codes 25 and 27 expose only part `a`, and codes 19, 23, 26, and 59 use their
   verified semantic input kinds. Other rule windows show the full compatibility
-  set and an unverified-field warning.
+  set and an unverified-field warning. See
+  [Trial rule windows](./trials/rule-windows.md) for the complete verified
+  configuration and compatibility boundary.
 - Selected dog rows have PDF, edit, and result-delete actions.
 - A missing workspace event is shown explicitly and never falls back to a
   different event.

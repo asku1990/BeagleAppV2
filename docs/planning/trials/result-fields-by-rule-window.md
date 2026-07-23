@@ -2,8 +2,9 @@
 
 ## Status and sequencing
 
-This is the first creation follow-up after R2. It is planning only and does
-not authorize implementation.
+R3A was implemented by PR #344. This file remains the planning and review
+record; current durable behavior is documented in
+[Trial rule windows](../../features/trials/rule-windows.md).
 
 R2 must be completed and reviewed before this work begins. R3A introduces the
 rule-window field-set structure only for the existing full-page result-create

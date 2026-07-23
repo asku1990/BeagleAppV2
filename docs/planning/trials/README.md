@@ -34,6 +34,7 @@ Repository guardrails and current feature documentation:
 - [Architecture guardrails](../../../ARCHITECTURE.md)
 - [Documentation rules](../../documentation-rules.md)
 - [Current admin trial management](../../features/admin-trial-management.md)
+- [Canonical trial rule windows](../../features/trials/rule-windows.md)
 - [Koiratietokanta AJOK upsert](../../features/trials/koiratietokanta-api-ajok-upsert.md)
 
 ## Grounded current state
