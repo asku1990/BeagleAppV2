@@ -1,10 +1,23 @@
 import { describe, expect, it } from "vitest";
+import { ADMIN_TRIAL_LISATIETO_GROUP_ORDER } from "../entry-edit-config";
 import {
   resolveResultCreateFieldSet,
   SEEDED_TRIAL_RULE_WINDOW_IDS,
 } from "../result-create-field-registry";
 
 describe("result create field registry", () => {
+  it("uses the official PDF domain order for lisatieto groups", () => {
+    expect(ADMIN_TRIAL_LISATIETO_GROUP_ORDER).toEqual([
+      "olosuhteet",
+      "haku",
+      "haukku",
+      "metsastysinto",
+      "ajo",
+      "muut_ominaisuudet",
+      "unknown",
+    ]);
+  });
+
   it("registers the verified 2023+ field set from the persisted rule window", () => {
     const fieldSet = resolveResultCreateFieldSet("trw_post_20230801");
 
@@ -18,6 +31,97 @@ describe("result create field registry", () => {
       entry: "Ajotaito",
       era: "ajotaito",
     });
+    expect(fieldSet.presentationGroups.map((group) => group.id)).toEqual([
+      "basic",
+      "time",
+      "merit",
+      "loss",
+      "result",
+      "judges",
+    ]);
+    expect(
+      fieldSet.presentationGroups.flatMap((group) => group.entryFields),
+    ).not.toContain("tja");
+    expect(
+      fieldSet.presentationGroups.find((group) => group.id === "time"),
+    ).toEqual({
+      id: "time",
+      entryFields: ["hyvaksytytAjominuutit", "ajoajanPisteet"],
+      eraFields: ["alkoi", "hakumin", "ajomin"],
+    });
+    expect(
+      Object.fromEntries(
+        fieldSet.presentationGroups.map((group) => [
+          group.id,
+          {
+            entry: group.entryFields,
+            era: group.eraFields,
+          },
+        ]),
+      ),
+    ).toEqual({
+      basic: {
+        entry: [
+          "koemaasto",
+          "koemuoto",
+          "koetyyppi",
+          "lk",
+          "omistajaSnapshot",
+          "omistajanKotikuntaSnapshot",
+        ],
+        era: [],
+      },
+      time: {
+        entry: ["hyvaksytytAjominuutit", "ajoajanPisteet"],
+        era: ["alkoi", "hakumin", "ajomin"],
+      },
+      merit: {
+        entry: ["haku", "hauk", "yva", "ansiopisteetYhteensa"],
+        era: ["haku", "hauk", "yva"],
+      },
+      loss: {
+        entry: ["hlo", "alo", "tappiopisteetYhteensa"],
+        era: ["hlo", "alo"],
+      },
+      result: {
+        entry: [
+          "ke",
+          "award",
+          "points",
+          "rank",
+          "koiriaLuokassa",
+          "huomautus",
+          "huomautusTeksti",
+        ],
+        era: ["huomautusTeksti"],
+      },
+      judges: {
+        entry: [
+          "ryhmatuomariNimi",
+          "palkintotuomariNimi",
+          "judge",
+          "ylituomariNumeroSnapshot",
+        ],
+        era: [],
+      },
+    });
+  });
+
+  it("presentation grouping neither adds nor removes visible fields", () => {
+    for (const id of ["trw_post_20230801", null] as const) {
+      const fieldSet = resolveResultCreateFieldSet(id);
+      const groupedEntryFields = fieldSet.presentationGroups.flatMap(
+        (group) => group.entryFields,
+      );
+      const groupedEraFields = fieldSet.presentationGroups.flatMap(
+        (group) => group.eraFields,
+      );
+
+      expect(new Set(groupedEntryFields)).toEqual(fieldSet.entryFields);
+      expect(groupedEntryFields).toHaveLength(new Set(groupedEntryFields).size);
+      expect(new Set(groupedEraFields)).toEqual(fieldSet.eraFields);
+      expect(groupedEraFields).toHaveLength(new Set(groupedEraFields).size);
+    }
   });
 
   it("matches the verified 2023+ lisatieto codes, parts, order and kinds", () => {

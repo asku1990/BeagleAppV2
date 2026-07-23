@@ -10,6 +10,13 @@ export type ResultCreateSemanticInputKind =
   | "tri-state";
 
 export type ResultCreateValueHint = "marker" | "integer" | "decimal" | "text";
+export type ResultCreatePresentationGroup =
+  | "basic"
+  | "time"
+  | "merit"
+  | "loss"
+  | "result"
+  | "judges";
 
 export type ResultCreateLisatietoField = AdminTrialLisatietoConfig & {
   inputKind: ResultCreateSemanticInputKind;
@@ -25,6 +32,11 @@ export type ResultCreateFieldSet = {
     | "admin.trials.manage.resultCreate.rulePeriod.unverified";
   entryFields: ReadonlySet<keyof EntryDraft>;
   eraFields: ReadonlySet<Exclude<keyof EraDraft, "era">>;
+  presentationGroups: readonly {
+    id: ResultCreatePresentationGroup;
+    entryFields: readonly (keyof EntryDraft)[];
+    eraFields: readonly Exclude<keyof EraDraft, "era">[];
+  }[];
   yvaLabels?: {
     entry: string;
     era: string;
@@ -137,6 +149,69 @@ const POST_2023_LISATIEDOT = ADMIN_TRIAL_LISATIETO_CONFIG.filter(
   hideOsaSuffix: config.koodi === "25" || config.koodi === "27",
 }));
 
+const PRESENTATION_GROUP_ENTRY_FIELDS: Record<
+  ResultCreatePresentationGroup,
+  readonly (keyof EntryDraft)[]
+> = {
+  basic: [
+    "koemaasto",
+    "koemuoto",
+    "koetyyppi",
+    "lk",
+    "omistajaSnapshot",
+    "omistajanKotikuntaSnapshot",
+  ],
+  time: ["hyvaksytytAjominuutit", "ajoajanPisteet"],
+  merit: ["haku", "hauk", "yva", "ansiopisteetYhteensa", "tja", "pin"],
+  loss: ["hlo", "alo", "tappiopisteetYhteensa"],
+  result: [
+    "ke",
+    "award",
+    "points",
+    "rank",
+    "koiriaLuokassa",
+    "huomautus",
+    "huomautusTeksti",
+  ],
+  judges: [
+    "ryhmatuomariNimi",
+    "palkintotuomariNimi",
+    "judge",
+    "ylituomariNumeroSnapshot",
+  ],
+};
+
+const PRESENTATION_GROUP_ERA_FIELDS: Record<
+  ResultCreatePresentationGroup,
+  readonly Exclude<keyof EraDraft, "era">[]
+> = {
+  basic: [],
+  time: ["alkoi", "hakumin", "ajomin"],
+  merit: ["haku", "hauk", "yva", "tja", "pin"],
+  loss: ["hlo", "alo"],
+  result: ["huomautusTeksti"],
+  judges: [],
+};
+
+function createPresentationGroups(
+  visibleEntryFields: ReadonlySet<keyof EntryDraft>,
+  visibleEraFields: ReadonlySet<Exclude<keyof EraDraft, "era">>,
+) {
+  return (
+    Object.keys(
+      PRESENTATION_GROUP_ENTRY_FIELDS,
+    ) as ResultCreatePresentationGroup[]
+  ).map((id) => ({
+    id,
+    entryFields: PRESENTATION_GROUP_ENTRY_FIELDS[id].filter((field) =>
+      visibleEntryFields.has(field),
+    ),
+    eraFields: PRESENTATION_GROUP_ERA_FIELDS[id].filter((field) =>
+      visibleEraFields.has(field),
+    ),
+  }));
+}
+
 const POST_2023_FIELD_SET: ResultCreateFieldSet = {
   id: "post-2023",
   verified: true,
@@ -146,6 +221,16 @@ const POST_2023_FIELD_SET: ResultCreateFieldSet = {
   ),
   eraFields: new Set(
     [...ALL_ERA_FIELDS].filter((field) => field !== "tja" && field !== "pin"),
+  ),
+  presentationGroups: createPresentationGroups(
+    new Set(
+      [...ALL_ENTRY_FIELDS].filter(
+        (field) => field !== "tja" && field !== "pin",
+      ),
+    ),
+    new Set(
+      [...ALL_ERA_FIELDS].filter((field) => field !== "tja" && field !== "pin"),
+    ),
   ),
   yvaLabels: {
     entry: "Ajotaito",
@@ -161,6 +246,10 @@ const UNVERIFIED_FALLBACK_FIELD_SET: ResultCreateFieldSet = {
     "admin.trials.manage.resultCreate.rulePeriod.unverified",
   entryFields: ALL_ENTRY_FIELDS,
   eraFields: ALL_ERA_FIELDS,
+  presentationGroups: createPresentationGroups(
+    ALL_ENTRY_FIELDS,
+    ALL_ERA_FIELDS,
+  ),
   lisatiedot: FALLBACK_LISATIEDOT,
 };
 
