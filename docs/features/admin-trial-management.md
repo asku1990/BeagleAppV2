@@ -23,6 +23,12 @@ and follow-up admin flow redesign).
   complete compatibility form with a warning. The canonical timeline, field
   sets, and fallback semantics are documented in
   [Trial rule windows](./trials/rule-windows.md).
+- Manual result creation presents the unchanged single draft in independently
+  collapsible cards grouped by the official PDF's domain structure without
+  copying its matrix geometry. Era- and entry-level values remain separate
+  controlled draft fields inside their shared domain card. Lisätiedot uses a
+  searchable, business-domain-grouped workspace with one controlled row
+  editor; removing a selected row clears its unsaved era values.
 
 ## Main files
 
@@ -106,6 +112,15 @@ and follow-up admin flow redesign).
   set and an unverified-field warning. See
   [Trial rule windows](./trials/rule-windows.md) for the complete verified
   configuration and compatibility boundary.
+- Result-create cards may be expanded independently. Koiran ja kokeen tiedot is
+  initially open, followed by Koe-erät ja ajoaika, Ansiopisteet,
+  Tappiopisteet, Tulos ja huomautukset, Tuomarit, and Lisätiedot. Saving while
+  continuing with another dog resets both the draft and presentation state
+  back to Koiran ja kokeen tiedot. Card summaries only repeat entered display
+  values and do not calculate result data.
+- Lisätiedot groups follow the PDF domain order: Olosuhteet, Haku, Haukku,
+  Metsästysinto, Ajo, and Muut ominaisuudet. The workspace does not reproduce
+  the PDF matrix.
 - Selected dog rows have PDF, edit, and result-delete actions.
 - A missing workspace event is shown explicitly and never falls back to a
   different event.

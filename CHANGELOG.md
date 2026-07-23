@@ -21,6 +21,7 @@ This project uses a user-facing changelog format.
 
 ### Changed
 
+- Ajokoetuloksen lisäyslomakkeen avattavat kortit noudattavat virallisen pöytäkirjan aihealueita ilman pöytäkirjan taulukkoasettelun kopiointia. Lisätietoja voi hakea ja muokata pöytäkirjan mukaisessa ryhmäjärjestyksessä myös mobiilissa.
 - Viimeisen koetuloksen poistaminen säilyttää ajokoetapahtuman tyhjänä, kunnes ylläpitäjä poistaa tapahtuman erikseen.
 - Uuden ajokoetapahtuman luomisen jälkeen siirrytään suoraan lisäämään tapahtuman ensimmäistä koetulosta.
 - Ajokoetuloksen lisäyslomake näyttää 1.8.2023 alkaen käytössä olevan sääntökauden mukaiset kentät. Vanhemmilla tai tunnistamattomilla sääntökausilla kaikki yhteensopivuuskentät säilyvät näkyvissä varoituksen kanssa.

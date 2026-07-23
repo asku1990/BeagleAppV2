@@ -100,6 +100,57 @@ describe("EntryMetaSection", () => {
     expect(html).toContain("Ansiopisteet yhteensä");
   });
 
+  it("renders only the requested presentation groups", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(EntryMetaSection, {
+        entryDraft,
+        isPending: false,
+        onChange: vi.fn(),
+        groups: ["result", "judges"],
+      }),
+    );
+
+    expect(html).toContain("Tulos ja huomautus");
+    expect(html).toContain("Tuomarit ja allekirjoitukset");
+    expect(html).not.toContain("Kokeen ja koiran tiedot");
+    expect(html).not.toContain("Ansiopisteet");
+    expect(html).not.toContain("Tappiopisteet");
+  });
+
+  it("moves weather into the create result group without changing edit defaults", () => {
+    const fieldSet = resolveResultCreateFieldSet("trw_post_20230801");
+    const groups = Object.fromEntries(
+      fieldSet.presentationGroups.map((group) => [
+        group.id,
+        new Set(group.entryFields),
+      ]),
+    );
+    const props = {
+      entryDraft,
+      isPending: false,
+      onChange: vi.fn(),
+      showHeadings: false,
+    };
+    const basicHtml = renderToStaticMarkup(
+      React.createElement(EntryMetaSection, {
+        ...props,
+        groups: ["basic"],
+        visibleFields: groups.basic,
+      }),
+    );
+    const resultHtml = renderToStaticMarkup(
+      React.createElement(EntryMetaSection, {
+        ...props,
+        groups: ["result"],
+        visibleFields: groups.result,
+      }),
+    );
+
+    expect(basicHtml).not.toContain("Keli");
+    expect(resultHtml).toContain("Keli");
+    expect(resultHtml).toContain("Huomautusteksti");
+  });
+
   it("keeps the generic label and all fields in compatibility fallback", () => {
     const fieldSet = resolveResultCreateFieldSet(null);
     const html = renderToStaticMarkup(

@@ -28,9 +28,18 @@ import {
 } from "@/queries/admin/trials";
 import { EntryMetaSection } from "./internal/entry-meta-section";
 import { EraSection } from "./internal/era-section";
-import { LisatiedotMatrix } from "./internal/lisatiedot-matrix";
+import { LisatiedotWorkspace } from "./internal/lisatiedot-workspace";
+import { ResultCreateCard } from "./internal/result-create-card";
 
 type SaveIntent = "another" | "finish";
+type CardId =
+  | "basic"
+  | "time"
+  | "merit"
+  | "loss"
+  | "result"
+  | "judges"
+  | "additional";
 
 export function AdminTrialEntryCreatePageClient({
   trialEventId,
@@ -123,6 +132,10 @@ function ResultCreateForm({
     [event, fieldSet],
   );
   const [draft, setDraft] = React.useState(initial);
+  const [openCards, setOpenCards] = React.useState<ReadonlySet<CardId>>(
+    new Set(["basic"]),
+  );
+  const [workspaceResetKey, setWorkspaceResetKey] = React.useState(0);
   const [errorText, setErrorText] = React.useState<string | null>(null);
   const submittingRef = React.useRef(false);
   const dirty = !areAdminTrialEntryCreateDraftsEqual(initial, draft);
@@ -157,6 +170,17 @@ function ResultCreateForm({
     setErrorText(null);
     const parsed = toCreateAdminTrialEntryRequest(event.trialEventId, draft);
     if (!parsed.ok) {
+      setOpenCards(
+        (current) =>
+          new Set([
+            ...current,
+            parsed.section === "registration"
+              ? "basic"
+              : parsed.section === "eras"
+                ? "time"
+                : "result",
+          ]),
+      );
       setErrorText(
         t(
           `admin.trials.manage.resultCreate.validation.${parsed.section}` as never,
@@ -168,9 +192,11 @@ function ResultCreateForm({
     try {
       await mutation.mutateAsync(parsed.request);
       toast.success(t("admin.trials.manage.resultCreate.success"));
-      if (intent === "another")
+      if (intent === "another") {
         setDraft(createAdminTrialEntryCreateDraft(event, fieldSet));
-      else router.replace(workspaceHref);
+        setOpenCards(new Set(["basic"]));
+        setWorkspaceResetKey((current) => current + 1);
+      } else router.replace(workspaceHref);
     } catch (error) {
       const code =
         error instanceof AdminMutationError ? error.errorCode : undefined;
@@ -192,6 +218,7 @@ function ResultCreateForm({
           ? (error.details as AdminTrialEntryValidationIssue | undefined)
           : undefined;
       if (issue?.area === "additional_info" && issue.koodi) {
+        setOpenCards((current) => new Set([...current, "additional"]));
         const row = `${issue.koodi}${issue.osa ? issue.osa : ""}`;
         const issueKey =
           issue.reason === "invalid_lisatieto_order"
@@ -199,6 +226,18 @@ function ResultCreateForm({
             : "admin.trials.manage.resultCreate.error.additionalInfoRow";
         setErrorText(`${t(issueKey)}: ${row}.`);
       } else {
+        const errorCard: Partial<Record<string, CardId>> = {
+          INVALID_REGISTRATION_NUMBER: "basic",
+          TRIAL_ENTRY_REGISTRATION_CONFLICT: "basic",
+          INVALID_TRIAL_ENTRY: "result",
+          INVALID_TRIAL_ERAS: "time",
+          INVALID_TRIAL_ADDITIONAL_INFO: "additional",
+        };
+        if (code && errorCard[code]) {
+          setOpenCards(
+            (current) => new Set([...current, errorCard[code] as CardId]),
+          );
+        }
         setErrorText(
           t(
             `admin.trials.manage.resultCreate.error.${map[code ?? ""] ?? "generic"}` as never,
@@ -209,6 +248,50 @@ function ResultCreateForm({
       submittingRef.current = false;
     }
   }
+
+  function toggleCard(id: CardId) {
+    setOpenCards((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+  const displaySummary = (...values: string[]) =>
+    values
+      .filter((value) => value.trim())
+      .slice(0, 3)
+      .join(" • ") || t("admin.trials.manage.resultCreate.summary.empty");
+  const entryGroups = Object.fromEntries(
+    fieldSet.presentationGroups.map((group) => [
+      group.id,
+      new Set(group.entryFields),
+    ]),
+  );
+  const eraGroups = Object.fromEntries(
+    fieldSet.presentationGroups.map((group) => [
+      group.id,
+      new Set(group.eraFields),
+    ]),
+  );
+  const changeEntry = (
+    update: (current: typeof draft.entry) => typeof draft.entry,
+  ) =>
+    setDraft((current) => ({
+      ...current,
+      entry: update(current.entry),
+    }));
+  const changeEra = (
+    era: number,
+    field: Exclude<keyof (typeof draft.eras)[number], "era">,
+    value: string,
+  ) =>
+    setDraft((current) => ({
+      ...current,
+      eras: current.eras.map((item) =>
+        item.era === era ? { ...item, [field]: value } : item,
+      ),
+    }));
 
   return (
     <div className="space-y-4">
@@ -229,13 +312,27 @@ function ResultCreateForm({
           </p>
         ) : null}
       </div>
-      <Card>
-        <CardContent className="space-y-5 p-5">
-          {errorText ? (
-            <p className="text-sm text-destructive" role="alert">
-              {errorText}
-            </p>
-          ) : null}
+      {errorText ? (
+        <p
+          className="text-sm text-destructive"
+          role="alert"
+          aria-live="assertive"
+        >
+          {errorText}
+        </p>
+      ) : null}
+      <ResultCreateCard
+        id="result-create-basic"
+        title={t("admin.trials.manage.resultCreate.card.basic")}
+        summary={displaySummary(
+          draft.registrationNo,
+          draft.entry.koemaasto,
+          draft.entry.omistajaSnapshot,
+        )}
+        open={openCards.has("basic")}
+        onToggle={() => toggleCard("basic")}
+      >
+        <div className="space-y-5">
           <label className="block space-y-1 text-sm">
             <span>{t("admin.trials.manage.resultCreate.registration")}</span>
             <Input
@@ -252,46 +349,204 @@ function ResultCreateForm({
           <EntryMetaSection
             entryDraft={draft.entry}
             isPending={mutation.isPending}
-            onChange={(update) =>
-              setDraft((current) => ({
-                ...current,
-                entry: update(current.entry),
-              }))
-            }
-            visibleFields={fieldSet.entryFields}
+            onChange={changeEntry}
+            visibleFields={entryGroups.basic}
             yvaLabel={fieldSet.yvaLabels?.entry}
+            groups={["basic"]}
+            showHeadings={false}
           />
+        </div>
+      </ResultCreateCard>
+      <ResultCreateCard
+        id="result-create-time"
+        title={t("admin.trials.manage.resultCreate.card.time")}
+        summary={displaySummary(
+          draft.entry.hyvaksytytAjominuutit,
+          draft.entry.ajoajanPisteet,
+          `${draft.eras.length} ${t("admin.trials.manage.resultCreate.summary.eras")}`,
+        )}
+        open={openCards.has("time")}
+        onToggle={() => toggleCard("time")}
+      >
+        <div className="space-y-5">
           <EraSection
             eras={draft.eras}
             isPending={mutation.isPending}
             onAddEra={addEra}
             onRemoveEra={removeEra}
-            onChangeEraField={(era, field, value) =>
-              setDraft((current) => ({
-                ...current,
-                eras: current.eras.map((item) =>
-                  item.era === era ? { ...item, [field]: value } : item,
-                ),
-              }))
-            }
-            visibleFields={fieldSet.eraFields}
+            onChangeEraField={changeEra}
+            visibleFields={eraGroups.time}
             yvaLabel={fieldSet.yvaLabels?.era}
           />
-          <LisatiedotMatrix
-            eras={draft.eras}
-            rows={draft.lisatiedotRows}
+          <EntryMetaSection
+            entryDraft={draft.entry}
             isPending={mutation.isPending}
-            onChangeCell={(koodi, osa, era, value) =>
-              setDraft((current) => ({
-                ...current,
-                lisatiedotRows: current.lisatiedotRows.map((row) =>
-                  row.koodi === koodi && row.osa === osa
-                    ? { ...row, eraValues: { ...row.eraValues, [era]: value } }
-                    : row,
-                ),
-              }))
-            }
+            onChange={changeEntry}
+            visibleFields={entryGroups.time}
+            yvaLabel={fieldSet.yvaLabels?.entry}
+            groups={["merit"]}
+            showHeadings={false}
           />
+        </div>
+      </ResultCreateCard>
+      <ResultCreateCard
+        id="result-create-merit"
+        title={t("admin.trials.manage.resultCreate.card.merit")}
+        summary={displaySummary(
+          draft.entry.haku,
+          draft.entry.hauk,
+          draft.entry.ansiopisteetYhteensa,
+        )}
+        open={openCards.has("merit")}
+        onToggle={() => toggleCard("merit")}
+      >
+        <div className="space-y-5">
+          <EraSection
+            eras={draft.eras}
+            isPending={mutation.isPending}
+            onAddEra={addEra}
+            onRemoveEra={removeEra}
+            onChangeEraField={changeEra}
+            visibleFields={eraGroups.merit}
+            yvaLabel={fieldSet.yvaLabels?.era}
+            showControls={false}
+          />
+          <EntryMetaSection
+            entryDraft={draft.entry}
+            isPending={mutation.isPending}
+            onChange={changeEntry}
+            visibleFields={entryGroups.merit}
+            yvaLabel={fieldSet.yvaLabels?.entry}
+            groups={["merit", "other"]}
+            showHeadings={false}
+          />
+        </div>
+      </ResultCreateCard>
+      <ResultCreateCard
+        id="result-create-loss"
+        title={t("admin.trials.manage.resultCreate.card.loss")}
+        summary={displaySummary(
+          draft.entry.hlo,
+          draft.entry.alo,
+          draft.entry.tappiopisteetYhteensa,
+        )}
+        open={openCards.has("loss")}
+        onToggle={() => toggleCard("loss")}
+      >
+        <div className="space-y-5">
+          <EraSection
+            eras={draft.eras}
+            isPending={mutation.isPending}
+            onAddEra={addEra}
+            onRemoveEra={removeEra}
+            onChangeEraField={changeEra}
+            visibleFields={eraGroups.loss}
+            showControls={false}
+          />
+          <EntryMetaSection
+            entryDraft={draft.entry}
+            isPending={mutation.isPending}
+            onChange={changeEntry}
+            visibleFields={entryGroups.loss}
+            groups={["other"]}
+            showHeadings={false}
+          />
+        </div>
+      </ResultCreateCard>
+      <ResultCreateCard
+        id="result-create-result"
+        title={t("admin.trials.manage.resultCreate.card.result")}
+        summary={displaySummary(
+          draft.entry.award,
+          draft.entry.points,
+          draft.entry.rank,
+        )}
+        open={openCards.has("result")}
+        onToggle={() => toggleCard("result")}
+      >
+        <div className="space-y-5">
+          <EntryMetaSection
+            entryDraft={draft.entry}
+            isPending={mutation.isPending}
+            onChange={changeEntry}
+            visibleFields={entryGroups.result}
+            groups={["result"]}
+            showHeadings={false}
+          />
+          {eraGroups.result.size ? (
+            <EraSection
+              eras={draft.eras}
+              isPending={mutation.isPending}
+              onAddEra={addEra}
+              onRemoveEra={removeEra}
+              onChangeEraField={changeEra}
+              visibleFields={eraGroups.result}
+              showControls={false}
+            />
+          ) : null}
+        </div>
+      </ResultCreateCard>
+      <ResultCreateCard
+        id="result-create-judges"
+        title={t("admin.trials.manage.resultCreate.card.judges")}
+        summary={displaySummary(
+          draft.entry.ryhmatuomariNimi,
+          draft.entry.palkintotuomariNimi,
+          draft.entry.judge,
+        )}
+        open={openCards.has("judges")}
+        onToggle={() => toggleCard("judges")}
+      >
+        <EntryMetaSection
+          entryDraft={draft.entry}
+          isPending={mutation.isPending}
+          onChange={changeEntry}
+          visibleFields={entryGroups.judges}
+          groups={["judges"]}
+          showHeadings={false}
+        />
+      </ResultCreateCard>
+      <ResultCreateCard
+        id="result-create-additional"
+        title={t("admin.trials.manage.resultCreate.card.additional")}
+        summary={`${draft.lisatiedotRows.filter((row) => Object.values(row.eraValues).some(Boolean)).length} ${t("admin.trials.manage.resultCreate.summary.selected")}`}
+        open={openCards.has("additional")}
+        onToggle={() => toggleCard("additional")}
+      >
+        <LisatiedotWorkspace
+          key={workspaceResetKey}
+          eras={draft.eras}
+          rows={draft.lisatiedotRows}
+          isPending={mutation.isPending}
+          onChangeCell={(koodi, osa, era, value) =>
+            setDraft((current) => ({
+              ...current,
+              lisatiedotRows: current.lisatiedotRows.map((row) =>
+                row.koodi === koodi && row.osa === osa
+                  ? { ...row, eraValues: { ...row.eraValues, [era]: value } }
+                  : row,
+              ),
+            }))
+          }
+          onRemoveRow={(koodi, osa) =>
+            setDraft((current) => ({
+              ...current,
+              lisatiedotRows: current.lisatiedotRows.map((row) =>
+                row.koodi === koodi && row.osa === osa
+                  ? {
+                      ...row,
+                      eraValues: Object.fromEntries(
+                        Object.keys(row.eraValues).map((era) => [era, ""]),
+                      ),
+                    }
+                  : row,
+              ),
+            }))
+          }
+        />
+      </ResultCreateCard>
+      <Card>
+        <CardContent className="p-5">
           <div className="flex flex-wrap gap-2">
             <Button
               disabled={mutation.isPending}
