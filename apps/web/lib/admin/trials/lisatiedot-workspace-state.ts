@@ -10,8 +10,7 @@ export type LisatiedotWorkspaceAction =
   | { type: "toggleGroup"; value: string }
   | { type: "remove"; value: string }
   | { type: "active"; value: string | null; mobile?: boolean }
-  | { type: "sheet"; value: boolean }
-  | { type: "reset" };
+  | { type: "sheet"; value: boolean };
 
 export const lisatietoRowKey = (
   row: Pick<LisatietoRowDraft, "koodi" | "osa">,
@@ -52,7 +51,5 @@ export function lisatiedotWorkspaceReducer(
       };
     case "sheet":
       return { ...state, mobileSheetOpen: action.value };
-    case "reset":
-      return createLisatiedotWorkspaceState();
   }
 }

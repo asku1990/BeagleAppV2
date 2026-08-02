@@ -80,12 +80,9 @@ scrolling matrix with a dedicated workspace inside its own card.
 
 The workspace supports:
 
-- search by code;
-- search by localized name;
-- filtering by business/PDF domain;
-- collapsible domain groups;
-- expand all and collapse all;
-- a selected-row summary above the groups;
+- PDF/business domain groups in the documented order;
+- individually collapsible domain groups;
+- a single active row editor;
 - semantic per-era controls; and
 - responsive desktop and mobile layouts.
 
@@ -120,14 +117,14 @@ Administrators must not normally enter raw persistence values such as `0` or
 `1`. The UI translates semantic control state through registry persistence
 mapping.
 
-Selected rows remain visible in the summary above the groups. Removing a
-selected row clears all of its unsaved era values. Rows with no values are
-omitted from the create request, preserving the existing request behavior.
+Clicking a row activates its single editor. Removing a row clears all of its
+unsaved era values. Rows with no values are omitted from the create request,
+preserving the existing request behavior.
 
-On desktop, the workspace may use adjacent filter, group, selected-row, and
-editor regions when space permits. On mobile, it uses stacked groups or an
-overlay/sheet while preserving the same selection and semantic controls.
-These are responsive implementation choices, not separate workflows.
+On desktop, the workspace uses the groups beside the active row editor. On
+mobile, the active row editor opens in a Sheet while preserving the same draft
+ownership and semantic controls. These are responsive implementation choices,
+not separate workflows.
 
 ## Erät and other sections
 
@@ -200,8 +197,8 @@ entry has an ID.
 - Rule windows remain mostly invisible: administrators cannot select one,
   normally see only a localized period label, and do not see the technical ID
   as a standard field.
-- Lisätiedot provides search, domain filtering, collapsible groups,
-  expand/collapse all, selected-row summary, and semantic per-era controls.
+- Lisätiedot provides PDF-domain grouping, individually collapsible groups, a
+  single row editor, and semantic per-era controls.
 - Business/PDF domains are the primary lisätieto grouping; numeric ranges are
   secondary only.
 - Removing a selected lisätieto clears its unsaved values, and empty rows are
@@ -221,9 +218,9 @@ entry has an ID.
 
 - Card tests for independent rendering, field-set-driven visibility,
   validation presentation, and draft callbacks.
-- Lisätieto tests for code/name search, domain filtering, group
-  expand/collapse, selected-row summary, selection removal, semantic controls,
-  per-era values, and omission of empty rows.
+- Lisätieto tests for PDF-domain ordering, independent group expansion, row
+  activation, removal, semantic controls, per-era values, and omission of
+  empty rows.
 - Tests proving semantic marker and tri-state controls serialize through the
   registry without exposing raw persistence values.
 - Responsive component tests for desktop and mobile workspace variants.

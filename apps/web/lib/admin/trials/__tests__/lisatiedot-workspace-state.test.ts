@@ -5,22 +5,6 @@ import {
 } from "../lisatiedot-workspace-state";
 
 describe("lisatiedot workspace reducer", () => {
-  it("resets all transient workspace state", () => {
-    let state = lisatiedotWorkspaceReducer(createLisatiedotWorkspaceState(), {
-      type: "toggleGroup",
-      value: "haku",
-    });
-    state = lisatiedotWorkspaceReducer(state, {
-      type: "active",
-      value: "20:",
-      mobile: true,
-    });
-
-    state = lisatiedotWorkspaceReducer(state, { type: "reset" });
-
-    expect(state).toEqual(createLisatiedotWorkspaceState());
-  });
-
   it("clears the active row when it is removed", () => {
     let state = lisatiedotWorkspaceReducer(createLisatiedotWorkspaceState(), {
       type: "active",
