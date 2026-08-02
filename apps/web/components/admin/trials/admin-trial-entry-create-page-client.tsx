@@ -509,7 +509,6 @@ function ResultCreateForm({
       <ResultCreateCard
         id="result-create-additional"
         title={t("admin.trials.manage.resultCreate.card.additional")}
-        summary={`${draft.lisatiedotRows.filter((row) => Object.values(row.eraValues).some(Boolean)).length} ${t("admin.trials.manage.resultCreate.summary.selected")}`}
         open={openCards.has("additional")}
         onToggle={() => toggleCard("additional")}
       >

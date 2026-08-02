@@ -77,15 +77,6 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.resultCreate.card.additional": "Lisätiedot",
   "admin.trials.manage.resultCreate.summary.empty": "Ei tietoja",
   "admin.trials.manage.resultCreate.summary.eras": "erää",
-  "admin.trials.manage.resultCreate.summary.selected": "valittua",
-  "admin.trials.manage.resultCreate.additional.search": "Hae lisätietoa",
-  "admin.trials.manage.resultCreate.additional.searchPlaceholder":
-    "Hae koodilla tai nimellä",
-  "admin.trials.manage.resultCreate.additional.expandAll": "Laajenna kaikki",
-  "admin.trials.manage.resultCreate.additional.collapseAll": "Supista kaikki",
-  "admin.trials.manage.resultCreate.additional.groups": "Lisätietoryhmät",
-  "admin.trials.manage.resultCreate.additional.allGroups": "Kaikki",
-  "admin.trials.manage.resultCreate.additional.selected": "Valitut lisätiedot",
   "admin.trials.manage.resultCreate.additional.remove": "Poista",
   "admin.trials.manage.resultCreate.additional.close": "Sulje",
   "admin.trials.manage.resultCreate.additional.chooseRow":
@@ -317,16 +308,6 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.resultCreate.card.additional": "Tilläggsuppgifter",
   "admin.trials.manage.resultCreate.summary.empty": "Inga uppgifter",
   "admin.trials.manage.resultCreate.summary.eras": "omgångar",
-  "admin.trials.manage.resultCreate.summary.selected": "valda",
-  "admin.trials.manage.resultCreate.additional.search": "Sök tilläggsuppgift",
-  "admin.trials.manage.resultCreate.additional.searchPlaceholder":
-    "Sök med kod eller namn",
-  "admin.trials.manage.resultCreate.additional.expandAll": "Expandera alla",
-  "admin.trials.manage.resultCreate.additional.collapseAll": "Fäll ihop alla",
-  "admin.trials.manage.resultCreate.additional.groups": "Tilläggsgrupper",
-  "admin.trials.manage.resultCreate.additional.allGroups": "Alla",
-  "admin.trials.manage.resultCreate.additional.selected":
-    "Valda tilläggsuppgifter",
   "admin.trials.manage.resultCreate.additional.remove": "Ta bort",
   "admin.trials.manage.resultCreate.additional.close": "Stäng",
   "admin.trials.manage.resultCreate.additional.chooseRow":

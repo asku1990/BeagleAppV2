@@ -27,8 +27,8 @@ and follow-up admin flow redesign).
   collapsible cards grouped by the official PDF's domain structure without
   copying its matrix geometry. Era- and entry-level values remain separate
   controlled draft fields inside their shared domain card. Lisätiedot uses a
-  searchable, business-domain-grouped workspace with one controlled row
-  editor; removing a selected row clears its unsaved era values.
+  business-domain-grouped workspace with individually collapsible groups and
+  one controlled row editor; removing a row clears its unsaved era values.
 
 ## Main files
 

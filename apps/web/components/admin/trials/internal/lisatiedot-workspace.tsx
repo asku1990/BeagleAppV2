@@ -23,7 +23,6 @@ import type {
 } from "@/lib/admin/trials/entry-edit-dialog-model";
 import {
   createLisatiedotWorkspaceState,
-  filterLisatietoRows,
   lisatietoRowKey,
   lisatiedotWorkspaceReducer,
 } from "@/lib/admin/trials/lisatiedot-workspace-state";
@@ -56,8 +55,8 @@ export function LisatiedotWorkspace({
   const { t } = useI18n();
   const [state, dispatch] = React.useReducer(
     lisatiedotWorkspaceReducer,
-    rows,
-    createLisatiedotWorkspaceState,
+    undefined,
+    () => createLisatiedotWorkspaceState(),
   );
   const isMobileWorkspace = useResultCreateWorkspaceMobile();
   const mobileControlRef = React.useRef<HTMLElement | null>(null);
@@ -81,10 +80,6 @@ export function LisatiedotWorkspace({
       ),
     [rows],
   );
-  const visibleRows = filterLisatietoRows(rows, state.query, state.activeGroup);
-  const selectedRows = rows.filter((row) =>
-    state.selectedRows.has(lisatietoRowKey(row)),
-  );
   const activeRow =
     rows.find((row) => lisatietoRowKey(row) === state.activeRow) ?? null;
 
@@ -94,14 +89,13 @@ export function LisatiedotWorkspace({
     }
   }, [isMobileWorkspace, state.mobileSheetOpen]);
 
-  function select(
+  function activate(
     row: LisatietoRowDraft,
     mobile: boolean,
     trigger: HTMLButtonElement,
   ) {
     const key = lisatietoRowKey(row);
     rowTriggerRef.current = trigger;
-    dispatch({ type: "select", value: key });
     dispatch({ type: "active", value: key, mobile });
   }
   function remove(row: LisatietoRowDraft) {
@@ -111,90 +105,10 @@ export function LisatiedotWorkspace({
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
-        <label className="space-y-1 text-sm">
-          <span>{t("admin.trials.manage.resultCreate.additional.search")}</span>
-          <Input
-            value={state.query}
-            placeholder={t(
-              "admin.trials.manage.resultCreate.additional.searchPlaceholder",
-            )}
-            onChange={(event) =>
-              dispatch({ type: "query", value: event.target.value })
-            }
-          />
-        </label>
-        <div className="flex flex-wrap items-end gap-2">
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={() => dispatch({ type: "expand", values: groups })}
-          >
-            {t("admin.trials.manage.resultCreate.additional.expandAll")}
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={() => dispatch({ type: "collapse" })}
-          >
-            {t("admin.trials.manage.resultCreate.additional.collapseAll")}
-          </Button>
-        </div>
-      </div>
-      <div
-        className="flex flex-wrap gap-2"
-        aria-label={t("admin.trials.manage.resultCreate.additional.groups")}
-      >
-        <Button
-          type="button"
-          size="sm"
-          variant={state.activeGroup === null ? "default" : "outline"}
-          onClick={() => dispatch({ type: "group", value: null })}
-        >
-          {t("admin.trials.manage.resultCreate.additional.allGroups")}
-        </Button>
-        {groups.map((group) => (
-          <Button
-            key={group}
-            type="button"
-            size="sm"
-            variant={state.activeGroup === group ? "default" : "outline"}
-            onClick={() => dispatch({ type: "group", value: group })}
-          >
-            {groupLabel(group)}
-          </Button>
-        ))}
-      </div>
-      {selectedRows.length ? (
-        <div
-          className="flex flex-wrap gap-2"
-          aria-label={t("admin.trials.manage.resultCreate.additional.selected")}
-        >
-          {selectedRows.map((row) => (
-            <span
-              key={lisatietoRowKey(row)}
-              className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-sm"
-            >
-              {row.koodi} {row.label}
-              <button
-                type="button"
-                className="rounded px-1"
-                aria-label={`${t("admin.trials.manage.resultCreate.additional.remove")} ${row.koodi} ${row.label}`}
-                onClick={() => remove(row)}
-              >
-                ×
-              </button>
-            </span>
-          ))}
-        </div>
-      ) : null}
       <div className="grid gap-4 lg:grid-cols-[minmax(260px,0.8fr)_minmax(0,1.2fr)]">
         <div className="space-y-2">
           {groups.map((group) => {
-            const groupRows = visibleRows.filter((row) => row.group === group);
-            if (!groupRows.length) return null;
+            const groupRows = rows.filter((row) => row.group === group);
             const expanded = state.expandedGroups.has(group);
             return (
               <div key={group} className="rounded-md border">
@@ -216,7 +130,7 @@ export function LisatiedotWorkspace({
                         type="button"
                         className="block w-full rounded p-2 text-left hover:bg-muted"
                         onClick={(event) =>
-                          select(row, isMobileWorkspace, event.currentTarget)
+                          activate(row, isMobileWorkspace, event.currentTarget)
                         }
                       >
                         <span className="font-medium">{row.koodi}</span>{" "}
@@ -326,7 +240,13 @@ function RowEditor({
             )}
           </p>
         </div>
-        <Button type="button" size="sm" variant="outline" onClick={onRemove}>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          aria-label={`${t("admin.trials.manage.resultCreate.additional.remove")} ${row.koodi} ${row.label}`}
+          onClick={onRemove}
+        >
           {t("admin.trials.manage.resultCreate.additional.remove")}
         </Button>
       </div>
