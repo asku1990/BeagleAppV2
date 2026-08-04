@@ -16,6 +16,8 @@ type Props = {
   ) => void;
   visibleFields?: ReadonlySet<Exclude<keyof EraDraft, "era">>;
   yvaLabel?: string;
+  showControls?: boolean;
+  showHeading?: boolean;
 };
 
 export function EraSection({
@@ -26,15 +28,26 @@ export function EraSection({
   onChangeEraField,
   visibleFields,
   yvaLabel,
+  showControls = true,
+  showHeading = true,
 }: Props) {
   return (
     <>
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold">Erät</h3>
-        <Button type="button" variant="outline" size="sm" onClick={onAddEra}>
-          Lisää erä
-        </Button>
-      </div>
+      {showHeading || showControls ? (
+        <div className="flex items-center justify-between">
+          {showHeading ? <h3 className="text-sm font-semibold">Erät</h3> : null}
+          {showControls ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onAddEra}
+            >
+              Lisää erä
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
       <div className="space-y-3">
         {eras
           .slice()
@@ -43,7 +56,7 @@ export function EraSection({
             <div key={era.era} className="rounded-md border p-3">
               <div className="mb-2 flex items-center justify-between">
                 <p className="text-sm font-medium">Erä {era.era}</p>
-                {era.era !== 1 ? (
+                {showControls && era.era !== 1 ? (
                   <Button
                     type="button"
                     variant="outline"

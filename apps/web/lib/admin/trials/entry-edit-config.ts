@@ -41,6 +41,16 @@ export type AdminTrialLisatietoConfig = {
   useSemanticControl?: boolean;
 };
 
+export const ADMIN_TRIAL_LISATIETO_GROUP_ORDER = [
+  "olosuhteet",
+  "haku",
+  "haukku",
+  "metsastysinto",
+  "ajo",
+  "muut_ominaisuudet",
+  "unknown",
+] as const satisfies readonly AdminTrialLisatietoGroup[];
+
 function defineLisatieto(
   koodi: string,
   group: AdminTrialLisatietoGroup,

@@ -68,6 +68,22 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.resultCreate.backToWorkspace":
     "Takaisin tapahtuman sivulle",
   "admin.trials.manage.resultCreate.registration": "Rekisterinumero",
+  "admin.trials.manage.resultCreate.card.basic": "Koiran ja kokeen tiedot",
+  "admin.trials.manage.resultCreate.card.time": "Koe-erät ja ajoaika",
+  "admin.trials.manage.resultCreate.card.merit": "Ansiopisteet",
+  "admin.trials.manage.resultCreate.card.loss": "Tappiopisteet",
+  "admin.trials.manage.resultCreate.card.result": "Tulos ja huomautukset",
+  "admin.trials.manage.resultCreate.card.judges": "Tuomarit",
+  "admin.trials.manage.resultCreate.card.additional": "Lisätiedot",
+  "admin.trials.manage.resultCreate.summary.empty": "Ei tietoja",
+  "admin.trials.manage.resultCreate.summary.eras": "erää",
+  "admin.trials.manage.resultCreate.additional.remove": "Poista",
+  "admin.trials.manage.resultCreate.additional.close": "Sulje",
+  "admin.trials.manage.resultCreate.additional.chooseRow":
+    "Valitse lisätieto muokattavaksi.",
+  "admin.trials.manage.resultCreate.additional.editorHelp":
+    "Anna arvot eräkohtaisesti.",
+  "admin.trials.manage.resultCreate.additional.era": "Erä",
   "admin.trials.manage.resultCreate.rulePeriod.post2023": "Säännöt: 1.8.2023 →",
   "admin.trials.manage.resultCreate.rulePeriod.unverified":
     "Säännöt: historiallinen tai määrittämätön sääntökausi",
@@ -282,6 +298,23 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.resultCreate.backToWorkspace":
     "Tillbaka till evenemangssidan",
   "admin.trials.manage.resultCreate.registration": "Registreringsnummer",
+  "admin.trials.manage.resultCreate.card.basic":
+    "Hundens och provets uppgifter",
+  "admin.trials.manage.resultCreate.card.time": "Provomgångar och drevtid",
+  "admin.trials.manage.resultCreate.card.merit": "Förtjänstpoäng",
+  "admin.trials.manage.resultCreate.card.loss": "Minuspoäng",
+  "admin.trials.manage.resultCreate.card.result": "Resultat och anmärkningar",
+  "admin.trials.manage.resultCreate.card.judges": "Domare",
+  "admin.trials.manage.resultCreate.card.additional": "Tilläggsuppgifter",
+  "admin.trials.manage.resultCreate.summary.empty": "Inga uppgifter",
+  "admin.trials.manage.resultCreate.summary.eras": "omgångar",
+  "admin.trials.manage.resultCreate.additional.remove": "Ta bort",
+  "admin.trials.manage.resultCreate.additional.close": "Stäng",
+  "admin.trials.manage.resultCreate.additional.chooseRow":
+    "Välj en tilläggsuppgift att redigera.",
+  "admin.trials.manage.resultCreate.additional.editorHelp":
+    "Ange värden per omgång.",
+  "admin.trials.manage.resultCreate.additional.era": "Omgång",
   "admin.trials.manage.resultCreate.rulePeriod.post2023": "Regler: 1.8.2023 →",
   "admin.trials.manage.resultCreate.rulePeriod.unverified":
     "Regler: historisk eller obestämd regelperiod",

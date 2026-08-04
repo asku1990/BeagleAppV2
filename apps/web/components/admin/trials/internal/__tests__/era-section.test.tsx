@@ -42,4 +42,45 @@ describe("EraSection", () => {
     expect(fallbackHtml).toContain("tie ja estetyöskentely");
     expect(fallbackHtml).toContain("metsästysinto");
   });
+
+  it("renders only the era fields resolved for a presentation domain", () => {
+    const props = {
+      eras: [createEmptyEraDraft(1)],
+      isPending: false,
+      onAddEra: vi.fn(),
+      onRemoveEra: vi.fn(),
+      onChangeEraField: vi.fn(),
+      showControls: false,
+      showHeading: false,
+    };
+    const fieldSet = resolveResultCreateFieldSet("trw_post_20230801");
+    const groups = Object.fromEntries(
+      fieldSet.presentationGroups.map((group) => [
+        group.id,
+        new Set(group.eraFields),
+      ]),
+    );
+    const timeHtml = renderToStaticMarkup(
+      React.createElement(EraSection, {
+        ...props,
+        visibleFields: groups.time,
+      }),
+    );
+    const meritHtml = renderToStaticMarkup(
+      React.createElement(EraSection, {
+        ...props,
+        visibleFields: groups.merit,
+        yvaLabel: fieldSet.yvaLabels?.era,
+      }),
+    );
+
+    expect(timeHtml).toContain("alkoi");
+    expect(timeHtml).toContain("hakumin");
+    expect(timeHtml).toContain("ajomin");
+    expect(timeHtml).not.toContain("haukku");
+    expect(meritHtml).toContain("haku");
+    expect(meritHtml).toContain("haukku");
+    expect(meritHtml).toContain("ajotaito");
+    expect(meritHtml).not.toContain("hakumin");
+  });
 });
