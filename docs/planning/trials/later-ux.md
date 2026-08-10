@@ -12,8 +12,6 @@ the review rules in the [BEJ-103 planning overview](./README.md).
 
 ## Deferred ideas
 
-- Replace the current trials master-detail list with a navigation-only event
-  index.
 - Move editing of existing results from the modal to the reusable full-page
   result form.
 - Make existing result editing rule-window-aware, including preservation of
@@ -26,6 +24,9 @@ the review rules in the [BEJ-103 planning overview](./README.md).
 - Enter and submit several dog results as one batch.
 - Autosave event or result forms.
 - Add reconciliation UI for manual and Koiratietokanta data conflicts.
+
+The navigation-only event index was promoted to
+[Gate F1](./feature-finalization.md); it is no longer deferred work.
 
 ## Explicit exclusions from current gates
 

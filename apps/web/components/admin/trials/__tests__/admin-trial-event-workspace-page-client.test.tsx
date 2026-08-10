@@ -97,7 +97,6 @@ describe("AdminTrialEventWorkspacePageClient", () => {
     expect(panelPropsRef.current?.selectedEvent).toEqual({
       trialEventId: "event-1",
     });
-    expect(panelPropsRef.current?.workspaceHref).toBeUndefined();
     expect(panelPropsRef.current?.allowEmptyEventDeletion).toBe(true);
     expect(panelPropsRef.current?.createEntryHref).toBe(
       "/admin/trials/event-1/results/new",

@@ -37,7 +37,6 @@ type AdminTrialSelectedEventPanelProps = {
   onDeletedTrialEvent: (deletedTrialEventId: string) => void;
   onTrialEventDeleteConflict?: () => void;
   allowEmptyEventDeletion?: boolean;
-  workspaceHref?: string;
   createEntryHref?: string;
 };
 
@@ -51,7 +50,6 @@ export function AdminTrialSelectedEventPanel({
   onDeletedTrialEvent,
   onTrialEventDeleteConflict,
   allowEmptyEventDeletion = false,
-  workspaceHref,
   createEntryHref,
 }: AdminTrialSelectedEventPanelProps) {
   const { t } = useI18n();
@@ -178,15 +176,6 @@ export function AdminTrialSelectedEventPanel({
                     <Button asChild>
                       <Link href={createEntryHref}>
                         {t("admin.trials.manage.resultCreate.action")}
-                      </Link>
-                    </Button>
-                  ) : null}
-                  {workspaceHref ? (
-                    <Button asChild variant="outline">
-                      <Link href={workspaceHref}>
-                        {t(
-                          "admin.trials.manage.selected.actions.openWorkspace",
-                        )}
                       </Link>
                     </Button>
                   ) : null}

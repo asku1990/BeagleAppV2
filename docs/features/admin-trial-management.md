@@ -5,11 +5,11 @@ and follow-up admin flow redesign).
 
 ## Primary purpose
 
-- The admin list page is an event-first master-detail workflow for canonical
-  AJOK `TrialEvent` + `TrialEntry` rows.
-- An admin can create and search events, select one event, inspect and edit its
-  metadata and dog rows, delete a result, or open the event at the stable
-  `/admin/trials/[trialEventId]` workspace URL.
+- The admin list page is a navigation-only event index for canonical AJOK
+  `TrialEvent` rows.
+- An admin can create and search events, then open an event at the stable
+  `/admin/trials/[trialEventId]` workspace URL to inspect and edit its metadata
+  and dog rows or delete a result.
 - Empty events remain available to administrators. They can be deleted
   explicitly from their workspace, but only while they have no result rows.
 - Per-dog inspection opens the generated trial PDF. Existing event and result
@@ -32,12 +32,12 @@ and follow-up admin flow redesign).
 
 ## Main files
 
-- `apps/web/app/(admin)/admin/trials/page.tsx`: route entrypoint for event master-detail list
+- `apps/web/app/(admin)/admin/trials/page.tsx`: route entrypoint for the navigation-only event index
 - `apps/web/app/(admin)/admin/trials/new/page.tsx`: full-page event creation route
 - `apps/web/app/(admin)/admin/trials/[trialEventId]/page.tsx`: stable event workspace route
 - `apps/web/app/(admin)/admin/trials/[trialEventId]/results/new/page.tsx`: manual result creation route
 - `apps/web/components/admin/trials/admin-trial-event-create-page-client.tsx`: event creation form and continuation
-- `apps/web/components/admin/trials/admin-trials-page-client.tsx`: event filters + event list + selected-event rows
+- `apps/web/components/admin/trials/admin-trials-page-client.tsx`: event filters, event list, and workspace navigation
 - `apps/web/components/admin/trials/admin-trial-event-workspace-page-client.tsx`: one-event workspace states and navigation
 - `apps/web/components/admin/trials/admin-trial-selected-event-panel.tsx`: selected-event rows and row actions
 - `apps/web/components/admin/trials/admin-trial-entry-actions.tsx`: per-dog PDF action
@@ -54,9 +54,9 @@ and follow-up admin flow redesign).
 ## Data flow
 
 1. List page fetches event summaries through `useAdminTrialEventsQuery`.
-2. Event selection fetches selected event rows through `useAdminTrialEventQuery`.
-3. The selected-event panel links to the stable event workspace, which fetches
-   only the `trialEventId` from its route.
+2. Activating an event row or card opens its stable event workspace.
+3. The workspace fetches selected event rows through
+   `useAdminTrialEventQuery`, using only the `trialEventId` from its route.
 4. Event and result changes use admin Server Action mutations; the PDF action
    opens `/api/trials/[trialEntryId]/pdf` in a new tab.
 5. Successful event creation opens the first manual result form for the new event.
@@ -99,8 +99,9 @@ and follow-up admin flow redesign).
 
 ## Render rules
 
-- Event rows/cards are the interaction target for choosing a selected event.
-- The selected-event header has event edit and workspace navigation actions.
+- Event rows/cards open the exact event workspace; the index does not
+  auto-select an event or render event details inline.
+- The workspace's selected-event header has the event edit action.
 - The event workspace links to the full-page result form. Dirty result forms
   confirm internal navigation and use native unload protection for refresh or
   close. Browser Back leaves the form without application confirmation because
@@ -155,4 +156,4 @@ Parity sample evidence for BEJ-81:
 ## When to update this doc
 
 - Update this file when the trial summary or selected-event contracts change.
-- Update this file when event list filters, selection model, or row actions change.
+- Update this file when event list filters, navigation model, or row actions change.

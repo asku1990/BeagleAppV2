@@ -2,13 +2,13 @@
 
 ## Status and sequencing
 
-This is the second creation follow-up after R2. It is planning only and does
-not authorize implementation.
+R3B was implemented in PR #345. This file remains the planning and review
+record for the result-creation presentation.
 
-R3A must be implemented, validated, reviewed, and approved before R3B begins.
-R3B consumes the R3A field-set registry and changes only the presentation of
-the existing full-page result-create experience. Existing result editing
-remains unchanged.
+R3A was implemented, validated, reviewed, and approved before R3B. R3B
+consumes the R3A field-set registry and changes only the presentation of the
+existing full-page result-create experience. Existing result editing remains
+unchanged.
 
 The referenced UX screenshots are concepts for hierarchy, cards, and
 lisätieto interaction. They do not specify exact geometry, field counts,

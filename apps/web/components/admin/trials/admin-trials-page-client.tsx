@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { AdminTrialEventSearchRequest } from "@beagle/contracts";
 import { useI18n } from "@/hooks/i18n";
 import { Button } from "@/components/ui/button";
@@ -11,20 +12,17 @@ import {
 } from "@/lib/admin/trials";
 import { AdminTrialEventsFilters } from "./admin-trial-events-filters";
 import { AdminTrialEventsResults } from "./admin-trial-events-results";
-import { AdminTrialSelectedEventPanel } from "./admin-trial-selected-event-panel";
 import {
   ADMIN_TRIAL_PAGE_SIZE,
   type AdminTrialSearchMode,
   type AdminTrialSearchSort,
   parseYearInput,
 } from "./internal/trial-ui";
-import {
-  useAdminTrialEventQuery,
-  useAdminTrialEventsQuery,
-} from "@/queries/admin/trials";
+import { useAdminTrialEventsQuery } from "@/queries/admin/trials";
 
 export function AdminTrialsPageClient() {
   const { t } = useI18n();
+  const router = useRouter();
   const [mode, setMode] = useState<AdminTrialSearchMode>("year");
   const [query, setQuery] = useState("");
   const [yearInput, setYearInput] = useState("");
@@ -38,10 +36,6 @@ export function AdminTrialsPageClient() {
       sort: "date-desc",
       year: undefined,
     });
-  const [selectedEventIdInput, setSelectedEventIdInput] = useState("");
-  const [blockedAutoSelectedEventId, setBlockedAutoSelectedEventId] = useState<
-    string | null
-  >(null);
   const [filterError, setFilterError] = useState<string | null>(null);
 
   const eventsQuery = useAdminTrialEventsQuery(searchRequest);
@@ -49,19 +43,6 @@ export function AdminTrialsPageClient() {
   const totalCount = eventsQuery.data?.total ?? events.length;
   const totalPages = eventsQuery.data?.totalPages ?? 0;
   const page = eventsQuery.data?.page ?? 1;
-  const fallbackSelectedEventId = events[0]?.trialEventId ?? "";
-  // modification: block auto-selection after deleting currently selected event
-  const selectedEventId =
-    selectedEventIdInput ||
-    (blockedAutoSelectedEventId ? "" : fallbackSelectedEventId);
-  const selectedSummary =
-    events.find((event) => event.trialEventId === selectedEventId) || null;
-
-  const eventQuery = useAdminTrialEventQuery({
-    trialEventId: selectedEventId,
-    enabled: selectedEventId.length > 0,
-  });
-
   function handleSubmitSearch() {
     if (mode === "year") {
       const parsedYear = parseYearInput(yearInput);
@@ -80,8 +61,6 @@ export function AdminTrialsPageClient() {
         pageSize: ADMIN_TRIAL_PAGE_SIZE,
         sort,
       });
-      setSelectedEventIdInput("");
-      setBlockedAutoSelectedEventId(null);
       return;
     }
 
@@ -105,8 +84,6 @@ export function AdminTrialsPageClient() {
       pageSize: ADMIN_TRIAL_PAGE_SIZE,
       sort,
     });
-    setSelectedEventIdInput("");
-    setBlockedAutoSelectedEventId(null);
   }
 
   function handleResetSearch() {
@@ -126,8 +103,6 @@ export function AdminTrialsPageClient() {
       pageSize: ADMIN_TRIAL_PAGE_SIZE,
       sort: "date-desc",
     });
-    setSelectedEventIdInput("");
-    setBlockedAutoSelectedEventId(null);
   }
 
   function handlePageDelta(delta: number) {
@@ -141,11 +116,6 @@ export function AdminTrialsPageClient() {
     eventsQuery.error instanceof Error
       ? eventsQuery.error.message
       : t("admin.trials.manage.error");
-  const selectedErrorText =
-    eventQuery.error instanceof Error
-      ? eventQuery.error.message
-      : t("admin.trials.manage.selected.error");
-
   return (
     <div className="space-y-4" suppressHydrationWarning>
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -184,34 +154,16 @@ export function AdminTrialsPageClient() {
 
       <AdminTrialEventsResults
         events={events}
-        selectedEventId={selectedSummary?.trialEventId}
         totalCount={totalCount}
         page={page}
         totalPages={totalPages}
         isLoading={eventsQuery.isLoading}
         isError={eventsQuery.isError}
         errorText={eventsErrorText}
-        onSelectEvent={(trialEventId) => {
-          setSelectedEventIdInput(trialEventId);
-          setBlockedAutoSelectedEventId(null);
-        }}
-        onPageDelta={handlePageDelta}
-      />
-
-      <AdminTrialSelectedEventPanel
-        selectedEvent={eventQuery.data?.event ?? null}
-        isLoading={eventQuery.isLoading}
-        isError={eventQuery.isError}
-        errorText={selectedErrorText}
-        workspaceHref={
-          eventQuery.data?.event
-            ? getAdminTrialEventHref(eventQuery.data.event.trialEventId)
-            : undefined
+        onOpenEvent={(trialEventId) =>
+          router.push(getAdminTrialEventHref(trialEventId))
         }
-        onDeletedTrialEvent={(deletedTrialEventId) => {
-          setSelectedEventIdInput("");
-          setBlockedAutoSelectedEventId(deletedTrialEventId);
-        }}
+        onPageDelta={handlePageDelta}
       />
     </div>
   );

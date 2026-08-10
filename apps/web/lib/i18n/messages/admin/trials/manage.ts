@@ -1,7 +1,7 @@
 export const fiAdminTrialsManageMessages = {
   "admin.trials.title": "Ylläpito: ajokokeet",
   "admin.trials.description":
-    "Selaa AJOK-kokeita tapahtumittain: valitse koe, tarkista koirat ja avaa pöytäkirja PDF:nä.",
+    "Selaa AJOK-kokeita tapahtumittain ja avaa koe tarkistaaksesi koirat sekä pöytäkirjat.",
   "admin.trials.manage.title": "Ajokokeiden koetulokset",
   "admin.trials.manage.description":
     "Hae ja selaa tapahtumia sekä niiden koirarivejä read-only-näkymässä.",
@@ -32,7 +32,7 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.empty": "Ei koetuloksia näytettäväksi.",
   "admin.trials.manage.events.title": "Tapahtumat",
   "admin.trials.manage.events.subtitle":
-    "Valitse tapahtuma nähdäksesi siihen kuuluvat koirarivit.",
+    "Avaa tapahtuma nähdäksesi siihen kuuluvat koirarivit ja toiminnot.",
   "admin.trials.manage.events.countSuffix": "tapahtumaa",
   "admin.trials.manage.events.empty": "Ei tapahtumia valituilla ehdoilla.",
   "admin.trials.manage.events.columns.date": "Päivä",
@@ -161,7 +161,6 @@ export const fiAdminTrialsManageMessages = {
   "admin.trials.manage.selected.columns.actions": "Toiminnot",
   "admin.trials.manage.selected.actions.openPdf": "Avaa pöytäkirja",
   "admin.trials.manage.selected.actions.more": "Lisää toimintoja",
-  "admin.trials.manage.selected.actions.openWorkspace": "Avaa tapahtuman sivu",
   "admin.trials.manage.selected.actions.editEvent": "Muokkaa tapahtumaa",
   "admin.trials.manage.selected.actions.editEntry": "Muokkaa riviä",
   "admin.trials.manage.entryModal.header.title": "Muokattava koerivi",
@@ -230,7 +229,7 @@ export const fiAdminTrialsManageMessages = {
 export const svAdminTrialsManageMessages = {
   "admin.trials.title": "Admin: jaktprov",
   "admin.trials.description":
-    "Bläddra AJOK-prov per evenemang: välj prov, granska hundrader och öppna protokollet som PDF.",
+    "Bläddra AJOK-prov per evenemang och öppna ett prov för att granska hundrader och protokoll.",
   "admin.trials.manage.title": "Jaktprovresultat",
   "admin.trials.manage.description":
     "Sök och bläddra evenemang och deras hundrader i en read-only-vy.",
@@ -261,7 +260,7 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.empty": "Inga provresultat att visa.",
   "admin.trials.manage.events.title": "Evenemang",
   "admin.trials.manage.events.subtitle":
-    "Välj ett evenemang för att se tillhörande hundrader.",
+    "Öppna ett evenemang för att se tillhörande hundrader och åtgärder.",
   "admin.trials.manage.events.countSuffix": "evenemang",
   "admin.trials.manage.events.empty": "Inga evenemang med valda filter.",
   "admin.trials.manage.events.columns.date": "Datum",
@@ -392,7 +391,6 @@ export const svAdminTrialsManageMessages = {
   "admin.trials.manage.selected.columns.actions": "Åtgärder",
   "admin.trials.manage.selected.actions.openPdf": "Öppna protokoll",
   "admin.trials.manage.selected.actions.more": "Fler åtgärder",
-  "admin.trials.manage.selected.actions.openWorkspace": "Öppna evenemangssidan",
   "admin.trials.manage.selected.actions.editEvent": "Redigera evenemang",
   "admin.trials.manage.selected.actions.editEntry": "Redigera rad",
   "admin.trials.manage.entryModal.header.title": "Redigerad provrad",

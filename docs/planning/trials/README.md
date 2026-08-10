@@ -11,6 +11,13 @@ Creating or changing these planning documents does not approve any
 implementation gate. Passing a gate's validation also does not authorize work
 on the next gate.
 
+## Status
+
+All gates through F1 are implemented and their automated validation is
+complete. BEJ-103 is complete; remaining ideas in `later-ux.md` require
+separate planning and approval. F1 desktop and mobile browser verification was
+not run.
+
 ## Planning set
 
 - [Event creation](./event-creation.md) defines the event workspace, manual
@@ -26,6 +33,8 @@ on the next gate.
 - [Result-creation UX](./result-creation-ux.md) defines R3B: evolve the
   existing full-page create form into a clearer card-based single-page
   experience after R3A has been reviewed.
+- [Feature finalization](./feature-finalization.md) defines F1: replace the
+  trials master-detail list with a navigation-only event index after R3B.
 - [Later UX](./later-ux.md) records deferred ideas only and does not authorize
   their implementation.
 
@@ -39,12 +48,12 @@ Repository guardrails and current feature documentation:
 
 ## Grounded current state
 
-- The admin trials page is an event-first master-detail flow backed by
-  canonical `TrialEvent` and `TrialEntry` rows.
+- The admin trials page is an event-first navigation index backed by canonical
+  `TrialEvent` rows. Each event opens in its dedicated workspace, which loads
+  the event's `TrialEntry` rows.
 - Admin event metadata and existing result rows can currently be edited, and
-  existing result rows can be deleted. The current feature documentation still
-  describes an older read-only state and must be updated when an implementation
-  slice changes durable feature behavior.
+  existing result rows can be deleted. Durable behavior is documented in
+  [Admin trial management](../../features/admin-trial-management.md).
 - Admin event searches include persisted events even when they have no entries.
 - Public trial search explicitly requires an event to have at least one entry,
   and public trial detail returns no result for an empty event.
@@ -69,8 +78,8 @@ Repository guardrails and current feature documentation:
   later matching Koiratietokanta upsert becomes authoritative.
 - Results are saved one dog at a time. The intended continuation supports both
   adding another result to the same event and finishing at the event workspace.
-- The existing trials master-detail list and existing result-edit modal remain
-  in place for BEJ-103.
+- The existing result-edit modal remains in place for BEJ-103. The final F1
+  gate replaces the trials master-detail list with a navigation-only index.
 - Rule-window-aware presentation is introduced for result creation before any
   result-editing redesign. Existing result editing remains unchanged through
   R3A and R3B.
@@ -91,6 +100,8 @@ R2 (UI)
 R3A (rule-window-aware creation)
  ↓
 R3B (result-creation UX)
+ ↓
+F1 (navigation-only event index)
 ```
 
 1. `E1` - event workspace
@@ -99,6 +110,7 @@ R3B (result-creation UX)
 4. `R2` - manual result UI and workflow
 5. `R3A` - rule-window-aware result creation, after R2 review
 6. `R3B` - card-based result-creation UX, after R3A review
+7. `F1` - navigation-only event index and BEJ-103 close-out, after R3B review
 
 For every gate:
 

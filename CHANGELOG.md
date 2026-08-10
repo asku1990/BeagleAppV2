@@ -21,6 +21,7 @@ This project uses a user-facing changelog format.
 
 ### Changed
 
+- Ylläpidon ajokoetapahtuman valitseminen avaa tapahtuman suoraan omalle sivulleen, eikä tapahtuman tietoja näytetä enää tapahtumalistan alla.
 - Ajokoetuloksen lisäyslomakkeen avattavat kortit noudattavat virallisen pöytäkirjan aihealueita ilman pöytäkirjan taulukkoasettelun kopiointia. Lisätietoja muokataan pöytäkirjan mukaisissa yksittäin avattavissa ryhmissä myös mobiilissa.
 - Viimeisen koetuloksen poistaminen säilyttää ajokoetapahtuman tyhjänä, kunnes ylläpitäjä poistaa tapahtuman erikseen.
 - Uuden ajokoetapahtuman luomisen jälkeen siirrytään suoraan lisäämään tapahtuman ensimmäistä koetulosta.
