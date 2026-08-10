@@ -14,24 +14,23 @@ This project uses a user-facing changelog format.
 
 ### Added
 
-- Ylläpitäjä voi avata ajokoetapahtuman omalle sivulleen tarkastelua ja nykyisiä muokkaustoimintoja varten.
-- Ylläpitäjä voi luoda ajokoetapahtuman perustietoineen ja avata sen omalle sivulleen ennen koetulosten lisäämistä.
-- Ylläpitäjä voi poistaa tyhjän ajokoetapahtuman sen omalta sivulta.
-- Ylläpitäjä voi lisätä ajokoetapahtumaan koirakohtaisia tuloksia yksi kerrallaan ja jatkaa seuraavaan tulokseen tai palata tapahtuman sivulle.
-
 ### Changed
-
-- Ylläpidon ajokoetapahtuman valitseminen avaa tapahtuman suoraan omalle sivulleen, eikä tapahtuman tietoja näytetä enää tapahtumalistan alla.
-- Ajokoetuloksen lisäyslomakkeen avattavat kortit noudattavat virallisen pöytäkirjan aihealueita ilman pöytäkirjan taulukkoasettelun kopiointia. Lisätietoja muokataan pöytäkirjan mukaisissa yksittäin avattavissa ryhmissä myös mobiilissa.
-- Viimeisen koetuloksen poistaminen säilyttää ajokoetapahtuman tyhjänä, kunnes ylläpitäjä poistaa tapahtuman erikseen.
-- Uuden ajokoetapahtuman luomisen jälkeen siirrytään suoraan lisäämään tapahtuman ensimmäistä koetulosta.
-- Ajokoetuloksen lisäyslomake näyttää 1.8.2023 alkaen käytössä olevan sääntökauden mukaiset kentät. Vanhemmilla tai tunnistamattomilla sääntökausilla kaikki yhteensopivuuskentät säilyvät näkyvissä varoituksen kanssa.
 
 ### Fixed
 
-- Ajokoetuloksen lisätietorivit tallennetaan kelvollisessa kokonaislukujärjestyksessä, ja hylätty lisätietorivi näytetään aiempaa tarkemmin.
-- Ajokoetuloksen lisäyslomakkeen selaimen Takaisin-toiminto ei enää yritä perua navigointia epäluotettavalla edestakaisella sivuhistorian käsittelyllä.
-- Ylisuuria kokonaislukuarvoja ei enää tallenneta tyhjinä ajokoetuloksen luonnissa tai muokkauksessa.
+### Removed
+
+## [0.20.0] - 2026-08-10
+
+### Added
+
+- Ylläpitäjä voi lisätä ajokokeita käsin. Tapahtuma luodaan ensin, minkä jälkeen koirakohtaiset tulokset lisätään yksi kerrallaan tapahtuman sääntökauden mukaisella lomakkeella. Tyhjän tapahtuman voi poistaa.
+
+### Changed
+
+- Ylläpidon ajokoetapahtumalista toimii nyt navigointinäkymänä: tapahtuman valitseminen avaa sen omalle sivulleen aiemman listan alle avautuvan näkymän sijaan.
+
+### Fixed
 
 ### Removed
 
