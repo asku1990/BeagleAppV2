@@ -3,6 +3,11 @@
 This document tracks AJOK PDF availability by rule period. It intentionally
 does not define field mapping for any single pöytäkirja renderer.
 
+Persisted rule-window identity and manual result-creation verification are
+documented separately in [Trial rule windows](./rule-windows.md). An
+implemented PDF renderer does not by itself make a rule window verified for
+manual creation.
+
 The web app exposes the PDFs through two entrypoints:
 
 - Public stacked view: `/beagle/trials/pdf?trialEntryId=...`

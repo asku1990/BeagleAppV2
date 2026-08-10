@@ -199,6 +199,7 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
           yva: 9.25,
           hlo: null,
           alo: null,
+          tja: null,
           ansiopisteetYhteensa: null,
           tappiopisteetYhteensa: null,
           lk: null,
@@ -268,6 +269,51 @@ describe("upsertKoiratietokantaAjokResultDb", () => {
       where: { trialEntryId: "entry-1" },
     });
     expect(txMock.trialEraLisatieto.createMany).not.toHaveBeenCalled();
+  });
+
+  it("authoritatively replaces a manual entry while preserving an unresolved dog link", async () => {
+    txMock.trialEntry.findUnique.mockResolvedValue({ id: "entry-1" });
+    txMock.dogRegistration.findUnique.mockResolvedValue(null);
+
+    const result = await upsertKoiratietokantaAjokResultDb({
+      event: {
+        sklKoeId: 431477,
+        koepaiva: new Date("2025-09-07T00:00:00.000Z"),
+        koekunta: "Ristijarvi",
+        jarjestaja: null,
+        kennelpiiri: null,
+        kennelpiirinro: null,
+        trialRuleWindowId: null,
+        ylituomariNimi: "API judge",
+        ylituomariNumero: null,
+        ytKertomus: null,
+      },
+      entry: { ...entryInput, raakadataJson: '{"source":"api"}', haku: 8.5 },
+      eras: eraInputs,
+    });
+
+    expect(result).toMatchObject({
+      created: false,
+      updated: true,
+      dogFound: false,
+    });
+    expect(txMock.trialEntry.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        update: expect.objectContaining({
+          lahde: "KOIRATIETOKANTA_API",
+          raakadataJson: '{"source":"api"}',
+          haku: 8.5,
+          tja: null,
+        }),
+      }),
+    );
+    const update = txMock.trialEntry.upsert.mock.calls.at(-1)?.[0].update;
+    expect(update).not.toHaveProperty("dogId");
+    expect(update).not.toHaveProperty("createdAt");
+    expect(txMock.trialEra.deleteMany).toHaveBeenCalledWith({
+      where: { trialEntryId: "entry-1" },
+    });
+    expect(txMock.trialEra.create).toHaveBeenCalledTimes(2);
   });
 
   it("writes canonical huomautus status", async () => {

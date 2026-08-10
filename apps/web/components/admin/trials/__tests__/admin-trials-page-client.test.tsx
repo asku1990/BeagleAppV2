@@ -6,6 +6,12 @@ import { AdminTrialsPageClient } from "../admin-trials-page-client";
 const { pushMock } = vi.hoisted(() => ({
   pushMock: vi.fn(),
 }));
+const eventQueryMock = vi.hoisted(() => vi.fn());
+const resultsPropsRef = vi.hoisted(() => ({
+  current: null as null | {
+    onOpenEvent: (trialEventId: string) => void;
+  },
+}));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -49,41 +55,22 @@ vi.mock("../admin-trial-events-results", () => ({
     totalCount,
     page,
     totalPages,
-    selectedEventId,
     errorText,
+    onOpenEvent,
   }: {
     totalCount: number;
     page: number;
     totalPages: number;
-    selectedEventId?: string;
     errorText: string;
-  }) =>
-    React.createElement(
+    onOpenEvent: (trialEventId: string) => void;
+  }) => {
+    resultsPropsRef.current = { onOpenEvent };
+    return React.createElement(
       "section",
       { "data-testid": "events" },
-      `${totalCount}|${page}|${totalPages}|${selectedEventId ?? ""}|${errorText}`,
-    ),
-}));
-
-vi.mock("../admin-trial-selected-event-panel", () => ({
-  AdminTrialSelectedEventPanel: ({
-    selectedEvent,
-    isLoading,
-    isError,
-    errorText,
-    onDeletedTrialEvent,
-  }: {
-    selectedEvent: { trialEventId: string } | null;
-    isLoading: boolean;
-    isError: boolean;
-    errorText: string;
-    onDeletedTrialEvent: (deletedTrialEventId: string) => void;
-  }) =>
-    React.createElement(
-      "section",
-      { "data-testid": "selected" },
-      `${selectedEvent?.trialEventId ?? ""}|${isLoading}|${isError}|${errorText}|${typeof onDeletedTrialEvent}`,
-    ),
+      `${totalCount}|${page}|${totalPages}|${errorText}`,
+    );
+  },
 }));
 
 vi.mock("@/queries/admin/trials", () => ({
@@ -127,62 +114,32 @@ vi.mock("@/queries/admin/trials", () => ({
     isError: false,
     error: null,
   }),
-  useAdminTrialEventQuery: ({
-    trialEventId,
-    enabled,
-  }: {
-    trialEventId: string;
-    enabled: boolean;
-  }) => ({
-    data: enabled
-      ? {
-          event: {
-            trialEventId,
-            eventDate: "2026-04-14",
-            eventPlace: "Helsinki",
-            eventName: "Kevatkoe",
-            jarjestaja: "Jarjestaja",
-            ylituomari: "Judge",
-            ylituomariNumero: null,
-            ytKertomus: null,
-            kennelpiiri: null,
-            kennelpiirinro: null,
-            sklKoeId: 12345,
-            dogCount: 2,
-            entries: [],
-          },
-        }
-      : null,
-    isLoading: false,
-    isError: false,
-    error: null,
-  }),
+  useAdminTrialEventQuery: eventQueryMock,
 }));
 
 describe("AdminTrialsPageClient", () => {
-  it("passes coordinator state into the split admin trials panels", () => {
+  it("renders the navigation-only event index", () => {
     const html = renderToStaticMarkup(
       React.createElement(AdminTrialsPageClient),
     );
 
     expect(html).toContain("admin.trials.title");
     expect(html).toContain("admin.trials.description");
+    expect(html).toContain("admin.trials.manage.create.action");
+    expect(html).toContain("/admin/trials/new");
     expect(html).toContain("year|||");
-    expect(html).toContain("2|1|1|event-1|admin.trials.manage.error");
-    expect(html).toContain(
-      "event-1|false|false|admin.trials.manage.selected.error|function",
-    );
+    expect(html).toContain("2|1|1|admin.trials.manage.error");
+    expect(html).not.toContain('data-testid="selected"');
+    expect(eventQueryMock).not.toHaveBeenCalled();
   });
 
-  it("blocks fallback auto-selection when a deleted event is blocked", () => {
-    const selectedEventIdInput = "";
-    const fallbackSelectedEventId = "event-2";
-    const blockedAutoSelectedEventId = "event-1";
+  it("opens the exact encoded event workspace", () => {
+    renderToStaticMarkup(React.createElement(AdminTrialsPageClient));
 
-    const selectedEventId =
-      selectedEventIdInput ||
-      (blockedAutoSelectedEventId ? "" : fallbackSelectedEventId);
+    resultsPropsRef.current?.onOpenEvent("event/with spaces");
 
-    expect(selectedEventId).toBe("");
+    expect(pushMock).toHaveBeenCalledWith(
+      "/admin/trials/event%2Fwith%20spaces",
+    );
   });
 });

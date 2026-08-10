@@ -20,6 +20,20 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.20.0] - 2026-08-10
+
+### Added
+
+- Ylläpitäjä voi lisätä ajokokeita käsin. Tapahtuma luodaan ensin, minkä jälkeen koirakohtaiset tulokset lisätään yksi kerrallaan tapahtuman sääntökauden mukaisella lomakkeella. Tyhjän tapahtuman voi poistaa.
+
+### Changed
+
+- Ylläpidon ajokoetapahtumalista toimii nyt navigointinäkymänä: tapahtuman valitseminen avaa sen omalle sivulleen aiemman listan alle avautuvan näkymän sijaan.
+
+### Fixed
+
+### Removed
+
 ## [0.19.0] - 2026-07-20
 
 ### Added

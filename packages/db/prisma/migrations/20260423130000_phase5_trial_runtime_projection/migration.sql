@@ -240,7 +240,7 @@ COMMENT ON COLUMN "TrialEntry"."hauk" IS 'Entry-level barking points from legacy
 COMMENT ON COLUMN "TrialEntry"."yva" IS 'Entry-level general impression points from legacy summary.';
 COMMENT ON COLUMN "TrialEntry"."hlo" IS 'Entry-level search looseness points/penalty value from legacy summary.';
 COMMENT ON COLUMN "TrialEntry"."alo" IS 'Entry-level driving-skill or driving looseness value from legacy summary.';
-COMMENT ON COLUMN "TrialEntry"."tja" IS 'Entry-level trail/backtrack work value from legacy summary.';
+COMMENT ON COLUMN "TrialEntry"."tja" IS 'Legacy-trial tie- ja estetyöskentely summary value; not a current Koiratietokanta API summary field.';
 COMMENT ON COLUMN "TrialEntry"."pin" IS 'Entry-level Metsastysinto or total merit value from legacy summary.';
 COMMENT ON COLUMN "TrialEntry"."tuom1" IS 'Primary/chief judge name snapshot from source.';
 COMMENT ON COLUMN "TrialEntry"."vara" IS 'Legacy reserved/flag field.';
@@ -262,7 +262,7 @@ COMMENT ON COLUMN "TrialEra"."hauk" IS 'Barking points for the era.';
 COMMENT ON COLUMN "TrialEra"."yva" IS 'entinen Yleisvaikutelma, nykyinen ajotaitokeskiarvo';
 COMMENT ON COLUMN "TrialEra"."hlo" IS 'Search looseness points/penalty value for the era.';
 COMMENT ON COLUMN "TrialEra"."alo" IS 'Ajolöysyys or driving looseness value for the era.';
-COMMENT ON COLUMN "TrialEra"."tja" IS 'Trail/backtrack work value for the era.';
+COMMENT ON COLUMN "TrialEra"."tja" IS 'Legacy-trial tie- ja estetyöskentely value for the era; not a current Koiratietokanta API era field.';
 COMMENT ON COLUMN "TrialEra"."pin" IS 'Metsästysinto or merit value for the era.';
 COMMENT ON COLUMN "TrialEra"."huomautusTeksti" IS 'Per-era free-text note rendered in the PDF huomautus section; sourced from API *_VIITE fields or legacy bealt*.VIITE.';
 COMMENT ON COLUMN "TrialEra"."raakadataJson" IS 'Raw source payload for this era/detail row.';

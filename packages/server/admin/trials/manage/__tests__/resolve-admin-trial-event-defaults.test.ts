@@ -125,8 +125,8 @@ describe("resolveAdminTrialEventSearchResponseDb", () => {
     });
     expect(searchAdminTrialsDbMock).toHaveBeenNthCalledWith(2, {
       query: "",
-      dateFrom: new Date("2025-12-31T22:00:00.000Z"),
-      dateTo: new Date("2026-12-31T22:00:00.000Z"),
+      dateFrom: new Date("2026-01-01T00:00:00.000Z"),
+      dateTo: new Date("2027-01-01T00:00:00.000Z"),
       page: 1,
       pageSize: 20,
       sort: "date-desc",

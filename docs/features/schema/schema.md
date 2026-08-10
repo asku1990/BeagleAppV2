@@ -16,6 +16,7 @@ For show-domain deep details, see:
 - `ImportIssueSeverity`: `INFO`, `WARNING`, `ERROR`
 - `ShowSourceTag`: source tagging for legacy/workbook/manual show data
 - `TrialSourceTag`: source tagging for canonical trial entry writes
+  (`LEGACY_AKOEALL`, `MANUAL_ADMIN`, `KOIRATIETOKANTA_API`)
 - `ShowResultValueType`: `FLAG`, `CODE`, `TEXT`, `NUMERIC`, `DATE`
 - `AuditAction`: `INSERT`, `UPDATE`, `DELETE`
 - `AuditSource`: `WEB`, `SCRIPT`, `SYSTEM`
@@ -82,7 +83,7 @@ erDiagram
 ### Results
 
 - `TrialResult`: canonical trial rows keyed by unique `sourceKey`.
-- `TrialEvent`: canonical AJOK trial event (new schema event level).
+- `TrialEvent`: canonical AJOK trial event; `koepaiva` is PostgreSQL `DATE`.
 - `TrialEntry`: canonical AJOK trial dog entry (new schema entry level).
   - `TrialEntry` stores the direct summary/core fields for one dog in one event.
   - `TrialEntry.ke` stores the top-level weather/condition value from source

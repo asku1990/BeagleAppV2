@@ -2,6 +2,7 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import type { EntryDraft } from "@/lib/admin/trials/entry-edit-dialog-model";
+import { resolveResultCreateFieldSet } from "@/lib/admin/trials/result-create-field-registry";
 import { EntryMetaSection } from "../entry-meta-section";
 
 const entryDraft: EntryDraft = {
@@ -62,6 +63,7 @@ describe("EntryMetaSection", () => {
     expect(html).toContain("Haukku");
     expect(html).toContain("Ajotaito / yleisvaikutelma");
     expect(html).toContain("Muut");
+    expect(html.match(/<h5/g)).toHaveLength(4);
     expect(html).toContain("Ansiopisteet yhteensä");
     expect(html).toContain("Metsästysinto");
     expect(html).toContain("Tie ja estetyöskentely");
@@ -71,5 +73,98 @@ describe("EntryMetaSection", () => {
     expect(html).toContain("Ylituomarin numero");
     expect(html).toContain("Ryhmätuomari");
     expect(html).toContain("Palkintotuomari");
+  });
+
+  it("uses create-only field visibility without changing the default edit view", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(EntryMetaSection, {
+        entryDraft,
+        isPending: false,
+        onChange: vi.fn(),
+        visibleFields:
+          resolveResultCreateFieldSet("trw_post_20230801").entryFields,
+        yvaLabel:
+          resolveResultCreateFieldSet("trw_post_20230801").yvaLabels?.entry,
+      }),
+    );
+
+    expect(html).not.toContain("Tie ja estetyöskentely");
+    expect(html).not.toContain("Metsästysinto");
+    expect(html).not.toContain("Ajotaito / yleisvaikutelma");
+    expect(html.match(/<h5/g)).toHaveLength(4);
+    expect(html).toContain(">Ajo</h5>");
+    expect(html).toContain(">Haku</h5>");
+    expect(html).toContain(">Haukku</h5>");
+    expect(html).toContain(">Muut</h5>");
+    expect(html).toContain("Ajotaito");
+    expect(html).toContain("Ansiopisteet yhteensä");
+  });
+
+  it("renders only the requested presentation groups", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(EntryMetaSection, {
+        entryDraft,
+        isPending: false,
+        onChange: vi.fn(),
+        groups: ["result", "judges"],
+      }),
+    );
+
+    expect(html).toContain("Tulos ja huomautus");
+    expect(html).toContain("Tuomarit ja allekirjoitukset");
+    expect(html).not.toContain("Kokeen ja koiran tiedot");
+    expect(html).not.toContain("Ansiopisteet");
+    expect(html).not.toContain("Tappiopisteet");
+  });
+
+  it("moves weather into the create result group without changing edit defaults", () => {
+    const fieldSet = resolveResultCreateFieldSet("trw_post_20230801");
+    const groups = Object.fromEntries(
+      fieldSet.presentationGroups.map((group) => [
+        group.id,
+        new Set(group.entryFields),
+      ]),
+    );
+    const props = {
+      entryDraft,
+      isPending: false,
+      onChange: vi.fn(),
+      showHeadings: false,
+    };
+    const basicHtml = renderToStaticMarkup(
+      React.createElement(EntryMetaSection, {
+        ...props,
+        groups: ["basic"],
+        visibleFields: groups.basic,
+      }),
+    );
+    const resultHtml = renderToStaticMarkup(
+      React.createElement(EntryMetaSection, {
+        ...props,
+        groups: ["result"],
+        visibleFields: groups.result,
+      }),
+    );
+
+    expect(basicHtml).not.toContain("Keli");
+    expect(resultHtml).toContain("Keli");
+    expect(resultHtml).toContain("Huomautusteksti");
+  });
+
+  it("keeps the generic label and all fields in compatibility fallback", () => {
+    const fieldSet = resolveResultCreateFieldSet(null);
+    const html = renderToStaticMarkup(
+      React.createElement(EntryMetaSection, {
+        entryDraft,
+        isPending: false,
+        onChange: vi.fn(),
+        visibleFields: fieldSet.entryFields,
+        yvaLabel: fieldSet.yvaLabels?.entry,
+      }),
+    );
+
+    expect(html).toContain("Ajotaito / yleisvaikutelma");
+    expect(html).toContain("Tie ja estetyöskentely");
+    expect(html).toContain("Metsästysinto");
   });
 });

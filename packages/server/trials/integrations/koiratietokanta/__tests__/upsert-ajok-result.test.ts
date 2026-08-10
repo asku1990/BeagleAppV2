@@ -1,12 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { upsertKoiratietokantaAjokResultService } from "../upsert-ajok-result";
 
-const { upsertDbMock, trialRuleWindowFindManyMock } = vi.hoisted(() => ({
+const { upsertDbMock, listActiveRuleWindowsMock } = vi.hoisted(() => ({
   upsertDbMock: vi.fn(),
-  trialRuleWindowFindManyMock: vi.fn(),
+  listActiveRuleWindowsMock: vi.fn(),
 }));
 
 vi.mock("@beagle/db", () => ({
+  buildTrialEntryIdentity: (sklKoeId: number, registrationNo: string) =>
+    `SKL:${sklKoeId}|REG:${registrationNo}`,
   DogSex: {
     MALE: "MALE",
     FEMALE: "FEMALE",
@@ -22,19 +24,15 @@ vi.mock("@beagle/db", () => ({
     SULJETTU: "SULJETTU",
     KESKEYTETTY: "KESKEYTETTY",
   },
-  prisma: {
-    trialRuleWindow: {
-      findMany: trialRuleWindowFindManyMock,
-    },
-  },
+  listActiveTrialRuleWindowsDb: listActiveRuleWindowsMock,
   upsertKoiratietokantaAjokResultDb: upsertDbMock,
 }));
 
 describe("upsertKoiratietokantaAjokResultService", () => {
   beforeEach(() => {
     upsertDbMock.mockReset();
-    trialRuleWindowFindManyMock.mockReset();
-    trialRuleWindowFindManyMock.mockResolvedValue([
+    listActiveRuleWindowsMock.mockReset();
+    listActiveRuleWindowsMock.mockResolvedValue([
       {
         id: "window-1",
         fromYmd: 20200101,

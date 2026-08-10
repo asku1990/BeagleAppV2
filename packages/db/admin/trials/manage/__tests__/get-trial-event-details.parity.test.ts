@@ -37,6 +37,7 @@ describe("getAdminTrialEventDetailsDb parity", () => {
   it("maps event entries and decimal points", async () => {
     trialEventFindUniqueMock.mockResolvedValue({
       id: "event-1",
+      trialRuleWindowId: "trw_post_20230801",
       sklKoeId: 1001,
       koepaiva: new Date("2026-03-01T00:00:00.000Z"),
       koekunta: "Helsinki",
@@ -95,6 +96,7 @@ describe("getAdminTrialEventDetailsDb parity", () => {
 
     expect(result).toEqual({
       trialEventId: "event-1",
+      trialRuleWindowId: "trw_post_20230801",
       eventDate: new Date("2026-03-01T00:00:00.000Z"),
       eventPlace: "Helsinki",
       eventName: "Talvikoe",

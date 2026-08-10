@@ -3,16 +3,18 @@ import {
   type KoiratietokantaAjokValidationIssue,
   type KoiratietokantaAjokWarning,
 } from "@beagle/contracts";
-import type {
-  KoiratietokantaAjokEntryDbInput,
-  KoiratietokantaAjokEraDbInput,
-  KoiratietokantaAjokEventDbInput,
+import {
+  buildTrialEntryIdentity,
+  type KoiratietokantaAjokEntryDbInput,
+  type KoiratietokantaAjokEraDbInput,
+  type KoiratietokantaAjokEventDbInput,
+  TrialEntryHuomautus,
+  TrialEntryKoetyyppi,
 } from "@beagle/db";
-import { TrialEntryHuomautus, TrialEntryKoetyyppi } from "@beagle/db";
 import {
   isValidRegistrationNo,
   normalizeRegistrationNo,
-} from "@server/imports/core";
+} from "@server/dogs/core";
 import { mapKoiratietokantaAjokEraWrites } from "./map-ajok-era-writes";
 import {
   isRecord,
@@ -185,7 +187,7 @@ export function mapKoiratietokantaAjokPayload(
   ]);
   const entry: KoiratietokantaAjokEntryDbInput = {
     rekisterinumeroSnapshot: registrationNo,
-    yksilointiAvain: `SKL:${sklKoeId}|REG:${registrationNo}`,
+    yksilointiAvain: buildTrialEntryIdentity(sklKoeId, registrationNo),
     raakadataJson: JSON.stringify(payload),
     luokka: normalizeText(payload.LUOKKA),
     omistajaSnapshot: normalizeText(payload.Omistaja),
