@@ -10,13 +10,13 @@ import { adminTrialEventQueryKey } from "./query-keys";
 
 const adminTrialsApiClient = createAdminTrialsApiClient();
 
-class AdminTrialEventQueryError extends Error {
-  errorCode?: string;
-
-  constructor(message: string, errorCode?: string) {
+export class AdminTrialEventQueryError extends Error {
+  constructor(
+    message: string,
+    readonly errorCode?: string,
+  ) {
     super(message);
     this.name = "AdminTrialEventQueryError";
-    this.errorCode = errorCode;
   }
 }
 
@@ -26,7 +26,7 @@ type UseAdminTrialEventQueryInput = AdminTrialEventDetailsRequest & {
 
 export function useAdminTrialEventQuery(input: UseAdminTrialEventQueryInput) {
   const normalizedTrialEventId = input.trialEventId.trim();
-  return useQuery<AdminTrialEventDetailsResponse>({
+  return useQuery<AdminTrialEventDetailsResponse, AdminTrialEventQueryError>({
     queryKey: adminTrialEventQueryKey(normalizedTrialEventId),
     queryFn: async () => {
       const result = await adminTrialsApiClient.getAdminTrialEvent({

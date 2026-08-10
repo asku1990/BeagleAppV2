@@ -7,25 +7,12 @@ import { updateAdminTrialEventWriteDb } from "@beagle/db";
 import { requireAdmin } from "@server/admin/core/service";
 import { toErrorLog, withLogContext } from "@server/core/logger";
 import type { ServiceResult } from "@server/core/result";
-import { parseIsoDateOnlyToUtcDate } from "@server/trials/internal/iso-date";
+import { parseAdminTrialEventWriteInput } from "./internal/parse-admin-trial-event-write-input";
 
 type ServiceLogContext = {
   requestId?: string;
   actorUserId?: string;
 };
-
-function normalizeRequiredText(value: string): string {
-  return value.trim();
-}
-
-function normalizeOptionalText(value: string | null): string | null {
-  if (value === null) {
-    return null;
-  }
-
-  const normalized = value.trim();
-  return normalized.length > 0 ? normalized : null;
-}
 
 // Validates and updates canonical TrialEvent metadata for one admin-selected event.
 export async function updateAdminTrialEvent(
@@ -73,72 +60,39 @@ export async function updateAdminTrialEvent(
     };
   }
 
-  const normalizedEventDate = input.eventDate.trim();
-  const eventDate = parseIsoDateOnlyToUtcDate(normalizedEventDate);
-  if (!eventDate) {
+  const parsed = parseAdminTrialEventWriteInput(input, {
+    requireSklKoeId: false,
+  });
+  if (!parsed.ok) {
     log.warn(
       {
-        event: "invalid_event_date",
-        eventDate: input.eventDate,
+        event: parsed.issue.event,
         durationMs: Date.now() - startedAt,
       },
-      "admin trial event update rejected because eventDate is invalid",
+      "admin trial event update rejected because event metadata is invalid",
     );
     return {
       status: 400,
       body: {
         ok: false,
-        error: "Event date must use YYYY-MM-DD format.",
-        code: "INVALID_EVENT_DATE",
+        error: parsed.issue.error,
+        code: parsed.issue.code,
       },
     };
   }
 
-  const eventPlace = normalizeRequiredText(input.eventPlace);
-  if (!eventPlace) {
-    log.warn(
-      { event: "invalid_event_place", durationMs: Date.now() - startedAt },
-      "admin trial event update rejected because eventPlace is invalid",
-    );
-    return {
-      status: 400,
-      body: {
-        ok: false,
-        error: "Event place is required.",
-        code: "INVALID_EVENT_PLACE",
-      },
-    };
-  }
-
-  const jarjestaja = normalizeOptionalText(input.jarjestaja);
-  const ylituomari = normalizeOptionalText(input.ylituomari);
-  const ylituomariNumero = normalizeOptionalText(input.ylituomariNumero);
-  const ytKertomus = normalizeOptionalText(input.ytKertomus);
-  const kennelpiiri = normalizeOptionalText(input.kennelpiiri);
-  const kennelpiirinro = normalizeOptionalText(input.kennelpiirinro);
-
-  const sklKoeId = input.sklKoeId;
-  if (
-    sklKoeId !== null &&
-    (!Number.isInteger(sklKoeId) || !Number.isFinite(sklKoeId) || sklKoeId < 1)
-  ) {
-    log.warn(
-      {
-        event: "invalid_skl_koe_id",
-        sklKoeId: input.sklKoeId,
-        durationMs: Date.now() - startedAt,
-      },
-      "admin trial event update rejected because sklKoeId is invalid",
-    );
-    return {
-      status: 400,
-      body: {
-        ok: false,
-        error: "SKL koe id must be a positive integer.",
-        code: "INVALID_SKL_KOE_ID",
-      },
-    };
-  }
+  const {
+    normalizedEventDate,
+    eventDate,
+    eventPlace,
+    jarjestaja,
+    ylituomari,
+    ylituomariNumero,
+    ytKertomus,
+    kennelpiiri,
+    kennelpiirinro,
+    sklKoeId,
+  } = parsed.data;
 
   log.info(
     {

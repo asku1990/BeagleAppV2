@@ -1,4 +1,5 @@
 import type { AdminTrialEventDetails } from "@beagle/contracts";
+export { parseSklKoeIdDraft } from "@/lib/admin/trials/submit-admin-trial-event-creation";
 
 export type TrialEventDraft = {
   eventDate: string;
@@ -11,6 +12,20 @@ export type TrialEventDraft = {
   kennelpiirinro: string;
   sklKoeId: string;
 };
+
+export function createEmptyTrialEventDraft(): TrialEventDraft {
+  return {
+    eventDate: "",
+    eventPlace: "",
+    jarjestaja: "",
+    ylituomari: "",
+    ylituomariNumero: "",
+    ytKertomus: "",
+    kennelpiiri: "",
+    kennelpiirinro: "",
+    sklKoeId: "",
+  };
+}
 
 export function toTrialEventDraft(
   event: AdminTrialEventDetails,
@@ -43,20 +58,4 @@ export function areTrialEventDraftsEqual(
     (left.kennelpiirinro ?? "") === right.kennelpiirinro &&
     (left.sklKoeId === null ? "" : String(left.sklKoeId)) === right.sklKoeId
   );
-}
-
-const VALID_SKL_KOE_ID_PATTERN = /^[1-9]\d*$/;
-
-export function parseSklKoeIdDraft(value: string): number | null {
-  const trimmed = value.trim();
-  if (!trimmed) {
-    return null;
-  }
-
-  if (!VALID_SKL_KOE_ID_PATTERN.test(trimmed)) {
-    return null;
-  }
-
-  const parsed = Number(trimmed);
-  return Number.isSafeInteger(parsed) ? parsed : null;
 }

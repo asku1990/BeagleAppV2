@@ -14,6 +14,10 @@ type Props = {
     field: Exclude<keyof EraDraft, "era">,
     value: string,
   ) => void;
+  visibleFields?: ReadonlySet<Exclude<keyof EraDraft, "era">>;
+  yvaLabel?: string;
+  showControls?: boolean;
+  showHeading?: boolean;
 };
 
 export function EraSection({
@@ -22,15 +26,28 @@ export function EraSection({
   onAddEra,
   onRemoveEra,
   onChangeEraField,
+  visibleFields,
+  yvaLabel,
+  showControls = true,
+  showHeading = true,
 }: Props) {
   return (
     <>
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold">Erät</h3>
-        <Button type="button" variant="outline" size="sm" onClick={onAddEra}>
-          Lisää erä
-        </Button>
-      </div>
+      {showHeading || showControls ? (
+        <div className="flex items-center justify-between">
+          {showHeading ? <h3 className="text-sm font-semibold">Erät</h3> : null}
+          {showControls ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onAddEra}
+            >
+              Lisää erä
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
       <div className="space-y-3">
         {eras
           .slice()
@@ -39,7 +56,7 @@ export function EraSection({
             <div key={era.era} className="rounded-md border p-3">
               <div className="mb-2 flex items-center justify-between">
                 <p className="text-sm font-medium">Erä {era.era}</p>
-                {era.era !== 1 ? (
+                {showControls && era.era !== 1 ? (
                   <Button
                     type="button"
                     variant="outline"
@@ -64,32 +81,40 @@ export function EraSection({
                     "tja",
                     "pin",
                   ] as const
-                ).map((field) => (
-                  <label key={field} className="space-y-1 text-xs">
-                    <span>{ADMIN_TRIAL_ERA_FIELD_LABELS[field]}</span>
+                ).map((field) =>
+                  visibleFields && !visibleFields.has(field) ? null : (
+                    <label key={field} className="space-y-1 text-xs">
+                      <span>
+                        {field === "yva"
+                          ? (yvaLabel ?? ADMIN_TRIAL_ERA_FIELD_LABELS[field])
+                          : ADMIN_TRIAL_ERA_FIELD_LABELS[field]}
+                      </span>
+                      <Input
+                        value={era[field]}
+                        disabled={isPending}
+                        onChange={(event) =>
+                          onChangeEraField(era.era, field, event.target.value)
+                        }
+                      />
+                    </label>
+                  ),
+                )}
+                {!visibleFields || visibleFields.has("huomautusTeksti") ? (
+                  <label className="space-y-1 text-xs md:col-span-4">
+                    <span>Huomautusteksti</span>
                     <Input
-                      value={era[field]}
+                      value={era.huomautusTeksti}
                       disabled={isPending}
                       onChange={(event) =>
-                        onChangeEraField(era.era, field, event.target.value)
+                        onChangeEraField(
+                          era.era,
+                          "huomautusTeksti",
+                          event.target.value,
+                        )
                       }
                     />
                   </label>
-                ))}
-                <label className="space-y-1 text-xs md:col-span-4">
-                  <span>Huomautusteksti</span>
-                  <Input
-                    value={era.huomautusTeksti}
-                    disabled={isPending}
-                    onChange={(event) =>
-                      onChangeEraField(
-                        era.era,
-                        "huomautusTeksti",
-                        event.target.value,
-                      )
-                    }
-                  />
-                </label>
+                ) : null}
               </div>
             </div>
           ))}

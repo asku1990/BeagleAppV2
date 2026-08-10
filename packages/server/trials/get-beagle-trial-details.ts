@@ -1,6 +1,6 @@
 import { getBeagleTrialDetailsDb } from "@beagle/db";
 import type { BeagleTrialDetailsResponse } from "@beagle/contracts";
-import { toBusinessDateOnly } from "../core/date-only";
+import { formatTrialDateOnly } from "./core/date-only";
 import { toErrorLog, withLogContext } from "../core/logger";
 import type { ServiceResult } from "../core/result";
 import { formatTrialAward } from "./core";
@@ -60,7 +60,7 @@ export async function getBeagleTrialDetailsService(
     const data: BeagleTrialDetailsResponse = {
       trial: {
         trialId: result.trialEventId,
-        eventDate: toBusinessDateOnly(result.eventDate),
+        eventDate: formatTrialDateOnly(result.eventDate),
         eventPlace: result.eventPlace,
         judge: result.judge,
         dogCount: result.dogCount,

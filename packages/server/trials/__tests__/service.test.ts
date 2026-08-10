@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createTrialsService } from "../service";
-import { getTrialBusinessDateStartUtc } from "../core/business-date";
+import { getTrialDateOnlyStartUtc } from "../core/date-only";
 
 const { searchBeagleTrialsDbMock, getBeagleTrialDetailsDbMock } = vi.hoisted(
   () => ({
@@ -97,8 +97,8 @@ describe("trials service", () => {
       sort: "date-desc",
     });
     expect(searchBeagleTrialsDbMock).toHaveBeenNthCalledWith(2, {
-      dateFrom: new Date("2024-12-31T22:00:00.000Z"),
-      dateTo: new Date("2025-12-31T22:00:00.000Z"),
+      dateFrom: new Date("2025-01-01T00:00:00.000Z"),
+      dateTo: new Date("2026-01-01T00:00:00.000Z"),
       page: 1,
       pageSize: 10,
       sort: "date-desc",
@@ -131,8 +131,8 @@ describe("trials service", () => {
       dateTo: "2026-06-30",
     });
     expect(searchBeagleTrialsDbMock).toHaveBeenCalledWith({
-      dateFrom: getTrialBusinessDateStartUtc("2026-06-01"),
-      dateTo: getTrialBusinessDateStartUtc("2026-07-01"),
+      dateFrom: getTrialDateOnlyStartUtc("2026-06-01"),
+      dateTo: getTrialDateOnlyStartUtc("2026-07-01"),
       page: 1,
       pageSize: 10,
       sort: "date-asc",

@@ -1,7 +1,11 @@
 export class AdminMutationError extends Error {
   readonly errorCode?: string;
 
-  constructor(message: string, errorCode?: string) {
+  constructor(
+    message: string,
+    errorCode?: string,
+    readonly details?: unknown,
+  ) {
     super(message);
     this.name = "AdminMutationError";
     this.errorCode = errorCode;

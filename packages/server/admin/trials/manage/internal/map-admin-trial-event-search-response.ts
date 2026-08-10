@@ -1,11 +1,13 @@
-import { toBusinessDateOnly } from "@server/core/date-only";
+import {
+  formatTrialDateOnly,
+  toTrialDateOnlyYear,
+} from "@server/trials/core/date-only";
 import type {
   AdminTrialEventSearchFilters,
   AdminTrialEventSearchResponse,
 } from "@beagle/contracts";
 import type { ParsedAdminTrialEventSearchInput } from "./parse-admin-trial-event-search-input";
 import type { ResolvedAdminTrialEventSearch } from "./resolve-admin-trial-event-defaults";
-import { toTrialBusinessYear } from "@server/trials/core/business-date";
 
 function resolveFilters(
   input: ParsedAdminTrialEventSearchInput,
@@ -46,7 +48,7 @@ export function mapAdminTrialEventSearchResponse(
   const result = resolved.result;
   const availableYears = Array.from(
     new Set(
-      result.availableEventDates.map((value) => toTrialBusinessYear(value)),
+      result.availableEventDates.map((value) => toTrialDateOnlyYear(value)),
     ),
   ).sort((left, right) => right - left);
 
@@ -58,7 +60,7 @@ export function mapAdminTrialEventSearchResponse(
     page: result.page,
     items: result.items.map((item) => ({
       trialEventId: item.trialEventId,
-      eventDate: toBusinessDateOnly(item.eventDate),
+      eventDate: formatTrialDateOnly(item.eventDate),
       eventPlace: item.eventPlace,
       eventName: item.eventName,
       jarjestaja: item.jarjestaja,

@@ -93,6 +93,7 @@ describe("AdminTrialEntryActions", () => {
 
   it("calls delete mutation with correct ids", async () => {
     vi.stubGlobal("window", { confirm: () => true, alert: vi.fn() });
+    const onDeletedTrialEvent = vi.fn();
     const mutateAsync = vi.fn().mockResolvedValue({
       deletedTrialEntryId: "entry-1",
       trialEventId: "event-1",
@@ -113,7 +114,7 @@ describe("AdminTrialEntryActions", () => {
         eventPlace: "Helsinki",
         eventName: "Kevatkoe",
         onEditEntry: vi.fn(),
-        onDeletedTrialEvent: vi.fn(),
+        onDeletedTrialEvent,
       }),
     );
 
@@ -123,6 +124,37 @@ describe("AdminTrialEntryActions", () => {
       trialEventId: "event-1",
       trialEntryId: "entry-1",
     });
+    expect(onDeletedTrialEvent).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
+  });
+
+  it("keeps the current event selected when deletion fails", async () => {
+    const alert = vi.fn();
+    vi.stubGlobal("window", { confirm: () => true, alert });
+    const onDeletedTrialEvent = vi.fn();
+    useDeleteAdminTrialEntryMutationMock.mockReturnValue({
+      mutateAsync: vi.fn().mockRejectedValue(new Error("Delete failed")),
+      isPending: false,
+    });
+
+    renderToStaticMarkup(
+      React.createElement(AdminTrialEntryActions, {
+        trialEventId: "event-1",
+        trialEntryId: "entry-1",
+        dogName: "Rex",
+        registrationNo: "FI123",
+        eventDate: "2026-04-14",
+        eventPlace: "Helsinki",
+        eventName: "Kevatkoe",
+        onEditEntry: vi.fn(),
+        onDeletedTrialEvent,
+      }),
+    );
+
+    await rowActionsMock.current[1]?.onSelect();
+
+    expect(onDeletedTrialEvent).not.toHaveBeenCalled();
+    expect(alert).toHaveBeenCalledWith("Delete failed");
     vi.unstubAllGlobals();
   });
 

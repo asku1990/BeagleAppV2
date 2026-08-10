@@ -117,7 +117,7 @@ describe("deleteAdminTrialEntry", () => {
       status: "deleted",
       deletedTrialEntryId: "entry-1",
       trialEventId: "event-1",
-      deletedTrialEvent: true,
+      deletedTrialEvent: false,
     });
 
     await expect(
@@ -140,7 +140,7 @@ describe("deleteAdminTrialEntry", () => {
         data: {
           deletedTrialEntryId: "entry-1",
           trialEventId: "event-1",
-          deletedTrialEvent: true,
+          deletedTrialEvent: false,
         },
       },
     });

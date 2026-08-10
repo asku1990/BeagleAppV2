@@ -1,4 +1,7 @@
 export * from "./query-keys";
+export * from "./use-create-admin-trial-event-mutation";
+export * from "./use-create-admin-trial-entry-mutation";
+export * from "./use-delete-admin-trial-event-mutation";
 export * from "./use-admin-trial-event-query";
 export * from "./use-admin-trial-events-query";
 export * from "./use-delete-admin-trial-entry-mutation";

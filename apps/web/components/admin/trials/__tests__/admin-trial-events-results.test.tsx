@@ -31,10 +31,10 @@ vi.mock("@/components/listing", () => ({
 }));
 
 vi.mock("@/components/ui/card", () => ({
-  Card: ({ children }: { children: React.ReactNode }) =>
-    React.createElement("section", null, children),
-  CardContent: ({ children }: { children: React.ReactNode }) =>
-    React.createElement("div", null, children),
+  Card: ({ children, ...props }: React.ComponentProps<"section">) =>
+    React.createElement("section", props, children),
+  CardContent: ({ children, ...props }: React.ComponentProps<"div">) =>
+    React.createElement("div", props, children),
 }));
 
 vi.mock("@/components/ui/button", () => ({
@@ -67,14 +67,13 @@ describe("AdminTrialEventsResults", () => {
             dogCount: 2,
           },
         ],
-        selectedEventId: "event-1",
         totalCount: 1,
         page: 1,
         totalPages: 2,
         isLoading: false,
         isError: false,
         errorText: "error",
-        onSelectEvent: vi.fn(),
+        onOpenEvent: vi.fn(),
         onPageDelta: vi.fn(),
       }),
     );
@@ -83,5 +82,7 @@ describe("AdminTrialEventsResults", () => {
     expect(html).toContain("Helsinki");
     expect(html).toContain("Kevatkoe");
     expect(html).toContain("admin.trials.manage.pagination.next");
+    expect(html.match(/role="link"/g)).toHaveLength(2);
+    expect(html).not.toContain("aria-pressed");
   });
 });
