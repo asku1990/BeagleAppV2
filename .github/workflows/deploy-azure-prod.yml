@@ -1,0 +1,94 @@
+name: Deploy Azure production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# The federated credential is scoped to main, and deployments only need repository reads.
+permissions:
+  contents: read
+  id-token: write
+
+# Finish an active deployment before deploying a newer main commit.
+concurrency:
+  group: deploy-azure-prod
+  cancel-in-progress: false
+
+env:
+  AZURE_WEBAPP_NAME: beagle-app-prod
+  AZURE_PACKAGE_PATH: apps/web/.next/standalone
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure deployment runs from main
+        run: |
+          if [ "${GITHUB_REF}" != "refs/heads/main" ]; then
+            echo "Deploy this workflow from main. Current ref: ${GITHUB_REF}"
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          version: 10.33.0
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: Build workspace
+        env:
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          # Keep Azure's build URL isolated from the existing Vercel/CI URL.
+          BETTER_AUTH_URL: ${{ vars.AZURE_BETTER_AUTH_URL }}
+        run: |
+          test -n "${BETTER_AUTH_SECRET:-}" || (echo "Missing BETTER_AUTH_SECRET in GitHub Actions secrets" && exit 1)
+          test -n "${BETTER_AUTH_URL:-}" || (echo "Missing AZURE_BETTER_AUTH_URL in GitHub Actions variables" && exit 1)
+          pnpm build
+
+      - name: Assemble and verify standalone package
+        run: |
+          # Next.js standalone output intentionally omits public and static assets.
+          mkdir -p "${AZURE_PACKAGE_PATH}/apps/web/public"
+          mkdir -p "${AZURE_PACKAGE_PATH}/apps/web/.next/static"
+          cp -R apps/web/public/. "${AZURE_PACKAGE_PATH}/apps/web/public/"
+          cp -R apps/web/.next/static/. "${AZURE_PACKAGE_PATH}/apps/web/.next/static/"
+
+          test -f "${AZURE_PACKAGE_PATH}/apps/web/server.js"
+          test -f "${AZURE_PACKAGE_PATH}/apps/web/.next/BUILD_ID"
+          test -e "${AZURE_PACKAGE_PATH}/apps/web/node_modules/next"
+          test -f "${AZURE_PACKAGE_PATH}/apps/web/public/beagle-icon.png"
+          test -f "${AZURE_PACKAGE_PATH}/apps/web/public/templates/ajok-poytakirja-2023.pdf"
+          test -f "${AZURE_PACKAGE_PATH}/CHANGELOG.md"
+          find "${AZURE_PACKAGE_PATH}/apps/web/.next/static" -type f -print -quit | grep -q .
+          node --check "${AZURE_PACKAGE_PATH}/apps/web/server.js"
+
+      - name: Log in to Azure with OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy standalone package to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: Production
+          package: ${{ env.AZURE_PACKAGE_PATH }}
+          startup-command: node apps/web/server.js

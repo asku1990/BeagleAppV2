@@ -21,7 +21,8 @@ Beagle App v2 is a production-style monorepo for a public Beagle database suppor
 - App usage guide: [docs/app-usage-and-features.md](docs/app-usage-and-features.md)
 - Env safety and runbooks: [docs/ops-env-safety.md](docs/ops-env-safety.md)
 - Import behavior details: [docs/legacy-import/import-flow.md](docs/legacy-import/import-flow.md)
-- Deployment notes: [docs/vercel-deployment.md](docs/vercel-deployment.md)
+- Azure deployment notes: [docs/azure-app-service-deployment.md](docs/azure-app-service-deployment.md)
+- Vercel deployment notes: [docs/vercel-deployment.md](docs/vercel-deployment.md)
 - Changelog: [CHANGELOG.md](CHANGELOG.md)
 
 ## Requirements
@@ -132,6 +133,10 @@ pnpm auth:set-password
 ```
 
 ## Deploy
+
+Azure production deploys from `main` through GitHub Actions. See
+`docs/azure-app-service-deployment.md` for the required repository and App
+Service configuration.
 
 Vercel build command:
 
