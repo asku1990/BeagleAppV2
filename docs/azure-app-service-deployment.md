@@ -7,6 +7,12 @@ manually from `main`.
 Vercel deployment remains separate. This workflow does not change Vercel,
 domains, DNS, or database migrations.
 
+The canonical production URL is `https://tietokanta.beaglejarjesto.fi`.
+`https://www.tietokanta.beaglejarjesto.fi` is also bound to the App Service and
+the Next.js application permanently redirects it to the canonical hostname
+while preserving the requested path and query string. Keep TLS bindings active
+for both hostnames so the redirect can be served over HTTPS.
+
 ## Build and deployment flow
 
 The workflow:
@@ -34,7 +40,7 @@ The application build also requires these repository-level GitHub Actions values
 
 - `BETTER_AUTH_SECRET` as a repository secret
 - `AZURE_BETTER_AUTH_URL` as a repository variable, set to
-  `https://beagle-app-prod.azurewebsites.net` during parallel testing
+  `https://tietokanta.beaglejarjesto.fi`
 
 The build needs these values while collecting Next.js page data. The deployed
 server reads its production values from Azure App Service settings at runtime.
@@ -68,8 +74,8 @@ Configure these settings on `beagle-app-prod` before the first runtime test:
 - `DATABASE_URL`: Azure PostgreSQL connection string with the required SSL
   options
 - `BETTER_AUTH_SECRET`: production signing secret, at least 32 characters
-- `BETTER_AUTH_URL`: `https://beagle-app-prod.azurewebsites.net` during testing
-- `CORS_ORIGINS`: `https://beagle-app-prod.azurewebsites.net` during testing
+- `BETTER_AUTH_URL`: `https://tietokanta.beaglejarjesto.fi`
+- `CORS_ORIGINS`: `https://tietokanta.beaglejarjesto.fi`
 - `KOIRATIETOKANTA_RESULTS_API_SECRET`: required for the AJOK result integration
 
 These settings are optional unless production overrides the application

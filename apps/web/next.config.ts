@@ -8,6 +8,21 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/api/trials/[trialEntryId]/pdf": ["./public/templates/*.pdf"],
   },
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "www.tietokanta.beaglejarjesto.fi",
+          },
+        ],
+        destination: "https://tietokanta.beaglejarjesto.fi/:path*",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

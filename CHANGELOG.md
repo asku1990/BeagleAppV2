@@ -16,6 +16,9 @@ This project uses a user-facing changelog format.
 
 ### Changed
 
+- `www.tietokanta.beaglejarjesto.fi` ohjaa nyt pysyvästi osoitteeseen
+  `tietokanta.beaglejarjesto.fi` säilyttäen sivupolun ja kyselyparametrit.
+
 ### Fixed
 
 ### Removed
