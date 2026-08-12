@@ -71,6 +71,13 @@ Prisma `migrate dev` (local only):
 Note: this may become interactive (for example drift/reset prompts). If that happens, run it directly in an interactive terminal session.
 
 ```bash
+pass-cli run --env-file .env.local -- pnpm db:migrate:dev
+pass-cli run --env-file .env.local -- pnpm db:migrate:dev -- --name <migration_name>
+```
+
+Equivalent package-scoped command:
+
+```bash
 pass-cli run --env-file .env.local -- pnpm --filter @beagle/db exec prisma migrate dev --name <migration_name>
 ```
 
@@ -86,6 +93,14 @@ CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm --filter @beagle/db e
 ```
 
 Prisma `migrate deploy`:
+
+```bash
+pass-cli run --env-file .env.local -- pnpm db:migrate:deploy
+pass-cli run --env-file .env.staging -- pnpm db:migrate:deploy
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm db:migrate:deploy
+```
+
+Equivalent package-scoped commands:
 
 ```bash
 pass-cli run --env-file .env.local -- pnpm --filter @beagle/db exec prisma migrate deploy
