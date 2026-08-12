@@ -26,6 +26,10 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+- Käytöstä poistettu analytiikka ja siihen liittyvä evästesuostumusbanneri
+  poistettiin palvelusta. Tietosuojasivu säilyy ilman analytiikkaa koskevia
+  tietoja.
+
 ## [0.20.0] - 2026-08-10
 
 ### Added

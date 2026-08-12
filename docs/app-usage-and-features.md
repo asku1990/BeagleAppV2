@@ -47,8 +47,6 @@ Sidebar:
   - `/beagle/trials`
 - Footer links for everyone:
   - `/privacy`
-- On `/privacy`:
-  - `Avaa evästevalinnat` avaa analytiikan suostumusvalinnat uudelleen
 
 Limits:
 
