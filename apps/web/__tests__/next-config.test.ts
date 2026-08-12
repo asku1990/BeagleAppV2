@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import nextConfig from "../next.config";
 
 describe("Next.js redirects", () => {
-  it("permanently redirects the www hostname to the canonical hostname", async () => {
+  it("permanently redirects www hostnames to their canonical hostnames", async () => {
     expect(nextConfig.redirects).toBeTypeOf("function");
 
     const redirects = await nextConfig.redirects?.();
@@ -17,6 +17,17 @@ describe("Next.js redirects", () => {
           },
         ],
         destination: "https://tietokanta.beaglejarjesto.fi/:path*",
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "www.develop.tietokanta.beaglejarjesto.fi",
+          },
+        ],
+        destination: "https://develop.tietokanta.beaglejarjesto.fi/:path*",
         permanent: true,
       },
     ]);
