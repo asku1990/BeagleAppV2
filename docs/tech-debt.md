@@ -62,9 +62,9 @@ Use this format for new entries:
 - Trigger to revisit: Next migration-history cleanup/squash task.
 - Ticket: BEJ-47 follow-up.
 
-## 2026-03-07 - Finalize privacy and consent legal details
+## 2026-03-07 - Finalize privacy legal details
 
-- Area: Public privacy page and analytics consent flow (`/privacy`, footer links, consent banner).
+- Area: Public privacy page (`/privacy`) and footer link.
 - Issue: Privacy page now follows an interim Finnish template with verified contact email, but controller identifiers, postal details, and final legal wording still need authoritative verification.
 - Impact: Compliance text is closer to publishable, but missing controller fields or unverified processing details can still leave the policy incomplete.
 - Suggested fix: Run legal review, validate exact Better Auth cookie names/attributes in production, and replace the remaining placeholder controller details with approved values.

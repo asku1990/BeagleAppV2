@@ -21,6 +21,17 @@ const nextConfig: NextConfig = {
         destination: "https://tietokanta.beaglejarjesto.fi/:path*",
         permanent: true,
       },
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "www.develop.tietokanta.beaglejarjesto.fi",
+          },
+        ],
+        destination: "https://develop.tietokanta.beaglejarjesto.fi/:path*",
+        permanent: true,
+      },
     ];
   },
 };

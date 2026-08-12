@@ -52,10 +52,6 @@ import {
   fiBeagleVirtualPairingMessages,
   svBeagleVirtualPairingMessages,
 } from "@/lib/i18n/messages/beagle/virtual-pairing";
-import {
-  fiPrivacyMessages,
-  svPrivacyMessages,
-} from "@/lib/i18n/messages/privacy";
 
 const fi = {
   ...fiHeaderMessages,
@@ -75,7 +71,6 @@ const fi = {
   ...fiBeagleShowsMessages,
   ...fiBeagleTrialsMessages,
   ...fiBeagleVirtualPairingMessages,
-  ...fiPrivacyMessages,
 } as const;
 
 export type MessageKey = keyof typeof fi;
@@ -99,7 +94,6 @@ const sv: Messages = {
   ...svBeagleShowsMessages,
   ...svBeagleTrialsMessages,
   ...svBeagleVirtualPairingMessages,
-  ...svPrivacyMessages,
 };
 
 export const messages: Record<Locale, Messages> = {

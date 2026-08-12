@@ -2,6 +2,13 @@
 
 This repository supports two valid Vercel project configurations.
 
+The canonical development URL is
+`https://develop.tietokanta.beaglejarjesto.fi`. Requests to
+`https://www.develop.tietokanta.beaglejarjesto.fi` are permanently redirected
+to the canonical development hostname while preserving the requested path and
+query string. Both hostnames must remain assigned to the Vercel project with
+valid TLS certificates so the redirect can be served over HTTPS.
+
 ## Option A: project root at repository root
 
 - Root Directory: `.`

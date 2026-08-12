@@ -16,12 +16,25 @@ This project uses a user-facing changelog format.
 
 ### Changed
 
-- `www.tietokanta.beaglejarjesto.fi` ohjaa nyt pysyvästi osoitteeseen
-  `tietokanta.beaglejarjesto.fi` säilyttäen sivupolun ja kyselyparametrit.
+### Fixed
+
+### Removed
+
+## [0.20.1] - 2026-08-12
+
+### Added
+
+### Changed
+
+- Tuotantopalvelu siirrettiin Suomen Beaglejärjestön hallinnoimaan Microsoft Azure -ympäristöön. Kehitysversio julkaistaan edelleen Vercelissä.
+- `www.tietokanta.beaglejarjesto.fi` ohjaa nyt pysyvästi osoitteeseen `tietokanta.beaglejarjesto.fi` säilyttäen sivupolun ja kyselyparametrit.
+- `www.develop.tietokanta.beaglejarjesto.fi` ohjaa nyt pysyvästi osoitteeseen `develop.tietokanta.beaglejarjesto.fi` säilyttäen sivupolun ja kyselyparametrit.
 
 ### Fixed
 
 ### Removed
+
+- Käytöstä poistettu analytiikka ja siihen liittyvä evästesuostumusbanneri poistettiin palvelusta. Tietosuojasivu säilyy ilman analytiikkaa koskevia tietoja.
 
 ## [0.20.0] - 2026-08-10
 

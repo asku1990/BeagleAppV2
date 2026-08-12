@@ -1,8 +1,7 @@
 import { beagleTheme } from "@/components/ui/beagle-theme";
-import { CookieChoicesButton } from "@/components/privacy";
 import { cn } from "@/lib/utils";
 
-const lastUpdated = "7.3.2026";
+const lastUpdated = "12.8.2026";
 
 function PrivacySection({
   title,
@@ -70,8 +69,7 @@ export default function PrivacyPage() {
           <p>
             Palvelun käyttäjätilit luo ylläpito. Käsiteltäviä tietoja ovat
             käyttäjätilin perustiedot (nimi, sähköposti, rooli), kirjautumis- ja
-            istuntotiedot, suostumus- ja asetustiedot (esim. kieli) sekä
-            tekniset lokitiedot.
+            istuntotiedot, asetustiedot (esim. kieli) sekä tekniset lokitiedot.
           </p>
           <p>
             Palvelun toiminnan ja tietoturvan varmistamiseksi järjestelmä voi
@@ -95,8 +93,7 @@ export default function PrivacyPage() {
             Eväste (cookie) on pieni tekstitiedosto, jonka internetselain
             tallentaa käyttäjän laitteelle. Evästeitä käytetään esimerkiksi
             silloin, kun käyttäjän valinnat halutaan säilyttää tämän siirtyessä
-            sivulta toiselle. Analytiikkaevästeiden tai vastaavien
-            selaintallennusten käyttö edellyttää käyttäjän suostumusta.
+            sivulta toiselle.
           </p>
           <p>
             Tämä sivusto käyttää tällä hetkellä muun muassa seuraavia evästeitä
@@ -112,26 +109,11 @@ export default function PrivacyPage() {
               auki/suljettu-tilan evästeessä enintään 7 päivän ajan.
             </li>
             <li>
-              <code>beagle.analytics_consent</code> tallentaa käyttäjän
-              analytiikkasuostumuksen enintään 12 kuukauden ajan.
-            </li>
-            <li>
               Kirjautumista varten käytetään Better Auth -ratkaisun
               istuntoevästeitä, jotka ovat välttämättömiä sisäänkirjautumisen ja
               käyttäjätilin käytön kannalta.
             </li>
           </ul>
-          <p>
-            Suostumuksen jälkeen sivustolla voidaan käyttää Vercel Analytics- ja
-            Vercel Speed Insights -palveluja anonyymin liikenteen ja
-            suorituskyvyn mittaamiseen.
-          </p>
-          <p>
-            Analytiikkaa käytetään vain yleisen tason liikenne- ja
-            suorituskykymittaukseen, eikä sitä käytetä yksittäisen käyttäjän
-            suoraan tunnistamiseen.
-          </p>
-          <CookieChoicesButton />
         </PrivacySection>
 
         <PrivacySection title="Tietolähteet, luovutukset ja suojaus">
@@ -141,10 +123,9 @@ export default function PrivacyPage() {
           </p>
           <p>
             Tietoja voivat käsitellä rekisterinpitäjän lukuun tekniset
-            palveluntarjoajat. Näihin kuuluvat esimerkiksi Vercel (hosting),
-            Vercel Analytics ja Vercel Speed Insights (analytiikka ja
-            suorituskykymittaus). Käyttäjätilien tunnistautuminen toteutetaan
-            Better Auth -ohjelmistolla osana palvelua.
+            palveluntarjoajat. Näihin kuuluu esimerkiksi Vercel (hosting).
+            Käyttäjätilien tunnistautuminen toteutetaan Better Auth
+            -ohjelmistolla osana palvelua.
           </p>
           <p>
             Henkilötietoja ei luovuteta muihin tarkoituksiin ilman perustetta.
@@ -163,9 +144,6 @@ export default function PrivacyPage() {
             estämisen ja lakisääteisten velvoitteiden täyttämiseksi.
           </p>
           <ul className="list-disc space-y-1 pl-5">
-            <li>
-              <code>beagle.analytics_consent</code> enintään 12 kuukautta.
-            </li>
             <li>
               <code>beagle.locale</code> evästeessä ja localStoragessa enintään
               12 kuukautta.
