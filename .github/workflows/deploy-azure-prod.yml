@@ -19,6 +19,12 @@ concurrency:
 env:
   AZURE_WEBAPP_NAME: beagle-app-prod
   AZURE_PACKAGE_PATH: apps/web/.next/standalone
+  # Keep the database resource location configurable without exposing credentials.
+  AZURE_POSTGRES_RESOURCE_GROUP: ${{ vars.AZURE_POSTGRES_RESOURCE_GROUP }}
+  AZURE_POSTGRES_SERVER_NAME: ${{ vars.AZURE_POSTGRES_SERVER_NAME }}
+  AZURE_POSTGRES_DATABASE_NAME: ${{ vars.AZURE_POSTGRES_DATABASE_NAME }}
+  # Concurrency makes one deterministic, auditable temporary rule safe to reuse.
+  AZURE_POSTGRES_FIREWALL_RULE_NAME: github-actions-migrations
 
 jobs:
   build-and-deploy:
@@ -88,7 +94,201 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      # Fail before changing the firewall, and validate the URL without printing it.
+      - name: Validate production migration configuration
+        env:
+          AZURE_DATABASE_URL_UNPOOLED: ${{ secrets.AZURE_DATABASE_URL_UNPOOLED }}
+        run: |
+          missing=()
+          test -n "${AZURE_POSTGRES_RESOURCE_GROUP:-}" || missing+=(AZURE_POSTGRES_RESOURCE_GROUP)
+          test -n "${AZURE_POSTGRES_SERVER_NAME:-}" || missing+=(AZURE_POSTGRES_SERVER_NAME)
+          test -n "${AZURE_POSTGRES_DATABASE_NAME:-}" || missing+=(AZURE_POSTGRES_DATABASE_NAME)
+          test -n "${AZURE_DATABASE_URL_UNPOOLED:-}" || missing+=(AZURE_DATABASE_URL_UNPOOLED)
+
+          if (( ${#missing[@]} > 0 )); then
+            echo "Missing required GitHub Actions configuration: ${missing[*]}"
+            exit 1
+          fi
+
+          EXPECTED_DATABASE_HOST="${AZURE_POSTGRES_SERVER_NAME}.postgres.database.azure.com" \
+            node --input-type=module <<'NODE'
+          const rawUrl = process.env.AZURE_DATABASE_URL_UNPOOLED;
+          const expectedHost = process.env.EXPECTED_DATABASE_HOST?.toLowerCase();
+          const expectedDatabase = process.env.AZURE_POSTGRES_DATABASE_NAME;
+          const forbiddenOverrides = [
+            "host",
+            "hostaddr",
+            "port",
+            "user",
+            "password",
+            "database",
+            "dbname",
+          ];
+          const allowedTlsModes = new Set(["require", "verify-ca", "verify-full"]);
+
+          try {
+            const databaseUrl = new URL(rawUrl);
+            const databaseName = decodeURIComponent(databaseUrl.pathname.slice(1));
+            // pg gives query parameters precedence over URL authority credentials and routing.
+            const hasConnectionOverride = forbiddenOverrides.some((parameter) =>
+              databaseUrl.searchParams.has(parameter),
+            );
+            const tlsModes = databaseUrl.searchParams.getAll("sslmode");
+            const validProtocol =
+              databaseUrl.protocol === "postgresql:" ||
+              databaseUrl.protocol === "postgres:";
+            const validCredentials =
+              Boolean(databaseUrl.username) && Boolean(databaseUrl.password);
+            const validDatabase =
+              databaseName === expectedDatabase && !databaseName.includes("/");
+            const validHost = databaseUrl.hostname.toLowerCase() === expectedHost;
+            // Require one explicit encrypted mode; duplicates could change pg's effective value.
+            const validTls =
+              tlsModes.length === 1 && allowedTlsModes.has(tlsModes[0]);
+
+            if (
+              !validProtocol ||
+              !validCredentials ||
+              !validDatabase ||
+              !validHost ||
+              hasConnectionOverride ||
+              !validTls
+            ) {
+              throw new Error("invalid direct Azure PostgreSQL URL");
+            }
+          } catch {
+            console.error(
+              "AZURE_DATABASE_URL_UNPOOLED must target the configured Azure server and database directly, without connection overrides, using sslmode=require, verify-ca, or verify-full.",
+            );
+            process.exit(1);
+          }
+          NODE
+
+      # GitHub-hosted runner addresses are dynamic, so allow exactly this runner's IPv4.
+      - name: Resolve and validate runner public IPv4
+        id: runner-ip
+        run: |
+          runner_ip="$(curl --fail --show-error --silent --retry 4 --retry-all-errors https://api.ipify.org)"
+          IFS=. read -r octet1 octet2 octet3 octet4 extra <<< "${runner_ip}"
+
+          for octet in "${octet1:-}" "${octet2:-}" "${octet3:-}" "${octet4:-}"; do
+            if [[ ! "${octet}" =~ ^(0|[1-9][0-9]{0,2})$ ]] || (( octet > 255 )); then
+              echo "api.ipify.org did not return a valid public IPv4 address."
+              exit 1
+            fi
+          done
+
+          if [[ -n "${extra:-}" ]]; then
+            echo "api.ipify.org did not return a single IPv4 address."
+            exit 1
+          fi
+
+          # The address is ephemeral public routing data, and must remain usable as a step output.
+          echo "address=${runner_ip}" >> "${GITHUB_OUTPUT}"
+
+      # Create-or-update the deterministic rule as a single-address /32 allowlist.
+      - name: Allow runner through the PostgreSQL firewall
+        run: |
+          az postgres flexible-server firewall-rule create \
+            --resource-group "${AZURE_POSTGRES_RESOURCE_GROUP}" \
+            --server-name "${AZURE_POSTGRES_SERVER_NAME}" \
+            --name "${AZURE_POSTGRES_FIREWALL_RULE_NAME}" \
+            --start-ip-address "${{ steps.runner-ip.outputs.address }}" \
+            --end-ip-address "${{ steps.runner-ip.outputs.address }}" \
+            --only-show-errors \
+            --output none
+
+      # Azure documents up to five minutes for firewall changes to propagate.
+      - name: Wait for PostgreSQL firewall propagation
+        env:
+          DATABASE_URL: ${{ secrets.AZURE_DATABASE_URL_UNPOOLED }}
+        run: |
+          deadline=$((SECONDS + 300))
+          attempt=1
+
+          while (( SECONDS < deadline )); do
+            if pnpm --filter @beagle/db exec node --input-type=module --eval '
+              import pg from "pg";
+              const client = new pg.Client({
+                connectionString: process.env.DATABASE_URL,
+                connectionTimeoutMillis: 5000,
+              });
+              try {
+                await client.connect();
+                await client.query("SELECT 1");
+              } catch {
+                process.exitCode = 1;
+              } finally {
+                await client.end().catch(() => {});
+              }
+            '; then
+              echo "PostgreSQL accepted a connection from the runner."
+              exit 0
+            fi
+
+            echo "PostgreSQL is not reachable yet (attempt ${attempt}); retrying."
+            attempt=$((attempt + 1))
+            sleep 10
+          done
+
+          echo "PostgreSQL did not become reachable during the firewall propagation window."
+          exit 1
+
+      # Bound lock waits or stalled migrations so the always() cleanup runs promptly.
+      - name: Deploy production database migrations
+        env:
+          DATABASE_URL: ${{ secrets.AZURE_DATABASE_URL_UNPOOLED }}
+          RUN_DB_MIGRATIONS: "true"
+          CONFIRM_PROD: "YES"
+        run: timeout --signal=TERM --kill-after=30s 15m pnpm db:deploy
+
+      # Always remove a rule after its creation was attempted; deployment stays blocked if cleanup fails.
+      - name: Remove temporary PostgreSQL firewall rule
+        if: ${{ always() && steps.runner-ip.outcome == 'success' }}
+        run: |
+          for attempt in 1 2 3 4 5; do
+            # Azure CLI may log a delete error while returning success, so never trust deletion alone.
+            cleanup_output="$(
+              az postgres flexible-server firewall-rule delete \
+                --resource-group "${AZURE_POSTGRES_RESOURCE_GROUP}" \
+                --server-name "${AZURE_POSTGRES_SERVER_NAME}" \
+                --name "${AZURE_POSTGRES_FIREWALL_RULE_NAME}" \
+                --yes \
+                --only-show-errors \
+                --output none 2>&1
+            )" || true
+
+            # Only an explicit not-found result proves the temporary rule is absent.
+            if verification_output="$(
+              az postgres flexible-server firewall-rule show \
+                --resource-group "${AZURE_POSTGRES_RESOURCE_GROUP}" \
+                --server-name "${AZURE_POSTGRES_SERVER_NAME}" \
+                --name "${AZURE_POSTGRES_FIREWALL_RULE_NAME}" \
+                --only-show-errors \
+                --output none 2>&1
+            )"; then
+              verification_error="Temporary PostgreSQL firewall rule still exists."
+            elif grep -qiE "ResourceNotFound|FirewallRuleNotFound|could not be found|was not found" <<< "${verification_output}"; then
+              echo "Temporary PostgreSQL firewall rule removal verified."
+              exit 0
+            else
+              verification_error="Firewall-rule absence could not be verified: ${verification_output}"
+            fi
+
+            if (( attempt < 5 )); then
+              echo "Firewall cleanup attempt ${attempt} was not verified; retrying."
+              sleep 10
+            else
+              echo "Firewall cleanup could not be verified after ${attempt} attempts." >&2
+              test -z "${cleanup_output}" || echo "Delete output: ${cleanup_output}" >&2
+              echo "${verification_error}" >&2
+              exit 1
+            fi
+          done
+
+      # success() prevents deployment after migration, connectivity, or cleanup failure.
       - name: Deploy standalone package to Azure App Service
+        if: ${{ success() }}
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}

@@ -5,7 +5,7 @@ Azure production is deployed from `main` by
 manually from `main`.
 
 Vercel deployment remains separate. This workflow does not change Vercel,
-domains, DNS, or database migrations.
+domains, or DNS.
 
 The canonical production URL is `https://tietokanta.beaglejarjesto.fi`.
 `https://www.tietokanta.beaglejarjesto.fi` is also bound to the App Service and
@@ -21,12 +21,22 @@ The workflow:
 2. runs `pnpm install --frozen-lockfile` and `pnpm db:generate`;
 3. runs `pnpm build` without the test or coverage suites;
 4. adds `public` and `.next/static` assets to the Next.js standalone output;
-5. authenticates to Azure with GitHub OIDC; and
-6. deploys `apps/web/.next/standalone` to the `Production` slot of
-   `beagle-app-prod`.
+5. authenticates to Azure with GitHub OIDC;
+6. validates the migration configuration and resolves the GitHub-hosted
+   runner's public IPv4 from `https://api.ipify.org`;
+7. creates or updates the `github-actions-migrations` PostgreSQL Flexible
+   Server firewall rule with that one IPv4 as both the start and end address;
+8. retries a direct database connection for up to Azure's documented
+   five-minute firewall propagation window;
+9. runs `pnpm db:deploy` against the direct production database URL;
+10. always retries deletion of the temporary firewall rule; and
+11. deploys `apps/web/.next/standalone` to the `Production` slot of
+    `beagle-app-prod`.
 
-The workflow does not run `pnpm db:deploy`. Production migration strategy is
-handled separately.
+The existing `deploy-azure-prod` concurrency group serializes production runs,
+so concurrent jobs cannot overwrite the deterministic firewall rule. The
+workflow does not allow Azure's broad `0.0.0.0` range or GitHub's published IP
+ranges.
 
 ## GitHub Actions configuration
 
@@ -35,12 +45,25 @@ OIDC authentication requires these repository secrets:
 - `AZURE_CLIENT_ID`
 - `AZURE_TENANT_ID`
 - `AZURE_SUBSCRIPTION_ID`
+- `AZURE_DATABASE_URL_UNPOOLED`: the direct production PostgreSQL URL for the
+  configured Flexible Server, including the database, credentials, and required
+  TLS options. Use exactly one `sslmode=require`, `sslmode=verify-ca`, or
+  `sslmode=verify-full`. Do not use a pooled URL or query parameters that
+  override the host, port, user, password, or database.
 
-The application build also requires these repository-level GitHub Actions values:
+The workflow also requires these repository variables:
+
+- `AZURE_POSTGRES_RESOURCE_GROUP`: the resource group containing the production
+  PostgreSQL Flexible Server
+- `AZURE_POSTGRES_SERVER_NAME`: the Flexible Server resource name, without the
+  `.postgres.database.azure.com` suffix
+- `AZURE_POSTGRES_DATABASE_NAME`: the exact production database name contained
+  in `AZURE_DATABASE_URL_UNPOOLED`
+- `AZURE_BETTER_AUTH_URL`: `https://tietokanta.beaglejarjesto.fi`
+
+The application build also requires this repository-level secret:
 
 - `BETTER_AUTH_SECRET` as a repository secret
-- `AZURE_BETTER_AUTH_URL` as a repository variable, set to
-  `https://tietokanta.beaglejarjesto.fi`
 
 The build needs these values while collecting Next.js page data. The deployed
 server reads its production values from Azure App Service settings at runtime.
@@ -50,6 +73,55 @@ Vercel and other CI workflows continue to use their current URL.
 
 Do not attach a GitHub Environment to this job without also replacing the
 branch-based federated credential, because that changes the OIDC subject.
+
+## Azure permission for temporary firewall rules
+
+Keep the existing App Service deployment permissions. In addition, assign the
+OIDC service principal a custom role at the production PostgreSQL Flexible
+Server resource scope with exactly these Azure resource-provider actions:
+
+```text
+Microsoft.DBforPostgreSQL/flexibleServers/read
+Microsoft.DBforPostgreSQL/flexibleServers/firewallRules/read
+Microsoft.DBforPostgreSQL/flexibleServers/firewallRules/write
+Microsoft.DBforPostgreSQL/flexibleServers/firewallRules/delete
+```
+
+The Azure CLI reads the parent Flexible Server to confirm that public access is
+enabled before operating on a firewall rule. Firewall-rule `write` covers both
+create and update. Scope the role assignment to this exact resource, replacing
+the placeholders:
+
+```text
+/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.DBforPostgreSQL/flexibleServers/<server-name>
+```
+
+Do not grant Contributor on the subscription or resource group solely for this
+workflow. The database user in `AZURE_DATABASE_URL_UNPOOLED` separately needs
+enough PostgreSQL privileges to apply the repository's Prisma migrations; Azure
+RBAC does not grant SQL privileges.
+
+## Migration and cleanup failure behavior
+
+`RUN_DB_MIGRATIONS=true` selects the migration URL path in the Prisma config,
+and `CONFIRM_PROD=YES` records the repository's production safety marker. The
+workflow supplies both values itself; neither is a GitHub variable or secret.
+
+The migration command has a 15-minute timeout so a database lock or stalled
+migration proceeds to cleanup instead of occupying most of the GitHub job
+limit. The firewall cleanup step runs even when connectivity or `pnpm db:deploy`
+fails. It verifies that the rule is absent after each delete attempt because the
+Azure CLI can log some deletion errors without returning a failing exit code.
+An explicit missing-rule response is treated as cleaned up; all other outcomes
+are retried five times and then fail the job. App Service deployment runs only
+when the migration and verified cleanup have both succeeded.
+
+After a migration failure, inspect the Prisma error, correct or resolve the
+migration, and rerun the workflow from `main`; `prisma migrate deploy` applies
+only pending migrations. After a cleanup failure or cancelled runner, manually
+remove `github-actions-migrations` from the Flexible Server's Networking page
+before rerunning. A rerun also updates that deterministic rule to the new
+runner's single IPv4 before attempting migrations.
 
 ## Standalone package and startup
 
