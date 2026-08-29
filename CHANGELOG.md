@@ -16,6 +16,8 @@ This project uses a user-facing changelog format.
 
 ### Changed
 
+- Beagletietokannan tietosuojaseloste päivitettiin kuvaamaan nykyiset tietolähteet, julkisten ja rajattujen tietojen ero, Azure-tuotantoympäristö sekä tietosuoja-asioiden uusi yhteysosoite.
+
 ### Fixed
 
 ### Removed
