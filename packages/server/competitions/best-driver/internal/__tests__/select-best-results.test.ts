@@ -46,6 +46,44 @@ describe("selectBestDriverResults", () => {
     expect(getBestDriverTotalPoints(results ?? [])).toBe(267);
   });
 
+  it("normalizes district numbers and ignores district names", () => {
+    const results = selectBestDriverResults([
+      candidate("a", 90, {
+        weather: "P",
+        kennelDistrict: "Etelä",
+        kennelDistrictNo: "01",
+      }),
+      candidate("b", 89, {
+        kennelDistrict: "Etelä",
+        kennelDistrictNo: " 1 ",
+      }),
+      candidate("c", 88, {
+        kennelDistrict: "Länsi",
+        kennelDistrictNo: "02",
+      }),
+    ]);
+
+    expect(results?.map((result) => result.trialEntryId)).toEqual([
+      "a",
+      "b",
+      "c",
+    ]);
+  });
+
+  it("rejects an invalid district even when the other two numbers differ", () => {
+    const results = selectBestDriverResults([
+      candidate("a", 90, {
+        weather: "P",
+        kennelDistrict: "01",
+        kennelDistrictNo: null,
+      }),
+      candidate("b", 89, { kennelDistrictNo: "02" }),
+      candidate("c", 88, { kennelDistrictNo: "03" }),
+    ]);
+
+    expect(results).toBeNull();
+  });
+
   it.each([
     [
       "without bare-ground result",
@@ -61,6 +99,14 @@ describe("selectBestDriverResults", () => {
         { weather: "P", kennelDistrictNo: "01" },
         { kennelDistrictNo: "01" },
         { kennelDistrictNo: "01" },
+      ],
+    ],
+    [
+      "with invalid district numbers",
+      [
+        { weather: "P", kennelDistrictNo: "00" },
+        { kennelDistrictNo: "invalid" },
+        { kennelDistrictNo: " " },
       ],
     ],
     [

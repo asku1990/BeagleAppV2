@@ -10,7 +10,8 @@ describe("best driver season helpers", () => {
   it("accepts only four-digit seasons in the supported range", () => {
     expect(parseBestDriverSeason(undefined)).toBeNull();
     expect(parseBestDriverSeason(2025.9)).toBe(2025);
-    expect(parseBestDriverSeason(1899)).toBeNaN();
+    expect(parseBestDriverSeason(2016)).toBe(2016);
+    expect(parseBestDriverSeason(2015)).toBeNaN();
     expect(parseBestDriverSeason(2101)).toBeNaN();
   });
 
@@ -36,6 +37,8 @@ describe("best driver season helpers", () => {
         [
           new Date("2026-02-28T00:00:00.000Z"),
           new Date("2025-08-02T00:00:00.000Z"),
+          new Date("2016-02-28T00:00:00.000Z"),
+          new Date("2015-08-02T00:00:00.000Z"),
           new Date("2025-05-01T00:00:00.000Z"),
         ],
         2026,

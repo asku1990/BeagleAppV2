@@ -6,9 +6,11 @@ const MINIMUM_TOTAL_POINTS = 150;
 
 function districtKey(result: BestDriverCandidateDb): string | null {
   const districtNo = result.kennelDistrictNo?.trim();
-  if (districtNo) return `number:${districtNo}`;
-  const district = result.kennelDistrict?.trim().toLocaleLowerCase("fi");
-  return district ? `name:${district}` : null;
+  if (!districtNo || !/^\d+$/.test(districtNo)) return null;
+  const normalized = Number(districtNo);
+  return Number.isSafeInteger(normalized) && normalized > 0
+    ? `number:${normalized}`
+    : null;
 }
 
 function isValidCombination(results: BestDriverCandidateDb[]): boolean {
@@ -20,9 +22,9 @@ function isValidCombination(results: BestDriverCandidateDb[]): boolean {
     return false;
   }
 
-  const districts = new Set(
-    results.map(districtKey).filter((value): value is string => value !== null),
-  );
+  const districtKeys = results.map(districtKey);
+  if (districtKeys.some((value) => value === null)) return false;
+  const districts = new Set(districtKeys);
   if (districts.size < 2) return false;
 
   return (

@@ -1,4 +1,4 @@
-const MIN_SEASON_YEAR = 1900;
+const MIN_SEASON_YEAR = 2016;
 const MAX_SEASON_YEAR = 2100;
 
 export function parseBestDriverSeason(
@@ -37,8 +37,13 @@ export function collectBestDriverSeasons(
   const seasons = new Set<number>([currentSeason]);
   for (const date of eventDates) {
     const month = date.getUTCMonth() + 1;
-    if (month >= 8) seasons.add(date.getUTCFullYear());
-    else if (month <= 2) seasons.add(date.getUTCFullYear() - 1);
+    const season =
+      month >= 8
+        ? date.getUTCFullYear()
+        : month <= 2
+          ? date.getUTCFullYear() - 1
+          : null;
+    if (season !== null && season >= MIN_SEASON_YEAR) seasons.add(season);
   }
   return [...seasons].sort((left, right) => right - left);
 }
