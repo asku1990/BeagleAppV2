@@ -67,11 +67,19 @@ export function BestDriverResults({ rows }: { rows: BestDriverRankingRow[] }) {
             beagleTheme.surface,
           )}
         >
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <strong>{result.eventPlace}</strong>
-            <span>{formatIsoDateForDisplay(result.eventDate, locale)}</span>
-          </div>
-          <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-5">
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-7">
+            <div>
+              <dt className={beagleTheme.mutedText}>
+                {t("bestDriver.results.place")}
+              </dt>
+              <dd>{result.eventPlace}</dd>
+            </div>
+            <div>
+              <dt className={beagleTheme.mutedText}>
+                {t("bestDriver.results.date")}
+              </dt>
+              <dd>{formatIsoDateForDisplay(result.eventDate, locale)}</dd>
+            </div>
             <div>
               <dt className={beagleTheme.mutedText}>
                 {t("bestDriver.results.district")}
