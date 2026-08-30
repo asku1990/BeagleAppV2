@@ -17,6 +17,17 @@ function dogHref(dogId: string) {
   return `/beagle/dogs/${encodeURIComponent(dogId)}`;
 }
 
+function districtLabel(
+  districtNo: string | null,
+  districtName: string | null,
+): string {
+  const normalizedNo = districtNo?.trim();
+  const normalizedName = districtName?.trim();
+  if (normalizedNo && normalizedName)
+    return `${normalizedNo} – ${normalizedName}`;
+  return normalizedNo || normalizedName || "–";
+}
+
 export function BestDriverResults({ rows }: { rows: BestDriverRankingRow[] }) {
   const { t, locale } = useI18n();
   const [expandedDogId, setExpandedDogId] = useState<string | null>(null);
@@ -65,7 +76,9 @@ export function BestDriverResults({ rows }: { rows: BestDriverRankingRow[] }) {
               <dt className={beagleTheme.mutedText}>
                 {t("bestDriver.results.district")}
               </dt>
-              <dd>{result.kennelDistrictNo || result.kennelDistrict || "–"}</dd>
+              <dd>
+                {districtLabel(result.kennelDistrictNo, result.kennelDistrict)}
+              </dd>
             </div>
             <div>
               <dt className={beagleTheme.mutedText}>
