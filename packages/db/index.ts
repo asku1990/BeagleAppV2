@@ -178,6 +178,11 @@ export {
   type KoiratietokantaAjokUpsertDbResult,
 } from "./trials";
 export {
+  getBestDriverSourceDb,
+  type BestDriverCandidateDb,
+  type BestDriverSourceDb,
+} from "./competitions";
+export {
   getAdminTrialEventDetailsDb,
   searchAdminTrialsDb,
   createAdminTrialEventWriteDb,

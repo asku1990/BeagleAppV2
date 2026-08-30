@@ -14,6 +14,8 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+- Paras ajuri -kilpailun seuranta näyttää koekauden sijoitukset, sijoitukseen lasketut kolme koetulosta ja kilpailun laskentasäännöt.
+
 ### Changed
 
 ### Fixed
