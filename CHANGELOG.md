@@ -20,6 +20,19 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.21.0] - 2026-08-30
+
+### Added
+
+- Uusi Julkinen Paras ajuri -kilpailu.
+- Kilpailussa käytetään vanhan tietokannan sääntöjä.
+
+### Changed
+
+### Fixed
+
+### Removed
+
 ## [0.20.2] - 2026-08-29
 
 ### Added

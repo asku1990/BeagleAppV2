@@ -102,7 +102,7 @@ const publicNavItems: NavItem[] = [
     labelKey: "sidebar.nav.bestDriver",
     icon: Trophy,
     href: "/beagle/best-driver",
-    availability: "planned",
+    availability: "enabled",
   },
 ];
 
