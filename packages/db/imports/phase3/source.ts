@@ -24,6 +24,37 @@ function toLegacyDateKey(raw: string | null | undefined): string {
   return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
 }
 
+function getShowImportUntilDate(): string | null {
+  const raw = process.env.LEGACY_SHOW_IMPORT_UNTIL_DATE?.trim();
+  if (!raw) return null;
+
+  if (!/^\d{4}-\d{2}-\d{2}$/u.test(raw)) {
+    throw new Error(
+      "LEGACY_SHOW_IMPORT_UNTIL_DATE must use YYYY-MM-DD format.",
+    );
+  }
+
+  const dateKey = raw.replaceAll("-", "");
+  const date = new Date(
+    Date.UTC(
+      Number(dateKey.slice(0, 4)),
+      Number(dateKey.slice(4, 6)) - 1,
+      Number(dateKey.slice(6, 8)),
+    ),
+  );
+  if (
+    date.getUTCFullYear() !== Number(dateKey.slice(0, 4)) ||
+    date.getUTCMonth() !== Number(dateKey.slice(4, 6)) - 1 ||
+    date.getUTCDate() !== Number(dateKey.slice(6, 8))
+  ) {
+    throw new Error(
+      "LEGACY_SHOW_IMPORT_UNTIL_DATE must be a valid calendar date.",
+    );
+  }
+
+  return dateKey;
+}
+
 function toLegacyMergeKey(row: {
   registrationNo: string;
   eventDateRaw: string | null;
@@ -75,7 +106,11 @@ export async function fetchLegacyShowRows(options?: {
   log?: (message: string) => void;
 }): Promise<LegacyShowResultRow[]> {
   const log = options?.log ?? (() => {});
+  const showImportUntilDate = getShowImportUntilDate();
   const startedAt = Date.now();
+  log(
+    `Show source date limit=${showImportUntilDate ? `${showImportUntilDate.slice(0, 4)}-${showImportUntilDate.slice(4, 6)}-${showImportUntilDate.slice(6, 8)}` : "all"}`,
+  );
   log("Connecting to legacy database...");
   const connection = await connectLegacyDatabase();
   try {
@@ -86,8 +121,7 @@ export async function fetchLegacyShowRows(options?: {
 
     const showResultsStartedAt = Date.now();
     // `KNIMI` is not in show result tables directly; it comes from `bearek_id`.
-    const baseRows = (await connection.query(
-      `SELECT n.REKNO as registrationNo,
+    const baseQuery = `SELECT n.REKNO as registrationNo,
               n.TAPPV as eventDateRaw,
               n.TAPPA as eventPlace,
               n.TULNI as resultText,
@@ -98,6 +132,7 @@ export async function fetchLegacyShowRows(options?: {
               'nay9599' as sourceTable
        FROM nay9599 n
        LEFT JOIN bearek_id b ON b.REKNO = n.REKNO
+       ${showImportUntilDate ? "WHERE REPLACE(n.TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(n.TAPPV, '-', '') <= ?" : ""}
        UNION ALL
        SELECT n.REKNO as registrationNo,
               n.TAPPV as eventDateRaw,
@@ -109,13 +144,18 @@ export async function fetchLegacyShowRows(options?: {
               b.KNIMI as dogName,
               'beanay' as sourceTable
        FROM beanay n
-       LEFT JOIN bearek_id b ON b.REKNO = n.REKNO`,
+       LEFT JOIN bearek_id b ON b.REKNO = n.REKNO
+       ${showImportUntilDate ? "WHERE REPLACE(n.TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(n.TAPPV, '-', '') <= ?" : ""}`;
+    const baseRows = (await connection.query(
+      baseQuery,
+      showImportUntilDate
+        ? [showImportUntilDate, showImportUntilDate]
+        : undefined,
     )) as RawLegacyShowRow[];
 
     let rdUdRows: RawLegacyShowRow[] = [];
     if (hasRdUdTable) {
-      rdUdRows = (await connection.query(
-        `SELECT n.REKNO as registrationNo,
+      const rdUdQuery = `SELECT n.REKNO as registrationNo,
                 n.TAPPV as eventDateRaw,
                 n.TAPPA as eventPlace,
                 n.TULNI as resultText,
@@ -125,16 +165,23 @@ export async function fetchLegacyShowRows(options?: {
                 b.KNIMI as dogName,
                 'nay9599_rd_ud' as sourceTable
          FROM nay9599_rd_ud n
-         LEFT JOIN bearek_id b ON b.REKNO = n.REKNO`,
+         LEFT JOIN bearek_id b ON b.REKNO = n.REKNO
+         ${showImportUntilDate ? "WHERE REPLACE(n.TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(n.TAPPV, '-', '') <= ?" : ""}`;
+      rdUdRows = (await connection.query(
+        rdUdQuery,
+        showImportUntilDate ? [showImportUntilDate] : undefined,
       )) as RawLegacyShowRow[];
     }
 
-    const critiqueRows = (await connection.query(
-      `SELECT REKNO as registrationNo,
+    const critiqueQuery = `SELECT REKNO as registrationNo,
               TAPPV as eventDateRaw,
               TAPPA as eventPlace,
               TEKSTI as critiqueText
-       FROM beanay_text`,
+       FROM beanay_text
+       ${showImportUntilDate ? "WHERE REPLACE(TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(TAPPV, '-', '') <= ?" : ""}`;
+    const critiqueRows = (await connection.query(
+      critiqueQuery,
+      showImportUntilDate ? [showImportUntilDate] : undefined,
     )) as Array<{
       registrationNo: string;
       eventDateRaw: string | null;
