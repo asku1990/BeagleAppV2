@@ -72,5 +72,9 @@
       "sharp",
       "unrs-resolver"
     ]
+  },
+  "engines": {
+    "node": ">=20",
+    "pnpm": "10.33.0"
   }
 }
