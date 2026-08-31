@@ -179,6 +179,13 @@ export type {
   KoiratietokantaAjokWarning,
   KoiratietokantaAjokWarningCode,
 } from "./trials";
+export type {
+  BestDriverQualifyingResult,
+  BestDriverRankingRequest,
+  BestDriverRankingResponse,
+  BestDriverRankingRow,
+  BestDriverTrialType,
+} from "./competitions";
 
 export type {
   AdminUserListItem,

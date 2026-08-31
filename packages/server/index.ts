@@ -42,6 +42,11 @@ export {
 export { calculatePublicVirtualPairing } from "./dogs";
 export { createShowsService, showsService } from "./shows";
 export { createTrialsService, trialsService } from "./trials";
+export {
+  createCompetitionsService,
+  competitionsService,
+  getBestDriverRankingService,
+} from "./competitions";
 export { upsertKoiratietokantaAjokResultService } from "./trials";
 export { listAdminTrialEvents } from "./admin";
 export { getAdminTrialEvent } from "./admin";
