@@ -204,6 +204,10 @@ pass-cli run --env-file .env.staging -- pnpm import:phase3
 CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm import:phase3
 ```
 
+To limit phase 3 to an inclusive show event date, set
+`LEGACY_SHOW_IMPORT_UNTIL_DATE=YYYY-MM-DD` in the selected environment file.
+Leave it unset or blank to import all show rows.
+
 Phase-5 trial runtime projection:
 
 ```bash

@@ -12,6 +12,12 @@ Phase 3 belongs to the initial canonical migration flow.
 
 `pnpm import:phase3 [USER_ID]`
 
+Optional environment setting:
+
+- `LEGACY_SHOW_IMPORT_UNTIL_DATE=YYYY-MM-DD` imports show rows whose event date
+  is on or before the configured date. Leave it unset or blank to import all
+  show rows. Invalid values fail before the legacy source is queried.
+
 ## Source and merge behavior
 
 Phase 3 builds canonical rows from:
