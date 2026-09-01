@@ -189,6 +189,8 @@ describe("formatTrialSearchRowsForClipboard", () => {
           eventPlace: "Helsinki",
           judge: "Judge A",
           dogCount: 7,
+          weather: "L",
+          average: 82.5,
         },
         {
           trialId: "t2",
@@ -196,6 +198,8 @@ describe("formatTrialSearchRowsForClipboard", () => {
           eventPlace: "Turku",
           judge: null,
           dogCount: 3,
+          weather: null,
+          average: null,
         },
       ],
       {
@@ -203,14 +207,16 @@ describe("formatTrialSearchRowsForClipboard", () => {
         place: "Paikka",
         judge: "Tuomari",
         dogCount: "Koiria",
+        weather: "Keli",
+        average: "Keskiarvo",
       },
     );
 
     const lines = output.split("\n");
     expect(lines).toHaveLength(3);
-    expect(lines[0]).toBe("Päivä\tPaikka\tTuomari\tKoiria");
-    expect(lines[1]).toBe("2025-06-01\tHelsinki\tJudge A\t7");
-    expect(lines[2]).toBe("2025-05-01\tTurku\t-\t3");
+    expect(lines[0]).toBe("Päivä\tPaikka\tKeli\tKoiria\tKeskiarvo\tTuomari");
+    expect(lines[1]).toBe("2025-06-01\tHelsinki\tL\t7\t82.50\tJudge A");
+    expect(lines[2]).toBe("2025-05-01\tTurku\t-\t3\t-\t-");
   });
 });
 

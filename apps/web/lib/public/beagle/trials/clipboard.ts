@@ -31,6 +31,8 @@ type TrialSearchClipboardLabels = {
   place: string;
   judge: string;
   dogCount: string;
+  weather: string;
+  average: string;
 };
 
 type DogProfileTrialClipboardLabels = {
@@ -229,12 +231,21 @@ export function formatTrialSearchRowsForClipboard(
 ): string {
   if (rows.length === 0) return "";
 
-  const header = [labels.date, labels.place, labels.judge, labels.dogCount];
+  const header = [
+    labels.date,
+    labels.place,
+    labels.weather,
+    labels.dogCount,
+    labels.average,
+    labels.judge,
+  ];
   const body = rows.map((row) => [
     row.eventDate,
     row.eventPlace,
-    formatMaybeString(row.judge),
+    formatMaybeString(row.weather),
     String(row.dogCount),
+    row.average == null ? "-" : row.average.toFixed(2),
+    formatMaybeString(row.judge),
   ]);
 
   return [header, ...body]

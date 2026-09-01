@@ -4,6 +4,7 @@ import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
 import {
   formatIsoDateForDisplay,
+  formatTrialWeather,
   getBeagleTrialHref,
 } from "@/lib/public/beagle/trials";
 import { cn } from "@/lib/utils";
@@ -33,6 +34,12 @@ export function BeagleTrialsResultsDesktopTable({
               {t("trials.results.col.dogCount")}
             </th>
             <th className="px-2 py-2 font-semibold">
+              {t("trials.results.col.weather")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
+              {t("trials.results.col.average")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
               {t("trials.results.col.details")}
             </th>
           </tr>
@@ -49,6 +56,15 @@ export function BeagleTrialsResultsDesktopTable({
               <td className="px-2 py-2">{row.eventPlace}</td>
               <td className="px-2 py-2">{row.judge ?? "-"}</td>
               <td className="px-2 py-2">{row.dogCount}</td>
+              <td className="px-2 py-2">
+                {formatTrialWeather(row.weather, {
+                  snow: t("trials.results.weather.snow"),
+                  bareGround: t("trials.results.weather.bareGround"),
+                })}
+              </td>
+              <td className="px-2 py-2">
+                {row.average == null ? "-" : row.average.toFixed(2)}
+              </td>
               <td className="px-2 py-2">
                 <Link
                   href={getBeagleTrialHref(row.trialId)}

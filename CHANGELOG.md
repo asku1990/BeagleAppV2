@@ -18,6 +18,8 @@ This project uses a user-facing changelog format.
 
 ### Fixed
 
+- Julkinen ajokoehaku näyttää nyt kokeen kelin ja pisteiden keskiarvon.
+
 ### Removed
 
 ## [0.21.0] - 2026-08-30

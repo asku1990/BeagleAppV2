@@ -100,6 +100,10 @@ export async function searchBeagleTrialsDb(
         koekunta: true,
         ylituomariNimi: true,
         _count: { select: { entries: true } },
+        entries: {
+          select: { ke: true, piste: true },
+          orderBy: { id: "asc" },
+        },
       },
     }),
   ]);
@@ -112,6 +116,15 @@ export async function searchBeagleTrialsDb(
       eventPlace: row.koekunta,
       judge: row.ylituomariNimi?.trim() || null,
       dogCount: row._count.entries,
+      weather: row.entries.find((entry) => entry.ke != null)?.ke ?? null,
+      average:
+        row.entries.filter((entry) => entry.piste != null).length > 0
+          ? row.entries.reduce(
+              (sum, entry) =>
+                sum + (entry.piste == null ? 0 : Number(entry.piste)),
+              0,
+            ) / row.entries.filter((entry) => entry.piste != null).length
+          : null,
     }))
     .sort((left, right) => compareRows(left, right, sort));
 

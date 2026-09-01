@@ -18,6 +18,8 @@ const searchLabels = {
   place: "Paikka",
   judge: "Tuomari",
   dogCount: "Koiria",
+  weather: "Keli",
+  average: "Keskiarvo",
 };
 
 const detailLabels = {
@@ -58,6 +60,8 @@ describe("trial clipboard actions", () => {
           eventPlace: "Helsinki",
           judge: "Judge A",
           dogCount: 7,
+          weather: "P",
+          average: 80.25,
         },
       ],
       labels: searchLabels,
@@ -68,7 +72,7 @@ describe("trial clipboard actions", () => {
 
     expect(result).toBe(true);
     expect(writeText).toHaveBeenCalledWith(
-      "Päivä\tPaikka\tTuomari\tKoiria\n2025-06-01\tHelsinki\tJudge A\t7",
+      "Päivä\tPaikka\tKeli\tKoiria\tKeskiarvo\tTuomari\n2025-06-01\tHelsinki\tP\t7\t80.25\tJudge A",
     );
     expect(toast.success).toHaveBeenCalledWith("copy.success");
   });

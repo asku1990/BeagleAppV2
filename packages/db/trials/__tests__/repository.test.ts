@@ -64,6 +64,11 @@ describe("searchBeagleTrialsDb", () => {
           koekunta: "Helsinki",
           ylituomariNimi: "Judge A",
           _count: { entries: 7 },
+          entries: [
+            { ke: "L", piste: 80 },
+            { ke: "L", piste: null },
+            { ke: "L", piste: 82 },
+          ],
         },
         {
           id: "event-1",
@@ -71,6 +76,7 @@ describe("searchBeagleTrialsDb", () => {
           koekunta: "Turku",
           ylituomariNimi: "Judge B",
           _count: { entries: 4 },
+          entries: [{ ke: "P", piste: 75 }],
         },
       ]);
 
@@ -96,6 +102,10 @@ describe("searchBeagleTrialsDb", () => {
     ]);
     expect(result.items[0]?.dogCount).toBe(4);
     expect(result.items[0]?.judge).toBe("Judge B");
+    expect(result.items[0]?.weather).toBe("P");
+    expect(result.items[0]?.average).toBe(75);
+    expect(result.items[1]?.weather).toBe("L");
+    expect(result.items[1]?.average).toBe(81);
     expect(result.total).toBe(2);
     expect(result.totalPages).toBe(1);
 
@@ -122,6 +132,7 @@ describe("searchBeagleTrialsDb", () => {
           koekunta: "Helsinki",
           ylituomariNimi: "Judge A",
           _count: { entries: 5 },
+          entries: [{ ke: "L", piste: 80 }],
         },
         {
           id: "event-b",
@@ -129,6 +140,7 @@ describe("searchBeagleTrialsDb", () => {
           koekunta: "Helsinki",
           ylituomariNimi: "Judge A",
           _count: { entries: 3 },
+          entries: [{ ke: "L", piste: null }],
         },
       ]);
 
@@ -146,6 +158,8 @@ describe("searchBeagleTrialsDb", () => {
       "event-b",
     ]);
     expect(result.items.map((row) => row.dogCount)).toEqual([5, 3]);
+    expect(result.items[0]?.average).toBe(80);
+    expect(result.items[1]?.average).toBeNull();
   });
 
   it("applies entries:{ some:{} } filter to both available-dates and event-rows queries", async () => {
@@ -184,6 +198,7 @@ describe("searchBeagleTrialsDb", () => {
           koekunta: "Akaa",
           ylituomariNimi: "Judge A",
           _count: { entries: 1 },
+          entries: [{ ke: "P", piste: 70 }],
         },
         {
           id: "event-a",
@@ -191,6 +206,7 @@ describe("searchBeagleTrialsDb", () => {
           koekunta: "Borga",
           ylituomariNimi: "Judge B",
           _count: { entries: 1 },
+          entries: [{ ke: "P", piste: 75 }],
         },
       ]);
 
