@@ -214,8 +214,8 @@ describe("formatTrialSearchRowsForClipboard", () => {
 
     const lines = output.split("\n");
     expect(lines).toHaveLength(3);
-    expect(lines[0]).toBe("Päivä\tPaikka\tKeli\tKoiria\tKeskiarvo\tTuomari");
-    expect(lines[1]).toBe("2025-06-01\tHelsinki\tL\t7\t82.50\tJudge A");
+    expect(lines[0]).toBe("Päivä\tPaikka\tTuomari\tKoiria\tKeli\tKeskiarvo");
+    expect(lines[1]).toBe("2025-06-01\tHelsinki\tJudge A\t7\tL\t82.50");
     expect(lines[2]).toBe("2025-05-01\tTurku\t-\t3\t-\t-");
   });
 });

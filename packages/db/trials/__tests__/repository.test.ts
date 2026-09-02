@@ -49,6 +49,8 @@ import {
 describe("searchBeagleTrialsDb", () => {
   beforeEach(() => {
     trialEventFindManyMock.mockReset();
+    trialEntryFindManyMock.mockReset();
+    trialEntryFindManyMock.mockResolvedValue([]);
   });
 
   it("returns one row per TrialEvent and available dates", async () => {
@@ -79,6 +81,12 @@ describe("searchBeagleTrialsDb", () => {
           entries: [{ ke: "P", piste: 75 }],
         },
       ]);
+    trialEntryFindManyMock.mockResolvedValueOnce([
+      { trialEventId: "event-1", ke: "P", piste: 75 },
+      { trialEventId: "event-2", ke: "L", piste: 80 },
+      { trialEventId: "event-2", ke: "L", piste: null },
+      { trialEventId: "event-2", ke: "L", piste: 82 },
+    ]);
 
     const result = await searchBeagleTrialsDb({
       dateFrom: new Date("2024-12-31T22:00:00.000Z"),
@@ -143,6 +151,10 @@ describe("searchBeagleTrialsDb", () => {
           entries: [{ ke: "L", piste: null }],
         },
       ]);
+    trialEntryFindManyMock.mockResolvedValueOnce([
+      { trialEventId: "event-a", ke: "L", piste: 80 },
+      { trialEventId: "event-b", ke: "L", piste: null },
+    ]);
 
     const result = await searchBeagleTrialsDb({
       dateFrom: new Date("2024-12-31T22:00:00.000Z"),
@@ -160,6 +172,11 @@ describe("searchBeagleTrialsDb", () => {
     expect(result.items.map((row) => row.dogCount)).toEqual([5, 3]);
     expect(result.items[0]?.average).toBe(80);
     expect(result.items[1]?.average).toBeNull();
+    expect(trialEntryFindManyMock).toHaveBeenCalledWith({
+      where: { trialEventId: { in: ["event-a", "event-b"] } },
+      select: { trialEventId: true, ke: true, piste: true },
+      orderBy: { id: "asc" },
+    });
   });
 
   it("applies entries:{ some:{} } filter to both available-dates and event-rows queries", async () => {

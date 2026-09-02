@@ -72,7 +72,7 @@ describe("trial clipboard actions", () => {
 
     expect(result).toBe(true);
     expect(writeText).toHaveBeenCalledWith(
-      "Päivä\tPaikka\tKeli\tKoiria\tKeskiarvo\tTuomari\n2025-06-01\tHelsinki\tP\t7\t80.25\tJudge A",
+      "Päivä\tPaikka\tTuomari\tKoiria\tKeli\tKeskiarvo\n2025-06-01\tHelsinki\tJudge A\t7\tP\t80.25",
     );
     expect(toast.success).toHaveBeenCalledWith("copy.success");
   });

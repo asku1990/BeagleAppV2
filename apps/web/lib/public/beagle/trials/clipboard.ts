@@ -234,18 +234,18 @@ export function formatTrialSearchRowsForClipboard(
   const header = [
     labels.date,
     labels.place,
-    labels.weather,
-    labels.dogCount,
-    labels.average,
     labels.judge,
+    labels.dogCount,
+    labels.weather,
+    labels.average,
   ];
   const body = rows.map((row) => [
     row.eventDate,
     row.eventPlace,
-    formatMaybeString(row.weather),
-    String(row.dogCount),
-    row.average == null ? "-" : row.average.toFixed(2),
     formatMaybeString(row.judge),
+    String(row.dogCount),
+    formatMaybeString(row.weather),
+    row.average == null ? "-" : row.average.toFixed(2),
   ]);
 
   return [header, ...body]
