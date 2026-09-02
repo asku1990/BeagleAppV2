@@ -80,6 +80,8 @@ describe("trials service", () => {
             eventPlace: "Helsinki",
             judge: "Judge Main",
             dogCount: 5,
+            weather: "L",
+            average: 81,
           },
         ],
       });

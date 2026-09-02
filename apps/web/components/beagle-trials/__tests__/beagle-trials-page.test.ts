@@ -142,6 +142,8 @@ describe("BeagleTrialsPage", () => {
             eventPlace: "Helsinki",
             judge: "Judge Main",
             dogCount: 9,
+            weather: "P",
+            average: 75.5,
           },
         ],
       },
@@ -155,6 +157,10 @@ describe("BeagleTrialsPage", () => {
     expect(html).toContain("trials.results.count 1");
     expect(html).toContain("Helsinki");
     expect(html).toContain("Judge Main");
+    expect(html).toContain("75.50");
+    expect(html).toContain("trials.results.col.weather");
+    expect(html).toContain("trials.results.col.average");
+    expect(html).toContain("trials.results.weather.bareGround");
     expect(html).toContain("trials.results.copy.button");
     expect(html).toContain("trials.results.open");
     expect(html).toContain("trials.pagination.range 1-1 / 1");

@@ -14,6 +14,8 @@ export type BeagleTrialSearchRowDb = {
   eventPlace: string;
   judge: string | null;
   dogCount: number;
+  weather: string | null;
+  average: number | null;
 };
 
 export type BeagleTrialSearchResponseDb = {
