@@ -116,8 +116,11 @@ that future UI will still operate inside the current parser contract:
 - admins can edit headers, requiredness, import/ignore policy, parser mode,
   fixed definition references, category scope, and value maps
 - lookup-key fields used to build canonical show identity remain protected:
-  `Rekisterinumero`, `Aika`, `Paikkakunta`, `Paikka`, and `Näyttelytyyppi`
-  must stay present and required
+  `Rekisterinumero`, `Aika`, `Paikkakunta`, and `Näyttelytyyppi` must stay
+  present with required row values; the `Paikka` column must be present, but
+  individual row values may be empty
+- an empty `Paikka` value is represented by an empty segment in the canonical
+  event lookup key
 - admins cannot define arbitrary parser scripts or new parse-mode behavior
 - save-time validation returns structured field-level errors for invalid rule
   edits

@@ -75,7 +75,7 @@ const SHOW_WORKBOOK_COLUMN_RULES: ShowWorkbookColumnSeed[] = [
     fixedDefinitionCode: null,
     allowedDefinitionCategoryCode: null,
     headerRequired: true,
-    rowValueRequired: true,
+    rowValueRequired: false,
     sortOrder: 40,
   },
   {

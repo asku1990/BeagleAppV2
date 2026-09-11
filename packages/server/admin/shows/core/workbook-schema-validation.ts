@@ -124,7 +124,21 @@ export function validateAdminShowWorkbookSchemaRuleDraft(
   if (
     input.targetField &&
     LOOKUP_KEY_TARGET_FIELDS.has(input.targetField) &&
-    (!input.headerRequired || !input.rowValueRequired)
+    !input.headerRequired
+  ) {
+    addError(
+      errors,
+      "headerRequired",
+      "LOOKUP_KEY_FIELD_REQUIRED",
+      `Lookup-key field ${input.targetField} must stay present in workbook metadata.`,
+    );
+  }
+
+  if (
+    input.targetField &&
+    LOOKUP_KEY_TARGET_FIELDS.has(input.targetField) &&
+    input.targetField !== "EVENT_PLACE" &&
+    !input.rowValueRequired
   ) {
     addError(
       errors,
