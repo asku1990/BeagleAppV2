@@ -111,6 +111,9 @@ export function BeagleTrialsPage() {
       labels: {
         date: t("trials.results.col.date"),
         place: t("trials.results.col.place"),
+        weather: t("trials.results.col.weather"),
+        average: t("trials.results.col.average"),
+        variedWeather: t("trials.results.weather.varied"),
         judge: t("trials.results.col.judge"),
         dogCount: t("trials.results.col.dogCount"),
       },

@@ -1,5 +1,10 @@
 export type BeagleTrialSearchSort = "date-desc" | "date-asc";
 
+export type BeagleTrialSearchWeatherSummary =
+  | { kind: "none" }
+  | { kind: "single"; value: string }
+  | { kind: "varied" };
+
 export type BeagleTrialSearchMode = "year" | "range";
 
 export type BeagleTrialSearchRequest = {
@@ -24,6 +29,8 @@ export type BeagleTrialSearchRow = {
   eventPlace: string;
   judge: string | null;
   dogCount: number;
+  weather: BeagleTrialSearchWeatherSummary;
+  average: number | null;
 };
 
 export type BeagleTrialSearchResponse = {

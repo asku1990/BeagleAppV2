@@ -273,6 +273,8 @@ export async function searchBeagleTrialsService(
         eventPlace: item.eventPlace,
         judge: item.judge,
         dogCount: item.dogCount,
+        weather: item.weather,
+        average: item.average,
       })),
     };
 

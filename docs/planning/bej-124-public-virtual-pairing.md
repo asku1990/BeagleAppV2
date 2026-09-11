@@ -15,7 +15,7 @@ Implement public virtuaaliparitus at `/beagle/virtual-pairing` by reusing the ex
   - v1 public search shows EK number, registration number, sex, dog name, trial/show counts, size summary, and a sire/dam select action.
   - v1 public result shows sire/dam names and registrations, known pedigree percentage, adjusted inbreeding coefficient, raw Fx only when different, EPI risk line with `epi-info`, swap action, dog-position checkbox, SP selector 5-9, calculation-basis list, optional positions, and calculation time.
 - Constraints/risks:
-  - `ARCHITECTURE.md` requires business logic in `packages/server` and prevents importing `packages/server` or `packages/db` into web UI/client code.
+  - `docs/architecture.md` requires business logic in `packages/server` and prevents importing `packages/server` or `packages/db` into web UI/client code.
   - Public route must not call admin services because admin DTOs include data that is out of scope for public users.
   - Public calculation must not introduce new inbreeding, EPI, Lafora, PUR, or risk semantics.
   - Existing grouped inbreeding contributions keep only one sire/dam position per ancestor; public "show dog positions" parity needs all included positions per ancestor.

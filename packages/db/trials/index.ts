@@ -18,6 +18,7 @@ export type {
   BeagleTrialSearchRequestDb,
   BeagleTrialSearchResponseDb,
   BeagleTrialSearchRowDb,
+  BeagleTrialSearchWeatherSummaryDb,
   BeagleTrialSearchSortDb,
 } from "./types";
 export { getTrialDogPdfDataDb } from "./pdf";

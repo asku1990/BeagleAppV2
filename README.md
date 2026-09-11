@@ -14,7 +14,7 @@ Beagle App v2 is a production-style monorepo for a public Beagle database suppor
 
 ## Quick links
 
-- Architecture rules and boundaries: [ARCHITECTURE.md](ARCHITECTURE.md)
+- Architecture rules and boundaries: [docs/architecture.md](docs/architecture.md)
 - Developer workflow and agent rules: [AGENTS.md](AGENTS.md)
 - Documentation rules: [docs/documentation-rules.md](docs/documentation-rules.md)
 - Tech debt register: [docs/tech-debt.md](docs/tech-debt.md)
@@ -151,4 +151,4 @@ See `docs/vercel-deployment.md` for supported Vercel project setups.
 - README is intentionally minimal and usage-focused.
 - Detailed feature behavior, API surface, and implementation conventions are in `docs/app-usage-and-features.md`.
 - Documentation workflow and future cleanup note conventions are in `docs/documentation-rules.md` and `docs/tech-debt.md`.
-- Source of truth for architecture and dependency boundaries is `ARCHITECTURE.md`.
+- Source of truth for architecture and dependency boundaries is `docs/architecture.md`.
