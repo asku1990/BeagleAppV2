@@ -40,7 +40,7 @@ not run.
 
 Repository guardrails and current feature documentation:
 
-- [Architecture guardrails](../../../ARCHITECTURE.md)
+- [Architecture guardrails](../../architecture.md)
 - [Documentation rules](../../documentation-rules.md)
 - [Current admin trial management](../../features/admin-trial-management.md)
 - [Canonical trial rule windows](../../features/trials/rule-windows.md)

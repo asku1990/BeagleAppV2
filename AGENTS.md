@@ -18,8 +18,8 @@ This is a single-context repository with root `CONTEXT.md` and `docs/adr/`. See 
 
 ## Source of truth
 
-- Architecture and dependency boundaries are defined in [ARCHITECTURE.md](/Users/akikuivas/personal-projects/beagle/beagle-app-v2/ARCHITECTURE.md).
-- If this file and architecture guidance conflict, follow `ARCHITECTURE.md` and mention the conflict in your response.
+- Architecture and dependency boundaries are defined in [docs/architecture.md](docs/architecture.md).
+- If this file and architecture guidance conflict, follow `docs/architecture.md` and mention the conflict in your response.
 
 ## Working style
 
