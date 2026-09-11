@@ -18,7 +18,18 @@ This project uses a user-facing changelog format.
 
 ### Fixed
 
+### Removed
+
+## [0.21.1] - 2026-09-11
+
+### Added
+
+### Changed
+
+### Fixed
+
 - Julkinen ajokoehaku näyttää nyt kokeen kelin ja pisteiden keskiarvon.
+- Useamman kelin sisältävät kokeet näytetään merkinnällä "Vaihteleva".
 
 ### Removed
 
