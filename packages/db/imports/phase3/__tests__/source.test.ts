@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fetchLegacyShowRows } from "../source";
 
 const { connectLegacyDatabaseMock } = vi.hoisted(() => ({
@@ -21,11 +21,16 @@ type RawLegacyRow = {
   sourceTable: "nay9599" | "beanay" | "nay9599_rd_ud";
 };
 
-function createConnection(baseRows: RawLegacyRow[]) {
+function createConnection(
+  baseRows: RawLegacyRow[],
+  hasRdUdTable = false,
+  rdUdRows: RawLegacyRow[] = [],
+) {
   const query = vi
     .fn()
-    .mockResolvedValueOnce([]) // tableExists(nay9599_rd_ud) => false
+    .mockResolvedValueOnce(hasRdUdTable ? [{ ok: 1 }] : []) // tableExists(nay9599_rd_ud)
     .mockResolvedValueOnce(baseRows) // baseRows from nay9599 + beanay union query
+    .mockResolvedValueOnce(rdUdRows) // optional nay9599_rd_ud rows
     .mockResolvedValueOnce([]); // critiqueRows from beanay_text
   return {
     query,
@@ -36,6 +41,10 @@ function createConnection(baseRows: RawLegacyRow[]) {
 describe("fetchLegacyShowRows", () => {
   beforeEach(() => {
     connectLegacyDatabaseMock.mockReset();
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("resolves equal-priority collisions deterministically", async () => {
@@ -70,5 +79,44 @@ describe("fetchLegacyShowRows", () => {
     expect(log).toHaveBeenCalledWith(
       "Fetched legacy show source rows: total=1, mergedKeys=1, passthroughRowsWithoutMergeKey=0, elapsed=0s",
     );
+  });
+
+  it("pushes an inclusive date cutoff to every show source query", async () => {
+    vi.stubEnv("LEGACY_SHOW_IMPORT_UNTIL_DATE", "2024-01-01");
+    const connection = createConnection([], true);
+    connectLegacyDatabaseMock.mockResolvedValue(connection);
+
+    await fetchLegacyShowRows();
+
+    expect(connection.query).toHaveBeenNthCalledWith(
+      2,
+      expect.stringContaining(
+        "REPLACE(n.TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(n.TAPPV, '-', '') <= ?",
+      ),
+      ["20240101", "20240101"],
+    );
+    expect(connection.query).toHaveBeenNthCalledWith(
+      3,
+      expect.stringContaining(
+        "REPLACE(n.TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(n.TAPPV, '-', '') <= ?",
+      ),
+      ["20240101"],
+    );
+    expect(connection.query).toHaveBeenNthCalledWith(
+      4,
+      expect.stringContaining(
+        "REPLACE(TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(TAPPV, '-', '') <= ?",
+      ),
+      ["20240101"],
+    );
+  });
+
+  it("rejects an invalid date cutoff before connecting", async () => {
+    vi.stubEnv("LEGACY_SHOW_IMPORT_UNTIL_DATE", "2024-02-30");
+
+    await expect(fetchLegacyShowRows()).rejects.toThrow(
+      "LEGACY_SHOW_IMPORT_UNTIL_DATE must be a valid calendar date.",
+    );
+    expect(connectLegacyDatabaseMock).not.toHaveBeenCalled();
   });
 });

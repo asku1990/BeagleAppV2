@@ -26,6 +26,8 @@ describe("BeagleTrialsResultsMobileCards", () => {
             eventPlace: "Helsinki",
             judge: "Judge Main",
             dogCount: 12,
+            weather: { kind: "single", value: "L" },
+            average: 81.25,
           },
         ],
       }),
@@ -34,6 +36,8 @@ describe("BeagleTrialsResultsMobileCards", () => {
     expect(html).toContain("Helsinki");
     expect(html).toContain("Judge Main");
     expect(html).toContain("12");
+    expect(html).toContain("81.25");
+    expect(html).toContain("trials.results.weather.snow");
     expect(html).toContain("trials.results.open");
     expect(html).toContain('href="/beagle/trials/show_1"');
   });
@@ -48,6 +52,8 @@ describe("BeagleTrialsResultsMobileCards", () => {
             eventPlace: "Turku",
             judge: null,
             dogCount: 4,
+            weather: { kind: "none" },
+            average: null,
           },
         ],
       }),
@@ -56,5 +62,25 @@ describe("BeagleTrialsResultsMobileCards", () => {
     expect(html).toContain("Turku");
     expect(html).toContain("trials.results.col.judge:");
     expect(html).toContain("-");
+  });
+
+  it("renders the varied weather label", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(BeagleTrialsResultsMobileCards, {
+        rows: [
+          {
+            trialId: "show_3",
+            eventDate: "2025-08-01",
+            eventPlace: "Oulu",
+            judge: null,
+            dogCount: 2,
+            weather: { kind: "varied" },
+            average: null,
+          },
+        ],
+      }),
+    );
+
+    expect(html).toContain("trials.results.weather.varied");
   });
 });

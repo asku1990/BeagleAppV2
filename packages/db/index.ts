@@ -167,6 +167,7 @@ export {
   type BeagleTrialSearchRequestDb,
   type BeagleTrialSearchResponseDb,
   type BeagleTrialSearchRowDb,
+  type BeagleTrialSearchWeatherSummaryDb,
   type BeagleTrialSearchSortDb,
   type ActiveTrialRuleWindowDb,
   type KoiratietokantaAjokEntryDbInput,

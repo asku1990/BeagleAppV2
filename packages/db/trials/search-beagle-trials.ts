@@ -4,6 +4,7 @@ import type {
   BeagleTrialSearchResponseDb,
   BeagleTrialSearchRowDb,
   BeagleTrialSearchSortDb,
+  BeagleTrialSearchWeatherSummaryDb,
 } from "./types";
 
 function parsePage(value: number | undefined): number {
@@ -105,19 +106,63 @@ export async function searchBeagleTrialsDb(
   ]);
 
   const availableEventDates = availableDateRows.map((row) => row.koepaiva);
-  const rows: BeagleTrialSearchRowDb[] = eventRows
+  const rows = eventRows
     .map((row) => ({
       trialEventId: row.id,
       eventDate: row.koepaiva,
       eventPlace: row.koekunta,
       judge: row.ylituomariNimi?.trim() || null,
       dogCount: row._count.entries,
+      weather: { kind: "none" as const },
+      average: null,
     }))
     .sort((left, right) => compareRows(left, right, sort));
 
   const total = rows.length;
   const pagination = resolvePagination(total, page, pageSize);
-  const items = rows.slice(pagination.start, pagination.start + pageSize);
+  const pageRows = rows.slice(pagination.start, pagination.start + pageSize);
+  const entryRows =
+    pageRows.length === 0
+      ? []
+      : await prisma.trialEntry.findMany({
+          where: {
+            trialEventId: { in: pageRows.map((row) => row.trialEventId) },
+          },
+          select: { trialEventId: true, ke: true, piste: true },
+          orderBy: { id: "asc" },
+        });
+  const entriesByEvent = new Map<string, typeof entryRows>();
+  for (const entry of entryRows) {
+    const entries = entriesByEvent.get(entry.trialEventId) ?? [];
+    entries.push(entry);
+    entriesByEvent.set(entry.trialEventId, entries);
+  }
+  const items: BeagleTrialSearchRowDb[] = pageRows.map((row) => {
+    const entries = entriesByEvent.get(row.trialEventId) ?? [];
+    const scoredEntries = entries.filter((entry) => entry.piste != null);
+    const weatherValues = new Set(
+      entries
+        .map((entry) => entry.ke)
+        .map((value) => value?.trim() ?? null)
+        .filter((value): value is string => value !== null && value !== ""),
+    );
+    const weather: BeagleTrialSearchWeatherSummaryDb =
+      weatherValues.size === 0
+        ? { kind: "none" }
+        : weatherValues.size === 1
+          ? { kind: "single", value: Array.from(weatherValues)[0] ?? "" }
+          : { kind: "varied" };
+
+    return {
+      ...row,
+      weather,
+      average:
+        scoredEntries.length === 0
+          ? null
+          : scoredEntries.reduce((sum, entry) => sum + Number(entry.piste), 0) /
+            scoredEntries.length,
+    };
+  });
 
   return {
     availableEventDates,

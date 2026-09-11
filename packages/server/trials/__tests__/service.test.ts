@@ -80,6 +80,8 @@ describe("trials service", () => {
             eventPlace: "Helsinki",
             judge: "Judge Main",
             dogCount: 5,
+            weather: { kind: "single", value: "L" },
+            average: 81,
           },
         ],
       });
@@ -165,7 +167,7 @@ describe("trials service", () => {
           registrationNo: "FI-1/20",
           name: "Aatu",
           sex: "U",
-          weather: "L",
+          weather: { kind: "single", value: "L" },
           award: "1",
           classCode: "V",
           rank: "1",
