@@ -8,6 +8,7 @@ export type {
   BeagleTrialSearchRequest,
   BeagleTrialSearchResponse,
   BeagleTrialSearchRow,
+  BeagleTrialSearchWeatherSummary,
   BeagleTrialSearchSort,
 } from "./beagle-trials";
 export type {

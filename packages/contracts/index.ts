@@ -158,6 +158,7 @@ export type {
   BeagleTrialSearchRequest,
   BeagleTrialSearchResponse,
   BeagleTrialSearchRow,
+  BeagleTrialSearchWeatherSummary,
   BeagleTrialSearchSort,
   TrialDogPdfAjoajanPisteytys,
   TrialDogPdfAnsiopisteet,

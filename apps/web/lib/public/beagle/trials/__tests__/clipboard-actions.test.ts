@@ -60,7 +60,7 @@ describe("trial clipboard actions", () => {
           eventPlace: "Helsinki",
           judge: "Judge A",
           dogCount: 7,
-          weather: "P",
+          weather: { kind: "single", value: "P" },
           average: 80.25,
         },
       ],

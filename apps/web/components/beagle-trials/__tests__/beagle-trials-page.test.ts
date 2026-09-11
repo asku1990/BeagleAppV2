@@ -142,7 +142,7 @@ describe("BeagleTrialsPage", () => {
             eventPlace: "Helsinki",
             judge: "Judge Main",
             dogCount: 9,
-            weather: "P",
+            weather: { kind: "single", value: "P" },
             average: 75.5,
           },
         ],

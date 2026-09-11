@@ -86,6 +86,7 @@ describe("searchBeagleTrialsDb", () => {
       { trialEventId: "event-2", ke: "L", piste: 80 },
       { trialEventId: "event-2", ke: "L", piste: null },
       { trialEventId: "event-2", ke: "L", piste: 82 },
+      { trialEventId: "event-2", ke: " ", piste: null },
     ]);
 
     const result = await searchBeagleTrialsDb({
@@ -110,9 +111,9 @@ describe("searchBeagleTrialsDb", () => {
     ]);
     expect(result.items[0]?.dogCount).toBe(4);
     expect(result.items[0]?.judge).toBe("Judge B");
-    expect(result.items[0]?.weather).toBe("P");
+    expect(result.items[0]?.weather).toEqual({ kind: "single", value: "P" });
     expect(result.items[0]?.average).toBe(75);
-    expect(result.items[1]?.weather).toBe("L");
+    expect(result.items[1]?.weather).toEqual({ kind: "single", value: "L" });
     expect(result.items[1]?.average).toBe(81);
     expect(result.total).toBe(2);
     expect(result.totalPages).toBe(1);
@@ -177,6 +178,28 @@ describe("searchBeagleTrialsDb", () => {
       select: { trialEventId: true, ke: true, piste: true },
       orderBy: { id: "asc" },
     });
+  });
+
+  it("summarizes distinct non-null event weather values", async () => {
+    trialEventFindManyMock.mockResolvedValueOnce([]).mockResolvedValueOnce([
+      {
+        id: "event-varied",
+        koepaiva: new Date("2025-06-01T00:00:00.000Z"),
+        koekunta: "Helsinki",
+        ylituomariNimi: null,
+        _count: { entries: 3 },
+      },
+    ]);
+    trialEntryFindManyMock.mockResolvedValueOnce([
+      { trialEventId: "event-varied", ke: "L", piste: 80 },
+      { trialEventId: "event-varied", ke: "P", piste: 82 },
+      { trialEventId: "event-varied", ke: null, piste: null },
+    ]);
+
+    const result = await searchBeagleTrialsDb({ page: 1, pageSize: 10 });
+
+    expect(result.items[0]?.weather).toEqual({ kind: "varied" });
+    expect(result.items[0]?.average).toBe(81);
   });
 
   it("applies entries:{ some:{} } filter to both available-dates and event-rows queries", async () => {

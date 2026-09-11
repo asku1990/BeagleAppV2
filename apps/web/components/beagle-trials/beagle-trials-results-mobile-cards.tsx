@@ -4,7 +4,7 @@ import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
 import {
   formatIsoDateForDisplay,
-  formatTrialWeather,
+  formatTrialWeatherSummary,
   getBeagleTrialHref,
 } from "@/lib/public/beagle/trials";
 import { cn } from "@/lib/utils";
@@ -59,9 +59,10 @@ export function BeagleTrialsResultsMobileCards({
                 {t("trials.results.col.weather")}:{" "}
               </span>
               <span>
-                {formatTrialWeather(row.weather, {
+                {formatTrialWeatherSummary(row.weather, {
                   snow: t("trials.results.weather.snow"),
                   bareGround: t("trials.results.weather.bareGround"),
+                  varied: t("trials.results.weather.varied"),
                 })}
               </span>
             </p>

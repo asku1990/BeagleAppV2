@@ -4,7 +4,7 @@ import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
 import {
   formatIsoDateForDisplay,
-  formatTrialWeather,
+  formatTrialWeatherSummary,
   getBeagleTrialHref,
 } from "@/lib/public/beagle/trials";
 import { cn } from "@/lib/utils";
@@ -57,9 +57,10 @@ export function BeagleTrialsResultsDesktopTable({
               <td className="px-2 py-2">{row.judge ?? "-"}</td>
               <td className="px-2 py-2">{row.dogCount}</td>
               <td className="px-2 py-2">
-                {formatTrialWeather(row.weather, {
+                {formatTrialWeatherSummary(row.weather, {
                   snow: t("trials.results.weather.snow"),
                   bareGround: t("trials.results.weather.bareGround"),
+                  varied: t("trials.results.weather.varied"),
                 })}
               </td>
               <td className="px-2 py-2">

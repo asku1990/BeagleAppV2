@@ -26,7 +26,7 @@ describe("BeagleTrialsResultsMobileCards", () => {
             eventPlace: "Helsinki",
             judge: "Judge Main",
             dogCount: 12,
-            weather: "L",
+            weather: { kind: "single", value: "L" },
             average: 81.25,
           },
         ],
@@ -52,7 +52,7 @@ describe("BeagleTrialsResultsMobileCards", () => {
             eventPlace: "Turku",
             judge: null,
             dogCount: 4,
-            weather: null,
+            weather: { kind: "none" },
             average: null,
           },
         ],
@@ -62,5 +62,25 @@ describe("BeagleTrialsResultsMobileCards", () => {
     expect(html).toContain("Turku");
     expect(html).toContain("trials.results.col.judge:");
     expect(html).toContain("-");
+  });
+
+  it("renders the varied weather label", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(BeagleTrialsResultsMobileCards, {
+        rows: [
+          {
+            trialId: "show_3",
+            eventDate: "2025-08-01",
+            eventPlace: "Oulu",
+            judge: null,
+            dogCount: 2,
+            weather: { kind: "varied" },
+            average: null,
+          },
+        ],
+      }),
+    );
+
+    expect(html).toContain("trials.results.weather.varied");
   });
 });

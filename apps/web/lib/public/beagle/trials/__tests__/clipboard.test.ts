@@ -189,7 +189,7 @@ describe("formatTrialSearchRowsForClipboard", () => {
           eventPlace: "Helsinki",
           judge: "Judge A",
           dogCount: 7,
-          weather: "L",
+          weather: { kind: "single", value: "L" },
           average: 82.5,
         },
         {
@@ -198,7 +198,7 @@ describe("formatTrialSearchRowsForClipboard", () => {
           eventPlace: "Turku",
           judge: null,
           dogCount: 3,
-          weather: null,
+          weather: { kind: "none" },
           average: null,
         },
       ],
@@ -209,6 +209,7 @@ describe("formatTrialSearchRowsForClipboard", () => {
         dogCount: "Koiria",
         weather: "Keli",
         average: "Keskiarvo",
+        variedWeather: "Vaihteleva",
       },
     );
 
@@ -217,6 +218,33 @@ describe("formatTrialSearchRowsForClipboard", () => {
     expect(lines[0]).toBe("Päivä\tPaikka\tTuomari\tKoiria\tKeli\tKeskiarvo");
     expect(lines[1]).toBe("2025-06-01\tHelsinki\tJudge A\t7\tL\t82.50");
     expect(lines[2]).toBe("2025-05-01\tTurku\t-\t3\t-\t-");
+  });
+
+  it("formats varied weather using the provided summary label", () => {
+    const output = formatTrialSearchRowsForClipboard(
+      [
+        {
+          trialId: "t1",
+          eventDate: "2025-06-01",
+          eventPlace: "Helsinki",
+          judge: null,
+          dogCount: 2,
+          weather: { kind: "varied" },
+          average: null,
+        },
+      ],
+      {
+        date: "Päivä",
+        place: "Paikka",
+        judge: "Tuomari",
+        dogCount: "Koiria",
+        weather: "Keli",
+        average: "Keskiarvo",
+        variedWeather: "Vaihteleva",
+      },
+    );
+
+    expect(output.split("\n")[1]).toContain("\tVaihteleva\t");
   });
 });
 

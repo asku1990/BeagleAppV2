@@ -6,6 +6,7 @@ import type {
   BeagleTrialSearchRow,
 } from "@beagle/contracts";
 import { formatPlacement } from "@/lib/public/beagle/trials/display-formatters";
+import { formatTrialWeatherSummary } from "./weather";
 
 type TrialClipboardLabels = {
   no: string;
@@ -33,6 +34,7 @@ type TrialSearchClipboardLabels = {
   dogCount: string;
   weather: string;
   average: string;
+  variedWeather?: string;
 };
 
 type DogProfileTrialClipboardLabels = {
@@ -244,7 +246,11 @@ export function formatTrialSearchRowsForClipboard(
     row.eventPlace,
     formatMaybeString(row.judge),
     String(row.dogCount),
-    formatMaybeString(row.weather),
+    formatTrialWeatherSummary(row.weather, {
+      snow: "L",
+      bareGround: "P",
+      varied: labels.variedWeather ?? "varied",
+    }),
     row.average == null ? "-" : row.average.toFixed(2),
   ]);
 
