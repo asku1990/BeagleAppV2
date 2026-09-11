@@ -81,8 +81,8 @@ describe("fetchLegacyShowRows", () => {
     );
   });
 
-  it("pushes an inclusive date cutoff to every show source query", async () => {
-    vi.stubEnv("LEGACY_SHOW_IMPORT_UNTIL_DATE", "2024-01-01");
+  it("pushes an exclusive date boundary to every show source query", async () => {
+    vi.stubEnv("LEGACY_SHOW_IMPORT_BEFORE_DATE", "2024-01-01");
     const connection = createConnection([], true);
     connectLegacyDatabaseMock.mockResolvedValue(connection);
 
@@ -91,31 +91,31 @@ describe("fetchLegacyShowRows", () => {
     expect(connection.query).toHaveBeenNthCalledWith(
       2,
       expect.stringContaining(
-        "REPLACE(n.TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(n.TAPPV, '-', '') <= ?",
+        "REPLACE(n.TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(n.TAPPV, '-', '') < ?",
       ),
       ["20240101", "20240101"],
     );
     expect(connection.query).toHaveBeenNthCalledWith(
       3,
       expect.stringContaining(
-        "REPLACE(n.TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(n.TAPPV, '-', '') <= ?",
+        "REPLACE(n.TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(n.TAPPV, '-', '') < ?",
       ),
       ["20240101"],
     );
     expect(connection.query).toHaveBeenNthCalledWith(
       4,
       expect.stringContaining(
-        "REPLACE(TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(TAPPV, '-', '') <= ?",
+        "REPLACE(TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(TAPPV, '-', '') < ?",
       ),
       ["20240101"],
     );
   });
 
   it("rejects an invalid date cutoff before connecting", async () => {
-    vi.stubEnv("LEGACY_SHOW_IMPORT_UNTIL_DATE", "2024-02-30");
+    vi.stubEnv("LEGACY_SHOW_IMPORT_BEFORE_DATE", "2024-02-30");
 
     await expect(fetchLegacyShowRows()).rejects.toThrow(
-      "LEGACY_SHOW_IMPORT_UNTIL_DATE must be a valid calendar date.",
+      "LEGACY_SHOW_IMPORT_BEFORE_DATE must be a valid calendar date.",
     );
     expect(connectLegacyDatabaseMock).not.toHaveBeenCalled();
   });

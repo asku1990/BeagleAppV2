@@ -14,9 +14,11 @@ Phase 3 belongs to the initial canonical migration flow.
 
 Optional environment setting:
 
-- `LEGACY_SHOW_IMPORT_UNTIL_DATE=YYYY-MM-DD` imports show rows whose event date
-  is on or before the configured date. Leave it unset or blank to import all
-  show rows. Invalid values fail before the legacy source is queried.
+- `LEGACY_SHOW_IMPORT_BEFORE_DATE=YYYY-MM-DD` imports show rows whose event
+  date is before the configured date. Set it to the first event date handled
+  by a newer Excel import to avoid manually subtracting one day. Leave it
+  unset or blank to import all show rows. Invalid values fail before the
+  legacy source is queried.
 
 ## Source and merge behavior
 
