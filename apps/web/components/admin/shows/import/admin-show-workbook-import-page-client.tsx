@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Loader2 } from "lucide-react";
-import { useState, type ChangeEvent } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import type {
   AdminShowWorkbookImportApplyResponse,
   AdminShowWorkbookImportPreviewResponse,
@@ -23,9 +23,10 @@ import {
 } from "@/lib/admin/shows/import/workbook-file";
 import { ShowWorkbookPreviewSection } from "./show-workbook-preview-section";
 import { ShowWorkbookValidationPanel } from "./show-workbook-validation-panel";
+import { WorkbookImportProgressStatus } from "./workbook-import-progress-status";
 
 export function AdminShowWorkbookImportPageClient() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [selectedWorkbook, setSelectedWorkbook] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [inputKey, setInputKey] = useState(0);
@@ -39,8 +40,10 @@ export function AdminShowWorkbookImportPageClient() {
   const [applyError, setApplyError] = useState<string | null>(null);
   const [hasAcceptedNotes, setHasAcceptedNotes] = useState(false);
   const [showValidationDetails, setShowValidationDetails] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   const hasWorkbookFile = selectedWorkbook !== null;
+  const isBusy = validationLoading || applyLoading;
   const hasReviewNotes =
     validationResult !== null &&
     (validationResult.warningCount > 0 ||
@@ -61,6 +64,19 @@ export function AdminShowWorkbookImportPageClient() {
   const validationPanelMode =
     canPreview && !showValidationDetails ? "summary" : "full";
 
+  useEffect(() => {
+    if (!isBusy) {
+      return;
+    }
+
+    const startedAt = Date.now();
+    const timer = window.setInterval(() => {
+      setElapsedSeconds(Math.floor((Date.now() - startedAt) / 1_000));
+    }, 1_000);
+
+    return () => window.clearInterval(timer);
+  }, [isBusy]);
+
   function resetValidationState() {
     setValidationError(null);
     setValidationResult(null);
@@ -68,7 +84,6 @@ export function AdminShowWorkbookImportPageClient() {
     setShowValidationDetails(false);
     setApplyResult(null);
     setApplyError(null);
-    setApplyLoading(false);
   }
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
@@ -94,6 +109,10 @@ export function AdminShowWorkbookImportPageClient() {
   }
 
   function handleResetFile() {
+    if (isBusy) {
+      return;
+    }
+
     setSelectedWorkbook(null);
     setFileError(null);
     resetValidationState();
@@ -106,6 +125,7 @@ export function AdminShowWorkbookImportPageClient() {
     }
 
     setValidationLoading(true);
+    setElapsedSeconds(0);
     setValidationError(null);
     setValidationResult(null);
     setApplyResult(null);
@@ -154,6 +174,7 @@ export function AdminShowWorkbookImportPageClient() {
     }
 
     setApplyLoading(true);
+    setElapsedSeconds(0);
     setApplyError(null);
     setApplyResult(null);
 
@@ -242,6 +263,7 @@ export function AdminShowWorkbookImportPageClient() {
               type="file"
               accept={SHOW_WORKBOOK_ACCEPT}
               onChange={handleFileChange}
+              disabled={isBusy}
               className="cursor-pointer"
             />
             <p className="text-xs text-muted-foreground">
@@ -272,7 +294,7 @@ export function AdminShowWorkbookImportPageClient() {
                 variant="outline"
                 size="sm"
                 onClick={handleResetFile}
-                disabled={!hasWorkbookFile && fileError === null}
+                disabled={isBusy || (!hasWorkbookFile && fileError === null)}
               >
                 {t("admin.shows.import.selected.reset")}
               </Button>
@@ -316,6 +338,40 @@ export function AdminShowWorkbookImportPageClient() {
             </Button>
           </div>
 
+          {isBusy ? (
+            <WorkbookImportProgressStatus
+              title={t(
+                validationLoading
+                  ? "admin.shows.import.status.validatingTitle"
+                  : "admin.shows.import.status.importingTitle",
+              )}
+              guidance={t(
+                validationLoading
+                  ? "admin.shows.import.status.validatingGuidance"
+                  : "admin.shows.import.status.importingGuidance",
+              )}
+              elapsedLabel={t("admin.shows.import.status.elapsed")}
+              elapsedSeconds={elapsedSeconds}
+              locale={locale}
+              counts={
+                applyLoading && validationResult
+                  ? {
+                      events: validationResult.eventCount,
+                      entries: validationResult.entryCount,
+                      resultItems: validationResult.resultItemCount,
+                    }
+                  : null
+              }
+              countLabels={{
+                events: t("admin.shows.preview.summary.events").toLowerCase(),
+                entries: t("admin.shows.preview.summary.entries").toLowerCase(),
+                resultItems: t(
+                  "admin.shows.preview.summary.resultItems",
+                ).toLowerCase(),
+              }}
+            />
+          ) : null}
+
           {applyError ? (
             <p className="text-sm text-destructive">{applyError}</p>
           ) : null}
@@ -342,8 +398,10 @@ export function AdminShowWorkbookImportPageClient() {
               !hasAcceptedNotes
             }
             notesAccepted={hasAcceptedNotes}
-            onAcceptNotes={handleAcceptNotes}
-            onShowDetails={canPreview ? handleShowValidationDetails : undefined}
+            onAcceptNotes={isBusy ? undefined : handleAcceptNotes}
+            onShowDetails={
+              canPreview && !isBusy ? handleShowValidationDetails : undefined
+            }
           />
         </CardContent>
       </Card>
@@ -360,7 +418,7 @@ export function AdminShowWorkbookImportPageClient() {
                 }
               : null
           }
-          onShowNotes={handleShowValidationDetails}
+          onShowNotes={isBusy ? undefined : handleShowValidationDetails}
         />
       ) : null}
     </div>

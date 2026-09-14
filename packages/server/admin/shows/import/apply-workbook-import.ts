@@ -205,7 +205,7 @@ export async function applyAdminShowWorkbookImport(input: {
       body: {
         ok: false,
         error: isTimeout
-          ? "Workbook import timed out before commit. No rows were written. Retry import preview and try again."
+          ? "Workbook import exceeded its safe processing time. The entire attempt was rolled back and no workbook rows were saved. Revalidate the workbook and retry the import."
           : "Workbook import write failed. Retry import preview and try again.",
         code: isTimeout
           ? ISSUE_CODES.importTimeout

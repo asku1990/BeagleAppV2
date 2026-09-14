@@ -8,3 +8,8 @@ export const LONG_RUNNING_WRITE_TX_CONFIG = {
   maxWait: 10_000,
   timeout: 20_000,
 } as const;
+
+export const WORKBOOK_IMPORT_WRITE_TX_CONFIG = {
+  maxWait: 10_000,
+  timeout: 90_000,
+} as const;

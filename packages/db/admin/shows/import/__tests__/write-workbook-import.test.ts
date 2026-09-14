@@ -78,6 +78,11 @@ describe("writeAdminShowWorkbookImportDb", () => {
   });
 
   it("passes explicit transaction timeout options", async () => {
+    expect(WORKBOOK_IMPORT_WRITE_TX_CONFIG).toEqual({
+      maxWait: 10_000,
+      timeout: 90_000,
+    });
+
     showEventFindManyMock.mockResolvedValue([]);
     dogRegistrationFindManyMock.mockResolvedValue([
       { registrationNo: "FI1/24", dogId: "dog-1" },
@@ -122,9 +127,10 @@ describe("writeAdminShowWorkbookImportDb", () => {
     });
 
     expect(prismaTransactionMock).toHaveBeenCalledTimes(1);
-    expect(prismaTransactionMock.mock.calls[0]?.[1]).toEqual(
-      WORKBOOK_IMPORT_WRITE_TX_CONFIG,
-    );
+    expect(prismaTransactionMock.mock.calls[0]?.[1]).toEqual({
+      maxWait: 10_000,
+      timeout: 90_000,
+    });
   });
 
   it("rejects the whole write when any create step fails", async () => {
