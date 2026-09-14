@@ -24,13 +24,13 @@ function toLegacyDateKey(raw: string | null | undefined): string {
   return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
 }
 
-function getShowImportUntilDate(): string | null {
-  const raw = process.env.LEGACY_SHOW_IMPORT_UNTIL_DATE?.trim();
+function getShowImportBeforeDate(): string | null {
+  const raw = process.env.LEGACY_SHOW_IMPORT_BEFORE_DATE?.trim();
   if (!raw) return null;
 
   if (!/^\d{4}-\d{2}-\d{2}$/u.test(raw)) {
     throw new Error(
-      "LEGACY_SHOW_IMPORT_UNTIL_DATE must use YYYY-MM-DD format.",
+      "LEGACY_SHOW_IMPORT_BEFORE_DATE must use YYYY-MM-DD format.",
     );
   }
 
@@ -48,7 +48,7 @@ function getShowImportUntilDate(): string | null {
     date.getUTCDate() !== Number(dateKey.slice(6, 8))
   ) {
     throw new Error(
-      "LEGACY_SHOW_IMPORT_UNTIL_DATE must be a valid calendar date.",
+      "LEGACY_SHOW_IMPORT_BEFORE_DATE must be a valid calendar date.",
     );
   }
 
@@ -106,10 +106,10 @@ export async function fetchLegacyShowRows(options?: {
   log?: (message: string) => void;
 }): Promise<LegacyShowResultRow[]> {
   const log = options?.log ?? (() => {});
-  const showImportUntilDate = getShowImportUntilDate();
+  const showImportBeforeDate = getShowImportBeforeDate();
   const startedAt = Date.now();
   log(
-    `Show source date limit=${showImportUntilDate ? `${showImportUntilDate.slice(0, 4)}-${showImportUntilDate.slice(4, 6)}-${showImportUntilDate.slice(6, 8)}` : "all"}`,
+    `Show source date limit=${showImportBeforeDate ? `<${showImportBeforeDate.slice(0, 4)}-${showImportBeforeDate.slice(4, 6)}-${showImportBeforeDate.slice(6, 8)}` : "all"}`,
   );
   log("Connecting to legacy database...");
   const connection = await connectLegacyDatabase();
@@ -132,7 +132,7 @@ export async function fetchLegacyShowRows(options?: {
               'nay9599' as sourceTable
        FROM nay9599 n
        LEFT JOIN bearek_id b ON b.REKNO = n.REKNO
-       ${showImportUntilDate ? "WHERE REPLACE(n.TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(n.TAPPV, '-', '') <= ?" : ""}
+        ${showImportBeforeDate ? "WHERE REPLACE(n.TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(n.TAPPV, '-', '') < ?" : ""}
        UNION ALL
        SELECT n.REKNO as registrationNo,
               n.TAPPV as eventDateRaw,
@@ -145,11 +145,11 @@ export async function fetchLegacyShowRows(options?: {
               'beanay' as sourceTable
        FROM beanay n
        LEFT JOIN bearek_id b ON b.REKNO = n.REKNO
-       ${showImportUntilDate ? "WHERE REPLACE(n.TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(n.TAPPV, '-', '') <= ?" : ""}`;
+        ${showImportBeforeDate ? "WHERE REPLACE(n.TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(n.TAPPV, '-', '') < ?" : ""}`;
     const baseRows = (await connection.query(
       baseQuery,
-      showImportUntilDate
-        ? [showImportUntilDate, showImportUntilDate]
+      showImportBeforeDate
+        ? [showImportBeforeDate, showImportBeforeDate]
         : undefined,
     )) as RawLegacyShowRow[];
 
@@ -166,10 +166,10 @@ export async function fetchLegacyShowRows(options?: {
                 'nay9599_rd_ud' as sourceTable
          FROM nay9599_rd_ud n
          LEFT JOIN bearek_id b ON b.REKNO = n.REKNO
-         ${showImportUntilDate ? "WHERE REPLACE(n.TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(n.TAPPV, '-', '') <= ?" : ""}`;
+          ${showImportBeforeDate ? "WHERE REPLACE(n.TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(n.TAPPV, '-', '') < ?" : ""}`;
       rdUdRows = (await connection.query(
         rdUdQuery,
-        showImportUntilDate ? [showImportUntilDate] : undefined,
+        showImportBeforeDate ? [showImportBeforeDate] : undefined,
       )) as RawLegacyShowRow[];
     }
 
@@ -178,10 +178,10 @@ export async function fetchLegacyShowRows(options?: {
               TAPPA as eventPlace,
               TEKSTI as critiqueText
        FROM beanay_text
-       ${showImportUntilDate ? "WHERE REPLACE(TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(TAPPV, '-', '') <= ?" : ""}`;
+        ${showImportBeforeDate ? "WHERE REPLACE(TAPPV, '-', '') REGEXP '^[0-9]{8}$' AND REPLACE(TAPPV, '-', '') < ?" : ""}`;
     const critiqueRows = (await connection.query(
       critiqueQuery,
-      showImportUntilDate ? [showImportUntilDate] : undefined,
+      showImportBeforeDate ? [showImportBeforeDate] : undefined,
     )) as Array<{
       registrationNo: string;
       eventDateRaw: string | null;

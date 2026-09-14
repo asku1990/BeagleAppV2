@@ -114,6 +114,23 @@ describe("validateAdminShowWorkbookSchemaRuleDraft", () => {
     expect(errors).toEqual([]);
   });
 
+  it("allows empty row values for the Paikka lookup-key field", () => {
+    const errors = validateAdminShowWorkbookSchemaRuleDraft(
+      createRuleDraft({
+        headerName: "Paikka",
+        targetField: "EVENT_PLACE",
+        parseMode: "TEXT",
+        destinationKind: "SHOW_EVENT",
+        allowedDefinitionCategoryCode: null,
+        headerRequired: true,
+        rowValueRequired: false,
+      }),
+      references,
+    );
+
+    expect(errors).toEqual([]);
+  });
+
   it("rejects optional lookup-key fields", () => {
     const errors = validateAdminShowWorkbookSchemaRuleDraft(
       createRuleDraft({

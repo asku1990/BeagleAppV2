@@ -814,6 +814,46 @@ describe("previewAdminShowWorkbookImport", () => {
     );
   });
 
+  it("accepts an empty Paikka value when metadata makes row values optional", async () => {
+    showWorkbookColumnRuleFindManyMock.mockResolvedValue(
+      buildDefaultColumnRules().map((rule) =>
+        rule.code === "EVENT_PLACE"
+          ? { ...rule, rowValueRequired: false }
+          : rule,
+      ),
+    );
+
+    const result = await previewAdminShowWorkbookImport({
+      fileName: "Näyttelyt.xlsx",
+      workbook: buildWorkbookBuffer([
+        createRow({
+          [IDX.registrationNo]: "FI16175/23",
+          [IDX.eventDate]: new Date("2025-01-11T00:00:00.000Z"),
+          [IDX.eventCity]: "Kajaani",
+          [IDX.eventType]: "Kansainvälinen näyttely",
+          [IDX.dogName]: "CARDIEM KIND REGARDS",
+          [IDX.classValue]: "AVO",
+          [IDX.qualityValue]: "ERI",
+        }),
+      ]),
+    });
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) {
+      throw new Error("Expected a successful preview response");
+    }
+
+    expect(result.body.data.acceptedRowCount).toBe(1);
+    expect(result.body.data.rejectedRowCount).toBe(0);
+    expect(result.body.data.errorCount).toBe(0);
+    expect(result.body.data.events[0]).toEqual(
+      expect.objectContaining({
+        eventPlace: "",
+        eventLookupKey: expect.stringContaining("||"),
+      }),
+    );
+  });
+
   it("rejects class and quality metadata in TEXT mode", async () => {
     showWorkbookColumnRuleFindManyMock.mockResolvedValue(
       buildDefaultColumnRules().map((rule) => {
