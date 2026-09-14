@@ -49,6 +49,36 @@ async function resolveTemplatePath(
   return candidates[0];
 }
 
+function sanitizePdfString(value: string): string {
+  return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "");
+}
+
+function sanitizeTrialDogPdfPayload(
+  input: TrialDogPdfPayload,
+): TrialDogPdfPayload {
+  const sanitizedInput = Object.fromEntries(
+    Object.entries(input).map(([key, value]) => [
+      key,
+      typeof value === "string"
+        ? sanitizePdfString(value)
+        : Array.isArray(value)
+          ? value.map((row) =>
+              Object.fromEntries(
+                Object.entries(row).map(([rowKey, rowValue]) => [
+                  rowKey,
+                  typeof rowValue === "string"
+                    ? sanitizePdfString(rowValue)
+                    : rowValue,
+                ]),
+              ),
+            )
+          : value,
+    ]),
+  );
+
+  return sanitizedInput as TrialDogPdfPayload;
+}
+
 // Renders trial row data onto the static AJOK dog-specific protocol template.
 export async function renderTrialDogPdf(
   input: TrialDogPdfPayload,
@@ -64,12 +94,13 @@ export async function renderTrialDogPdf(
 
   const font = await pdfDocument.embedFont(StandardFonts.Helvetica);
   const page = pdfDocument.getPage(0);
+  const sanitizedInput = sanitizeTrialDogPdfPayload(input);
 
   ruleSet.renderFields({
     pdfDocument,
     page,
     font,
-    input,
+    input: sanitizedInput,
   });
 
   return pdfDocument.save();
