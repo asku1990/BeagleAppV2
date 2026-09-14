@@ -20,6 +20,18 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.21.2] - 2026-09-14
+
+### Added
+
+### Changed
+
+### Fixed
+
+- näyttelytulosten-tuonnin aikakatkaisua jatkettu, ja tuontinäkymä näyttää odotuksen aikana kuluneen ajan sekä varmistaa aikakatkaisussa, ettei rivejä tallennettu osittain.
+
+### Removed
+
 ## [0.21.1] - 2026-09-11
 
 ### Added

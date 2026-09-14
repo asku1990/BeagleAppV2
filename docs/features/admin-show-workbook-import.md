@@ -55,6 +55,10 @@ workbook inline and apply the import in one safe all-or-nothing write step.
 - Apply writes only in one `prisma.$transaction` and uses create-only semantics
   (`ShowEvent` create-if-missing, `ShowEntry` create-only, `ShowResultItem`
   create-only).
+- While validation or apply is running, the synchronous UI shows elapsed wall
+  time and wait guidance and disables file, reset, and import actions. During
+  apply it also shows the event, entry, and result-item totals known from the
+  validated preview.
 - The active workbook schema is global and edited in place. The validator and
   future admin settings use the same metadata contract.
 
@@ -159,11 +163,12 @@ The preview response returns:
   not block preview or produce result items.
 - Writes happen only after apply passes full revalidation.
 - Any transaction failure or unique conflict rolls back the whole import.
-- Apply write uses the shared long-running interactive transaction budget from
+- Apply write uses the feature-specific interactive transaction budget from
   [`docs/prisma-write-transactions.md`](../prisma-write-transactions.md)
-  (`maxWait=10s`, `timeout=20s`) and returns a dedicated timeout failure when
-  commit cannot complete in time. Timeout failures are still all-or-nothing
-  (no partial writes).
+  (`maxWait=10s`, `timeout=90s`) and returns a dedicated timeout failure when
+  commit cannot complete in time. The message directs the operator to
+  revalidate and retry and confirms that the whole attempt was rolled back with
+  no workbook rows saved.
 - Preview is available only after validation succeeds without blocking errors.
   If the workbook still contains warnings or explicitly ignored columns, the
   operator must acknowledge those notes before preview opens.
