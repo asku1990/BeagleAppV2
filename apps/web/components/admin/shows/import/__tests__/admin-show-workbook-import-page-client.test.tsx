@@ -1,7 +1,9 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
+import { formatWorkbookImportElapsedTime } from "@/lib/admin/shows/import/workbook-import-progress";
 import { AdminShowWorkbookImportPageClient } from "../admin-show-workbook-import-page-client";
+import { WorkbookImportProgressStatus } from "../workbook-import-progress-status";
 
 vi.mock("@/hooks/i18n", () => ({
   useI18n: () => ({
@@ -88,5 +90,42 @@ describe("AdminShowWorkbookImportPageClient", () => {
     expect(html).toContain("admin.shows.import.actions.validate");
     expect(html).toContain("admin.shows.import.actions.import");
     expect(html).toContain("admin.shows.validation.title");
+  });
+
+  it("formats wall-clock elapsed time as m:ss", () => {
+    expect(formatWorkbookImportElapsedTime(0)).toBe("0:00");
+    expect(formatWorkbookImportElapsedTime(65)).toBe("1:05");
+    expect(formatWorkbookImportElapsedTime(3_661)).toBe("61:01");
+  });
+
+  it("shows atomic wait guidance, known counts, and elapsed time", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(WorkbookImportProgressStatus, {
+        title: "Workbookia tuodaan",
+        guidance:
+          "Odota. Tuonti tallennetaan yhtenä kokonaisuutena vasta lopuksi.",
+        elapsedLabel: "Kulunut",
+        elapsedSeconds: 65,
+        locale: "en-US",
+        counts: {
+          events: 463,
+          entries: 5_018,
+          resultItems: 22_827,
+        },
+        countLabels: {
+          events: "tapahtumia",
+          entries: "merkintöjä",
+          resultItems: "tuloksia",
+        },
+      }),
+    );
+
+    expect(html).toContain('role="status"');
+    expect(html).toContain('aria-hidden="true"');
+    expect(html).toContain("Kulunut 1:05");
+    expect(html).toContain("463 tapahtumia");
+    expect(html).toContain("5,018 merkintöjä");
+    expect(html).toContain("22,827 tuloksia");
+    expect(html).toContain("yhtenä kokonaisuutena");
   });
 });

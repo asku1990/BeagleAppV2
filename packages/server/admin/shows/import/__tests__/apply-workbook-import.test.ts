@@ -40,7 +40,7 @@ vi.mock("@server/core/logger", () => ({
 vi.mock("@beagle/db", () => ({
   WORKBOOK_IMPORT_WRITE_TX_CONFIG: {
     maxWait: 10_000,
-    timeout: 20_000,
+    timeout: 90_000,
   },
   writeAdminShowWorkbookImportDb: writeAdminShowWorkbookImportDbMock,
 }));
@@ -397,8 +397,21 @@ describe("applyAdminShowWorkbookImport", () => {
     expect(result.body.ok).toBe(false);
     if (!result.body.ok) {
       expect(result.body.code).toBe(ISSUE_CODES.importTimeout);
-      expect(result.body.error).toContain("No rows were written");
+      expect(result.body.error).toContain("entire attempt was rolled back");
+      expect(result.body.error).toContain("no workbook rows were saved");
     }
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        acceptedRowCount: 1,
+        eventCount: 1,
+        entryCount: 1,
+        resultItemCount: 0,
+        transactionMaxWaitMs: 10_000,
+        transactionTimeoutMs: 90_000,
+        isTransactionTimeout: true,
+      }),
+      "show workbook apply write failed",
+    );
   });
 
   it("returns timeout code when persistence cannot start transaction in time", async () => {
@@ -470,7 +483,7 @@ describe("applyAdminShowWorkbookImport", () => {
     expect(result.body.ok).toBe(false);
     if (!result.body.ok) {
       expect(result.body.code).toBe(ISSUE_CODES.importTimeout);
-      expect(result.body.error).toContain("No rows were written");
+      expect(result.body.error).toContain("no workbook rows were saved");
     }
   });
 });

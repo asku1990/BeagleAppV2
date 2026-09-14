@@ -16,6 +16,9 @@ This document defines the default rule for Prisma interactive write transactions
 - `LONG_RUNNING_WRITE_TX_CONFIG`
   - Use only for known heavier write flows that still need one interactive transaction.
   - Current budget: `maxWait=10s`, `timeout=20s`.
+- `WORKBOOK_IMPORT_WRITE_TX_CONFIG`
+  - Use only for the atomic workbook import write workload.
+  - Current budget: `maxWait=10s`, `timeout=90s`.
 
 ## Performance rule
 
@@ -27,7 +30,7 @@ This document defines the default rule for Prisma interactive write transactions
 
 - Admin show manage writes use the shared admin write budget.
 - Audited admin dog writes inherit the shared admin write budget via `runInAuditContextDb`.
-- Workbook import uses the shared long-running write budget because it intentionally persists a larger all-or-nothing batch.
+- Workbook import uses its feature-specific write budget because production workloads can persist thousands of entries and result items in one required all-or-nothing transaction.
 
 ## Error handling
 

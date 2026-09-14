@@ -30,6 +30,13 @@ export const fiAdminShowsImportMessages = {
   "admin.shows.import.actions.import": "Aloita tuonti",
   "admin.shows.import.actions.validating": "Validoidaan...",
   "admin.shows.import.actions.importing": "Tietoja käsitellään...",
+  "admin.shows.import.status.validatingTitle": "Workbookia validoidaan",
+  "admin.shows.import.status.importingTitle": "Workbookia tuodaan",
+  "admin.shows.import.status.validatingGuidance":
+    "Odota validoinnin valmistumista ja pidä tämä sivu avoinna.",
+  "admin.shows.import.status.importingGuidance":
+    "Odota ja pidä sivu avoinna. Tuonti tallennetaan yhtenä kokonaisuutena vasta, kun kaikki rivit ovat valmiit.",
+  "admin.shows.import.status.elapsed": "Kulunut",
   "admin.shows.import.actions.placeholder":
     "Validoi tarkistaa workbookin, esikatselu näkyy validoinnin alla ja tuonti lisätään myöhemmin.",
   "admin.shows.import.invalidFile": "Valitse .xlsx-muotoinen workbook.",
@@ -160,7 +167,7 @@ export const fiAdminShowsImportMessages = {
   "admin.shows.import.result.done": "Tuonti valmis",
   "admin.shows.import.result.blocked": "Tuonti estetty",
   "admin.shows.import.error.timeout":
-    "Tuonti aikakatkaistiin ennen tallennuksen vahvistusta. Tietoja ei kirjoitettu. Validoi uudelleen ja yritä uudestaan.",
+    "Tuonnin turvallinen käsittelyaika ylittyi. Koko yritys peruttiin eikä workbookin rivejä tallennettu. Validoi workbook uudelleen ja yritä tuontia uudestaan.",
   "admin.shows.import.error.writeFailed":
     "Tuonnin kirjoitus epäonnistui. Validoi uudelleen ja yritä uudestaan.",
 } as const;
@@ -197,6 +204,13 @@ export const svAdminShowsImportMessages = {
   "admin.shows.import.actions.import": "Starta import",
   "admin.shows.import.actions.validating": "Validerar...",
   "admin.shows.import.actions.importing": "Bearbetar uppgifter...",
+  "admin.shows.import.status.validatingTitle": "Workbooken valideras",
+  "admin.shows.import.status.importingTitle": "Workbooken importeras",
+  "admin.shows.import.status.validatingGuidance":
+    "Vänta tills valideringen är klar och håll sidan öppen.",
+  "admin.shows.import.status.importingGuidance":
+    "Vänta och håll sidan öppen. Importen sparas atomärt först när alla rader är klara.",
+  "admin.shows.import.status.elapsed": "Förfluten tid",
   "admin.shows.import.actions.placeholder":
     "Validera granskar workbooken, forhandsgranskningen visas under valideringen och import laggs till senare.",
   "admin.shows.import.invalidFile": "Valj en workbook i .xlsx-format.",
@@ -327,7 +341,7 @@ export const svAdminShowsImportMessages = {
   "admin.shows.import.result.done": "Import klar",
   "admin.shows.import.result.blocked": "Import blockerad",
   "admin.shows.import.error.timeout":
-    "Importen fick timeout innan skrivningen kunde bekräftas. Ingen data skrevs. Validera igen och försök på nytt.",
+    "Importens säkra behandlingstid överskreds. Hela försöket rullades tillbaka och inga workbook-rader sparades. Validera workbooken igen och försök importera på nytt.",
   "admin.shows.import.error.writeFailed":
     "Skrivningen for importen misslyckades. Validera pa nytt och forsok igen.",
 } as const;
