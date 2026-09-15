@@ -88,7 +88,7 @@ describe("AdminTrialEntryActions", () => {
 
     expect(html).toContain("admin.trials.manage.selected.actions.openPdf");
     expect(html).toContain("menu-admin.trials.manage.selected.actions.more");
-    expect(html).toContain('href="/api/trials/entry-1/pdf"');
+    expect(html).toContain('href="/beagle/trials/pdf?trialEntryId=entry-1"');
   });
 
   it("calls delete mutation with correct ids", async () => {
