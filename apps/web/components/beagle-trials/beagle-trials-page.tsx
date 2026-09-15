@@ -20,12 +20,14 @@ import {
 } from "@/lib/public/beagle/trials";
 import { cn } from "@/lib/utils";
 import { useBeagleTrialsQuery } from "@/queries/public/beagle/trials/use-beagle-trials-query";
+import { BeagleTrialsAwardSummary } from "./beagle-trials-award-summary";
 import { BeagleTrialsEmptyState } from "./beagle-trials-empty-state";
 import { BeagleTrialsForm } from "./beagle-trials-form";
 import { BeagleTrialsLoadingState } from "./beagle-trials-loading-state";
 import { BeagleTrialsPagination } from "./beagle-trials-pagination";
 import { BeagleTrialsResultsDesktopTable } from "./beagle-trials-results-desktop-table";
 import { BeagleTrialsResultsMobileCards } from "./beagle-trials-results-mobile-cards";
+import { BeagleTrialsSearchSummary } from "./beagle-trials-search-summary";
 
 function getFilterLabel(
   filters: {
@@ -88,6 +90,18 @@ export function BeagleTrialsPage() {
       totalPages: 0,
       page: 1,
       items: [],
+      awardSummary: { dateFrom: null, dateTo: null, rows: [] },
+      searchSummary: {
+        trialCount: 0,
+        entryCount: 0,
+        awarded: { count: 0, percentage: 0 },
+        first: { count: 0, percentage: 0 },
+        second: { count: 0, percentage: 0 },
+        third: { count: 0, percentage: 0 },
+        noPrize: { count: 0, percentage: 0 },
+        withdrew: { count: 0, percentage: 0 },
+        excluded: { count: 0, percentage: 0 },
+      },
     } as const);
 
   const hasItems = response.items.length > 0;
@@ -199,6 +213,12 @@ export function BeagleTrialsPage() {
           <BeagleTrialsEmptyState variant="no-results" />
         )}
       </ListingSectionShell>
+      {!isLoading && !hasError ? (
+        <>
+          <BeagleTrialsSearchSummary summary={response.searchSummary} />
+          <BeagleTrialsAwardSummary summary={response.awardSummary} />
+        </>
+      ) : null}
     </>
   );
 }

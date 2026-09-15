@@ -31,6 +31,7 @@ describe("formatShowSearchRowsForClipboard", () => {
         {
           showId: "s1",
           eventDate: "2025-06-01",
+          eventCity: "Helsinki",
           eventPlace: "Helsinki",
           judge: "Judge A",
           dogCount: 7,
@@ -38,6 +39,7 @@ describe("formatShowSearchRowsForClipboard", () => {
         {
           showId: "s2",
           eventDate: "2025-05-01",
+          eventCity: "Turku",
           eventPlace: "Turku",
           judge: null,
           dogCount: 3,
@@ -45,6 +47,7 @@ describe("formatShowSearchRowsForClipboard", () => {
       ],
       {
         date: "Päivä",
+        city: "Paikkakunta",
         place: "Paikka",
         judge: "Tuomari",
         dogCount: "Koiria",
@@ -53,9 +56,9 @@ describe("formatShowSearchRowsForClipboard", () => {
 
     const lines = output.split("\n");
     expect(lines).toHaveLength(3);
-    expect(lines[0]).toBe("Päivä\tPaikka\tTuomari\tKoiria");
-    expect(lines[1]).toBe("2025-06-01\tHelsinki\tJudge A\t7");
-    expect(lines[2]).toBe("2025-05-01\tTurku\t-\t3");
+    expect(lines[0]).toBe("Päivä\tPaikkakunta\tPaikka\tTuomari\tKoiria");
+    expect(lines[1]).toBe("2025-06-01\tHelsinki\tHelsinki\tJudge A\t7");
+    expect(lines[2]).toBe("2025-05-01\tTurku\tTurku\t-\t3");
   });
 
   it("sanitizes tabs/newlines and normalizes nulls", () => {
@@ -64,6 +67,7 @@ describe("formatShowSearchRowsForClipboard", () => {
         {
           showId: "s1",
           eventDate: "2025-06-01",
+          eventCity: null,
           eventPlace: "Hel\tsin\nki",
           judge: null,
           dogCount: 7,
@@ -71,13 +75,14 @@ describe("formatShowSearchRowsForClipboard", () => {
       ],
       {
         date: "Päivä",
+        city: "Paikkakunta",
         place: "Paikka",
         judge: "Tuomari",
         dogCount: "Koiria",
       },
     );
 
-    expect(output.split("\n")[1]).toBe("2025-06-01\tHel sin ki\t-\t7");
+    expect(output.split("\n")[1]).toBe("2025-06-01\t-\tHel sin ki\t-\t7");
   });
 });
 

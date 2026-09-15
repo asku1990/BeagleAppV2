@@ -1,4 +1,9 @@
-import { searchBeagleTrialsDb, type BeagleTrialSearchSortDb } from "@beagle/db";
+import {
+  getBeagleTrialAwardSummaryDb,
+  getBeagleTrialSearchSummaryDb,
+  searchBeagleTrialsDb,
+  type BeagleTrialSearchSortDb,
+} from "@beagle/db";
 import type {
   BeagleTrialSearchRequest,
   BeagleTrialSearchMode,
@@ -13,6 +18,8 @@ import {
   toTrialDateOnlyYear,
 } from "./core/date-only";
 import { parseIsoDateOnly } from "./internal/iso-date";
+import { mapBeagleTrialAwardSummary } from "./internal/map-beagle-trial-award-summary";
+import { mapBeagleTrialSearchSummary } from "./internal/map-beagle-trial-search-summary";
 import type { TrialsServiceLogContext } from "./types";
 
 const ALLOWED_SORTS: ReadonlySet<BeagleTrialSearchSortDb> = new Set([
@@ -200,6 +207,8 @@ export async function searchBeagleTrialsService(
     let filterYear: number | null = null;
     let filterDateFrom: string | null = null;
     let filterDateTo: string | null = null;
+    let summaryDateFrom: Date | undefined;
+    let summaryDateTo: Date | undefined;
     let result: Awaited<ReturnType<typeof searchBeagleTrialsDb>>;
 
     if (resolvedMode === "year") {
@@ -215,6 +224,8 @@ export async function searchBeagleTrialsService(
         sort: sortResult.value,
       });
       filterYear = year;
+      summaryDateFrom = yearRange.start;
+      summaryDateTo = yearRange.endExclusive;
     } else if (resolvedMode === "range") {
       result = await searchBeagleTrialsDb({
         dateFrom: rangeFromDate ?? undefined,
@@ -226,6 +237,8 @@ export async function searchBeagleTrialsService(
       filterMode = "range";
       filterDateFrom = dateFromIso;
       filterDateTo = dateToIso;
+      summaryDateFrom = rangeFromDate ?? undefined;
+      summaryDateTo = rangeToExclusive ?? undefined;
     } else {
       const available = await searchBeagleTrialsDb({
         page: 1,
@@ -251,10 +264,19 @@ export async function searchBeagleTrialsService(
           sort: sortResult.value,
         });
         filterYear = latestYear;
+        summaryDateFrom = yearRange.start;
+        summaryDateTo = yearRange.endExclusive;
       }
     }
 
     const availableYears = collectAvailableYears(result.availableEventDates);
+    const [awardSummaryRows, searchSummarySource] = await Promise.all([
+      getBeagleTrialAwardSummaryDb(),
+      getBeagleTrialSearchSummaryDb({
+        dateFrom: summaryDateFrom,
+        dateTo: summaryDateTo,
+      }),
+    ]);
 
     const data: BeagleTrialSearchResponse = {
       filters: {
@@ -276,6 +298,8 @@ export async function searchBeagleTrialsService(
         weather: item.weather,
         average: item.average,
       })),
+      awardSummary: mapBeagleTrialAwardSummary(awardSummaryRows),
+      searchSummary: mapBeagleTrialSearchSummary(searchSummarySource),
     };
 
     log.info(

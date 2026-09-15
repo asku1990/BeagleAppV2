@@ -141,6 +141,7 @@ export async function searchBeagleShowsDb(
         id: true,
         eventLookupKey: true,
         eventDate: true,
+        eventCity: true,
         eventPlace: true,
         _count: {
           select: {
@@ -162,6 +163,7 @@ export async function searchBeagleShowsDb(
     .map((row) => ({
       eventKey: row.eventLookupKey,
       eventDate: row.eventDate,
+      eventCity: row.eventCity,
       eventPlace: row.eventPlace,
       judge: null,
       dogCount: row._count.entries,

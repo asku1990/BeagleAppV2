@@ -16,6 +16,7 @@ import {
 
 type ShowSearchClipboardLabels = {
   date: string;
+  city: string;
   place: string;
   judge: string;
   dogCount: string;
@@ -146,9 +147,16 @@ export function formatShowSearchRowsForClipboard(
 ): string {
   if (rows.length === 0) return "";
 
-  const header = [labels.date, labels.place, labels.judge, labels.dogCount];
+  const header = [
+    labels.date,
+    labels.city,
+    labels.place,
+    labels.judge,
+    labels.dogCount,
+  ];
   const body = rows.map((row) => [
     row.eventDate,
+    formatMaybeString(row.eventCity),
     row.eventPlace,
     formatMaybeString(row.judge),
     String(row.dogCount),

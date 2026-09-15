@@ -14,6 +14,7 @@ export type BeagleShowSearchRequestDb = {
 export type BeagleShowSearchRowDb = {
   eventKey: string;
   eventDate: Date;
+  eventCity: string | null;
   eventPlace: string;
   judge: string | null;
   dogCount: number;

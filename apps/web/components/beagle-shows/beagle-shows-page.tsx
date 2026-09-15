@@ -110,6 +110,7 @@ export function BeagleShowsPage() {
       rows: response.items,
       labels: {
         date: t("shows.results.col.date"),
+        city: t("shows.results.col.city"),
         place: t("shows.results.col.place"),
         judge: t("shows.results.col.judge"),
         dogCount: t("shows.results.col.dogCount"),

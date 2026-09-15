@@ -46,6 +46,28 @@ export const fiBeagleTrialsMessages = {
   "trials.results.copy.unsupported":
     "Leikepöydän kirjoitus ei ole käytettävissä tässä selaimessa.",
 
+  "trials.awardSummary.title": "Palkintosijajakauma",
+  "trials.awardSummary.comparison": "Pitkän kokeen ja normaalikokeen vertailu",
+  "trials.awardSummary.trialType.normal": "Yksipäiväinen",
+  "trials.awardSummary.trialType.long": "Kahden viikon",
+  "trials.awardSummary.col.trialType": "Koemuoto",
+  "trials.awardSummary.col.withdrew": "L",
+  "trials.awardSummary.col.excluded": "S",
+  "trials.awardSummary.col.awarded": "Palk",
+  "trials.awardSummary.col.total": "Yht",
+
+  "trials.searchSummary.title": "Yhteenveto",
+  "trials.searchSummary.unit.count": "kpl",
+  "trials.searchSummary.row.trials": "Kokeita",
+  "trials.searchSummary.row.entries": "Koesuorituksia",
+  "trials.searchSummary.row.awarded": "Palkittuja",
+  "trials.searchSummary.row.first": "1-tuloksia",
+  "trials.searchSummary.row.second": "2-tuloksia",
+  "trials.searchSummary.row.third": "3-tuloksia",
+  "trials.searchSummary.row.noPrize": "0-tuloksia",
+  "trials.searchSummary.row.withdrew": "Luopuneita",
+  "trials.searchSummary.row.excluded": "Suljettuja",
+
   "trials.pagination.pageSize": "Sivukoko",
   "trials.pagination.previous": "Edellinen",
   "trials.pagination.next": "Seuraava",
@@ -145,6 +167,29 @@ export const svBeagleTrialsMessages = {
   "trials.results.copy.error": "Kopiering av jaktprovsresultat misslyckades.",
   "trials.results.copy.unsupported":
     "Skrivning till urklipp stöds inte i den här webbläsaren.",
+
+  "trials.awardSummary.title": "Prisplaceringsfördelning",
+  "trials.awardSummary.comparison":
+    "Jämförelse av tvåveckors-prov och normalt prov",
+  "trials.awardSummary.trialType.normal": "En dags",
+  "trials.awardSummary.trialType.long": "Tvåveckors prov",
+  "trials.awardSummary.col.trialType": "Jaktprovs typ",
+  "trials.awardSummary.col.withdrew": "A",
+  "trials.awardSummary.col.excluded": "S",
+  "trials.awardSummary.col.awarded": "Pris",
+  "trials.awardSummary.col.total": "Tot",
+
+  "trials.searchSummary.title": "Sammandrag",
+  "trials.searchSummary.unit.count": "st.",
+  "trials.searchSummary.row.trials": "Jaktprov",
+  "trials.searchSummary.row.entries": "Provprestationer",
+  "trials.searchSummary.row.awarded": "Prisplacerade",
+  "trials.searchSummary.row.first": "1-resultat",
+  "trials.searchSummary.row.second": "2-resultat",
+  "trials.searchSummary.row.third": "3-resultat",
+  "trials.searchSummary.row.noPrize": "0-resultat",
+  "trials.searchSummary.row.withdrew": "Avstått",
+  "trials.searchSummary.row.excluded": "Uteslutna",
 
   "trials.pagination.pageSize": "Sidstorlek",
   "trials.pagination.previous": "Föregående",

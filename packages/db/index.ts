@@ -151,6 +151,8 @@ export {
 } from "./admin/shows/manage";
 export {
   getBeagleTrialDetailsDb,
+  getBeagleTrialAwardSummaryDb,
+  getBeagleTrialSearchSummaryDb,
   getBeagleTrialsForDogDb,
   getBeagleTrialSummarySourceForDogDb,
   listActiveTrialRuleWindowsDb,
@@ -160,6 +162,8 @@ export {
   type BeagleTrialDetailsRequestDb,
   type BeagleTrialDetailsResponseDb,
   type BeagleTrialDetailsRowDb,
+  type BeagleTrialAwardSummaryRowDb,
+  type BeagleTrialSearchSummaryDb,
   type BeagleTrialDogSummaryAggregateDb,
   type BeagleTrialDogSummarySourceDb,
   type BeagleTrialDogSummarySourceRowDb,

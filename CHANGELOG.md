@@ -20,6 +20,20 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.22.0] - 2026-09-15
+
+### Added
+
+- Julkisella ajokoehakusivulla näytetään v1-sivua vastaava palkintosijojen vertailu yksi- ja kaksiviikkoisille kokeille.
+- Julkisella näyttelyhakusivulla näytetään näyttelyn paikkakunta tuloslistauksessa ja leikepöytäkopioinnissa.
+- Julkisella ajokoehakusivulla näytetään valitun ajanjakson kokeiden Yhteenveto.
+
+### Changed
+
+### Fixed
+
+### Removed
+
 ## [0.21.4] - 2026-09-15
 
 ### Added

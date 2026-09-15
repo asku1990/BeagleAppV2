@@ -37,10 +37,139 @@ vi.mock("../../core/prisma", () => ({
 
 import {
   getBeagleTrialDetailsDb,
+  getBeagleTrialAwardSummaryDb,
+  getBeagleTrialSearchSummaryDb,
   getBeagleTrialSummarySourceForDogDb,
   getBeagleTrialsForDogDb,
   searchBeagleTrialsDb,
 } from "../index";
+
+describe("getBeagleTrialSearchSummaryDb", () => {
+  beforeEach(() => {
+    queryRawMock.mockReset();
+  });
+
+  it("aggregates all entries in the requested date range", async () => {
+    queryRawMock.mockResolvedValue([
+      {
+        trialCount: 4,
+        entryCount: 10,
+        awarded: 6,
+        first: 2,
+        second: 1,
+        third: 3,
+        noPrize: 2,
+        withdrew: 1,
+        excluded: 1,
+      },
+    ]);
+
+    await expect(
+      getBeagleTrialSearchSummaryDb({
+        dateFrom: new Date("2026-01-01T00:00:00.000Z"),
+        dateTo: new Date("2027-01-01T00:00:00.000Z"),
+      }),
+    ).resolves.toEqual({
+      trialCount: 4,
+      entryCount: 10,
+      awarded: 6,
+      first: 2,
+      second: 1,
+      third: 3,
+      noPrize: 2,
+      withdrew: 1,
+      excluded: 1,
+    });
+
+    const query = queryRawMock.mock.calls[0]?.[0] as {
+      strings: string[];
+      values: unknown[];
+    };
+    expect(query.strings.join("?")).toContain('COUNT(DISTINCT event."id")');
+    expect(query.strings.join("?")).toContain("entry.\"pa\" = 'L'");
+    expect(query.values).toEqual([
+      new Date("2026-01-01T00:00:00.000Z"),
+      new Date("2027-01-01T00:00:00.000Z"),
+    ]);
+  });
+});
+
+describe("getBeagleTrialAwardSummaryDb", () => {
+  beforeEach(() => {
+    queryRawMock.mockReset();
+  });
+
+  it("returns award counts grouped by canonical trial type", async () => {
+    queryRawMock.mockResolvedValue([
+      {
+        trialType: "normal",
+        first: 3,
+        second: 2,
+        third: 1,
+        noPrize: 4,
+        withdrew: 1,
+        excluded: 1,
+        total: 13,
+        firstDate: new Date("2005-08-20T00:00:00.000Z"),
+        lastDate: new Date("2026-02-28T00:00:00.000Z"),
+      },
+      {
+        trialType: "long",
+        first: 2,
+        second: 1,
+        third: 0,
+        noPrize: 1,
+        withdrew: 0,
+        excluded: 0,
+        total: 4,
+        firstDate: new Date("2006-01-01T00:00:00.000Z"),
+        lastDate: new Date("2025-12-01T00:00:00.000Z"),
+      },
+    ]);
+
+    await expect(getBeagleTrialAwardSummaryDb()).resolves.toEqual([
+      {
+        trialType: "normal",
+        first: 3,
+        second: 2,
+        third: 1,
+        noPrize: 4,
+        withdrew: 1,
+        excluded: 1,
+        total: 13,
+        firstDate: new Date("2005-08-20T00:00:00.000Z"),
+        lastDate: new Date("2026-02-28T00:00:00.000Z"),
+      },
+      {
+        trialType: "long",
+        first: 2,
+        second: 1,
+        third: 0,
+        noPrize: 1,
+        withdrew: 0,
+        excluded: 0,
+        total: 4,
+        firstDate: new Date("2006-01-01T00:00:00.000Z"),
+        lastDate: new Date("2025-12-01T00:00:00.000Z"),
+      },
+    ]);
+
+    const query = queryRawMock.mock.calls[0]?.[0] as {
+      strings: string[];
+      values: unknown[];
+    };
+    const sql = query.strings.join("?");
+    expect(sql).toContain(`entry."lahde" = 'LEGACY_AKOEALL'`);
+    expect(sql).toContain(
+      `UPPER(LEFT(entry."raakadataJson"::jsonb ->> 'SIJA', 2)) = 'PK'`,
+    );
+    expect(sql).toContain(`entry."koetyyppi" = 'PITKAKOE'`);
+    expect(sql).toContain(`entries."pa" = '1'`);
+    expect(sql).toContain(`entries."pa" = 'S'`);
+    expect(sql).toContain(`event."koepaiva" >= DATE '2005-08-20'`);
+    expect(query.values).toEqual([]);
+  });
+});
 
 // ---------------------------------------------------------------------------
 // searchBeagleTrialsDb
