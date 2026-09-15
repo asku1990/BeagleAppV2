@@ -20,6 +20,18 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.21.4] - 2026-09-15
+
+### Added
+
+### Changed
+
+### Fixed
+
+- Ajokokeiden PDF-pöytäkirja on yhteneväinen eri näkymissä, ja Ajokokeet laaja -PDF-kokoelman sivut erotellaan toisistaan.
+
+### Removed
+
 ## [0.21.3] - 2026-09-15
 
 ### Added
