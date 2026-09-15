@@ -6,6 +6,7 @@ export type {
   BeagleTrialAwardSummary,
   BeagleTrialAwardSummaryRow,
   BeagleTrialAwardSummaryValue,
+  BeagleTrialSearchSummary,
   BeagleTrialSearchFilters,
   BeagleTrialSearchMode,
   BeagleTrialSearchRequest,

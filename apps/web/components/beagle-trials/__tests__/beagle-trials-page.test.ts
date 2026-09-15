@@ -112,6 +112,17 @@ describe("BeagleTrialsPage", () => {
         totalPages: 0,
         page: 1,
         items: [],
+        searchSummary: {
+          trialCount: 0,
+          entryCount: 0,
+          awarded: { count: 0, percentage: 0 },
+          first: { count: 0, percentage: 0 },
+          second: { count: 0, percentage: 0 },
+          third: { count: 0, percentage: 0 },
+          noPrize: { count: 0, percentage: 0 },
+          withdrew: { count: 0, percentage: 0 },
+          excluded: { count: 0, percentage: 0 },
+        },
         awardSummary: {
           dateFrom: "2005-08-20",
           dateTo: "2026-02-28",
@@ -181,6 +192,17 @@ describe("BeagleTrialsPage", () => {
             },
           ],
         },
+        searchSummary: {
+          trialCount: 2,
+          entryCount: 4,
+          awarded: { count: 2, percentage: 50 },
+          first: { count: 1, percentage: 25 },
+          second: { count: 1, percentage: 25 },
+          third: { count: 0, percentage: 0 },
+          noPrize: { count: 2, percentage: 50 },
+          withdrew: { count: 0, percentage: 0 },
+          excluded: { count: 0, percentage: 0 },
+        },
       },
       isFetching: false,
       isError: false,
@@ -201,5 +223,7 @@ describe("BeagleTrialsPage", () => {
     expect(html).toContain("trials.pagination.range 1-1 / 1");
     expect(html).toContain("trials.awardSummary.title");
     expect(html).toContain("1 (25.00%)");
+    expect(html).toContain("trials.searchSummary.title");
+    expect(html).toContain("trials.searchSummary.row.entries");
   });
 });
