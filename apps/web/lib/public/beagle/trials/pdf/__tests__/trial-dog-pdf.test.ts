@@ -1,4 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { PDFDocument, StandardFonts } from "pdf-lib";
+import type { TrialDogPdfPayload } from "@contracts";
 import {
   canRenderTrialDogPdf,
   getSeededTrialDogPdfRuleWindowIds,
@@ -6,9 +8,36 @@ import {
   getTrialDogPdfRuleSetStatus,
   getTrialDogPdfTemplateFileName,
   renderTrialDogPdf,
+  sanitizeTrialDogPdfPayload,
 } from "../trial-dog-pdf";
 
 describe("renderTrialDogPdf", () => {
+  it("sanitizes only characters Helvetica cannot encode, including nested rows", async () => {
+    const pdfDocument = await PDFDocument.create();
+    const font = await pdfDocument.embedFont(StandardFonts.Helvetica);
+    const payload = {
+      trialRuleWindowId: "trw_post_20230801",
+      registrationNo: "FI12345/21",
+      dogName: "Mäyrä, åäö\tline\nnext\rend 😀",
+      lisatiedotRows: [{ koodi: "11", era1: "Lisätieto 😀", era2: "äöå" }],
+    } as TrialDogPdfPayload;
+
+    expect(() => font.encodeText("😀")).toThrow(/WinAnsi cannot encode/);
+
+    const onSanitized = vi.fn();
+    const sanitized = sanitizeTrialDogPdfPayload(payload, font, onSanitized);
+
+    expect(sanitized.dogName).toBe("Mäyrä, åäö\tline\nnext\rend ");
+    expect(sanitized.lisatiedotRows).toEqual([
+      { koodi: "11", era1: "Lisätieto ", era2: "äöå" },
+    ]);
+    expect(onSanitized).toHaveBeenCalledWith({
+      registrationNo: "FI12345/21",
+      trialRuleWindowId: "trw_post_20230801",
+      removedCharacterCount: 2,
+    });
+  });
+
   it("renders pdf bytes when lisatiedot sections are omitted", async () => {
     const bytes = await renderTrialDogPdf({
       trialRuleWindowId: "trw_post_20110801",
@@ -69,6 +98,72 @@ describe("renderTrialDogPdf", () => {
       palkintotuomariNimi: null,
       ylituomariNumeroSnapshot: null,
       ylituomariNimi: null,
+    });
+
+    expect(Buffer.from(bytes).toString("latin1", 0, 4)).toBe("%PDF");
+  });
+
+  it("renders pdf bytes when payload strings contain C0 controls", async () => {
+    const bytes = await renderTrialDogPdf({
+      trialRuleWindowId: "trw_post_20230801",
+      registrationNo: "FI12345/21\u001F",
+      dogName: "Control\u001F Dog",
+      dogSex: "MALE",
+      sireName: null,
+      sireRegistrationNo: null,
+      damName: null,
+      damRegistrationNo: null,
+      omistaja: null,
+      omistajanKotikunta: null,
+      kennelpiiri: null,
+      kennelpiirinro: null,
+      koekunta: null,
+      koemaasto: null,
+      koepaiva: new Date("2025-09-07T00:00:00.000Z"),
+      jarjestaja: null,
+      era1Alkoi: null,
+      era2Alkoi: null,
+      hakuMin1: null,
+      hakuMin2: null,
+      ajoMin1: null,
+      ajoMin2: null,
+      hyvaksytytAjominuutit: null,
+      ajoajanPisteet: null,
+      hakuEra1: null,
+      hakuEra2: null,
+      hakuKeskiarvo: null,
+      haukkuEra1: null,
+      haukkuEra2: null,
+      haukkuKeskiarvo: null,
+      metsastysintoEra1: null,
+      metsastysintoEra2: null,
+      metsastysintoKeskiarvo: null,
+      hakuloysyysTappioEra1: null,
+      hakuloysyysTappioEra2: null,
+      hakuloysyysTappioYhteensa: null,
+      ajoloysyysTappioEra1: null,
+      ajoloysyysTappioEra2: null,
+      ajoloysyysTappioYhteensa: null,
+      tappiopisteetYhteensa: null,
+      ajotaitoEra1: null,
+      ajotaitoEra2: null,
+      ajotaitoKeskiarvo: null,
+      ansiopisteetYhteensa: null,
+      loppupisteet: null,
+      paljasMaaTaiLumi: null,
+      luopui: false,
+      suljettu: false,
+      keskeytetty: false,
+      koetyyppi: "NORMAL",
+      sijoitus: null,
+      koiriaLuokassa: null,
+      Palkinto: null,
+      huomautusTeksti: "Note\u001F\nkeeps line breaks",
+      ryhmatuomariNimi: null,
+      palkintotuomariNimi: null,
+      ylituomariNumeroSnapshot: null,
+      ylituomariNimi: null,
+      lisatiedotRows: [{ koodi: "11\u001F", era1: "1\u001F", era2: null }],
     });
 
     expect(Buffer.from(bytes).toString("latin1", 0, 4)).toBe("%PDF");
