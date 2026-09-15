@@ -1,4 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { PDFDocument, StandardFonts } from "pdf-lib";
+import type { TrialDogPdfPayload } from "@contracts";
 import {
   canRenderTrialDogPdf,
   getSeededTrialDogPdfRuleWindowIds,
@@ -6,9 +8,36 @@ import {
   getTrialDogPdfRuleSetStatus,
   getTrialDogPdfTemplateFileName,
   renderTrialDogPdf,
+  sanitizeTrialDogPdfPayload,
 } from "../trial-dog-pdf";
 
 describe("renderTrialDogPdf", () => {
+  it("sanitizes only characters Helvetica cannot encode, including nested rows", async () => {
+    const pdfDocument = await PDFDocument.create();
+    const font = await pdfDocument.embedFont(StandardFonts.Helvetica);
+    const payload = {
+      trialRuleWindowId: "trw_post_20230801",
+      registrationNo: "FI12345/21",
+      dogName: "Mäyrä, åäö\tline\nnext\rend 😀",
+      lisatiedotRows: [{ koodi: "11", era1: "Lisätieto 😀", era2: "äöå" }],
+    } as TrialDogPdfPayload;
+
+    expect(() => font.encodeText("😀")).toThrow(/WinAnsi cannot encode/);
+
+    const onSanitized = vi.fn();
+    const sanitized = sanitizeTrialDogPdfPayload(payload, font, onSanitized);
+
+    expect(sanitized.dogName).toBe("Mäyrä, åäö\tline\nnext\rend ");
+    expect(sanitized.lisatiedotRows).toEqual([
+      { koodi: "11", era1: "Lisätieto ", era2: "äöå" },
+    ]);
+    expect(onSanitized).toHaveBeenCalledWith({
+      registrationNo: "FI12345/21",
+      trialRuleWindowId: "trw_post_20230801",
+      removedCharacterCount: 2,
+    });
+  });
+
   it("renders pdf bytes when lisatiedot sections are omitted", async () => {
     const bytes = await renderTrialDogPdf({
       trialRuleWindowId: "trw_post_20110801",
