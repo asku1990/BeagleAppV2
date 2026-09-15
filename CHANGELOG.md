@@ -14,6 +14,8 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+- Julkisella ajokoehakusivulla on kokeen PDF-pöytäkirjojen painike ja tiiviimpi yhden rivin työpöytänäkymä.
+
 ### Changed
 
 ### Fixed
