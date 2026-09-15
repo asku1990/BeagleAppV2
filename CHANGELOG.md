@@ -14,6 +14,8 @@ This project uses a user-facing changelog format.
 
 ### Added
 
+- Julkisella ajokoehakusivulla näytetään v1-sivua vastaava palkintosijojen vertailu yksi- ja kaksiviikkoisille kokeille.
+
 ### Changed
 
 ### Fixed

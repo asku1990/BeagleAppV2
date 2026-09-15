@@ -20,6 +20,7 @@ import {
 } from "@/lib/public/beagle/trials";
 import { cn } from "@/lib/utils";
 import { useBeagleTrialsQuery } from "@/queries/public/beagle/trials/use-beagle-trials-query";
+import { BeagleTrialsAwardSummary } from "./beagle-trials-award-summary";
 import { BeagleTrialsEmptyState } from "./beagle-trials-empty-state";
 import { BeagleTrialsForm } from "./beagle-trials-form";
 import { BeagleTrialsLoadingState } from "./beagle-trials-loading-state";
@@ -88,6 +89,7 @@ export function BeagleTrialsPage() {
       totalPages: 0,
       page: 1,
       items: [],
+      awardSummary: { dateFrom: null, dateTo: null, rows: [] },
     } as const);
 
   const hasItems = response.items.length > 0;
@@ -199,6 +201,9 @@ export function BeagleTrialsPage() {
           <BeagleTrialsEmptyState variant="no-results" />
         )}
       </ListingSectionShell>
+      {!isLoading && !hasError ? (
+        <BeagleTrialsAwardSummary summary={response.awardSummary} />
+      ) : null}
     </>
   );
 }

@@ -46,6 +46,16 @@ export const fiBeagleTrialsMessages = {
   "trials.results.copy.unsupported":
     "Leikepöydän kirjoitus ei ole käytettävissä tässä selaimessa.",
 
+  "trials.awardSummary.title": "Palkintosijajakauma",
+  "trials.awardSummary.comparison": "Pitkän kokeen ja normaalikokeen vertailu",
+  "trials.awardSummary.trialType.normal": "Yksipäiväinen",
+  "trials.awardSummary.trialType.long": "Kahden viikon",
+  "trials.awardSummary.col.trialType": "Koemuoto",
+  "trials.awardSummary.col.withdrew": "L",
+  "trials.awardSummary.col.excluded": "S",
+  "trials.awardSummary.col.awarded": "Palk",
+  "trials.awardSummary.col.total": "Yht",
+
   "trials.pagination.pageSize": "Sivukoko",
   "trials.pagination.previous": "Edellinen",
   "trials.pagination.next": "Seuraava",
@@ -145,6 +155,17 @@ export const svBeagleTrialsMessages = {
   "trials.results.copy.error": "Kopiering av jaktprovsresultat misslyckades.",
   "trials.results.copy.unsupported":
     "Skrivning till urklipp stöds inte i den här webbläsaren.",
+
+  "trials.awardSummary.title": "Prisplaceringsfördelning",
+  "trials.awardSummary.comparison":
+    "Jämförelse av tvåveckors-prov och normalt prov",
+  "trials.awardSummary.trialType.normal": "En dags",
+  "trials.awardSummary.trialType.long": "Tvåveckors prov",
+  "trials.awardSummary.col.trialType": "Jaktprovs typ",
+  "trials.awardSummary.col.withdrew": "A",
+  "trials.awardSummary.col.excluded": "S",
+  "trials.awardSummary.col.awarded": "Pris",
+  "trials.awardSummary.col.total": "Tot",
 
   "trials.pagination.pageSize": "Sidstorlek",
   "trials.pagination.previous": "Föregående",

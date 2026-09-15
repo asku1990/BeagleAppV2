@@ -52,6 +52,7 @@ describe("useBeagleTrialsQuery", () => {
       totalPages: 1,
       page: 1,
       items: [],
+      awardSummary: { dateFrom: null, dateTo: null, rows: [] },
     };
     searchBeagleTrialsActionMock.mockResolvedValue({
       hasError: false,

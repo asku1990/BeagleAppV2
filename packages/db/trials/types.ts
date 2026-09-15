@@ -31,6 +31,19 @@ export type BeagleTrialSearchResponseDb = {
   items: BeagleTrialSearchRowDb[];
 };
 
+export type BeagleTrialAwardSummaryRowDb = {
+  trialType: "normal" | "long";
+  first: number;
+  second: number;
+  third: number;
+  noPrize: number;
+  withdrew: number;
+  excluded: number;
+  total: number;
+  firstDate: Date | null;
+  lastDate: Date | null;
+};
+
 export type BeagleTrialDetailsRequestDb = {
   trialEventId: string;
 };
