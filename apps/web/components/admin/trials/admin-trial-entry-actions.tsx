@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
 import { useI18n } from "@/hooks/i18n";
 import { formatDateForFinland } from "@/lib/admin/core/date";
-import { getTrialPdfApiHref } from "@/lib/public/beagle/trials";
+import { getTrialPdfPageHref } from "@/lib/public/beagle/trials";
 import { useDeleteAdminTrialEntryMutation } from "@/queries/admin/trials";
 
 type AdminTrialEntryActionsProps = {
@@ -73,7 +73,7 @@ export function AdminTrialEntryActions({
     <div className="flex items-center gap-1">
       <Button asChild variant="ghost" size="icon-xs">
         <Link
-          href={getTrialPdfApiHref(trialEntryId)}
+          href={getTrialPdfPageHref(trialEntryId)}
           target="_blank"
           rel="noreferrer"
         >

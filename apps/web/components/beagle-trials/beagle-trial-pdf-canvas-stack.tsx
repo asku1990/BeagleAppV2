@@ -221,7 +221,7 @@ function BeagleTrialPdfCanvas({
   }
 
   return (
-    <div className="flex w-full justify-center bg-background">
+    <div className="flex w-full justify-center border-b border-border/40 bg-background shadow-sm">
       <canvas
         ref={canvasRef}
         aria-label="AJOK koirakohtainen pöytäkirja"
@@ -271,7 +271,10 @@ export function BeagleTrialPdfCanvasStack({
   }, []);
 
   return (
-    <div ref={ref} className="fixed inset-0 z-50 overflow-y-auto bg-background">
+    <div
+      ref={ref}
+      className="fixed inset-0 z-50 flex flex-col gap-2 overflow-y-auto bg-muted md:gap-4"
+    >
       {visibleItems.map((item) => (
         <BeagleTrialPdfCanvas
           key={item.trialEntryId}
