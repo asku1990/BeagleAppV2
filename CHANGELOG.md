@@ -20,6 +20,19 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.21.3] - 2026-09-15
+
+### Added
+
+### Changed
+
+### Fixed
+
+- Ajokokeiden PDF-generointi säilyttää tuetut merkit ja käsittelee Helvetica-fontin tukemattomat merkit turvallisesti.
+- Generointi ei enää kaada koko sivua mikäli datassa on mukana tuntemattomia merkkejä.
+
+### Removed
+
 ## [0.21.2] - 2026-09-14
 
 ### Added

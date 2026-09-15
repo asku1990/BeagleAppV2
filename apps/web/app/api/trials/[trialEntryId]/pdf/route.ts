@@ -108,7 +108,15 @@ export async function GET(
       era2Alkoi: restData.era2Alkoi?.trim() ?? null,
     };
 
-    const pdfBytes = await renderTrialDogPdf(payload);
+    const pdfBytes = await renderTrialDogPdf(payload, (details) => {
+      log.warn(
+        {
+          event: "unsupported_characters_sanitized",
+          ...details,
+        },
+        "unsupported characters removed from trial pdf text",
+      );
+    });
 
     log.info(
       {
