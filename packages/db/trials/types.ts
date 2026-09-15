@@ -44,6 +44,18 @@ export type BeagleTrialAwardSummaryRowDb = {
   lastDate: Date | null;
 };
 
+export type BeagleTrialSearchSummaryDb = {
+  trialCount: number;
+  entryCount: number;
+  awarded: number;
+  first: number;
+  second: number;
+  third: number;
+  noPrize: number;
+  withdrew: number;
+  excluded: number;
+};
+
 export type BeagleTrialDetailsRequestDb = {
   trialEventId: string;
 };

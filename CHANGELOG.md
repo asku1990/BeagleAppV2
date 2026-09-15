@@ -16,6 +16,7 @@ This project uses a user-facing changelog format.
 
 - Julkisella ajokoehakusivulla näytetään v1-sivua vastaava palkintosijojen vertailu yksi- ja kaksiviikkoisille kokeille.
 - Julkisella näyttelyhakusivulla näytetään näyttelyn paikkakunta tuloslistauksessa ja leikepöytäkopioinnissa.
+- Julkisella ajokoehakusivulla näytetään valitun ajanjakson kokeiden Yhteenveto.
 
 ### Changed
 

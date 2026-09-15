@@ -2,6 +2,17 @@
 
 Developer notes for the public `/beagle/trials` listing.
 
+## Filtered YHTEENVETO
+
+The listing also renders a filtered `Yhteenveto` section before the long-term
+`Palkintosijajakauma`. It uses the active year or date-range filter and is
+calculated across every matching trial entry, not only the current result page.
+
+The section shows unique trial count, result-entry count, and counts plus
+percentages for awarded entries, ranks 1-3, no prize (`0`), withdrawn (`L`),
+and excluded (`S`). Percentages use all matching result entries as the
+denominator. Empty searches omit the section.
+
 ## PALKINTOSIJA comparison
 
 The listing renders a separate `Palkintosijajakauma` section after the paginated
@@ -34,3 +45,5 @@ rules and modules.
 - Server DTO mapping: `packages/server/trials/__tests__/service.test.ts`
 - Web summary rendering: `apps/web/components/beagle-trials/__tests__/beagle-trials-award-summary.test.ts`
 - Listing composition: `apps/web/components/beagle-trials/__tests__/beagle-trials-page.test.ts`
+- Filtered summary aggregation: `packages/db/trials/get-beagle-trial-search-summary.ts`
+- Filtered summary mapping: `packages/server/trials/internal/map-beagle-trial-search-summary.ts`

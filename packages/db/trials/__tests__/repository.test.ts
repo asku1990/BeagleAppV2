@@ -38,10 +38,61 @@ vi.mock("../../core/prisma", () => ({
 import {
   getBeagleTrialDetailsDb,
   getBeagleTrialAwardSummaryDb,
+  getBeagleTrialSearchSummaryDb,
   getBeagleTrialSummarySourceForDogDb,
   getBeagleTrialsForDogDb,
   searchBeagleTrialsDb,
 } from "../index";
+
+describe("getBeagleTrialSearchSummaryDb", () => {
+  beforeEach(() => {
+    queryRawMock.mockReset();
+  });
+
+  it("aggregates all entries in the requested date range", async () => {
+    queryRawMock.mockResolvedValue([
+      {
+        trialCount: 4,
+        entryCount: 10,
+        awarded: 6,
+        first: 2,
+        second: 1,
+        third: 3,
+        noPrize: 2,
+        withdrew: 1,
+        excluded: 1,
+      },
+    ]);
+
+    await expect(
+      getBeagleTrialSearchSummaryDb({
+        dateFrom: new Date("2026-01-01T00:00:00.000Z"),
+        dateTo: new Date("2027-01-01T00:00:00.000Z"),
+      }),
+    ).resolves.toEqual({
+      trialCount: 4,
+      entryCount: 10,
+      awarded: 6,
+      first: 2,
+      second: 1,
+      third: 3,
+      noPrize: 2,
+      withdrew: 1,
+      excluded: 1,
+    });
+
+    const query = queryRawMock.mock.calls[0]?.[0] as {
+      strings: string[];
+      values: unknown[];
+    };
+    expect(query.strings.join("?")).toContain('COUNT(DISTINCT event."id")');
+    expect(query.strings.join("?")).toContain("entry.\"pa\" = 'L'");
+    expect(query.values).toEqual([
+      new Date("2026-01-01T00:00:00.000Z"),
+      new Date("2027-01-01T00:00:00.000Z"),
+    ]);
+  });
+});
 
 describe("getBeagleTrialAwardSummaryDb", () => {
   beforeEach(() => {
