@@ -24,6 +24,9 @@ export function BeagleShowsResultsDesktopTable({
               {t("shows.results.col.date")}
             </th>
             <th className="px-2 py-2 font-semibold">
+              {t("shows.results.col.city")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
               {t("shows.results.col.place")}
             </th>
             <th className="px-2 py-2 font-semibold">
@@ -46,6 +49,7 @@ export function BeagleShowsResultsDesktopTable({
               <td className="px-2 py-2">
                 {formatIsoDateForDisplay(row.eventDate, locale)}
               </td>
+              <td className="px-2 py-2">{row.eventCity ?? "-"}</td>
               <td className="px-2 py-2">{row.eventPlace}</td>
               <td className="px-2 py-2">{row.judge ?? "-"}</td>
               <td className="px-2 py-2">{row.dogCount}</td>

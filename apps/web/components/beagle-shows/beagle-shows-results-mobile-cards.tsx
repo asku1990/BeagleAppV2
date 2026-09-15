@@ -43,6 +43,12 @@ export function BeagleShowsResultsMobileCards({
             </p>
             <p className="col-span-2">
               <span className={beagleTheme.mutedText}>
+                {t("shows.results.col.city")}:{" "}
+              </span>
+              <span>{row.eventCity ?? "-"}</span>
+            </p>
+            <p className="col-span-2">
+              <span className={beagleTheme.mutedText}>
                 {t("shows.results.col.place")}:{" "}
               </span>
               <span>{row.eventPlace}</span>

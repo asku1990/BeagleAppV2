@@ -21,6 +21,7 @@ export type BeagleShowSearchFilters = {
 export type BeagleShowSearchRow = {
   showId: string;
   eventDate: string;
+  eventCity: string | null;
   eventPlace: string;
   judge: string | null;
   dogCount: number;

@@ -80,6 +80,7 @@ describe("searchBeagleShowsDb", () => {
           id: "event-1",
           eventLookupKey: "show-event-1",
           eventDate: new Date("2025-06-01T00:00:00.000Z"),
+          eventCity: "Espoo",
           eventPlace: "Helsinki",
           _count: { entries: 7 },
         },
@@ -87,6 +88,7 @@ describe("searchBeagleShowsDb", () => {
           id: "event-2",
           eventLookupKey: "show-event-2",
           eventDate: new Date("2025-09-01T00:00:00.000Z"),
+          eventCity: null,
           eventPlace: "Turku",
           _count: { entries: 4 },
         },
@@ -109,6 +111,7 @@ describe("searchBeagleShowsDb", () => {
       "Turku",
       "Helsinki",
     ]);
+    expect(result.items.map((row) => row.eventCity)).toEqual([null, "Espoo"]);
     expect(result.items.map((row) => row.eventKey)).toEqual([
       "show-event-2",
       "show-event-1",
@@ -122,6 +125,12 @@ describe("searchBeagleShowsDb", () => {
         judge: true,
       },
     });
+
+    expect(showEventFindManyMock.mock.calls[1]?.[0]).toEqual(
+      expect.objectContaining({
+        select: expect.objectContaining({ eventCity: true }),
+      }),
+    );
 
     const args = showEventFindManyMock.mock.calls[1]?.[0] as {
       where: { eventDate: { gte: Date; lt: Date } };
