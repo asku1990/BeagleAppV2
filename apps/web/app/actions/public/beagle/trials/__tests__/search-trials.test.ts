@@ -63,6 +63,7 @@ describe("searchBeagleTrialsAction", () => {
           items: [
             {
               trialId: "s_1",
+              pdfTrialEntryIds: ["entry_1"],
               eventDate: "2025-06-01",
               eventPlace: "Helsinki",
               judge: "Judge Main",
@@ -93,6 +94,7 @@ describe("searchBeagleTrialsAction", () => {
         items: [
           {
             trialId: "s_1",
+            pdfTrialEntryIds: ["entry_1"],
             eventDate: "2025-06-01",
             eventPlace: "Helsinki",
             judge: "Judge Main",

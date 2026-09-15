@@ -291,6 +291,7 @@ export async function searchBeagleTrialsService(
       page: result.page,
       items: result.items.map((item) => ({
         trialId: item.trialEventId,
+        pdfTrialEntryIds: item.pdfTrialEntryIds,
         eventDate: formatTrialDateOnly(item.eventDate),
         eventPlace: item.eventPlace,
         judge: item.judge,

@@ -191,6 +191,7 @@ describe("searchBeagleTrialsDb", () => {
       .mockResolvedValueOnce([
         {
           id: "event-2",
+          trialRuleWindowId: "trw_post_20230801",
           koepaiva: new Date("2025-06-01T00:00:00.000Z"),
           koekunta: "Helsinki",
           ylituomariNimi: "Judge A",
@@ -203,6 +204,7 @@ describe("searchBeagleTrialsDb", () => {
         },
         {
           id: "event-1",
+          trialRuleWindowId: "trw_post_20230801",
           koepaiva: new Date("2025-09-01T00:00:00.000Z"),
           koekunta: "Turku",
           ylituomariNimi: "Judge B",
@@ -211,11 +213,11 @@ describe("searchBeagleTrialsDb", () => {
         },
       ]);
     trialEntryFindManyMock.mockResolvedValueOnce([
-      { trialEventId: "event-1", ke: "P", piste: 75 },
-      { trialEventId: "event-2", ke: "L", piste: 80 },
-      { trialEventId: "event-2", ke: "L", piste: null },
-      { trialEventId: "event-2", ke: "L", piste: 82 },
-      { trialEventId: "event-2", ke: " ", piste: null },
+      { id: "entry-1", trialEventId: "event-1", ke: "P", piste: 75 },
+      { id: "entry-2", trialEventId: "event-2", ke: "L", piste: 80 },
+      { id: "entry-3", trialEventId: "event-2", ke: "L", piste: null },
+      { id: "entry-4", trialEventId: "event-2", ke: "L", piste: 82 },
+      { id: "entry-5", trialEventId: "event-2", ke: " ", piste: null },
     ]);
 
     const result = await searchBeagleTrialsDb({
@@ -242,6 +244,13 @@ describe("searchBeagleTrialsDb", () => {
     expect(result.items[0]?.judge).toBe("Judge B");
     expect(result.items[0]?.weather).toEqual({ kind: "single", value: "P" });
     expect(result.items[0]?.average).toBe(75);
+    expect(result.items[0]?.pdfTrialEntryIds).toEqual(["entry-1"]);
+    expect(result.items[1]?.pdfTrialEntryIds).toEqual([
+      "entry-2",
+      "entry-3",
+      "entry-4",
+      "entry-5",
+    ]);
     expect(result.items[1]?.weather).toEqual({ kind: "single", value: "L" });
     expect(result.items[1]?.average).toBe(81);
     expect(result.total).toBe(2);
@@ -304,7 +313,7 @@ describe("searchBeagleTrialsDb", () => {
     expect(result.items[1]?.average).toBeNull();
     expect(trialEntryFindManyMock).toHaveBeenCalledWith({
       where: { trialEventId: { in: ["event-a", "event-b"] } },
-      select: { trialEventId: true, ke: true, piste: true },
+      select: { id: true, trialEventId: true, ke: true, piste: true },
       orderBy: { id: "asc" },
     });
   });

@@ -1,11 +1,14 @@
 import Link from "next/link";
+import { FileText } from "lucide-react";
 import type { BeagleTrialSearchRow } from "@beagle/contracts";
+import { Button } from "@/components/ui/button";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
 import {
   formatIsoDateForDisplay,
   formatTrialWeatherSummary,
   getBeagleTrialHref,
+  getTrialPdfPageHref,
 } from "@/lib/public/beagle/trials";
 import { cn } from "@/lib/utils";
 
@@ -72,13 +75,28 @@ export function BeagleTrialsResultsMobileCards({
               </span>
               <span>{row.average == null ? "-" : row.average.toFixed(2)}</span>
             </p>
-            <p className="col-span-2">
+            <p>
               <Link
                 href={getBeagleTrialHref(row.trialId)}
                 className={beagleTheme.entityLink}
               >
                 {t("trials.results.open")}
               </Link>
+            </p>
+            <p>
+              {row.pdfTrialEntryIds.length > 0 ? (
+                <Button asChild variant="ghost" size="icon-xs">
+                  <Link
+                    href={getTrialPdfPageHref(row.pdfTrialEntryIds)}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={t("trials.results.actions.pdf")}
+                    title={t("trials.results.actions.pdf")}
+                  >
+                    <FileText className="size-3.5" aria-hidden="true" />
+                  </Link>
+                </Button>
+              ) : null}
             </p>
           </div>
         </article>
