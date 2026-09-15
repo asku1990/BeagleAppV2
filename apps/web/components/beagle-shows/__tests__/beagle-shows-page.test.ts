@@ -139,6 +139,7 @@ describe("BeagleShowsPage", () => {
           {
             showId: "s_1",
             eventDate: "2025-06-01",
+            eventCity: "Espoo",
             eventPlace: "Helsinki",
             judge: "Judge Main",
             dogCount: 9,
@@ -154,6 +155,7 @@ describe("BeagleShowsPage", () => {
 
     expect(html).toContain("shows.results.count 1");
     expect(html).toContain("Helsinki");
+    expect(html).toContain("Espoo");
     expect(html).toContain("Judge Main");
     expect(html).toContain("shows.results.open");
     expect(html).toContain("shows.results.copy.button");

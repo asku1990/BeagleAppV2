@@ -64,6 +64,7 @@ describe("searchBeagleShowsAction", () => {
             {
               showId: "s_1",
               eventDate: "2025-06-01",
+              eventCity: "Espoo",
               eventPlace: "Helsinki",
               judge: "Judge Main",
               dogCount: 10,
@@ -91,6 +92,7 @@ describe("searchBeagleShowsAction", () => {
           {
             showId: "s_1",
             eventDate: "2025-06-01",
+            eventCity: "Espoo",
             eventPlace: "Helsinki",
             judge: "Judge Main",
             dogCount: 10,

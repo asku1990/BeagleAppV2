@@ -1,7 +1,7 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { BeagleShowsResultsMobileCards } from "../beagle-shows-results-mobile-cards";
+import { BeagleShowsResultsDesktopTable } from "../beagle-shows-results-desktop-table";
 
 vi.mock("next/link", () => ({
   default: ({ href, children, ...props }: React.ComponentProps<"a">) =>
@@ -15,10 +15,10 @@ vi.mock("@/hooks/i18n", () => ({
   }),
 }));
 
-describe("BeagleShowsResultsMobileCards", () => {
-  it("renders show card content with details link", () => {
+describe("BeagleShowsResultsDesktopTable", () => {
+  it("renders the city column and its missing value fallback", () => {
     const html = renderToStaticMarkup(
-      React.createElement(BeagleShowsResultsMobileCards, {
+      React.createElement(BeagleShowsResultsDesktopTable, {
         rows: [
           {
             showId: "show_1",
@@ -28,22 +28,6 @@ describe("BeagleShowsResultsMobileCards", () => {
             judge: "Judge Main",
             dogCount: 12,
           },
-        ],
-      }),
-    );
-
-    expect(html).toContain("Espoo");
-    expect(html).toContain("Helsinki");
-    expect(html).toContain("Judge Main");
-    expect(html).toContain("12");
-    expect(html).toContain("shows.results.open");
-    expect(html).toContain('href="/beagle/shows/show_1"');
-  });
-
-  it("renders dash fallback when judge is missing", () => {
-    const html = renderToStaticMarkup(
-      React.createElement(BeagleShowsResultsMobileCards, {
-        rows: [
           {
             showId: "show_2",
             eventDate: "2025-07-01",
@@ -56,9 +40,8 @@ describe("BeagleShowsResultsMobileCards", () => {
       }),
     );
 
-    expect(html).toContain("Turku");
-    expect(html).toContain("shows.results.col.city:");
-    expect(html).toContain("shows.results.col.judge:");
-    expect(html).toContain("-");
+    expect(html).toContain("shows.results.col.city");
+    expect(html).toContain("Espoo");
+    expect(html).toContain(">-</td>");
   });
 });

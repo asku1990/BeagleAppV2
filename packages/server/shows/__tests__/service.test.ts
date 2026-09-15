@@ -98,6 +98,7 @@ describe("shows service", () => {
           {
             eventKey: "show-event-1",
             eventDate: new Date("2025-06-01T00:00:00.000Z"),
+            eventCity: "Espoo",
             eventPlace: "Helsinki",
             judge: "Judge Main",
             dogCount: 5,
@@ -131,6 +132,7 @@ describe("shows service", () => {
       dateFrom: null,
       dateTo: null,
     });
+    expect(result.body.data.items[0]?.eventCity).toBe("Espoo");
     expect(parseShowId(result.body.data.items[0].showId)).toEqual({
       eventDateIsoDate: "2025-06-01",
       eventDate: new Date("2025-06-01T00:00:00.000Z"),

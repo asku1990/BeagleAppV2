@@ -15,6 +15,7 @@ function createToastMocks() {
 
 const searchLabels = {
   date: "Päivä",
+  city: "Paikkakunta",
   place: "Paikka",
   judge: "Tuomari",
   dogCount: "Koiria",
@@ -54,6 +55,7 @@ describe("show clipboard actions", () => {
         {
           showId: "s1",
           eventDate: "2025-06-01",
+          eventCity: "Helsinki",
           eventPlace: "Helsinki",
           judge: "Judge A",
           dogCount: 7,
@@ -67,7 +69,7 @@ describe("show clipboard actions", () => {
 
     expect(result).toBe(true);
     expect(writeText).toHaveBeenCalledWith(
-      "Päivä\tPaikka\tTuomari\tKoiria\n2025-06-01\tHelsinki\tJudge A\t7",
+      "Päivä\tPaikkakunta\tPaikka\tTuomari\tKoiria\n2025-06-01\tHelsinki\tHelsinki\tJudge A\t7",
     );
     expect(toast.success).toHaveBeenCalledWith("copy.success");
   });
@@ -80,6 +82,7 @@ describe("show clipboard actions", () => {
         {
           showId: "s1",
           eventDate: "2025-06-01",
+          eventCity: null,
           eventPlace: "Helsinki",
           judge: "Judge A",
           dogCount: 7,

@@ -260,6 +260,7 @@ export async function searchBeagleShowsService(
         return {
           showId: encodeShowId(eventDate, item.eventPlace, item.eventKey),
           eventDate,
+          eventCity: item.eventCity,
           eventPlace: item.eventPlace,
           judge: item.judge,
           dogCount: item.dogCount,
