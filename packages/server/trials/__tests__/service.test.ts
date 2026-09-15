@@ -2,21 +2,27 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createTrialsService } from "../service";
 import { getTrialDateOnlyStartUtc } from "../core/date-only";
 
-const { searchBeagleTrialsDbMock, getBeagleTrialDetailsDbMock } = vi.hoisted(
-  () => ({
-    searchBeagleTrialsDbMock: vi.fn(),
-    getBeagleTrialDetailsDbMock: vi.fn(),
-  }),
-);
+const {
+  searchBeagleTrialsDbMock,
+  getBeagleTrialAwardSummaryDbMock,
+  getBeagleTrialDetailsDbMock,
+} = vi.hoisted(() => ({
+  searchBeagleTrialsDbMock: vi.fn(),
+  getBeagleTrialAwardSummaryDbMock: vi.fn(),
+  getBeagleTrialDetailsDbMock: vi.fn(),
+}));
 
 vi.mock("@beagle/db", () => ({
   searchBeagleTrialsDb: searchBeagleTrialsDbMock,
+  getBeagleTrialAwardSummaryDb: getBeagleTrialAwardSummaryDbMock,
   getBeagleTrialDetailsDb: getBeagleTrialDetailsDbMock,
 }));
 
 describe("trials service", () => {
   beforeEach(() => {
     searchBeagleTrialsDbMock.mockReset();
+    getBeagleTrialAwardSummaryDbMock.mockReset();
+    getBeagleTrialAwardSummaryDbMock.mockResolvedValue([]);
     getBeagleTrialDetailsDbMock.mockReset();
   });
 
@@ -138,6 +144,91 @@ describe("trials service", () => {
       page: 1,
       pageSize: 10,
       sort: "date-asc",
+    });
+  });
+
+  it("maps the all-time award summary independently of listing filters", async () => {
+    searchBeagleTrialsDbMock.mockResolvedValue({
+      availableEventDates: [new Date("2026-06-01T00:00:00.000Z")],
+      total: 1,
+      totalPages: 1,
+      page: 1,
+      items: [],
+    });
+    getBeagleTrialAwardSummaryDbMock.mockResolvedValue([
+      {
+        trialType: "normal",
+        first: 1,
+        second: 2,
+        third: 3,
+        noPrize: 4,
+        withdrew: 1,
+        excluded: 0,
+        total: 12,
+        firstDate: new Date("2005-08-20T00:00:00.000Z"),
+        lastDate: new Date("2026-02-28T00:00:00.000Z"),
+      },
+    ]);
+
+    const result = await createTrialsService().searchBeagleTrials({
+      year: 2026,
+    });
+
+    expect(getBeagleTrialAwardSummaryDbMock).toHaveBeenCalledWith();
+    expect(result.status).toBe(200);
+    if (!result.body.ok) throw new Error("Expected ok=true");
+    expect(result.body.data.awardSummary).toEqual({
+      dateFrom: "2005-08-20",
+      dateTo: "2026-02-28",
+      rows: [
+        {
+          trialType: "normal",
+          first: { count: 1, percentage: 8.333333333333332 },
+          second: { count: 2, percentage: 16.666666666666664 },
+          third: { count: 3, percentage: 25 },
+          noPrize: { count: 4, percentage: 33.33333333333333 },
+          withdrew: { count: 1, percentage: 8.333333333333332 },
+          excluded: { count: 0, percentage: 0 },
+          awarded: { count: 6, percentage: 50 },
+          total: 12,
+        },
+      ],
+    });
+  });
+
+  it("omits the award summary when both trial types are empty", async () => {
+    searchBeagleTrialsDbMock.mockResolvedValue({
+      availableEventDates: [],
+      total: 0,
+      totalPages: 0,
+      page: 1,
+      items: [],
+    });
+    getBeagleTrialAwardSummaryDbMock.mockResolvedValue(
+      ["normal", "long"].map((trialType) => ({
+        trialType,
+        first: 0,
+        second: 0,
+        third: 0,
+        noPrize: 0,
+        withdrew: 0,
+        excluded: 0,
+        total: 0,
+        firstDate: null,
+        lastDate: null,
+      })),
+    );
+
+    const result = await createTrialsService().searchBeagleTrials({
+      year: 2026,
+    });
+
+    expect(result.status).toBe(200);
+    if (!result.body.ok) throw new Error("Expected ok=true");
+    expect(result.body.data.awardSummary).toEqual({
+      dateFrom: null,
+      dateTo: null,
+      rows: [],
     });
   });
 

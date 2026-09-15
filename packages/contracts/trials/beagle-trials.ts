@@ -33,6 +33,29 @@ export type BeagleTrialSearchRow = {
   average: number | null;
 };
 
+export type BeagleTrialAwardSummaryValue = {
+  count: number;
+  percentage: number;
+};
+
+export type BeagleTrialAwardSummaryRow = {
+  trialType: "normal" | "long";
+  first: BeagleTrialAwardSummaryValue;
+  second: BeagleTrialAwardSummaryValue;
+  third: BeagleTrialAwardSummaryValue;
+  noPrize: BeagleTrialAwardSummaryValue;
+  withdrew: BeagleTrialAwardSummaryValue;
+  excluded: BeagleTrialAwardSummaryValue;
+  awarded: BeagleTrialAwardSummaryValue;
+  total: number;
+};
+
+export type BeagleTrialAwardSummary = {
+  dateFrom: string | null;
+  dateTo: string | null;
+  rows: BeagleTrialAwardSummaryRow[];
+};
+
 export type BeagleTrialSearchResponse = {
   filters: BeagleTrialSearchFilters;
   availableYears: number[];
@@ -40,6 +63,7 @@ export type BeagleTrialSearchResponse = {
   totalPages: number;
   page: number;
   items: BeagleTrialSearchRow[];
+  awardSummary: BeagleTrialAwardSummary;
 };
 
 export type BeagleTrialDetailsRequest = {

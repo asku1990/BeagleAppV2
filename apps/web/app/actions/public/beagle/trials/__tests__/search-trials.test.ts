@@ -71,6 +71,7 @@ describe("searchBeagleTrialsAction", () => {
               average: 80.5,
             },
           ],
+          awardSummary: { dateFrom: null, dateTo: null, rows: [] },
         },
       },
     });
@@ -100,6 +101,7 @@ describe("searchBeagleTrialsAction", () => {
             average: 80.5,
           },
         ],
+        awardSummary: { dateFrom: null, dateTo: null, rows: [] },
       },
       hasError: false,
       status: 200,

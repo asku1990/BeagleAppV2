@@ -1,4 +1,8 @@
-import { searchBeagleTrialsDb, type BeagleTrialSearchSortDb } from "@beagle/db";
+import {
+  getBeagleTrialAwardSummaryDb,
+  searchBeagleTrialsDb,
+  type BeagleTrialSearchSortDb,
+} from "@beagle/db";
 import type {
   BeagleTrialSearchRequest,
   BeagleTrialSearchMode,
@@ -13,6 +17,7 @@ import {
   toTrialDateOnlyYear,
 } from "./core/date-only";
 import { parseIsoDateOnly } from "./internal/iso-date";
+import { mapBeagleTrialAwardSummary } from "./internal/map-beagle-trial-award-summary";
 import type { TrialsServiceLogContext } from "./types";
 
 const ALLOWED_SORTS: ReadonlySet<BeagleTrialSearchSortDb> = new Set([
@@ -255,6 +260,7 @@ export async function searchBeagleTrialsService(
     }
 
     const availableYears = collectAvailableYears(result.availableEventDates);
+    const awardSummaryRows = await getBeagleTrialAwardSummaryDb();
 
     const data: BeagleTrialSearchResponse = {
       filters: {
@@ -276,6 +282,7 @@ export async function searchBeagleTrialsService(
         weather: item.weather,
         average: item.average,
       })),
+      awardSummary: mapBeagleTrialAwardSummary(awardSummaryRows),
     };
 
     log.info(

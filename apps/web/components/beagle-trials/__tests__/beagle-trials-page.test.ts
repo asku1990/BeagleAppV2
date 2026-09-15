@@ -112,6 +112,23 @@ describe("BeagleTrialsPage", () => {
         totalPages: 0,
         page: 1,
         items: [],
+        awardSummary: {
+          dateFrom: "2005-08-20",
+          dateTo: "2026-02-28",
+          rows: [
+            {
+              trialType: "long",
+              first: { count: 1, percentage: 100 },
+              second: { count: 0, percentage: 0 },
+              third: { count: 0, percentage: 0 },
+              noPrize: { count: 0, percentage: 0 },
+              withdrew: { count: 0, percentage: 0 },
+              excluded: { count: 0, percentage: 0 },
+              awarded: { count: 1, percentage: 100 },
+              total: 1,
+            },
+          ],
+        },
       },
       isFetching: false,
       isError: false,
@@ -120,6 +137,7 @@ describe("BeagleTrialsPage", () => {
 
     const html = renderToStaticMarkup(React.createElement(BeagleTrialsPage));
     expect(html).toContain("trials.empty.noResults");
+    expect(html).toContain("trials.awardSummary.title");
   });
 
   it("renders desktop/mobile results and pagination when rows exist", () => {
@@ -146,6 +164,23 @@ describe("BeagleTrialsPage", () => {
             average: 75.5,
           },
         ],
+        awardSummary: {
+          dateFrom: "2005-08-20",
+          dateTo: "2026-02-28",
+          rows: [
+            {
+              trialType: "normal",
+              first: { count: 1, percentage: 25 },
+              second: { count: 1, percentage: 25 },
+              third: { count: 0, percentage: 0 },
+              noPrize: { count: 2, percentage: 50 },
+              withdrew: { count: 0, percentage: 0 },
+              excluded: { count: 0, percentage: 0 },
+              awarded: { count: 2, percentage: 50 },
+              total: 4,
+            },
+          ],
+        },
       },
       isFetching: false,
       isError: false,
@@ -164,5 +199,7 @@ describe("BeagleTrialsPage", () => {
     expect(html).toContain("trials.results.copy.button");
     expect(html).toContain("trials.results.open");
     expect(html).toContain("trials.pagination.range 1-1 / 1");
+    expect(html).toContain("trials.awardSummary.title");
+    expect(html).toContain("1 (25.00%)");
   });
 });
