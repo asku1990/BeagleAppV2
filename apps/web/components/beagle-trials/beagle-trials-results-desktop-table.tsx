@@ -12,8 +12,9 @@ import {
 } from "@/lib/public/beagle/trials";
 import { cn } from "@/lib/utils";
 
-const trialInfoGridClassName =
-  "grid grid-cols-[1.2fr_1.5fr_1.4fr_0.5fr_1.2fr_1fr]";
+const trialInfoGridStyle = {
+  gridTemplateColumns: "1.2fr 1.5fr 1.4fr 0.5fr 1.2fr 1fr",
+};
 
 export function BeagleTrialsResultsDesktopTable({
   rows,
@@ -28,7 +29,7 @@ export function BeagleTrialsResultsDesktopTable({
         <thead>
           <tr className={cn("border-b text-left", beagleTheme.border)}>
             <th colSpan={6} className="p-0">
-              <div className={cn("mx-2", trialInfoGridClassName)}>
+              <div className="mx-2 grid" style={trialInfoGridStyle}>
                 <span className="py-2 font-semibold">
                   {t("trials.results.col.date")}
                 </span>
@@ -72,7 +73,7 @@ export function BeagleTrialsResultsDesktopTable({
                     beagleTheme.focusRing,
                   )}
                 >
-                  <div className={trialInfoGridClassName}>
+                  <div className="grid" style={trialInfoGridStyle}>
                     <span>
                       {formatIsoDateForDisplay(row.eventDate, locale)}
                     </span>
