@@ -220,7 +220,11 @@ describe("BeagleTrialsPage", () => {
     expect(html).toContain("trials.results.col.average");
     expect(html).toContain("trials.results.weather.bareGround");
     expect(html).toContain("trials.results.copy.button");
-    expect(html).toContain("trials.results.open");
+    expect(html).toContain('href="/beagle/trials/s_1"');
+    expect(html).not.toContain("trials.results.open");
+    expect(html).not.toContain("trials.results.col.details");
+    expect(html).toContain('target="_blank"');
+    expect(html).toContain('aria-label="trials.results.actions.pdf"');
     expect(html).toContain("trials.pagination.range 1-1 / 1");
     expect(html).toContain("trials.awardSummary.title");
     expect(html).toContain("1 (25.00%)");

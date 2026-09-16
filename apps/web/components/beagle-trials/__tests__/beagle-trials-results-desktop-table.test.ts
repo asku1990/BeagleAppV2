@@ -16,7 +16,7 @@ vi.mock("@/hooks/i18n", () => ({
 }));
 
 describe("BeagleTrialsResultsDesktopTable", () => {
-  it("renders all summary fields in a compact row with a new-tab PDF action", () => {
+  it("uses one detail link and keeps PDF as a separate new-tab action", () => {
     const html = renderToStaticMarkup(
       React.createElement(BeagleTrialsResultsDesktopTable, {
         rows: [
@@ -35,6 +35,10 @@ describe("BeagleTrialsResultsDesktopTable", () => {
     );
 
     expect(html).toContain("Helsinki");
+    expect(html).toContain('href="/beagle/trials/trial_1"');
+    expect(html.match(/<a /g)).toHaveLength(2);
+    expect(html).toContain('href="/beagle/trials/trial_1" class="block ');
+    expect(html).toContain('colSpan="6"');
     expect(html).toContain("Judge Main");
     expect(html).toContain("81.25");
     expect(html).toContain("whitespace-nowrap");
@@ -43,5 +47,8 @@ describe("BeagleTrialsResultsDesktopTable", () => {
     );
     expect(html).toContain('target="_blank"');
     expect(html).toContain('aria-label="trials.results.actions.pdf"');
+    expect(html).toContain('title="trials.results.actions.pdf"');
+    expect(html).not.toContain("trials.results.col.details");
+    expect(html).not.toContain("trials.results.open");
   });
 });

@@ -16,7 +16,7 @@ vi.mock("@/hooks/i18n", () => ({
 }));
 
 describe("BeagleTrialsResultsMobileCards", () => {
-  it("renders show card content with details link", () => {
+  it("uses one detail link and keeps PDF as a separate new-tab action", () => {
     const html = renderToStaticMarkup(
       React.createElement(BeagleTrialsResultsMobileCards, {
         rows: [
@@ -39,12 +39,18 @@ describe("BeagleTrialsResultsMobileCards", () => {
     expect(html).toContain("12");
     expect(html).toContain("81.25");
     expect(html).toContain("trials.results.weather.snow");
-    expect(html).toContain("trials.results.open");
     expect(html).toContain('href="/beagle/trials/show_1"');
+    expect(html.match(/<a /g)).toHaveLength(2);
+    expect(html).toContain(
+      'href="/beagle/trials/show_1" class="block min-w-0 flex-1 ',
+    );
     expect(html).toContain(
       'href="/beagle/trials/pdf?trialEntryId=entry_1&amp;trialEntryId=entry_2"',
     );
     expect(html).toContain('target="_blank"');
+    expect(html).toContain('aria-label="trials.results.actions.pdf"');
+    expect(html).toContain('title="trials.results.actions.pdf"');
+    expect(html).not.toContain("trials.results.open");
   });
 
   it("renders dash fallback when judge is missing", () => {
