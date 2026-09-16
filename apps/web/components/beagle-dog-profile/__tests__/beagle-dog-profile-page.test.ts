@@ -140,6 +140,7 @@ describe("BeagleDogProfilePage", () => {
             {
               id: "show1",
               showId: "show-route-1",
+              eventCity: null,
               place: "Helsinki",
               date: "2024-01-01",
               showType: "Ryhmänäyttely",

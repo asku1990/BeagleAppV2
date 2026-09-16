@@ -140,6 +140,7 @@ describe("show clipboard actions", () => {
         {
           id: "s1",
           showId: "show-1",
+          eventCity: null,
           place: "Helsinki",
           date: "2025-06-01",
           showType: "Ryhmänäyttely",

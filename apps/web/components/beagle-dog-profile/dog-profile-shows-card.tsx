@@ -18,7 +18,6 @@ import {
   hasDogProfileShowPlacement,
   hasDogProfileShowPupn,
   hasDogProfileShowQuality,
-  hasDogProfileShowType,
   hasShowClassResult,
 } from "@/lib/public/beagle/shows";
 import { cn } from "@/lib/utils";
@@ -40,7 +39,6 @@ export function DogProfileShowsCard({
   const canReveal = rows.length > 10;
   const visibleRows = isExpanded ? rows : rows.slice(0, 10);
 
-  const hasShowType = hasDogProfileShowType(rows);
   const hasQualityGrade = hasDogProfileShowQuality(rows);
   const hasClassCode = hasDogProfileShowClass(rows);
   const hasClassResult = hasShowClassResult(rows);
@@ -69,7 +67,7 @@ export function DogProfileShowsCard({
         judge: t("dog.profile.shows.col.judge"),
       },
       columns: {
-        includeShowType: hasShowType,
+        includeShowType: false, // Temporarily hidden from the profile view.
         includeQualityGrade: hasQualityGrade,
         includeClassName: hasClassCode,
         includeClassPlacement: hasClassPlacement,
@@ -124,7 +122,6 @@ export function DogProfileShowsCard({
       ) : (
         <DogProfileShowsResults
           visibleRows={visibleRows}
-          hasShowType={hasShowType}
           hasQualityGrade={hasQualityGrade}
           hasClassResult={hasClassResult}
           hasPupn={hasPupn}

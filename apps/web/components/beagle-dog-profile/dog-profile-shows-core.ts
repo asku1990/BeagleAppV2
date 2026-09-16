@@ -15,6 +15,7 @@ export type DogProfileShowsT = (
     | "dog.profile.shows.col.showType"
     | "dog.profile.shows.col.className"
     | "dog.profile.shows.col.place"
+    | "dog.profile.shows.col.city"
     | "dog.profile.shows.col.date"
     | "dog.profile.shows.col.qualityGrade"
     | "dog.profile.shows.col.classResult"

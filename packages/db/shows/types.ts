@@ -70,6 +70,7 @@ export type BeagleShowDetailsResponseDb = {
 export type BeagleShowDogRowDb = BeagleShowStructuredResultDb & {
   id: string;
   eventKey: string;
+  eventCity: string | null;
   place: string;
   date: Date;
   critiqueText: string | null;

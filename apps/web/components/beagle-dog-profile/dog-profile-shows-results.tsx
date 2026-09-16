@@ -8,7 +8,6 @@ import {
   formatClassResult,
   formatPupn,
   formatQualityGrade,
-  formatShowType,
   getBeagleShowHref,
 } from "@/lib/public/beagle/shows";
 import {
@@ -22,7 +21,6 @@ import { DogProfileShowsResultsMobile } from "./dog-profile-shows-results-mobile
 
 type DogProfileShowsResultsProps = {
   visibleRows: BeagleDogProfileShowRowDto[];
-  hasShowType: boolean;
   hasQualityGrade: boolean;
   hasClassResult: boolean;
   hasPupn: boolean;
@@ -37,7 +35,6 @@ type DogProfileShowsResultsProps = {
 
 export function DogProfileShowsResults({
   visibleRows,
-  hasShowType,
   hasQualityGrade,
   hasClassResult,
   hasPupn,
@@ -59,16 +56,20 @@ export function DogProfileShowsResults({
                 <th className="px-2 py-2 font-semibold">
                   {t("dog.profile.shows.col.no")}
                 </th>
-                {hasShowType && (
+                {/* Temporarily hidden until show type is needed here. */}
+                {/* {hasShowType && (
                   <th className="px-2 py-2 font-semibold">
                     {t("dog.profile.shows.col.showType")}
                   </th>
-                )}
-                <th className="px-2 py-2 font-semibold">
-                  {t("dog.profile.shows.col.place")}
-                </th>
+                )} */}
                 <th className="px-2 py-2 font-semibold">
                   {t("dog.profile.shows.col.date")}
+                </th>
+                <th className="px-2 py-2 font-semibold">
+                  {t("dog.profile.shows.col.city")}
+                </th>
+                <th className="px-2 py-2 font-semibold">
+                  {t("dog.profile.shows.col.place")}
                 </th>
                 {hasQualityGrade && (
                   <th className="px-2 py-2 font-semibold">
@@ -114,9 +115,25 @@ export function DogProfileShowsResults({
                   className={cn("border-b align-top", beagleTheme.border)}
                 >
                   <td className="px-2 py-2">{index + 1}</td>
-                  {hasShowType && (
+                  {/* {hasShowType && (
                     <td className="px-2 py-2">{formatShowType(row)}</td>
-                  )}
+                  )} */}
+                  <td className="px-2 py-2">
+                    <Link
+                      href={getBeagleShowHref(row.showId)}
+                      className={beagleTheme.entityLink}
+                    >
+                      {formatDogProfileShowDate(row.date, locale)}
+                    </Link>
+                  </td>
+                  <td className="px-2 py-2">
+                    <Link
+                      href={getBeagleShowHref(row.showId)}
+                      className={beagleTheme.entityLink}
+                    >
+                      {row.eventCity ?? "-"}
+                    </Link>
+                  </td>
                   <td className="px-2 py-2">
                     <Link
                       href={getBeagleShowHref(row.showId)}
@@ -124,9 +141,6 @@ export function DogProfileShowsResults({
                     >
                       {row.place}
                     </Link>
-                  </td>
-                  <td className="px-2 py-2">
-                    {formatDogProfileShowDate(row.date, locale)}
                   </td>
                   {hasQualityGrade && (
                     <td className="px-2 py-2">{formatQualityGrade(row)}</td>
@@ -179,7 +193,6 @@ export function DogProfileShowsResults({
       mobile={
         <DogProfileShowsResultsMobile
           visibleRows={visibleRows}
-          hasShowType={hasShowType}
           hasQualityGrade={hasQualityGrade}
           hasClassResult={hasClassResult}
           hasPupn={hasPupn}

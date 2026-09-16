@@ -19,6 +19,8 @@ This project uses a user-facing changelog format.
 
 ### Changed
 
+- Koiraprofiilin näyttelytuloksiin lisättiin näyttelyn kaupunki desktop- ja mobiilinäkymiin.
+
 ### Fixed
 
 ### Removed
