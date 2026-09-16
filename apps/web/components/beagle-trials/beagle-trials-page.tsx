@@ -3,11 +3,11 @@
 import { useMemo } from "react";
 import { toast } from "@/components/ui/sonner";
 import { FeatureHeroHeader } from "@/components/layout";
+import { Button } from "@/components/ui/button";
 import {
   ListingResponsiveResults,
   ListingSectionShell,
 } from "@/components/listing";
-import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useBeagleTrialsUiState } from "@/hooks/public/beagle/trials";
 import { useI18n } from "@/hooks/i18n";
 import type { MessageKey } from "@/lib/i18n";
@@ -18,7 +18,6 @@ import {
   parseTrialYearInput,
   toBeagleTrialSearchRequest,
 } from "@/lib/public/beagle/trials";
-import { cn } from "@/lib/utils";
 import { useBeagleTrialsQuery } from "@/queries/public/beagle/trials/use-beagle-trials-query";
 import { BeagleTrialsAwardSummary } from "./beagle-trials-award-summary";
 import { BeagleTrialsEmptyState } from "./beagle-trials-empty-state";
@@ -174,15 +173,16 @@ export function BeagleTrialsPage() {
                 {getFilterLabel(response.filters, locale, t)}
               </span>
               {hasItems ? (
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="xs"
                   onClick={() => {
                     void handleCopyResults();
                   }}
-                  className={cn("text-xs", beagleTheme.actionLink)}
                 >
                   {t("trials.results.copy.button")}
-                </button>
+                </Button>
               ) : null}
             </span>
           ) : undefined
