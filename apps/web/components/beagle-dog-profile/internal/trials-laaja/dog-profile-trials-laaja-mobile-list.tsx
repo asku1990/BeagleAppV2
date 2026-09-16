@@ -1,8 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { beagleTheme } from "@/components/ui/beagle-theme";
-import { getBeagleTrialHref } from "@/lib/public/beagle/trials";
+import {
+  getBeagleTrialHref,
+  getTrialPdfPageHref,
+} from "@/lib/public/beagle/trials";
 import {
   FALLBACK_VALUE,
   formatDate,
@@ -19,11 +24,13 @@ export function DogProfileTrialsLaajaMobileList({
   headers,
   showEraDetails,
   locale,
+  hasPdf,
 }: {
   rows: BeagleDogProfileTrialRowDto[];
   headers: DogProfileTrialsLaajaHeaders;
   showEraDetails: boolean;
   locale: "fi" | "sv";
+  hasPdf: boolean;
 }) {
   const hasTja = rows.some((row) => row.tja != null);
   const hasPin = rows.some((row) => row.pin != null);
@@ -107,6 +114,21 @@ export function DogProfileTrialsLaajaMobileList({
               <p>
                 <span className={beagleTheme.mutedText}>{headers.pin}:</span>{" "}
                 <span>{formatNumber(row.pin)}</span>
+              </p>
+            ) : null}
+            {hasPdf && row.hasDogTrialPdf ? (
+              <p className="col-span-2 flex justify-end">
+                <Button asChild variant="ghost" size="icon-xs">
+                  <Link
+                    href={getTrialPdfPageHref(row.trialEntryId)}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={headers.pdf}
+                    title={headers.pdf}
+                  >
+                    <FileText className="size-3.5" aria-hidden="true" />
+                  </Link>
+                </Button>
               </p>
             ) : null}
           </div>

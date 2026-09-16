@@ -16,6 +16,7 @@ type DogProfileTrialsEraDesktopRowProps = {
     hasEraHuomautus: boolean;
     hasTja: boolean;
     hasPin: boolean;
+    hasPdf: boolean;
   };
   rowId: string;
 };
@@ -68,6 +69,7 @@ export function DogProfileTrialsEraDesktopRow({
       {columns.hasPin ? (
         <td className="px-2 py-2">{formatNumber(era.pin)}</td>
       ) : null}
+      {columns.hasPdf ? <td className="px-2 py-2" /> : null}
     </tr>
   );
 }

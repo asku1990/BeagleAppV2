@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FileText } from "lucide-react";
 import { useState } from "react";
 import {
   ListingResponsiveResults,
@@ -15,6 +16,7 @@ import {
 import {
   copyDogProfileTrialRowsToClipboard,
   getBeagleTrialHref,
+  getTrialPdfPageHref,
 } from "@/lib/public/beagle/trials";
 import { cn } from "@/lib/utils";
 import type { BeagleDogProfileTrialRowDto } from "@beagle/contracts";
@@ -76,6 +78,11 @@ export function DogProfileTrialsCard({
   const hasChaseLoosenessPenalty = rows.some((r) => r.alo != null);
   const hasObstacleWork = rows.some((r) => r.tja != null);
   const hasTotalPoints = rows.some((r) => r.pin != null);
+  const hasPdf = rows.some((row) => row.hasDogTrialPdf);
+  const pdfLabel = t("dog.profile.trials.actions.pdf");
+  const supportedTrialEntryIds = rows
+    .filter((row) => row.hasDogTrialPdf)
+    .map((row) => row.trialEntryId);
   const handleCopyRows = async () => {
     await copyDogProfileTrialRowsToClipboard({
       rows,
@@ -148,6 +155,19 @@ export function DogProfileTrialsCard({
                   {t("dog.profile.trials.openLaaja")}
                 </Link>
               </Button>
+              {supportedTrialEntryIds.length > 0 ? (
+                <Button asChild variant="outline" size="xs">
+                  <Link
+                    href={getTrialPdfPageHref(supportedTrialEntryIds)}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={t("dog.profile.trials.openPdfStack")}
+                    title={t("dog.profile.trials.openPdfStack")}
+                  >
+                    {t("dog.profile.trials.openPdfStack")}
+                  </Link>
+                </Button>
+              ) : null}
             </span>
           ) : null}
         </span>
@@ -199,6 +219,11 @@ export function DogProfileTrialsCard({
                         {t("dog.profile.trials.col.points")}
                       </th>
                     )}
+                    {hasPdf ? (
+                      <th className="w-10 px-2 py-2 font-semibold">
+                        {t("trials.results.col.pdf")}
+                      </th>
+                    ) : null}
                   </tr>
                 </thead>
                 <tbody>
@@ -235,6 +260,26 @@ export function DogProfileTrialsCard({
                       {hasPoints && (
                         <td className="px-2 py-2">
                           {formatPoints(row.points)}
+                        </td>
+                      )}
+                      {hasPdf && (
+                        <td className="px-2 py-2">
+                          {row.hasDogTrialPdf ? (
+                            <Button asChild variant="ghost" size="icon-xs">
+                              <Link
+                                href={getTrialPdfPageHref(row.trialEntryId)}
+                                target="_blank"
+                                rel="noreferrer"
+                                aria-label={pdfLabel}
+                                title={pdfLabel}
+                              >
+                                <FileText
+                                  className="size-3.5"
+                                  aria-hidden="true"
+                                />
+                              </Link>
+                            </Button>
+                          ) : null}
                         </td>
                       )}
                     </tr>
@@ -310,6 +355,21 @@ export function DogProfileTrialsCard({
                         <span>{formatPoints(row.points)}</span>
                       </p>
                     )}
+                    {row.hasDogTrialPdf ? (
+                      <p className="col-span-2 flex justify-end">
+                        <Button asChild variant="ghost" size="icon-xs">
+                          <Link
+                            href={getTrialPdfPageHref(row.trialEntryId)}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label={pdfLabel}
+                            title={pdfLabel}
+                          >
+                            <FileText className="size-3.5" aria-hidden="true" />
+                          </Link>
+                        </Button>
+                      </p>
+                    ) : null}
                   </div>
                 </article>
               ))}
