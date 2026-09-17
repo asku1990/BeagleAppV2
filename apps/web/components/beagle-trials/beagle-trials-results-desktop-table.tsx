@@ -12,10 +12,6 @@ import {
 } from "@/lib/public/beagle/trials";
 import { cn } from "@/lib/utils";
 
-const trialInfoGridStyle = {
-  gridTemplateColumns: "1.2fr 1.5fr 1.4fr 0.5fr 1.2fr 1fr",
-};
-
 export function BeagleTrialsResultsDesktopTable({
   rows,
 }: {
@@ -28,27 +24,26 @@ export function BeagleTrialsResultsDesktopTable({
       <table className="w-full min-w-[980px] border-collapse text-sm">
         <thead>
           <tr className={cn("border-b text-left", beagleTheme.border)}>
-            <th colSpan={6} className="p-0">
-              <div className="mx-2 grid" style={trialInfoGridStyle}>
-                <span className="py-2 font-semibold">
-                  {t("trials.results.col.date")}
-                </span>
-                <span className="py-2 font-semibold">
-                  {t("trials.results.col.place")}
-                </span>
-                <span className="py-2 font-semibold">
-                  {t("trials.results.col.judge")}
-                </span>
-                <span className="py-2 font-semibold">
-                  {t("trials.results.col.dogCount")}
-                </span>
-                <span className="py-2 font-semibold">
-                  {t("trials.results.col.weather")}
-                </span>
-                <span className="py-2 font-semibold">
-                  {t("trials.results.col.average")}
-                </span>
-              </div>
+            <th className="px-2 py-2 font-semibold">
+              {t("trials.results.col.date")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
+              {t("trials.results.col.place")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
+              {t("trials.results.col.judge")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
+              {t("trials.results.col.dogCount")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
+              {t("trials.results.col.weather")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
+              {t("trials.results.col.average")}
+            </th>
+            <th className="px-2 py-2 font-semibold">
+              {t("trials.results.open")}
             </th>
             <th className="px-2 py-2 text-left font-semibold">
               {t("trials.results.col.pdf")}
@@ -59,41 +54,33 @@ export function BeagleTrialsResultsDesktopTable({
           {rows.map((row) => (
             <tr
               key={row.trialId}
-              className={cn(
-                "border-b align-top whitespace-nowrap",
-                beagleTheme.border,
-              )}
+              className={cn("border-b align-top", beagleTheme.border)}
             >
-              <td colSpan={6} className="px-1 py-1">
+              <td className="px-2 py-2">
+                {formatIsoDateForDisplay(row.eventDate, locale)}
+              </td>
+              <td className="px-2 py-2">{row.eventPlace}</td>
+              <td className="px-2 py-2">{row.judge ?? "-"}</td>
+              <td className="px-2 py-2">{row.dogCount}</td>
+              <td className="px-2 py-2">
+                {formatTrialWeatherSummary(row.weather, {
+                  snow: t("trials.results.weather.snow"),
+                  bareGround: t("trials.results.weather.bareGround"),
+                  varied: t("trials.results.weather.varied"),
+                })}
+              </td>
+              <td className="px-2 py-2">
+                {row.average == null ? "-" : row.average.toFixed(2)}
+              </td>
+              <td className="px-2 py-2">
                 <Link
                   href={getBeagleTrialHref(row.trialId)}
-                  className={cn(
-                    "block rounded-md p-1",
-                    beagleTheme.interactive,
-                    beagleTheme.focusRing,
-                  )}
+                  className={beagleTheme.entityLink}
                 >
-                  <div className="grid" style={trialInfoGridStyle}>
-                    <span>
-                      {formatIsoDateForDisplay(row.eventDate, locale)}
-                    </span>
-                    <span>{row.eventPlace}</span>
-                    <span>{row.judge ?? "-"}</span>
-                    <span>{row.dogCount}</span>
-                    <span>
-                      {formatTrialWeatherSummary(row.weather, {
-                        snow: t("trials.results.weather.snow"),
-                        bareGround: t("trials.results.weather.bareGround"),
-                        varied: t("trials.results.weather.varied"),
-                      })}
-                    </span>
-                    <span>
-                      {row.average == null ? "-" : row.average.toFixed(2)}
-                    </span>
-                  </div>
+                  {t("trials.results.open")}
                 </Link>
               </td>
-              <td className="px-1 py-1">
+              <td className="px-2 py-2">
                 {row.pdfTrialEntryIds.length > 0 ? (
                   <Button asChild variant="ghost" size="icon-xs">
                     <Link

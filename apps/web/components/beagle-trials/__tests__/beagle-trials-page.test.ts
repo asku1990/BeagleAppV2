@@ -221,7 +221,7 @@ describe("BeagleTrialsPage", () => {
     expect(html).toContain("trials.results.weather.bareGround");
     expect(html).toContain("trials.results.copy.button");
     expect(html).toContain('href="/beagle/trials/s_1"');
-    expect(html).not.toContain("trials.results.open");
+    expect(html).toContain("trials.results.open");
     expect(html).not.toContain("trials.results.col.details");
     expect(html).toContain('target="_blank"');
     expect(html).toContain('aria-label="trials.results.actions.pdf"');

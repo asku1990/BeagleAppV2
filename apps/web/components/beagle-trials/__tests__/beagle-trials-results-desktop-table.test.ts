@@ -16,7 +16,7 @@ vi.mock("@/hooks/i18n", () => ({
 }));
 
 describe("BeagleTrialsResultsDesktopTable", () => {
-  it("uses one detail link and keeps PDF as a separate new-tab action", () => {
+  it("uses an open link and keeps PDF as a separate new-tab action", () => {
     const html = renderToStaticMarkup(
       React.createElement(BeagleTrialsResultsDesktopTable, {
         rows: [
@@ -37,11 +37,10 @@ describe("BeagleTrialsResultsDesktopTable", () => {
     expect(html).toContain("Helsinki");
     expect(html).toContain('href="/beagle/trials/trial_1"');
     expect(html.match(/<a /g)).toHaveLength(2);
-    expect(html).toContain('href="/beagle/trials/trial_1" class="block ');
-    expect(html).toContain('colSpan="6"');
+    expect(html).toContain('href="/beagle/trials/trial_1" class="');
+    expect(html).not.toContain('colSpan="6"');
     expect(html).toContain("Judge Main");
     expect(html).toContain("81.25");
-    expect(html).toContain("whitespace-nowrap");
     expect(html).toContain(
       'href="/beagle/trials/pdf?trialEntryId=entry+1&amp;trialEntryId=entry-2"',
     );
@@ -49,6 +48,6 @@ describe("BeagleTrialsResultsDesktopTable", () => {
     expect(html).toContain('aria-label="trials.results.actions.pdf"');
     expect(html).toContain('title="trials.results.actions.pdf"');
     expect(html).not.toContain("trials.results.col.details");
-    expect(html).not.toContain("trials.results.open");
+    expect(html).toContain("trials.results.open");
   });
 });
