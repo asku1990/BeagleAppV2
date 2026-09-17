@@ -45,12 +45,6 @@ function normalizeSort(
   return value === "date-asc" ? "date-asc" : "date-desc";
 }
 
-const PDF_SUPPORTED_RULE_WINDOWS = new Set([
-  "trw_range_2005_2011",
-  "trw_post_20110801",
-  "trw_post_20230801",
-]);
-
 function compareRows(
   left: BeagleTrialSearchRowDb,
   right: BeagleTrialSearchRowDb,
@@ -117,7 +111,7 @@ export async function searchBeagleTrialsDb(
     .map((row) => ({
       trialEventId: row.id,
       trialRuleWindowId: row.trialRuleWindowId,
-      pdfTrialEntryIds: [],
+      trialEntryIds: [],
       eventDate: row.koepaiva,
       eventPlace: row.koekunta,
       judge: row.ylituomariNimi?.trim() || null,
@@ -164,13 +158,9 @@ export async function searchBeagleTrialsDb(
 
     return {
       ...row,
-      pdfTrialEntryIds:
-        row.trialRuleWindowId &&
-        PDF_SUPPORTED_RULE_WINDOWS.has(row.trialRuleWindowId)
-          ? entries
-              .map((entry) => entry.id)
-              .filter((id): id is string => typeof id === "string")
-          : [],
+      trialEntryIds: entries
+        .map((entry) => entry.id)
+        .filter((id): id is string => typeof id === "string"),
       weather,
       average:
         scoredEntries.length === 0

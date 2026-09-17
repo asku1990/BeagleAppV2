@@ -16,7 +16,7 @@ export type BeagleTrialSearchRequestDb = {
 export type BeagleTrialSearchRowDb = {
   trialEventId: string;
   trialRuleWindowId: string | null;
-  pdfTrialEntryIds: string[];
+  trialEntryIds: string[];
   eventDate: Date;
   eventPlace: string;
   judge: string | null;

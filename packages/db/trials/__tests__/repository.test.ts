@@ -244,8 +244,8 @@ describe("searchBeagleTrialsDb", () => {
     expect(result.items[0]?.judge).toBe("Judge B");
     expect(result.items[0]?.weather).toEqual({ kind: "single", value: "P" });
     expect(result.items[0]?.average).toBe(75);
-    expect(result.items[0]?.pdfTrialEntryIds).toEqual(["entry-1"]);
-    expect(result.items[1]?.pdfTrialEntryIds).toEqual([
+    expect(result.items[0]?.trialEntryIds).toEqual(["entry-1"]);
+    expect(result.items[1]?.trialEntryIds).toEqual([
       "entry-2",
       "entry-3",
       "entry-4",
