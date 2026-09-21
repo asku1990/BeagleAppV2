@@ -1,11 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { FileText } from "lucide-react";
 import { Fragment, useMemo } from "react";
 import { ListingResponsiveResults } from "@/components/listing";
 import { beagleTheme } from "@/components/ui/beagle-theme";
+import { Button } from "@/components/ui/button";
 import { useI18n } from "@/hooks/i18n";
-import { getBeagleTrialHref } from "@/lib/public/beagle/trials";
+import {
+  getBeagleTrialHref,
+  getTrialPdfPageHref,
+} from "@/lib/public/beagle/trials";
 import {
   FALLBACK_VALUE,
   formatDate,
@@ -28,6 +33,8 @@ export function DogProfileTrialsLaajaTable({
   const { t, locale } = useI18n();
   const hasTja = rows.some((row) => row.tja != null);
   const hasPin = rows.some((row) => row.pin != null);
+  const hasPdf = rows.some((row) => row.hasDogTrialPdf);
+  const pdfLabel = t("dog.profile.trials.actions.pdf");
   const hasVisibleEras =
     showEraDetails && rows.some((row) => row.eras && row.eras.length > 0);
   const hasEraHuomautus =
@@ -37,6 +44,7 @@ export function DogProfileTrialsLaajaTable({
     hasEraHuomautus,
     hasTja,
     hasPin,
+    hasPdf,
   };
   const headers = useMemo<DogProfileTrialsLaajaHeaders>(
     () => ({
@@ -55,6 +63,8 @@ export function DogProfileTrialsLaajaTable({
       alo: t("trials.details.copy.col.chaseLoosenessPenalty"),
       tja: t("trials.details.copy.col.obstacleWork"),
       pin: t("trials.details.copy.col.mi"),
+      pdfColumn: t("trials.results.col.pdf"),
+      pdf: t("dog.profile.trials.actions.pdf"),
       era: t("dog.profile.trials.eras.col.era"),
       alkoi: t("dog.profile.trials.eras.col.alkoi"),
       hakumin: t("dog.profile.trials.eras.col.hakumin"),
@@ -94,6 +104,11 @@ export function DogProfileTrialsLaajaTable({
                 ) : null}
                 {hasPin ? (
                   <th className="px-2 py-2 font-semibold">{headers.pin}</th>
+                ) : null}
+                {hasPdf ? (
+                  <th className="w-10 px-2 py-2 font-semibold">
+                    {headers.pdfColumn}
+                  </th>
                 ) : null}
               </tr>
             </thead>
@@ -138,6 +153,26 @@ export function DogProfileTrialsLaajaTable({
                     {hasPin ? (
                       <td className="px-2 py-2">{formatNumber(row.pin)}</td>
                     ) : null}
+                    {hasPdf ? (
+                      <td className="px-2 py-2">
+                        {row.hasDogTrialPdf ? (
+                          <Button asChild variant="ghost" size="icon-xs">
+                            <Link
+                              href={getTrialPdfPageHref(row.trialEntryId)}
+                              target="_blank"
+                              rel="noreferrer"
+                              aria-label={pdfLabel}
+                              title={pdfLabel}
+                            >
+                              <FileText
+                                className="size-3.5"
+                                aria-hidden="true"
+                              />
+                            </Link>
+                          </Button>
+                        ) : null}
+                      </td>
+                    ) : null}
                   </tr>
                   {hasVisibleEras && row.eras && row.eras.length > 0
                     ? row.eras.map((era) => (
@@ -162,6 +197,7 @@ export function DogProfileTrialsLaajaTable({
           headers={headers}
           showEraDetails={showEraDetails}
           locale={locale}
+          hasPdf={hasPdf}
         />
       }
     />

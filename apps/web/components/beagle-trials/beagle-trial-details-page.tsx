@@ -140,6 +140,9 @@ export function BeagleTrialDetailsPage({
   const { t, locale } = useI18n();
   const usesLegacyPmiLabel =
     details.trial.eventDate.localeCompare("2005-08-19") < 0;
+  const eligibleTrialPdfIds = details.items
+    .filter((row) => canShowTrialPdfAction(row.trialRuleWindowId))
+    .map((row) => row.id);
   const clipboardLabels = {
     no: t("trials.details.col.no"),
     registrationNo: t("trials.details.col.reg"),
@@ -219,15 +222,29 @@ export function BeagleTrialDetailsPage({
               {t("trials.details.dogCount")}: {details.items.length}
             </span>
             {details.items.length > 0 ? (
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="xs"
                 onClick={() => {
                   void handleCopyAllRows();
                 }}
-                className={cn("text-xs", beagleTheme.actionLink)}
               >
                 {t("trials.details.copy.all")}
-              </button>
+              </Button>
+            ) : null}
+            {eligibleTrialPdfIds.length > 0 ? (
+              <Button asChild variant="outline" size="xs">
+                <Link
+                  href={getTrialPdfPageHref(eligibleTrialPdfIds)}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={t("trials.details.actions.pdf.all")}
+                  title={t("trials.details.actions.pdf.all")}
+                >
+                  {t("trials.details.actions.pdf.all")}
+                </Link>
+              </Button>
             ) : null}
           </span>
         }

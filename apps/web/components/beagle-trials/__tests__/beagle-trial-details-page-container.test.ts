@@ -116,6 +116,20 @@ describe("BeagleTrialDetailsPageContainer", () => {
             points: null,
             judge: null,
           },
+          {
+            id: "r_3",
+            trialRuleWindowId: "trw_post_20110801",
+            dogId: null,
+            registrationNo: "FI-3/20",
+            name: "FI-3/20",
+            sex: "-",
+            weather: null,
+            award: null,
+            classCode: null,
+            rank: null,
+            points: null,
+            judge: null,
+          },
         ],
       },
       isLoading: false,
@@ -139,7 +153,52 @@ describe("BeagleTrialDetailsPageContainer", () => {
     expect(html).toContain('aria-label="trials.details.actions.pdf"');
     expect(html).toContain('href="/beagle/trials/pdf?trialEntryId=r_1"');
     expect(html).not.toContain('href="/beagle/trials/pdf?trialEntryId=r_2"');
+    expect(html).toContain(
+      'href="/beagle/trials/pdf?trialEntryId=r_1&amp;trialEntryId=r_3" target="_blank" rel="noreferrer" aria-label="trials.details.actions.pdf.all" title="trials.details.actions.pdf.all"',
+    );
     expect(html).toContain("trials.details.copy.all");
     expect(html).toContain('href="/beagle/dogs/dog_1"');
+  });
+
+  it("does not render aggregate PDF action when no rows are eligible", () => {
+    useBeagleTrialDetailsQueryMock.mockReturnValue({
+      data: {
+        trial: {
+          trialId: "trial_1",
+          eventDate: "2025-06-01",
+          eventPlace: "Helsinki",
+          judge: null,
+          dogCount: 1,
+        },
+        items: [
+          {
+            id: "r_2",
+            trialRuleWindowId: "trw_pre_20020801",
+            dogId: null,
+            registrationNo: "FI-2/20",
+            name: "FI-2/20",
+            sex: "-",
+            weather: null,
+            award: null,
+            classCode: null,
+            rank: null,
+            points: null,
+            judge: null,
+          },
+        ],
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+
+    const html = renderToStaticMarkup(
+      React.createElement(BeagleTrialDetailsPageContainer, {
+        trialId: "trial_1",
+      }),
+    );
+
+    expect(html).not.toContain("trials.details.actions.pdf.all");
+    expect(html).not.toContain('href="/beagle/trials/pdf?trialEntryId=r_2"');
   });
 });

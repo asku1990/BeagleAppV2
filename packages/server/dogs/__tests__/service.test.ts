@@ -390,6 +390,7 @@ describe("dogs service", () => {
       {
         id: "show1",
         eventKey: "show-event-1",
+        eventCity: "Espoo",
         place: "City",
         date: new Date("2024-01-01T00:00:00.000Z"),
         showType: "Ryhmänäyttely",
@@ -642,6 +643,7 @@ describe("dogs service", () => {
       {
         id: "show2",
         eventKey: "show-event-2",
+        eventCity: null,
         place: "Helsinki",
         date: new Date("2022-03-15T00:00:00+02:00"),
         showType: null,
@@ -756,6 +758,7 @@ describe("dogs service", () => {
       {
         id: "show-case",
         eventKey: "show-event-case",
+        eventCity: null,
         place: "City",
         date: new Date("2024-02-01T00:00:00.000Z"),
         showType: "Ryhmänäyttely",
@@ -821,6 +824,7 @@ describe("dogs service", () => {
       {
         id: "show-legacy",
         eventKey: "show-event-legacy",
+        eventCity: null,
         place: "Kajaani",
         date: new Date("1996-01-06T00:00:00.000Z"),
         showType: null,

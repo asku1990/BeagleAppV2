@@ -50,7 +50,12 @@ describe("DogProfileTrialsCard", () => {
 
     expect(html).toContain(">S1<");
     expect(html).toContain("dog.profile.trials.copy.button");
+    expect(html).toContain("dog.profile.trials.openPdfStack");
+    expect(html).toContain("dog.profile.trials.actions.pdf");
     expect(html).toContain('href="/beagle/trials/trial-route-1"');
+    expect(html).toContain(
+      'href="/beagle/trials/pdf?trialEntryId=trial-entry-1"',
+    );
   });
 
   it("keeps pair rank separator as pipe", () => {
@@ -86,5 +91,6 @@ describe("DogProfileTrialsCard", () => {
     );
 
     expect(html).toContain(">8|12<");
+    expect(html).not.toContain("trial-entry-2");
   });
 });

@@ -7,7 +7,6 @@ import {
   formatClassResult,
   formatPupn,
   formatQualityGrade,
-  formatShowType,
   getBeagleShowHref,
 } from "@/lib/public/beagle/shows";
 import {
@@ -16,11 +15,10 @@ import {
   formatDogProfileShowHeight,
   type DogProfileShowCritique,
   type DogProfileShowsT,
-} from "./dog-profile-shows-core";
+} from "@/lib/public/beagle/dogs/profile";
 
 type DogProfileShowsResultsMobileProps = {
   visibleRows: BeagleDogProfileShowRowDto[];
-  hasShowType: boolean;
   hasQualityGrade: boolean;
   hasClassResult: boolean;
   hasPupn: boolean;
@@ -35,7 +33,6 @@ type DogProfileShowsResultsMobileProps = {
 
 export function DogProfileShowsResultsMobile({
   visibleRows,
-  hasShowType,
   hasQualityGrade,
   hasClassResult,
   hasPupn,
@@ -65,19 +62,27 @@ export function DogProfileShowsResultsMobile({
               </span>{" "}
               <span>{index + 1}</span>
             </p>
-            {hasShowType && (
-              <p>
-                <span className={beagleTheme.mutedText}>
-                  {t("dog.profile.shows.col.showType")}:
-                </span>{" "}
-                <span>{formatShowType(row)}</span>
-              </p>
-            )}
             <p>
               <span className={beagleTheme.mutedText}>
                 {t("dog.profile.shows.col.date")}:
               </span>{" "}
-              <span>{formatDogProfileShowDate(row.date, locale)}</span>
+              <Link
+                href={getBeagleShowHref(row.showId)}
+                className={beagleTheme.entityLink}
+              >
+                {formatDogProfileShowDate(row.date, locale)}
+              </Link>
+            </p>
+            <p className="col-span-2">
+              <span className={beagleTheme.mutedText}>
+                {t("dog.profile.shows.col.city")}:
+              </span>{" "}
+              <Link
+                href={getBeagleShowHref(row.showId)}
+                className={beagleTheme.entityLink}
+              >
+                {row.eventCity ?? "-"}
+              </Link>
             </p>
             <p className="col-span-2">
               <span className={beagleTheme.mutedText}>

@@ -241,6 +241,7 @@ describe("formatDogProfileShowRowsForClipboard", () => {
         {
           id: "s1",
           showId: "show-1",
+          eventCity: null,
           place: "Helsinki",
           date: "2025-06-01",
           showType: "Ryhmänäyttely",
@@ -256,6 +257,7 @@ describe("formatDogProfileShowRowsForClipboard", () => {
         {
           id: "s2",
           showId: "show-2",
+          eventCity: null,
           place: "Turku",
           date: "2025-05-01",
           showType: null,
@@ -312,6 +314,7 @@ describe("formatDogProfileShowRowsForClipboard", () => {
         {
           id: "s3",
           showId: "show-3",
+          eventCity: null,
           place: "Tam\tpe\nre",
           date: "2025-06-03",
           showType: null,

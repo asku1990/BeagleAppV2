@@ -34,8 +34,6 @@ export const fiBeagleShowsMessages = {
   "shows.results.col.place": "Paikka",
   "shows.results.col.judge": "Tuomari",
   "shows.results.col.dogCount": "Koiria",
-  "shows.results.col.details": "Tuloslista",
-  "shows.results.open": "Avaa näyttely",
   "shows.results.copy.button": "Kopioi sivun tulokset",
   "shows.results.copy.success": "Näyttelyhaun tulokset kopioitu leikepöydälle.",
   "shows.results.copy.error": "Näyttelyhaun tulosten kopiointi epäonnistui.",
@@ -123,8 +121,6 @@ export const svBeagleShowsMessages = {
   "shows.results.col.place": "Plats",
   "shows.results.col.judge": "Domare",
   "shows.results.col.dogCount": "Hundar",
-  "shows.results.col.details": "Resultatlista",
-  "shows.results.open": "Öppna utställning",
   "shows.results.copy.button": "Kopiera sidans resultat",
   "shows.results.copy.success":
     "Utställningsresultaten kopierades till urklipp.",

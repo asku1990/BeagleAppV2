@@ -1,11 +1,14 @@
 import Link from "next/link";
+import { FileText } from "lucide-react";
 import type { BeagleTrialSearchRow } from "@beagle/contracts";
+import { Button } from "@/components/ui/button";
 import { beagleTheme } from "@/components/ui/beagle-theme";
 import { useI18n } from "@/hooks/i18n";
 import {
   formatIsoDateForDisplay,
   formatTrialWeatherSummary,
   getBeagleTrialHref,
+  getTrialPdfPageHref,
 } from "@/lib/public/beagle/trials";
 import { cn } from "@/lib/utils";
 
@@ -32,13 +35,23 @@ export function BeagleTrialsResultsMobileCards({
               <span className={beagleTheme.mutedText}>
                 {t("trials.results.col.date")}:{" "}
               </span>
-              <span>{formatIsoDateForDisplay(row.eventDate, locale)}</span>
+              <Link
+                href={getBeagleTrialHref(row.trialId)}
+                className={beagleTheme.entityLink}
+              >
+                {formatIsoDateForDisplay(row.eventDate, locale)}
+              </Link>
             </p>
             <p className="col-span-2">
               <span className={beagleTheme.mutedText}>
                 {t("trials.results.col.place")}:{" "}
               </span>
-              <span>{row.eventPlace}</span>
+              <Link
+                href={getBeagleTrialHref(row.trialId)}
+                className={beagleTheme.entityLink}
+              >
+                {row.eventPlace}
+              </Link>
             </p>
             <p className="col-span-2">
               <span className={beagleTheme.mutedText}>
@@ -72,14 +85,24 @@ export function BeagleTrialsResultsMobileCards({
               </span>
               <span>{row.average == null ? "-" : row.average.toFixed(2)}</span>
             </p>
-            <p className="col-span-2">
-              <Link
-                href={getBeagleTrialHref(row.trialId)}
-                className={beagleTheme.entityLink}
+            {row.pdfTrialEntryIds.length > 0 ? (
+              <Button
+                asChild
+                variant="ghost"
+                size="icon-xs"
+                className="justify-self-end"
               >
-                {t("trials.results.open")}
-              </Link>
-            </p>
+                <Link
+                  href={getTrialPdfPageHref(row.pdfTrialEntryIds)}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={t("trials.results.actions.pdf")}
+                  title={t("trials.results.actions.pdf")}
+                >
+                  <FileText className="size-3.5" aria-hidden="true" />
+                </Link>
+              </Button>
+            ) : null}
           </div>
         </article>
       ))}

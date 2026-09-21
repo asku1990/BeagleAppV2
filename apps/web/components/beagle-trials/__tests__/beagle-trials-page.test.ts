@@ -167,6 +167,7 @@ describe("BeagleTrialsPage", () => {
         items: [
           {
             trialId: "s_1",
+            pdfTrialEntryIds: ["entry_1"],
             eventDate: "2025-06-01",
             eventPlace: "Helsinki",
             judge: "Judge Main",
@@ -219,11 +220,16 @@ describe("BeagleTrialsPage", () => {
     expect(html).toContain("trials.results.col.average");
     expect(html).toContain("trials.results.weather.bareGround");
     expect(html).toContain("trials.results.copy.button");
-    expect(html).toContain("trials.results.open");
+    expect(html).toContain('href="/beagle/trials/s_1"');
+    expect(html).not.toContain("trials.results.open");
+    expect(html).not.toContain("trials.results.col.details");
+    expect(html).toContain('target="_blank"');
+    expect(html).toContain('aria-label="trials.results.actions.pdf"');
     expect(html).toContain("trials.pagination.range 1-1 / 1");
     expect(html).toContain("trials.awardSummary.title");
     expect(html).toContain("1 (25.00%)");
     expect(html).toContain("trials.searchSummary.title");
     expect(html).toContain("trials.searchSummary.row.entries");
+    expect(html).toContain("trials.results.filter.year 2025");
   });
 });

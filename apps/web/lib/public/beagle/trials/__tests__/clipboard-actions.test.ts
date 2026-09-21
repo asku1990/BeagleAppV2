@@ -56,6 +56,7 @@ describe("trial clipboard actions", () => {
       rows: [
         {
           trialId: "t1",
+          pdfTrialEntryIds: [],
           eventDate: "2025-06-01",
           eventPlace: "Helsinki",
           judge: "Judge A",

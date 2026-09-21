@@ -193,16 +193,41 @@ function BeagleTrialPdfCanvas({
       await renderTask.promise;
     }
 
-    void renderPdfPage().catch((error) => {
+    const renderPromise = renderPdfPage();
+    void renderPromise.catch((error) => {
       if (!cancelled) {
         throw error;
       }
     });
 
+    const cleanupPdfDocument = async () => {
+      if (!pdfDocument) {
+        return;
+      }
+
+      for (let attempt = 0; attempt < 5; attempt += 1) {
+        try {
+          await pdfDocument.cleanup();
+          return;
+        } catch (error) {
+          if (
+            !(error instanceof Error) ||
+            !error.message.includes("currently rendering")
+          ) {
+            return;
+          }
+
+          await new Promise<void>((resolve) => {
+            requestAnimationFrame(() => resolve());
+          });
+        }
+      }
+    };
+
     return () => {
       cancelled = true;
       renderTask?.cancel();
-      void pdfDocument?.cleanup();
+      void renderPromise.then(cleanupPdfDocument, cleanupPdfDocument);
     };
   }, [containerWidth, loadedPage, sharedPageWidth]);
 

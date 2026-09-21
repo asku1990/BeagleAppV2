@@ -157,7 +157,9 @@ describe("BeagleShowsPage", () => {
     expect(html).toContain("Helsinki");
     expect(html).toContain("Espoo");
     expect(html).toContain("Judge Main");
-    expect(html).toContain("shows.results.open");
+    expect(html.match(/href="\/beagle\/shows\/s_1"/g)).toHaveLength(6);
+    expect(html).not.toContain("shows.results.col.details");
+    expect(html).not.toContain("shows.results.open");
     expect(html).toContain("shows.results.copy.button");
     expect(html).toContain("shows.pagination.range 1-1 / 1");
   });

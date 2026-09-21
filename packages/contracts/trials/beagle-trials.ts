@@ -25,6 +25,7 @@ export type BeagleTrialSearchFilters = {
 
 export type BeagleTrialSearchRow = {
   trialId: string;
+  pdfTrialEntryIds: string[];
   eventDate: string;
   eventPlace: string;
   judge: string | null;

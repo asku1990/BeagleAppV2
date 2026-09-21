@@ -16,6 +16,7 @@ export async function getBeagleShowsForDogDb(
       showEvent: {
         select: {
           eventLookupKey: true,
+          eventCity: true,
           eventPlace: true,
           eventDate: true,
           eventType: true,
@@ -52,6 +53,7 @@ export async function getBeagleShowsForDogDb(
   return rows.map((row) => ({
     id: row.id,
     eventKey: row.showEvent.eventLookupKey,
+    eventCity: row.showEvent.eventCity,
     place: row.showEvent.eventPlace,
     date: row.showEvent.eventDate,
     ...projectCanonicalShowResult(row.showEvent.eventType, row.resultItems),

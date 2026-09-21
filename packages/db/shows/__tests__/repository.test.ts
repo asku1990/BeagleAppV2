@@ -615,6 +615,7 @@ describe("getBeagleShowsForDogDb", () => {
         critiqueText: "Excellent",
         showEvent: {
           eventLookupKey: "show-event-2",
+          eventCity: "Espoo",
           eventPlace: "Lahti",
           eventDate: new Date("2025-06-02T00:00:00.000Z"),
         },
@@ -641,6 +642,7 @@ describe("getBeagleShowsForDogDb", () => {
         critiqueText: null,
         showEvent: {
           eventLookupKey: "show-event-1",
+          eventCity: null,
           eventPlace: "Helsinki",
           eventDate: new Date("2025-06-01T00:00:00.000Z"),
         },
@@ -663,6 +665,7 @@ describe("getBeagleShowsForDogDb", () => {
       {
         id: "s2",
         eventKey: "show-event-2",
+        eventCity: "Espoo",
         place: "Lahti",
         date: new Date("2025-06-02T00:00:00.000Z"),
         showType: null,
@@ -678,6 +681,7 @@ describe("getBeagleShowsForDogDb", () => {
       {
         id: "s1",
         eventKey: "show-event-1",
+        eventCity: null,
         place: "Helsinki",
         date: new Date("2025-06-01T00:00:00.000Z"),
         showType: null,
