@@ -35,6 +35,7 @@ describe("BeagleTrialsResultsDesktopTable", () => {
     );
 
     expect(html).toContain("Helsinki");
+    expect(html).toContain("whitespace-nowrap");
     expect(html).toContain('href="/beagle/trials/trial_1"');
     expect(html.match(/<a /g)).toHaveLength(2);
     expect(html).toContain('href="/beagle/trials/trial_1" class="');

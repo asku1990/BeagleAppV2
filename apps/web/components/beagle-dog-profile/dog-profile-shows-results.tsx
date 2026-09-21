@@ -16,7 +16,7 @@ import {
   formatDogProfileShowHeight,
   type DogProfileShowCritique,
   type DogProfileShowsT,
-} from "./dog-profile-shows-core";
+} from "@/lib/public/beagle/dogs/profile";
 import { DogProfileShowsResultsMobile } from "./dog-profile-shows-results-mobile";
 
 type DogProfileShowsResultsProps = {
@@ -56,12 +56,6 @@ export function DogProfileShowsResults({
                 <th className="px-2 py-2 font-semibold">
                   {t("dog.profile.shows.col.no")}
                 </th>
-                {/* Temporarily hidden until show type is needed here. */}
-                {/* {hasShowType && (
-                  <th className="px-2 py-2 font-semibold">
-                    {t("dog.profile.shows.col.showType")}
-                  </th>
-                )} */}
                 <th className="px-2 py-2 font-semibold">
                   {t("dog.profile.shows.col.date")}
                 </th>
@@ -115,9 +109,6 @@ export function DogProfileShowsResults({
                   className={cn("border-b align-top", beagleTheme.border)}
                 >
                   <td className="px-2 py-2">{index + 1}</td>
-                  {/* {hasShowType && (
-                    <td className="px-2 py-2">{formatShowType(row)}</td>
-                  )} */}
                   <td className="px-2 py-2">
                     <Link
                       href={getBeagleShowHref(row.showId)}

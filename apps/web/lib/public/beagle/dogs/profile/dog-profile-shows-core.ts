@@ -1,4 +1,4 @@
-import { parseLocalIsoDate } from "@/lib/public/beagle/dogs/profile";
+import { parseLocalIsoDate } from "./date";
 
 export const DOG_PROFILE_SHOW_FALLBACK_VALUE = "-";
 

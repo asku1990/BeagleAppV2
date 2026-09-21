@@ -21,7 +21,7 @@ export function BeagleTrialsResultsDesktopTable({
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[980px] border-collapse text-sm">
+      <table className="w-full min-w-[980px] whitespace-nowrap border-collapse text-sm">
         <thead>
           <tr className={cn("border-b text-left", beagleTheme.border)}>
             <th className="px-2 py-2 font-semibold">

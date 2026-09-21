@@ -15,7 +15,7 @@ import {
   formatDogProfileShowHeight,
   type DogProfileShowCritique,
   type DogProfileShowsT,
-} from "./dog-profile-shows-core";
+} from "@/lib/public/beagle/dogs/profile";
 
 type DogProfileShowsResultsMobileProps = {
   visibleRows: BeagleDogProfileShowRowDto[];
@@ -62,15 +62,6 @@ export function DogProfileShowsResultsMobile({
               </span>{" "}
               <span>{index + 1}</span>
             </p>
-            {/* Temporarily hidden until show type is needed here. */}
-            {/* {hasShowType && (
-              <p>
-                <span className={beagleTheme.mutedText}>
-                  {t("dog.profile.shows.col.showType")}:
-                </span>{" "}
-                <span>{formatShowType(row)}</span>
-              </p>
-            )} */}
             <p>
               <span className={beagleTheme.mutedText}>
                 {t("dog.profile.shows.col.date")}:

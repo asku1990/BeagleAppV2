@@ -20,12 +20,12 @@ import {
   hasDogProfileShowQuality,
   hasShowClassResult,
 } from "@/lib/public/beagle/shows";
-import { cn } from "@/lib/utils";
-import { DogProfileShowsResults } from "./dog-profile-shows-results";
 import {
   formatDogProfileShowDate,
   type DogProfileShowCritique,
-} from "./dog-profile-shows-core";
+} from "@/lib/public/beagle/dogs/profile";
+import { cn } from "@/lib/utils";
+import { DogProfileShowsResults } from "./dog-profile-shows-results";
 
 export function DogProfileShowsCard({
   rows,

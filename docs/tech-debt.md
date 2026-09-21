@@ -26,6 +26,15 @@ Use this format for new entries:
 
 ## Entries
 
+## 2026-09-21 - Centralize public trial PDF eligibility for detail DTOs
+
+- Area: Public trial detail PDF actions.
+- Issue: The detail page owns a client-side copy of the trial-rule-window eligibility predicate, while listing and dog-profile DTOs receive the eligibility decision from `packages/server`.
+- Impact: A future rule-window change can make the detail-page action drift from the server-enforced PDF policy.
+- Suggested fix: Add a server-derived eligibility field to the trial detail DTO and remove the client-side predicate.
+- Trigger to revisit: Next change to trial PDF eligibility or the public trial detail contract.
+- Ticket: Unassigned follow-up.
+
 ## 2026-07-23 - Add deterministic dirty-form browser Back interception
 
 - Area: Admin AJOK manual-result navigation guard.
