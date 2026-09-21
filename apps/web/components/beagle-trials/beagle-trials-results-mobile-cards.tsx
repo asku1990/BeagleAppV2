@@ -35,13 +35,23 @@ export function BeagleTrialsResultsMobileCards({
               <span className={beagleTheme.mutedText}>
                 {t("trials.results.col.date")}:{" "}
               </span>
-              {formatIsoDateForDisplay(row.eventDate, locale)}
+              <Link
+                href={getBeagleTrialHref(row.trialId)}
+                className={beagleTheme.entityLink}
+              >
+                {formatIsoDateForDisplay(row.eventDate, locale)}
+              </Link>
             </p>
             <p className="col-span-2">
               <span className={beagleTheme.mutedText}>
                 {t("trials.results.col.place")}:{" "}
               </span>
-              {row.eventPlace}
+              <Link
+                href={getBeagleTrialHref(row.trialId)}
+                className={beagleTheme.entityLink}
+              >
+                {row.eventPlace}
+              </Link>
             </p>
             <p className="col-span-2">
               <span className={beagleTheme.mutedText}>
@@ -74,14 +84,6 @@ export function BeagleTrialsResultsMobileCards({
                 {t("trials.results.col.average")}:{" "}
               </span>
               <span>{row.average == null ? "-" : row.average.toFixed(2)}</span>
-            </p>
-            <p className="col-span-2">
-              <Link
-                href={getBeagleTrialHref(row.trialId)}
-                className={beagleTheme.entityLink}
-              >
-                {t("trials.results.open")}
-              </Link>
             </p>
             {row.pdfTrialEntryIds.length > 0 ? (
               <Button

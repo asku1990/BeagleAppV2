@@ -42,9 +42,6 @@ export function BeagleTrialsResultsDesktopTable({
             <th className="px-2 py-2 font-semibold">
               {t("trials.results.col.average")}
             </th>
-            <th className="px-2 py-2 font-semibold">
-              {t("trials.results.open")}
-            </th>
             <th className="px-2 py-2 text-left font-semibold">
               {t("trials.results.col.pdf")}
             </th>
@@ -57,9 +54,21 @@ export function BeagleTrialsResultsDesktopTable({
               className={cn("border-b align-top", beagleTheme.border)}
             >
               <td className="px-2 py-2">
-                {formatIsoDateForDisplay(row.eventDate, locale)}
+                <Link
+                  href={getBeagleTrialHref(row.trialId)}
+                  className={beagleTheme.entityLink}
+                >
+                  {formatIsoDateForDisplay(row.eventDate, locale)}
+                </Link>
               </td>
-              <td className="px-2 py-2">{row.eventPlace}</td>
+              <td className="px-2 py-2">
+                <Link
+                  href={getBeagleTrialHref(row.trialId)}
+                  className={beagleTheme.entityLink}
+                >
+                  {row.eventPlace}
+                </Link>
+              </td>
               <td className="px-2 py-2">{row.judge ?? "-"}</td>
               <td className="px-2 py-2">{row.dogCount}</td>
               <td className="px-2 py-2">
@@ -71,14 +80,6 @@ export function BeagleTrialsResultsDesktopTable({
               </td>
               <td className="px-2 py-2">
                 {row.average == null ? "-" : row.average.toFixed(2)}
-              </td>
-              <td className="px-2 py-2">
-                <Link
-                  href={getBeagleTrialHref(row.trialId)}
-                  className={beagleTheme.entityLink}
-                >
-                  {t("trials.results.open")}
-                </Link>
               </td>
               <td className="px-2 py-2">
                 {row.pdfTrialEntryIds.length > 0 ? (
