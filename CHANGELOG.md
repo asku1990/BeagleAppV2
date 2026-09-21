@@ -20,6 +20,23 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.23.0] - 2026-09-21
+
+### Added
+
+- Julkisella ajokoehakusivulla on kokeen PDF-pöytäkirjojen painike ja tiiviimpi yhden rivin työpöytänäkymä.
+- Ajokokeen tulossivulta voi avata kaikkien kelvollisten koirien PDF-pöytäkirjat kerralla.
+- Koiraprofiilissa voi avata ajokokeiden yksittäisiä ja kaikkia PDF-pöytäkirjoja.
+
+### Changed
+
+- Koiraprofiilin näyttelytuloksissa näytetään paikkakunta, ja Päivä-, Paikkakunta- ja Paikka-kentät ovat linkkejä näyttelyn tietoihin. Näyttelytyyppi on toistaiseksi piilotettu.
+- Julkisten ajokoe- ja näyttelyhakujen Päivä- ja Paikka-kentät sekä näyttelyhaun Paikkakunta-kenttä avaavat tulossivun ilman erillistä Avaa-painiketta.
+
+### Fixed
+
+### Removed
+
 ## [0.22.0] - 2026-09-15
 
 ### Added

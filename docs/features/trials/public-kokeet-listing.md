@@ -2,6 +2,13 @@
 
 Developer notes for the public `/beagle/trials` listing.
 
+## PDF action and compact rows
+
+Each supported public trial row exposes a PDF action that opens the collection
+view in a new tab, matching the v1 listing flow. The desktop table keeps all
+summary fields on one compact, non-wrapping row; mobile continues to use the
+stacked card presentation for usability.
+
 ## Filtered YHTEENVETO
 
 The listing also renders a filtered `Yhteenveto` section before the long-term

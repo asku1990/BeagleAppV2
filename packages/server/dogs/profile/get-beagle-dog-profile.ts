@@ -87,6 +87,7 @@ function mapDogProfileFromDb(
       return {
         id: show.id,
         showId: encodeShowId(showDate, show.place, show.eventKey),
+        eventCity: show.eventCity,
         place: show.place,
         date: showDate,
         showType: show.showType,

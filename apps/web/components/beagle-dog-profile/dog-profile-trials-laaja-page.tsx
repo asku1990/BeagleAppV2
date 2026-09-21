@@ -126,6 +126,8 @@ export function DogProfileTrialsLaajaPage({
                       href={getTrialPdfPageHref(supportedTrialEntryIds)}
                       target="_blank"
                       rel="noreferrer"
+                      aria-label={t("dog.profile.trials.openPdfStack")}
+                      title={t("dog.profile.trials.openPdfStack")}
                     >
                       {t("dog.profile.trials.openPdfStack")}
                     </Link>

@@ -20,6 +20,7 @@ import {
 import { parseIsoDateOnly } from "./internal/iso-date";
 import { mapBeagleTrialAwardSummary } from "./internal/map-beagle-trial-award-summary";
 import { mapBeagleTrialSearchSummary } from "./internal/map-beagle-trial-search-summary";
+import { canRenderTrialDogPdf } from "./pdf";
 import type { TrialsServiceLogContext } from "./types";
 
 const ALLOWED_SORTS: ReadonlySet<BeagleTrialSearchSortDb> = new Set([
@@ -291,6 +292,9 @@ export async function searchBeagleTrialsService(
       page: result.page,
       items: result.items.map((item) => ({
         trialId: item.trialEventId,
+        pdfTrialEntryIds: canRenderTrialDogPdf(item.trialRuleWindowId)
+          ? item.trialEntryIds
+          : [],
         eventDate: formatTrialDateOnly(item.eventDate),
         eventPlace: item.eventPlace,
         judge: item.judge,

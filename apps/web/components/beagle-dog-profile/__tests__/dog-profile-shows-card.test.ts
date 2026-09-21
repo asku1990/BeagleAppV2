@@ -23,6 +23,7 @@ describe("DogProfileShowsCard", () => {
           {
             id: "show1",
             showId: "show-route-1",
+            eventCity: "Espoo",
             place: "Helsinki",
             date: "2024-01-01",
             showType: "Ryhmänäyttely",
@@ -40,7 +41,9 @@ describe("DogProfileShowsCard", () => {
     );
 
     expect(html).toContain("dog.profile.shows.copy.button");
-    expect(html).toContain("dog.profile.shows.col.showType");
+    expect(html).not.toContain("dog.profile.shows.col.showType");
+    expect(html).toContain("dog.profile.shows.col.city");
+    expect(html).toContain("Espoo");
     expect(html).toContain("dog.profile.shows.col.classResult");
     expect(html).toContain('href="/beagle/shows/show-route-1"');
   });

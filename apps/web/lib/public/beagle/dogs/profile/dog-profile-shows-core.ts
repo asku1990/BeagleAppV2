@@ -1,4 +1,4 @@
-import { parseLocalIsoDate } from "@/lib/public/beagle/dogs/profile";
+import { parseLocalIsoDate } from "./date";
 
 export const DOG_PROFILE_SHOW_FALLBACK_VALUE = "-";
 
@@ -15,6 +15,7 @@ export type DogProfileShowsT = (
     | "dog.profile.shows.col.showType"
     | "dog.profile.shows.col.className"
     | "dog.profile.shows.col.place"
+    | "dog.profile.shows.col.city"
     | "dog.profile.shows.col.date"
     | "dog.profile.shows.col.qualityGrade"
     | "dog.profile.shows.col.classResult"

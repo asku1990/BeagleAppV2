@@ -50,6 +50,9 @@ The public dog profile contract includes:
 - `siblingsSummary`
 - `siblings[]`
 
+Show rows include the event city as `eventCity`; the UI displays it after the
+date and uses `-` when it is missing, matching the public show search.
+
 Current note:
 
 - grouped litter data is already part of the profile contract and backend mapping

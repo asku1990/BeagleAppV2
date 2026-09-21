@@ -207,6 +207,7 @@ describe("DogProfileTrialsLaajaPage", () => {
     );
     expect(html).toContain('target="_blank"');
     expect(html).toContain('rel="noreferrer"');
+    expect(html).toContain("dog.profile.trials.actions.pdf");
     expect(html).not.toContain("trial-entry-2");
     expect(html).toContain("1 / 12");
     expect(html).toContain("85.50");
@@ -363,7 +364,7 @@ describe("DogProfileTrialsLaajaPage", () => {
         .find((rowHtml) => rowHtml.includes("Hyvä erä")) ?? "";
     const firstEraCells = [...firstEraRowHtml.matchAll(/<td/g)];
 
-    expect(firstEraCells).toHaveLength(16);
+    expect(firstEraCells).toHaveLength(17);
     expect(firstEraRowHtml).toMatch(
       /0\.00<\/td><td class="px-2 py-2"><\/td><td class="px-2 py-2">Hyvä erä<\/td><td class="px-2 py-2">0\.50<\/td><td class="px-2 py-2">8\.00<\/td>/,
     );

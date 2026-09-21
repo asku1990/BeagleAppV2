@@ -185,6 +185,7 @@ describe("formatTrialSearchRowsForClipboard", () => {
       [
         {
           trialId: "t1",
+          pdfTrialEntryIds: [],
           eventDate: "2025-06-01",
           eventPlace: "Helsinki",
           judge: "Judge A",
@@ -194,6 +195,7 @@ describe("formatTrialSearchRowsForClipboard", () => {
         },
         {
           trialId: "t2",
+          pdfTrialEntryIds: [],
           eventDate: "2025-05-01",
           eventPlace: "Turku",
           judge: null,
@@ -225,6 +227,7 @@ describe("formatTrialSearchRowsForClipboard", () => {
       [
         {
           trialId: "t1",
+          pdfTrialEntryIds: [],
           eventDate: "2025-06-01",
           eventPlace: "Helsinki",
           judge: null,

@@ -100,6 +100,7 @@ export async function searchBeagleTrialsDb(
         koepaiva: true,
         koekunta: true,
         ylituomariNimi: true,
+        trialRuleWindowId: true,
         _count: { select: { entries: true } },
       },
     }),
@@ -109,6 +110,8 @@ export async function searchBeagleTrialsDb(
   const rows = eventRows
     .map((row) => ({
       trialEventId: row.id,
+      trialRuleWindowId: row.trialRuleWindowId,
+      trialEntryIds: [],
       eventDate: row.koepaiva,
       eventPlace: row.koekunta,
       judge: row.ylituomariNimi?.trim() || null,
@@ -128,7 +131,7 @@ export async function searchBeagleTrialsDb(
           where: {
             trialEventId: { in: pageRows.map((row) => row.trialEventId) },
           },
-          select: { trialEventId: true, ke: true, piste: true },
+          select: { id: true, trialEventId: true, ke: true, piste: true },
           orderBy: { id: "asc" },
         });
   const entriesByEvent = new Map<string, typeof entryRows>();
@@ -155,6 +158,9 @@ export async function searchBeagleTrialsDb(
 
     return {
       ...row,
+      trialEntryIds: entries
+        .map((entry) => entry.id)
+        .filter((id): id is string => typeof id === "string"),
       weather,
       average:
         scoredEntries.length === 0

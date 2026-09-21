@@ -22,4 +22,6 @@ export type DogProfileTrialsLaajaHeaders = DogProfileTrialsEraHeaders & {
   rank: string;
   points: string;
   judge: string;
+  pdf: string;
+  pdfColumn: string;
 };

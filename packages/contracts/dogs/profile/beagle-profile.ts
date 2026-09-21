@@ -97,6 +97,7 @@ export type BeagleDogTrialsEraStatsDto = {
 export type BeagleDogProfileShowRowDto = BeagleShowStructuredResultDto & {
   id: string;
   showId: string;
+  eventCity: string | null;
   place: string;
   date: string;
   critiqueText: string | null;
