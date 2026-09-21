@@ -16,7 +16,7 @@ vi.mock("@/hooks/i18n", () => ({
 }));
 
 describe("BeagleShowsResultsMobileCards", () => {
-  it("renders show card content with details link", () => {
+  it("links date, city, and place", () => {
     const html = renderToStaticMarkup(
       React.createElement(BeagleShowsResultsMobileCards, {
         rows: [
@@ -36,8 +36,9 @@ describe("BeagleShowsResultsMobileCards", () => {
     expect(html).toContain("Helsinki");
     expect(html).toContain("Judge Main");
     expect(html).toContain("12");
-    expect(html).toContain("shows.results.open");
     expect(html).toContain('href="/beagle/shows/show_1"');
+    expect(html.match(/href="\/beagle\/shows\/show_1"/g)).toHaveLength(3);
+    expect(html).not.toContain("shows.results.open");
   });
 
   it("renders dash fallback when judge is missing", () => {
@@ -59,6 +60,6 @@ describe("BeagleShowsResultsMobileCards", () => {
     expect(html).toContain("Turku");
     expect(html).toContain("shows.results.col.city:");
     expect(html).toContain("shows.results.col.judge:");
-    expect(html).toContain("-");
+    expect(html).toMatch(/href="\/beagle\/shows\/show_2" class="[^"]*">-<\/a>/);
   });
 });

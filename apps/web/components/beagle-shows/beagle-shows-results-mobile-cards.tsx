@@ -31,7 +31,12 @@ export function BeagleShowsResultsMobileCards({
               <span className={beagleTheme.mutedText}>
                 {t("shows.results.col.date")}:{" "}
               </span>
-              <span>{formatIsoDateForDisplay(row.eventDate, locale)}</span>
+              <Link
+                href={getBeagleShowHref(row.showId)}
+                className={beagleTheme.entityLink}
+              >
+                {formatIsoDateForDisplay(row.eventDate, locale)}
+              </Link>
             </p>
             <p>
               <span className={beagleTheme.mutedText}>
@@ -45,27 +50,29 @@ export function BeagleShowsResultsMobileCards({
               <span className={beagleTheme.mutedText}>
                 {t("shows.results.col.city")}:{" "}
               </span>
-              <span>{row.eventCity ?? "-"}</span>
+              <Link
+                href={getBeagleShowHref(row.showId)}
+                className={beagleTheme.entityLink}
+              >
+                {row.eventCity ?? "-"}
+              </Link>
             </p>
             <p className="col-span-2">
               <span className={beagleTheme.mutedText}>
                 {t("shows.results.col.place")}:{" "}
               </span>
-              <span>{row.eventPlace}</span>
+              <Link
+                href={getBeagleShowHref(row.showId)}
+                className={beagleTheme.entityLink}
+              >
+                {row.eventPlace}
+              </Link>
             </p>
             <p className="col-span-2">
               <span className={beagleTheme.mutedText}>
                 {t("shows.results.col.judge")}:{" "}
               </span>
               <span>{row.judge ?? "-"}</span>
-            </p>
-            <p className="col-span-2">
-              <Link
-                href={getBeagleShowHref(row.showId)}
-                className={beagleTheme.entityLink}
-              >
-                {t("shows.results.open")}
-              </Link>
             </p>
           </div>
         </article>

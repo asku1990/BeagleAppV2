@@ -35,9 +35,6 @@ export function BeagleShowsResultsDesktopTable({
             <th className="px-2 py-2 font-semibold">
               {t("shows.results.col.dogCount")}
             </th>
-            <th className="px-2 py-2 font-semibold">
-              {t("shows.results.col.details")}
-            </th>
           </tr>
         </thead>
         <tbody>
@@ -47,20 +44,31 @@ export function BeagleShowsResultsDesktopTable({
               className={cn("border-b align-top", beagleTheme.border)}
             >
               <td className="px-2 py-2">
-                {formatIsoDateForDisplay(row.eventDate, locale)}
+                <Link
+                  href={getBeagleShowHref(row.showId)}
+                  className={beagleTheme.entityLink}
+                >
+                  {formatIsoDateForDisplay(row.eventDate, locale)}
+                </Link>
               </td>
-              <td className="px-2 py-2">{row.eventCity ?? "-"}</td>
-              <td className="px-2 py-2">{row.eventPlace}</td>
-              <td className="px-2 py-2">{row.judge ?? "-"}</td>
-              <td className="px-2 py-2">{row.dogCount}</td>
               <td className="px-2 py-2">
                 <Link
                   href={getBeagleShowHref(row.showId)}
                   className={beagleTheme.entityLink}
                 >
-                  {t("shows.results.open")}
+                  {row.eventCity ?? "-"}
                 </Link>
               </td>
+              <td className="px-2 py-2">
+                <Link
+                  href={getBeagleShowHref(row.showId)}
+                  className={beagleTheme.entityLink}
+                >
+                  {row.eventPlace}
+                </Link>
+              </td>
+              <td className="px-2 py-2">{row.judge ?? "-"}</td>
+              <td className="px-2 py-2">{row.dogCount}</td>
             </tr>
           ))}
         </tbody>

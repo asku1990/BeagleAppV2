@@ -16,7 +16,7 @@ vi.mock("@/hooks/i18n", () => ({
 }));
 
 describe("BeagleShowsResultsDesktopTable", () => {
-  it("renders the city column and its missing value fallback", () => {
+  it("links date, city, and place while keeping the city fallback", () => {
     const html = renderToStaticMarkup(
       React.createElement(BeagleShowsResultsDesktopTable, {
         rows: [
@@ -42,6 +42,11 @@ describe("BeagleShowsResultsDesktopTable", () => {
 
     expect(html).toContain("shows.results.col.city");
     expect(html).toContain("Espoo");
-    expect(html).toContain(">-</td>");
+    expect(html).toContain('href="/beagle/shows/show_1"');
+    expect(html.match(/href="\/beagle\/shows\/show_1"/g)).toHaveLength(3);
+    expect(html).toContain('href="/beagle/shows/show_2"');
+    expect(html).toMatch(/href="\/beagle\/shows\/show_2" class="[^"]*">-<\/a>/);
+    expect(html).not.toContain("shows.results.col.details");
+    expect(html).not.toContain("shows.results.open");
   });
 });
