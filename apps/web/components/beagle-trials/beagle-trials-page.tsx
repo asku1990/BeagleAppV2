@@ -215,7 +215,10 @@ export function BeagleTrialsPage() {
       </ListingSectionShell>
       {!isLoading && !hasError ? (
         <>
-          <BeagleTrialsSearchSummary summary={response.searchSummary} />
+          <BeagleTrialsSearchSummary
+            summary={response.searchSummary}
+            filterLabel={getFilterLabel(response.filters, locale, t)}
+          />
           <BeagleTrialsAwardSummary summary={response.awardSummary} />
         </>
       ) : null}

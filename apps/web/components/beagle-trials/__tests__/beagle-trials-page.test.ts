@@ -230,5 +230,6 @@ describe("BeagleTrialsPage", () => {
     expect(html).toContain("1 (25.00%)");
     expect(html).toContain("trials.searchSummary.title");
     expect(html).toContain("trials.searchSummary.row.entries");
+    expect(html).toContain("trials.results.filter.year 2025");
   });
 });

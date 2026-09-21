@@ -17,8 +17,10 @@ type OutcomeKey =
 
 export function BeagleTrialsSearchSummary({
   summary,
+  filterLabel,
 }: {
   summary: BeagleTrialSearchSummary;
+  filterLabel: string;
 }) {
   const { t } = useI18n();
 
@@ -36,54 +38,11 @@ export function BeagleTrialsSearchSummary({
 
   return (
     <ListingSectionShell title={t("trials.searchSummary.title")}>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div
-          className={cn(
-            "rounded-lg border px-4 py-3",
-            beagleTheme.border,
-            beagleTheme.surface,
-          )}
-        >
-          <p className={cn("text-xs", beagleTheme.mutedText)}>
-            {t("trials.searchSummary.row.trials")}
-          </p>
-          <p
-            className={cn(
-              "mt-1 text-xl font-semibold",
-              beagleTheme.inkStrongText,
-            )}
-          >
-            {summary.trialCount}{" "}
-            <span className="text-sm font-normal">
-              {t("trials.searchSummary.unit.count")}
-            </span>
-          </p>
-        </div>
-        <div
-          className={cn(
-            "rounded-lg border px-4 py-3",
-            beagleTheme.border,
-            beagleTheme.surface,
-          )}
-        >
-          <p className={cn("text-xs", beagleTheme.mutedText)}>
-            {t("trials.searchSummary.row.entries")}
-          </p>
-          <p
-            className={cn(
-              "mt-1 text-xl font-semibold",
-              beagleTheme.inkStrongText,
-            )}
-          >
-            {summary.entryCount}{" "}
-            <span className="text-sm font-normal">
-              {t("trials.searchSummary.unit.count")}
-            </span>
-          </p>
-        </div>
-      </div>
+      <p className={cn("text-sm", beagleTheme.mutedText)}>
+        {`${t("trials.searchSummary.row.trials")}: ${summary.trialCount} ${t("trials.searchSummary.unit.count")} · ${t("trials.searchSummary.row.entries")}: ${summary.entryCount} ${t("trials.searchSummary.unit.count")} · ${filterLabel}`}
+      </p>
 
-      <div className="mt-4">
+      <div className="mt-3">
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className={cn("border-b text-left", beagleTheme.border)}>
@@ -104,11 +63,11 @@ export function BeagleTrialsSearchSummary({
                   index % 2 === 0 ? beagleTheme.surface : "bg-transparent",
                 )}
               >
-                <th className="px-3 py-2 text-left font-medium">{row.label}</th>
-                <td className="px-3 py-2 text-right font-semibold tabular-nums">
+                <th className="px-3 py-2 text-left font-normal">{row.label}</th>
+                <td className="px-3 py-2 text-right font-normal tabular-nums">
                   {summary[row.key].count}
                 </td>
-                <td className="px-3 py-2 text-right font-semibold tabular-nums">
+                <td className="px-3 py-2 text-right font-normal tabular-nums">
                   {summary[row.key].percentage.toFixed(2)} %
                 </td>
               </tr>
