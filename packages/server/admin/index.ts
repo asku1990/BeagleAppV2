@@ -38,3 +38,7 @@ export { listAdminShowEvents } from "./shows";
 export { updateAdminShowEvent } from "./shows";
 export { updateAdminShowEntry } from "./shows";
 export { deleteAdminShowEntry } from "./shows";
+export {
+  previewFinnishKennelClubDogImport,
+  applyFinnishKennelClubDogImport,
+} from "./dogs/import";

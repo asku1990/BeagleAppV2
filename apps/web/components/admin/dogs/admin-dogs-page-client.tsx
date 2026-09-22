@@ -2,6 +2,7 @@
 
 import type { AdminDogListRequest, DogStatus } from "@beagle/contracts";
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { ListingSectionShell } from "@/components/listing";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/hooks/i18n";
@@ -177,9 +178,16 @@ export function AdminDogsPageClient() {
         <h1 className="text-2xl font-semibold tracking-tight">
           {t("admin.dogs.title")}
         </h1>
-        <Button type="button" onClick={dogFormFlow.openCreateModal}>
-          {t("admin.dogs.create.button")}
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild variant="outline">
+            <Link href="/admin/dogs/import">
+              {t("admin.dogs.import.button")}
+            </Link>
+          </Button>
+          <Button type="button" onClick={dogFormFlow.openCreateModal}>
+            {t("admin.dogs.create.button")}
+          </Button>
+        </div>
       </div>
 
       <ListingSectionShell title={t("admin.dogs.management.title")}>

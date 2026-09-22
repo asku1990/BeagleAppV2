@@ -3,6 +3,10 @@ import { createRequest } from "@api-client/core/request";
 import { getAdminDogProfile } from "@api-client/admin/dogs/get-admin-dog-profile";
 import { listAdminDogColorOptions as listAdminDogColorOptionsRequest } from "@api-client/admin/dogs/list-admin-dog-color-options";
 import { listAdminDogDiseases as listAdminDogDiseasesRequest } from "@api-client/admin/dogs/list-admin-dog-diseases";
+import {
+  applyFinnishKennelClubImport,
+  previewFinnishKennelClubImport,
+} from "@api-client/admin/dogs/import/finnish-kennel-club";
 import type {
   AdminDogDiseaseBrowseRequest,
   AdminDogProfileRequest,
@@ -22,6 +26,21 @@ export function createAdminDogsApiClient(options: ClientOptions = {}) {
 
     listAdminDogDiseases(input: AdminDogDiseaseBrowseRequest = {}) {
       return listAdminDogDiseasesRequest(request, input);
+    },
+    previewFinnishKennelClubImport(file: File) {
+      return previewFinnishKennelClubImport(request, file);
+    },
+    applyFinnishKennelClubImport(
+      file: File,
+      previewDigest: string,
+      sourceFileSha256: string,
+    ) {
+      return applyFinnishKennelClubImport(
+        request,
+        file,
+        previewDigest,
+        sourceFileSha256,
+      );
     },
   };
 }
