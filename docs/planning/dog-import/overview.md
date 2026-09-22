@@ -572,7 +572,7 @@ the preview digest.
 | Parent registration used as both sire and dam                   | `PARENT_ROLE_AMBIGUOUS`            |          BLOCKER |    No | BLOCK                              |                 No |
 | Child is its own parent                                         | `PARENT_SELF_REFERENCE`            |          BLOCKER |    No | BLOCK                              |                 No |
 | Sire and dam resolve to the same dog                            | `PARENT_SAME_IDENTITY`             |          BLOCKER |    No | BLOCK                              |                 No |
-| Existing parent sex conflicts with role                         | `PARENT_SEX_CONFLICT`              |          BLOCKER |    No | BLOCK                              |                Yes |
+| Existing parent sex conflicts with role                         | `PARENT_SEX_CONFLICT`              |          BLOCKER |    No | BLOCK                              |                 No |
 | Full source-row parent's sex conflicts with its referenced role | `PARENT_SOURCE_SEX_CONFLICT`       |          BLOCKER |    No | BLOCK                              |                 No |
 | Child depends on a blocked full source parent row               | `PARENT_SOURCE_ROW_BLOCKED`        |          BLOCKER |    No | BLOCK                              |                 No |
 | Valid parent is missing                                         | `REFERENCE_PARENT_PLANNED`         |             INFO |   Yes | CREATE_REFERENCE                   | Yes, to BLOCK only |
@@ -826,9 +826,9 @@ Add the thin page route:
 /admin/dogs/import
 ```
 
-Keep the current dog search at `/admin/dogs`; do not add a dog dashboard. Add a
-flat `Rekisteröintien tuonti` admin-sidebar item near `Koirat`, following the
-current sidebar pattern. Change active matching to exact/segment-aware matching
+Keep the current dog search at `/admin/dogs`; do not add a dog dashboard. Add an
+outline `Rekisteröintien tuonti` action beside `Lisää koira` in the existing dogs
+management header; do not add a dedicated import sidebar item. Change active matching to exact/segment-aware matching
 so `/admin/dogs`, `/admin/dogs/import`, `/admin/dogs/diseases`, and
 `/admin/dogs/virtual-pairing` do not activate one another accidentally.
 
@@ -1057,7 +1057,7 @@ own reviewable interface.
 7. **Admin workflow UI**
    - Add route, i18n, workflow hook, upload/review/confirm/completion modules,
      responsive results, filters, and sticky action summary.
-   - Add sidebar navigation and segment-aware active matching.
+   - Add the dogs-header import action and segment-aware active matching.
 
 8. **End-to-end validation and durable documentation**
    - Add the two Playwright flows when the isolated admin fixture is available.

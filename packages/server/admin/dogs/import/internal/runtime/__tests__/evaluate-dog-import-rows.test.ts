@@ -3,7 +3,11 @@ import { describe, expect, it } from "vitest";
 import { evaluateDogImportRows } from "../evaluate-dog-import-rows";
 import type { CanonicalDogImportRow } from "@server/admin/dogs/import/internal/model/canonical-dog-import";
 
-const state: DogImportStateDb = { dogs: [], colors: [] };
+const state: DogImportStateDb = {
+  dogs: [],
+  colors: [],
+  historicalLinksByRegistration: {},
+};
 const row: CanonicalDogImportRow = {
   source: "FINNISH_KENNEL_CLUB",
   sourceRowNumber: 2,
@@ -44,6 +48,7 @@ describe("evaluateDogImportRows parser facts", () => {
     const registrationUpdatedAt = new Date("2026-01-01T00:00:00.000Z");
     const evaluation = evaluateDogImportRows([row], {
       colors: [],
+      historicalLinksByRegistration: {},
       dogs: [
         {
           id: "dog-1",
@@ -137,6 +142,51 @@ describe("evaluateDogImportRows parser facts", () => {
 
     expect(evaluateDogImportRows([row], state, facts).previewDigest).toBe(
       evaluateDogImportRows([row], state, [...facts].reverse()).previewDigest,
+    );
+  });
+
+  it("does not report a color difference when both labels resolve to the same color", () => {
+    const updatedAt = new Date("2026-01-01T00:00:00.000Z");
+    const evaluation = evaluateDogImportRows(
+      [{ ...row, colorName: "kolmivärinen" }],
+      {
+        historicalLinksByRegistration: {},
+        colors: [
+          {
+            code: 121,
+            nameFi: "Kolmivärinen",
+            status: "SELECTABLE",
+            updatedAt,
+          },
+        ],
+        dogs: [
+          {
+            id: "dog-1",
+            registrationNo: row.registrationNo!,
+            name: row.name!,
+            sex: row.sex!,
+            status: "NORMAL",
+            birthDate: new Date("2024-01-01T00:00:00.000Z"),
+            sireId: null,
+            damId: null,
+            breederNameText: null,
+            breederId: null,
+            breederName: null,
+            colorCode: 121,
+            originTypeText: row.originTypeText,
+            originCountryText: row.originCountryText,
+            tailText: row.tailText,
+            updatedAt,
+            registrationId: "registration-1",
+            registeredOn: new Date("2024-01-02T00:00:00.000Z"),
+            registrationUpdatedAt: updatedAt,
+          },
+        ],
+      },
+    );
+
+    expect(evaluation.issues).not.toContainEqual(
+      expect.objectContaining({ code: "DOG_COLOR_DIFFERS" }),
     );
   });
 });

@@ -1,4 +1,8 @@
 export type DogImportStateDb = {
+  historicalLinksByRegistration: Record<
+    string,
+    { showEntryIds: string[]; trialEntryIds: string[] }
+  >;
   dogs: Array<{
     id: string;
     registrationNo: string;
@@ -29,6 +33,7 @@ export type DogImportStateDb = {
 };
 
 export type DogImportDogUpdateData = {
+  birthDate?: string | null;
   breederNameText?: string;
   originTypeText?: string;
   originCountryText?: string;
@@ -65,4 +70,9 @@ export type DogImportWritePlanDb = {
     damRegistrationNo: string;
   }>;
   references: Array<{ registrationNo: string; sex: "MALE" | "FEMALE" }>;
+  historicalLinks: Array<{
+    registrationNo: string;
+    showEntryIds: string[];
+    trialEntryIds: string[];
+  }>;
 };

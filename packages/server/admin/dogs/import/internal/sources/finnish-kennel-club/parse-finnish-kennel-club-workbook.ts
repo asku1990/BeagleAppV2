@@ -34,6 +34,10 @@ const KNOWN_HEADERS = new Set<string>([
 
 type Cell = string | number | boolean | Date | null | undefined;
 
+const MAX_SOURCE_ROWS = 10_000;
+const MAX_COLUMNS = 64;
+const MAX_POPULATED_CELLS = 100_000;
+
 export type FinnishWorkbookFact = {
   code:
     | "REQUIRED_COLUMN_MISSING"
@@ -44,7 +48,10 @@ export type FinnishWorkbookFact = {
     | "REQUIRED_VALUE_MISSING"
     | "BREED_NOT_BEAGLE"
     | "DOG_SEX_INVALID"
-    | "INVALID_DATE";
+    | "INVALID_DATE"
+    | "SOURCE_FILE_UNREADABLE"
+    | "SOURCE_RESOURCE_LIMIT_EXCEEDED"
+    | "ADDITIONAL_SHEETS_IGNORED";
   header: string | null;
   columnIndex: number | null;
   sourceRowNumber?: number;
@@ -92,12 +99,21 @@ function excelDate(value: Cell, date1904: boolean): string | null {
   }
   const valueText = text(value);
   if (!valueText) return null;
-  const iso = valueText.match(/^(\d{4}-\d{2}-\d{2})/u)?.[1];
-  if (iso) return iso;
-  const parsed = new Date(valueText);
-  return Number.isNaN(parsed.getTime())
-    ? null
-    : parsed.toISOString().slice(0, 10);
+  return isValidIsoDate(valueText) ? valueText : null;
+}
+
+function isValidIsoDate(value: string): boolean {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/u.exec(value);
+  if (!match) return false;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
 }
 
 function registration(value: Cell): string | null {
@@ -135,11 +151,42 @@ function populatedCell(cell: unknown): cell is { v?: Cell; f?: string } {
 export function parseFinnishKennelClubWorkbook(
   buffer: Buffer | Uint8Array | ArrayBuffer,
 ): FinnishWorkbookParseResult {
-  const workbook = XLSX.read(buffer, { type: "buffer", cellDates: false });
+  let workbook: XLSX.WorkBook;
+  try {
+    workbook = XLSX.read(buffer, { type: "buffer", cellDates: false });
+  } catch {
+    return {
+      sheetName: "",
+      date1904: false,
+      rows: [],
+      sourceRowCount: 0,
+      facts: [
+        { code: "SOURCE_FILE_UNREADABLE", header: null, columnIndex: null },
+      ],
+    };
+  }
   const sheetName = workbook.SheetNames[0];
-  if (!sheetName) throw new Error("Workbook does not contain any sheets.");
+  if (!sheetName)
+    return {
+      sheetName: "",
+      date1904: false,
+      rows: [],
+      sourceRowCount: 0,
+      facts: [
+        { code: "SOURCE_FILE_UNREADABLE", header: null, columnIndex: null },
+      ],
+    };
   const sheet = workbook.Sheets[sheetName];
-  if (!sheet) throw new Error("Workbook sheet is missing.");
+  if (!sheet)
+    return {
+      sheetName,
+      date1904: false,
+      rows: [],
+      sourceRowCount: 0,
+      facts: [
+        { code: "SOURCE_FILE_UNREADABLE", header: null, columnIndex: null },
+      ],
+    };
 
   const populated = Object.entries(sheet).filter(([, cell]) =>
     populatedCell(cell),
@@ -147,8 +194,49 @@ export function parseFinnishKennelClubWorkbook(
   const coordinates = populated
     .map(([address]) => XLSX.utils.decode_cell(address))
     .filter((coordinate) => coordinate.r >= 0 && coordinate.c >= 0);
-  const maxRow = Math.max(...coordinates.map(({ r }) => r), 0);
-  const maxColumn = Math.max(...coordinates.map(({ c }) => c), 0);
+  const sourceRows = new Set(
+    coordinates.filter(({ r }) => r > 0).map(({ r }) => r),
+  );
+  const maxRow = coordinates.reduce((max, { r }) => Math.max(max, r), 0);
+  const maxColumn = coordinates.reduce((max, { c }) => Math.max(max, c), 0);
+  const date1904 = workbook.Workbook?.WBProps?.date1904 === true;
+  const limitFact =
+    sourceRows.size > MAX_SOURCE_ROWS ||
+    maxColumn + 1 > MAX_COLUMNS ||
+    populated.length > MAX_POPULATED_CELLS;
+  const facts: FinnishWorkbookFact[] = [];
+  if (workbook.SheetNames.length > 1)
+    facts.push({
+      code: "ADDITIONAL_SHEETS_IGNORED",
+      header: null,
+      columnIndex: null,
+    });
+  if (limitFact)
+    return {
+      sheetName,
+      date1904,
+      rows: [],
+      sourceRowCount: 0,
+      facts: [
+        ...facts,
+        {
+          code: "SOURCE_RESOURCE_LIMIT_EXCEEDED",
+          header: null,
+          columnIndex: null,
+        },
+      ],
+    };
+  if (sourceRows.size === 0)
+    return {
+      sheetName,
+      date1904,
+      rows: [],
+      sourceRowCount: 0,
+      facts: [
+        ...facts,
+        { code: "SOURCE_FILE_UNREADABLE", header: null, columnIndex: null },
+      ],
+    };
   const matrix = Array.from({ length: maxRow + 1 }, (_, row) =>
     Array.from({ length: maxColumn + 1 }, (_, column) => {
       const cell = sheet[XLSX.utils.encode_cell({ r: row, c: column })];
@@ -156,7 +244,6 @@ export function parseFinnishKennelClubWorkbook(
     }),
   ) as Cell[][];
 
-  const facts: FinnishWorkbookFact[] = [];
   const headers = matrix[0] ?? [];
   const indexes = new Map<string, number>();
   headers.forEach((value, columnIndex) => {
@@ -179,7 +266,7 @@ export function parseFinnishKennelClubWorkbook(
       return;
     }
     indexes.set(key, columnIndex);
-    if (!KNOWN_HEADERS.has(key) && hasData) {
+    if (!KNOWN_HEADERS.has(key)) {
       facts.push({ code: "UNSUPPORTED_COLUMN_IGNORED", header, columnIndex });
     }
   });
@@ -200,7 +287,6 @@ export function parseFinnishKennelClubWorkbook(
       });
   }
 
-  const date1904 = workbook.Workbook?.WBProps?.date1904 === true;
   const rows = matrix.slice(1).flatMap((row, index) => {
     if (!row.some((cell) => text(cell) !== null)) return [];
     const sourceRowNumber = index + 2;

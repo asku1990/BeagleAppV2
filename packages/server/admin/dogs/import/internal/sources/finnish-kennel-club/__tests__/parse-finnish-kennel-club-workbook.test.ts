@@ -26,6 +26,18 @@ function workbook(rows: unknown[][], date1904 = false): Buffer {
   return XLSX.write(book, { type: "buffer", bookType: "xlsx" });
 }
 
+function writeBook(...sheets: XLSX.WorkSheet[]): Buffer {
+  const book = XLSX.utils.book_new();
+  sheets.forEach((sheet, index) =>
+    XLSX.utils.book_append_sheet(
+      book,
+      sheet,
+      index === 0 ? "Koirat" : `Extra${index}`,
+    ),
+  );
+  return XLSX.write(book, { type: "buffer", bookType: "xlsx" });
+}
+
 const validRow = [
   "fi123/24",
   "Kennel",
@@ -135,5 +147,81 @@ describe("parseFinnishKennelClubWorkbook", () => {
       "BREED_NOT_BEAGLE",
       "DOG_SEX_INVALID",
     ]);
+  });
+
+  it("blocks empty, unreadable, and source-limit workbooks", () => {
+    const emptyBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(
+      emptyBook,
+      XLSX.utils.aoa_to_sheet([headers]),
+      "Koirat",
+    );
+    expect(
+      parseFinnishKennelClubWorkbook(
+        XLSX.write(emptyBook, { type: "buffer", bookType: "xlsx" }),
+      ).facts,
+    ).toContainEqual(
+      expect.objectContaining({ code: "SOURCE_FILE_UNREADABLE" }),
+    );
+    expect(
+      parseFinnishKennelClubWorkbook(Buffer.from("not an xlsx")).facts,
+    ).toContainEqual(
+      expect.objectContaining({ code: "SOURCE_FILE_UNREADABLE" }),
+    );
+
+    const tooManyRows = Array.from({ length: 10_001 }, () => validRow);
+    const result = parseFinnishKennelClubWorkbook(workbook(tooManyRows));
+    expect(result.rows).toEqual([]);
+    expect(result.facts).toContainEqual(
+      expect.objectContaining({ code: "SOURCE_RESOURCE_LIMIT_EXCEEDED" }),
+    );
+  });
+
+  it("limits columns and populated cells and warns about additional sheets", () => {
+    const wide = XLSX.utils.aoa_to_sheet([
+      [
+        ...headers,
+        ...Array.from({ length: 52 }, (_, index) => `Extra ${index}`),
+      ],
+      [...validRow, ...Array.from({ length: 52 }, () => "x")],
+    ]);
+    const parsedWide = parseFinnishKennelClubWorkbook(
+      writeBook(wide, XLSX.utils.aoa_to_sheet([headers])),
+    );
+    expect(parsedWide.facts.map((fact) => fact.code)).toContain(
+      "SOURCE_RESOURCE_LIMIT_EXCEEDED",
+    );
+    expect(parsedWide.facts.map((fact) => fact.code)).toContain(
+      "ADDITIONAL_SHEETS_IGNORED",
+    );
+
+    const manyCells: XLSX.WorkSheet = {
+      A1: { v: "x" },
+      "!ref": "A1:A100001",
+    };
+    for (let row = 2; row <= 100_001; row += 1)
+      manyCells[`A${row}`] = { v: "x" };
+    const parsedCells = parseFinnishKennelClubWorkbook(writeBook(manyCells));
+    expect(parsedCells.facts).toContainEqual(
+      expect.objectContaining({ code: "SOURCE_RESOURCE_LIMIT_EXCEEDED" }),
+    );
+  });
+
+  it("accepts only valid ISO calendar dates in text cells", () => {
+    const result = parseFinnishKennelClubWorkbook(
+      workbook([
+        [
+          ...validRow.slice(0, 5),
+          "2024-02-30",
+          "2024-01-02",
+          ...validRow.slice(7),
+        ],
+      ]),
+    );
+    expect(result.rows[0]?.birthDate).toBeNull();
+    expect(result.rows[0]?.registeredOn).toBe("2024-01-02");
+    expect(result.facts).toContainEqual(
+      expect.objectContaining({ code: "INVALID_DATE", header: "Syntymäaika" }),
+    );
   });
 });
