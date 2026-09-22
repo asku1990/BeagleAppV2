@@ -328,6 +328,16 @@ export type {
   AdminTrialEventSearchResponse,
   AdminTrialEventSearchSort,
   AdminTrialEventSummary,
+  DogImportField,
+  DogImportIssue,
+  DogImportIssueCode,
+  DogImportIssueSeverity,
+  DogImportIssueValue,
+  DogImportResolution,
+  AdminDogImportPreviewRow,
+  AdminFinnishKennelClubImportPreviewResponse,
+  AdminFinnishKennelClubImportApplyRequest,
+  AdminFinnishKennelClubImportApplyResponse,
 } from "./admin";
 export type { HomeStatisticsResponse } from "./home";
 export {

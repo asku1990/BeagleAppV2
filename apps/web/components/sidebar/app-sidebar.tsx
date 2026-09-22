@@ -127,6 +127,12 @@ const adminModuleNavItems: NavItem[] = [
     availability: "enabled",
   },
   {
+    labelKey: "sidebar.nav.adminDogImport",
+    icon: FileText,
+    href: "/admin/dogs/import",
+    availability: "enabled",
+  },
+  {
     labelKey: "sidebar.nav.adminDiseases",
     icon: FileText,
     href: "/admin/dogs/diseases",
@@ -310,7 +316,7 @@ export function AppSidebar() {
                       <SidebarMenuButton
                         asChild
                         tooltip={t(item.labelKey)}
-                        isActive={pathname.startsWith(item.href ?? "/admin")}
+                        isActive={pathname === item.href}
                         className={cn(
                           beagleTheme.inkStrongText,
                           beagleTheme.interactive,
