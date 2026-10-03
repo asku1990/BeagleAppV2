@@ -11,17 +11,17 @@ vi.mock("@/hooks/i18n", () => ({
 
 const baseProps = {
   values: {
-    mode: "year" as const,
-    year: "",
+    mode: "season" as const,
+    season: "",
     dateFrom: "",
     dateTo: "",
   },
   sort: "date-desc" as const,
   isPending: false,
   canSubmit: true,
-  availableYears: [2025, 2024],
+  availableSeasons: ["2025-2026", "2024-2025"],
   onModeChange: vi.fn(),
-  onYearChange: vi.fn(),
+  onSeasonChange: vi.fn(),
   onDateFromChange: vi.fn(),
   onDateToChange: vi.fn(),
   onSortChange: vi.fn(),
@@ -53,18 +53,19 @@ function asElements(node: React.ReactNode): TestElement[] {
 }
 
 describe("BeagleTrialsForm", () => {
-  it("renders year mode fields and sort options", () => {
+  it("renders season mode fields and sort options", () => {
     const html = renderToStaticMarkup(
       React.createElement(BeagleTrialsForm, baseProps),
     );
 
     expect(html).toContain("trials.form.title");
-    expect(html).toContain("trials.form.mode.year");
+    expect(html).toContain("trials.form.mode.season");
     expect(html).toContain("trials.form.mode.range");
     expect(html).toContain('value="date-desc"');
     expect(html).toContain('value="date-asc"');
-    expect(html).toContain('placeholder="trials.form.year.placeholder"');
-    expect(html).toContain("trials.form.year.helper");
+    expect(html).toContain('value="2025-2026"');
+    expect(html.match(/value="2025-2026"/g)).toHaveLength(1);
+    expect(html).not.toContain("trials.form.season.latest");
   });
 
   it("renders range date fields when mode is range", () => {
@@ -73,7 +74,7 @@ describe("BeagleTrialsForm", () => {
         ...baseProps,
         values: {
           mode: "range" as const,
-          year: "",
+          season: "",
           dateFrom: "2025-01-01",
           dateTo: "2025-01-31",
         },
@@ -87,7 +88,7 @@ describe("BeagleTrialsForm", () => {
 
   it("invokes handlers for submit/reset/field changes", () => {
     const onModeChange = vi.fn();
-    const onYearChange = vi.fn();
+    const onSeasonChange = vi.fn();
     const onSortChange = vi.fn();
     const onSubmit = vi.fn();
     const onReset = vi.fn();
@@ -95,7 +96,7 @@ describe("BeagleTrialsForm", () => {
     const tree = BeagleTrialsForm({
       ...baseProps,
       onModeChange,
-      onYearChange,
+      onSeasonChange,
       onSortChange,
       onSubmit,
       onReset,
@@ -109,10 +110,8 @@ describe("BeagleTrialsForm", () => {
     const sortSelect = selects[0];
     sortSelect?.props.onChange?.({ target: { value: "date-asc" } });
 
-    const yearInput = elements.find(
-      (element) => element.props.placeholder === "trials.form.year.placeholder",
-    );
-    yearInput?.props.onChange?.({ target: { value: "2025" } });
+    const seasonSelect = selects[1];
+    seasonSelect?.props.onChange?.({ target: { value: "2025-2026" } });
 
     const button = elements.find(
       (element) =>
@@ -121,17 +120,17 @@ describe("BeagleTrialsForm", () => {
     );
     button?.props.onClick?.();
 
-    const yearRadio = elements.find(
+    const seasonRadio = elements.find(
       (element) =>
         element.type === "input" &&
         (element.props as { type?: string }).type === "radio",
     );
-    yearRadio?.props.onChange?.({ target: { value: "year" } });
+    seasonRadio?.props.onChange?.({ target: { value: "season" } });
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSortChange).toHaveBeenCalledWith("date-asc");
-    expect(onYearChange).toHaveBeenCalledWith("2025");
+    expect(onSeasonChange).toHaveBeenCalledWith("2025-2026");
     expect(onReset).toHaveBeenCalledTimes(1);
-    expect(onModeChange).toHaveBeenCalledWith("year");
+    expect(onModeChange).toHaveBeenCalledWith("season");
   });
 });

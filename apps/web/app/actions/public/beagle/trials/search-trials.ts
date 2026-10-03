@@ -14,11 +14,10 @@ export type SearchBeagleTrialsActionResult = {
   error?: string;
 };
 
-function normalizeYearForLog(value: number | undefined): number | undefined {
-  if (!Number.isFinite(value)) {
-    return undefined;
-  }
-  return Math.trunc(value as number);
+function normalizeSeasonForLog(value: string | undefined): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const normalized = value.trim();
+  return normalized ? normalized : undefined;
 }
 
 function normalizeDateForLog(value: string | undefined): string | undefined {
@@ -46,7 +45,7 @@ export async function searchBeagleTrialsAction(
   log.info(
     {
       event: "start",
-      year: normalizeYearForLog(input.year),
+      season: normalizeSeasonForLog(input.season),
       dateFrom: normalizeDateForLog(input.dateFrom),
       dateTo: normalizeDateForLog(input.dateTo),
       page: normalizePageForLog(input.page, 1),

@@ -5,10 +5,10 @@ export type BeagleTrialSearchWeatherSummary =
   | { kind: "single"; value: string }
   | { kind: "varied" };
 
-export type BeagleTrialSearchMode = "year" | "range";
+export type BeagleTrialSearchMode = "season" | "range";
 
 export type BeagleTrialSearchRequest = {
-  year?: number;
+  season?: string;
   dateFrom?: string;
   dateTo?: string;
   page?: number;
@@ -18,7 +18,7 @@ export type BeagleTrialSearchRequest = {
 
 export type BeagleTrialSearchFilters = {
   mode: BeagleTrialSearchMode;
-  year: number | null;
+  season: string | null;
   dateFrom: string | null;
   dateTo: string | null;
 };
@@ -71,7 +71,7 @@ export type BeagleTrialSearchSummary = {
 
 export type BeagleTrialSearchResponse = {
   filters: BeagleTrialSearchFilters;
-  availableYears: number[];
+  availableSeasons: string[];
   total: number;
   totalPages: number;
   page: number;

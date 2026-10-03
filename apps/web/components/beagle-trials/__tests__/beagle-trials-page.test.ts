@@ -3,6 +3,14 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { BeagleTrialsPage } from "../beagle-trials-page";
 
+vi.mock("react", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("react")>();
+  return {
+    ...actual,
+    useEffect: (effect: () => void) => effect(),
+  };
+});
+
 const { useBeagleTrialsUiStateMock, useBeagleTrialsQueryMock } = vi.hoisted(
   () => ({
     useBeagleTrialsUiStateMock: vi.fn(),
@@ -33,14 +41,14 @@ vi.mock("@/queries/public/beagle/trials/use-beagle-trials-query", () => ({
 function baseUiState() {
   return {
     formState: {
-      mode: "year" as const,
-      year: "",
+      mode: "season" as const,
+      season: "",
       dateFrom: "",
       dateTo: "",
     },
     urlState: {
-      mode: "year" as const,
-      year: "",
+      mode: "season" as const,
+      season: "",
       dateFrom: "",
       dateTo: "",
       page: 1,
@@ -49,7 +57,8 @@ function baseUiState() {
     },
     isPending: false,
     setMode: vi.fn(),
-    setYear: vi.fn(),
+    setSeason: vi.fn(),
+    setDefaultSeason: vi.fn(),
     setDateFrom: vi.fn(),
     setDateTo: vi.fn(),
     submitSearch: vi.fn(),
@@ -102,12 +111,12 @@ describe("BeagleTrialsPage", () => {
     useBeagleTrialsQueryMock.mockReturnValue({
       data: {
         filters: {
-          mode: "year",
-          year: 2025,
+          mode: "season",
+          season: "2025-2026",
           dateFrom: null,
           dateTo: null,
         },
-        availableYears: [2025],
+        availableSeasons: ["2025-2026"],
         total: 0,
         totalPages: 0,
         page: 1,
@@ -151,16 +160,55 @@ describe("BeagleTrialsPage", () => {
     expect(html).toContain("trials.awardSummary.title");
   });
 
+  it("adopts the resolved default season for URL state", () => {
+    const uiState = baseUiState();
+    useBeagleTrialsUiStateMock.mockReturnValue(uiState);
+    useBeagleTrialsQueryMock.mockReturnValue({
+      data: {
+        filters: {
+          mode: "season",
+          season: "2025-2026",
+          dateFrom: null,
+          dateTo: null,
+        },
+        availableSeasons: ["2025-2026"],
+        total: 0,
+        totalPages: 0,
+        page: 1,
+        items: [],
+        awardSummary: { dateFrom: null, dateTo: null, rows: [] },
+        searchSummary: {
+          trialCount: 0,
+          entryCount: 0,
+          awarded: { count: 0, percentage: 0 },
+          first: { count: 0, percentage: 0 },
+          second: { count: 0, percentage: 0 },
+          third: { count: 0, percentage: 0 },
+          noPrize: { count: 0, percentage: 0 },
+          withdrew: { count: 0, percentage: 0 },
+          excluded: { count: 0, percentage: 0 },
+        },
+      },
+      isFetching: false,
+      isError: false,
+      error: null,
+    });
+
+    renderToStaticMarkup(React.createElement(BeagleTrialsPage));
+
+    expect(uiState.setDefaultSeason).toHaveBeenCalledWith("2025-2026");
+  });
+
   it("renders desktop/mobile results and pagination when rows exist", () => {
     useBeagleTrialsQueryMock.mockReturnValue({
       data: {
         filters: {
-          mode: "year",
-          year: 2025,
+          mode: "season",
+          season: "2025-2026",
           dateFrom: null,
           dateTo: null,
         },
-        availableYears: [2025],
+        availableSeasons: ["2025-2026"],
         total: 1,
         totalPages: 1,
         page: 1,
@@ -230,6 +278,6 @@ describe("BeagleTrialsPage", () => {
     expect(html).toContain("1 (25.00%)");
     expect(html).toContain("trials.searchSummary.title");
     expect(html).toContain("trials.searchSummary.row.entries");
-    expect(html).toContain("trials.results.filter.year 2025");
+    expect(html).toContain("trials.results.filter.season 2025-2026");
   });
 });

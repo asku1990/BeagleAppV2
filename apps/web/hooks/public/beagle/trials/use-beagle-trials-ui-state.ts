@@ -13,7 +13,7 @@ import {
   BEAGLE_TRIALS_DEFAULT_SORT,
   BEAGLE_TRIALS_PAGE_SIZE_OPTIONS,
   normalizeIsoDateOnlyInput,
-  parseTrialYearInput,
+  parseTrialSeasonInput,
   type BeagleTrialsFilterMode,
   type BeagleTrialsQueryState,
   type BeagleTrialSearchSort,
@@ -24,8 +24,8 @@ type SearchParamsLike = {
 };
 
 const DEFAULT_STATE: BeagleTrialsQueryState = {
-  mode: "year",
-  year: "",
+  mode: "season",
+  season: "",
   dateFrom: "",
   dateTo: "",
   page: 1,
@@ -72,15 +72,15 @@ function readMode(
   value: string | null,
   fallback: BeagleTrialsFilterMode,
 ): BeagleTrialsFilterMode {
-  if (value === "year" || value === "range") {
+  if (value === "season" || value === "range") {
     return value;
   }
   return fallback;
 }
 
-function readYearInput(value: string | null): string {
+function readSeasonInput(value: string | null): string {
   const trimmed = trimValue(value);
-  return parseTrialYearInput(trimmed) != null ? trimmed : "";
+  return parseTrialSeasonInput(trimmed) != null ? trimmed : "";
 }
 
 export function readUrlTrialsState(
@@ -89,11 +89,11 @@ export function readUrlTrialsState(
   const dateFrom = normalizeIsoDateOnlyInput(params.get("dateFrom"));
   const dateTo = normalizeIsoDateOnlyInput(params.get("dateTo"));
   const fallbackMode: BeagleTrialsFilterMode =
-    dateFrom || dateTo ? "range" : "year";
+    dateFrom || dateTo ? "range" : "season";
 
   return {
     mode: readMode(params.get("mode"), fallbackMode),
-    year: readYearInput(params.get("year")),
+    season: readSeasonInput(params.get("season")),
     dateFrom,
     dateTo,
     page: readPage(params.get("page")),
@@ -109,8 +109,8 @@ export function toTrialsQueryString(state: BeagleTrialsQueryState): string {
     params.set("mode", "range");
     if (state.dateFrom) params.set("dateFrom", state.dateFrom);
     if (state.dateTo) params.set("dateTo", state.dateTo);
-  } else if (state.year) {
-    params.set("year", state.year);
+  } else if (state.season) {
+    params.set("season", state.season);
   }
 
   if (state.page > 1) {
@@ -139,7 +139,7 @@ export function useBeagleTrialsUiState() {
 
   const [formState, setFormState] = useState({
     mode: urlState.mode,
-    year: urlState.year,
+    season: urlState.season,
     dateFrom: urlState.dateFrom,
     dateTo: urlState.dateTo,
   });
@@ -148,19 +148,22 @@ export function useBeagleTrialsUiState() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setFormState({
       mode: urlState.mode,
-      year: urlState.year,
+      season: urlState.season,
       dateFrom: urlState.dateFrom,
       dateTo: urlState.dateTo,
     });
-  }, [urlState.mode, urlState.year, urlState.dateFrom, urlState.dateTo]);
+  }, [urlState.mode, urlState.season, urlState.dateFrom, urlState.dateTo]);
 
   const commitState = useCallback(
-    (nextState: BeagleTrialsQueryState) => {
+    (
+      nextState: BeagleTrialsQueryState,
+      history: "push" | "replace" = "push",
+    ) => {
       const query = toTrialsQueryString(nextState);
       const href = query ? `${pathname}?${query}` : pathname;
 
       startTransition(() => {
-        router.push(href, { scroll: false });
+        router[history](href, { scroll: false });
       });
     },
     [pathname, router],
@@ -168,15 +171,33 @@ export function useBeagleTrialsUiState() {
 
   const setMode = useCallback((mode: BeagleTrialsFilterMode) => {
     setFormState((current) =>
-      mode === "year"
+      mode === "season"
         ? { ...current, mode, dateFrom: "", dateTo: "" }
-        : { ...current, mode, year: "" },
+        : { ...current, mode, season: "" },
     );
   }, []);
 
-  const setYear = useCallback((year: string) => {
-    setFormState((current) => ({ ...current, year }));
+  const setSeason = useCallback((season: string) => {
+    setFormState((current) => ({ ...current, season }));
   }, []);
+
+  const setDefaultSeason = useCallback(
+    (season: string) => {
+      const normalizedSeason = parseTrialSeasonInput(season);
+      if (
+        !normalizedSeason ||
+        urlState.mode !== "season" ||
+        urlState.season ||
+        formState.season
+      ) {
+        return;
+      }
+
+      setFormState((current) => ({ ...current, season: normalizedSeason }));
+      commitState({ ...urlState, season: normalizedSeason }, "replace");
+    },
+    [commitState, formState.season, urlState],
+  );
 
   const setDateFrom = useCallback((dateFrom: string) => {
     setFormState((current) => ({ ...current, dateFrom }));
@@ -190,7 +211,7 @@ export function useBeagleTrialsUiState() {
     commitState({
       ...urlState,
       mode: formState.mode,
-      year: formState.mode === "year" ? trimValue(formState.year) : "",
+      season: formState.mode === "season" ? trimValue(formState.season) : "",
       dateFrom:
         formState.mode === "range"
           ? normalizeIsoDateOnlyInput(formState.dateFrom)
@@ -204,7 +225,7 @@ export function useBeagleTrialsUiState() {
   }, [
     commitState,
     formState.mode,
-    formState.year,
+    formState.season,
     formState.dateFrom,
     formState.dateTo,
     urlState,
@@ -212,8 +233,8 @@ export function useBeagleTrialsUiState() {
 
   const resetSearch = useCallback(() => {
     setFormState({
-      mode: "year",
-      year: "",
+      mode: "season",
+      season: "",
       dateFrom: "",
       dateTo: "",
     });
@@ -253,7 +274,8 @@ export function useBeagleTrialsUiState() {
     urlState,
     isPending,
     setMode,
-    setYear,
+    setSeason,
+    setDefaultSeason,
     setDateFrom,
     setDateTo,
     submitSearch,

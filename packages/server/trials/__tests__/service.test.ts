@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createTrialsService } from "../service";
+import { searchBeagleTrialsService } from "../search-beagle-trials";
 import { getTrialDateOnlyStartUtc } from "../core/date-only";
 
 const {
@@ -53,17 +54,29 @@ describe("trials service", () => {
     });
   });
 
-  it("returns 400 for mixed year and range filters", async () => {
+  it("returns 400 for a non-string season", async () => {
+    const result = await searchBeagleTrialsService({
+      season: 2025 as unknown as string,
+    });
+
+    expect(result).toEqual({
+      status: 400,
+      body: { ok: false, error: "Invalid season value." },
+    });
+    expect(searchBeagleTrialsDbMock).not.toHaveBeenCalled();
+  });
+
+  it("returns 400 for mixed season and range filters", async () => {
     const service = createTrialsService();
     const result = await service.searchBeagleTrials({
-      year: 2025,
+      season: "2025-2026",
       dateFrom: "2025-01-01",
       dateTo: "2025-01-31",
     });
 
     expect(result).toEqual({
       status: 400,
-      body: { ok: false, error: "Use either year or date range filter." },
+      body: { ok: false, error: "Use either season or date range filter." },
     });
   });
 
@@ -77,10 +90,10 @@ describe("trials service", () => {
     });
   });
 
-  it("uses latest year by default and maps canonical trialId", async () => {
+  it("uses latest season by default and maps canonical trialId", async () => {
     searchBeagleTrialsDbMock
       .mockResolvedValueOnce({
-        availableEventDates: [new Date("2025-06-01T00:00:00.000Z")],
+        availableEventDates: [new Date("2025-09-01T00:00:00.000Z")],
         total: 0,
         totalPages: 0,
         page: 1,
@@ -88,8 +101,8 @@ describe("trials service", () => {
       })
       .mockResolvedValueOnce({
         availableEventDates: [
-          new Date("2025-06-01T00:00:00.000Z"),
-          new Date("2024-06-01T00:00:00.000Z"),
+          new Date("2025-09-01T00:00:00.000Z"),
+          new Date("2024-09-01T00:00:00.000Z"),
         ],
         total: 1,
         totalPages: 1,
@@ -97,7 +110,7 @@ describe("trials service", () => {
         items: [
           {
             trialEventId: "event-1",
-            eventDate: new Date("2025-06-01T00:00:00.000Z"),
+            eventDate: new Date("2025-09-01T00:00:00.000Z"),
             eventPlace: "Helsinki",
             judge: "Judge Main",
             dogCount: 5,
@@ -120,8 +133,8 @@ describe("trials service", () => {
       sort: "date-desc",
     });
     expect(searchBeagleTrialsDbMock).toHaveBeenNthCalledWith(2, {
-      dateFrom: new Date("2025-01-01T00:00:00.000Z"),
-      dateTo: new Date("2026-01-01T00:00:00.000Z"),
+      dateFrom: new Date("2025-08-01T00:00:00.000Z"),
+      dateTo: new Date("2026-08-01T00:00:00.000Z"),
       page: 1,
       pageSize: 10,
       sort: "date-desc",
@@ -130,7 +143,7 @@ describe("trials service", () => {
 
   it("normalizes range searches to business-timezone boundaries", async () => {
     searchBeagleTrialsDbMock.mockResolvedValue({
-      availableEventDates: [new Date("2026-06-01T00:00:00.000Z")],
+      availableEventDates: [new Date("2025-09-01T00:00:00.000Z")],
       total: 1,
       totalPages: 1,
       page: 1,
@@ -149,7 +162,7 @@ describe("trials service", () => {
 
     expect(result.body.data.filters).toEqual({
       mode: "range",
-      year: null,
+      season: null,
       dateFrom: "2026-06-01",
       dateTo: "2026-06-30",
     });
@@ -162,9 +175,9 @@ describe("trials service", () => {
     });
   });
 
-  it("maps the all-time award summary independently of listing filters", async () => {
+  it("maps the all-time award summary independently of season filters", async () => {
     searchBeagleTrialsDbMock.mockResolvedValue({
-      availableEventDates: [new Date("2026-06-01T00:00:00.000Z")],
+      availableEventDates: [new Date("2025-09-01T00:00:00.000Z")],
       total: 1,
       totalPages: 1,
       page: 1,
@@ -186,7 +199,7 @@ describe("trials service", () => {
     ]);
 
     const result = await createTrialsService().searchBeagleTrials({
-      year: 2026,
+      season: "2025-2026",
     });
 
     expect(getBeagleTrialAwardSummaryDbMock).toHaveBeenCalledWith();
@@ -211,9 +224,9 @@ describe("trials service", () => {
     });
   });
 
-  it("maps the filtered search summary using the resolved year range", async () => {
+  it("maps the filtered search summary using the resolved season range", async () => {
     searchBeagleTrialsDbMock.mockResolvedValue({
-      availableEventDates: [new Date("2026-06-01T00:00:00.000Z")],
+      availableEventDates: [new Date("2025-09-01T00:00:00.000Z")],
       total: 1,
       totalPages: 1,
       page: 1,
@@ -232,7 +245,7 @@ describe("trials service", () => {
     });
 
     const result = await createTrialsService().searchBeagleTrials({
-      year: 2026,
+      season: "2025-2026",
     });
 
     expect(result.status).toBe(200);
@@ -249,8 +262,8 @@ describe("trials service", () => {
       excluded: { count: 1, percentage: 10 },
     });
     expect(getBeagleTrialSearchSummaryDbMock).toHaveBeenCalledWith({
-      dateFrom: new Date("2026-01-01T00:00:00.000Z"),
-      dateTo: new Date("2027-01-01T00:00:00.000Z"),
+      dateFrom: new Date("2025-08-01T00:00:00.000Z"),
+      dateTo: new Date("2026-08-01T00:00:00.000Z"),
     });
   });
 
@@ -278,7 +291,7 @@ describe("trials service", () => {
     );
 
     const result = await createTrialsService().searchBeagleTrials({
-      year: 2026,
+      season: "2025-2026",
     });
 
     expect(result.status).toBe(200);
@@ -352,7 +365,7 @@ describe("trials service", () => {
   it("returns 500 when db throws", async () => {
     searchBeagleTrialsDbMock.mockRejectedValue(new Error("db fail"));
     const service = createTrialsService();
-    const result = await service.searchBeagleTrials({ year: 2025 });
+    const result = await service.searchBeagleTrials({ season: "2025-2026" });
 
     expect(result).toEqual({
       status: 500,

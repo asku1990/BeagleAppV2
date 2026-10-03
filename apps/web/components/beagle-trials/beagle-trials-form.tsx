@@ -15,22 +15,25 @@ export function BeagleTrialsForm({
   sort,
   isPending,
   canSubmit,
-  availableYears,
+  availableSeasons,
   onModeChange,
-  onYearChange,
+  onSeasonChange,
   onDateFromChange,
   onDateToChange,
   onSortChange,
   onSubmit,
   onReset,
 }: {
-  values: Pick<BeagleTrialsQueryState, "mode" | "year" | "dateFrom" | "dateTo">;
+  values: Pick<
+    BeagleTrialsQueryState,
+    "mode" | "season" | "dateFrom" | "dateTo"
+  >;
   sort: BeagleTrialSearchSort;
   isPending: boolean;
   canSubmit: boolean;
-  availableYears: number[];
+  availableSeasons: string[];
   onModeChange: (mode: BeagleTrialsFilterMode) => void;
-  onYearChange: (value: string) => void;
+  onSeasonChange: (value: string) => void;
   onDateFromChange: (value: string) => void;
   onDateToChange: (value: string) => void;
   onSortChange: (sort: BeagleTrialSearchSort) => void;
@@ -38,6 +41,7 @@ export function BeagleTrialsForm({
   onReset: () => void;
 }) {
   const { t } = useI18n();
+  const selectedSeason = values.season || availableSeasons[0] || "";
 
   return (
     <Card className={cn(beagleTheme.panel, "gap-0 py-0")}>
@@ -95,10 +99,10 @@ export function BeagleTrialsForm({
                 <input
                   type="radio"
                   name="trial-search-mode"
-                  checked={values.mode === "year"}
-                  onChange={() => onModeChange("year")}
+                  checked={values.mode === "season"}
+                  onChange={() => onModeChange("season")}
                 />
-                <span>{t("trials.form.mode.year")}</span>
+                <span>{t("trials.form.mode.season")}</span>
               </label>
               <label className="inline-flex items-center gap-2">
                 <input
@@ -112,28 +116,26 @@ export function BeagleTrialsForm({
             </div>
           </fieldset>
 
-          {values.mode === "year" ? (
+          {values.mode === "season" ? (
             <label className="space-y-1 text-xs md:max-w-xs">
               <span className={beagleTheme.mutedText}>
-                {t("trials.form.year.label")}
+                {t("trials.form.season.label")}
               </span>
-              <Input
-                value={values.year}
-                onChange={(event) => onYearChange(event.target.value)}
-                placeholder={t("trials.form.year.placeholder")}
-                list="beagle-trial-years"
-                inputMode="numeric"
-              />
-              {availableYears.length > 0 ? (
-                <datalist id="beagle-trial-years">
-                  {availableYears.map((year) => (
-                    <option key={year} value={year} />
-                  ))}
-                </datalist>
-              ) : null}
-              <p className={cn("text-[11px]", beagleTheme.mutedText)}>
-                {t("trials.form.year.helper")}
-              </p>
+              <select
+                value={selectedSeason}
+                onChange={(event) => onSeasonChange(event.target.value)}
+                className={cn(
+                  "h-9 w-full min-w-0 rounded-md border bg-white px-2 text-sm",
+                  beagleTheme.border,
+                  beagleTheme.focusRing,
+                )}
+              >
+                {availableSeasons.map((season) => (
+                  <option key={season} value={season}>
+                    {season}
+                  </option>
+                ))}
+              </select>
             </label>
           ) : (
             <div className="grid gap-3 md:max-w-xl md:grid-cols-2">
@@ -170,11 +172,6 @@ export function BeagleTrialsForm({
             {!canSubmit && values.mode === "range" ? (
               <p className="text-xs text-red-700">
                 {t("trials.form.rangeValidation")}
-              </p>
-            ) : null}
-            {!canSubmit && values.mode === "year" ? (
-              <p className="text-xs text-red-700">
-                {t("trials.form.yearValidation")}
               </p>
             ) : null}
           </div>
