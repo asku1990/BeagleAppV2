@@ -12,6 +12,7 @@ type DecimalLike = { toNumber(): number };
 
 type SummarySourceRow = {
   pa: string | null;
+  huomautus: "LUOPUI" | "SULJETTU" | "KESKEYTETTY" | null;
   piste: DecimalLike | null;
   haku: DecimalLike | null;
   hauk: DecimalLike | null;
@@ -46,6 +47,7 @@ function mapSummarySourceRow(
 ): BeagleTrialDogSummarySourceRowDb[] {
   return rows.map((row) => ({
     pa: row.pa,
+    huomautus: row.huomautus,
     piste: toNumber(row.piste),
     haku: toNumber(row.haku),
     hauk: toNumber(row.hauk),
@@ -110,14 +112,19 @@ async function getBreedSummaryAggregatesDb(): Promise<
     SELECT 'noPrize' AS "groupKey", ${aggregateSelect}
     ${aggregateFrom}
     WHERE entry."pa" = '0'
+      AND entry."huomautus" IS DISTINCT FROM 'LUOPUI'
+      AND entry."huomautus" IS DISTINCT FROM 'SULJETTU'
     UNION ALL
     SELECT 'prizePlacements' AS "groupKey", ${aggregateSelect}
     ${aggregateFrom}
     WHERE entry."pa" IN ('1', '2', '3')
+      AND entry."huomautus" IS DISTINCT FROM 'LUOPUI'
+      AND entry."huomautus" IS DISTINCT FROM 'SULJETTU'
     UNION ALL
     SELECT 'interrupted' AS "groupKey", ${aggregateSelect}
     ${aggregateFrom}
     WHERE entry."pa" IN ('L', 'S')
+      OR entry."huomautus" IN ('LUOPUI', 'SULJETTU')
   `);
 
   return rows.map(mapBreedSummaryAggregateRow);
@@ -128,6 +135,7 @@ export async function getBeagleTrialSummarySourceForDogDb(
 ): Promise<BeagleTrialDogSummarySourceDb> {
   const select = {
     pa: true,
+    huomautus: true,
     piste: true,
     haku: true,
     hauk: true,

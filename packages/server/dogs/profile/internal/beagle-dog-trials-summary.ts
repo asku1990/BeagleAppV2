@@ -6,6 +6,17 @@ import type {
 
 type SummaryGroupKey = keyof BeagleDogTrialsSummaryDto;
 
+function isWithdrawalOrExclusion(
+  row: BeagleTrialDogSummarySourceRowDb,
+): boolean {
+  return (
+    row.pa === "L" ||
+    row.pa === "S" ||
+    row.huomautus === "LUOPUI" ||
+    row.huomautus === "SULJETTU"
+  );
+}
+
 const SUMMARY_GROUPS = [
   {
     key: "allTrials",
@@ -19,17 +30,21 @@ const SUMMARY_GROUPS = [
   {
     key: "noPrize",
     dogRows: (rows: BeagleTrialDogSummarySourceRowDb[]) =>
-      rows.filter((row) => row.pa === "0"),
+      rows.filter((row) => row.pa === "0" && !isWithdrawalOrExclusion(row)),
   },
   {
     key: "prizePlacements",
     dogRows: (rows: BeagleTrialDogSummarySourceRowDb[]) =>
-      rows.filter((row) => row.pa === "1" || row.pa === "2" || row.pa === "3"),
+      rows.filter(
+        (row) =>
+          (row.pa === "1" || row.pa === "2" || row.pa === "3") &&
+          !isWithdrawalOrExclusion(row),
+      ),
   },
   {
     key: "interrupted",
     dogRows: (rows: BeagleTrialDogSummarySourceRowDb[]) =>
-      rows.filter((row) => row.pa === "L" || row.pa === "S"),
+      rows.filter(isWithdrawalOrExclusion),
   },
 ] as const satisfies ReadonlyArray<{
   key: SummaryGroupKey;

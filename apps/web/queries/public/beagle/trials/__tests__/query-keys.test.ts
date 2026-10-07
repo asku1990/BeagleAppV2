@@ -10,7 +10,7 @@ describe("beagle trial query keys", () => {
   it("builds search key with normalized values", () => {
     expect(
       beagleTrialSearchQueryKey({
-        year: 2025.9,
+        season: " 2025-2026 ",
         dateFrom: " 2025-01-01 ",
         dateTo: "2025-12-31",
         page: 2.4,
@@ -19,7 +19,7 @@ describe("beagle trial query keys", () => {
       }),
     ).toEqual([
       ...beagleTrialSearchQueryKeyRoot,
-      2025,
+      "2025-2026",
       "2025-01-01",
       "2025-12-31",
       2,

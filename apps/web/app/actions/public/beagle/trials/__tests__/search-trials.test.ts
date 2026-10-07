@@ -51,12 +51,12 @@ describe("searchBeagleTrialsAction", () => {
         ok: true,
         data: {
           filters: {
-            mode: "year",
-            year: 2025,
+            mode: "season",
+            season: "2025-2026",
             dateFrom: null,
             dateTo: null,
           },
-          availableYears: [2025],
+          availableSeasons: ["2025-2026"],
           total: 1,
           totalPages: 1,
           page: 1,
@@ -78,16 +78,16 @@ describe("searchBeagleTrialsAction", () => {
     });
 
     await expect(
-      searchBeagleTrialsAction({ year: 2025, page: 1, pageSize: 10 }),
+      searchBeagleTrialsAction({ season: "2025-2026", page: 1, pageSize: 10 }),
     ).resolves.toEqual({
       data: {
         filters: {
-          mode: "year",
-          year: 2025,
+          mode: "season",
+          season: "2025-2026",
           dateFrom: null,
           dateTo: null,
         },
-        availableYears: [2025],
+        availableSeasons: ["2025-2026"],
         total: 1,
         totalPages: 1,
         page: 1,
@@ -110,7 +110,7 @@ describe("searchBeagleTrialsAction", () => {
     });
 
     expect(searchBeagleTrialsMock).toHaveBeenCalledWith(
-      { year: 2025, page: 1, pageSize: 10 },
+      { season: "2025-2026", page: 1, pageSize: 10 },
       { requestId: "req_1" },
     );
   });
@@ -120,24 +120,44 @@ describe("searchBeagleTrialsAction", () => {
       status: 400,
       body: {
         ok: false,
-        error: "Invalid year value.",
+        error: "Invalid season value.",
       },
     });
 
-    await expect(searchBeagleTrialsAction({ year: 1800 })).resolves.toEqual({
+    await expect(
+      searchBeagleTrialsAction({ season: "1800-1801" }),
+    ).resolves.toEqual({
       data: null,
       hasError: true,
       status: 400,
-      error: "Invalid year value.",
+      error: "Invalid season value.",
     });
 
     expect(warnLogMock).toHaveBeenCalled();
   });
 
+  it("returns service error for a non-string season without throwing in logging", async () => {
+    searchBeagleTrialsMock.mockResolvedValue({
+      status: 400,
+      body: { ok: false, error: "Invalid season value." },
+    });
+
+    await expect(
+      searchBeagleTrialsAction({ season: 2025 as unknown as string }),
+    ).resolves.toEqual({
+      data: null,
+      hasError: true,
+      status: 400,
+      error: "Invalid season value.",
+    });
+  });
+
   it("returns 500 payload when service throws", async () => {
     searchBeagleTrialsMock.mockRejectedValue(new Error("boom"));
 
-    await expect(searchBeagleTrialsAction({ year: 2025 })).resolves.toEqual({
+    await expect(
+      searchBeagleTrialsAction({ season: "2025-2026" }),
+    ).resolves.toEqual({
       data: null,
       hasError: true,
       status: 500,

@@ -14,12 +14,29 @@ function row(
     alo: null,
     pin: null,
     pa: null,
+    huomautus: null,
     trialRuleWindowId: "trw_range_2005_2011",
     ...input,
   };
 }
 
 describe("buildBeagleDogTrialsSummary", () => {
+  it("uses huomautus to keep withdrawals and exclusions out of PA groups", () => {
+    const result = buildBeagleDogTrialsSummary({
+      dogName: "Ajometsan Aada",
+      dogRows: [
+        row({ pa: "0", huomautus: "LUOPUI" }),
+        row({ pa: "1", huomautus: "SULJETTU" }),
+        row({ pa: "2", huomautus: "KESKEYTETTY" }),
+      ],
+      breedSummaries: [],
+    });
+
+    expect(result.noPrize).toEqual([]);
+    expect(result.prizePlacements[0]).toMatchObject({ count: 1 });
+    expect(result.interrupted[0]).toMatchObject({ count: 2 });
+  });
+
   it("builds v1-style all-trials summary rows for the dog and whole breed", () => {
     const result = buildBeagleDogTrialsSummary({
       dogName: "Ajometsan Aada",

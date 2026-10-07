@@ -11,6 +11,7 @@ export async function getBeagleTrialAwardSummaryDb(): Promise<
       SELECT
         entry."id",
         entry."pa",
+        entry."huomautus",
         CASE
           WHEN entry."lahde" = 'LEGACY_AKOEALL'
             AND UPPER(LEFT(entry."raakadataJson"::jsonb ->> 'SIJA', 2)) = 'PK'
@@ -29,12 +30,12 @@ export async function getBeagleTrialAwardSummaryDb(): Promise<
     )
     SELECT
       types."trialType",
-      COUNT(entries."id") FILTER (WHERE entries."pa" = '1')::int AS "first",
-      COUNT(entries."id") FILTER (WHERE entries."pa" = '2')::int AS "second",
-      COUNT(entries."id") FILTER (WHERE entries."pa" = '3')::int AS "third",
-      COUNT(entries."id") FILTER (WHERE entries."pa" = '0')::int AS "noPrize",
-      COUNT(entries."id") FILTER (WHERE entries."pa" = 'L')::int AS "withdrew",
-      COUNT(entries."id") FILTER (WHERE entries."pa" = 'S')::int AS "excluded",
+      COUNT(entries."id") FILTER (WHERE entries."pa" = '1' AND entries."huomautus" IS DISTINCT FROM 'LUOPUI' AND entries."huomautus" IS DISTINCT FROM 'SULJETTU')::int AS "first",
+      COUNT(entries."id") FILTER (WHERE entries."pa" = '2' AND entries."huomautus" IS DISTINCT FROM 'LUOPUI' AND entries."huomautus" IS DISTINCT FROM 'SULJETTU')::int AS "second",
+      COUNT(entries."id") FILTER (WHERE entries."pa" = '3' AND entries."huomautus" IS DISTINCT FROM 'LUOPUI' AND entries."huomautus" IS DISTINCT FROM 'SULJETTU')::int AS "third",
+      COUNT(entries."id") FILTER (WHERE entries."pa" = '0' AND entries."huomautus" IS DISTINCT FROM 'LUOPUI' AND entries."huomautus" IS DISTINCT FROM 'SULJETTU')::int AS "noPrize",
+      COUNT(entries."id") FILTER (WHERE entries."huomautus" = 'LUOPUI')::int AS "withdrew",
+      COUNT(entries."id") FILTER (WHERE entries."huomautus" = 'SULJETTU')::int AS "excluded",
       COUNT(entries."id")::int AS "total",
       MIN(entries."koepaiva") AS "firstDate",
       MAX(entries."koepaiva") AS "lastDate"

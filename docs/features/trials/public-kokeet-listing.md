@@ -2,6 +2,10 @@
 
 Developer notes for the public `/beagle/trials` listing.
 
+When the default season search resolves, the returned newest season is adopted
+by the season control and serialized as `?season=YYYY-YYYY`. Existing paging and
+sort parameters are preserved; date-range filters remain mutually exclusive.
+
 ## PDF action and compact rows
 
 Each supported public trial row exposes a PDF action that opens the collection
@@ -12,7 +16,7 @@ stacked card presentation for usability.
 ## Filtered YHTEENVETO
 
 The listing also renders a filtered `Yhteenveto` section before the long-term
-`Palkintosijajakauma`. It uses the active year or date-range filter and is
+`Palkintosijajakauma`. It uses the active season or date-range filter and is
 calculated across every matching trial entry, not only the current result page.
 
 The section shows unique trial count, result-entry count, and counts plus
@@ -25,7 +29,7 @@ denominator. Empty searches omit the section.
 The listing renders a separate `Palkintosijajakauma` section after the paginated
 event rows. It mirrors the `P A L K I N T O S I J A kpl(%)` long-trial comparison
 on the public v1 `kokeetall.php` page and is independent of the selected listing
-year or date range.
+season or date range.
 
 The comparison includes canonical trial entries dated on or after 20 August
 2005 and groups them as follows:
