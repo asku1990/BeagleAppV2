@@ -214,7 +214,10 @@ model Dog {
   sex             DogSex            @default(UNKNOWN)
   status          DogStatus         @default(NORMAL)
   birthDate       DateTime?
-  breederNameText String?
+  originTypeText      String?
+  originCountryText   String?
+  tailText            String?
+  breederNameText     String?
   sireId          String?
   damId           String?
   breederId       String?
@@ -278,6 +281,7 @@ model DogRegistration {
   id             String   @id @default(cuid())
   dogId          String
   registrationNo String   @unique
+  registeredOn   DateTime? @db.Date
   source         String
   dog            Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
   createdAt      DateTime @default(now())
