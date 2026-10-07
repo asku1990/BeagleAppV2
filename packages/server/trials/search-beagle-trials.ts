@@ -13,10 +13,14 @@ import { toErrorLog, withLogContext } from "../core/logger";
 import type { ServiceResult } from "../core/result";
 import {
   getTrialDateOnlyUtcRange,
-  getTrialDateOnlyYearUtcRange,
   formatTrialDateOnly,
-  toTrialDateOnlyYear,
 } from "./core/date-only";
+import {
+  formatTrialSeason,
+  getTrialSeasonUtcRange,
+  parseTrialSeason,
+  toTrialSeason,
+} from "./core/trial-season";
 import { parseIsoDateOnly } from "./internal/iso-date";
 import { mapBeagleTrialAwardSummary } from "./internal/map-beagle-trial-award-summary";
 import { mapBeagleTrialSearchSummary } from "./internal/map-beagle-trial-search-summary";
@@ -48,17 +52,14 @@ function parsePageSize(value: number | undefined): number {
   return Math.min(100, Math.max(1, Math.floor(value ?? 10)));
 }
 
-function parseYear(value: number | undefined): number | null {
-  if (!Number.isFinite(value)) return null;
-  const year = Math.floor(value ?? 0);
-  if (year < 1900 || year > 2100) return null;
-  return year;
-}
-
-function collectAvailableYears(availableEventDates: Date[]): number[] {
+function collectAvailableSeasons(availableEventDates: Date[]): string[] {
   return Array.from(
-    new Set(availableEventDates.map((value) => toTrialDateOnlyYear(value))),
-  ).sort((left, right) => right - left);
+    new Set(
+      availableEventDates.map((value) =>
+        formatTrialSeason(toTrialSeason(value)),
+      ),
+    ),
+  ).sort((left, right) => right.localeCompare(left));
 }
 
 export async function searchBeagleTrialsService(
@@ -89,20 +90,23 @@ export async function searchBeagleTrialsService(
     };
   }
 
-  const year = parseYear(input.year);
-  const hasYearInput = input.year != null;
-  if (hasYearInput && year == null) {
+  const season = parseTrialSeason(input.season);
+  const hasSeasonInput =
+    input.season != null &&
+    (typeof input.season !== "string" || input.season.trim() !== "");
+  if (hasSeasonInput && season == null) {
     log.warn(
       {
-        event: "invalid_year",
-        year: input.year,
+        event: "invalid_season",
+        season:
+          typeof input.season === "string" ? input.season.trim() : input.season,
         durationMs: Date.now() - startedAt,
       },
-      "trials search rejected because year is invalid",
+      "trials search rejected because season is invalid",
     );
     return {
       status: 400,
-      body: { ok: false, error: "Invalid year value." },
+      body: { ok: false, error: "Invalid season value." },
     };
   }
 
@@ -128,20 +132,20 @@ export async function searchBeagleTrialsService(
     };
   }
 
-  if (year != null && hasRangeInput) {
+  if (season != null && hasRangeInput) {
     log.warn(
       {
         event: "mixed_filters",
-        year,
+        season: formatTrialSeason(season),
         dateFrom: dateFromIso,
         dateTo: dateToIso,
         durationMs: Date.now() - startedAt,
       },
-      "trials search rejected because year and range filters are mixed",
+      "trials search rejected because season and range filters are mixed",
     );
     return {
       status: 400,
-      body: { ok: false, error: "Use either year or date range filter." },
+      body: { ok: false, error: "Use either season or date range filter." },
     };
   }
 
@@ -183,7 +187,7 @@ export async function searchBeagleTrialsService(
   log.info(
     {
       event: "start",
-      year,
+      season: season ? formatTrialSeason(season) : undefined,
       dateFrom: dateFromIso,
       dateTo: dateToIso,
       page: normalizedPage,
@@ -202,31 +206,31 @@ export async function searchBeagleTrialsService(
           .endExclusive
       : null;
 
-    const resolvedMode = year != null ? "year" : hasRangeInput ? "range" : null;
+    const resolvedMode =
+      season != null ? "season" : hasRangeInput ? "range" : null;
 
-    let filterMode: BeagleTrialSearchMode = "year";
-    let filterYear: number | null = null;
+    let filterMode: BeagleTrialSearchMode = "season";
+    let filterSeason: string | null = null;
     let filterDateFrom: string | null = null;
     let filterDateTo: string | null = null;
     let summaryDateFrom: Date | undefined;
     let summaryDateTo: Date | undefined;
     let result: Awaited<ReturnType<typeof searchBeagleTrialsDb>>;
 
-    if (resolvedMode === "year") {
-      const yearRange = getTrialDateOnlyYearUtcRange(year ?? 0);
-      if (!yearRange) {
-        throw new Error("Failed to build trial year range.");
-      }
+    if (resolvedMode === "season") {
+      const seasonRange = getTrialSeasonUtcRange(
+        season as NonNullable<typeof season>,
+      );
       result = await searchBeagleTrialsDb({
-        dateFrom: yearRange.start,
-        dateTo: yearRange.endExclusive,
+        dateFrom: seasonRange.start,
+        dateTo: seasonRange.endExclusive,
         page: normalizedPage,
         pageSize: normalizedPageSize,
         sort: sortResult.value,
       });
-      filterYear = year;
-      summaryDateFrom = yearRange.start;
-      summaryDateTo = yearRange.endExclusive;
+      filterSeason = formatTrialSeason(season as NonNullable<typeof season>);
+      summaryDateFrom = seasonRange.start;
+      summaryDateTo = seasonRange.endExclusive;
     } else if (resolvedMode === "range") {
       result = await searchBeagleTrialsDb({
         dateFrom: rangeFromDate ?? undefined,
@@ -246,31 +250,32 @@ export async function searchBeagleTrialsService(
         pageSize: 1,
         sort: sortResult.value,
       });
-      const availableYears = collectAvailableYears(
+      const availableSeasons = collectAvailableSeasons(
         available.availableEventDates,
       );
-      const latestYear = availableYears[0];
-      if (!latestYear) {
+      const latestSeason = availableSeasons[0];
+      if (!latestSeason) {
         result = available;
       } else {
-        const yearRange = getTrialDateOnlyYearUtcRange(latestYear);
-        if (!yearRange) {
-          throw new Error("Failed to build trial year range.");
-        }
+        const latest = parseTrialSeason(latestSeason);
+        if (!latest) throw new Error("Failed to build trial season range.");
+        const seasonRange = getTrialSeasonUtcRange(latest);
         result = await searchBeagleTrialsDb({
-          dateFrom: yearRange.start,
-          dateTo: yearRange.endExclusive,
+          dateFrom: seasonRange.start,
+          dateTo: seasonRange.endExclusive,
           page: normalizedPage,
           pageSize: normalizedPageSize,
           sort: sortResult.value,
         });
-        filterYear = latestYear;
-        summaryDateFrom = yearRange.start;
-        summaryDateTo = yearRange.endExclusive;
+        filterSeason = latestSeason;
+        summaryDateFrom = seasonRange.start;
+        summaryDateTo = seasonRange.endExclusive;
       }
     }
 
-    const availableYears = collectAvailableYears(result.availableEventDates);
+    const availableSeasons = collectAvailableSeasons(
+      result.availableEventDates,
+    );
     const [awardSummaryRows, searchSummarySource] = await Promise.all([
       getBeagleTrialAwardSummaryDb(),
       getBeagleTrialSearchSummaryDb({
@@ -282,11 +287,11 @@ export async function searchBeagleTrialsService(
     const data: BeagleTrialSearchResponse = {
       filters: {
         mode: filterMode,
-        year: filterYear ?? null,
+        season: filterSeason,
         dateFrom: filterDateFrom,
         dateTo: filterDateTo,
       },
-      availableYears,
+      availableSeasons,
       total: result.total,
       totalPages: result.totalPages,
       page: result.page,
@@ -322,7 +327,10 @@ export async function searchBeagleTrialsService(
     log.error(
       {
         event: "exception",
-        year,
+        season:
+          typeof input.season === "string"
+            ? input.season.trim() || undefined
+            : input.season,
         dateFrom: dateFromIso,
         dateTo: dateToIso,
         durationMs: Date.now() - startedAt,

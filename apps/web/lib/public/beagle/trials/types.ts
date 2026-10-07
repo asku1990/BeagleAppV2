@@ -2,11 +2,11 @@ import type { BeagleTrialSearchSort } from "@beagle/contracts";
 
 export type { BeagleTrialSearchSort };
 
-export type BeagleTrialsFilterMode = "year" | "range";
+export type BeagleTrialsFilterMode = "season" | "range";
 
 export type BeagleTrialsQueryState = {
   mode: BeagleTrialsFilterMode;
-  year: string;
+  season: string;
   dateFrom: string;
   dateTo: string;
   page: number;

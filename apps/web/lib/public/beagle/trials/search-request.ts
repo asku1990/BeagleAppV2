@@ -2,20 +2,22 @@ import type { BeagleTrialSearchRequest } from "@beagle/contracts";
 import { normalizeIsoDateOnlyInput } from "./date";
 import type { BeagleTrialsQueryState } from "./types";
 
-export function parseTrialYearInput(
+export function parseTrialSeasonInput(
   input: string | null | undefined,
-): number | undefined {
+): string | undefined {
   const trimmed = (input ?? "").trim();
-  if (!/^\d{4}$/.test(trimmed)) {
+  const match = trimmed.match(/^(\d{4})-(\d{4})$/);
+  if (
+    !match ||
+    Number.parseInt(match[2], 10) !== Number.parseInt(match[1], 10) + 1
+  ) {
     return undefined;
   }
-
-  const year = Number.parseInt(trimmed, 10);
-  if (!Number.isFinite(year) || year < 1900 || year > 2100) {
+  const year = Number.parseInt(match[1], 10);
+  if (year < 1900 || year > 2100) {
     return undefined;
   }
-
-  return year;
+  return trimmed;
 }
 
 export function toBeagleTrialSearchRequest(
@@ -37,6 +39,6 @@ export function toBeagleTrialSearchRequest(
 
   return {
     ...base,
-    year: parseTrialYearInput(state.year),
+    season: parseTrialSeasonInput(state.season),
   };
 }

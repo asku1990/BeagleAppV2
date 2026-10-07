@@ -24,7 +24,7 @@ describe("useBeagleTrialsQuery", () => {
   it("uses expected query key", () => {
     useQueryMock.mockImplementation((options) => options);
     const input = {
-      year: 2025,
+      season: "2025-2026",
       page: 2,
       pageSize: 25,
       sort: "date-asc" as const,
@@ -42,12 +42,12 @@ describe("useBeagleTrialsQuery", () => {
     useQueryMock.mockImplementation((options) => options);
     const data = {
       filters: {
-        mode: "year" as const,
-        year: 2025,
+        mode: "season" as const,
+        season: "2025-2026",
         dateFrom: null,
         dateTo: null,
       },
-      availableYears: [2025],
+      availableSeasons: ["2025-2026"],
       total: 1,
       totalPages: 1,
       page: 1,
@@ -60,13 +60,15 @@ describe("useBeagleTrialsQuery", () => {
       data,
     });
 
-    useBeagleTrialsQuery({ year: 2025 });
+    useBeagleTrialsQuery({ season: "2025-2026" });
     const options = useQueryMock.mock.calls[0]?.[0] as {
       queryFn: () => Promise<unknown>;
     };
 
     await expect(options.queryFn()).resolves.toEqual(data);
-    expect(searchBeagleTrialsActionMock).toHaveBeenCalledWith({ year: 2025 });
+    expect(searchBeagleTrialsActionMock).toHaveBeenCalledWith({
+      season: "2025-2026",
+    });
   });
 
   it("throws mapped action error", async () => {
@@ -75,16 +77,16 @@ describe("useBeagleTrialsQuery", () => {
       hasError: true,
       status: 400,
       data: null,
-      error: "Invalid year value.",
+      error: "Invalid season value.",
     });
 
-    useBeagleTrialsQuery({ year: 1000 });
+    useBeagleTrialsQuery({ season: "1000-1001" });
     const options = useQueryMock.mock.calls[0]?.[0] as {
       queryFn: () => Promise<unknown>;
     };
 
     await expect(options.queryFn()).rejects.toMatchObject({
-      message: "Invalid year value.",
+      message: "Invalid season value.",
       status: 400,
     });
   });

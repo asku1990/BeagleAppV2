@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { toast } from "@/components/ui/sonner";
 import { FeatureHeroHeader } from "@/components/layout";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,6 @@ import {
   copyTrialSearchRowsToClipboard,
   formatIsoDateForDisplay,
   normalizeIsoDateOnlyInput,
-  parseTrialYearInput,
   toBeagleTrialSearchRequest,
 } from "@/lib/public/beagle/trials";
 import { useBeagleTrialsQuery } from "@/queries/public/beagle/trials/use-beagle-trials-query";
@@ -30,8 +29,8 @@ import { BeagleTrialsSearchSummary } from "./beagle-trials-search-summary";
 
 function getFilterLabel(
   filters: {
-    mode: "year" | "range";
-    year: number | null;
+    mode: "season" | "range";
+    season: string | null;
     dateFrom: string | null;
     dateTo: string | null;
   },
@@ -45,11 +44,11 @@ function getFilterLabel(
     return t("trials.results.filter.range");
   }
 
-  if (filters.year == null) {
-    return t("trials.results.filter.latestYear");
+  if (filters.season == null) {
+    return t("trials.results.filter.latestSeason");
   }
 
-  return `${t("trials.results.filter.year")} ${filters.year}`;
+  return `${t("trials.results.filter.season")} ${filters.season}`;
 }
 
 export function BeagleTrialsPage() {
@@ -59,7 +58,8 @@ export function BeagleTrialsPage() {
     urlState,
     isPending,
     setMode,
-    setYear,
+    setSeason,
+    setDefaultSeason,
     setDateFrom,
     setDateTo,
     submitSearch,
@@ -79,12 +79,12 @@ export function BeagleTrialsPage() {
     trialsQuery.data ??
     ({
       filters: {
-        mode: "year",
-        year: null,
+        mode: "season",
+        season: null,
         dateFrom: null,
         dateTo: null,
       },
-      availableYears: [],
+      availableSeasons: [],
       total: 0,
       totalPages: 0,
       page: 1,
@@ -103,6 +103,23 @@ export function BeagleTrialsPage() {
       },
     } as const);
 
+  useEffect(() => {
+    if (
+      urlState.mode === "season" &&
+      !urlState.season &&
+      response.filters.mode === "season" &&
+      response.filters.season
+    ) {
+      setDefaultSeason(response.filters.season);
+    }
+  }, [
+    response.filters.mode,
+    response.filters.season,
+    setDefaultSeason,
+    urlState.mode,
+    urlState.season,
+  ]);
+
   const hasItems = response.items.length > 0;
   const isLoading = isPending || (trialsQuery.isFetching && !trialsQuery.data);
   const hasError = trialsQuery.isError && !trialsQuery.data;
@@ -112,11 +129,9 @@ export function BeagleTrialsPage() {
       : t("trials.empty.error");
 
   const canSubmit =
-    formState.mode === "year"
-      ? formState.year.trim().length === 0 ||
-        parseTrialYearInput(formState.year) != null
-      : normalizeIsoDateOnlyInput(formState.dateFrom).length > 0 &&
-        normalizeIsoDateOnlyInput(formState.dateTo).length > 0;
+    formState.mode === "season" ||
+    (normalizeIsoDateOnlyInput(formState.dateFrom).length > 0 &&
+      normalizeIsoDateOnlyInput(formState.dateTo).length > 0);
 
   const handleCopyResults = async () => {
     await copyTrialSearchRowsToClipboard({
@@ -153,9 +168,9 @@ export function BeagleTrialsPage() {
         sort={urlState.sort}
         isPending={isPending}
         canSubmit={canSubmit}
-        availableYears={response.availableYears}
+        availableSeasons={response.availableSeasons}
         onModeChange={setMode}
-        onYearChange={setYear}
+        onSeasonChange={setSeason}
         onDateFromChange={setDateFrom}
         onDateToChange={setDateTo}
         onSortChange={setSort}

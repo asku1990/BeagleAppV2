@@ -20,6 +20,18 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.24.0] - 2026-10-07
+
+### Added
+
+### Changed
+
+- Julkinen Beagle-koehaku ryhmittelee ja hakee tulokset nyt koekauden (1.8.–31.7.) eikä kalenterivuoden mukaan.
+
+### Fixed
+
+### Removed
+
 ## [0.23.0] - 2026-09-21
 
 ### Added

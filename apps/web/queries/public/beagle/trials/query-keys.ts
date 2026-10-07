@@ -36,7 +36,7 @@ export function beagleTrialSearchQueryKey(
 ) {
   return [
     ...beagleTrialSearchQueryKeyRoot,
-    normalizeNumber(input.year, null),
+    normalizeDate(input.season),
     normalizeDate(input.dateFrom),
     normalizeDate(input.dateTo),
     normalizeNumber(input.page, 1),
