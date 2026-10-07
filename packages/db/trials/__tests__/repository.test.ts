@@ -86,7 +86,7 @@ describe("getBeagleTrialSearchSummaryDb", () => {
       values: unknown[];
     };
     expect(query.strings.join("?")).toContain('COUNT(DISTINCT event."id")');
-    expect(query.strings.join("?")).toContain("entry.\"pa\" = 'L'");
+    expect(query.strings.join("?")).toContain("entry.\"huomautus\" = 'LUOPUI'");
     expect(query.values).toEqual([
       new Date("2026-01-01T00:00:00.000Z"),
       new Date("2027-01-01T00:00:00.000Z"),
@@ -165,7 +165,7 @@ describe("getBeagleTrialAwardSummaryDb", () => {
     );
     expect(sql).toContain(`entry."koetyyppi" = 'PITKAKOE'`);
     expect(sql).toContain(`entries."pa" = '1'`);
-    expect(sql).toContain(`entries."pa" = 'S'`);
+    expect(sql).toContain(`entries."huomautus" = 'SULJETTU'`);
     expect(sql).toContain(`event."koepaiva" >= DATE '2005-08-20'`);
     expect(query.values).toEqual([]);
   });
@@ -720,6 +720,7 @@ describe("getBeagleTrialsForDogDb", () => {
         koiriaLuokassa: true,
         piste: true,
         pa: true,
+        huomautus: true,
         tuom1: true,
         haku: true,
         hauk: true,
@@ -950,6 +951,7 @@ describe("getBeagleTrialSummarySourceForDogDb", () => {
     trialEntryFindManyMock.mockResolvedValueOnce([
       {
         pa: "1",
+        huomautus: null,
         piste: decimal(80),
         haku: decimal(8),
         hauk: decimal(6),
@@ -1030,7 +1032,7 @@ describe("getBeagleTrialSummarySourceForDogDb", () => {
     expect(trialEntryFindManyMock).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { dogId: "dog-1" },
-        select: expect.objectContaining({ pa: true }),
+        select: expect.objectContaining({ pa: true, huomautus: true }),
       }),
     );
     expect(trialEntryFindManyMock).toHaveBeenCalledTimes(1);
@@ -1039,6 +1041,7 @@ describe("getBeagleTrialSummarySourceForDogDb", () => {
       dogRows: [
         {
           pa: "1",
+          huomautus: null,
           piste: 80,
           haku: 8,
           hauk: 6,

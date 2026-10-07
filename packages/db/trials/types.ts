@@ -134,6 +134,7 @@ export type BeagleTrialDogEraRowDb = {
 
 export type BeagleTrialDogSummarySourceRowDb = {
   pa: string | null;
+  huomautus: "LUOPUI" | "SULJETTU" | "KESKEYTETTY" | null;
   piste: number | null;
   haku: number | null;
   hauk: number | null;

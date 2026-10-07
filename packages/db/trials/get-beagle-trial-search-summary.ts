@@ -16,13 +16,13 @@ export async function getBeagleTrialSearchSummaryDb(input: {
     SELECT
       COUNT(DISTINCT event."id")::int AS "trialCount",
       COUNT(entry."id")::int AS "entryCount",
-      COUNT(entry."id") FILTER (WHERE entry."pa" IN ('1', '2', '3'))::int AS "awarded",
-      COUNT(entry."id") FILTER (WHERE entry."pa" = '1')::int AS "first",
-      COUNT(entry."id") FILTER (WHERE entry."pa" = '2')::int AS "second",
-      COUNT(entry."id") FILTER (WHERE entry."pa" = '3')::int AS "third",
-      COUNT(entry."id") FILTER (WHERE entry."pa" = '0')::int AS "noPrize",
-      COUNT(entry."id") FILTER (WHERE entry."pa" = 'L')::int AS "withdrew",
-      COUNT(entry."id") FILTER (WHERE entry."pa" = 'S')::int AS "excluded"
+      COUNT(entry."id") FILTER (WHERE entry."pa" IN ('1', '2', '3') AND entry."huomautus" IS DISTINCT FROM 'LUOPUI' AND entry."huomautus" IS DISTINCT FROM 'SULJETTU')::int AS "awarded",
+      COUNT(entry."id") FILTER (WHERE entry."pa" = '1' AND entry."huomautus" IS DISTINCT FROM 'LUOPUI' AND entry."huomautus" IS DISTINCT FROM 'SULJETTU')::int AS "first",
+      COUNT(entry."id") FILTER (WHERE entry."pa" = '2' AND entry."huomautus" IS DISTINCT FROM 'LUOPUI' AND entry."huomautus" IS DISTINCT FROM 'SULJETTU')::int AS "second",
+      COUNT(entry."id") FILTER (WHERE entry."pa" = '3' AND entry."huomautus" IS DISTINCT FROM 'LUOPUI' AND entry."huomautus" IS DISTINCT FROM 'SULJETTU')::int AS "third",
+      COUNT(entry."id") FILTER (WHERE entry."pa" = '0' AND entry."huomautus" IS DISTINCT FROM 'LUOPUI' AND entry."huomautus" IS DISTINCT FROM 'SULJETTU')::int AS "noPrize",
+      COUNT(entry."id") FILTER (WHERE entry."huomautus" = 'LUOPUI')::int AS "withdrew",
+      COUNT(entry."id") FILTER (WHERE entry."huomautus" = 'SULJETTU')::int AS "excluded"
     FROM "TrialEvent" event
     INNER JOIN "TrialEntry" entry ON entry."trialEventId" = event."id"
     ${dateWhere}

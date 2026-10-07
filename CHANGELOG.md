@@ -20,6 +20,8 @@ This project uses a user-facing changelog format.
 
 ### Fixed
 
+- Ajokoehaun yhteenveto ja tuloslista tunnistavat luopuneet ja suljetut myös Koiratietokanta-aineistosta.
+
 ### Removed
 
 ## [0.23.0] - 2026-09-21
