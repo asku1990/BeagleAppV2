@@ -82,6 +82,7 @@ describe("getBeagleDogTrialsService", () => {
         rank: "1",
         classCode: "A",
         award: "1",
+        huomautus: null,
         judge: "Chief Judge",
         points: 85.5,
         haku: 4,
@@ -215,7 +216,7 @@ describe("getBeagleDogTrialsService", () => {
     expect(toBusinessDateOnlyMock).toHaveBeenCalledWith(
       new Date("2024-02-01T00:00:00.000Z"),
     );
-    expect(formatTrialAwardMock).toHaveBeenCalledWith("1", "A");
+    expect(formatTrialAwardMock).toHaveBeenCalledWith("1", "A", null);
     expect(result).toEqual({
       status: 200,
       body: {

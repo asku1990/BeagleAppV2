@@ -3,7 +3,6 @@
 // exactly to one event, even when other events share the same date/place.
 import { DogSex, DogStatus, type Prisma } from "@prisma/client";
 import { prisma } from "../core/prisma";
-import { getTrialEntryDisplayAward } from "./internal/get-trial-entry-display-award";
 import type {
   BeagleTrialDetailsRequestDb,
   BeagleTrialDetailsResponseDb,
@@ -118,7 +117,8 @@ export async function getBeagleTrialDetailsDb(
       name: entry.dog?.name?.trim() || entry.rekisterinumeroSnapshot,
       sex: toSexCode(entry.dog?.sex),
       weather: entry.ke,
-      award: getTrialEntryDisplayAward(entry.pa, entry.huomautus),
+      award: entry.pa,
+      huomautus: entry.huomautus,
       classCode: entry.lk,
       rank: entry.sija,
       points: toNumberOrNull(entry.piste),

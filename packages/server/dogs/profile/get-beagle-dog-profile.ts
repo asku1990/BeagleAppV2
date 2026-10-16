@@ -114,7 +114,7 @@ function mapDogProfileFromDb(
       koiriaLuokassa: trial.koiriaLuokassa,
       rank: trial.rank,
       points: trial.points,
-      award: formatTrialAward(trial.award, trial.classCode),
+      award: formatTrialAward(trial.award, trial.classCode, trial.huomautus),
       judge: trial.judge,
       haku: trial.haku,
       hauk: trial.hauk,
