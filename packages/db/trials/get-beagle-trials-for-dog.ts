@@ -1,5 +1,4 @@
 import { prisma } from "../core/prisma";
-import { getTrialEntryDisplayAward } from "./internal/get-trial-entry-display-award";
 import type { BeagleTrialDogRowDb } from "./types";
 
 function toNumberOrNull(value: { toNumber(): number } | null): number | null {
@@ -80,7 +79,8 @@ export async function getBeagleTrialsForDogDb(
     rank: row.sija,
     koiriaLuokassa: row.koiriaLuokassa,
     points: toNumberOrNull(row.piste),
-    award: getTrialEntryDisplayAward(row.pa, row.huomautus),
+    award: row.pa,
+    huomautus: row.huomautus,
     judge: row.tuom1?.trim() || row.trialEvent.ylituomariNimi || null,
     haku: toNumberOrNull(row.haku),
     hauk: toNumberOrNull(row.hauk),

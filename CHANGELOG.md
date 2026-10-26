@@ -18,6 +18,8 @@ This project uses a user-facing changelog format.
 
 ### Fixed
 
+- Keskeytetyn ajokokeen tulos näkyy tuloslistoilla myös nollatuloksella, ja keskeytys merkitään tuloksen perään `(K)`.
+
 ### Removed
 
 ## [0.24.1] - 2026-10-07

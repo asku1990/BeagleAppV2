@@ -1,8 +1,19 @@
 export function formatTrialAward(
   award: string | null,
   classCode: string | null,
+  huomautus: "LUOPUI" | "SULJETTU" | "KESKEYTETTY" | null,
 ): string | null {
-  if (!award) {
+  const result =
+    huomautus === "LUOPUI"
+      ? "L"
+      : huomautus === "SULJETTU"
+        ? "S"
+        : huomautus === "KESKEYTETTY" && award
+          ? `${award} (K)`
+          : huomautus === "KESKEYTETTY"
+            ? "K"
+            : award;
+  if (!result) {
     return null;
   }
 
@@ -16,5 +27,5 @@ export function formatTrialAward(
         ? "Voi"
         : "Beaj";
 
-  return `${prefix} ${award}`;
+  return `${prefix} ${result}`;
 }

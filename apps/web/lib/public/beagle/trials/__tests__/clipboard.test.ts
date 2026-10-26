@@ -36,7 +36,7 @@ describe("formatTrialDetailRowForClipboard", () => {
         name: "Pena",
         sex: "U",
         weather: "K",
-        award: "1",
+        award: "1 (K)",
         classCode: "V",
         rank: "1",
         points: 80,
@@ -53,7 +53,7 @@ describe("formatTrialDetailRowForClipboard", () => {
       1,
     );
 
-    expect(output.split("\n")[1]).toContain("\tVoi 1\t");
+    expect(output.split("\n")[1]).toContain("\tVoi 1 (K)\t");
   });
 
   it("formats one row as tab-separated output with header", () => {
@@ -268,7 +268,7 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
           koiriaLuokassa: 12,
           rank: "1",
           points: 88.2,
-          award: "Voi 1",
+          award: "Voi 1 (K)",
           judge: "Judge A",
           haku: 4,
           hauk: 5,
@@ -340,7 +340,7 @@ describe("formatDogProfileTrialRowsForClipboard", () => {
       "N:o\tPaikka\tPäivä\tKeli\tPalkinto\tSija\tPisteet\tTuomari\tHaku\tHaukku\tYVA\tHLO\tALO\tTJA\tPIN",
     );
     expect(lines[1]).toBe(
-      "1\tHelsinki\t2025-06-01\tL\tVoi 1\t1 / 12\t88.20\tJudge A\t4.00\t5.00\t6.00\t1.00\t2.00\t3.00\t9.00",
+      "1\tHelsinki\t2025-06-01\tL\tVoi 1 (K)\t1 / 12\t88.20\tJudge A\t4.00\t5.00\t6.00\t1.00\t2.00\t3.00\t9.00",
     );
     expect(lines[2]).toBe(
       "2\tTurku\t2025-06-02\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-",

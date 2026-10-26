@@ -16,6 +16,8 @@ Developer notes for the public dog-specific `Kokeet laaja` page.
 4. `packages/server` builds the `BeagleDogTrialsSummaryDto`.
 5. `apps/web` renders the trial rows, optional era rows, PDF stack link, era stats, and `YHTEENVETO`.
 
+The public trial result is formatted in `packages/server` from the stored prize code and status. An interrupted entry with a result keeps that result and adds `(K)` (for example `Beaj 0 (K)`); withdrawn and excluded entries keep the existing `L` and `S` markers. The compact dog trial card and the trial event detail list use the same formatting, including their copy-to-clipboard output.
+
 The dog profile only links to `Kokeet laaja` when trial rows exist. The direct page/API path still returns a valid empty summary for dogs with no trials.
 
 ## LT/Era Stats

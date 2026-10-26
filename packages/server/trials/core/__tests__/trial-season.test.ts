@@ -17,6 +17,9 @@ describe("trial seasons", () => {
     expect(
       formatTrialSeason(toTrialSeason(new Date("2025-01-15T00:00:00Z"))),
     ).toBe("2024-2025");
+    expect(
+      formatTrialSeason(toTrialSeason(new Date("2026-01-15T00:00:00Z"))),
+    ).toBe("2025-2026");
   });
 
   it("rejects invalid and nonconsecutive season strings", () => {
