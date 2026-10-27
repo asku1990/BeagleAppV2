@@ -28,7 +28,7 @@ This project uses a user-facing changelog format.
 
 ### Fixed
 
-- Keskeytetyn ajokokeen tulos näkyy tuloslistoilla myös nollatuloksella, ja keskeytys merkitään tuloksen perään `(K)`.
+- Keskeytetyn ajokokeen tulos näkyy tuloslistoilla aina, ja keskeytys merkitään tuloksen perään `(K)`. (BEAJ 2 (K)
 
 ### Removed
 
