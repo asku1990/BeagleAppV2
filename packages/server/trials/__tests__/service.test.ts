@@ -331,6 +331,7 @@ describe("trials service", () => {
           sex: "U",
           weather: { kind: "single", value: "L" },
           award: "1",
+          huomautus: null,
           classCode: "V",
           rank: "1",
           points: 88.5,

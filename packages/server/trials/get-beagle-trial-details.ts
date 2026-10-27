@@ -73,7 +73,7 @@ export async function getBeagleTrialDetailsService(
         name: item.name,
         sex: item.sex,
         weather: item.weather,
-        award: formatTrialAward(item.award, item.classCode),
+        award: formatTrialAward(item.award, item.classCode, item.huomautus),
         classCode: item.classCode,
         rank: item.rank,
         points: item.points,

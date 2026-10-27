@@ -20,6 +20,18 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [0.24.2] - 2026-10-27
+
+### Added
+
+### Changed
+
+### Fixed
+
+- Keskeytetyn ajokokeen tulos näkyy tuloslistoilla aina, ja keskeytys merkitään tuloksen perään `(K)`. esim. BEAJ 2 (K)
+
+### Removed
+
 ## [0.24.1] - 2026-10-07
 
 ### Added

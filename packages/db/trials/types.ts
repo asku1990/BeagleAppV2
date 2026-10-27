@@ -71,6 +71,7 @@ export type BeagleTrialDetailsRowDb = {
   sex: "U" | "N" | "-";
   weather: string | null;
   award: string | null;
+  huomautus: "LUOPUI" | "SULJETTU" | "KESKEYTETTY" | null;
   classCode: string | null;
   rank: string | null;
   points: number | null;
@@ -106,6 +107,7 @@ export type BeagleTrialDogRowDb = {
   koiriaLuokassa: number | null;
   points: number | null;
   award: string | null;
+  huomautus: "LUOPUI" | "SULJETTU" | "KESKEYTETTY" | null;
   judge: string | null;
   haku: number | null;
   hauk: number | null;
