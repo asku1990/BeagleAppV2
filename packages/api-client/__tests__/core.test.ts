@@ -76,4 +76,21 @@ describe("createRequest", () => {
     expect(init?.credentials).toBe("include");
     expect(headers.get("content-type")).toBe("application/json");
   });
+
+  it("leaves FormData content-type unset so fetch supplies its boundary", async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(
+        new Response(JSON.stringify({ ok: true, data: {} }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+    const request = createRequest({ baseUrl: "http://base.example" });
+    const form = new FormData();
+    form.append("file", new Blob(["xlsx"]), "dogs.xlsx");
+    await request("/api/test", { method: "POST", body: form });
+    const [, init] = fetchMock.mock.calls[0] ?? [];
+    expect(new Headers(init?.headers).has("content-type")).toBe(false);
+  });
 });

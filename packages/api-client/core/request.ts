@@ -21,7 +21,12 @@ export function createRequest(options: ClientOptions): RequestFn {
         headers.set(key, value),
       );
     }
-    if (init.body != null && !headers.has("Content-Type")) {
+    // The browser must add the multipart boundary for FormData requests.
+    if (
+      init.body != null &&
+      !(init.body instanceof FormData) &&
+      !headers.has("Content-Type")
+    ) {
       headers.set("Content-Type", "application/json");
     }
 

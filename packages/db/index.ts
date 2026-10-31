@@ -16,6 +16,13 @@ export {
   type AuditContextDb,
   type AuditSourceDb,
 } from "./core/audit-context";
+export { DOG_REGISTRY_IMPORT_TX_CONFIG } from "./core/interactive-write-transaction";
+export { loadDogImportStateDb } from "./admin/dogs/import/load-dog-import-state";
+export { applyDogImportPlanDb } from "./admin/dogs/import/apply-dog-import-plan";
+export type {
+  DogImportStateDb,
+  DogImportWritePlanDb,
+} from "./admin/dogs/import/types";
 
 export {
   createImportRunIssue,

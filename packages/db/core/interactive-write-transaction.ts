@@ -13,3 +13,9 @@ export const WORKBOOK_IMPORT_WRITE_TX_CONFIG = {
   maxWait: 10_000,
   timeout: 90_000,
 } as const;
+
+export const DOG_REGISTRY_IMPORT_TX_CONFIG = {
+  maxWait: 10_000,
+  timeout: 90_000,
+  isolationLevel: "Serializable",
+} as const;

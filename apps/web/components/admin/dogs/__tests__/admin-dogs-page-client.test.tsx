@@ -277,11 +277,13 @@ describe("AdminDogsPageClient", () => {
     renderToStaticMarkup(React.createElement(AdminDogsPageClient));
 
     const formFlow = useAdminDogFormFlowMock.mock.results[0].value;
-    const firstButtonProps = buttonPropsMock.mock.calls[0][0];
+    const addDogButtonProps = buttonPropsMock.mock.calls
+      .map(([props]) => props)
+      .find((props) => typeof props.onClick === "function");
     const dogFormProps = dogFormModalPropsMock.mock.calls[0][0];
     const deleteProps = deleteModalPropsMock.mock.calls[0][0];
 
-    firstButtonProps.onClick();
+    addDogButtonProps!.onClick();
     deleteProps.onCancel();
 
     expect(formFlow.openCreateModal).toHaveBeenCalledTimes(1);
