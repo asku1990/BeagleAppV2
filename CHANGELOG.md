@@ -20,6 +20,22 @@ This project uses a user-facing changelog format.
 
 ### Removed
 
+## [1.0.0] - 2026-11-26
+
+### Added
+
+- Tuotantotietokannasta otetaan automaattinen varmuuskopio kerran kuukaudessa. Palautus varmuuskopiosta on testattu.
+
+### Changed
+
+- Beagletietokannan ensimmäinen tuotantoversio 1.0.0.
+
+### Fixed
+
+- Korjattu ci testejä.
+
+### Removed
+
 ## [0.24.2] - 2026-10-27
 
 ### Added

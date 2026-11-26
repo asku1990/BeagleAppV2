@@ -35,7 +35,8 @@ jobs:
         run: pnpm test:coverage:global-check
 
   e2e:
-    runs-on: ubuntu-latest
+    # Playwright 1.58.2 does not support Chromium on Ubuntu 26.04.
+    runs-on: ubuntu-24.04
     needs: checks
     env:
       BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
