@@ -1,0 +1,228 @@
+name: Back up production PostgreSQL to R2
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: db-backup-r2
+  cancel-in-progress: false
+
+env:
+  AZURE_POSTGRES_RESOURCE_GROUP: ${{ vars.AZURE_POSTGRES_RESOURCE_GROUP }}
+  AZURE_POSTGRES_SERVER_NAME: ${{ vars.AZURE_POSTGRES_SERVER_NAME }}
+  AZURE_POSTGRES_DATABASE_NAME: ${{ vars.AZURE_POSTGRES_DATABASE_NAME }}
+  AZURE_POSTGRES_FIREWALL_RULE_NAME: github-actions-r2-backup
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Ensure backup runs from main
+        run: |
+          if [[ "${GITHUB_REF}" != refs/heads/main ]]; then
+            echo "Run this workflow from main."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Validate production backup configuration
+        env:
+          DATABASE_URL: ${{ secrets.AZURE_DATABASE_URL_UNPOOLED }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          required=(
+            AZURE_POSTGRES_RESOURCE_GROUP AZURE_POSTGRES_SERVER_NAME AZURE_POSTGRES_DATABASE_NAME
+            R2_BUCKET R2_ENDPOINT R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY
+          )
+          for name in "${required[@]}"; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "Missing required GitHub Actions configuration: ${name}"
+              exit 1
+            fi
+          done
+
+          node --input-type=module <<'NODE'
+          const expectedHost = `${process.env.AZURE_POSTGRES_SERVER_NAME}.postgres.database.azure.com`;
+          const allowedTlsModes = new Set(["require", "verify-ca", "verify-full"]);
+          const allowedParameters = new Set(["sslmode", "sslrootcert"]);
+
+          try {
+            const url = new URL(process.env.DATABASE_URL);
+            const sslModes = url.searchParams.getAll("sslmode");
+            if (
+              !["postgresql:", "postgres:"].includes(url.protocol) ||
+              !url.username || !url.password ||
+              url.hostname.toLowerCase() !== expectedHost.toLowerCase() ||
+              (url.port && url.port !== "5432") ||
+              decodeURIComponent(url.pathname.slice(1)) !== process.env.AZURE_POSTGRES_DATABASE_NAME ||
+              url.hash ||
+              sslModes.length !== 1 || !allowedTlsModes.has(sslModes[0]) ||
+              [...url.searchParams.keys()].some((name) => !allowedParameters.has(name))
+            ) {
+              throw new Error();
+            }
+          } catch {
+            console.error("AZURE_DATABASE_URL_UNPOOLED must be a direct libpq URL for the configured Azure server and database, with sslmode=require, verify-ca, or verify-full.");
+            process.exit(1);
+          }
+
+          try {
+            const endpoint = new URL(process.env.R2_ENDPOINT);
+            if (
+              endpoint.protocol !== "https:" ||
+              endpoint.username || endpoint.password ||
+              endpoint.pathname !== "/" || endpoint.search || endpoint.hash
+            ) {
+              throw new Error();
+            }
+          } catch {
+            console.error("R2_ENDPOINT must be an HTTPS S3 endpoint without credentials, a path, or query parameters.");
+            process.exit(1);
+          }
+          NODE
+
+      - name: Log in to Azure with OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install matching PostgreSQL client
+        timeout-minutes: 10
+        run: |
+          version="$(az postgres flexible-server show \
+            --resource-group "${AZURE_POSTGRES_RESOURCE_GROUP}" \
+            --name "${AZURE_POSTGRES_SERVER_NAME}" \
+            --query version --output tsv --only-show-errors)"
+          if [[ ! "${version}" =~ ^[1-9][0-9](\.[0-9]+)*$ ]]; then
+            echo "Azure did not report a supported PostgreSQL major version."
+            exit 1
+          fi
+
+          major="${version%%.*}"
+          sudo apt-get update
+          sudo apt-get install -y postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y "postgresql-client-${major}"
+
+          echo "/usr/lib/postgresql/${major}/bin" >> "${GITHUB_PATH}"
+          echo "POSTGRES_MAJOR=${major}" >> "${GITHUB_ENV}"
+          aws --version
+
+      - name: Resolve runner public IPv4
+        id: runner-ip
+        run: |
+          runner_ip="$(curl --ipv4 --fail --show-error --silent --max-time 10 --retry 4 --retry-all-errors https://api.ipify.org)"
+          node --input-type=module -e '
+            import { isIPv4 } from "node:net";
+            const address = process.argv[1];
+            if (!isIPv4(address) || address === "0.0.0.0") {
+              console.error("api.ipify.org did not return a usable runner IPv4 address.");
+              process.exit(1);
+            }
+          ' -- "${runner_ip}"
+          echo "address=${runner_ip}" >> "${GITHUB_OUTPUT}"
+
+      - name: Allow runner through the PostgreSQL firewall
+        id: allow-runner
+        timeout-minutes: 5
+        env:
+          RUNNER_IPV4: ${{ steps.runner-ip.outputs.address }}
+        run: |
+          az postgres flexible-server firewall-rule create \
+            --resource-group "${AZURE_POSTGRES_RESOURCE_GROUP}" \
+            --server-name "${AZURE_POSTGRES_SERVER_NAME}" \
+            --name "${AZURE_POSTGRES_FIREWALL_RULE_NAME}" \
+            --start-ip-address "${RUNNER_IPV4}" \
+            --end-ip-address "${RUNNER_IPV4}" \
+            --only-show-errors --output none
+
+      - name: Wait for PostgreSQL and verify its major version
+        env:
+          DATABASE_URL: ${{ secrets.AZURE_DATABASE_URL_UNPOOLED }}
+          PGCONNECT_TIMEOUT: "5"
+        run: |
+          deadline=$((SECONDS + 300))
+          while (( SECONDS < deadline )); do
+            if version="$(timeout 10s psql -XAtw --dbname="${DATABASE_URL}" \
+              --command='SHOW server_version_num' 2>/dev/null)"; then
+              if [[ ! "${version}" =~ ^[1-9][0-9]{5}$ ]] || (( version / 10000 != POSTGRES_MAJOR )); then
+                echo "The connected PostgreSQL server does not match the installed client major version."
+                exit 1
+              fi
+              echo "PostgreSQL accepted a connection from the runner."
+              exit 0
+            fi
+            sleep 10
+          done
+
+          echo "PostgreSQL did not become reachable during the firewall propagation window."
+          exit 1
+
+      - name: Create recovery dump
+        env:
+          DATABASE_URL: ${{ secrets.AZURE_DATABASE_URL_UNPOOLED }}
+          CONFIRM_PROD: "YES"
+          DUMP_INCLUDE_AUDIT_LOGS: "1"
+          PGCONNECT_TIMEOUT: "5"
+        run: |
+          umask 077
+          timeout --signal=TERM --kill-after=30s 20m \
+            bash scripts/db/dump.sh "${RUNNER_TEMP}/beagle-prod.sql"
+          test -s "${RUNNER_TEMP}/beagle-prod.sql"
+
+      - name: Remove temporary PostgreSQL firewall rule
+        if: ${{ always() && steps.allow-runner.outcome != '' && steps.allow-runner.outcome != 'skipped' }}
+        timeout-minutes: 5
+        run: |
+          server=(--resource-group "${AZURE_POSTGRES_RESOURCE_GROUP}" --server-name "${AZURE_POSTGRES_SERVER_NAME}")
+          for attempt in 1 2 3 4 5; do
+            timeout 20s az postgres flexible-server firewall-rule delete "${server[@]}" \
+              --name "${AZURE_POSTGRES_FIREWALL_RULE_NAME}" \
+              --yes --only-show-errors --output none || true
+
+            # A successful list with no match proves absence even if delete reported an error.
+            if remaining="$(timeout 20s az postgres flexible-server firewall-rule list "${server[@]}" \
+              --query "[?name=='${AZURE_POSTGRES_FIREWALL_RULE_NAME}'].name" \
+              --only-show-errors --output tsv)" && [[ -z "${remaining}" ]]; then
+              echo "Temporary PostgreSQL firewall rule removal verified."
+              exit 0
+            fi
+
+            if (( attempt < 5 )); then
+              echo "Firewall cleanup attempt ${attempt} was not verified; retrying."
+              sleep 10
+            fi
+          done
+
+          echo "Could not verify removal of ${AZURE_POSTGRES_FIREWALL_RULE_NAME}." >&2
+          exit 1
+
+      - name: Compress and upload backup to R2
+        timeout-minutes: 10
+        env:
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+        run: |
+          timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
+          key="beagle/prod/beagle-${timestamp}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.sql.gz"
+          gzip -- "${RUNNER_TEMP}/beagle-prod.sql"
+          aws s3 cp "${RUNNER_TEMP}/beagle-prod.sql.gz" "s3://${R2_BUCKET}/${key}" \
+            --endpoint-url "${R2_ENDPOINT}" --only-show-errors
+          echo "Backup uploaded: ${key}"
