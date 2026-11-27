@@ -14,20 +14,56 @@ import { Input } from "@/components/ui/input";
 import { useI18n } from "@/hooks/i18n";
 
 const client = createAdminDogsApiClient();
-const PAGE_SIZE = 10;
 const issueLabelKeys = {
+  DOG_COLOR_UNRESOLVED: "admin.dogs.import.issue.unknownColor",
+  MULTIPLE_SOURCE_ROWS_SAME_DOG: "admin.dogs.import.issue.sameDog",
+  DUPLICATE_COLUMN: "admin.dogs.import.issue.duplicateHeader",
+  REQUIRED_COLUMN_MISSING: "admin.dogs.import.issue.missingHeader",
+  OPTIONAL_COLUMN_MISSING: "admin.dogs.import.issue.optionalHeader",
+  UNNAMED_COLUMN_WITH_DATA: "admin.dogs.import.issue.unnamedHeader",
+  UNSUPPORTED_COLUMN_IGNORED: "admin.dogs.import.issue.ignoredHeader",
+  ADDITIONAL_SHEETS_IGNORED: "admin.dogs.import.issue.extraSheets",
+  REGISTRATION_CANONICAL_COLLISION: "admin.dogs.import.issue.collision",
+  SOURCE_FILE_UNREADABLE: "admin.dogs.import.issue.unreadable",
+  SOURCE_RESOURCE_LIMIT_EXCEEDED: "admin.dogs.import.issue.limit",
   PARENT_SEX_CONFLICT: "admin.dogs.import.issue.PARENT_SEX_CONFLICT",
   DOG_BREEDER_NOT_FOUND: "admin.dogs.import.issue.DOG_BREEDER_NOT_FOUND",
   DOG_BREEDER_AMBIGUOUS: "admin.dogs.import.issue.DOG_BREEDER_AMBIGUOUS",
   DOG_BREEDER_LINK_CONFLICT:
     "admin.dogs.import.issue.DOG_BREEDER_LINK_CONFLICT",
 } as const;
-type Filter = "ALL" | "BLOCKED" | "WARNING" | "CREATE" | "UPDATE" | "UNCHANGED";
-const isReferenceRow = (row: AdminDogImportPreviewRow) =>
-  row.issues.some((issue) => issue.resolution === "CREATE_REFERENCE");
+type Filter =
+  | "ALL"
+  | "BLOCKED"
+  | "WARNING"
+  | "REFERENCE"
+  | "CREATE"
+  | "UPDATE"
+  | "UNCHANGED";
+const fieldLabels = {
+  registeredOn: "admin.dogs.import.field.registeredOn",
+  originTypeText: "admin.dogs.import.field.origin",
+  originCountryText: "admin.dogs.import.field.country",
+  tailText: "admin.dogs.import.field.tail",
+  colorName: "admin.dogs.import.field.color",
+  breeder: "admin.dogs.import.review.breeder",
+  birthDate: "admin.dogs.import.field.birthDate",
+  name: "admin.dogs.import.field.name",
+  sex: "admin.dogs.import.field.sex",
+  sireRegistrationNo: "admin.dogs.import.field.sire",
+  damRegistrationNo: "admin.dogs.import.field.dam",
+  status: "admin.dogs.import.field.status",
+  registrationNo: "admin.dogs.import.field.registration",
+} as const;
 
 export function AdminDogImportPageClient() {
   const { t } = useI18n();
+  const issueLabel = (
+    code: AdminDogImportPreviewRow["issues"][number]["code"],
+  ) => {
+    const key = issueLabelKeys[code as keyof typeof issueLabelKeys];
+    return key ? t(key) : code;
+  };
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] =
     useState<AdminFinnishKennelClubImportPreviewResponse | null>(null);
@@ -38,8 +74,6 @@ export function AdminDogImportPageClient() {
   >("upload");
   const [filter, setFilter] = useState<Filter>("ALL");
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [expanded, setExpanded] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -51,7 +85,6 @@ export function AdminDogImportPageClient() {
     setStep("upload");
     setFilter("ALL");
     setSearch("");
-    setPage(1);
   }
   async function review() {
     if (!file || busy) return;
@@ -92,19 +125,10 @@ export function AdminDogImportPageClient() {
       const matchesSearch =
         !query || (row.registrationNo ?? "").toLowerCase().includes(query);
       const matchesFilter =
-        filter === "ALL" ||
-        (filter === "WARNING" &&
-          row.issues.some((issue) => issue.severity === "WARNING")) ||
-        (filter === "BLOCKED" && row.status === "BLOCKED") ||
-        filter === row.status;
+        filter === "ALL" || (filter !== "BLOCKED" && filter === row.status);
       return matchesSearch && matchesFilter;
     });
   }, [filter, preview, search]);
-  const pageCount = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
-  const visibleRows = filteredRows.slice(
-    (page - 1) * PAGE_SIZE,
-    page * PAGE_SIZE,
-  );
   const missingKennelsByName = new Map<string, string>();
   for (const issue of preview?.issues ?? []) {
     if (
@@ -119,13 +143,52 @@ export function AdminDogImportPageClient() {
     a.localeCompare(b, "fi"),
   );
   const labels = {
-    ALL: "admin.dogs.import.review.all",
-    BLOCKED: "admin.dogs.import.review.blocked",
-    WARNING: "admin.dogs.import.review.warnings",
+    ALL: "admin.dogs.import.review.rows",
     CREATE: "admin.dogs.import.review.create",
     UPDATE: "admin.dogs.import.review.update",
     UNCHANGED: "admin.dogs.import.review.unchanged",
+    BLOCKED: "admin.dogs.import.review.blocked",
+    WARNING: "admin.dogs.import.review.warnings",
+    REFERENCE: "admin.dogs.import.review.reference",
   } as const;
+  const issues = preview?.issues ?? [];
+  const warnings = issues.filter((issue) => issue.severity === "WARNING");
+  const blockers = issues.filter((issue) => issue.severity === "BLOCKER");
+  const parents = issues.filter(
+    (issue) => issue.resolution === "CREATE_REFERENCE",
+  );
+  const counts = {
+    ALL: preview?.rowCount,
+    CREATE: preview?.createCount,
+    UPDATE: preview?.updateCount,
+    UNCHANGED: preview?.unchangedCount,
+    BLOCKED: blockers.length,
+    WARNING: warnings.length,
+    REFERENCE: parents.length,
+  };
+  const details =
+    filter === "BLOCKED"
+      ? blockers
+      : filter === "WARNING"
+        ? warnings
+        : filter === "REFERENCE"
+          ? parents
+          : null;
+  const visibleIssues = (
+    details ??
+    issues.filter(
+      (issue) =>
+        filter === "ALL" &&
+        issue.sourceRowNumber === null &&
+        issue.resolution !== "CREATE_REFERENCE",
+    )
+  ).filter(
+    (issue) =>
+      !search.trim() ||
+      (issue.registrationNo ?? "")
+        .toLowerCase()
+        .includes(search.trim().toLowerCase()),
+  );
 
   return (
     <div className="mx-auto max-w-5xl space-y-4">
@@ -223,52 +286,19 @@ export function AdminDogImportPageClient() {
               ) : null}
               {preview && step === "review" ? (
                 <>
-                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-6">
-                    {(
-                      [
-                        ["admin.dogs.import.review.rows", preview.rowCount],
-                        [
-                          "admin.dogs.import.review.create",
-                          preview.createCount,
-                        ],
-                        [
-                          "admin.dogs.import.review.update",
-                          preview.updateCount,
-                        ],
-                        [
-                          "admin.dogs.import.review.unchanged",
-                          preview.unchangedCount,
-                        ],
-                        [
-                          "admin.dogs.import.review.blocked",
-                          preview.blockedCount,
-                        ],
-                        [
-                          "admin.dogs.import.review.reference",
-                          preview.referenceCount,
-                        ],
-                      ] as const
-                    ).map(([label, count]) => (
-                      <div className="rounded-md border p-2" key={label}>
-                        <div className="text-xs text-muted-foreground">
-                          {t(label)}
-                        </div>
-                        <div className="font-semibold">{count}</div>
-                      </div>
-                    ))}
-                  </div>
                   <div className="flex flex-wrap gap-2">
                     {(Object.keys(labels) as Filter[]).map((value) => (
                       <Button
                         key={value}
                         size="sm"
                         variant={filter === value ? "default" : "outline"}
+                        aria-pressed={filter === value}
                         onClick={() => {
                           setFilter(value);
-                          setPage(1);
+                          setSearch("");
                         }}
                       >
-                        {t(labels[value])}
+                        {t(labels[value])} ({counts[value]})
                       </Button>
                     ))}
                   </div>
@@ -277,9 +307,11 @@ export function AdminDogImportPageClient() {
                     value={search}
                     onChange={(event) => {
                       setSearch(event.target.value);
-                      setPage(1);
                     }}
                   />
+                  <p className="text-sm text-muted-foreground">
+                    {t("admin.dogs.import.review.explain")}
+                  </p>
                   {filter === "BLOCKED" && missingKennels.length > 0 ? (
                     <div className="space-y-1 rounded-md border p-3 text-sm">
                       <p className="font-medium">
@@ -289,113 +321,97 @@ export function AdminDogImportPageClient() {
                       <p>{missingKennels.join(", ")}</p>
                     </div>
                   ) : null}
-                  <div className="max-h-96 overflow-auto text-sm">
-                    {visibleRows.length === 0 ? (
+                  {visibleIssues.map((issue, index) => (
+                    <p
+                      key={`${issue.code}-${index}`}
+                      className="rounded border p-2 text-sm"
+                    >
+                      <strong>
+                        {issue.registrationNo ??
+                          t("admin.dogs.import.review.workbook")}
+                      </strong>
+                      {issue.sourceRowNumber !== null &&
+                        ` · ${t("admin.dogs.import.review.row")} ${issue.sourceRowNumber}`}
+                      {" · "}
+                      {issue.resolution === "CREATE_REFERENCE" && issue.field
+                        ? t(fieldLabels[issue.field])
+                        : issueLabel(issue.code)}
+                      {issue.currentValue != null &&
+                        ` · ${t("admin.dogs.import.review.current")}: ${issue.currentValue}`}
+                      {issue.incomingValue != null &&
+                        ` · ${t("admin.dogs.import.review.incoming")}: ${issue.incomingValue}`}
+                    </p>
+                  ))}
+                  <div className="divide-y text-sm">
+                    {filteredRows.length === 0 && visibleIssues.length === 0 ? (
                       <p className="p-3 text-muted-foreground">
-                        {t("admin.dogs.import.review.empty")}
+                        {filter === "WARNING" && !warnings.length
+                          ? t("admin.dogs.import.review.noWarnings")
+                          : t("admin.dogs.import.review.empty")}
                       </p>
                     ) : (
-                      visibleRows.map((row) => (
-                        <div
+                      filteredRows.map((row) => (
+                        <article
                           key={row.sourceRowNumber}
-                          className="border-b py-2"
+                          className="space-y-2 py-3"
                         >
-                          <button
-                            type="button"
-                            className="w-full text-left"
-                            onClick={() =>
-                              setExpanded(
-                                expanded === row.sourceRowNumber
-                                  ? null
-                                  : row.sourceRowNumber,
-                              )
-                            }
-                          >
+                          <h3>
                             <span className="font-medium">
                               {row.registrationNo ?? "-"}
                             </span>{" "}
-                            · {t("admin.dogs.import.review.row")}{" "}
+                            {row.name} · {t("admin.dogs.import.review.row")}{" "}
                             {row.sourceRowNumber} ·{" "}
                             {t(
                               `admin.dogs.import.status.${row.status}` as never,
                             )}{" "}
-                            {isReferenceRow(row)
-                              ? `· ${t("admin.dogs.import.review.reference")}`
-                              : null}
-                          </button>
-                          {expanded === row.sourceRowNumber ? (
-                            <div className="mt-2 space-y-2 rounded bg-muted/40 p-2">
-                              {row.breederToLink ? (
-                                <div>
-                                  {t("admin.dogs.import.review.breeder")}: — →{" "}
-                                  {row.breederToLink}
-                                </div>
-                              ) : null}
-                              {!row.breederToLink && row.issues.length === 0 ? (
-                                <span>-</span>
-                              ) : (
-                                row.issues.map((issue, index) => (
-                                  <div key={`${issue.code}-${index}`}>
-                                    <div className="font-medium">
-                                      {issueLabelKeys[
-                                        issue.code as keyof typeof issueLabelKeys
-                                      ]
-                                        ? t(
-                                            issueLabelKeys[
-                                              issue.code as keyof typeof issueLabelKeys
-                                            ],
-                                          )
-                                        : issue.code}
-                                    </div>
-                                    <div>
-                                      {issue.field === "breeder"
-                                        ? t("admin.dogs.import.review.breeder")
-                                        : (issue.field ?? "-")}
-                                      : {t("admin.dogs.import.review.current")}{" "}
-                                      {String(issue.currentValue ?? "-")} ·{" "}
-                                      {t("admin.dogs.import.review.incoming")}{" "}
-                                      {String(issue.incomingValue ?? "-")}
-                                    </div>
-                                  </div>
-                                ))
-                              )}
+                          </h3>
+                          <div className="grid gap-x-4 gap-y-1 sm:grid-cols-2 lg:grid-cols-3">
+                            {row.breederToLink ? (
+                              <div>
+                                {t("admin.dogs.import.review.breeder")}: — →{" "}
+                                {row.breederToLink}
+                              </div>
+                            ) : null}
+                            {row.changes?.map((change) => (
+                              <div key={change.field}>
+                                <span className="text-muted-foreground">
+                                  {t(fieldLabels[change.field])}:{" "}
+                                </span>
+                                {row.status !== "CREATE" &&
+                                  `${change.before ?? "—"} → `}
+                                {change.field === "sex" &&
+                                change.after === "MALE"
+                                  ? t("admin.dogs.import.value.male")
+                                  : change.field === "sex" &&
+                                      change.after === "FEMALE"
+                                    ? t("admin.dogs.import.value.female")
+                                    : (change.after ?? "—")}
+                              </div>
+                            ))}
+                          </div>
+                          {row.issues.map((issue, index) => (
+                            <div
+                              key={`${issue.code}-${index}`}
+                              className="rounded bg-muted/40 p-2"
+                            >
+                              <div className="font-medium">
+                                {issueLabel(issue.code)}
+                              </div>
+                              <div>
+                                {issue.field
+                                  ? t(fieldLabels[issue.field])
+                                  : "—"}
+                                : {t("admin.dogs.import.review.current")}{" "}
+                                {String(issue.currentValue ?? "-")} ·{" "}
+                                {t("admin.dogs.import.review.incoming")}{" "}
+                                {String(issue.incomingValue ?? "-")}
+                              </div>
                             </div>
-                          ) : null}
-                        </div>
+                          ))}
+                        </article>
                       ))
                     )}
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={page <= 1}
-                      onClick={() => setPage(page - 1)}
-                    >
-                      ‹
-                    </Button>
-                    <span>
-                      {page} / {pageCount}
-                    </span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={page >= pageCount}
-                      onClick={() => setPage(page + 1)}
-                    >
-                      ›
-                    </Button>
-                  </div>
-                  <p className="text-sm text-destructive">
-                    {preview.blockedCount}{" "}
-                    {t("admin.dogs.import.review.blocked")},{" "}
-                    {
-                      preview.issues.filter(
-                        (issue) => issue.severity === "WARNING",
-                      ).length
-                    }{" "}
-                    {t("admin.dogs.import.review.warnings")}
-                  </p>
                   {!preview.hasChanges &&
                   !preview.issues.some(
                     (issue) => issue.severity === "BLOCKER",
@@ -420,8 +436,14 @@ export function AdminDogImportPageClient() {
                     {preview.sourceFileSha256.slice(0, 12)}…
                   </p>
                   <p className="text-sm">
-                    {preview.createCount} / {preview.updateCount} /{" "}
-                    {preview.unchangedCount} / {preview.referenceCount}
+                    {t("admin.dogs.import.review.create")}:{" "}
+                    {preview.createCount} ·{" "}
+                    {t("admin.dogs.import.review.update")}:{" "}
+                    {preview.updateCount} ·{" "}
+                    {t("admin.dogs.import.review.unchanged")}:{" "}
+                    {preview.unchangedCount} ·{" "}
+                    {t("admin.dogs.import.review.reference")}:{" "}
+                    {preview.referenceCount}
                   </p>
                   <p className="text-sm">
                     {t("admin.dogs.import.confirm.noClearing")}

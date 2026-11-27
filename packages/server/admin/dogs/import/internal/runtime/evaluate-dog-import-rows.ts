@@ -82,6 +82,16 @@ export function evaluateDogImportRows(
     byRegistration.set(dog.registrationNo, dog);
   }
   const seen = new Set<string>();
+  const sourceRegistrationsByDog = new Map<string, Set<string>>();
+  for (const row of rows) {
+    if (!row.registrationNo) continue;
+    const dog = byRegistration.get(row.registrationNo);
+    if (!dog) continue;
+    const registrations =
+      sourceRegistrationsByDog.get(dog.id) ?? new Set<string>();
+    registrations.add(row.registrationNo);
+    sourceRegistrationsByDog.set(dog.id, registrations);
+  }
   const references = new Map<string, "MALE" | "FEMALE">();
   const sourceRows = new Map(
     rows.map((sourceRow) => [sourceRow.registrationNo, sourceRow]),
@@ -222,7 +232,17 @@ export function evaluateDogImportRows(
         incomingDam.sex,
         "FEMALE",
       );
-    if (existing && row.name && existing.name !== row.name) {
+    if (existing && (sourceRegistrationsByDog.get(existing.id)?.size ?? 0) > 1)
+      add("MULTIPLE_SOURCE_ROWS_SAME_DOG", "registrationNo");
+    const hasFallbackName =
+      existing?.status === "REFERENCE_ONLY" &&
+      existing.name === existing.registrationNo;
+    if (
+      existing &&
+      !hasFallbackName &&
+      row.name &&
+      existing.name !== row.name
+    ) {
       const sameFormat =
         existing.name.trim().toLocaleLowerCase("fi-FI") ===
         row.name.trim().toLocaleLowerCase("fi-FI");
@@ -318,37 +338,31 @@ export function evaluateDogImportRows(
         registrationNo: row.registrationNo,
         sourceRowNumber: row.sourceRowNumber,
         field: "colorName",
+        incomingValue: row.colorName,
       });
       rowIssues.push(issue);
       issues.push(issue);
       uniqueRowIssues = [...uniqueRowIssues, issue];
     }
     if (existing) {
-      const currentColorName =
-        state.colors.find((color) => color.code === existing.colorCode)
-          ?.nameFi ?? null;
       for (const comparison of [
         {
           field: "originTypeText",
-          code: "DOG_ORIGIN_TYPE_DIFFERS",
           currentValue: existing.originTypeText,
           incomingValue: row.originTypeText,
         },
         {
           field: "originCountryText",
-          code: "DOG_ORIGIN_COUNTRY_DIFFERS",
           currentValue: existing.originCountryText,
           incomingValue: row.originCountryText,
         },
         {
           field: "tailText",
-          code: "DOG_TAIL_DIFFERS",
           currentValue: existing.tailText,
           incomingValue: row.tailText,
         },
         {
           field: "registeredOn",
-          code: "DOG_REGISTRATION_DATE_DIFFERS",
           currentValue: dateValue(existing.registeredOn),
           incomingValue: row.registeredOn,
         },
@@ -359,21 +373,6 @@ export function evaluateDogImportRows(
           sourceRowNumber: row.sourceRowNumber,
         });
         if (comparisonIssue) rowIssues.push(comparisonIssue);
-      }
-      if (
-        row.colorName &&
-        colorMatches.length === 1 &&
-        colorCode !== existing.colorCode
-      ) {
-        const colorIssue = compareWithoutClearing({
-          field: "colorName",
-          code: "DOG_COLOR_DIFFERS",
-          currentValue: currentColorName,
-          incomingValue: row.colorName,
-          registrationNo: row.registrationNo,
-          sourceRowNumber: row.sourceRowNumber,
-        });
-        if (colorIssue) rowIssues.push(colorIssue);
       }
       const previousIssues = new Set(issues.map(canonical));
       const comparisonIssues = rowIssues.filter(
@@ -407,28 +406,80 @@ export function evaluateDogImportRows(
         registrationNo: row.registrationNo,
         name: row.name,
         status: "CREATE",
-        ...(breederToLink && { breederToLink: breederToLink.name }),
+        changes: [
+          { field: "sex", before: null, after: row.sex },
+          { field: "birthDate", before: null, after: row.birthDate },
+          { field: "registeredOn", before: null, after: row.registeredOn },
+          {
+            field: "breeder",
+            before: null,
+            after: breederToLink?.name ?? null,
+          },
+          { field: "originTypeText", before: null, after: row.originTypeText },
+          {
+            field: "originCountryText",
+            before: null,
+            after: row.originCountryText,
+          },
+          {
+            field: "colorName",
+            before: null,
+            after: colorCode !== null ? colorMatches[0]!.nameFi : null,
+          },
+          { field: "tailText", before: null, after: row.tailText },
+          {
+            field: "sireRegistrationNo",
+            before: null,
+            after: row.sireRegistrationNo,
+          },
+          {
+            field: "damRegistrationNo",
+            before: null,
+            after: row.damRegistrationNo,
+          },
+        ],
         issues: uniqueRowIssues,
       });
       continue;
     }
     const data: DogImportDogUpdateData & { birthDate?: string } = {};
+    const changes: NonNullable<AdminDogImportPreviewRow["changes"]> = [];
     if (breederToLink) data.breederId = breederToLink.id;
     for (const [key, incoming, current] of [
       ["originTypeText", row.originTypeText, existing.originTypeText],
       ["originCountryText", row.originCountryText, existing.originCountryText],
       ["tailText", row.tailText, existing.tailText],
     ] as const)
-      if (incoming && incoming !== current) data[key] = incoming;
+      if (incoming && incoming !== current) {
+        data[key] = incoming;
+        changes.push({ field: key, before: current, after: incoming });
+      }
     if (
       row.colorName &&
       colorMatches.length === 1 &&
       colorCode !== existing.colorCode
-    )
+    ) {
       data.colorCode = colorCode;
-    if (!existing.birthDate && row.birthDate) data.birthDate = row.birthDate;
+      const before = state.colors.find(
+        (color) => color.code === existing.colorCode,
+      );
+      changes.push({
+        field: "colorName",
+        before: before?.nameFi ?? null,
+        after: colorMatches[0]!.nameFi,
+      });
+    }
+    if (!existing.birthDate && row.birthDate) {
+      data.birthDate = row.birthDate;
+      changes.push({ field: "birthDate", before: null, after: row.birthDate });
+    }
     if (existing.status === "REFERENCE_ONLY") {
       data.status = "NORMAL";
+      changes.push({
+        field: "status",
+        before: existing.status,
+        after: data.status,
+      });
       const referenceIssues: DogImportIssue[] = [
         issueFromDogImportFact({
           code: "REFERENCE_DOG_PROMOTED",
@@ -436,8 +487,9 @@ export function evaluateDogImportRows(
           sourceRowNumber: row.sourceRowNumber,
         }),
       ];
-      if (existing.name === existing.registrationNo && row.name) {
+      if (hasFallbackName && row.name) {
         data.name = row.name;
+        changes.push({ field: "name", before: existing.name, after: row.name });
         referenceIssues.push(
           issueFromDogImportFact({
             code: "REFERENCE_FALLBACK_NAME_REPLACED",
@@ -451,6 +503,7 @@ export function evaluateDogImportRows(
       }
       if (existing.sex === "UNKNOWN" && row.sex) {
         data.sex = row.sex;
+        changes.push({ field: "sex", before: existing.sex, after: row.sex });
         referenceIssues.push(
           issueFromDogImportFact({
             code: "REFERENCE_UNKNOWN_SEX_FILLED",
@@ -471,25 +524,36 @@ export function evaluateDogImportRows(
           ) === index,
       );
     }
-    const parentsChanged =
-      (!existing.sireId && !!row.sireRegistrationNo) ||
-      (!existing.damId && !!row.damRegistrationNo);
-    if (
-      Object.keys(data).length ||
-      parentsChanged ||
-      (row.registeredOn &&
-        dateValue(existing.registeredOn) !== row.registeredOn)
-    ) {
+    if (!existing.sireId && row.sireRegistrationNo)
+      changes.push({
+        field: "sireRegistrationNo",
+        before: null,
+        after: row.sireRegistrationNo,
+      });
+    if (!existing.damId && row.damRegistrationNo)
+      changes.push({
+        field: "damRegistrationNo",
+        before: null,
+        after: row.damRegistrationNo,
+      });
+    const registeredOn =
+      row.registeredOn !== dateValue(existing.registeredOn)
+        ? row.registeredOn
+        : null;
+    if (registeredOn)
+      changes.push({
+        field: "registeredOn",
+        before: dateValue(existing.registeredOn),
+        after: registeredOn,
+      });
+    if (changes.length || breederToLink) {
       updates.push({
         id: existing.id,
         registrationId: existing.registrationId,
         expectedUpdatedAt: existing.updatedAt,
         expectedRegistrationUpdatedAt: existing.registrationUpdatedAt,
         data,
-        ...(row.registeredOn &&
-        dateValue(existing.registeredOn) !== row.registeredOn
-          ? { registeredOn: row.registeredOn }
-          : {}),
+        ...(registeredOn && { registeredOn }),
         sireRegistrationNo: row.sireRegistrationNo!,
         damRegistrationNo: row.damRegistrationNo!,
       });
@@ -498,6 +562,7 @@ export function evaluateDogImportRows(
         registrationNo: row.registrationNo,
         name: row.name,
         status: "UPDATE",
+        changes,
         ...(breederToLink && { breederToLink: breederToLink.name }),
         issues: uniqueRowIssues,
       });
@@ -523,6 +588,8 @@ export function evaluateDogImportRows(
       issueFromDogImportFact({
         code: "REFERENCE_PARENT_PLANNED",
         registrationNo: reference.registrationNo,
+        field:
+          reference.sex === "MALE" ? "sireRegistrationNo" : "damRegistrationNo",
       }),
     );
   const plan = {

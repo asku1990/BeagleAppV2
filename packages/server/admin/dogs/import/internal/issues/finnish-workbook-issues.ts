@@ -31,6 +31,8 @@ export function issueFromFinnishWorkbookFact(fact: FinnishWorkbookFact) {
     code,
     field: fact.header ? (fieldByHeader[fact.header] ?? null) : null,
     sourceRowNumber: fact.sourceRowNumber ?? null,
+    ...(fact.sourceRowNumber == null &&
+      fact.header && { incomingValue: fact.header }),
   };
   return issueFromDogImportFact(adapted);
 }

@@ -22,7 +22,7 @@ const overridableBlocker = (): RuleOptions => ({
   resolution: "BLOCK",
   overridable: true,
 });
-const warning = (resolution: DogImportResolution): RuleOptions => ({
+const warning = (resolution: "IGNORE" | "KEEP_EXISTING"): RuleOptions => ({
   severity: "WARNING",
   resolution,
   overridable: true,
@@ -95,16 +95,11 @@ const rules: Record<DogImportIssueCode, RuleOptions> = {
   DOG_BIRTH_DATE_CONFLICT: overridableBlocker(),
   DOG_SIRE_CONFLICT: overridableBlocker(),
   DOG_DAM_CONFLICT: overridableBlocker(),
-  DOG_COLOR_DIFFERS: warning("AUTO_UPDATE"),
   DOG_COLOR_UNRESOLVED: warning("KEEP_EXISTING"),
   DOG_BREEDER_NOT_FOUND: blocker(),
   DOG_BREEDER_AMBIGUOUS: blocker(),
   DOG_BREEDER_LINK_CONFLICT: blocker(),
   DOG_REGISTRATION_DATE_INVALID: blocker(),
-  DOG_REGISTRATION_DATE_DIFFERS: warning("AUTO_UPDATE"),
-  DOG_ORIGIN_TYPE_DIFFERS: warning("AUTO_UPDATE"),
-  DOG_ORIGIN_COUNTRY_DIFFERS: warning("AUTO_UPDATE"),
-  DOG_TAIL_DIFFERS: warning("AUTO_UPDATE"),
   SOURCE_EMPTY_PRESERVED: info("KEEP_EXISTING"),
   PARENT_REGISTRATION_INVALID: blocker(),
   PARENT_REGISTRATION_PLACEHOLDER: blocker(),
@@ -122,7 +117,7 @@ const rules: Record<DogImportIssueCode, RuleOptions> = {
   PREVIEW_STALE: blocker(),
 };
 
-export const DOG_IMPORT_POLICY_VERSION = "2" as const;
+export const DOG_IMPORT_POLICY_VERSION = "4" as const;
 export const DOG_IMPORT_POLICY_DEFAULTS = Object.fromEntries(
   Object.entries(rules).map(([code, rule]) => [
     code,

@@ -1,4 +1,37 @@
 export const fiAdminDogsImportMessages = {
+  "admin.dogs.import.review.explain":
+    "Päivitys näyttää tallennettavan muutoksen: nykyinen arvo → uusi arvo. Viiva tarkoittaa tyhjää arvoa. Varoitus kertoo, mitä jätetään tuomatta ja miksi. Yksikin estävä virhe estää koko tuonnin.",
+  "admin.dogs.import.value.male": "Uros",
+  "admin.dogs.import.value.female": "Narttu",
+  "admin.dogs.import.review.workbook": "Tiedosto",
+  "admin.dogs.import.issue.unknownColor":
+    "Väriä ei voitu tunnistaa. Tuonti ei muuta väriä.",
+  "admin.dogs.import.issue.sameDog": "Useampi rivi viittaa samaan koiraan",
+  "admin.dogs.import.issue.duplicateHeader":
+    "Sama sarakeotsikko esiintyy useasti",
+  "admin.dogs.import.issue.missingHeader": "Pakollinen sarake puuttuu",
+  "admin.dogs.import.issue.optionalHeader": "Valinnainen sarake puuttuu",
+  "admin.dogs.import.issue.unnamedHeader":
+    "Tietoja sarakkeessa, jolta puuttuu otsikko",
+  "admin.dogs.import.issue.ignoredHeader": "Tuntematon sarake ohitetaan",
+  "admin.dogs.import.issue.extraSheets":
+    "Vain ensimmäinen laskentataulukko tuodaan",
+  "admin.dogs.import.issue.collision":
+    "Rekisterinumero ei yksilöi tietokannan rekisteröintiä",
+  "admin.dogs.import.issue.unreadable": "Tiedostoa ei voitu lukea",
+  "admin.dogs.import.issue.limit": "Tiedosto ylittää tuonnin kokorajan",
+  "admin.dogs.import.field.registeredOn": "Rekisteröintipäivä",
+  "admin.dogs.import.field.origin": "Alkuperä",
+  "admin.dogs.import.field.country": "Alkuperämaa",
+  "admin.dogs.import.field.tail": "Häntä",
+  "admin.dogs.import.field.color": "Väri",
+  "admin.dogs.import.field.birthDate": "Syntymäaika",
+  "admin.dogs.import.field.name": "Nimi",
+  "admin.dogs.import.field.sex": "Sukupuoli",
+  "admin.dogs.import.field.sire": "Isän rekisterinumero",
+  "admin.dogs.import.field.dam": "Emän rekisterinumero",
+  "admin.dogs.import.field.status": "Koiran tila",
+  "admin.dogs.import.field.registration": "Rekisterinumero",
   "admin.dogs.import.button": "Tuo rekisteritiedot",
   "admin.dogs.import.title": "Rekisteritietojen tuonti",
   "admin.dogs.import.source": "Suomen koirarekisteri · .xlsx · enintään 10 MiB",
@@ -16,7 +49,8 @@ export const fiAdminDogsImportMessages = {
   "admin.dogs.import.review.unchanged": "Muuttumattomat",
   "admin.dogs.import.review.blocked": "Estävät",
   "admin.dogs.import.review.warnings": "Varoitukset",
-  "admin.dogs.import.review.reference": "Vain sukupuuhun luodut",
+  "admin.dogs.import.review.reference": "Sukupuuhun lisättävät vanhemmat",
+  "admin.dogs.import.review.noWarnings": "Tuonnissa ei ole varoituksia.",
   "admin.dogs.import.status.CREATE": "Uusi",
   "admin.dogs.import.status.UPDATE": "Päivitys",
   "admin.dogs.import.status.UNCHANGED": "Muuttumaton",
@@ -59,6 +93,38 @@ export const fiAdminDogsImportMessages = {
 } as const;
 
 export const svAdminDogsImportMessages = {
+  "admin.dogs.import.review.explain":
+    "En uppdatering visar vad som sparas: nuvarande värde → nytt värde. Ett streck betyder att värdet saknas. En varning visar vad som hoppas över och varför. Ett enda blockerande fel stoppar hela importen.",
+  "admin.dogs.import.value.male": "Hane",
+  "admin.dogs.import.value.female": "Tik",
+  "admin.dogs.import.review.workbook": "Fil",
+  "admin.dogs.import.issue.unknownColor":
+    "Färgen kunde inte identifieras. Importen ändrar inte färgen.",
+  "admin.dogs.import.issue.sameDog": "Flera rader hänvisar till samma hund",
+  "admin.dogs.import.issue.duplicateHeader":
+    "Samma kolumnrubrik förekommer flera gånger",
+  "admin.dogs.import.issue.missingHeader": "En obligatorisk kolumn saknas",
+  "admin.dogs.import.issue.optionalHeader": "En valfri kolumn saknas",
+  "admin.dogs.import.issue.unnamedHeader": "En kolumn med data saknar rubrik",
+  "admin.dogs.import.issue.ignoredHeader": "Okänd kolumn ignoreras",
+  "admin.dogs.import.issue.extraSheets":
+    "Endast det första kalkylbladet importeras",
+  "admin.dogs.import.issue.collision":
+    "Registreringsnumret motsvarar flera registreringar i databasen",
+  "admin.dogs.import.issue.unreadable": "Filen kunde inte läsas",
+  "admin.dogs.import.issue.limit": "Filen överskrider importens storleksgräns",
+  "admin.dogs.import.field.registeredOn": "Registreringsdatum",
+  "admin.dogs.import.field.origin": "Ursprung",
+  "admin.dogs.import.field.country": "Ursprungsland",
+  "admin.dogs.import.field.tail": "Svans",
+  "admin.dogs.import.field.color": "Färg",
+  "admin.dogs.import.field.birthDate": "Födelsedatum",
+  "admin.dogs.import.field.name": "Namn",
+  "admin.dogs.import.field.sex": "Kön",
+  "admin.dogs.import.field.sire": "Faderns registreringsnummer",
+  "admin.dogs.import.field.dam": "Moderns registreringsnummer",
+  "admin.dogs.import.field.status": "Hundens status",
+  "admin.dogs.import.field.registration": "Registreringsnummer",
   "admin.dogs.import.button": "Importera registreringsuppgifter",
   "admin.dogs.import.title": "Import av registreringsuppgifter",
   "admin.dogs.import.source": "Finska hundregistret · .xlsx · högst 10 MiB",
@@ -76,7 +142,8 @@ export const svAdminDogsImportMessages = {
   "admin.dogs.import.review.unchanged": "Oförändrade",
   "admin.dogs.import.review.blocked": "Blockerade",
   "admin.dogs.import.review.warnings": "Varningar",
-  "admin.dogs.import.review.reference": "Skapade endast i stamtavlan",
+  "admin.dogs.import.review.reference": "Föräldrar som läggs till i stamtavlan",
+  "admin.dogs.import.review.noWarnings": "Importen har inga varningar.",
   "admin.dogs.import.status.CREATE": "Ny",
   "admin.dogs.import.status.UPDATE": "Uppdatering",
   "admin.dogs.import.status.UNCHANGED": "Oförändrad",

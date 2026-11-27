@@ -10,17 +10,17 @@ describe("dog import policy", () => {
   it("converts facts using the default policy", () => {
     expect(
       issueFromDogImportFact({
-        code: "DOG_COLOR_DIFFERS",
+        code: "DOG_COLOR_UNRESOLVED",
         field: "colorName",
         currentValue: "Black",
         incomingValue: "Tan",
       }),
     ).toMatchObject({
       severity: "WARNING",
-      resolution: "AUTO_UPDATE",
+      resolution: "KEEP_EXISTING",
       overridable: true,
     });
-    expect(DOG_IMPORT_POLICY_VERSION).toBe("2");
+    expect(DOG_IMPORT_POLICY_VERSION).toBe("4");
   });
 
   it("marks integrity rules as non-overridable", () => {
@@ -34,7 +34,6 @@ describe("dog import policy", () => {
     expect(
       compareWithoutClearing({
         field: "tailText",
-        code: "DOG_TAIL_DIFFERS",
         currentValue: "long",
         incomingValue: "",
       }),
@@ -46,9 +45,15 @@ describe("dog import policy", () => {
     expect(
       compareWithoutClearing({
         field: "tailText",
-        code: "DOG_TAIL_DIFFERS",
         currentValue: "",
         incomingValue: "",
+      }),
+    ).toBeNull();
+    expect(
+      compareWithoutClearing({
+        field: "tailText",
+        currentValue: "long",
+        incomingValue: "short",
       }),
     ).toBeNull();
   });

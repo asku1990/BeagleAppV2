@@ -118,6 +118,18 @@ describe("evaluateDogImportRows parser facts", () => {
 
     expect(evaluation.hasChanges).toBe(true);
     expect(evaluation.plan.updates).toHaveLength(1);
+    expect(evaluation.rows[0]?.changes).toEqual([
+      {
+        field: "sireRegistrationNo",
+        before: null,
+        after: row.sireRegistrationNo,
+      },
+      {
+        field: "damRegistrationNo",
+        before: null,
+        after: row.damRegistrationNo,
+      },
+    ]);
     expect(evaluation.plan.updates[0]).toMatchObject({
       id: "dog-1",
       sireRegistrationNo: row.sireRegistrationNo,
@@ -180,6 +192,52 @@ describe("evaluateDogImportRows parser facts", () => {
     });
   });
 
+  it("promotes a fallback name but blocks two registrations for the same dog", () => {
+    const reference: DogImportStateDb["dogs"][number] = {
+      id: "reference",
+      registrationId: "registration",
+      registrationNo: row.registrationNo!,
+      name: row.registrationNo!,
+      status: "REFERENCE_ONLY",
+      sex: "UNKNOWN",
+      birthDate: null,
+      registeredOn: null,
+      sireId: null,
+      damId: null,
+      breederId: null,
+      breederName: null,
+      colorCode: null,
+      originTypeText: null,
+      originCountryText: null,
+      tailText: null,
+      updatedAt: new Date(0),
+      registrationUpdatedAt: new Date(0),
+    };
+    const promoted = evaluateDogImportRows([row], {
+      ...state,
+      dogs: [reference],
+    });
+    expect(promoted.hasBlockers).toBe(false);
+    expect(promoted.plan.updates[0]?.data).toMatchObject({
+      status: "NORMAL",
+      name: row.name,
+    });
+    const alias = {
+      ...reference,
+      registrationId: "alias",
+      registrationNo: "FI999/24",
+    };
+    const collisions = evaluateDogImportRows(
+      [
+        row,
+        { ...row, sourceRowNumber: 3, registrationNo: alias.registrationNo },
+      ],
+      { ...state, dogs: [reference, alias] },
+    );
+    expect(collisions.blockedCount).toBe(2);
+    expect(collisions.plan.updates).toHaveLength(0);
+  });
+
   it("requires a unique breeder for a nonblank kennel on a new dog", () => {
     const kennelRow = { ...row, kennel: "TAVAJS" };
     const breeder = { id: "breeder-1", name: "Tavajs" };
@@ -225,47 +283,65 @@ describe("evaluateDogImportRows parser facts", () => {
     );
   });
 
-  it("does not report a color difference when both labels resolve to the same color", () => {
+  it("shows recognized color changes as updates and warns only for unresolved colors", () => {
     const updatedAt = new Date("2026-01-01T00:00:00.000Z");
-    const evaluation = evaluateDogImportRows(
-      [{ ...row, colorName: "kolmivärinen" }],
-      {
-        historicalLinksByRegistration: {},
-        colors: [
-          {
-            code: 121,
-            nameFi: "Kolmivärinen",
-            status: "SELECTABLE",
-            updatedAt,
-          },
-        ],
-        dogs: [
-          {
-            id: "dog-1",
-            registrationNo: row.registrationNo!,
-            name: row.name!,
-            sex: row.sex!,
-            status: "NORMAL",
-            birthDate: new Date("2024-01-01T00:00:00.000Z"),
-            sireId: null,
-            damId: null,
-            breederId: null,
-            breederName: null,
-            colorCode: 121,
-            originTypeText: row.originTypeText,
-            originCountryText: row.originCountryText,
-            tailText: row.tailText,
-            updatedAt,
-            registrationId: "registration-1",
-            registeredOn: new Date("2024-01-02T00:00:00.000Z"),
-            registrationUpdatedAt: updatedAt,
-          },
-        ],
-      },
+    const colorState: DogImportStateDb = {
+      ...state,
+      historicalLinksByRegistration: {},
+      colors: [
+        { code: 122, nameFi: "Kaksivärinen", status: "SELECTABLE", updatedAt },
+        {
+          code: 121,
+          nameFi: "Kolmivärinen",
+          status: "SELECTABLE",
+          updatedAt,
+        },
+      ],
+      dogs: [
+        {
+          id: "dog-1",
+          registrationNo: row.registrationNo!,
+          name: row.name!,
+          sex: row.sex!,
+          status: "NORMAL",
+          birthDate: new Date("2024-01-01T00:00:00.000Z"),
+          sireId: null,
+          damId: null,
+          breederId: null,
+          breederName: null,
+          colorCode: 121,
+          originTypeText: row.originTypeText,
+          originCountryText: row.originCountryText,
+          tailText: row.tailText,
+          updatedAt,
+          registrationId: "registration-1",
+          registeredOn: new Date("2024-01-02T00:00:00.000Z"),
+          registrationUpdatedAt: updatedAt,
+        },
+      ],
+    };
+    const preview = (colorName: string) =>
+      evaluateDogImportRows([{ ...row, colorName }], colorState);
+    expect(preview("kolmivärinen").rows[0]?.changes).not.toContainEqual(
+      expect.objectContaining({ field: "colorName" }),
     );
-
-    expect(evaluation.issues).not.toContainEqual(
-      expect.objectContaining({ code: "DOG_COLOR_DIFFERS" }),
+    const changed = preview("kaksivärinen");
+    expect(changed.rows[0]?.changes).toContainEqual({
+      field: "colorName",
+      before: "Kolmivärinen",
+      after: "Kaksivärinen",
+    });
+    expect(changed.plan.updates[0]?.data.colorCode).toBe(122);
+    expect(changed.issues.some((issue) => issue.severity === "WARNING")).toBe(
+      false,
     );
+    const unresolved = preview("unknown");
+    expect(unresolved.issues).toContainEqual(
+      expect.objectContaining({
+        code: "DOG_COLOR_UNRESOLVED",
+        severity: "WARNING",
+      }),
+    );
+    expect(unresolved.plan.updates[0]?.data).not.toHaveProperty("colorCode");
   });
 });

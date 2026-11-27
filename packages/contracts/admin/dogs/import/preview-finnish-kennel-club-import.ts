@@ -1,4 +1,4 @@
-import type { DogImportIssue } from "./types";
+import type { DogImportField, DogImportIssue } from "./types";
 
 export type AdminDogImportPreviewRow = {
   sourceRowNumber: number;
@@ -6,6 +6,11 @@ export type AdminDogImportPreviewRow = {
   name: string | null;
   status: "CREATE" | "UPDATE" | "UNCHANGED" | "BLOCKED";
   breederToLink?: string;
+  changes?: Array<{
+    field: DogImportField | "status";
+    before: string | null;
+    after: string | null;
+  }>;
   issues: DogImportIssue[];
 };
 

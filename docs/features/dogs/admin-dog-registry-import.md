@@ -19,11 +19,19 @@ Admins can import Finnish Kennel Club Beagle registrations at
 1. Upload the workbook and review the preview. It does not write to the
    database. The review classifies the rows as new, updated, unchanged, or
    blocked and shows how many reference-only parents are planned.
-2. Check warnings and proposed breeder links before confirming. If there is a
+2. Review the list directly: new dogs show their full imported details, and
+   updates show which fields will be filled or replaced, including
+   parent and breeder links. The update count is dogs, not fields. Filling a
+   field and replacing an accepted value are both ordinary updates. Warnings
+   explain what is skipped: an unresolved color, an unsupported column, or an
+   extra worksheet. Workbook-wide issues appear above the rows. If there is a
    blocker, correct the workbook or the affected record, then preview again.
    A blocker prevents the entire import from being applied. The **Estävät**
    filter lists the missing kennel names for the whole workbook above the
    blocked rows.
+   Each summary count opens its list. Warnings and blockers count individual
+   issues (including workbook-wide ones); pedigree-only parents are listed
+   separately by registration and role and do not count as source rows.
 3. Select **Jatka vahvistukseen** and confirm to apply the reviewed changes.
    Apply checks that the same workbook and plan are still current, then writes
    in one audited transaction. If the preview is stale, review it again.

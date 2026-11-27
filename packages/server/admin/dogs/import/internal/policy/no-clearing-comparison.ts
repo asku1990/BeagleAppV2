@@ -1,14 +1,12 @@
 import type {
   DogImportField,
   DogImportIssue,
-  DogImportIssueCode,
   DogImportIssueValue,
 } from "@beagle/contracts";
 import { issueFromDogImportFact } from "../issues/dog-import-issues";
 
 export type DogImportComparison = {
   field: DogImportField;
-  code: DogImportIssueCode;
   currentValue: DogImportIssueValue;
   incomingValue: DogImportIssueValue;
   registrationNo?: string | null;
@@ -30,6 +28,5 @@ export function compareWithoutClearing(
       message: "Incoming empty value preserves the existing value.",
     });
   }
-  if (currentEmpty || input.currentValue === input.incomingValue) return null;
-  return issueFromDogImportFact(input);
+  return null;
 }
