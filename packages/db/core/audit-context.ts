@@ -33,9 +33,12 @@ async function setAuditContextDb(
 export async function runInAuditContextDb<T>(
   context: AuditContextDb,
   callback: (tx: Prisma.TransactionClient) => Promise<T>,
+  transactionOptions: Parameters<
+    typeof prisma.$transaction
+  >[1] = ADMIN_WRITE_TX_CONFIG,
 ): Promise<T> {
   return prisma.$transaction(async (tx) => {
     await setAuditContextDb(tx, context);
     return callback(tx);
-  }, ADMIN_WRITE_TX_CONFIG);
+  }, transactionOptions);
 }

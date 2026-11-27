@@ -99,4 +99,20 @@ describe("runInAuditContextDb", () => {
     const calls = executeRawMock.mock.calls;
     expect(calls[2]?.[1]).toBe("SYSTEM");
   });
+
+  it("passes explicit transaction options", async () => {
+    const callback = vi.fn().mockResolvedValue("result");
+    const transactionOptions = {
+      maxWait: 10_000,
+      timeout: 90_000,
+      isolationLevel: "Serializable" as const,
+    };
+
+    await runInAuditContextDb({}, callback, transactionOptions);
+
+    expect(transactionMock).toHaveBeenLastCalledWith(
+      expect.any(Function),
+      transactionOptions,
+    );
+  });
 });
