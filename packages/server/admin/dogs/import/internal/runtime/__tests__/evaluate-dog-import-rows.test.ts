@@ -44,6 +44,35 @@ describe("evaluateDogImportRows parser facts", () => {
     });
   });
 
+  it("blocks a row with an invalid birth date and identifies the affected field", () => {
+    const evaluation = evaluateDogImportRows(
+      [{ ...row, birthDate: null }],
+      state,
+      [
+        {
+          code: "INVALID_DATE",
+          header: "Syntymäaika",
+          columnIndex: 5,
+          sourceRowNumber: row.sourceRowNumber,
+        },
+      ],
+    );
+
+    expect(evaluation.hasBlockers).toBe(true);
+    expect(evaluation.rows[0]).toMatchObject({
+      sourceRowNumber: row.sourceRowNumber,
+      status: "BLOCKED",
+      issues: [
+        {
+          code: "DOG_BIRTH_DATE_INVALID",
+          field: "birthDate",
+          severity: "BLOCKER",
+        },
+      ],
+    });
+    expect(evaluation.plan.creates).toHaveLength(0);
+  });
+
   it("plans missing parent links and reports no changes once they exist", () => {
     const updatedAt = new Date("2026-01-01T00:00:00.000Z");
     const registrationUpdatedAt = new Date("2026-01-01T00:00:00.000Z");
