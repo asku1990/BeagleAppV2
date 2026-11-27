@@ -217,6 +217,54 @@ describe("evaluateDogImportRows parser facts", () => {
       unchangedCount: 1,
     });
 
+    const sireAlias = {
+      ...linkedState.dogs.find(({ id }) => id === "sire-1")!,
+      registrationId: "registration-sire-alias",
+      registrationNo: "SE1/20",
+    };
+    const damAlias = {
+      ...linkedState.dogs.find(({ id }) => id === "dam-1")!,
+      registrationId: "registration-dam-alias",
+      registrationNo: "SE2/20",
+    };
+    const aliasRow = {
+      ...row,
+      sireRegistrationNo: sireAlias.registrationNo,
+      damRegistrationNo: damAlias.registrationNo,
+    };
+    expect(
+      evaluateDogImportRows([aliasRow], {
+        ...linkedState,
+        dogs: [...linkedState.dogs, sireAlias, damAlias],
+      }),
+    ).toMatchObject({
+      hasBlockers: false,
+      hasChanges: false,
+      unchangedCount: 1,
+    });
+
+    const differentParents = evaluateDogImportRows([aliasRow], {
+      ...linkedState,
+      dogs: [
+        ...linkedState.dogs,
+        { ...sireAlias, id: "sire-2" },
+        { ...damAlias, id: "dam-2" },
+      ],
+    });
+    expect(differentParents).toMatchObject({
+      hasBlockers: true,
+      rows: [
+        {
+          status: "BLOCKED",
+          issues: expect.arrayContaining([
+            expect.objectContaining({ code: "DOG_SIRE_CONFLICT" }),
+            expect.objectContaining({ code: "DOG_DAM_CONFLICT" }),
+          ]),
+        },
+      ],
+      plan: { updates: [] },
+    });
+
     const kennelRow = { ...row, kennel: "TAVAJS" };
     const breeder = { id: "breeder-1", name: "TAVAJS" };
     const breederState = {

@@ -277,24 +277,28 @@ export function evaluateDogImportRows(
           incomingValue: row.birthDate,
         }),
       );
-    if (existing && row.sireRegistrationNo && row.damRegistrationNo) {
-      const linkedSire = state.dogs.find((dog) => dog.id === existing.sireId);
-      const linkedDam = state.dogs.find((dog) => dog.id === existing.damId);
-      if (linkedSire && linkedSire.registrationNo !== row.sireRegistrationNo)
-        add(
-          "DOG_SIRE_CONFLICT",
-          "sireRegistrationNo",
-          linkedSire.registrationNo,
-          row.sireRegistrationNo,
-        );
-      if (linkedDam && linkedDam.registrationNo !== row.damRegistrationNo)
-        add(
-          "DOG_DAM_CONFLICT",
-          "damRegistrationNo",
-          linkedDam.registrationNo,
-          row.damRegistrationNo,
-        );
-    }
+    if (
+      existing?.sireId &&
+      row.sireRegistrationNo &&
+      incomingSire?.id !== existing.sireId
+    )
+      add(
+        "DOG_SIRE_CONFLICT",
+        "sireRegistrationNo",
+        state.dogs.find((dog) => dog.id === existing.sireId)?.registrationNo,
+        row.sireRegistrationNo,
+      );
+    if (
+      existing?.damId &&
+      row.damRegistrationNo &&
+      incomingDam?.id !== existing.damId
+    )
+      add(
+        "DOG_DAM_CONFLICT",
+        "damRegistrationNo",
+        state.dogs.find((dog) => dog.id === existing.damId)?.registrationNo,
+        row.damRegistrationNo,
+      );
     let uniqueRowIssues = rowIssues.filter(
       (issue, index, all) =>
         all.findIndex(

@@ -57,7 +57,8 @@ Admins can import Finnish Kennel Club Beagle registrations at
   linked to a different breeder, blocks Apply. Check the spelling and resolve
   the catalog or link separately, then preview again. The importer never
   creates breeders. A blank `Kennel` leaves breeder information alone.
-- A valid parent already in the database is reused. A valid missing parent is
+- A valid parent already in the database is reused, including when the workbook
+  uses another registration number for the same dog. A valid missing parent is
   created as a reference-only dog if it has no full row in the workbook. A later
   valid full row can promote that same dog to normal.
 - On creation or promotion, unlinked show and trial entries with a matching
