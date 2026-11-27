@@ -8,13 +8,13 @@ import type {
   AdminFinnishKennelClubImportApplyResponse,
   CurrentUserDto,
 } from "@beagle/contracts";
+import { DOG_IMPORT_MAX_FILE_BYTES } from "@beagle/contracts";
 import { requireAdmin } from "@server/admin/core/service";
 import type { ServiceResult } from "@server/core/result";
 import { isPrismaTransactionTimeoutError } from "@server/core/prisma-transaction-timeout";
 import { parseFinnishKennelClubWorkbook } from "./internal/sources/finnish-kennel-club/parse-finnish-kennel-club-workbook";
 import { evaluateDogImportRows } from "./internal/runtime/evaluate-dog-import-rows";
 import { DOG_IMPORT_POLICY_VERSION } from "./internal/policy/dog-import-policy";
-import { DOG_IMPORT_MAX_FILE_BYTES } from "./preview-finnish-kennel-club-import";
 
 const MAX_SERIALIZABLE_RETRIES = 2;
 

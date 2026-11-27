@@ -1,8 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  DOG_IMPORT_MAX_FILE_BYTES,
-  previewFinnishKennelClubDogImport,
-} from "../preview-finnish-kennel-club-import";
+import { DOG_IMPORT_MAX_FILE_BYTES } from "@beagle/contracts";
+import { previewFinnishKennelClubDogImport } from "../preview-finnish-kennel-club-import";
 
 const { parseMock, loadStateMock, evaluateMock } = vi.hoisted(() => ({
   parseMock: vi.fn(),

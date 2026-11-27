@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { loadDogImportStateDb } from "@beagle/db";
+import { DOG_IMPORT_MAX_FILE_BYTES } from "@beagle/contracts";
 import type {
   AdminFinnishKennelClubImportPreviewResponse,
   CurrentUserDto,
@@ -9,8 +10,6 @@ import type { ServiceResult } from "@server/core/result";
 import { parseFinnishKennelClubWorkbook } from "./internal/sources/finnish-kennel-club/parse-finnish-kennel-club-workbook";
 import { evaluateDogImportRows } from "./internal/runtime/evaluate-dog-import-rows";
 import { DOG_IMPORT_POLICY_VERSION } from "./internal/policy/dog-import-policy";
-
-export const DOG_IMPORT_MAX_FILE_BYTES = 10 * 1024 * 1024;
 
 export async function previewFinnishKennelClubDogImport(
   input: { bytes: Buffer; fileName: string },

@@ -38,6 +38,17 @@ describe("Finnish Kennel Club dog import preview route", () => {
     currentUserMock.mockReset();
   });
 
+  it("requires admin access before checking an oversized request", async () => {
+    currentUserMock.mockResolvedValue(null);
+    const incoming = requestWithFile();
+    incoming.headers.set("content-length", "11000000");
+
+    const response = await (await import("../route")).POST(incoming);
+
+    expect(response.status).toBe(401);
+    expect(previewMock).not.toHaveBeenCalled();
+  });
+
   it("rejects a form without an xlsx file", async () => {
     currentUserMock.mockResolvedValue(user);
     const response = await (

@@ -1,6 +1,7 @@
 import * as XLSX from "xlsx";
 import { describe, expect, it } from "vitest";
 import { parseFinnishKennelClubWorkbook } from "../parse-finnish-kennel-club-workbook";
+import { readSparseWorksheet } from "../read-sparse-worksheet";
 
 const headers = [
   "Rekisterinumero",
@@ -147,6 +148,22 @@ describe("parseFinnishKennelClubWorkbook", () => {
       "BREED_NOT_BEAGLE",
       "DOG_SEX_INVALID",
     ]);
+  });
+
+  it("retains the original worksheet row without storing the blank gaps", () => {
+    const lastRow = 10_002;
+    const sheet = XLSX.utils.aoa_to_sheet([headers]);
+    XLSX.utils.sheet_add_aoa(sheet, [validRow], { origin: `A${lastRow}` });
+
+    expect([...readSparseWorksheet(sheet)!.rows.keys()]).toEqual([
+      0,
+      lastRow - 1,
+    ]);
+    expect(
+      parseFinnishKennelClubWorkbook(writeBook(sheet)).rows.map(
+        ({ sourceRowNumber }) => sourceRowNumber,
+      ),
+    ).toEqual([lastRow]);
   });
 
   it("blocks empty, unreadable, and source-limit workbooks", () => {

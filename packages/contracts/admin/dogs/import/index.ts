@@ -1,3 +1,5 @@
+export const DOG_IMPORT_MAX_FILE_BYTES = 10 * 1024 * 1024;
+
 export type {
   DogImportField,
   DogImportIssue,

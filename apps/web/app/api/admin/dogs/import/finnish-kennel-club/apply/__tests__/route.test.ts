@@ -42,6 +42,17 @@ describe("Finnish Kennel Club dog import apply route", () => {
     currentUserMock.mockReset();
   });
 
+  it("rejects an oversized request before calling the import", async () => {
+    currentUserMock.mockResolvedValue(user);
+    const incoming = requestWithForm();
+    incoming.headers.set("content-length", "11000000");
+
+    const response = await (await import("../route")).POST(incoming);
+
+    expect(response.status).toBe(413);
+    expect(applyMock).not.toHaveBeenCalled();
+  });
+
   it("rejects a form missing required fields", async () => {
     currentUserMock.mockResolvedValue(user);
     const response = await (

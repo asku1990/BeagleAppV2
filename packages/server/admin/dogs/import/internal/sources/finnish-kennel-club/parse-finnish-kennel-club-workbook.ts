@@ -7,6 +7,7 @@ import {
   DOG_IMPORT_SOURCE,
   type CanonicalDogImportRow,
 } from "@server/admin/dogs/import/internal/model/canonical-dog-import";
+import { readSparseWorksheet, type Cell } from "./read-sparse-worksheet";
 
 const REQUIRED_HEADERS = [
   "Rekisterinumero",
@@ -31,12 +32,6 @@ const KNOWN_HEADERS = new Set<string>([
   ...REQUIRED_HEADERS.map((header) => headerKey(header)!).filter(Boolean),
   ...OPTIONAL_HEADERS.map((header) => headerKey(header)!).filter(Boolean),
 ]);
-
-type Cell = string | number | boolean | Date | null | undefined;
-
-const MAX_SOURCE_ROWS = 10_000;
-const MAX_COLUMNS = 64;
-const MAX_POPULATED_CELLS = 100_000;
 
 export type FinnishWorkbookFact = {
   code:
@@ -138,22 +133,17 @@ function valueAt(
   return row[columnIndex];
 }
 
-function populatedCell(cell: unknown): cell is { v?: Cell; f?: string } {
-  return (
-    typeof cell === "object" &&
-    cell !== null &&
-    (("v" in cell && (cell as { v?: Cell }).v !== undefined) ||
-      ("f" in cell && typeof (cell as { f?: string }).f === "string"))
-  );
-}
-
 /** Parses the first Finnish registry sheet without trusting its inflated !ref. */
 export function parseFinnishKennelClubWorkbook(
   buffer: Buffer | Uint8Array | ArrayBuffer,
 ): FinnishWorkbookParseResult {
   let workbook: XLSX.WorkBook;
   try {
-    workbook = XLSX.read(buffer, { type: "buffer", cellDates: false });
+    workbook = XLSX.read(buffer, {
+      type: "buffer",
+      cellDates: false,
+      sheets: 0,
+    });
   } catch {
     return {
       sheetName: "",
@@ -188,22 +178,8 @@ export function parseFinnishKennelClubWorkbook(
       ],
     };
 
-  const populated = Object.entries(sheet).filter(([, cell]) =>
-    populatedCell(cell),
-  );
-  const coordinates = populated
-    .map(([address]) => XLSX.utils.decode_cell(address))
-    .filter((coordinate) => coordinate.r >= 0 && coordinate.c >= 0);
-  const sourceRows = new Set(
-    coordinates.filter(({ r }) => r > 0).map(({ r }) => r),
-  );
-  const maxRow = coordinates.reduce((max, { r }) => Math.max(max, r), 0);
-  const maxColumn = coordinates.reduce((max, { c }) => Math.max(max, c), 0);
+  const worksheet = readSparseWorksheet(sheet);
   const date1904 = workbook.Workbook?.WBProps?.date1904 === true;
-  const limitFact =
-    sourceRows.size > MAX_SOURCE_ROWS ||
-    maxColumn + 1 > MAX_COLUMNS ||
-    populated.length > MAX_POPULATED_CELLS;
   const facts: FinnishWorkbookFact[] = [];
   if (workbook.SheetNames.length > 1)
     facts.push({
@@ -211,7 +187,7 @@ export function parseFinnishKennelClubWorkbook(
       header: null,
       columnIndex: null,
     });
-  if (limitFact)
+  if (!worksheet)
     return {
       sheetName,
       date1904,
@@ -226,7 +202,10 @@ export function parseFinnishKennelClubWorkbook(
         },
       ],
     };
-  if (sourceRows.size === 0)
+  const sourceRows = [...worksheet.rows.entries()]
+    .filter(([rowIndex]) => rowIndex > 0)
+    .sort(([a], [b]) => a - b);
+  if (!sourceRows.length)
     return {
       sheetName,
       date1904,
@@ -237,39 +216,34 @@ export function parseFinnishKennelClubWorkbook(
         { code: "SOURCE_FILE_UNREADABLE", header: null, columnIndex: null },
       ],
     };
-  const matrix = Array.from({ length: maxRow + 1 }, (_, row) =>
-    Array.from({ length: maxColumn + 1 }, (_, column) => {
-      const cell = sheet[XLSX.utils.encode_cell({ r: row, c: column })];
-      return populatedCell(cell) ? (cell.v ?? null) : null;
-    }),
-  ) as Cell[][];
-
-  const headers = matrix[0] ?? [];
   const indexes = new Map<string, number>();
-  headers.forEach((value, columnIndex) => {
+  const headers = worksheet.rows.get(0) ?? [];
+  for (
+    let columnIndex = 0;
+    columnIndex < worksheet.columnCount;
+    columnIndex += 1
+  ) {
+    const value = headers[columnIndex];
     const key = headerKey(value);
     const header = text(value);
-    const hasData = matrix
-      .slice(1)
-      .some((row) => text(row[columnIndex]) !== null);
     if (!key) {
-      if (hasData)
+      if (sourceRows.some(([, row]) => text(row[columnIndex]) !== null))
         facts.push({
           code: "UNNAMED_COLUMN_WITH_DATA",
           header: null,
           columnIndex,
         });
-      return;
+      continue;
     }
     if (indexes.has(key)) {
       facts.push({ code: "DUPLICATE_COLUMN", header, columnIndex });
-      return;
+      continue;
     }
     indexes.set(key, columnIndex);
     if (!KNOWN_HEADERS.has(key)) {
       facts.push({ code: "UNSUPPORTED_COLUMN_IGNORED", header, columnIndex });
     }
-  });
+  }
   for (const header of REQUIRED_HEADERS) {
     if (!indexes.has(headerKey(header)!))
       facts.push({
@@ -287,9 +261,9 @@ export function parseFinnishKennelClubWorkbook(
       });
   }
 
-  const rows = matrix.slice(1).flatMap((row, index) => {
+  const rows = sourceRows.flatMap(([rowIndex, row]) => {
     if (!row.some((cell) => text(cell) !== null)) return [];
-    const sourceRowNumber = index + 2;
+    const sourceRowNumber = rowIndex + 1;
     const breed = text(valueAt(row, indexes, "Rotukoodi"));
     const sourceSex = text(valueAt(row, indexes, "Sukupuoli"));
     const sourceDate = valueAt(row, indexes, "Syntymäaika");

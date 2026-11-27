@@ -3,6 +3,7 @@ import { applyFinnishKennelClubDogImport } from "@beagle/server";
 import { getSessionCurrentUser } from "@/lib/server/current-user";
 import { toAdminUserContext } from "@/lib/server/admin-user-context";
 import { jsonResponse } from "@/lib/server/cors";
+import { readDogImportUpload } from "@/lib/server/admin/dogs/import/read-dog-import-upload";
 
 export async function POST(request: NextRequest) {
   const user = await getSessionCurrentUser();
@@ -15,16 +16,12 @@ export async function POST(request: NextRequest) {
       },
       { status: user ? 403 : 401 },
     );
-  const form = await request.formData();
-  const file = form.get("file");
+  const upload = await readDogImportUpload(request);
+  if (!upload.ok) return upload.response;
+  const { file, form } = upload;
   const previewDigest = form.get("previewDigest");
   const sourceFileSha256 = form.get("sourceFileSha256");
-  if (
-    !(file instanceof File) ||
-    file.size > 10 * 1024 * 1024 ||
-    typeof previewDigest !== "string" ||
-    typeof sourceFileSha256 !== "string"
-  )
+  if (typeof previewDigest !== "string" || typeof sourceFileSha256 !== "string")
     return jsonResponse(
       {
         ok: false,
