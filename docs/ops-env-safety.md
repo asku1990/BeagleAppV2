@@ -66,6 +66,16 @@ pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db exec prisma db 
 CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm --filter @beagle/db exec prisma db push
 ```
 
+Prisma `migrate status` (read-only):
+
+This compares the migration files with the selected database's migration history without applying migrations. Use `--filter @beagle/db` because the Prisma CLI is installed in that workspace package.
+
+```bash
+pass-cli run --env-file .env.local -- pnpm --filter @beagle/db exec prisma migrate status
+pass-cli run --env-file .env.staging -- pnpm --filter @beagle/db exec prisma migrate status
+CONFIRM_PROD=YES pass-cli run --env-file .env.prod -- pnpm --filter @beagle/db exec prisma migrate status
+```
+
 Prisma `migrate dev` (local only):
 
 Note: this may become interactive (for example drift/reset prompts). If that happens, run it directly in an interactive terminal session.
