@@ -27,6 +27,8 @@ export type DogImportEvaluation = {
   blockedCount: number;
   referenceCount: number;
 };
+const MAX_REGISTRATION_LENGTH = 40;
+
 const canonical = (value: unknown): string => {
   if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
   if (
@@ -144,7 +146,7 @@ export function evaluateDogImportRows(
         }),
       );
     if (!row.registrationNo) add("REGISTRATION_INVALID", "registrationNo");
-    else if (row.registrationNo.length > 40)
+    else if (row.registrationNo.length > MAX_REGISTRATION_LENGTH)
       add("REGISTRATION_TOO_LONG", "registrationNo");
     else if (!isValidRegistrationNo(row.registrationNo))
       add("REGISTRATION_INVALID", "registrationNo");
@@ -154,17 +156,35 @@ export function evaluateDogImportRows(
     if (!row.name) add("REQUIRED_VALUE_MISSING", "name");
     else if (row.name.length > 120) add("DOG_NAME_TOO_LONG", "name");
     if (!row.sex) add("DOG_SEX_INVALID", "sex");
-    for (const [field, value] of [
-      ["sireRegistrationNo", row.sireRegistrationNo],
-      ["damRegistrationNo", row.damRegistrationNo],
+    const existing = row.registrationNo
+      ? byRegistration.get(row.registrationNo)
+      : undefined;
+    const incomingSire = row.sireRegistrationNo
+      ? byRegistration.get(row.sireRegistrationNo)
+      : undefined;
+    const incomingDam = row.damRegistrationNo
+      ? byRegistration.get(row.damRegistrationNo)
+      : undefined;
+    for (const [field, value, parent] of [
+      ["sireRegistrationNo", row.sireRegistrationNo, incomingSire],
+      ["damRegistrationNo", row.damRegistrationNo, incomingDam],
     ] as const) {
-      if (!value) add("PARENT_REGISTRATION_INVALID", field);
-      else if (value === row.registrationNo)
+      if (!value || !isValidRegistrationNo(value))
+        add("PARENT_REGISTRATION_INVALID", field, null, value);
+      else if (value.length > MAX_REGISTRATION_LENGTH)
+        add("REGISTRATION_TOO_LONG", field, null, value);
+      else if (/^[./-]+$|^U0+$/i.test(value))
+        add("PARENT_REGISTRATION_PLACEHOLDER", field, null, value);
+      else if (
+        value === row.registrationNo ||
+        (existing && parent?.id === existing.id)
+      )
         add("PARENT_SELF_REFERENCE", field);
     }
     if (
-      row.sireRegistrationNo &&
-      row.sireRegistrationNo === row.damRegistrationNo
+      (row.sireRegistrationNo &&
+        row.sireRegistrationNo === row.damRegistrationNo) ||
+      (incomingSire && incomingSire.id === incomingDam?.id)
     )
       add("PARENT_SAME_IDENTITY");
     for (const [registrationNo, role] of [
@@ -174,7 +194,6 @@ export function evaluateDogImportRows(
       if (!registrationNo) continue;
       const roles = sourceRoles.get(registrationNo);
       if (roles && roles.size > 1) add("PARENT_ROLE_AMBIGUOUS");
-      references.set(registrationNo, role);
       const sourceParent = sourceRows.get(registrationNo);
       if (sourceParent && sourceParent.sex && sourceParent.sex !== role)
         add(
@@ -182,9 +201,6 @@ export function evaluateDogImportRows(
           role === "MALE" ? "sireRegistrationNo" : "damRegistrationNo",
         );
     }
-    const existing = row.registrationNo
-      ? byRegistration.get(row.registrationNo)
-      : undefined;
     const kennelMatches = row.kennel
       ? (state.breedersByKennel.get(row.kennel) ?? [])
       : [];
@@ -205,12 +221,6 @@ export function evaluateDogImportRows(
         existing.breederName,
         breeder.name,
       );
-    const incomingSire = row.sireRegistrationNo
-      ? byRegistration.get(row.sireRegistrationNo)
-      : undefined;
-    const incomingDam = row.damRegistrationNo
-      ? byRegistration.get(row.damRegistrationNo)
-      : undefined;
     if (
       incomingSire &&
       incomingSire.sex !== "UNKNOWN" &&
@@ -323,6 +333,8 @@ export function evaluateDogImportRows(
       });
       continue;
     }
+    if (row.sireRegistrationNo) references.set(row.sireRegistrationNo, "MALE");
+    if (row.damRegistrationNo) references.set(row.damRegistrationNo, "FEMALE");
     if (breeder && row.kennel)
       breederMatches.set(row.kennel, { kennel: row.kennel, ...breeder });
     const breederToLink = breeder && !existing?.breederId ? breeder : undefined;

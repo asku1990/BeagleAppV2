@@ -103,6 +103,141 @@ describe("evaluateDogImportRows parser facts", () => {
       ],
     });
     expect(evaluation.plan.creates).toHaveLength(0);
+    expect(evaluation.referenceCount).toBe(0);
+    expect(evaluation.plan.references).toEqual([]);
+    expect(evaluation.issues.map(({ code }) => code)).not.toContain(
+      "REFERENCE_PARENT_PLANNED",
+    );
+  });
+
+  it("keeps a shared parent proposed by an unblocked row", () => {
+    const evaluation = evaluateDogImportRows(
+      [
+        { ...row, kennel: "Unknown kennel" },
+        {
+          ...row,
+          sourceRowNumber: 3,
+          registrationNo: "FI124/24",
+          damRegistrationNo: "FI3/20",
+        },
+      ],
+      state,
+    );
+
+    expect(evaluation.rows.map(({ status }) => status)).toEqual([
+      "BLOCKED",
+      "CREATE",
+    ]);
+    expect(evaluation.referenceCount).toBe(2);
+    expect(evaluation.plan.references).toEqual([
+      { registrationNo: "FI1/20", sex: "MALE" },
+      { registrationNo: "FI3/20", sex: "FEMALE" },
+    ]);
+  });
+
+  it.each([
+    {
+      description: "the dog as its own sire through an alias",
+      sourceRow: { ...row, sex: "MALE" as const, sireRegistrationNo: "SE1/24" },
+      storedRegistration: row.registrationNo!,
+      code: "PARENT_SELF_REFERENCE",
+      field: "sireRegistrationNo",
+    },
+    {
+      description: "the dog as its own dam through an alias",
+      sourceRow: { ...row, damRegistrationNo: "SE1/24" },
+      storedRegistration: row.registrationNo!,
+      code: "PARENT_SELF_REFERENCE",
+      field: "damRegistrationNo",
+    },
+    {
+      description:
+        "the same dog in both parent roles through different registrations",
+      sourceRow: { ...row, damRegistrationNo: "SE1/24" },
+      storedRegistration: row.sireRegistrationNo!,
+      code: "PARENT_SAME_IDENTITY",
+      field: null,
+    },
+  ])(
+    "blocks $description",
+    ({ sourceRow, storedRegistration, code, field }) => {
+      const storedDog: DogImportStateDb["dogs"][number] = {
+        id: "dog-1",
+        registrationId: "registration-1",
+        registrationNo: storedRegistration,
+        name: row.name!,
+        sex:
+          storedRegistration === row.registrationNo
+            ? sourceRow.sex!
+            : "UNKNOWN",
+        status: "NORMAL",
+        birthDate: null,
+        sireId: null,
+        damId: null,
+        breederId: null,
+        breederName: null,
+        colorCode: null,
+        originTypeText: null,
+        originCountryText: null,
+        tailText: null,
+        updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+        registeredOn: null,
+        registrationUpdatedAt: new Date("2026-01-01T00:00:00.000Z"),
+      };
+      const evaluation = evaluateDogImportRows([sourceRow], {
+        ...state,
+        dogs: [
+          storedDog,
+          {
+            ...storedDog,
+            registrationId: "registration-alias",
+            registrationNo: "SE1/24",
+          },
+        ],
+      });
+
+      expect(evaluation).toMatchObject({
+        hasBlockers: true,
+        rows: [
+          {
+            status: "BLOCKED",
+            issues: expect.arrayContaining([
+              expect.objectContaining({ code, field }),
+            ]),
+          },
+        ],
+        plan: { creates: [], updates: [], references: [] },
+      });
+    },
+  );
+
+  it.each([
+    ["sireRegistrationNo", "-", "PARENT_REGISTRATION_PLACEHOLDER"],
+    ["damRegistrationNo", "U000", "PARENT_REGISTRATION_PLACEHOLDER"],
+    ["damRegistrationNo", "A".repeat(41), "REGISTRATION_TOO_LONG"],
+  ] as const)("blocks %s with value %s", (field, value, code) => {
+    const evaluation = evaluateDogImportRows(
+      [{ ...row, [field]: value }],
+      state,
+    );
+
+    expect(evaluation).toMatchObject({
+      hasBlockers: true,
+      rows: [
+        {
+          status: "BLOCKED",
+          issues: [
+            {
+              code,
+              field,
+              severity: "BLOCKER",
+              incomingValue: value,
+            },
+          ],
+        },
+      ],
+      plan: { creates: [], updates: [], references: [] },
+    });
   });
 
   it("plans missing parent links and reports no changes once they exist", () => {

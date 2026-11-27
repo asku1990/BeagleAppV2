@@ -14,7 +14,8 @@ Admins can import Finnish Kennel Club Beagle registrations at
 - Optional headers: `Kennel`, `Rekisteröity`, `Alkuperämaa`, `Väri`, `Häntä`.
 - Use breed code `161` and sex values `uros` or `narttu`. Dates can be Excel
   date cells or text in `YYYY-MM-DD` format. Both parent registration numbers
-  must be valid, even if the parents are not yet in Beagle App.
+  must be valid and at most 40 characters, even if the parents are not yet in
+  Beagle App. Placeholders such as `-` or `U000` are not valid.
 
 ## Review and apply
 
@@ -34,6 +35,7 @@ Admins can import Finnish Kennel Club Beagle registrations at
    Each summary count opens its list. Warnings and blockers count individual
    issues (including workbook-wide ones); pedigree-only parents are listed
    separately by registration and role and do not count as source rows.
+   Only unblocked source rows contribute to the planned parent count.
 3. Select **Jatka vahvistukseen** and confirm to apply the reviewed changes.
    Apply rechecks the reviewed plan inside the audited transaction before
    writing, including on retries. If the preview is stale, review it again.
@@ -58,9 +60,11 @@ Admins can import Finnish Kennel Club Beagle registrations at
   the catalog or link separately, then preview again. The importer never
   creates breeders. A blank `Kennel` leaves breeder information alone.
 - A valid parent already in the database is reused, including when the workbook
-  uses another registration number for the same dog. A valid missing parent is
-  created as a reference-only dog if it has no full row in the workbook. A later
-  valid full row can promote that same dog to normal.
+  uses another registration number for the same dog. A dog cannot be its own
+  parent, and the same dog cannot be both sire and dam, even under different
+  registration numbers. A valid missing parent is created as a reference-only
+  dog if it has no full row in the workbook. A later valid full row can promote
+  that same dog to normal.
 - On creation or promotion, unlinked show and trial entries with a matching
   registration number can be linked to the dog.
 
