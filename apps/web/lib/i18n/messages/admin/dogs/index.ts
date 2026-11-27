@@ -10,6 +10,7 @@ import {
   fiAdminDogsDiseasesMessages,
   svAdminDogsDiseasesMessages,
 } from "./diseases";
+import { fiAdminDogsImportMessages, svAdminDogsImportMessages } from "./import";
 
 export const fiAdminDogsMessages = {
   ...fiAdminDogsCommonMessages,
@@ -18,6 +19,7 @@ export const fiAdminDogsMessages = {
   ...fiAdminDogsModalMessages,
   ...fiAdminDogsVirtualPairingMessages,
   ...fiAdminDogsDiseasesMessages,
+  ...fiAdminDogsImportMessages,
 } as const;
 
 export const svAdminDogsMessages = {
@@ -27,4 +29,5 @@ export const svAdminDogsMessages = {
   ...svAdminDogsModalMessages,
   ...svAdminDogsVirtualPairingMessages,
   ...svAdminDogsDiseasesMessages,
+  ...svAdminDogsImportMessages,
 } as const;

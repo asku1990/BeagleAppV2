@@ -36,7 +36,7 @@ Can do:
 Feature-level behavior is documented in:
 
 - `docs/features/beagle-search.md`
-- `docs/features/beagle-dog-profile.md`
+- [Beagle Dog Profile](features/dogs/beagle-dog-profile.md)
 
 Sidebar:
 
@@ -88,6 +88,7 @@ Routes:
 - `/admin/shows/manage`
 - `/admin/users`
 - `/admin/dogs`
+- `/admin/dogs/import`
 - `/admin/settings`
 
 Can do:
@@ -104,6 +105,7 @@ Can do:
    - edit dog records
    - delete dog records
    - use breeder/owner/parent lookup helpers
+   - preview and apply Finnish Kennel Club registration workbooks (`/admin/dogs/import`)
 3. Manage shows (`/admin/shows`, `/admin/shows/import`, `/admin/shows/manage`):
    - open the shows module hub
    - validate and apply workbook imports
@@ -132,6 +134,7 @@ Admin-only APIs (not currently surfaced in admin UI):
 
 Feature-level behavior is documented in:
 
+- [Admin Dog Registry Import](features/dogs/admin-dog-registry-import.md)
 - `docs/features/admin-show-workbook-import.md`
 - `docs/features/admin-show-management.md`
 

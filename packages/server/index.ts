@@ -23,6 +23,8 @@ export {
   deleteAdminShowEntry,
   previewAdminShowWorkbookImport,
   applyAdminShowWorkbookImport,
+  previewFinnishKennelClubDogImport,
+  applyFinnishKennelClubDogImport,
   requireAdmin,
   setAdminUserPassword,
   setAdminUserStatus,
