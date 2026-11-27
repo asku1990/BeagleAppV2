@@ -1,0 +1,14 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  // Local validation only. Avoid argument wildcards that could run other code.
+  "permissions": [
+    { "action": "shell", "resource": "pnpm --filter @beagle/web test:unit", "effect": "allow" },
+    { "action": "shell", "resource": "pnpm --filter @beagle/server test:unit", "effect": "allow" },
+    { "action": "shell", "resource": "pnpm --filter @beagle/web test:unit read-dog-import-upload app/api/admin/dogs/import", "effect": "allow" },
+    { "action": "shell", "resource": "pnpm --filter @beagle/server test:unit admin/dogs/import admin/shows/import", "effect": "allow" },
+    { "action": "shell", "resource": "pnpm --filter @beagle/web typecheck", "effect": "allow" },
+    { "action": "shell", "resource": "pnpm --filter @beagle/server typecheck", "effect": "allow" },
+    { "action": "shell", "resource": "pnpm --filter @beagle/web lint", "effect": "allow" },
+    { "action": "shell", "resource": "pnpm --filter @beagle/server lint", "effect": "allow" }
+  ]
+}
