@@ -13,6 +13,7 @@ import { requireAdmin } from "@server/admin/core/service";
 import type { ServiceResult } from "@server/core/result";
 import { isPrismaTransactionTimeoutError } from "@server/core/prisma-transaction-timeout";
 import { parseFinnishKennelClubWorkbook } from "./internal/sources/finnish-kennel-club/parse-finnish-kennel-club-workbook";
+import { WorkbookArchiveLimitError } from "./internal/sources/finnish-kennel-club/read-bounded-workbook-archive";
 import { evaluateDogImportRows } from "./internal/runtime/evaluate-dog-import-rows";
 import { DOG_IMPORT_POLICY_VERSION } from "./internal/policy/dog-import-policy";
 
@@ -67,10 +68,19 @@ export async function applyFinnishKennelClubDogImport(
         error: "Workbook exceeds the supported limit.",
       },
     };
-  let parsed: ReturnType<typeof parseFinnishKennelClubWorkbook>;
+  let parsed: Awaited<ReturnType<typeof parseFinnishKennelClubWorkbook>>;
   try {
-    parsed = parseFinnishKennelClubWorkbook(input.bytes);
-  } catch {
+    parsed = await parseFinnishKennelClubWorkbook(input.bytes);
+  } catch (error) {
+    if (error instanceof WorkbookArchiveLimitError)
+      return {
+        status: 413,
+        body: {
+          ok: false,
+          code: "SOURCE_RESOURCE_LIMIT_EXCEEDED",
+          error: "Workbook exceeds the supported expansion limit.",
+        },
+      };
     return {
       status: 400,
       body: {

@@ -30,9 +30,11 @@
     "@beagle/db": "workspace:*",
     "better-auth": "^1.4.18",
     "pino": "^9.14.0",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
+    "yauzl": "3.4.0"
   },
   "devDependencies": {
+    "@types/yauzl": "3.4.0",
     "pino-pretty": "^13.1.3"
   }
 }

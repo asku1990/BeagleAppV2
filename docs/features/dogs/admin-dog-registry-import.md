@@ -7,6 +7,8 @@ Admins can import Finnish Kennel Club Beagle registrations at
 
 - Upload one `.xlsx` file, up to 10 MiB. The importer reads the first worksheet
   and reports any additional sheets as ignored. The first row contains headers.
+- Before reading worksheet data, the importer checks ZIP expansion: up to
+  20 MiB per entry, 50 MiB total, 100:1 expansion per entry, and 2,048 entries.
 - Required headers: `Rekisterinumero`, `Nimi`, `Rotukoodi`, `Sukupuoli`,
   `Syntymäaika`, `Alkuperä`, `Rekisterinumero isä`, `Rekisterinumero emä`.
 - Optional headers: `Kennel`, `Rekisteröity`, `Alkuperämaa`, `Väri`, `Häntä`.
@@ -60,3 +62,10 @@ Admins can import Finnish Kennel Club Beagle registrations at
   valid full row can promote that same dog to normal.
 - On creation or promotion, unlinked show and trial entries with a matching
   registration number can be linked to the dog.
+
+## Azure production rollout check
+
+After deployment, use only Preview to verify that a valid 10 MiB workbook
+plus multipart overhead reaches the app. Separately verify that Azure ingress
+rejects a request above its configured body cap before the route runs. The
+application's own request cap is 10 MiB plus 32 KiB.

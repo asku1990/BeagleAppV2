@@ -8,6 +8,10 @@ import {
   type CanonicalDogImportRow,
 } from "@server/admin/dogs/import/internal/model/canonical-dog-import";
 import { readSparseWorksheet, type Cell } from "./read-sparse-worksheet";
+import {
+  readBoundedWorkbookArchive,
+  WorkbookArchiveLimitError,
+} from "./read-bounded-workbook-archive";
 
 const REQUIRED_HEADERS = [
   "Rekisterinumero",
@@ -134,17 +138,18 @@ function valueAt(
 }
 
 /** Parses the first Finnish registry sheet without trusting its inflated !ref. */
-export function parseFinnishKennelClubWorkbook(
-  buffer: Buffer | Uint8Array | ArrayBuffer,
-): FinnishWorkbookParseResult {
+export async function parseFinnishKennelClubWorkbook(
+  buffer: Buffer,
+): Promise<FinnishWorkbookParseResult> {
   let workbook: XLSX.WorkBook;
   try {
-    workbook = XLSX.read(buffer, {
+    workbook = XLSX.read(await readBoundedWorkbookArchive(buffer), {
       type: "buffer",
       cellDates: false,
       sheets: 0,
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof WorkbookArchiveLimitError) throw error;
     return {
       sheetName: "",
       date1904: false,

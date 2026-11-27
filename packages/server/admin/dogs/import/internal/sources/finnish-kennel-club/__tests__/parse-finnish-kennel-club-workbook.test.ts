@@ -19,12 +19,11 @@ const headers = [
   "Rekisterinumero emä",
 ];
 
-function workbook(rows: unknown[][], date1904 = false): Buffer {
+function workbook(rows: unknown[][], compression = false): Buffer {
   const sheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
   const book = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(book, sheet, "Koirat");
-  if (date1904) book.Workbook = { WBProps: { date1904: true } };
-  return XLSX.write(book, { type: "buffer", bookType: "xlsx" });
+  return XLSX.write(book, { type: "buffer", bookType: "xlsx", compression });
 }
 
 function writeBook(...sheets: XLSX.WorkSheet[]): Buffer {
@@ -56,8 +55,10 @@ const validRow = [
 ];
 
 describe("parseFinnishKennelClubWorkbook", () => {
-  it("normalizes a Finnish source row and Excel dates", () => {
-    const result = parseFinnishKennelClubWorkbook(workbook([validRow]));
+  it("normalizes a compressed Finnish source row and Excel dates", async () => {
+    const result = await parseFinnishKennelClubWorkbook(
+      workbook([validRow], true),
+    );
 
     expect(result.sheetName).toBe("Koirat");
     expect(result.date1904).toBe(false);
@@ -75,8 +76,8 @@ describe("parseFinnishKennelClubWorkbook", () => {
     expect(result.facts).toEqual([]);
   });
 
-  it("accepts textual breed and Finnish male sex", () => {
-    const result = parseFinnishKennelClubWorkbook(
+  it("accepts textual breed and Finnish male sex", async () => {
+    const result = await parseFinnishKennelClubWorkbook(
       workbook([
         [...validRow.slice(0, 3), "161", "uros", ...validRow.slice(5)],
       ]),
@@ -86,9 +87,9 @@ describe("parseFinnishKennelClubWorkbook", () => {
     expect(result.facts).toEqual([]);
   });
 
-  it("reports missing, duplicate, unnamed, and unsupported populated headers", () => {
+  it("reports missing, duplicate, unnamed, and unsupported populated headers", async () => {
     const row = validRow.slice();
-    const result = parseFinnishKennelClubWorkbook(workbook([row]));
+    const result = await parseFinnishKennelClubWorkbook(workbook([row]));
     const sheet = XLSX.utils.aoa_to_sheet([
       headers
         .filter((header) => header !== "Kennel")
@@ -97,7 +98,7 @@ describe("parseFinnishKennelClubWorkbook", () => {
     ]);
     const book = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(book, sheet, "Koirat");
-    const parsed = parseFinnishKennelClubWorkbook(
+    const parsed = await parseFinnishKennelClubWorkbook(
       XLSX.write(book, { type: "buffer", bookType: "xlsx" }),
     );
 
@@ -114,23 +115,22 @@ describe("parseFinnishKennelClubWorkbook", () => {
     ]);
     const unnamedBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(unnamedBook, unnamedSheet, "Koirat");
-    expect(
-      parseFinnishKennelClubWorkbook(
-        XLSX.write(unnamedBook, { type: "buffer", bookType: "xlsx" }),
-      ).facts,
-    ).toContainEqual(
+    const unnamed = await parseFinnishKennelClubWorkbook(
+      XLSX.write(unnamedBook, { type: "buffer", bookType: "xlsx" }),
+    );
+    expect(unnamed.facts).toContainEqual(
       expect.objectContaining({ code: "UNNAMED_COLUMN_WITH_DATA" }),
     );
   });
 
-  it("ignores formatting-only extended ranges and reads the 1904 date system", () => {
+  it("ignores formatting-only extended ranges and reads the 1904 date system", async () => {
     const sheet = XLSX.utils.aoa_to_sheet([headers, validRow]);
     sheet["!ref"] = "A1:M1000";
     sheet["M1000"] = { s: 1 };
     const book = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(book, sheet, "Koirat");
     book.Workbook = { WBProps: { date1904: true } };
-    const result = parseFinnishKennelClubWorkbook(
+    const result = await parseFinnishKennelClubWorkbook(
       XLSX.write(book, { type: "buffer", bookType: "xlsx" }),
     );
 
@@ -139,8 +139,8 @@ describe("parseFinnishKennelClubWorkbook", () => {
     expect(result.rows[0]?.birthDate).toBe("2028-01-02");
   });
 
-  it("records source facts for non-Beagle and invalid sex rows", () => {
-    const result = parseFinnishKennelClubWorkbook(
+  it("records source facts for non-Beagle and invalid sex rows", async () => {
+    const result = await parseFinnishKennelClubWorkbook(
       workbook([[...validRow.slice(0, 3), "999", "muu", ...validRow.slice(5)]]),
     );
 
@@ -150,7 +150,7 @@ describe("parseFinnishKennelClubWorkbook", () => {
     ]);
   });
 
-  it("retains the original worksheet row without storing the blank gaps", () => {
+  it("retains the original worksheet row without storing the blank gaps", async () => {
     const lastRow = 10_002;
     const sheet = XLSX.utils.aoa_to_sheet([headers]);
     XLSX.utils.sheet_add_aoa(sheet, [validRow], { origin: `A${lastRow}` });
@@ -159,42 +159,41 @@ describe("parseFinnishKennelClubWorkbook", () => {
       0,
       lastRow - 1,
     ]);
-    expect(
-      parseFinnishKennelClubWorkbook(writeBook(sheet)).rows.map(
-        ({ sourceRowNumber }) => sourceRowNumber,
-      ),
-    ).toEqual([lastRow]);
+    const result = await parseFinnishKennelClubWorkbook(writeBook(sheet));
+    expect(result.rows.map(({ sourceRowNumber }) => sourceRowNumber)).toEqual([
+      lastRow,
+    ]);
   });
 
-  it("blocks empty, unreadable, and source-limit workbooks", () => {
+  it("blocks empty, unreadable, and source-limit workbooks", async () => {
     const emptyBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(
       emptyBook,
       XLSX.utils.aoa_to_sheet([headers]),
       "Koirat",
     );
-    expect(
-      parseFinnishKennelClubWorkbook(
-        XLSX.write(emptyBook, { type: "buffer", bookType: "xlsx" }),
-      ).facts,
-    ).toContainEqual(
+    const empty = await parseFinnishKennelClubWorkbook(
+      XLSX.write(emptyBook, { type: "buffer", bookType: "xlsx" }),
+    );
+    expect(empty.facts).toContainEqual(
       expect.objectContaining({ code: "SOURCE_FILE_UNREADABLE" }),
     );
-    expect(
-      parseFinnishKennelClubWorkbook(Buffer.from("not an xlsx")).facts,
-    ).toContainEqual(
+    const invalid = await parseFinnishKennelClubWorkbook(
+      Buffer.from("not an xlsx"),
+    );
+    expect(invalid.facts).toContainEqual(
       expect.objectContaining({ code: "SOURCE_FILE_UNREADABLE" }),
     );
 
     const tooManyRows = Array.from({ length: 10_001 }, () => validRow);
-    const result = parseFinnishKennelClubWorkbook(workbook(tooManyRows));
+    const result = await parseFinnishKennelClubWorkbook(workbook(tooManyRows));
     expect(result.rows).toEqual([]);
     expect(result.facts).toContainEqual(
       expect.objectContaining({ code: "SOURCE_RESOURCE_LIMIT_EXCEEDED" }),
     );
   });
 
-  it("limits columns and populated cells and warns about additional sheets", () => {
+  it("limits columns and populated cells and warns about additional sheets", async () => {
     const wide = XLSX.utils.aoa_to_sheet([
       [
         ...headers,
@@ -202,7 +201,7 @@ describe("parseFinnishKennelClubWorkbook", () => {
       ],
       [...validRow, ...Array.from({ length: 52 }, () => "x")],
     ]);
-    const parsedWide = parseFinnishKennelClubWorkbook(
+    const parsedWide = await parseFinnishKennelClubWorkbook(
       writeBook(wide, XLSX.utils.aoa_to_sheet([headers])),
     );
     expect(parsedWide.facts.map((fact) => fact.code)).toContain(
@@ -218,14 +217,16 @@ describe("parseFinnishKennelClubWorkbook", () => {
     };
     for (let row = 2; row <= 100_001; row += 1)
       manyCells[`A${row}`] = { v: "x" };
-    const parsedCells = parseFinnishKennelClubWorkbook(writeBook(manyCells));
+    const parsedCells = await parseFinnishKennelClubWorkbook(
+      writeBook(manyCells),
+    );
     expect(parsedCells.facts).toContainEqual(
       expect.objectContaining({ code: "SOURCE_RESOURCE_LIMIT_EXCEEDED" }),
     );
   });
 
-  it("accepts only valid ISO calendar dates in text cells", () => {
-    const result = parseFinnishKennelClubWorkbook(
+  it("accepts only valid ISO calendar dates in text cells", async () => {
+    const result = await parseFinnishKennelClubWorkbook(
       workbook([
         [
           ...validRow.slice(0, 5),

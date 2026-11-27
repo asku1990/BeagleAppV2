@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { applyFinnishKennelClubDogImport } from "../apply-finnish-kennel-club-import";
+import { WorkbookArchiveLimitError } from "../internal/sources/finnish-kennel-club/read-bounded-workbook-archive";
 
 const { parseMock, loadStateMock, evaluateMock, writeMock } = vi.hoisted(
   () => ({
@@ -131,6 +132,17 @@ describe("applyFinnishKennelClubDogImport", () => {
   it("rejects a stale preview digest", async () => {
     const result = await apply({ previewDigest: "old" });
     expect(result.body).toMatchObject({ code: "PREVIEW_STALE" });
+    expect(writeMock).not.toHaveBeenCalled();
+  });
+
+  it("returns 413 for archive expansion limits before loading or writing state", async () => {
+    parseMock.mockRejectedValueOnce(new WorkbookArchiveLimitError());
+
+    expect(await apply()).toMatchObject({
+      status: 413,
+      body: { code: "SOURCE_RESOURCE_LIMIT_EXCEEDED" },
+    });
+    expect(loadStateMock).not.toHaveBeenCalled();
     expect(writeMock).not.toHaveBeenCalled();
   });
 

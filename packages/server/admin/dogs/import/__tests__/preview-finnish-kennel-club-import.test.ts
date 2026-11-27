@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DOG_IMPORT_MAX_FILE_BYTES } from "@beagle/contracts";
 import { previewFinnishKennelClubDogImport } from "../preview-finnish-kennel-club-import";
+import { WorkbookArchiveLimitError } from "../internal/sources/finnish-kennel-club/read-bounded-workbook-archive";
 
 const { parseMock, loadStateMock, evaluateMock } = vi.hoisted(() => ({
   parseMock: vi.fn(),
@@ -163,5 +164,20 @@ describe("previewFinnishKennelClubDogImport", () => {
         )
       ).body,
     ).toMatchObject({ code: "SOURCE_FILE_UNREADABLE" });
+  });
+
+  it("returns 413 for archive expansion limits before loading database state", async () => {
+    parseMock.mockRejectedValueOnce(new WorkbookArchiveLimitError());
+
+    const result = await previewFinnishKennelClubDogImport(
+      { bytes: Buffer.from("file"), fileName: "dogs.xlsx" },
+      admin,
+    );
+
+    expect(result).toMatchObject({
+      status: 413,
+      body: { code: "SOURCE_RESOURCE_LIMIT_EXCEEDED" },
+    });
+    expect(loadStateMock).not.toHaveBeenCalled();
   });
 });
