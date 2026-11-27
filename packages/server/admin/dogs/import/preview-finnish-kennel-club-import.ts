@@ -67,7 +67,8 @@ export async function previewFinnishKennelClubDogImport(
             .update(input.bytes)
             .digest("hex"),
           previewDigest: evaluation.previewDigest,
-          applyAllowed: evaluation.applyAllowed,
+          applyAllowed: !evaluation.hasBlockers && evaluation.hasChanges,
+          hasChanges: evaluation.hasChanges,
           rowCount: parsed.sourceRowCount,
           createCount: evaluation.createCount,
           updateCount: evaluation.updateCount,

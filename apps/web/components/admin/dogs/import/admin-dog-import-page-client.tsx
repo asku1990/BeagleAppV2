@@ -60,7 +60,7 @@ export function AdminDogImportPageClient() {
     setStep("review");
   }
   async function apply() {
-    if (!file || !preview || busy) return;
+    if (!file || !preview?.applyAllowed || busy) return;
     setBusy(true);
     const response = await client.applyFinnishKennelClubImport(
       file,
@@ -362,6 +362,14 @@ export function AdminDogImportPageClient() {
                     }{" "}
                     {t("admin.dogs.import.review.warnings")}
                   </p>
+                  {!preview.hasChanges &&
+                  !preview.issues.some(
+                    (issue) => issue.severity === "BLOCKER",
+                  ) ? (
+                    <p className="text-sm text-muted-foreground">
+                      {t("admin.dogs.import.review.noChanges")}
+                    </p>
+                  ) : null}
                   <Button
                     disabled={!preview.applyAllowed || busy}
                     onClick={() => setStep("confirm")}
@@ -388,7 +396,10 @@ export function AdminDogImportPageClient() {
                     <Button variant="outline" onClick={() => setStep("review")}>
                       {t("admin.dogs.import.confirm.back")}
                     </Button>
-                    <Button disabled={busy} onClick={() => void apply()}>
+                    <Button
+                      disabled={!preview.applyAllowed || busy}
+                      onClick={() => void apply()}
+                    >
                       {t("admin.dogs.import.confirm.apply")}
                     </Button>
                   </div>

@@ -122,7 +122,7 @@ export async function applyFinnishKennelClubDogImport(
         error: "The reviewed import is stale. Validate it again.",
       },
     };
-  if (!evaluation.applyAllowed)
+  if (evaluation.hasBlockers)
     return {
       status: 422,
       body: {
@@ -132,22 +132,24 @@ export async function applyFinnishKennelClubDogImport(
       },
     };
   try {
-    let written;
-    for (let attempt = 0; ; attempt += 1) {
-      try {
-        written = await applyDogImportPlanDb(evaluation.plan, {
-          ...input.audit,
-          source: "WEB",
-          intent: "IMPORT_FINNISH_DOG_REGISTRATIONS",
-        });
-        break;
-      } catch (error) {
-        if (
-          isSerializableTransactionError(error) &&
-          attempt < MAX_SERIALIZABLE_RETRIES
-        )
-          continue;
-        throw error;
+    let written = { createdCount: 0, updatedCount: 0, referenceCount: 0 };
+    if (evaluation.hasChanges) {
+      for (let attempt = 0; ; attempt += 1) {
+        try {
+          written = await applyDogImportPlanDb(evaluation.plan, {
+            ...input.audit,
+            source: "WEB",
+            intent: "IMPORT_FINNISH_DOG_REGISTRATIONS",
+          });
+          break;
+        } catch (error) {
+          if (
+            isSerializableTransactionError(error) &&
+            attempt < MAX_SERIALIZABLE_RETRIES
+          )
+            continue;
+          throw error;
+        }
       }
     }
     return {

@@ -36,17 +36,17 @@ describe("evaluateDogImportRows parser facts", () => {
       },
     ]);
 
-    expect(evaluation.applyAllowed).toBe(false);
+    expect(evaluation.hasBlockers).toBe(true);
     expect(evaluation.rows[0]).toMatchObject({
       status: "BLOCKED",
       issues: [{ code: "BREED_NOT_BEAGLE", field: null }],
     });
   });
 
-  it("plans parent links when an existing dog has different parents", () => {
+  it("plans missing parent links and reports no changes once they exist", () => {
     const updatedAt = new Date("2026-01-01T00:00:00.000Z");
     const registrationUpdatedAt = new Date("2026-01-01T00:00:00.000Z");
-    const evaluation = evaluateDogImportRows([row], {
+    const currentState: DogImportStateDb = {
       colors: [],
       historicalLinksByRegistration: {},
       dogs: [
@@ -114,13 +114,27 @@ describe("evaluateDogImportRows parser facts", () => {
           registrationUpdatedAt,
         },
       ],
-    });
+    };
+    const evaluation = evaluateDogImportRows([row], currentState);
 
+    expect(evaluation.hasChanges).toBe(true);
     expect(evaluation.plan.updates).toHaveLength(1);
     expect(evaluation.plan.updates[0]).toMatchObject({
       id: "dog-1",
       sireRegistrationNo: row.sireRegistrationNo,
       damRegistrationNo: row.damRegistrationNo,
+    });
+
+    const linkedState = {
+      ...currentState,
+      dogs: currentState.dogs.map((dog) =>
+        dog.id === "dog-1" ? { ...dog, sireId: "sire-1", damId: "dam-1" } : dog,
+      ),
+    };
+    expect(evaluateDogImportRows([row], linkedState)).toMatchObject({
+      hasBlockers: false,
+      hasChanges: false,
+      unchangedCount: 1,
     });
   });
 

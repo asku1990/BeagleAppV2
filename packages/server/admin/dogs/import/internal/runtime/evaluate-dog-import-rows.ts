@@ -17,7 +17,8 @@ import type { FinnishWorkbookFact } from "../sources/finnish-kennel-club/parse-f
 export type DogImportEvaluation = {
   rows: AdminDogImportPreviewRow[];
   issues: DogImportIssue[];
-  applyAllowed: boolean;
+  hasBlockers: boolean;
+  hasChanges: boolean;
   previewDigest: string;
   plan: DogImportWritePlanDb;
   createCount: number;
@@ -529,8 +530,13 @@ export function evaluateDogImportRows(
   const blockedCount = previewRows.filter(
     (row) => row.status === "BLOCKED",
   ).length;
-  const applyAllowed =
-    blockedCount === 0 && !issues.some((issue) => issue.severity === "BLOCKER");
+  const hasBlockers =
+    blockedCount > 0 || issues.some((issue) => issue.severity === "BLOCKER");
+  const hasChanges =
+    creates.length > 0 ||
+    updates.length > 0 ||
+    referenceRows.length > 0 ||
+    historicalLinks.length > 0;
   return {
     rows: previewRows,
     issues: issues.sort(
@@ -538,7 +544,8 @@ export function evaluateDogImportRows(
         (a.sourceRowNumber ?? 0) - (b.sourceRowNumber ?? 0) ||
         a.code.localeCompare(b.code),
     ),
-    applyAllowed,
+    hasBlockers,
+    hasChanges,
     previewDigest: digest({
       policyVersion: DOG_IMPORT_POLICY_VERSION,
       rows,

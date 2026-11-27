@@ -1,0 +1,47 @@
+# Admin Dog Registry Import
+
+Admins can import Finnish Kennel Club Beagle registrations at
+`/admin/dogs/import`. Open **Tuo rekisteritiedot** from the admin dog list.
+
+## Workbook format
+
+- Upload one `.xlsx` file, up to 10 MiB. The importer reads the first worksheet
+  and reports any additional sheets as ignored. The first row contains headers.
+- Required headers: `Rekisterinumero`, `Nimi`, `Rotukoodi`, `Sukupuoli`,
+  `Syntymäaika`, `Alkuperä`, `Rekisterinumero isä`, `Rekisterinumero emä`.
+- Optional headers: `Kennel`, `Rekisteröity`, `Alkuperämaa`, `Väri`, `Häntä`.
+- Use breed code `161` and sex values `uros` or `narttu`. Dates can be Excel
+  date cells or text in `YYYY-MM-DD` format. Both parent registration numbers
+  must be valid, even if the parents are not yet in Beagle App.
+
+## Review and apply
+
+1. Upload the workbook and review the preview. It does not write to the
+   database. The review classifies the rows as new, updated, unchanged, or
+   blocked and shows how many reference-only parents are planned.
+2. Check warnings before confirming. For example, a different nonblank
+   `Kennel` value can replace the existing kennel text. If there is a blocker,
+   correct the workbook or the existing dog record, then preview again. A
+   blocker prevents the entire import from being applied.
+3. Select **Jatka vahvistukseen** and confirm to apply the reviewed changes.
+   Apply checks that the same workbook and plan are still current, then writes
+   in one audited transaction. If the preview is stale, review it again.
+4. Preview the same workbook again to verify the result. If no changes remain,
+   review shows **Ei tuotavia muutoksia** and disables confirmation. A direct
+   Apply request for a current, empty plan also returns without writing.
+
+## What gets written
+
+- Dogs are matched by registration number. A new registration creates a
+  normal dog. An existing dog keeps its identity; conflicting identity data,
+  such as a different birth date or parent, can block the import.
+- Nonblank workbook values can update the registration date, origin, origin
+  country, and tail text. `Kennel` updates free-text kennel information without
+  assigning a linked breeder. `Väri` updates the canonical color only if it
+  matches exactly one Finnish color label, ignoring case and surrounding
+  whitespace. Blank cells do not clear stored values.
+- A valid parent already in the database is reused. A valid missing parent is
+  created as a reference-only dog if it has no full row in the workbook. A later
+  valid full row can promote that same dog to normal.
+- On creation or promotion, unlinked show and trial entries with a matching
+  registration number can be linked to the dog.

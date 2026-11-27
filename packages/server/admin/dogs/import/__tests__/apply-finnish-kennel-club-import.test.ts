@@ -43,12 +43,28 @@ const parsed = {
   sheetName: "Rekisteri",
   facts: [],
 };
-const plan = { creates: [], updates: [], references: [], historicalLinks: [] };
+const emptyPlan = {
+  creates: [],
+  updates: [],
+  references: [],
+  historicalLinks: [],
+};
+const plan = {
+  ...emptyPlan,
+  historicalLinks: [
+    {
+      registrationNo: row.registrationNo,
+      showEntryIds: ["show-1"],
+      trialEntryIds: [],
+    },
+  ],
+};
 
 function evaluation(overrides: Record<string, unknown> = {}) {
   return {
     previewDigest: "digest",
-    applyAllowed: true,
+    hasBlockers: false,
+    hasChanges: true,
     createCount: 0,
     updateCount: 0,
     unchangedCount: 0,
@@ -118,10 +134,31 @@ describe("applyFinnishKennelClubDogImport", () => {
 
   it("blocks writes when evaluation has blockers", async () => {
     evaluateMock.mockReturnValue(
-      evaluation({ applyAllowed: false, blockedCount: 1 }),
+      evaluation({ hasBlockers: true, blockedCount: 1 }),
     );
     const result = await apply();
     expect(result.body).toMatchObject({ code: "IMPORT_BLOCKED" });
+    expect(writeMock).not.toHaveBeenCalled();
+  });
+
+  it("returns an unchanged result without starting a write for an empty plan", async () => {
+    evaluateMock.mockReturnValue(
+      evaluation({ hasChanges: false, unchangedCount: 1, plan: emptyPlan }),
+    );
+    const result = await apply();
+    expect(result).toMatchObject({
+      status: 200,
+      body: {
+        ok: true,
+        data: {
+          success: true,
+          createdCount: 0,
+          updatedCount: 0,
+          unchangedCount: 1,
+          referenceCount: 0,
+        },
+      },
+    });
     expect(writeMock).not.toHaveBeenCalled();
   });
 

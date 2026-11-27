@@ -16,6 +16,7 @@ export type AdminFinnishKennelClubImportPreviewResponse = {
   previewDigest: string;
   sourceFileSha256: string;
   applyAllowed: boolean;
+  hasChanges: boolean;
   rowCount: number;
   createCount: number;
   updateCount: number;

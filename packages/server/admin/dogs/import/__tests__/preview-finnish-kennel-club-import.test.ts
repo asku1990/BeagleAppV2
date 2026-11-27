@@ -60,7 +60,8 @@ describe("previewFinnishKennelClubDogImport", () => {
     });
     evaluateMock.mockReturnValue({
       previewDigest: "digest",
-      applyAllowed: true,
+      hasBlockers: false,
+      hasChanges: true,
       createCount: 1,
       updateCount: 0,
       unchangedCount: 0,
@@ -93,10 +94,28 @@ describe("previewFinnishKennelClubDogImport", () => {
         fileName: "dogs.xlsx",
         sheetName: "Rekisteri",
         previewDigest: "digest",
+        applyAllowed: true,
+        hasChanges: true,
       },
     });
     expect(loadStateMock).toHaveBeenCalledWith(["FI12345/24"]);
     expect(evaluateMock).toHaveBeenCalledWith([row], expect.anything(), []);
+  });
+
+  it("does not allow confirmation when the plan is unchanged", async () => {
+    evaluateMock.mockReturnValue({
+      hasBlockers: false,
+      hasChanges: false,
+      unchangedCount: 1,
+    });
+    const result = await previewFinnishKennelClubDogImport(
+      { bytes: Buffer.from("file"), fileName: "dogs.xlsx" },
+      admin,
+    );
+    expect(result.body).toMatchObject({
+      ok: true,
+      data: { applyAllowed: false, hasChanges: false, unchangedCount: 1 },
+    });
   });
 
   it("rejects empty and oversized sources", async () => {

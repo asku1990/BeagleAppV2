@@ -29,6 +29,7 @@ export const fiAdminDogsImportMessages = {
   "admin.dogs.import.review.incoming": "Tuodaan",
   "admin.dogs.import.review.row": "Excel-rivi",
   "admin.dogs.import.review.continue": "Jatka vahvistukseen",
+  "admin.dogs.import.review.noChanges": "Ei tuotavia muutoksia.",
   "admin.dogs.import.confirm.title": "Vahvista tuonti",
   "admin.dogs.import.confirm.hash": "Työkirjan tiiviste",
   "admin.dogs.import.confirm.noClearing":
@@ -79,6 +80,7 @@ export const svAdminDogsImportMessages = {
   "admin.dogs.import.review.incoming": "Importeras",
   "admin.dogs.import.review.row": "Excelrad",
   "admin.dogs.import.review.continue": "Fortsätt till bekräftelse",
+  "admin.dogs.import.review.noChanges": "Inga ändringar att importera.",
   "admin.dogs.import.confirm.title": "Bekräfta import",
   "admin.dogs.import.confirm.hash": "Arbetsbokens hash",
   "admin.dogs.import.confirm.noClearing":

@@ -2,7 +2,8 @@
 
 ## Status and notation
 
-Implementation-ready planning document. No production implementation exists yet.
+Original phase-one implementation plan. For the implemented workflow and its
+current behavior, see [Admin Dog Registry Import](../../features/dogs/admin-dog-registry-import.md).
 
 This document uses these labels:
 
