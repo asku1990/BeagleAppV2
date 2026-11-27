@@ -9,6 +9,7 @@ const normalizeRegistrationNo = (value: string) =>
 export async function loadDogImportStateDb(
   registrationNos: readonly string[],
   kennelNames: readonly (string | null)[],
+  db: Prisma.TransactionClient = prisma,
 ): Promise<DogImportStateDb> {
   const wanted = new Set(
     registrationNos
@@ -20,13 +21,13 @@ export async function loadDogImportStateDb(
   // Match legacy noncanonical spellings without scanning every registration.
   for (let offset = 0; offset < wantedValues.length; offset += 500) {
     const batch = wantedValues.slice(offset, offset + 500);
-    const matches = await prisma.$queryRaw<Array<{ id: string }>>(Prisma.sql`
+    const matches = await db.$queryRaw<Array<{ id: string }>>(Prisma.sql`
       SELECT "id" FROM "DogRegistration"
       WHERE upper(btrim("registrationNo")) = ANY(${batch}::text[])
     `);
     for (const match of matches) registrationIds.add(match.id);
   }
-  const registrations = await prisma.dogRegistration.findMany({
+  const registrations = await db.dogRegistration.findMany({
     where: { id: { in: [...registrationIds] } },
     include: {
       dog: {
@@ -111,7 +112,7 @@ export async function loadDogImportStateDb(
         if (stateDog && !byRegistrationId.has(stateDog.registrationId))
           byRegistrationId.set(stateDog.registrationId, stateDog);
       }
-  const colors = await prisma.dogColor.findMany({
+  const colors = await db.dogColor.findMany({
     select: { code: true, nameFi: true, status: true, updatedAt: true },
   });
   const historicalLinksByRegistration: DogImportStateDb["historicalLinksByRegistration"] =
@@ -119,17 +120,13 @@ export async function loadDogImportStateDb(
   for (let offset = 0; offset < wantedValues.length; offset += 500) {
     const batch = wantedValues.slice(offset, offset + 500);
     const [showEntries, trialEntries] = await Promise.all([
-      prisma.$queryRaw<
-        Array<{ id: string; registrationNo: string }>
-      >(Prisma.sql`
+      db.$queryRaw<Array<{ id: string; registrationNo: string }>>(Prisma.sql`
         SELECT "id", "registrationNoSnapshot" AS "registrationNo"
         FROM "ShowEntry"
         WHERE "dogId" IS NULL
           AND upper(btrim("registrationNoSnapshot")) = ANY(${batch}::text[])
       `),
-      prisma.$queryRaw<
-        Array<{ id: string; registrationNo: string }>
-      >(Prisma.sql`
+      db.$queryRaw<Array<{ id: string; registrationNo: string }>>(Prisma.sql`
         SELECT "id", "rekisterinumeroSnapshot" AS "registrationNo"
         FROM "TrialEntry"
         WHERE "dogId" IS NULL
@@ -139,25 +136,27 @@ export async function loadDogImportStateDb(
     for (const entry of showEntries) {
       const registrationNo = normalizeRegistrationNo(entry.registrationNo);
       const links = historicalLinksByRegistration[registrationNo] ?? {
-        showEntryIds: [],
-        trialEntryIds: [],
+        showEntries: [],
+        trialEntries: [],
       };
-      links.showEntryIds.push(entry.id);
+      links.showEntries.push(entry);
       historicalLinksByRegistration[registrationNo] = links;
     }
     for (const entry of trialEntries) {
       const registrationNo = normalizeRegistrationNo(entry.registrationNo);
       const links = historicalLinksByRegistration[registrationNo] ?? {
-        showEntryIds: [],
-        trialEntryIds: [],
+        showEntries: [],
+        trialEntries: [],
       };
-      links.trialEntryIds.push(entry.id);
+      links.trialEntries.push(entry);
       historicalLinksByRegistration[registrationNo] = links;
     }
   }
   return {
-    breedersByKennel: await findDogImportBreeders(prisma, kennelNames),
-    dogs: [...byRegistrationId.values()],
+    breedersByKennel: await findDogImportBreeders(db, kennelNames),
+    dogs: [...byRegistrationId.values()].sort((a, b) =>
+      a.registrationId.localeCompare(b.registrationId),
+    ),
     colors,
     historicalLinksByRegistration,
   };

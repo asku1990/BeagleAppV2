@@ -3,6 +3,7 @@ import {
   applyDogImportPlanDb,
   loadDogImportStateDb,
   type AuditContextDb,
+  type DogImportStateDb,
 } from "@beagle/db";
 import type {
   AdminFinnishKennelClubImportApplyResponse,
@@ -11,6 +12,7 @@ import type {
 import { DOG_IMPORT_MAX_FILE_BYTES } from "@beagle/contracts";
 import { requireAdmin } from "@server/admin/core/service";
 import type { ServiceResult } from "@server/core/result";
+import { logger } from "@server/core/logger";
 import { isPrismaTransactionTimeoutError } from "@server/core/prisma-transaction-timeout";
 import { parseFinnishKennelClubWorkbook } from "./internal/sources/finnish-kennel-club/parse-finnish-kennel-club-workbook";
 import { WorkbookArchiveLimitError } from "./internal/sources/finnish-kennel-club/read-bounded-workbook-archive";
@@ -106,17 +108,16 @@ export async function applyFinnishKennelClubDogImport(
       row.damRegistrationNo,
     ])
     .filter((value): value is string => Boolean(value));
+  const kennelNames = parsed.rows.map((row) => row.kennel);
+  const evaluate = (state: DogImportStateDb) =>
+    evaluateDogImportRows(parsed.rows, state, parsed.facts);
   let evaluation: ReturnType<typeof evaluateDogImportRows>;
   try {
-    evaluation = evaluateDogImportRows(
-      parsed.rows,
-      await loadDogImportStateDb(
-        registrations,
-        parsed.rows.map((row) => row.kennel),
-      ),
-      parsed.facts,
+    evaluation = evaluate(
+      await loadDogImportStateDb(registrations, kennelNames),
     );
   } catch {
+    logger.error("Finnish dog import evaluation failed");
     return {
       status: 500,
       body: {
@@ -149,11 +150,24 @@ export async function applyFinnishKennelClubDogImport(
     if (evaluation.hasChanges) {
       for (let attempt = 0; ; attempt += 1) {
         try {
-          written = await applyDogImportPlanDb(evaluation.plan, {
-            ...input.audit,
-            source: "WEB",
-            intent: "IMPORT_FINNISH_DOG_REGISTRATIONS",
-          });
+          written = await applyDogImportPlanDb(
+            registrations,
+            kennelNames,
+            {
+              ...input.audit,
+              source: "WEB",
+              intent: "IMPORT_FINNISH_DOG_REGISTRATIONS",
+            },
+            (state) => {
+              const current = evaluate(state);
+              if (
+                current.previewDigest !== input.previewDigest ||
+                current.hasBlockers
+              )
+                throw new Error("DOG_IMPORT_STALE");
+              return current.plan;
+            },
+          );
           break;
         } catch (error) {
           if (
@@ -185,6 +199,7 @@ export async function applyFinnishKennelClubDogImport(
       (error instanceof Error && error.message === "DOG_IMPORT_STALE") ||
       isExpectedConflictError(error);
     const timeout = isPrismaTransactionTimeoutError(error);
+    if (!stale && !timeout) logger.error("Finnish dog import write failed");
     return {
       status: stale || timeout ? 409 : 500,
       body: {

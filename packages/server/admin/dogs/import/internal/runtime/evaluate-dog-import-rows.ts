@@ -116,6 +116,7 @@ export function evaluateDogImportRows(
     DogImportWritePlanDb["breederMatches"][number]
   >();
   const previewRows: AdminDogImportPreviewRow[] = [];
+  const matchedColors = new Map<number, DogImportStateDb["colors"][number]>();
   for (const row of [...rows].sort(
     (a, b) => a.sourceRowNumber - b.sourceRowNumber,
   )) {
@@ -328,6 +329,7 @@ export function evaluateDogImportRows(
             row.colorName!.trim().toLocaleLowerCase("fi-FI"),
         )
       : [];
+    for (const color of colorMatches) matchedColors.set(color.code, color);
     const colorCode =
       colorMatches.length === 1
         ? colorMatches[0]!.code
@@ -598,14 +600,16 @@ export function evaluateDogImportRows(
     references: referenceRows,
     breederMatches: [...breederMatches.values()],
   };
-  const historicalLinks = [
+  const historicalEntries = [
     ...new Set([
       ...creates.map((row) => row.registrationNo),
       ...updates
         .filter((update) => update.data.status === "NORMAL")
         .map(
           (update) =>
-            state.dogs.find((dog) => dog.id === update.id)?.registrationNo,
+            state.dogs.find(
+              (dog) => dog.registrationId === update.registrationId,
+            )?.registrationNo,
         )
         .filter((registrationNo): registrationNo is string =>
           Boolean(registrationNo),
@@ -614,13 +618,23 @@ export function evaluateDogImportRows(
   ]
     .map((registrationNo) => ({
       registrationNo,
-      showEntryIds:
-        state.historicalLinksByRegistration[registrationNo]?.showEntryIds ?? [],
-      trialEntryIds:
-        state.historicalLinksByRegistration[registrationNo]?.trialEntryIds ??
-        [],
+      showEntries: [
+        ...(state.historicalLinksByRegistration[registrationNo]?.showEntries ??
+          []),
+      ].sort((a, b) => a.id.localeCompare(b.id)),
+      trialEntries: [
+        ...(state.historicalLinksByRegistration[registrationNo]?.trialEntries ??
+          []),
+      ].sort((a, b) => a.id.localeCompare(b.id)),
     }))
-    .filter((links) => links.showEntryIds.length || links.trialEntryIds.length);
+    .filter((links) => links.showEntries.length || links.trialEntries.length);
+  const historicalLinks = historicalEntries.map(
+    ({ registrationNo, showEntries, trialEntries }) => ({
+      registrationNo,
+      showEntryIds: showEntries.map(({ id }) => id),
+      trialEntryIds: trialEntries.map(({ id }) => id),
+    }),
+  );
   const planWithHistoricalLinks = { ...plan, historicalLinks };
   const blockedCount = previewRows.filter(
     (row) => row.status === "BLOCKED",
@@ -646,8 +660,11 @@ export function evaluateDogImportRows(
       rows,
       issues,
       plan: planWithHistoricalLinks,
+      historicalEntries,
+      colors: [...matchedColors.values()].sort((a, b) => a.code - b.code),
       state: state.dogs.map((dog) => [
         dog.id,
+        dog.registrationNo,
         dog.updatedAt.toISOString(),
         dog.registrationId,
         dog.registrationUpdatedAt.toISOString(),

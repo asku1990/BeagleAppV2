@@ -35,8 +35,8 @@ Admins can import Finnish Kennel Club Beagle registrations at
    issues (including workbook-wide ones); pedigree-only parents are listed
    separately by registration and role and do not count as source rows.
 3. Select **Jatka vahvistukseen** and confirm to apply the reviewed changes.
-   Apply checks that the same workbook and plan are still current, then writes
-   in one audited transaction. If the preview is stale, review it again.
+   Apply rechecks the reviewed plan inside the audited transaction before
+   writing, including on retries. If the preview is stale, review it again.
 4. Preview the same workbook again to verify the result. If no changes remain,
    review shows **Ei tuotavia muutoksia** and disables confirmation. A direct
    Apply request for a current, empty plan also returns without writing.

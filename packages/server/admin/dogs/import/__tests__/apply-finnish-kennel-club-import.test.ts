@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import type { DogImportStateDb, DogImportWritePlanDb } from "@beagle/db";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { applyFinnishKennelClubDogImport } from "../apply-finnish-kennel-club-import";
 import { WorkbookArchiveLimitError } from "../internal/sources/finnish-kennel-club/read-bounded-workbook-archive";
@@ -37,6 +38,12 @@ const row = {
   registrationNo: "FI12345/24",
   sireRegistrationNo: null,
   damRegistrationNo: null,
+};
+const state: DogImportStateDb = {
+  dogs: [],
+  colors: [],
+  historicalLinksByRegistration: {},
+  breedersByKennel: new Map(),
 };
 const parsed = {
   rows: [row],
@@ -83,12 +90,7 @@ describe("applyFinnishKennelClubDogImport", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     parseMock.mockReturnValue(parsed);
-    loadStateMock.mockResolvedValue({
-      dogs: [],
-      colors: [],
-      historicalLinksByRegistration: {},
-      breedersByKennel: new Map(),
-    });
+    loadStateMock.mockResolvedValue(state);
     evaluateMock.mockReturnValue(evaluation());
     writeMock.mockResolvedValue({
       createdCount: 0,
@@ -192,11 +194,56 @@ describe("applyFinnishKennelClubDogImport", () => {
         referenceCount: 1,
       },
     });
-    expect(writeMock).toHaveBeenCalledWith(plan, {
-      ...audit,
-      source: "WEB",
-      intent: "IMPORT_FINNISH_DOG_REGISTRATIONS",
+    expect(writeMock).toHaveBeenCalledWith(
+      [row.registrationNo],
+      [undefined],
+      { ...audit, source: "WEB", intent: "IMPORT_FINNISH_DOG_REGISTRATIONS" },
+      expect.any(Function),
+    );
+  });
+
+  it("revalidates the reviewed plan on a serializable retry before writing", async () => {
+    evaluateMock
+      .mockReturnValueOnce(evaluation())
+      .mockReturnValueOnce(evaluation())
+      .mockReturnValueOnce(evaluation({ previewDigest: "changed" }));
+    const firstSnapshot = { ...state };
+    const retrySnapshot = { ...state };
+    const write = vi.fn();
+    type Verify = (snapshot: DogImportStateDb) => DogImportWritePlanDb;
+    writeMock
+      .mockImplementationOnce(
+        async (_registrations, _kennels, _audit, verify: Verify) => {
+          expect(verify(firstSnapshot)).toEqual(plan);
+          throw Object.assign(new Error("Serialization conflict"), {
+            code: "P2034",
+          });
+        },
+      )
+      .mockImplementationOnce(
+        async (_registrations, _kennels, _audit, verify: Verify) => {
+          const verified = verify(retrySnapshot);
+          return write(verified);
+        },
+      );
+
+    expect(await apply()).toMatchObject({
+      status: 409,
+      body: { code: "PREVIEW_STALE" },
     });
+    expect(evaluateMock).toHaveBeenNthCalledWith(
+      2,
+      parsed.rows,
+      firstSnapshot,
+      [],
+    );
+    expect(evaluateMock).toHaveBeenNthCalledWith(
+      3,
+      parsed.rows,
+      retrySnapshot,
+      [],
+    );
+    expect(write).not.toHaveBeenCalled();
   });
 
   it("returns the expected stale error from a write", async () => {

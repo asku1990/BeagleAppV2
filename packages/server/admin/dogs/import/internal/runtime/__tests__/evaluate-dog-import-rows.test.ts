@@ -27,6 +27,38 @@ const row: CanonicalDogImportRow = {
 };
 
 describe("evaluateDogImportRows parser facts", () => {
+  it("detects a historical registration edit even when the planned entry IDs are unchanged", () => {
+    const currentState: DogImportStateDb = {
+      ...state,
+      historicalLinksByRegistration: {
+        "FI123/24": {
+          showEntries: [{ id: "show-1", registrationNo: "fi123/24" }],
+          trialEntries: [],
+        },
+      },
+    };
+    const reviewed = evaluateDogImportRows([row], currentState);
+    const edited = evaluateDogImportRows([row], {
+      ...currentState,
+      historicalLinksByRegistration: {
+        "FI123/24": {
+          showEntries: [{ id: "show-1", registrationNo: "FI123/24" }],
+          trialEntries: [],
+        },
+      },
+    });
+
+    expect(reviewed.plan.historicalLinks).toEqual([
+      {
+        registrationNo: "FI123/24",
+        showEntryIds: ["show-1"],
+        trialEntryIds: [],
+      },
+    ]);
+    expect(edited.plan).toEqual(reviewed.plan);
+    expect(edited.previewDigest).not.toBe(reviewed.previewDigest);
+  });
+
   it("blocks rows for parser blockers and includes the adapted issue", () => {
     const evaluation = evaluateDogImportRows([row], state, [
       {
@@ -144,6 +176,14 @@ describe("evaluateDogImportRows parser facts", () => {
       ],
     };
     const evaluation = evaluateDogImportRows([row], currentState);
+    const reassigned = evaluateDogImportRows([row], {
+      ...currentState,
+      dogs: currentState.dogs.map((dog) =>
+        dog.id === "sire-1" ? { ...dog, id: "sire-2" } : dog,
+      ),
+    });
+    expect(reassigned.plan).toEqual(evaluation.plan);
+    expect(reassigned.previewDigest).not.toBe(evaluation.previewDigest);
 
     expect(evaluation.hasChanges).toBe(true);
     expect(evaluation.plan.updates).toHaveLength(1);

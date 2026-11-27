@@ -2,7 +2,10 @@ export type DogImportStateDb = {
   breedersByKennel: Map<string, Array<{ id: string; name: string }>>;
   historicalLinksByRegistration: Record<
     string,
-    { showEntryIds: string[]; trialEntryIds: string[] }
+    {
+      showEntries: Array<{ id: string; registrationNo: string }>;
+      trialEntries: Array<{ id: string; registrationNo: string }>;
+    }
   >;
   dogs: Array<{
     id: string;
