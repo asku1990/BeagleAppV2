@@ -595,5 +595,27 @@ describe("evaluateDogImportRows parser facts", () => {
       }),
     );
     expect(unresolved.plan.updates[0]?.data).not.toHaveProperty("colorCode");
+
+    const blankDate = evaluateDogImportRows(
+      [{ ...row, colorName: "unknown", registeredOn: null }],
+      colorState,
+    );
+    const expectedIssues = [
+      ["DOG_COLOR_UNRESOLVED", "colorName"],
+      ["SOURCE_EMPTY_PRESERVED", "registeredOn"],
+    ];
+    const issueFields = ({
+      code,
+      field,
+    }: (typeof blankDate.issues)[number]) => [code, field];
+    expect(blankDate.rows[0]?.issues.map(issueFields)).toEqual(expectedIssues);
+    expect(
+      blankDate.issues
+        .filter(
+          ({ sourceRowNumber }) => sourceRowNumber === row.sourceRowNumber,
+        )
+        .map(issueFields),
+    ).toEqual(expectedIssues);
+    expect(blankDate.plan.updates[0]).not.toHaveProperty("registeredOn");
   });
 });

@@ -390,19 +390,12 @@ export function evaluateDogImportRows(
           registrationNo: row.registrationNo,
           sourceRowNumber: row.sourceRowNumber,
         });
-        if (comparisonIssue) rowIssues.push(comparisonIssue);
+        if (comparisonIssue) {
+          rowIssues.push(comparisonIssue);
+          issues.push(comparisonIssue);
+          uniqueRowIssues.push(comparisonIssue);
+        }
       }
-      const previousIssues = new Set(issues.map(canonical));
-      const comparisonIssues = rowIssues.filter(
-        (issue) => !previousIssues.has(canonical(issue)),
-      );
-      issues.push(...comparisonIssues);
-      uniqueRowIssues = rowIssues.filter(
-        (issue, index, all) =>
-          all.findIndex(
-            (candidate) => canonical(candidate) === canonical(issue),
-          ) === index,
-      );
     }
     if (!existing) {
       creates.push({
