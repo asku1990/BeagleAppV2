@@ -27,6 +27,9 @@ export const fiAdminDogsImportMessages = {
   "admin.dogs.import.review.details": "Näytä tiedot",
   "admin.dogs.import.review.current": "Nykyinen",
   "admin.dogs.import.review.incoming": "Tuodaan",
+  "admin.dogs.import.review.breeder": "Kasvattaja",
+  "admin.dogs.import.review.missingKennels":
+    "Kasvattajarekisteristä puuttuvat kennelnimet",
   "admin.dogs.import.review.row": "Excel-rivi",
   "admin.dogs.import.review.continue": "Jatka vahvistukseen",
   "admin.dogs.import.review.noChanges": "Ei tuotavia muutoksia.",
@@ -47,6 +50,12 @@ export const fiAdminDogsImportMessages = {
   "admin.dogs.import.issue.unknown": "Tuonnin huomio",
   "admin.dogs.import.issue.PARENT_SEX_CONFLICT":
     "Vanhemman sukupuoli ei vastaa roolia",
+  "admin.dogs.import.issue.DOG_BREEDER_NOT_FOUND":
+    "Kennelnimeä ei löydy kasvattajarekisteristä",
+  "admin.dogs.import.issue.DOG_BREEDER_AMBIGUOUS":
+    "Kennelnimi vastaa useaa kasvattajaa",
+  "admin.dogs.import.issue.DOG_BREEDER_LINK_CONFLICT":
+    "Koira on jo yhdistetty toiseen kasvattajaan",
 } as const;
 
 export const svAdminDogsImportMessages = {
@@ -78,6 +87,9 @@ export const svAdminDogsImportMessages = {
   "admin.dogs.import.review.details": "Visa detaljer",
   "admin.dogs.import.review.current": "Nuvarande",
   "admin.dogs.import.review.incoming": "Importeras",
+  "admin.dogs.import.review.breeder": "Uppfödare",
+  "admin.dogs.import.review.missingKennels":
+    "Kennelnamn som saknas i uppfödarregistret",
   "admin.dogs.import.review.row": "Excelrad",
   "admin.dogs.import.review.continue": "Fortsätt till bekräftelse",
   "admin.dogs.import.review.noChanges": "Inga ändringar att importera.",
@@ -98,4 +110,10 @@ export const svAdminDogsImportMessages = {
   "admin.dogs.import.issue.unknown": "Importnotering",
   "admin.dogs.import.issue.PARENT_SEX_CONFLICT":
     "Förälderns kön motsvarar inte rollen",
+  "admin.dogs.import.issue.DOG_BREEDER_NOT_FOUND":
+    "Kennelnamnet finns inte i uppfödarregistret",
+  "admin.dogs.import.issue.DOG_BREEDER_AMBIGUOUS":
+    "Kennelnamnet matchar flera uppfödare",
+  "admin.dogs.import.issue.DOG_BREEDER_LINK_CONFLICT":
+    "Hunden är redan kopplad till en annan uppfödare",
 } as const;

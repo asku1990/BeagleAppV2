@@ -5,6 +5,7 @@ import {
 } from "@db/core/audit-context";
 import { Prisma } from "@prisma/client";
 import type { DogImportWritePlanDb } from "./types";
+import { findDogImportBreeders } from "./find-dog-import-breeders";
 
 const date = (value: string | null | undefined) =>
   value ? new Date(`${value}T00:00:00.000Z`) : null;
@@ -18,6 +19,19 @@ export async function applyDogImportPlanDb(
   return runInAuditContextDb(
     audit,
     async (tx) => {
+      const breedersByKennel = await findDogImportBreeders(
+        tx,
+        plan.breederMatches.map(({ kennel }) => kennel),
+      );
+      for (const expected of plan.breederMatches) {
+        const matches = breedersByKennel.get(expected.kennel) ?? [];
+        if (
+          matches.length !== 1 ||
+          matches[0]?.id !== expected.id ||
+          matches[0]?.name !== expected.name
+        )
+          throw new Error("DOG_IMPORT_STALE");
+      }
       const ids = new Map<string, string>();
       const createRegistration = async (
         data: Parameters<typeof tx.dogRegistration.create>[0]["data"],
@@ -36,7 +50,7 @@ export async function applyDogImportPlanDb(
             name: create.name,
             sex: create.sex,
             birthDate: date(create.birthDate),
-            breederNameText: create.breederNameText,
+            breederId: create.breederId,
             originTypeText: create.originTypeText,
             originCountryText: create.originCountryText,
             tailText: create.tailText,

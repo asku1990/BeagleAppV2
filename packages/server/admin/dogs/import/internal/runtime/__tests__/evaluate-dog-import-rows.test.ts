@@ -4,6 +4,7 @@ import { evaluateDogImportRows } from "../evaluate-dog-import-rows";
 import type { CanonicalDogImportRow } from "@server/admin/dogs/import/internal/model/canonical-dog-import";
 
 const state: DogImportStateDb = {
+  breedersByKennel: new Map(),
   dogs: [],
   colors: [],
   historicalLinksByRegistration: {},
@@ -16,7 +17,7 @@ const row: CanonicalDogImportRow = {
   sex: "FEMALE",
   birthDate: "2024-01-01",
   registeredOn: "2024-01-02",
-  breederNameText: null,
+  kennel: null,
   originTypeText: "Suomi",
   originCountryText: null,
   colorName: null,
@@ -47,6 +48,7 @@ describe("evaluateDogImportRows parser facts", () => {
     const updatedAt = new Date("2026-01-01T00:00:00.000Z");
     const registrationUpdatedAt = new Date("2026-01-01T00:00:00.000Z");
     const currentState: DogImportStateDb = {
+      ...state,
       colors: [],
       historicalLinksByRegistration: {},
       dogs: [
@@ -59,7 +61,6 @@ describe("evaluateDogImportRows parser facts", () => {
           birthDate: new Date("2024-01-01T00:00:00.000Z"),
           sireId: null,
           damId: null,
-          breederNameText: null,
           breederId: null,
           breederName: null,
           colorCode: null,
@@ -80,7 +81,6 @@ describe("evaluateDogImportRows parser facts", () => {
           birthDate: null,
           sireId: null,
           damId: null,
-          breederNameText: null,
           breederId: null,
           breederName: null,
           colorCode: null,
@@ -101,7 +101,6 @@ describe("evaluateDogImportRows parser facts", () => {
           birthDate: null,
           sireId: null,
           damId: null,
-          breederNameText: null,
           breederId: null,
           breederName: null,
           colorCode: null,
@@ -136,11 +135,78 @@ describe("evaluateDogImportRows parser facts", () => {
       hasChanges: false,
       unchangedCount: 1,
     });
+
+    const kennelRow = { ...row, kennel: "TAVAJS" };
+    const breeder = { id: "breeder-1", name: "TAVAJS" };
+    const breederState = {
+      ...linkedState,
+      breedersByKennel: new Map([["TAVAJS", [breeder]]]),
+    };
+    const withBreeder = evaluateDogImportRows([kennelRow], breederState);
+    expect(withBreeder.rows[0]).toMatchObject({
+      status: "UPDATE",
+      breederToLink: "TAVAJS",
+      issues: [],
+    });
+    expect(withBreeder.plan.updates[0]?.data).toEqual({
+      breederId: breeder.id,
+    });
+
+    const linkedBreederState = {
+      ...breederState,
+      dogs: linkedState.dogs.map((dog) =>
+        dog.id === "dog-1"
+          ? { ...dog, breederId: breeder.id, breederName: breeder.name }
+          : dog,
+      ),
+    };
+    expect(
+      evaluateDogImportRows([kennelRow], linkedBreederState).hasChanges,
+    ).toBe(false);
+    expect(evaluateDogImportRows([row], linkedBreederState).hasChanges).toBe(
+      false,
+    );
+    const conflictingState = {
+      ...linkedBreederState,
+      breedersByKennel: new Map([
+        ["TAVAJS", [{ id: "breeder-2", name: "Tavajs" }]],
+      ]),
+    };
+    expect(
+      evaluateDogImportRows([kennelRow], conflictingState).rows[0],
+    ).toMatchObject({
+      status: "BLOCKED",
+      issues: [{ code: "DOG_BREEDER_LINK_CONFLICT" }],
+    });
+  });
+
+  it("requires a unique breeder for a nonblank kennel on a new dog", () => {
+    const kennelRow = { ...row, kennel: "TAVAJS" };
+    const breeder = { id: "breeder-1", name: "Tavajs" };
+    const evaluate = (matches: (typeof breeder)[]) =>
+      evaluateDogImportRows([kennelRow], {
+        ...state,
+        breedersByKennel: new Map([["TAVAJS", matches]]),
+      });
+    expect(evaluate([]).rows[0]).toMatchObject({
+      status: "BLOCKED",
+      issues: [{ code: "DOG_BREEDER_NOT_FOUND" }],
+    });
+    expect(
+      evaluate([breeder, { id: "breeder-2", name: "TAVAJS" }]).rows[0],
+    ).toMatchObject({
+      status: "BLOCKED",
+      issues: [{ code: "DOG_BREEDER_AMBIGUOUS" }],
+    });
+    expect(evaluate([breeder]).plan.creates[0]).toMatchObject({
+      breederId: breeder.id,
+    });
   });
 
   it("builds the same digest when parser facts arrive in another order", () => {
     const facts = [
       {
+        ...state,
         code: "INVALID_DATE" as const,
         header: "Rekisteröity",
         columnIndex: 6,
@@ -183,7 +249,6 @@ describe("evaluateDogImportRows parser facts", () => {
             birthDate: new Date("2024-01-01T00:00:00.000Z"),
             sireId: null,
             damId: null,
-            breederNameText: null,
             breederId: null,
             breederName: null,
             colorCode: 121,

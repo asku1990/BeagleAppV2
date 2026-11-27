@@ -101,6 +101,10 @@ export function evaluateDogImportRows(
   }
   const creates: DogImportWritePlanDb["creates"] = [];
   const updates: DogImportWritePlanDb["updates"] = [];
+  const breederMatches = new Map<
+    string,
+    DogImportWritePlanDb["breederMatches"][number]
+  >();
   const previewRows: AdminDogImportPreviewRow[] = [];
   for (const row of [...rows].sort(
     (a, b) => a.sourceRowNumber - b.sourceRowNumber,
@@ -170,6 +174,26 @@ export function evaluateDogImportRows(
     const existing = row.registrationNo
       ? byRegistration.get(row.registrationNo)
       : undefined;
+    const kennelMatches = row.kennel
+      ? (state.breedersByKennel.get(row.kennel) ?? [])
+      : [];
+    const breeder = kennelMatches.length === 1 ? kennelMatches[0] : undefined;
+    if (row.kennel && !breeder)
+      add(
+        kennelMatches.length
+          ? "DOG_BREEDER_AMBIGUOUS"
+          : "DOG_BREEDER_NOT_FOUND",
+        "breeder",
+        null,
+        row.kennel,
+      );
+    if (breeder && existing?.breederId && existing.breederId !== breeder.id)
+      add(
+        "DOG_BREEDER_LINK_CONFLICT",
+        "breeder",
+        existing.breederName,
+        breeder.name,
+      );
     const incomingSire = row.sireRegistrationNo
       ? byRegistration.get(row.sireRegistrationNo)
       : undefined;
@@ -274,6 +298,9 @@ export function evaluateDogImportRows(
       });
       continue;
     }
+    if (breeder && row.kennel)
+      breederMatches.set(row.kennel, { kennel: row.kennel, ...breeder });
+    const breederToLink = breeder && !existing?.breederId ? breeder : undefined;
     const colorMatches = row.colorName
       ? state.colors.filter(
           (color) =>
@@ -301,12 +328,6 @@ export function evaluateDogImportRows(
         state.colors.find((color) => color.code === existing.colorCode)
           ?.nameFi ?? null;
       for (const comparison of [
-        {
-          field: "breederNameText",
-          code: "DOG_BREEDER_TEXT_DIFFERS",
-          currentValue: existing.breederNameText,
-          incomingValue: row.breederNameText,
-        },
         {
           field: "originTypeText",
           code: "DOG_ORIGIN_TYPE_DIFFERS",
@@ -373,7 +394,7 @@ export function evaluateDogImportRows(
         sex: row.sex!,
         birthDate: row.birthDate,
         registeredOn: row.registeredOn,
-        breederNameText: row.breederNameText,
+        breederId: breederToLink?.id ?? null,
         originTypeText: row.originTypeText,
         originCountryText: row.originCountryText,
         tailText: row.tailText,
@@ -386,13 +407,14 @@ export function evaluateDogImportRows(
         registrationNo: row.registrationNo,
         name: row.name,
         status: "CREATE",
+        ...(breederToLink && { breederToLink: breederToLink.name }),
         issues: uniqueRowIssues,
       });
       continue;
     }
     const data: DogImportDogUpdateData & { birthDate?: string } = {};
+    if (breederToLink) data.breederId = breederToLink.id;
     for (const [key, incoming, current] of [
-      ["breederNameText", row.breederNameText, existing.breederNameText],
       ["originTypeText", row.originTypeText, existing.originTypeText],
       ["originCountryText", row.originCountryText, existing.originCountryText],
       ["tailText", row.tailText, existing.tailText],
@@ -476,6 +498,7 @@ export function evaluateDogImportRows(
         registrationNo: row.registrationNo,
         name: row.name,
         status: "UPDATE",
+        ...(breederToLink && { breederToLink: breederToLink.name }),
         issues: uniqueRowIssues,
       });
     } else
@@ -502,7 +525,12 @@ export function evaluateDogImportRows(
         registrationNo: reference.registrationNo,
       }),
     );
-  const plan = { creates, updates, references: referenceRows };
+  const plan = {
+    creates,
+    updates,
+    references: referenceRows,
+    breederMatches: [...breederMatches.values()],
+  };
   const historicalLinks = [
     ...new Set([
       ...creates.map((row) => row.registrationNo),

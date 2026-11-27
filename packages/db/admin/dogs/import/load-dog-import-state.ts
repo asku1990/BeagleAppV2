@@ -1,12 +1,14 @@
 import { prisma } from "@db/core/prisma";
 import { Prisma } from "@prisma/client";
 import type { DogImportStateDb } from "./types";
+import { findDogImportBreeders } from "./find-dog-import-breeders";
 
 const normalizeRegistrationNo = (value: string) =>
   value.trim().toLocaleUpperCase("fi-FI");
 
 export async function loadDogImportStateDb(
   registrationNos: readonly string[],
+  kennelNames: readonly (string | null)[],
 ): Promise<DogImportStateDb> {
   const wanted = new Set(
     registrationNos
@@ -59,7 +61,6 @@ export async function loadDogImportStateDb(
       | "birthDate"
       | "sireId"
       | "damId"
-      | "breederNameText"
       | "breederId"
       | "colorCode"
       | "originTypeText"
@@ -81,7 +82,6 @@ export async function loadDogImportStateDb(
       birthDate: dog.birthDate,
       sireId: dog.sireId,
       damId: dog.damId,
-      breederNameText: dog.breederNameText,
       breederId: dog.breederId,
       breederName: dog.breeder?.name ?? null,
       colorCode: dog.colorCode,
@@ -156,6 +156,7 @@ export async function loadDogImportStateDb(
     }
   }
   return {
+    breedersByKennel: await findDogImportBreeders(prisma, kennelNames),
     dogs: [...byRegistrationId.values()],
     colors,
     historicalLinksByRegistration,

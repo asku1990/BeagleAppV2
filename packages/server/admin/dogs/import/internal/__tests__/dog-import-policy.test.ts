@@ -20,7 +20,7 @@ describe("dog import policy", () => {
       resolution: "AUTO_UPDATE",
       overridable: true,
     });
-    expect(DOG_IMPORT_POLICY_VERSION).toBe("1");
+    expect(DOG_IMPORT_POLICY_VERSION).toBe("2");
   });
 
   it("marks integrity rules as non-overridable", () => {

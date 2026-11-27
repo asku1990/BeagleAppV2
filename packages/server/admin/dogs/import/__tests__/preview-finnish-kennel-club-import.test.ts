@@ -35,7 +35,7 @@ const row = {
   sex: "MALE",
   birthDate: null,
   registeredOn: null,
-  breederNameText: null,
+  kennel: null,
   originTypeText: null,
   originCountryText: null,
   colorName: null,
@@ -57,6 +57,7 @@ describe("previewFinnishKennelClubDogImport", () => {
       dogs: [],
       colors: [],
       historicalLinksByRegistration: {},
+      breedersByKennel: new Map(),
     });
     evaluateMock.mockReturnValue({
       previewDigest: "digest",
@@ -98,7 +99,7 @@ describe("previewFinnishKennelClubDogImport", () => {
         hasChanges: true,
       },
     });
-    expect(loadStateMock).toHaveBeenCalledWith(["FI12345/24"]);
+    expect(loadStateMock).toHaveBeenCalledWith(["FI12345/24"], [null]);
     expect(evaluateMock).toHaveBeenCalledWith([row], expect.anything(), []);
   });
 

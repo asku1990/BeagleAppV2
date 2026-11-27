@@ -11,7 +11,7 @@ const fieldByHeader: Record<string, DogImportField> = {
   Sukupuoli: "sex",
   Syntymäaika: "birthDate",
   Rekisteröity: "registeredOn",
-  Kennel: "breederNameText",
+  Kennel: "breeder",
   Alkuperä: "originTypeText",
   Alkuperämaa: "originCountryText",
   Väri: "colorName",

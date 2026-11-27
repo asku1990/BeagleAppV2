@@ -100,7 +100,10 @@ export async function applyFinnishKennelClubDogImport(
   try {
     evaluation = evaluateDogImportRows(
       parsed.rows,
-      await loadDogImportStateDb(registrations),
+      await loadDogImportStateDb(
+        registrations,
+        parsed.rows.map((row) => row.kennel),
+      ),
       parsed.facts,
     );
   } catch {

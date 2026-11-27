@@ -348,7 +348,7 @@ export function parseFinnishKennelClubWorkbook(
         sex: sex(valueAt(row, indexes, "Sukupuoli")),
         birthDate: parsedBirthDate,
         registeredOn: parsedRegisteredOn,
-        breederNameText: text(valueAt(row, indexes, "Kennel")),
+        kennel: text(valueAt(row, indexes, "Kennel")),
         originTypeText: text(valueAt(row, indexes, "Alkuperä")),
         originCountryText: text(valueAt(row, indexes, "Alkuperämaa")),
         colorName: text(valueAt(row, indexes, "Väri")),

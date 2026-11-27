@@ -5,6 +5,7 @@ export type AdminDogImportPreviewRow = {
   registrationNo: string | null;
   name: string | null;
   status: "CREATE" | "UPDATE" | "UNCHANGED" | "BLOCKED";
+  breederToLink?: string;
   issues: DogImportIssue[];
 };
 

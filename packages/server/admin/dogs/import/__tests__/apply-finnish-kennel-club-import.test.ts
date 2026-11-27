@@ -44,6 +44,7 @@ const parsed = {
   facts: [],
 };
 const emptyPlan = {
+  breederMatches: [],
   creates: [],
   updates: [],
   references: [],
@@ -85,6 +86,7 @@ describe("applyFinnishKennelClubDogImport", () => {
       dogs: [],
       colors: [],
       historicalLinksByRegistration: {},
+      breedersByKennel: new Map(),
     });
     evaluateMock.mockReturnValue(evaluation());
     writeMock.mockResolvedValue({

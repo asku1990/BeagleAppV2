@@ -11,7 +11,7 @@ export type CanonicalDogImportRow = {
   sex: "MALE" | "FEMALE" | null;
   birthDate: string | null;
   registeredOn: string | null;
-  breederNameText: string | null;
+  kennel: string | null;
   originTypeText: string | null;
   originCountryText: string | null;
   colorName: string | null;

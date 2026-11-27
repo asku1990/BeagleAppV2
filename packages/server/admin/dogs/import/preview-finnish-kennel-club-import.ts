@@ -51,7 +51,10 @@ export async function previewFinnishKennelClubDogImport(
       .filter((value): value is string => Boolean(value));
     const evaluation = evaluateDogImportRows(
       parsed.rows,
-      await loadDogImportStateDb(registrations),
+      await loadDogImportStateDb(
+        registrations,
+        parsed.rows.map((row) => row.kennel),
+      ),
       parsed.facts,
     );
     return {

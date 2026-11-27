@@ -19,10 +19,11 @@ Admins can import Finnish Kennel Club Beagle registrations at
 1. Upload the workbook and review the preview. It does not write to the
    database. The review classifies the rows as new, updated, unchanged, or
    blocked and shows how many reference-only parents are planned.
-2. Check warnings before confirming. For example, a different nonblank
-   `Kennel` value can replace the existing kennel text. If there is a blocker,
-   correct the workbook or the existing dog record, then preview again. A
-   blocker prevents the entire import from being applied.
+2. Check warnings and proposed breeder links before confirming. If there is a
+   blocker, correct the workbook or the affected record, then preview again.
+   A blocker prevents the entire import from being applied. The **Estävät**
+   filter lists the missing kennel names for the whole workbook above the
+   blocked rows.
 3. Select **Jatka vahvistukseen** and confirm to apply the reviewed changes.
    Apply checks that the same workbook and plan are still current, then writes
    in one audited transaction. If the preview is stale, review it again.
@@ -36,10 +37,16 @@ Admins can import Finnish Kennel Club Beagle registrations at
   normal dog. An existing dog keeps its identity; conflicting identity data,
   such as a different birth date or parent, can block the import.
 - Nonblank workbook values can update the registration date, origin, origin
-  country, and tail text. `Kennel` updates free-text kennel information without
-  assigning a linked breeder. `Väri` updates the canonical color only if it
+  country, and tail text. `Väri` updates the canonical color only if it
   matches exactly one Finnish color label, ignoring case and surrounding
   whitespace. Blank cells do not clear stored values.
+- A nonblank `Kennel` must match exactly one existing breeder name, ignoring
+  case and surrounding whitespace. The importer links a new or unlinked dog
+  to that breeder and preserves the dog's free-text breeder information. It
+  leaves an identical link unchanged. A missing or ambiguous match, or a dog
+  linked to a different breeder, blocks Apply. Check the spelling and resolve
+  the catalog or link separately, then preview again. The importer never
+  creates breeders. A blank `Kennel` leaves breeder information alone.
 - A valid parent already in the database is reused. A valid missing parent is
   created as a reference-only dog if it has no full row in the workbook. A later
   valid full row can promote that same dog to normal.

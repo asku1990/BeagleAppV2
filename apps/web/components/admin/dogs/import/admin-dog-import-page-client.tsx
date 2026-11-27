@@ -17,6 +17,10 @@ const client = createAdminDogsApiClient();
 const PAGE_SIZE = 10;
 const issueLabelKeys = {
   PARENT_SEX_CONFLICT: "admin.dogs.import.issue.PARENT_SEX_CONFLICT",
+  DOG_BREEDER_NOT_FOUND: "admin.dogs.import.issue.DOG_BREEDER_NOT_FOUND",
+  DOG_BREEDER_AMBIGUOUS: "admin.dogs.import.issue.DOG_BREEDER_AMBIGUOUS",
+  DOG_BREEDER_LINK_CONFLICT:
+    "admin.dogs.import.issue.DOG_BREEDER_LINK_CONFLICT",
 } as const;
 type Filter = "ALL" | "BLOCKED" | "WARNING" | "CREATE" | "UPDATE" | "UNCHANGED";
 const isReferenceRow = (row: AdminDogImportPreviewRow) =>
@@ -100,6 +104,19 @@ export function AdminDogImportPageClient() {
   const visibleRows = filteredRows.slice(
     (page - 1) * PAGE_SIZE,
     page * PAGE_SIZE,
+  );
+  const missingKennelsByName = new Map<string, string>();
+  for (const issue of preview?.issues ?? []) {
+    if (
+      issue.code === "DOG_BREEDER_NOT_FOUND" &&
+      typeof issue.incomingValue === "string"
+    ) {
+      const name = issue.incomingValue.trim();
+      missingKennelsByName.set(name.toLocaleLowerCase("fi-FI"), name);
+    }
+  }
+  const missingKennels = [...missingKennelsByName.values()].sort((a, b) =>
+    a.localeCompare(b, "fi"),
   );
   const labels = {
     ALL: "admin.dogs.import.review.all",
@@ -263,6 +280,15 @@ export function AdminDogImportPageClient() {
                       setPage(1);
                     }}
                   />
+                  {filter === "BLOCKED" && missingKennels.length > 0 ? (
+                    <div className="space-y-1 rounded-md border p-3 text-sm">
+                      <p className="font-medium">
+                        {t("admin.dogs.import.review.missingKennels")} (
+                        {missingKennels.length})
+                      </p>
+                      <p>{missingKennels.join(", ")}</p>
+                    </div>
+                  ) : null}
                   <div className="max-h-96 overflow-auto text-sm">
                     {visibleRows.length === 0 ? (
                       <p className="p-3 text-muted-foreground">
@@ -299,7 +325,13 @@ export function AdminDogImportPageClient() {
                           </button>
                           {expanded === row.sourceRowNumber ? (
                             <div className="mt-2 space-y-2 rounded bg-muted/40 p-2">
-                              {row.issues.length === 0 ? (
+                              {row.breederToLink ? (
+                                <div>
+                                  {t("admin.dogs.import.review.breeder")}: — →{" "}
+                                  {row.breederToLink}
+                                </div>
+                              ) : null}
+                              {!row.breederToLink && row.issues.length === 0 ? (
                                 <span>-</span>
                               ) : (
                                 row.issues.map((issue, index) => (
@@ -316,8 +348,10 @@ export function AdminDogImportPageClient() {
                                         : issue.code}
                                     </div>
                                     <div>
-                                      {issue.field ?? "-"}:{" "}
-                                      {t("admin.dogs.import.review.current")}{" "}
+                                      {issue.field === "breeder"
+                                        ? t("admin.dogs.import.review.breeder")
+                                        : (issue.field ?? "-")}
+                                      : {t("admin.dogs.import.review.current")}{" "}
                                       {String(issue.currentValue ?? "-")} ·{" "}
                                       {t("admin.dogs.import.review.incoming")}{" "}
                                       {String(issue.incomingValue ?? "-")}

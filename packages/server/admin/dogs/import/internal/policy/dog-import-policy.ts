@@ -97,8 +97,9 @@ const rules: Record<DogImportIssueCode, RuleOptions> = {
   DOG_DAM_CONFLICT: overridableBlocker(),
   DOG_COLOR_DIFFERS: warning("AUTO_UPDATE"),
   DOG_COLOR_UNRESOLVED: warning("KEEP_EXISTING"),
-  DOG_BREEDER_TEXT_DIFFERS: warning("AUTO_UPDATE"),
-  DOG_BREEDER_LINK_CONFLICT: warning("KEEP_EXISTING"),
+  DOG_BREEDER_NOT_FOUND: blocker(),
+  DOG_BREEDER_AMBIGUOUS: blocker(),
+  DOG_BREEDER_LINK_CONFLICT: blocker(),
   DOG_REGISTRATION_DATE_INVALID: blocker(),
   DOG_REGISTRATION_DATE_DIFFERS: warning("AUTO_UPDATE"),
   DOG_ORIGIN_TYPE_DIFFERS: warning("AUTO_UPDATE"),
@@ -121,7 +122,7 @@ const rules: Record<DogImportIssueCode, RuleOptions> = {
   PREVIEW_STALE: blocker(),
 };
 
-export const DOG_IMPORT_POLICY_VERSION = "1" as const;
+export const DOG_IMPORT_POLICY_VERSION = "2" as const;
 export const DOG_IMPORT_POLICY_DEFAULTS = Object.fromEntries(
   Object.entries(rules).map(([code, rule]) => [
     code,

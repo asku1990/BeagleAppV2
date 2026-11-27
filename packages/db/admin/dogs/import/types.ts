@@ -1,4 +1,5 @@
 export type DogImportStateDb = {
+  breedersByKennel: Map<string, Array<{ id: string; name: string }>>;
   historicalLinksByRegistration: Record<
     string,
     { showEntryIds: string[]; trialEntryIds: string[] }
@@ -12,7 +13,6 @@ export type DogImportStateDb = {
     birthDate: Date | null;
     sireId: string | null;
     damId: string | null;
-    breederNameText: string | null;
     breederId: string | null;
     breederName: string | null;
     colorCode: number | null;
@@ -34,7 +34,7 @@ export type DogImportStateDb = {
 
 export type DogImportDogUpdateData = {
   birthDate?: string | null;
-  breederNameText?: string;
+  breederId?: string;
   originTypeText?: string;
   originCountryText?: string;
   tailText?: string;
@@ -45,13 +45,14 @@ export type DogImportDogUpdateData = {
 };
 
 export type DogImportWritePlanDb = {
+  breederMatches: Array<{ kennel: string; id: string; name: string }>;
   creates: Array<{
     registrationNo: string;
     name: string;
     sex: "MALE" | "FEMALE";
     birthDate: string | null;
     registeredOn: string | null;
-    breederNameText: string | null;
+    breederId: string | null;
     originTypeText: string | null;
     originCountryText: string | null;
     tailText: string | null;
